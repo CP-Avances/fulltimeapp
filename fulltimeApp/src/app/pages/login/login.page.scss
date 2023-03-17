@@ -1,0 +1,48 @@
+ion-content {
+    text-align: center;
+}
+.cerrar {
+    cursor: pointer;
+}
+.contenido {
+    margin-top: 150px;
+}
+.item-select {
+    width: 100% !important;
+    right: auto !important;
+    left: auto !important;
+    direction: ltr !important;
+}
+.posicionOjo {
+    margin-top: 10%;
+}
+#rounded {
+    width: 100%;
+    height: 100px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 5px;
+}
+
+#rounded2 {
+    width: 100%;
+    height: 100px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 5px;
+}
+#container {
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 75%;
+    margin-top: 75px;
+}
+
+#contra{
+    color: white;
+}

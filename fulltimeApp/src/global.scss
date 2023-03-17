@@ -24,3 +24,59 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+.pendiente{
+    color: rgb(18, 166, 193); 
+    margin-top: -1%;
+    font-size: 3vw;
+  }
+  
+  .pre_autorizado{
+    color: rgb(99, 112, 255); 
+    margin-top: 1%;
+    font-size: 3vw;
+  }
+  
+  .autorizada{
+    color: rgb(80, 251, 80); 
+    margin-top: -2%;
+    font-size: 3vw;
+  }
+  
+  .negado{
+    color: rgb(243, 65, 127); 
+    margin-top: -2%;
+    font-size: 3.5vw;
+  }
+  
+  .item-pendientes-color{
+    --ion-item-background:#333333c3;
+    --ion-item-color:#ffffffd5;
+    margin-bottom: 1%;
+    margin-left: 4%;
+    margin-right: 4%;
+  }
+  
+  .item-pre_autorizados-color{
+    --ion-item-background:#05274dc3;
+    --ion-item-color:#ffffffd5;
+    margin-bottom: 1%;
+    margin-left: 4%;
+    margin-right: 4%;
+  }
+  
+  .item-autorizados-color{
+    --ion-item-background:#054d39c3;
+    --ion-item-color:#ffffffd5;
+    margin-top: 1%;
+    margin-left: 4%;
+    margin-right: 4%;
+  }
+  
+  .item-negados-color{
+    --ion-item-background:#4d0534c3;
+    --ion-item-color:#ffffffd5;
+    margin-top: 1%;
+    margin-left: 4%;
+    margin-right: 4%;
+  }
