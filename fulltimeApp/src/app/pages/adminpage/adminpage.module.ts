@@ -1,22 +1,18 @@
+import { IonicModule } from '@ionic/angular';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ComponentesModule } from '../../componentes/componentes.module';
-
-import { IonicModule } from '@ionic/angular';
 
 import { AdminpagePageRoutingModule } from './adminpage-routing.module';
-
 import { AdminpagePage } from './adminpage.page';
 
 @NgModule({
   imports: [
+    IonicModule,
     CommonModule,
     FormsModule,
-    IonicModule,
-    AdminpagePageRoutingModule,
-    
+    AdminpagePageRoutingModule
   ],
   declarations: [AdminpagePage]
 })
-export class AdminpagePageModule { }
+export class AdminpagePageModule {}

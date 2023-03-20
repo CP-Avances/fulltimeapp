@@ -17,8 +17,8 @@ const routes: Routes = [
     loadChildren: () => import('./pages/inicio/inicio.module').then(m => m.InicioPageModule)
   },
   {
-    path: 'tabs',
-    loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
+    path: 'adminpage',
+    loadChildren: () => import('./pages/adminpage/adminpage.module').then(m => m.AdminpagePageModule), canActivate: [AutenticacionGuard]
   }
 ];
 @NgModule({
