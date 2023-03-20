@@ -74,6 +74,12 @@
   --ion-color-light-contrast-rgb: 0, 0, 0;
   --ion-color-light-shade: #d7d8da;
   --ion-color-light-tint: #f5f6f9;
+
+  /* Set of colors toolbar */
+  --ion-toolbar-background: rgb(28, 139, 212);
+  --ion-toolbar-color: rgb(240, 240, 240);
+  --ion-tab-bar-color-selected:rgb(3, 111, 161);
+
 }
 
 @media (prefers-color-scheme: dark) {
@@ -180,7 +186,7 @@
     --ion-color-step-950: #f2f2f2;
 
     --ion-item-background: #000000;
-
+    --ion-tab-bar-color-selected:#39c8fc;
     --ion-card-background: #1c1c1d;
   }
 
@@ -226,11 +232,8 @@
     --ion-color-step-950: #f3f3f3;
 
     --ion-item-background: #1e1e1e;
-
-    --ion-toolbar-background: #1f1f1f;
-
-    --ion-tab-bar-background: #1f1f1f;
-
+    --ion-tab-bar-background: #ffffff00;
+    --ion-tab-bar-color-selected:#39c8fc;
     --ion-card-background: #1e1e1e;
   }
 }

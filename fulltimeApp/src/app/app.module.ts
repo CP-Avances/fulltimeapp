@@ -14,6 +14,8 @@ import { AppComponent } from './app.component';
 import { ComponentesModule } from './componentes/componentes.module';
 import { Drivers } from '@ionic/storage';
 
+import { NgxPaginationModule } from 'ngx-pagination';
+
 
 @NgModule({
   declarations: [AppComponent],
@@ -23,6 +25,7 @@ import { Drivers } from '@ionic/storage';
     AppRoutingModule,
     HttpClientModule,
     ComponentesModule,
+    NgxPaginationModule,
     IonicStorageModule.forRoot({
       name: '__fulltime',
       driverOrder: [Drivers.IndexedDB, Drivers.LocalStorage]
