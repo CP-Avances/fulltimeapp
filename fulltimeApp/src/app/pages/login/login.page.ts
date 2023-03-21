@@ -4,6 +4,7 @@ import { NavController, ToastController, Platform, AlertController } from "@ioni
 import { Usuario, UsuarioValueDefault } from 'src/app/interfaces/Usuario';
 import { IdDispositivos } from 'src/app/interfaces/Usuario';
 import { ParametrosService } from 'src/app/services/parametros.service';
+import { Device } from '@capacitor/device';
 
 
 @Component({
@@ -15,8 +16,7 @@ export class LoginPage implements OnInit {
   iniciandoSesion = false;
   user = {
     usuario: "",
-    contrasena: "",
-    id_celular: ""
+    contrasena: ""
   }
 
   iddispositivos: IdDispositivos[] = [];
@@ -36,6 +36,10 @@ export class LoginPage implements OnInit {
     public parametros: ParametrosService,
     public platform: Platform,
   ) { }
+
+  ionViewWillEnter(){
+    this.infoDispositivo();
+  }
 
   ngOnInit() {
 
@@ -72,27 +76,40 @@ export class LoginPage implements OnInit {
     });
   }
 
+  infoDispositivo(){
+    Device.getId().then((id) => {
+      this.id_celular = id.uuid;
+    });
+
+    Device.getInfo().then((info) => {
+      this.dispositi = info.model;
+    });
+  }
 
   mostrarPassword(): void{
     this.verPassword = !this.verPassword;   
   }
 
   iniciarSesion1() {
-
+    this.infoDispositivo();
     this.user.usuario = this.user.usuario.trim();
     this.user.contrasena = this.user.contrasena.trim();
     this.iniciandoSesion = true;
     
     if (this.user.usuario == "" && this.user.contrasena == "") {
       this.iniciandoSesion = false;
-      this.usuarioIncorrectoToas("Ups! Ingrese sus datos.", 2000)
+      this.usuarioIncorrectoToas("Ups! Ingrese sus datos.", 2000);
     } else {
       this.relojService.iniciarSesion(this.user).subscribe(
         res => {
           this.iniciandoSesion = false;
           this.usuarioObtenido = res.body.usuario;
-          const id_empleado = parseInt((this.usuarioObtenido.codigo)+'');
+          const id_empleado = parseInt((this.usuarioObtenido.codigo));
           let existeId_Dispositivo: boolean;
+          
+          console.log('usuarioObtenido: ',res);
+          console.log('usuarioObtenido.body: ',res.body);
+          console.log('Token impreso: ',res.body.autenticacion);
 
           this.relojService.obtenerIdDispositivosUsuario(id_empleado).subscribe(
                 dispositivos => {
@@ -107,16 +124,16 @@ export class LoginPage implements OnInit {
 
                   if(existeId_Dispositivo == true){
                     localStorage.setItem('token', res.body.autorizacion);
-                    localStorage.setItem('Uid', this.usuarioObtenido.id + "");
-                    localStorage.setItem('nom', this.usuarioObtenido.nombre+"");
-                    localStorage.setItem('ap', this.usuarioObtenido.apellido+"");
-                    localStorage.setItem('correo', this.usuarioObtenido.correo + "");
-                    localStorage.setItem('rol', this.usuarioObtenido.id_rol + "");
+                    localStorage.setItem('Uid', String(this.usuarioObtenido.id));
+                    localStorage.setItem('nom', String(this.usuarioObtenido.nombre));
+                    localStorage.setItem('ap', String(this.usuarioObtenido.apellido));
+                    localStorage.setItem('correo', String(this.usuarioObtenido.correo));
+                    localStorage.setItem('rol', String(this.usuarioObtenido.id_rol));
                     localStorage.setItem('UCedula', this.usuarioObtenido.cedula);
                     localStorage.setItem('username', this.usuarioObtenido.usuario);
-                    localStorage.setItem('codigo', this.usuarioObtenido.codigo + "");
-                    localStorage.setItem('empleadoID', res.body.usuario.id_registro_empleado + "");
-                    localStorage.setItem('id_empresa', res.body.empresa.id_empresa + "");
+                    localStorage.setItem('codigo', this.usuarioObtenido.codigo);
+                    localStorage.setItem('empleadoID', res.body.usuario.id_registro_empleado);
+                    localStorage.setItem('id_empresa', res.body.empresa.id_empresa);
                     localStorage.setItem('cperi_vacacion', res.body.empresa.id_peri_vacacion);
                     localStorage.setItem('ccontr', res.body.empresa.id_contrato);
                     localStorage.setItem('cdepar', res.body.empresa.id_departamento);
@@ -144,16 +161,16 @@ export class LoginPage implements OnInit {
                     }else{
                       this.registrarCelular();
                       localStorage.setItem('token', res.body.autorizacion);
-                      localStorage.setItem('Uid', this.usuarioObtenido.id + "");
-                      localStorage.setItem('nom', this.usuarioObtenido.nombre+"");
-                      localStorage.setItem('ap', this.usuarioObtenido.apellido+"");
-                      localStorage.setItem('correo', this.usuarioObtenido.correo + "");
-                      localStorage.setItem('rol', this.usuarioObtenido.id_rol + "");
+                      localStorage.setItem('Uid', String(this.usuarioObtenido.id));
+                      localStorage.setItem('nom', String(this.usuarioObtenido.nombre));
+                      localStorage.setItem('ap', String(this.usuarioObtenido.apellido));
+                      localStorage.setItem('correo', String(this.usuarioObtenido.correo));
+                      localStorage.setItem('rol', String(this.usuarioObtenido.id_rol));
                       localStorage.setItem('UCedula', this.usuarioObtenido.cedula);
                       localStorage.setItem('username', this.usuarioObtenido.usuario);
-                      localStorage.setItem('codigo', this.usuarioObtenido.codigo + "");
-                      localStorage.setItem('empleadoID', res.body.usuario.id_registro_empleado + "");
-                      localStorage.setItem('id_empresa', res.body.empresa.id_empresa + "");
+                      localStorage.setItem('codigo', this.usuarioObtenido.codigo);
+                      localStorage.setItem('empleadoID', res.body.usuario.id_registro_empleado);
+                      localStorage.setItem('id_empresa', res.body.empresa.id_empresa);
                       localStorage.setItem('cperi_vacacion', res.body.empresa.id_peri_vacacion);
                       localStorage.setItem('ccontr', res.body.empresa.id_contrato);
                       localStorage.setItem('cdepar', res.body.empresa.id_departamento);
@@ -178,7 +195,7 @@ export class LoginPage implements OnInit {
                   this.iniciandoSesion = false;
                   if (err.status == 0) {
                     console.log(err.url + "|" + err.message + "|" + err.statusText + "|" + err.name);
-                    this.usuarioIncorrectoToas("Ups! halgo ha salido mal. COMPRUEBA TU CONEXION A INTERNET o PONGASE EN CONTACTO CON EL ADMINISTRADOR", 3000);
+                    this.usuarioIncorrectoToas("Halgo ha salido mal. COMPRUEBA TU CONEXION A INTERNET o PONGASE EN CONTACTO CON EL ADMINISTRADOR", 3000);
                   } else {
                     console.log(err.url + "|" + err.message + "|" + err.statusText + "|" + err.name);
                     this.usuarioIncorrectoToas(err.error.message, 3000),

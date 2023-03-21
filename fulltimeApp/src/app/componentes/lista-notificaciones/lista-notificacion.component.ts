@@ -6,16 +6,15 @@ import { NotificacionTimbre } from '../../interfaces/Notificaciones';
 import { SkeletonListNotificacionesArray } from '../../interfaces/Skeleton';
 import { Router } from '@angular/router';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
-import { ListaNotificacionComponent } from '../lista-notificaciones/lista-notificacion.component';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 
 
 @Component({
-  selector: 'app-notificacion-popover',
-  templateUrl: './notificacion-popover.component.html',
-  styleUrls: ['./notificacion-popover.component.scss'],
+  selector: 'app-lista-notificacion',
+  templateUrl: './lista-notificacion.component.html',
+  styleUrls: ['./lista-notificacion.component.scss'],
 })
-export class NotificacionPopoverComponent implements OnInit {
+export class ListaNotificacionComponent implements OnInit {
 
   skeleton = SkeletonListNotificacionesArray;
   loading: boolean = true;
@@ -25,14 +24,16 @@ export class NotificacionPopoverComponent implements OnInit {
 
   notificacionesAll: any = [];
   
-  countNoti: number = 0;
+  countNoti: any;
  
-  pageActual: number = 1;
+  pageActual: any = 1;
   valorcolor: string = '';
   noticheck: string = '';
 
   valor: boolean = false;
-
+  paginaccionvista: boolean = false;
+  ver: boolean = false;
+  
   constructor(
     private notificacionService: AutorizacionesService,
     private router: Router,
@@ -40,15 +41,16 @@ export class NotificacionPopoverComponent implements OnInit {
     private vistonotificacion: NotificacionesService,
     public modalController: ModalController,
     private userService: DataUserLoggedService,
-  ) {}
+    private navCtroller: NavController,
+  ) { }
 
   ngOnInit() {
-    const id_empleado = localStorage.getItem('empleadoID');
-
+    const id_empleado = localStorage.getItem('empleadoID')
     this.notificacionService.getNotificacionesByIdEmpleado(id_empleado+'').subscribe(
       notificacion => {
         this.notificaciones = notificacion;
-        this.notificaciones.sort(
+
+        this.notificacionesAll.sort(
           (firstObject: Notificacion, secondObject: Notificacion) =>  
               (firstObject.visto === true)? 1 : 
                 (firstObject.visto === secondObject.visto) ?
@@ -61,7 +63,7 @@ export class NotificacionPopoverComponent implements OnInit {
         notificaiontim => {
           this.notificaiontimbre = notificaiontim;
           this.notificacionestimbres = this.notificaiontimbre;
-          
+
           this.notificacionesAll = this.notificaciones.concat(this.notificacionestimbres);
 
           this.notificacionesAll.sort(
@@ -72,18 +74,15 @@ export class NotificacionPopoverComponent implements OnInit {
                 
               :-1
           );
-          
-          //cuenta las notificaciones que estan sin ver
-          this.notificacionesAll.forEach((item: any) => {
 
-          if(item.visto === false){
-            this.countNoti ++;
+          //si el objeto de los timbres esta vacion oculta las ventanas y muestra la ventana - 'vacio'.
+          if(Object.keys(this.notificacionesAll).length === 0){
+            this.ver = true;
           }
-          });
-
+          
         },
-        err => {console.log(err)},
-        () => { this.loading = false }
+        err => {console.log(err); this.ver = true},
+        () => { this.loading = false;}
       )
       
 
@@ -101,26 +100,19 @@ export class NotificacionPopoverComponent implements OnInit {
                 
               :-1
           );
-
-          //cuenta las notificaciones que estan sin ver
-          this.notificacionesAll.forEach((item: any) => {
-            if(item.visto === false){
-              this.countNoti ++;
-            }
-            });
-            
+          console.log(this.notificacionesAll)
           },
-          err => { console.log(err) },
-          () => { this.loading = false }
+          err => { console.log(err); this.ver = true},
+          () => { this.loading = false;}
         )
 
-        console.log(err) },
-      () => { this.loading = false }
-    )  
+        console.log(err); },
+      () => { this.loading = false;}
+    ) 
 
   }
 
-  tiponotificacion(noti: { id_permiso: string; id_vacaciones: string; id_hora_extra: string; visto: boolean; tipo:number;}){
+  tiponotificacion(noti: { id_permiso: string; id_vacaciones: string; id_hora_extra: string; visto: boolean, tipo:number}){
     if(noti.visto === true){
       return "reportes";
     }
@@ -150,11 +142,10 @@ export class NotificacionPopoverComponent implements OnInit {
     }
   }
 
-
-  AbrirNoti(noti: {id:number, id_permiso: string; id_vacaciones: string; id_hora_extra: string; estado: string; tipo: number; nempleadoreceives: string; id_receives_empl: number; nempleadosend: string;}) {
+  AbrirNoti(noti: {id:number, id_permiso: string; id_vacaciones: string; id_hora_extra: string; estado: string, tipo: number; nempleadoreceives: string; id_receives_empl: number; nempleadosend: string;}) { 
     this.cambiovistanoti(noti);
     this.cambiovistanotitimbre(noti);
-    this.pooverCtrl.dismiss({});  
+    this.modalController.dismiss({});
 
     if(noti.nempleadoreceives === noti.nempleadosend){
 
@@ -169,24 +160,23 @@ export class NotificacionPopoverComponent implements OnInit {
         }else if(noti.id_vacaciones != null && noti.estado === "Pendiente"){
           return this.router.navigate(['/adminpage/solicitudes/vacacion-solicitud']);
         }
-
         if(noti.tipo === 1 ){
           return this.router.navigate(['/adminpage/solicitudes/alimentacion-solicitud']);
         }
-      
+
         return this.router.navigate(['/adminpage/solicitudes/alimentacion-solicitud']);
 
       }else{
         //Solicitudes Empleado envia
         if(noti.id_permiso != null){
-          return this.router.navigate(['/empleado/solicitar-permisos']);
+          this.router.navigate(['/empleado/solicitar-permisos']);
         }else if(noti.id_vacaciones != null){
-          return this.router.navigate(['/empleado/solicitar-vacaciones']);
+          this.router.navigate(['/empleado/solicitar-vacaciones']);
         }else if(noti.id_hora_extra != null && noti.estado === "Pendiente"){
-          return this.router.navigate(['/empleado/solicitar-horas-extras']);
+          this.router.navigate(['/empleado/solicitar-horas-extras']);
         }else if(noti.tipo ===  1 ){
           console.log("Alimentacion Tipo =", noti.tipo);
-          return this.router.navigate(['empleado/solicitar-planificar-alimentacion']);
+          this.router.navigate(['/empleado/solicitar-planificar-alimentacion']);
         }
 
         //Aprobar las solicitudes Admin envia respuesta
@@ -206,10 +196,11 @@ export class NotificacionPopoverComponent implements OnInit {
           console.log("Aprobar Alimentacion ",noti.tipo, " = ", noti.estado)
           return this.router.navigate(['/adminpage/aprobar-alimentacion']);
         }
-        
-        return this.router.navigate(['/adminpage/aprobar-alimentacion']);
-      }
 
+        return this.router.navigate(['/adminpage/aprobar-alimentacion']);
+        
+      } 
+    
     }
     else
     {
@@ -232,13 +223,13 @@ export class NotificacionPopoverComponent implements OnInit {
         if(noti.tipo === 2 ){
           console.log("Aprobar Alimentacion ",noti.tipo, " = ", noti.estado)
           return this.router.navigate(['/adminpage/solicitudes/alimentacion-solicitud']);
-        }else{
+        }
+        else{
           return this.router.navigate(['/adminpage/solicitudes/alimentacion-solicitud']);
         }
-
       }else{
-        //Solicitudes Empleado Respuesta que recibe
-        if(noti.id_permiso != null){
+         //Solicitudes Empleado Respuesta que recibe
+         if(noti.id_permiso != null){
           return this.router.navigate(['/empleado/solicitar-permisos']);
         }else if(noti.id_vacaciones != null){
           return this.router.navigate(['/empleado/solicitar-vacaciones']);
@@ -251,10 +242,6 @@ export class NotificacionPopoverComponent implements OnInit {
       
 
         //Aprobaciones Admin envia
-        if(noti.tipo === 1 ){
-          return this.router.navigate(['/adminpage/aprobar-alimentacion']);
-        }
-
         if(noti.id_permiso != null && noti.estado === "Pendiente"){
           return this.router.navigate(['/adminpage/aprobar-permisos']);
         }else if(noti.id_hora_extra != null && noti.estado === "Pendiente"){
@@ -262,13 +249,17 @@ export class NotificacionPopoverComponent implements OnInit {
         }else if(noti.id_vacaciones != null && noti.estado === "Pendiente"){
           return this.router.navigate(['/adminpage/aprobar-vacaciones']);
         }
+        if(noti.tipo === 1 ){
+          return this.router.navigate(['/adminpage/aprobar-alimentacion']);
+        }
+
         return this.router.navigate(['empleado/solicitar-planificar-alimentacion']);
       }
     }
- 
+
   }
 
-  
+  //cambia el estado de la columna visto de la tabla realtime_noti de true a false.
   cambiovistanoti(noti:{id: number}) {
     const vista = true;
     const datos = {id_notificacion: noti.id, visible: vista}
@@ -282,6 +273,7 @@ export class NotificacionPopoverComponent implements OnInit {
     )
   }
 
+  //cambia el estado de la columna visto de la tabla realtime_notitimbre de true a false.
   cambiovistanotitimbre(noti:{id: number}) {
     const vista = true;
     const datos = {id_notificacion: noti.id, visible: vista}
@@ -295,13 +287,38 @@ export class NotificacionPopoverComponent implements OnInit {
     )
   }
 
-  async abrirNotificaciones() {
-    this.pooverCtrl.dismiss({}); 
-    this.valor = false;
-    const modal = await this.modalController.create({
-      component: ListaNotificacionComponent,
-      cssClass: 'my-custom-class'
+  //Poner todas las notificaciones como vistas
+  notificacionesvistanoti(noti: any){
+    const vista = true;
+    var datos = {id_notificacion: 0, visible: vista}
+    var allNotificaciones = [];
+    allNotificaciones = noti;
+    
+    noti.forEach((item: any) => {
+      if(item.visto == false){
+        datos.id_notificacion = item.id
+      this.vistonotificacion.PutNotificaVisto(datos).subscribe(
+        res => {
+          res.forEach((notificacio: any) => {
+            notificacio.visto = true;
+          });
+        },
+        res => {console.error()},
+        () => { this.loading = false }
+      )
+
+      this.vistonotificacion.PutNotifiTimbreVisto(datos).subscribe(
+        res => {
+          res.forEach((notificaciontim: any) => {
+            notificaciontim = true;
+          });
+        },
+        res => {console.error()},
+        () => { this.loading = false }
+      )
+      }
     });
-    return await modal.present();
+
+    this.modalController.dismiss({});
   }
 }

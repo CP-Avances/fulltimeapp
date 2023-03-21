@@ -8,8 +8,8 @@ const routes: Routes = [
     component: AdminpagePage,
     children: [
       {
-        path: 'tab1',
-        loadChildren: () => import('../tab1/tab1.module').then(m => m.Tab1PageModule)
+        path: 'bienvenido',
+        loadChildren: () => import('../bienvenido/bienvenido.module').then(m => m.BienvenidoPageModule)
       },
       {
         path: 'tab2',
@@ -21,14 +21,14 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'adminpage/tab1',
+        redirectTo: 'adminpage/bienvenido',
         pathMatch: 'full'
       }
     ]
   },
   {
     path: '',
-    redirectTo: 'adminpage/tab1',
+    redirectTo: 'adminpage/bienvenido',
     pathMatch: 'full'
   }
 ];

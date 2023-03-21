@@ -51,8 +51,7 @@ exports.getUserById = getUserById;
 const loginUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let caducidad_licencia = new Date();
-        const { usuario, contrasena, id_celular } = req.body;
-        console.log("user controlador: ", id_celular);
+        const { usuario, contrasena } = req.body;
         const response = yield database_1.pool.query('SELECT e.id AS id_registro_empleado, e.codigo as idEmpleado, ' +
             'e.cedula, e.apellido, e.nombre, e.esta_civil, e.genero, e.correo, e.fec_nacimiento, ' +
             'e.estado as eestado, e.mail_alternativo, e.domicilio, e.telefono, e.id_nacionalidad, ' +

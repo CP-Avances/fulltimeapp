@@ -1,21 +1,23 @@
-import { LOCALE_ID, NgModule } from '@angular/core';
+import { NgModule, LOCALE_ID } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
+import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
+import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app-routing.module';
 import { IonicStorageModule } from '@ionic/storage-angular';
 
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AutenticacionGuard } from './guards/autenticacion.guard';
 import { TokenInterceptorService } from './services/token-interceptor.service';
 
-import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
-
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
 import { ComponentesModule } from './componentes/componentes.module';
 import { Drivers } from '@ionic/storage';
-
 import { NgxPaginationModule } from 'ngx-pagination';
 
+// Cambiar el local de la APP
+import localEsEC from '@angular/common/locales/es-EC';
+import { registerLocaleData } from '@angular/common';
+registerLocaleData(localEsEC);
 
 @NgModule({
   declarations: [AppComponent],
@@ -39,7 +41,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
       multi: true
     },
     {
-      provide: LOCALE_ID, useValue: 'es-EC'
+      provide: LOCALE_ID, useValue: "es-EC"
     },
     
   ],

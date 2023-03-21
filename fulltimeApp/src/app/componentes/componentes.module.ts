@@ -9,16 +9,19 @@ import { NotificacionPopoverComponent } from './notificacion-popover/notificacio
 import { DataUserLoggedService } from '../services/data-user-logged.service';
 import { EmpleadosService } from '../services/empleados.service';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { CloseModalComponent } from './close-modal/close-modal.component';
 
 
 @NgModule({
     declarations: [
         NavegadorAdminComponent,
-        NotificacionPopoverComponent
+        NotificacionPopoverComponent,
+        CloseModalComponent,
     ],
     exports: [
         NavegadorAdminComponent,
-        NotificacionPopoverComponent
+        NotificacionPopoverComponent,
+        CloseModalComponent,
     ],
     imports: [
         CommonModule,

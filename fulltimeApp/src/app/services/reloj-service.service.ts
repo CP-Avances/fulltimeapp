@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { NavController } from "@ionic/angular";
 import { environment } from '../../environments/environment';
-import { Storage } from '@ionic/storage-angular';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +13,7 @@ export class RelojServiceService {
   constructor(
     private http: HttpClient, 
     private navCtroller: NavController,
-    private storage: Storage) {
+  ) {
   }
 
   //USUARIO
@@ -34,6 +33,7 @@ export class RelojServiceService {
   }
 
   iniciarSesion(user: any) {
+    console.log('Datos Usuario: ',user);
     return this.http.post<any>(this.URL + '/user/loginUsuario', user);
   }
 
@@ -67,7 +67,7 @@ export class RelojServiceService {
   public get rol(): number {
     const r = (localStorage.getItem('rol') === null
       || localStorage.getItem('rol') === undefined
-      || localStorage.getItem('rol') === 'undefined') ? 0 : parseInt((localStorage.getItem('rol'))+'');
+      || localStorage.getItem('rol') === 'undefined') ? 0 : parseInt(String(localStorage.getItem('rol')));
     return r
   }
 

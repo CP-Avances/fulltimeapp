@@ -44,9 +44,7 @@ export const getUserById = async (req: Request, res: Response): Promise<Response
 export const loginUsuario = async (req: Request, res: Response) => {
     try {
         let caducidad_licencia: Date = new Date();
-        const { usuario, contrasena, id_celular} = req.body;
-
-        console.log("user controlador: ", id_celular);
+        const { usuario, contrasena} = req.body;
 
         const response = await pool.query('SELECT e.id AS id_registro_empleado, e.codigo as idEmpleado, ' +
             'e.cedula, e.apellido, e.nombre, e.esta_civil, e.genero, e.correo, e.fec_nacimiento, ' +

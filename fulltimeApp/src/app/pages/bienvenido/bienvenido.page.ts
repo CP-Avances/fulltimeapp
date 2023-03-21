@@ -1,19 +1,29 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { Moment } from 'moment';
 
 @Component({
-  selector: 'app-tab1',
-  templateUrl: 'tab1.page.html',
-  styleUrls: ['tab1.page.scss']
+  selector: 'app-bienvenido',
+  templateUrl: './bienvenido.page.html',
+  styleUrls: ['./bienvenido.page.scss']
 })
-export class Tab1Page implements OnInit, OnDestroy{
+export class BienvenidoPage implements OnInit, OnDestroy{
 
-  time: Date = new Date('es');
+  pipe: DatePipe = new DatePipe('es-EC', null);
+  time: Date = new Date();
+  horaTransformada = this.pipe.transform(Date.now(), 'hh:mm a');
+  fechaTransformada = this.pipe.transform(Date.now(), 'fullDate');
+
+  horarioAbierto: boolean = false;
+  valorsol: string = "none";
+  valorluna: string = "none";
 
   rol: any;
   intervalo: any;
 
-  constructor() {
+  constructor(
+    
+  ) {
     this.cambioimagen();
     this.rol = localStorage.getItem('rol');
   }
@@ -23,6 +33,10 @@ export class Tab1Page implements OnInit, OnDestroy{
   }
 
   ngOnInit() {
+    setInterval(() => {
+      this.horaTransformada = this.pipe.transform(Date.now(), 'hh:mm:ss a');
+      this.fechaTransformada = this.pipe.transform(Date.now(), 'fullDate');
+    }, 1000);
   }
 
    //Funcion para el cambio del sol y la luna en la imagen svg//

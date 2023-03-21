@@ -6,7 +6,10 @@ import { RelojServiceService } from "./reloj-service.service";
 })
 export class TokenInterceptorService {
 
-  constructor(private relojServiceService: RelojServiceService) { }
+  constructor(
+    private relojServiceService: RelojServiceService
+  ) 
+  {}
 
   intercept(req: any, next: any) {
     if (this.relojServiceService.estaLogueado()) {
