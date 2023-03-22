@@ -17,18 +17,18 @@ export interface Notificacion {
 }
 
 export const notificacionValueDefault = {
-    id: undefined,
-    id_send_empl: undefined,
-    id_receives_empl: undefined,
-    id_receives_depa: undefined,
-    estado: undefined,
-    create_at: undefined,
-    visto: undefined,
+    id: 0,
+    id_send_empl: 0,
+    id_receives_empl: 0,
+    id_receives_depa: 0,
+    estado: '',
+    create_at: '',
+    visto: false,
     id_permiso: null,
     id_vacaciones: null,
     id_hora_extra: null,
-    mensaje: undefined,
-    tipo: undefined
+    mensaje: '',
+    tipo: 0
 }
 
 export interface EmpleadosSendNotiEmail {

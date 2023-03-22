@@ -56,17 +56,18 @@ export class AppComponent {
     await alert.present();
   }
 
-    //Pestalas de mensajes
-    async mostrarToas(mensaje: string) {
-      const toast = await this.toastController.create({
-        message: `<ion-icon name="information-circle-outline"></ion-icon>`+mensaje+"\n\n",
-        duration: 4500,
-        position: "top",
-        color: "notificacicon",
-        mode: "ios",
-        cssClass: 'toast-custom-class',
-      });
-      await toast.present();
-    }
+  //Pestalas de mensajes
+  async mostrarToas(mensaje: string) {
+    const toast = await this.toastController.create({
+      message: `<ion-icon name="information-circle-outline"></ion-icon>`+mensaje+"\n\n",
+      duration: 4500,
+      position: "top",
+      color: "notificacicon",
+      mode: "ios",
+      cssClass: 'toast-custom-class',
+    });
+    await toast.present();
+  }
 
+  
 }

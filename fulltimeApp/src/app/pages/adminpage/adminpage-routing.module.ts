@@ -4,12 +4,17 @@ import { AdminpagePage } from './adminpage.page';
 
 const routes: Routes = [
   {
-    path: 'adminpage',
+    path: '',
     component: AdminpagePage,
     children: [
       {
         path: 'bienvenido',
-        loadChildren: () => import('../bienvenido/bienvenido.module').then(m => m.BienvenidoPageModule)
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../bienvenido/bienvenido.module').then(m => m.BienvenidoPageModule)
+          }
+        ]
       },
       {
         path: 'informacion',
@@ -30,14 +35,14 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'adminpage/bienvenido',
+        redirectTo: '/adminpage/bienvenido',
         pathMatch: 'full'
       }
     ]
   },
   {
     path: '',
-    redirectTo: 'adminpage/bienvenido',
+    redirectTo: '/adminpage/bienvenido',
     pathMatch: 'full'
   }
 ];

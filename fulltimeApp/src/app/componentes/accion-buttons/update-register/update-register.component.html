@@ -1,0 +1,15 @@
+<ion-button style="height: 10%; " shape="round" expand="block" (click)="UpdateRegisterBtn()" [disabled]="formRegistro!= null && !formRegistro.valid">
+  <ng-container *ngIf="!loadingBtn; then updateReg; else spiner"></ng-container>
+    <ng-template #updateReg>
+      <h6>
+        <ion-icon style="font-size: 20px;" slot="start" name="create-outline"></ion-icon>
+        {{ label }}
+        <br>
+      </h6>
+      
+    </ng-template>
+    
+    <ng-template #spiner>
+    <ion-spinner name="circles"></ion-spinner>
+    </ng-template>
+</ion-button>

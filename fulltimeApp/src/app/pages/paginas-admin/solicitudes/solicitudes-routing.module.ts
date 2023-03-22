@@ -9,6 +9,10 @@ const routes: Routes = [
     component: SolicitudesPage
   },
   {
+    path: 'permiso-solicitud',
+    loadChildren: () => import('./permiso-solicitud/permiso-solicitud.module').then( m => m.PermisoSolicitudPageModule)
+  },
+  {
     path: '',
     redirectTo: '/adminpage/solicitudes',
     pathMatch: 'full'

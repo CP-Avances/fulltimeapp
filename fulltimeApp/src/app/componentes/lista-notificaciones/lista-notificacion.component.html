@@ -1,4 +1,84 @@
+<app-close-modal titleModal="Notificaciones"></app-close-modal>
+ 
+<ion-content mode="md">
+ <ng-container *ngIf="loading; then showSkeletor else showList"></ng-container>
 
+ <ng-template #showSkeletor>
+   <ion-list>
+     <ion-list-header>
+       <ion-label>
+         <ion-skeleton-text animated style="width: 25%"></ion-skeleton-text>
+       </ion-label>
+     </ion-list-header>
 
+     <ion-item>
+       <ion-label>
+         <h3>
+           <ion-skeleton-text animated style="width: 40% "></ion-skeleton-text>
+         </h3>
+         <p>
+           <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+         </p>
+         <p>
+           <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+         </p>
+       </ion-label>
+     </ion-item>
+   </ion-list>
+ </ng-template>
+ 
+ <ng-template #showList>
+
+   <ion-button shape="round" expand="block" color="acua" style="margin: 2% 3% 2% 3%;" (click)="notificacionesvistanoti(notificacionesAll)">
+     <ion-item color="acua" style="font-size: 80%; align-items: center;">
+       <p style="margin: auto;"> Marcar todas las notificaciones como leidas </p><ion-icon name="checkmark-done-outline" class="btnleerTodas"></ion-icon>
+     </ion-item>
+   </ion-button>
+
+   <ion-card *ngFor="let noti of notificacionesAll | paginate: { itemsPerPage: 10, currentPage: pageActual} ">
+     <ng-container>
+       <div>
+       <ion-item (click)="AbrirNoti(noti)" class="ion-activated" [color]='tiponotificacion(noti)'>
+         <ion-label>
+
+           <small> 
+             <h4 style="font-size: 85%;"><b>Colaborador: {{ noti.nempleadosend }} </b> 
+               <strong *ngIf="noti.id_permiso != null" style="font-size: 90%; float: right;"> Per. {{noti.id_permiso}} </strong> 
+               <strong *ngIf="noti.id_vacaciones != null" style="font-size: 90%; float: right;"> Vac. {{noti.id_vacaciones}} </strong> 
+               <strong *ngIf="noti.id_hora_extra != null" style="font-size: 90%; float: right;"> Hor. {{noti.id_hora_extra}} </strong> 
+             </h4> 
+             <p style="font-size: 80%;">
+                 {{ noti.mensaje}}
+             </p>
+             <h5 style="font-size: 85%;"> <b>Fecha: </b> {{noti.create_at | date:'MMM d,y '}}   <b> Hora: </b> {{noti.create_at | date:'h:mm:ss a'}} </h5>
+           </small>
+
+         </ion-label>
+       </ion-item>
+       </div>
+   </ng-container>
+
+   </ion-card>
+
+    <!--Configuracion del Pagination - ngxPaginationModulo-->
+ <ion-item style="font-size: 80%; margin: 1% 0% 1% 0%;" [hidden] = "ver">
+    <pagination-controls 
+        class="paginacion" 
+        (pageChange)="pageActual = $event" 
+        [maxSize] = maxSize
+        [directionLinks] = directionLinks
+        [responsive] = responsive 
+        [autoHide]="autoHide"
+        [previousLabel]="labels.previousLabel"
+        [nextLabel]="labels.nextLabel"
+        [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+        [screenReaderPageLabel]="labels.screenReaderPageLabel"
+        [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+    </pagination-controls>
+ </ion-item>
+
+ </ng-template>
+
+</ion-content>
  
 

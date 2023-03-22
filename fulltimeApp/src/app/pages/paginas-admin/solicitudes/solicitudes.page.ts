@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ParametrosService } from 'src/app/services/parametros.service';
-import { AlertController, MenuController, ToastController } from '@ionic/angular';
+import { AlertController, MenuController, NavController, ToastController } from '@ionic/angular';
 import { Platform } from '@ionic/angular';
 
 @Component({
@@ -15,11 +15,11 @@ import { Platform } from '@ionic/angular';
     </header>
 
     <div class="Imagen">
-      <img class="center" src="../../../assets/C_FTLOGORV.png">
+      <img class="center" src="../../../assets/images/C_FTLOGORV.png">
         <ion-label style="text-align:center" mode="md" color="medium">
           <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
         </ion-label>
-        <img class="tamanoImagen" src="../../../assets/Solicitudes.svg">
+        <img class="tamanoImagen" src="../../../assets/images/Solicitudes.svg">
     </div>
 
     <ion-grid>
@@ -123,15 +123,13 @@ import { Platform } from '@ionic/angular';
 export class SolicitudesPage implements OnInit {
 
   constructor(
-    private menu: MenuController,
+    private navCtroller: NavController,
     public platform: Platform,
     private router: Router,
     public toastController: ToastController,
     public alertController: AlertController,
     public parametros: ParametrosService,
-  ) {
-    
-  }
+  ) {}
 
   ionViewWillEnter(){
     this.VerificarFunciones();

@@ -1,0 +1,12 @@
+<ion-button shape="round" expand="block" (click)="SaveRegisterBtn()" [disabled]="formRegistro!=null && !formRegistro.valid">
+
+  <ng-container *ngIf="!loadingBtn; then saveReg; else spiner"></ng-container>
+  <ng-template #saveReg>
+    <ion-icon slot="start" name="save-outline"></ion-icon>
+    {{ label }}
+  </ng-template>
+  <ng-template #spiner>
+    <ion-spinner name="circles"></ion-spinner>
+  </ng-template>
+
+</ion-button>

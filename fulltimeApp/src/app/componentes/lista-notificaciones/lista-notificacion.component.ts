@@ -40,8 +40,6 @@ export class ListaNotificacionComponent implements OnInit {
     public pooverCtrl: PopoverController,
     private vistonotificacion: NotificacionesService,
     public modalController: ModalController,
-    private userService: DataUserLoggedService,
-    private navCtroller: NavController,
   ) { }
 
   ngOnInit() {
@@ -321,4 +319,18 @@ export class ListaNotificacionComponent implements OnInit {
 
     this.modalController.dismiss({});
   }
+
+  //variables de configuracion del componente de paginacion (pagination-controls)
+  public maxSize: number = 5;
+  public directionLinks: boolean = true;
+  public autoHide: boolean = false;
+  public responsive: boolean = true;
+  public labels: any = {
+    previousLabel: 'ante..',
+    nextLabel: 'sigui..',
+    screenReaderPaginationLabel: 'Pagination',
+    screenReaderPageLabel: 'page',
+    screenReaderCurrentLabel: `You're on page`
+  };
+
 }
