@@ -1,0 +1,30 @@
+<ion-header style="color: #000000;">
+  <div style="padding:1%; background: white">
+    <br><br>
+    <ion-img class="center" style="width:45%;" src="../../../assets/images/C_FTLOGORV.png"></ion-img>
+    <ion-label mode="md" color="medium" style="text-align:center">
+      <h1 style="font-size: 4.5vw"><b>Reloj Virtual</b></h1>
+    </ion-label>
+  </div>
+  <br>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
+
+  <ion-list mode="md" style="margin-top: 2%;">
+    <ion-list-header>
+      <ion-label>
+        <h1 style="font-size: 150%"><b>{{empresa.nombre}}</b></h1>
+      </ion-label>
+
+
+    </ion-list-header>
+    <ion-list-header class="label2">
+      <ion-label>
+        <p style="font-size: 110%"> RUC: {{empresa.ruc}}</p>
+      </ion-label>
+    </ion-list-header>
+  </ion-list>
+
+</ion-content>

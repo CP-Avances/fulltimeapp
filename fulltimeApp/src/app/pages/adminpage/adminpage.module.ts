@@ -11,6 +11,7 @@ import { AdminpagePage } from './adminpage.page';
     IonicModule,
     CommonModule,
     FormsModule,
+    CommonModule,
     AdminpagePageRoutingModule
   ],
   declarations: [AdminpagePage]

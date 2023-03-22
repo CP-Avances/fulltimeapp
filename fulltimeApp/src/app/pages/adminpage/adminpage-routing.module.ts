@@ -12,12 +12,21 @@ const routes: Routes = [
         loadChildren: () => import('../bienvenido/bienvenido.module').then(m => m.BienvenidoPageModule)
       },
       {
-        path: 'tab2',
-        loadChildren: () => import('../tab2/tab2.module').then(m => m.Tab2PageModule)
+        path: 'informacion',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../informacion-admin/informacion-admin.module').then(m => m.InformacionAdminPageModule)
+          }
+        ]
       },
       {
         path: 'tab3',
         loadChildren: () => import('../tab3/tab3.module').then(m => m.Tab3PageModule)
+      },
+      {
+        path: 'solicitudes',
+        loadChildren: () => import('../paginas-admin/solicitudes/solicitudes.module').then(m => m.SolicitudesPageModule)
       },
       {
         path: '',

@@ -10,6 +10,7 @@ import { DataUserLoggedService } from '../services/data-user-logged.service';
 import { EmpleadosService } from '../services/empleados.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { CloseModalComponent } from './close-modal/close-modal.component';
+import { RefreshInfoComponent } from './refresh-info/refresh-info.component';
 
 
 @NgModule({
@@ -17,11 +18,13 @@ import { CloseModalComponent } from './close-modal/close-modal.component';
         NavegadorAdminComponent,
         NotificacionPopoverComponent,
         CloseModalComponent,
+        RefreshInfoComponent,
     ],
     exports: [
         NavegadorAdminComponent,
         NotificacionPopoverComponent,
         CloseModalComponent,
+        RefreshInfoComponent,
     ],
     imports: [
         CommonModule,

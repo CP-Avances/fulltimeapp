@@ -1,0 +1,94 @@
+<ion-header style="color: #000000;">
+  <div style="padding:1%; background: white">
+    <br><br>
+    <ion-img class="center" style="width:45%;" src="../../../assets/C_FTLOGORV.png"></ion-img>
+    <ion-label mode="md" color="medium" style="text-align:center">
+      <h1 style="font-size: 4.5vw"><b>Reloj Virtual</b></h1>
+    </ion-label>
+  </div>
+  <br>
+</ion-header>
+
+<ion-content fullscreen>
+    <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
+
+    <ion-list mode="md" style="margin-top: 2%;">
+      <ion-card>
+        <ion-img class="tamanoImagen" src="../../../assets/empleado.svg"></ion-img><br>
+        <ion-label style="text-align:center;">
+          <h2 style="font-size: 5vw"><b>Información Personal {{usuario.nombre}}</b></h2>
+        </ion-label>
+        <ion-list>
+          <ion-item style="font-size: 4vw">
+            <ion-label>Nombre:</ion-label>
+            <ion-label slot="end">{{usuario.nombre}}</ion-label>
+          </ion-item>
+          <ion-item style="font-size: 4vw">
+            <ion-label>Apellido:</ion-label>
+            <ion-label slot="end">{{usuario.apellido}}</ion-label>
+          </ion-item>
+          <ion-item style="font-size: 4vw">
+            <ion-label>Cedula:</ion-label>
+            <ion-label slot="end">{{usuario.cedula}}</ion-label>
+          </ion-item>
+          <ion-item style="font-size: 4vw">
+            <ion-label>Usuario:</ion-label>
+            <ion-label slot="end">{{usuario.usuario}}</ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card>
+    </ion-list>
+
+    <ion-list mode="md">
+      <ion-list-header>
+        <ion-label style="text-align:center">
+          <h1 style="font-size:5vw"><b> Información App </b></h1>
+        </ion-label>
+      </ion-list-header>
+      <ion-card>
+        <ion-list>
+          <ion-item style="font-size: 4vw">
+            <ion-label>Licencia caduca:</ion-label>
+            <ion-label slot="end">{{caduca_}}</ion-label>
+          </ion-item>
+          <ion-item style="font-size: 4vw">
+            <ion-label>Versión:</ion-label>
+            <ion-label slot="end">{{app_info.version}}</ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card>
+    </ion-list>
+
+    <ion-list mode="md" *ngIf="app_vacuna.id_tipo_vacuna != ''">
+      <ion-list-header>
+        <ion-label style="text-align:center">
+          <h1 style="font-size: 5vw"><b> Historial Vacuna </b></h1>
+        </ion-label>
+      </ion-list-header>
+      <ion-card>
+        <ion-list>
+          <ion-item>
+            <ion-label>Descripción: </ion-label>
+            <ion-label slot="end">{{app_vacuna.descripcion}}</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-label>Fecha:</ion-label>
+            <ion-label slot="end">{{fecha_}}</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-label>Vacuna:</ion-label>
+            <ion-label slot="end">{{app_vacuna.nombre}}</ion-label>
+          </ion-item>
+          <ion-item
+            *ngIf="app_vacuna.nom_carnet != null && app_vacuna.nom_carnet != '' && app_vacuna.nom_carnet != undefined">
+            <ion-label>Carnet:</ion-label>
+            <ion-label slot="end">
+              <a href="http://186.71.19.82:3001/vacunas/documentos/{{app_vacuna.carnet}}"> {{app_vacuna.nom_carnet}}
+              </a>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+
+      </ion-card>
+    </ion-list>
+</ion-content>

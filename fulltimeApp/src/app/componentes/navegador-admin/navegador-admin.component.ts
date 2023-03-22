@@ -1,5 +1,6 @@
 import { Component, OnInit} from '@angular/core';
-import { MenuController, ModalController, Platform, PopoverController, AlertController, LoadingController, ToastController} from '@ionic/angular';
+import { Platform } from '@ionic/angular';
+import { MenuController, ModalController, PopoverController, AlertController, LoadingController, ToastController} from '@ionic/angular';
 import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
@@ -10,7 +11,7 @@ import { NotificacionTimbre } from '../../interfaces/Notificaciones';
 
 import { Router } from '@angular/router';
 import { ParametrosService } from 'src/app/services/parametros.service';
-
+import { Socket } from 'ngx-socket-io';
 
 
 @Component({
@@ -46,7 +47,8 @@ export class NavegadorAdminComponent implements OnInit {
     private router: Router,
     public loadingController: LoadingController,
     private toastController: ToastController,
-    public parametros: ParametrosService
+    public parametros: ParametrosService,
+    private socket: Socket
   ) 
   {}
 
@@ -61,10 +63,112 @@ export class NavegadorAdminComponent implements OnInit {
     this.idEmpleadoIngresa = parseInt(''+(localStorage.getItem('empleadoID')));
     this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
 
+    this.socket.on('recibir_notificacion', (data_llega: any)=>{
+      console.log("notificacion recibida :)", data_llega);
+      
+      this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
+      if(data_llega.id_send_empl !== this.idEmpleadoIngresa){
+        console.log("Notificacion recibida",data_llega.id);
+
+        if(data_llega.id_receives_empl === this.idEmpleadoIngresa){
+          this.mensaje = "Nueva Notificacion de " + data_llega.usuario;
+          console.log("Usuario envio",this.empleEnvia);
+          this.countbadge = this.countNoti + 1;
+
+            try{
+              this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
+            }catch (error) {
+              this.mostrarToasNoti("No se pudo resibir la notificacion: \n"+ error);
+              console.log("Problemas en la notificacion: ", error);
+            }     
+        }
+        
+      }
+      
+    });
+
+    this.socket.on('recibir_aviso', (data_llega: any)=>{
+      this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
+      if(data_llega.id_send_empl !== this.idEmpleadoIngresa){
+        console.log("Aviso recibido",data_llega.id);
+        this.countbadge = this.countNoti + 1;
+
+        if(data_llega.id_receives_empl === this.idEmpleadoIngresa){
+          this.mensaje = "Nuevo aviso de " + data_llega.usuario;
+          console.log("Usuario envio",this.empleEnvia);
+
+          try{
+            this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
+          }catch (error) {
+            this.mostrarToasNoti("No se pudo resibir la notificacion: \n"+ error);
+            console.log("Problemas en la notificacion: ", error);
+          } 
+        }
+      }
+    });
   }
 
   LlamarNotificcaccciones(id_empleado: number){
     //Carga y Muestra el numero de notificaciones,   
+    this.notificacionService.getNotificacionesByIdEmpleado(id_empleado).subscribe(
+      notificacion => {
+        this.notificaciones = notificacion;
+
+      this.notificacionService.getNotificacionesTimbreByIdEmpleado(id_empleado) .subscribe(
+        notificaciontim => {
+          this.notificacionestimbres = notificaciontim;
+
+          this.notificacionesAll = this.notificaciones.concat(this.notificacionestimbres);
+          
+          this.countNoti = 0;
+          
+          //cuenta las notificaciones que estan sin ver
+          this.notificacionesAll.forEach((item: any) => {
+          if(item.visto === false){
+            this.countNoti ++;
+            this.empleEnvia = item.nempleadosend;
+          }
+          });
+
+          //badge de notificacciones pendientes
+          if(this.countNoti == 0){
+            this.valor = false;
+          }else{
+            this.valor = true;
+          }
+
+        },
+        err => {console.log(err)},() => { this.loading = false }
+      )
+      },
+      err => { 
+  
+      this.notificacionService.getNotificacionesTimbreByIdEmpleado(id_empleado).subscribe(
+        notificaiontim => {
+        this.notificacionesAll = notificaiontim;
+        
+        this.countNoti = 0;
+        //cuenta las notificaciones que estan sin ver
+        this.notificacionesAll.forEach((item: any) => {
+          if(item.visto === false){
+            this.countNoti ++;
+            this.empleEnvia = item.nempleadosend;
+          }
+          });
+
+          //badge de notificacciones pendientes
+          if(this.countNoti == 0){
+            this.valor = false;
+          }else{
+            this.valor = true;
+          }
+
+        },
+        err => { console.log(err) },
+        () => { this.loading = false }
+      )
+    console.log(err) },
+    () => { this.loading = false });
   }
 
   //Verifica si tiene activado los modulos mediante la tabla funciones

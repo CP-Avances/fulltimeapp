@@ -9,6 +9,7 @@ import { RelojServiceService } from 'src/app/services/reloj-service.service';
 })
 export class AdminpagePage {
 
+
   constructor(
     private relojServiceService: RelojServiceService,
     private navCtroller: NavController, 
