@@ -7,10 +7,6 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
     ion-refresher {
       z-index: 102
     }
-    ion-label {
-      font-size: 10px;
-      margin: 5px 15%;
-    }
   `],
 })
 export class RefreshInfoComponent {

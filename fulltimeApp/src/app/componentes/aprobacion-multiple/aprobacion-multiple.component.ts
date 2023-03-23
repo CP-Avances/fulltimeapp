@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
-import { UpdateAutorizacionMultipleComponent } from '../../modals/update-autorizacion-multiple/update-autorizacion-multiple.component';
+//import { UpdateAutorizacionMultipleComponent } from '../../modals/update-autorizacion-multiple/update-autorizacion-multiple.component';
 import { Permiso } from '../../interfaces/Permisos';
 import { ValidacionesService } from '../../libs/validaciones.service';
 import { ModalController } from '@ionic/angular';
@@ -45,7 +45,7 @@ export class AprobacionMultipleComponent implements OnDestroy {
     }
   }
 
-  async presentModalAutorizarMultiple() {
+  /*async presentModalAutorizarMultiple() {
     if (this.permisos) {
       await this.permisosAutorizacion()
     }
@@ -55,9 +55,9 @@ export class AprobacionMultipleComponent implements OnDestroy {
     if (this.horas_extras) {
       await this.horasExtrasAutorizacion()
     }
-  }
+  }*/
 
-  private async permisosAutorizacion() {
+  /*private async permisosAutorizacion() {
     let permisos = await this.permisos.filter(o => { return o.isChecked === true });
 
     if (permisos.length === 0) return this.validacionService.showToast('Seleccione solicitudes.', 3000, 'danger');
@@ -127,7 +127,7 @@ export class AprobacionMultipleComponent implements OnDestroy {
       this.refeshSolicitudes(true)
     }
     return;
-  }
+  }*/
 
   refeshSolicitudes(refreshInfo: boolean) {
     this.onRefreshOnInit.emit(refreshInfo)

@@ -11,7 +11,7 @@ export class CloseModalComponent {
 
   @Input() titleModal: string = '';
   @Input() resetF: boolean = false;
-  //@Input() formRegistro: NgForm;
+  @Input() formRegistro: NgForm;
 
   constructor(
     public modalController: ModalController
@@ -19,7 +19,7 @@ export class CloseModalComponent {
 
   closeModal(refreshInfo = true) {
     if (this.resetF) {
-      //this.formRegistro.onReset();
+      this.formRegistro.onReset();
     }
     this.modalController.dismiss({
       'refreshInfo': refreshInfo

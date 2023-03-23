@@ -4,7 +4,6 @@ import { Empresa } from 'src/app/interfaces/Empresa';
 import { Usuario } from 'src/app/interfaces/Usuario';
 import { DatePipe } from '@angular/common';
 import { AlertController, Platform, ToastController } from '@ionic/angular';
-import { Device } from '@ionic-native/device/ngx';
 import { DataUserLoggedService } from '../../services/data-user-logged.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
@@ -16,7 +15,7 @@ import { ValidacionesService } from 'src/app/libs/validaciones.service';
 })
 export class InformacionEmpleadoPage implements OnInit {
   pipe = new DatePipe('en-US');
-  fecha
+  fecha: any;
 
   empresa: Empresa = {
     nombre: '',
@@ -34,6 +33,7 @@ export class InformacionEmpleadoPage implements OnInit {
     usuario: "",
     correo: "",
     id_rol: 0,
+    codigo: "",
   }
 
   public get app_info(): any {
@@ -47,7 +47,6 @@ export class InformacionEmpleadoPage implements OnInit {
   constructor(
     private relojService: RelojServiceService,
     public alertController: AlertController,
-    private device: Device,
     private toastController: ToastController,
     private dataUser: DataUserLoggedService,
     public platform: Platform,
@@ -56,11 +55,11 @@ export class InformacionEmpleadoPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.usuario.correo = localStorage.getItem('correo');
-    this.usuario.apellido = localStorage.getItem('ap');
-    this.usuario.nombre = localStorage.getItem('nom');
-    this.usuario.cedula = localStorage.getItem('UCedula');
-    this.usuario.usuario = localStorage.getItem('username');
+    this.usuario.correo = localStorage.getItem('correo')!;
+    this.usuario.apellido = localStorage.getItem('ap')!;
+    this.usuario.nombre = localStorage.getItem('nom')!;
+    this.usuario.cedula = localStorage.getItem('UCedula')!;
+    this.usuario.usuario = localStorage.getItem('username')!;
 
     console.log('data vacuna empleado ... ', this.dataUser.dataVacuna)
     this.BuscarFormatos();

@@ -27,4 +27,103 @@
     </ion-list-header>
   </ion-list>
 
+  <ion-list mode="md">
+    <ion-list-header>
+      <ion-label>
+        <h1 style="font-size: 115%"><b>Información App</b></h1>
+      </ion-label>
+    </ion-list-header>
+    <ion-card>
+      <ion-list>
+        <ion-item style="font-size: 110%">
+          <ion-label>Licencia caduca:</ion-label>
+          <ion-label slot="end">{{caduca_}}</ion-label>
+        </ion-item>
+        <ion-item style="font-size: 110%">
+          <ion-label>Versión:</ion-label>
+          <ion-label slot="end">{{app_info.version}}</ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card>
+  </ion-list>
+
+  <ion-list mode="md" *ngIf="app_vacuna.id_tipo_vacuna != ''">
+    <ion-list-header>
+      <ion-label>
+        <h1 style="font-size: 115%"><b> Historial Vacuna </b></h1>
+      </ion-label>
+    </ion-list-header>
+    <ion-card>
+      <ion-list>
+        <ion-item>
+          <ion-label>Descripción: </ion-label>
+          <ion-label slot="end">{{app_vacuna.descripcion}}</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label>Fecha:</ion-label>
+          <ion-label slot="end">{{fecha_}}</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label>Vacuna:</ion-label>
+          <ion-label slot="end">{{app_vacuna.nombre}}</ion-label>
+        </ion-item>
+        <ion-item
+          *ngIf="app_vacuna.nom_carnet != null && app_vacuna.nom_carnet != '' && app_vacuna.nom_carnet != undefined">
+          <ion-label>Carnet:</ion-label>
+          <ion-label slot="end">
+            <a href="http://186.71.19.82:3001/vacunas/documentos/{{app_vacuna.carnet}}"> {{app_vacuna.nom_carnet}}
+            </a>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+    </ion-card>
+  </ion-list>
+
+  <ion-list mode="md">
+    <ion-list-header>
+      <ion-label>
+        <h1 style="font-size: 130%"><b> Lista de empleados </b></h1>
+      </ion-label>
+    </ion-list-header>
+
+    <div *ngIf="!existenEmpleados">
+      <ion-text color="primary">
+        <span>Obteniendo empleados</span>
+      </ion-text>
+      <ion-progress-bar value="0.5" buffer="0.75"></ion-progress-bar>
+    </div>
+
+    <ion-item *ngFor="let e of empleados | paginate: { itemsPerPage: 10, currentPage: pageActual }">
+      <ion-avatar slot="start">
+        <ion-icon name="person-circle-outline" color="theme" style="font-size: 30px;"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+
+        <h2> {{e.fullname}}</h2>
+
+        <p>Nombre de usuario: {{e.usuario}} </p>
+        <ion-text color="success">
+          <p *ngIf="e.id_rol==1" color="success"> Administrador </p>
+        </ion-text>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <!--Configuracion del Pagination - ngxPaginationModulo-->
+  <ion-item style="font-size: 80%; margin: 1% 0% 1% 0%;">
+    <pagination-controls 
+        class="paginacion" 
+        (pageChange)="pageActual = $event" 
+        [maxSize] = maxSize
+        [directionLinks] = directionLinks
+        [responsive] = responsive 
+        [autoHide]="autoHide"
+        [previousLabel]="labels.previousLabel"
+        [nextLabel]="labels.nextLabel"
+        [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+        [screenReaderPageLabel]="labels.screenReaderPageLabel"
+        [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+    </pagination-controls>
+  </ion-item>
 </ion-content>

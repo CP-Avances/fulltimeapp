@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ParametrosService } from 'src/app/services/parametros.service';
-import { AlertController, MenuController, NavController, ToastController } from '@ionic/angular';
+import { AlertController, MenuController, ToastController } from '@ionic/angular';
 import { Platform } from '@ionic/angular';
 
 @Component({
@@ -123,7 +123,7 @@ import { Platform } from '@ionic/angular';
 export class SolicitudesPage implements OnInit {
 
   constructor(
-    private navCtroller: NavController,
+    private menu: MenuController,
     public platform: Platform,
     private router: Router,
     public toastController: ToastController,

@@ -68,7 +68,7 @@ export class NotificacionPopoverComponent implements OnInit {
             (firstObject: NotificacionTimbre, secondObject: NotificacionTimbre) =>  
                 (firstObject.visto === true)? 1 : 
                   (firstObject.visto === secondObject.visto) ?
-                    ((firstObject.create_at < secondObject.create_at)? 1 : -1)
+                    ((firstObject.create_at! < secondObject.create_at!)? 1 : -1)
                 
               :-1
           );
@@ -97,7 +97,7 @@ export class NotificacionPopoverComponent implements OnInit {
             (firstObject: NotificacionTimbre, secondObject: NotificacionTimbre) =>  
                 (firstObject.visto === true)? 1 : 
                   (firstObject.visto === secondObject.visto) ?
-                    ((firstObject.create_at < secondObject.create_at)? 1 : -1)
+                    ((firstObject.create_at! < secondObject.create_at!)? 1 : -1)
                 
               :-1
           );

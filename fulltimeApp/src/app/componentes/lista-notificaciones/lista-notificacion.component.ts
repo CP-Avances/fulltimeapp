@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController, NavController, PopoverController } from '@ionic/angular';
+import { ModalController, PopoverController } from '@ionic/angular';
 import { AutorizacionesService } from '../../services/autorizaciones.service';
 import { Notificacion } from '../../interfaces/Notificaciones';
 import { NotificacionTimbre } from '../../interfaces/Notificaciones';
 import { SkeletonListNotificacionesArray } from '../../interfaces/Skeleton';
 import { Router } from '@angular/router';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
-import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 
 
 @Component({
@@ -68,7 +67,7 @@ export class ListaNotificacionComponent implements OnInit {
             (firstObject: NotificacionTimbre, secondObject: NotificacionTimbre) =>  
                 (firstObject.visto === true)? 1 : 
                   (firstObject.visto === secondObject.visto) ?
-                    ((firstObject.create_at < secondObject.create_at)? 1 : -1)
+                    ((firstObject.create_at! < secondObject.create_at!)? 1 : -1)
                 
               :-1
           );
@@ -94,7 +93,7 @@ export class ListaNotificacionComponent implements OnInit {
             (firstObject: NotificacionTimbre, secondObject: NotificacionTimbre) =>  
                 (firstObject.visto === true)? 1 : 
                   (firstObject.visto === secondObject.visto) ?
-                    ((firstObject.create_at < secondObject.create_at)? 1 : -1)
+                    ((firstObject.create_at! < secondObject.create_at!)? 1 : -1)
                 
               :-1
           );

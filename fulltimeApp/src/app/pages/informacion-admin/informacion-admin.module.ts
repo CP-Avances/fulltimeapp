@@ -7,12 +7,16 @@ import { ComponentesModule } from '../../componentes/componentes.module';
 import { InformacionAdminPage } from './informacion-admin.page';
 import { InformacionAdminPageRoutingModule } from './informacion-admin-routing.module';
 
+//modulo paginacion
+import {NgxPaginationModule} from 'ngx-pagination';
+
 @NgModule({
   imports: [
     IonicModule,
     CommonModule,
     FormsModule,
     ComponentesModule,
+    NgxPaginationModule,
     InformacionAdminPageRoutingModule
   ],
   declarations: [InformacionAdminPage]

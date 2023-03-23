@@ -31,6 +31,10 @@ const routes: Routes = [
           }
         ]
       },
+      {
+        path: 'solicitar-permisos',
+        loadChildren: () => import('../paginas-empleado/solicitar-permisos/solicitar-permisos.module').then(m => m.SolicitarPermisosPageModule)
+      },
     ]
   },
   {

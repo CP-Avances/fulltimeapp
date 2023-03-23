@@ -61,29 +61,29 @@ export interface EmpleadosSendNotiEmail {
 }
 
 export interface NotificacionTimbre {
-    id: number;
-    create_at: string;
-    id_send_empl: number;
-    id_receives_empl: number;
-    visto: boolean;
-    descripcion: string;
+    id: number | undefined;
+    create_at: string | null;
+    id_send_empl: number | null;
+    id_receives_empl: number | null;
+    visto: boolean | null;
+    descripcion: string | null;
     id_timbre: number | null;
-    tipo: number;
-    nempleadosend?: string;
-    nempleadoreceives?: string;
-    id_comida: number;
+    tipo: number | null;
+    nempleadosend?: string | null;
+    nempleadoreceives?: string | null;
+    id_comida: number | null;
 }
 
 export const notificacionTimbreValueDefault = {
     id: undefined,
-    create_at: undefined,
-    id_send_empl: undefined,
-    id_receives_empl: undefined,
-    visto: undefined,
-    descripcion: undefined,
-    id_timbre: undefined,
-    tipo: undefined,
-    id_comida: undefined,
+    create_at: null,
+    id_send_empl: null,
+    id_receives_empl: null,
+    visto: null,
+    descripcion: null,
+    id_timbre: null,
+    tipo: null,
+    id_comida: null,
 }
 
 export interface SettingsInfoEmpleado {

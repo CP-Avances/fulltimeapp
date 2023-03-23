@@ -1,57 +1,52 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { Permiso } from 'src/app/interfaces/Permisos';
-import { ModalController } from '@ionic/angular';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
-import { LoadingController, IonInfiniteScroll } from '@ionic/angular';
-
+import { ModalController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
-import { PermisosService } from 'src/app/services/permisos.service';
-import { RegistrarPermisoComponent } from 'src/app/pages/paginas-empleado/solicitar-permisos/componentes/registrar-permiso/registrar-permiso.component';
-import { VerPermisoComponent } from 'src/app/pages/paginas-empleado/solicitar-permisos/componentes/ver-permiso/ver-permiso.component';
-import { EditarPermisoComponent } from 'src/app/pages/paginas-empleado/solicitar-permisos/componentes/editar-permiso/editar-permiso.component';
+import { Permiso } from 'src/app/interfaces/Permisos';
+
+import { PermisosService } from '../../../../../services/permisos.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 
-
+import { RegistrarPermisoComponent } from '../registrar-permiso/registrar-permiso.component';
+import { EditarPermisoComponent } from '../editar-permiso/editar-permiso.component';
+import { VerPermisoComponent } from '../ver-permiso/ver-permiso.component';
 
 @Component({
-  selector: 'app-permisos-lista',
-  templateUrl: './permisos-lista.component.html',
-  styleUrls: ['../../permiso-solicitud.page.scss'],
+  selector: 'app-lista-permisos',
+  templateUrl: './lista-permisos.component.html',
+  styleUrls: ['../../solicitar-permisos.page.scss'],
 })
 
-export class PermisosListaComponent implements OnInit, OnDestroy {
+export class ListaPermisosComponent implements OnInit, OnDestroy {
 
   subscripted: Subscription;
   skeleton = SkeletonListPermisoArray;
   loading: boolean = true;
-  pageActual: number = 1;
 
   permisos: Permiso[] = [];
   num_permiso: number = 0;
 
-  ver: boolean = false;
+  page: number = 1;
   codigo: any;
-
-  @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
+  ver: boolean;
 
   constructor(
     private permisosService: PermisosService,
-    public loadingController: LoadingController,
     public modalController: ModalController,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
   ) { }
 
   ngOnInit() {
-    this.codigo = localStorage.getItem('codigo')
+    this.codigo = localStorage.getItem('codigo');
     this.BuscarFormatos();
   }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
-  formato_fecha: string = '';
-  formato_hora: string = '';
+  formato_fecha: string;
+  formato_hora: string;
   BuscarFormatos() {
     this.parametro.ObtenerFormatos().subscribe(
       resp => {
@@ -64,23 +59,6 @@ export class PermisosListaComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscripted.unsubscribe();
-  }
-
-  posts: any[] = [];
-  totalPosts = 0;
-  limit = 10;
-
-  //have issue here about "disabling"
-  loadMorePosts(event: any) {
-    setTimeout(() => {
-      console.log('Begin async operation');
-      this.limit += 10;
-      event.target.complete();
-
-      if (this.posts.length == this.limit) {
-        event.target.disabled = true;
-      }
-    }, 500);
   }
 
   colorfondocard(permiso: { estado: any }) {
@@ -106,10 +84,11 @@ export class PermisosListaComponent implements OnInit, OnDestroy {
             p.fec_inicio_ = this.validar.FormatearFecha(String(p.fec_inicio), this.formato_fecha, this.validar.dia_completo);
             p.fec_final_ = this.validar.FormatearFecha(String(p.fec_final), this.formato_fecha, this.validar.dia_completo);
 
-            p.hora_ingreso_ = this.validar.FormatearHora(p.hora_ingreso!, this.formato_hora);
-            p.hora_salida_ = this.validar.FormatearHora(p.hora_salida!, this.formato_hora);
+            p.hora_ingreso_ = this.validar.FormatearHora(String(p.hora_ingreso), this.formato_hora);
+            p.hora_salida_ = this.validar.FormatearHora(String(p.hora_salida), this.formato_hora);
 
           })
+          console.log('empl permisos... ', this.permisos)
           const [ultimoNumeroPermiso] = permisos;
           this.num_permiso = (ultimoNumeroPermiso) ? ultimoNumeroPermiso.num_permiso! + 1 : 1;
 
@@ -185,4 +164,5 @@ export class PermisosListaComponent implements OnInit, OnDestroy {
     screenReaderPageLabel: 'page',
     screenReaderCurrentLabel: `You're on page`
   };
+
 }

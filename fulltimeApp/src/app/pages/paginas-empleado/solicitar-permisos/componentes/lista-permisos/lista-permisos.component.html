@@ -1,0 +1,121 @@
+<ng-container *ngIf="loading; then showSkeletor else showList"></ng-container>
+
+<ng-template #showSkeletor>
+  <ion-list>
+    <ion-list-header>
+      <ion-label>
+        <ion-skeleton-text animated style="width: 20%"></ion-skeleton-text>
+      </ion-label>
+    </ion-list-header>
+    <ion-item *ngFor="let s of skeleton">
+      <ion-label>
+        <h3>
+          <ion-skeleton-text animated [style]="{width: s.h3 }"></ion-skeleton-text>
+        </h3>
+        <p>
+          <ion-skeleton-text animated [style]="{width: s.p1 }"></ion-skeleton-text>
+        </p>
+        <p>
+          <ion-skeleton-text animated [style]="{width: s.p2 }"></ion-skeleton-text>
+        </p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ng-template>
+<ng-template #showList>
+  <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
+
+  <ion-button expand="full" shape="round" style="margin: 10px 10px" color="primary"
+    (click)="presentModalNuevoRegistro( num_permiso )">
+    <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+    Nuevo Permiso
+  </ion-button>
+
+  <ion-list-header>
+    <ion-label style="text-align: center;">
+      <h2>Tus permisos</h2>
+    </ion-label>
+  </ion-list-header>
+
+  <ion-card *ngFor="let permiso of permisos | paginate: { itemsPerPage: 5, currentPage: page}" mode="md" style="margin-top: 5%; border: solid 1px rgb(123, 124, 125);" [color]="colorfondocard(permiso)">
+    
+    <ion-item>
+      <div class="etiqueta" slot="start">
+        <p style="font-size: 62%; margin-top: -4%;">
+          <strong> Solicitud {{ permiso.num_permiso }} </strong>
+        </p>
+        <ion-icon class="icono" name="document-outline" slot="start"></ion-icon>
+        <ion-text class="icono_texto">
+          <p class="servicio">
+            <strong> Permiso </strong>
+          </p>
+          <p *ngIf="permiso.estado == 1 " class="pendiente">
+            Pendiente
+          </p>
+          <p *ngIf="permiso.estado == 2" class="pre_autorizado">
+            Pre Autorizada
+          </p>
+          <p *ngIf="permiso.estado == 3" class="autorizada">
+            Autorizada
+          </p>
+          <p *ngIf="permiso.estado == 4" class="negado">
+            Negada
+          </p>
+        </ion-text>
+      </div>
+
+      <div class="info">
+        <p>
+          <strong>Motivo: </strong> {{ permiso.ntipopermiso | titlecase }}<br>
+          <ion-text>
+            <strong>Fecha</strong><br>
+            Desde: {{ permiso.fec_inicio_ }}<br>
+            Hasta: {{ permiso.fec_final_ }}<br>
+            <strong>Datos Tiempo</strong> <br>
+            <ion-text *ngIf="permiso.dia != 0">
+              Días permiso:  {{ permiso.dia }} <br>
+            </ion-text>
+            <ion-text *ngIf="permiso.hora_numero != '00:00:00'">
+              Horas permiso: {{ permiso.hora_numero }}
+            </ion-text>
+          </ion-text>
+        </p>
+      </div>
+
+      <div slot="end" style="text-align: center; font-size: 20px;">
+        <!-- VER REGISTRO -->
+        <ion-icon name="eye-outline" (click)="presentModalVerRegistro( permiso )"></ion-icon><br>
+        <!-- EDITAR REGISTRO -->
+        <ion-icon *ngIf="permiso.estado === 1" name="create-outline" (click)="presentModalEditarRegistro( permiso )"
+          style="margin-bottom:15%;"></ion-icon><br>
+        <!-- ELIMINAR REGISTRO -->
+        <btn-delete *ngIf="permiso.estado === 1" (onDelete)="ngOnInit()" [isButtom]="false" nameTable="permisos"
+          [idreg]="permiso.id" [userCodigo]="permiso.codigo"></btn-delete>
+      </div>
+
+    </ion-item>
+
+    <ion-label style="font-size: 11px; margin: 2%; float:right">
+      <strong> Solicitud realizada &nbsp; {{ permiso.fec_creacion_}} </strong>
+    </ion-label>
+
+  </ion-card>
+
+  <!--Configuracion del Pagination - ngxPaginationModulo-->
+  <ion-item style="font-size: 70%; margin: 1% 0% 1% 0%;" [hidden]="ver">
+    <pagination-controls 
+      class="paginacion" 
+      (pageChange)="page = $event" 
+      [maxSize] = maxSize
+      [directionLinks] = directionLinks
+      [responsive] = responsive 
+      [autoHide]="autoHide"
+      [previousLabel]="labels.previousLabel"
+      [nextLabel]="labels.nextLabel"
+      [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+      [screenReaderPageLabel]="labels.screenReaderPageLabel"
+      [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+    </pagination-controls>
+  </ion-item>
+
+</ng-template>
