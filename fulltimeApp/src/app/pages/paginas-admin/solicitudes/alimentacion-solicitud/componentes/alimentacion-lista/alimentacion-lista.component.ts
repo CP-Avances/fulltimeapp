@@ -4,9 +4,9 @@ import { Subscription } from 'rxjs';
 import { Alimentacion } from 'src/app/interfaces/Alimentacion';
 import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
-//import { EditarAlimentacionComponent } from 'src/app/pages/paginas-empleado/solicitar-planificar-alimentacion/componentes/editar-alimentacion/editar-alimentacion.component';
-//import { RegistrarAlimentacionComponent } from 'src/app/pages/paginas-empleado/solicitar-planificar-alimentacion/componentes/registrar-alimentacion/registrar-alimentacion.component';
-//import { VerAlimentacionComponent } from 'src/app/pages/paginas-empleado/solicitar-planificar-alimentacion/componentes/ver-alimentacion/ver-alimentacion.component';
+import { EditarAlimentacionComponent } from 'src/app/pages/paginas-empleado/solicitar-planificar-alimentacion/componentes/editar-alimentacion/editar-alimentacion.component';
+import { RegistrarAlimentacionComponent } from 'src/app/pages/paginas-empleado/solicitar-planificar-alimentacion/componentes/registrar-alimentacion/registrar-alimentacion.component';
+import { VerAlimentacionComponent } from 'src/app/pages/paginas-empleado/solicitar-planificar-alimentacion/componentes/ver-alimentacion/ver-alimentacion.component';
 import { AlimentacionService } from 'src/app/services/alimentacion.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 
@@ -110,7 +110,7 @@ export class AlimentacionListaComponent implements OnInit, OnDestroy {
   }
 
   async presentModalNuevoRegistro() {
-    /*const modal = await this.modalController.create({
+    const modal = await this.modalController.create({
       component: RegistrarAlimentacionComponent,
       cssClass: 'my-custom-class'
     });
@@ -122,20 +122,20 @@ export class AlimentacionListaComponent implements OnInit, OnDestroy {
     if (refreshInfo) {
       this.ngOnInit()
     }
-    return;*/
+    return;
   }
 
   async presentModalVerRegistro(alimentacion: Alimentacion) {
-    /*const modal = await this.modalController.create({
+    const modal = await this.modalController.create({
       component: VerAlimentacionComponent,
       componentProps: { alimentacion },
       cssClass: 'my-custom-class'
     });
-    return await modal.present();*/
+    return await modal.present();
   }
 
   async presentModalEditarRegistro(alimentacion: Alimentacion) {
-    /*const modal = await this.modalController.create({
+    const modal = await this.modalController.create({
       component: EditarAlimentacionComponent,
       componentProps: { alimentacion },
       cssClass: 'my-custom-class'
@@ -148,7 +148,7 @@ export class AlimentacionListaComponent implements OnInit, OnDestroy {
     if (refreshInfo) {
       this.ngOnInit()
     }
-    return;*/
+    return;
   }
 
   //variables de configuracion del componente de paginacion (pagination-controls)

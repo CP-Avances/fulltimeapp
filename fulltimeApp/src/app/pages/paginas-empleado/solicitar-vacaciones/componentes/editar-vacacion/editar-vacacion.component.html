@@ -1,0 +1,188 @@
+<app-close-modal titleModal="Editar Solicitud Vacaciones"></app-close-modal>
+
+<ion-content mode="md">
+  <app-refresh-info (onRefresh)="ngOnInit()" removeItem="cg_feriado"></app-refresh-info>
+  <form #formRegistro="ngForm">
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6">
+          <ion-item style=" font-size: 85%;">
+            <ion-icon slot="start" name="document-text-outline"></ion-icon>
+            <ion-label>
+              <b>Soli.. N°: </b> {{ reg.id }}
+            </ion-label>
+          </ion-item>
+        </ion-col>
+        <ion-col size="6">
+          <ion-item style=" font-size: 85%;">
+            <ion-label *ngIf="reg.estado == 1">
+              <b> Estado: </b> <b style="font-size: 95%; float:right;" class="pendiente"> Pendiente </b>
+            </ion-label>
+            <ion-label *ngIf="reg.estado != 1">
+              <b> Estado: </b> <b style=" font-size: 95%;"> {{ reg.estado | estadoSolicitudes }} </b>
+            </ion-label>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <ng-container *ngIf="reg.legalizado == true">
+      <div style="text-align: center;">
+        <ion-text id="text_info"> La vacacione debe ser legalizada por el personal a cargo </ion-text>
+      </div>
+
+      <div class="formdiv" >
+          <ion-item class="item_fondo">
+            <ion-label>
+              <b style=" font-size: 85%;"> Legalizar: </b> <b style="float:right;"> SI </b>
+            </ion-label>
+          </ion-item>        
+      </div>
+
+      <!-- legalizado
+        <ion-list>
+        <ion-list-header>
+          <ion-label class="is-required"> Legalizado </ion-label>
+        </ion-list-header>
+        <ion-radio-group name="legalizado" *ngFor="let r of radioButton" [(ngModel)]="reg.legalizado"
+          [value]="reg.legalizado" required>
+  
+          <ion-item class="radio-buttoms" lines="none">
+            <ion-label> {{ r.label }} </ion-label>
+            <ion-radio slot="start" mode="md" [value]="r.value"></ion-radio>
+          </ion-item>
+        </ion-radio-group>
+      </ion-list>
+      -->
+    </ng-container>
+
+    <div style="text-align: center;">
+      <ion-text id="text_info"> TOME EN CUENTA LOS DATOS QUE VA A CAMBIAR </ion-text>
+    </div>
+
+    <ion-text class="text_info">Ingrese los datos</ion-text>
+    <!-- FECHA INICIO Y FECHA FINAL -->
+    <ion-grid style="margin-top: -2%;">
+      <ion-row>
+        <ion-col size="6" >
+          <div class="formdiv_tiempo">
+            <ion-item class="item_fondo" id="open-popover" mode="md">
+              <ion-label class="is-required" position="floating" >Día Inicio</ion-label>
+              <ion-input readonly="true" name="fec_inicio" [ngModel]="dia_inicio" mode="md"></ion-input>
+            </ion-item>
+            <ion-popover trigger="open-popover">
+              <ng-template>
+                <ion-datetime 
+                  presentation="date"
+                  [showDefaultButtons]="true" 
+                    doneText="OK"
+                    cancelText="Cancelar"  
+                  name="fec_inicio" 
+                  color="success" 
+                  mode="md" 
+                  min="1990-01-01" max="2050-12-31" 
+                  (ionChange)="ChangeDiaInicio($event)" 
+                  [value]="reg.fec_inicio" required></ion-datetime>
+              </ng-template>
+            </ion-popover>
+          </div>
+        </ion-col>
+
+        <ion-col size="6">
+          <div class="formdiv_tiempo">
+            <ion-item  class="item_fondo" id="open-popover1" mode="md">
+              <ion-label class="is-required" position="floating" >Día Final</ion-label>
+              <ion-input readonly="true" name="fec_final" [ngModel]="dia_fianl" mode="md"></ion-input>
+            </ion-item>
+            <ion-popover trigger="open-popover1">
+              <ng-template>
+                <ion-datetime 
+                [disabled] = "disabled_dia_fianl"
+                  presentation="date"
+                  [showDefaultButtons]="true" 
+                    doneText="OK"
+                    cancelText="Cancelar"  
+                  name="fec_final" 
+                  mode="md" 
+                  [min]="dia_inicio" max="2050-12-31" 
+                  (ionChange)="ChangeDiaFinal($event)" 
+                  [value]="dia_fianl" required></ion-datetime>
+              </ng-template>
+            </ion-popover>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- FECHA INGRESA -->
+    <div class="formdiv">
+      <ion-item  class="item_fondo" id="open-popover2" mode="md">
+        <ion-label class="is-required" position="floating" >Fecha ingreso</ion-label>
+        <ion-input readonly="true" name="fec_ingreso" [ngModel]="dia_ingreso" mode="md"></ion-input>
+      </ion-item>
+      <ion-popover trigger="open-popover2">
+        <ng-template>
+          <p style="margin: auto; padding: 4%;" *ngIf="(dia_fianl == '')">Ingrese el dia Final</p>
+          <ion-datetime *ngIf="dia_fianl != ''"
+            [disabled] = "disabled_dia_ingreso"
+            presentation="date"
+            [showDefaultButtons]="true" 
+              doneText="OK"
+              cancelText="Cancelar"   
+            name="fec_ingreso" 
+            model="md"
+            [min]="dia_fianl" max="2050-12-31"  
+            color="warning" 
+            [value]= "reg.fec_ingreso" 
+            (ionChange)="ChangeDiaIngreso($event)" required></ion-datetime>
+        </ng-template>
+      </ion-popover>
+    </div>
+
+     <!-- CALCULO DE DIAS DE VACACION -->
+    <div>
+      <ion-button [disabled] = "(btnOculto == true) || (validar.vacio(reg.fec_inicio) ||  validar.vacio(reg.fec_final) || validar.vacio(reg.fec_ingreso)) "  
+       shape="round" expand="block" color="tertiary" (click)="mostrarCalculos()" style="margin: 4% 3% 2% 3%;">
+        <ion-icon slot="start" name="calculator-outline"></ion-icon>
+        Calcular días.
+      </ion-button>
+    </div> 
+
+    <ion-text class="text_info">Resultado del calculo</ion-text>
+    <!-- CAMPOS CALCULOS DE DIAS SEGUN FECHAS -->
+    <ion-grid style="margin-top: -2%;">
+      <ion-row>
+        <ion-col size="6">
+          <div class="formdiv_tiempo">
+            <ion-item class="item_fondo">
+              <ion-label position="floating"><b>Días laborables</b></ion-label>
+              <ion-input name="dia" [ngModel]="reg.dia_laborable" mode="ios" disabled="true" maxlengt="10" required></ion-input>
+            </ion-item>
+          </div>
+        </ion-col>
+
+        <ion-col size="6">
+          <div class="formdiv_tiempo">
+            <ion-item class="item_fondo">
+              <ion-label position="floating"><b>Días libre y feriado</b></ion-label>
+              <ion-input name="dia_libre" [ngModel]="reg.dia_libre" mode="md" maxlengt="10" disabled="true" required></ion-input>
+            </ion-item>
+          </div>
+        </ion-col>
+      </ion-row>
+
+    </ion-grid>
+
+    <!-- BOTON GUARDAR COMPONENTE -->
+    <div style="margin: 6% 3% 0% 3%;">
+      <button [disabled] = "btnOcultoguardar" style="width: 100%; background-color: transparent;">
+        <btn-update (onUpdate)="UpdateRegister()" [loadingBtn]="loadingBtn" [formRegistro]="formRegistro"></btn-update>
+      </button>
+    </div>
+
+ 
+
+  </form>
+  <br>
+</ion-content>

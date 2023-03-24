@@ -30,7 +30,7 @@ export class ListaPermisosComponent implements OnInit, OnDestroy {
 
   page: number = 1;
   codigo: any;
-  ver: boolean;
+  ver: boolean = true;
 
   constructor(
     private permisosService: PermisosService,
@@ -92,10 +92,10 @@ export class ListaPermisosComponent implements OnInit, OnDestroy {
           const [ultimoNumeroPermiso] = permisos;
           this.num_permiso = (ultimoNumeroPermiso) ? ultimoNumeroPermiso.num_permiso! + 1 : 1;
 
-          if (permisos.length == 0) {
-            this.ver = true;
+          if (permisos.length < 6) {
+            return this.ver = true;
           } else {
-            this.ver = false;
+            return this.ver = false;
           }
 
         },

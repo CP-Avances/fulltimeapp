@@ -290,7 +290,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   async showAlert(){
     let alert = await this.alertCrtl.create({
       message: `<div class="card-alert">
-                  <img src="../../../assets/LOGOBLFT.png" class="img-alert">
+                  <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                   <br>
                   <p> Ups! El dia que ingreso esta fuera de su calendario laboral </p>
                   <p> Por favor cambie a un dia dentro de su calendario </p>
@@ -792,9 +792,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       console.log("si envia notificaciones: ", e.permiso_noti);
       console.log('Info de notificacion: ',noti);
 
-
-      //  No dejar con el signo de esclamacion no se debe leer asi quitar 
-      if (!e.permiso_noti) {
+      if (e.permiso_noti) {
         this.autorizaciones.postNotificacion(noti).subscribe(
           resp => {
             this.permisoService.sendNotiRealTime(resp.respuesta);

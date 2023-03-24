@@ -47,6 +47,8 @@ export class InformacionAdminPage implements OnInit {
     return this.dataUser.dataVacuna
   }
 
+  ver: boolean = true; 
+
   constructor(
     private relojService: RelojServiceService,
     private dataUser: DataUserLoggedService,
@@ -98,6 +100,15 @@ export class InformacionAdminPage implements OnInit {
 
         this.empleados = res;
         this.existenEmpleados = true;
+
+
+        console.log('lista empleados: ',this.empleados)
+
+        if(this.empleados.length < 11){
+          return this.ver = true;
+        }else{
+          return this.ver = false;
+        }
 
       },
       err => {

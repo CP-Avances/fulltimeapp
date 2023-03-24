@@ -6,7 +6,42 @@
       <h1 style="font-size: 4.5vw"><b>Reloj Virtual</b></h1>
     </ion-label>
   </div>
-  <br>
+  
+  <div>
+    <br>
+    <!-- Botones de Hora celular y la hora del servidor -->
+    <ion-segment color="primary" mode="md">
+      
+      <ion-segment-button value="timbreCelular">
+        <ion-label>Hora del celular</ion-label>
+      </ion-segment-button>  
+      
+      <ion-segment-button value="timbreServidor">
+        <ion-label>Hora del Servidor</ion-label>
+      </ion-segment-button>
+
+    </ion-segment>
+
+    <!-- filtro de timbres por fechas 
+    <app-rango-fechas></app-rango-fechas>-->
+   
+    <ion-row>
+      <ion-col size="6">
+        <ion-button color="acua" shape="round" expand="full" >
+         <ion-icon color="light" name="search-outline" style="margin-right: 3%;"></ion-icon>
+          <ion-label style="font-size: 72%;">FILTRAR TIMBRES</ion-label>
+        </ion-button>
+      </ion-col>
+
+      <ion-col size="6">
+        <ion-button color="theme" shape="round" expand="full" >
+          <ion-icon color="light" name="list-outline" style="margin-right: 3%;"></ion-icon>
+          <ion-label style="font-size: 72%;">MOSTRAR TODOS</ion-label>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    <br>
+  </div>
 </ion-header>
 
 <ion-content [fullscreen]="true">

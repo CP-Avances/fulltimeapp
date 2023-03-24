@@ -80,7 +80,7 @@
     </ion-card>
   </ion-list>
 
-  <ion-list mode="md">
+  <ion-list mode="md" style="margin-bottom: 2%;">
     <ion-list-header>
       <ion-label>
         <h1 style="font-size: 130%"><b> Lista de empleados </b></h1>
@@ -111,7 +111,7 @@
   </ion-list>
 
   <!--Configuracion del Pagination - ngxPaginationModulo-->
-  <ion-item style="font-size: 80%; margin: 1% 0% 1% 0%;">
+  <ion-item style="font-size: 80%; margin: 0% 0% 1% 0%;" [hidden]="ver">
     <pagination-controls 
         class="paginacion" 
         (pageChange)="pageActual = $event" 

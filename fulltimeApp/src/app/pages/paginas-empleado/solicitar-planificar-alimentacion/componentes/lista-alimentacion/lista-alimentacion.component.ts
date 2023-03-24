@@ -1,42 +1,43 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
-import { Vacacion } from '../../../../../../interfaces/Vacacion';
 import { Subscription } from 'rxjs';
-import { VacacionesService } from 'src/app/services/vacaciones.service';
-import { RegistrarVacacionComponent } from 'src/app/pages/paginas-empleado/solicitar-vacaciones/componentes/registrar-vacacion/registrar-vacacion.component';
-import { VerVacacionComponent } from 'src/app/pages/paginas-empleado/solicitar-vacaciones/componentes/ver-vacacion/ver-vacacion.component';
-import { EditarVacacionComponent } from 'src/app/pages/paginas-empleado/solicitar-vacaciones/componentes/editar-vacacion/editar-vacacion.component';
+import { Alimentacion } from 'src/app/interfaces/Alimentacion';
+import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
+import { AlimentacionService } from 'src/app/services/alimentacion.service';
+import { VerAlimentacionComponent } from '../ver-alimentacion/ver-alimentacion.component';
+import { EditarAlimentacionComponent } from '../editar-alimentacion/editar-alimentacion.component';
+import { RegistrarAlimentacionComponent } from '../registrar-alimentacion/registrar-alimentacion.component';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 
 @Component({
-  selector: 'app-vacacion-lista',
-  templateUrl: './vacacion-lista.component.html',
-  styleUrls: ['../../vacacion-solicitud.page.scss'],
+  selector: 'app-lista-alimentacion',
+  templateUrl: './lista-alimentacion.component.html',
+  styleUrls: ['../../solicitar-planificar-alimentacion.page.scss'],
 })
-
-export class VacacionListaComponent implements OnInit, OnDestroy {
+export class ListaAlimentacionComponent implements OnInit, OnDestroy {
 
   subscripted: Subscription;
   skeleton = SkeletonListPermisoArray;
   loading: boolean = true;
   pageActual: number = 1;
 
-  vacaciones: Vacacion[] = [];
+  alimentacion: Alimentacion[] = [];
+  num_alimentos: number = 0;
+
+  idEmpleado: any;
 
   ver: boolean = true;
-  codigo: any;
 
   constructor(
-    private vacacionesService: VacacionesService,
+    private alimentacionService: AlimentacionService,
     public modalController: ModalController,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
   ) { }
 
   ngOnInit() {
-    this.codigo = localStorage.getItem('codigo')
+    this.idEmpleado = localStorage.getItem('empleadoID');
     this.BuscarFormatos();
   }
 
@@ -48,34 +49,32 @@ export class VacacionListaComponent implements OnInit, OnDestroy {
       resp => {
         this.formato_fecha = resp.fecha;
         this.formato_hora = resp.hora;
-        this.obtenerListaVacaciones();
+        this.obtenerListaPermisos();
       }
     )
   }
-
+  
   ngOnDestroy() {
     this.subscripted.unsubscribe();
   }
 
-  colorfondocard(vacaciones: { estado: any }) {
-    if (vacaciones.estado === 1) {
+  colorfondocard(a: { aprobada: any; }) {
+    if (a.aprobada === null) {
       return "pendientes";
-    } else if (vacaciones.estado === 2) {
-      return "preautorizados"
-    } else if (vacaciones.estado === 3) {
+    } else if (a.aprobada === true) {
       return "autorizados";
     } else {
       return "negados";
     }
   }
 
-  obtenerListaVacaciones() {
-    this.subscripted = this.vacacionesService.getListaVacacionesByCodigo(this.codigo)
+  obtenerListaPermisos() {
+    this.subscripted = this.alimentacionService.getListaAlimentacionByIdEmpleado(this.idEmpleado)
       .subscribe(
-        vacaciones => {
-          this.vacaciones = vacaciones;
+        alimentacion => {
+          this.alimentacion = alimentacion;
 
-          this.vacaciones.sort((n1, n2) => {
+          this.alimentacion.sort((n1, n2) => {
             if (n1.id > n2.id) {
               return -1;
             }
@@ -84,14 +83,16 @@ export class VacacionListaComponent implements OnInit, OnDestroy {
             }
           });
 
-          this.vacaciones.forEach(v => {
-            // TRATAMIENTO DE FECHAS Y HORAS 
-            v.fec_ingreso_ = this.validar.FormatearFecha(String(v.fec_ingreso), this.formato_fecha, this.validar.dia_completo);
-            v.fec_inicio_ = this.validar.FormatearFecha(String(v.fec_inicio), this.formato_fecha, this.validar.dia_completo);
-            v.fec_final_ = this.validar.FormatearFecha(String(v.fec_final), this.formato_fecha, this.validar.dia_completo);
+          alimentacion.forEach(c => {
+            // TRATAMIENTO DE FECHAS Y HORAS
+            c.fecha_ = this.validar.FormatearFecha(String(c.fecha), this.formato_fecha, this.validar.dia_completo);
+            c.fec_comida_ = this.validar.FormatearFecha(String(c.fec_comida), this.formato_fecha, this.validar.dia_completo);
+            c.hora_inicio_ = this.validar.FormatearHora(c.hora_inicio, this.formato_hora);
+            c.hora_fin_ = this.validar.FormatearHora(c.hora_fin, this.formato_hora);
+
           })
 
-          if (vacaciones.length < 6) {
+          if (alimentacion.length < 6) {
             return this.ver = true;
           } else {
             return this.ver = false;
@@ -108,7 +109,7 @@ export class VacacionListaComponent implements OnInit, OnDestroy {
 
   async presentModalNuevoRegistro() {
     const modal = await this.modalController.create({
-      component: RegistrarVacacionComponent,
+      component: RegistrarAlimentacionComponent,
       cssClass: 'my-custom-class'
     });
 
@@ -122,19 +123,19 @@ export class VacacionListaComponent implements OnInit, OnDestroy {
     return;
   }
 
-  async presentModalVerRegistro(vacacion: Vacacion) {
+  async presentModalVerRegistro(alimentacion: Alimentacion) {
     const modal = await this.modalController.create({
-      component: VerVacacionComponent,
-      componentProps: { vacacion },
+      component: VerAlimentacionComponent,
+      componentProps: { alimentacion },
       cssClass: 'my-custom-class'
     });
     return await modal.present();
   }
 
-  async presentModalEditarRegistro(vacacion: Vacacion) {
+  async presentModalEditarRegistro(alimentacion: Alimentacion) {
     const modal = await this.modalController.create({
-      component: EditarVacacionComponent,
-      componentProps: { vacacion },
+      component: EditarAlimentacionComponent,
+      componentProps: { alimentacion },
       cssClass: 'my-custom-class'
     });
 

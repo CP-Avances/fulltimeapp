@@ -1,41 +1,35 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { ModalController } from '@ionic/angular';
+import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
+import { VerVacacionComponent } from '../ver-vacacion/ver-vacacion.component';
 import { Subscription } from 'rxjs';
-
-import { HoraExtra } from 'src/app/interfaces/HoraExtra';
-
-import { HorasExtrasService } from '../../../../../services/horas-extras.service';
+import { Vacacion } from '../../../../../interfaces/Vacacion';
+import { VacacionesService } from '../../../../../services/vacaciones.service';
+import { EditarVacacionComponent } from '../editar-vacacion/editar-vacacion.component';
+import { RegistrarVacacionComponent } from '../registrar-vacacion/registrar-vacacion.component';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 
-import { RegistrarHoraExtraComponent } from '../registrar-hora-extra/registrar-hora-extra.component';
-import { VerHoraExtraComponent } from '../ver-hora-extra/ver-hora-extra.component';
-import { EditarHoraExtraComponent } from '../editar-hora-extra/editar-hora-extra.component';
-
-import moment from 'moment';
-
 @Component({
-  selector: 'app-lista-hora-extra',
-  templateUrl: './lista-hora-extra.component.html',
-  styleUrls: ['../../solicitar-horas-extras.page.scss'],
+  selector: 'app-lista-vacacion',
+  templateUrl: './lista-vacacion.component.html',
+  styleUrls: ['../../solicitar-vacaciones.page.scss'],
 })
-
-export class ListaHoraExtraComponent implements OnInit, OnDestroy {
+export class ListaVacacionComponent implements OnInit, OnDestroy {
 
   subscripted: Subscription;
   skeleton = SkeletonListPermisoArray;
   loading: boolean = true;
+
+  vacaciones: Vacacion[] = [];
+  num_vacaciones: number = 0;
+
   pageActual: number = 1;
-
-  horas_extras: HoraExtra[] = [];
-  num_horasExtra: number = 0;
-
   ver: boolean = true;
   codigo: any;
 
   constructor(
-    private horasExtrasService: HorasExtrasService,
+    private vacacionesService: VacacionesService,
     public modalController: ModalController,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
@@ -54,7 +48,7 @@ export class ListaHoraExtraComponent implements OnInit, OnDestroy {
       resp => {
         this.formato_fecha = resp.fecha;
         this.formato_hora = resp.hora;
-        this.obtenerListaHoraExtra();
+        this.obtenerListaVacaciones();
       }
     )
   }
@@ -63,41 +57,46 @@ export class ListaHoraExtraComponent implements OnInit, OnDestroy {
     this.subscripted.unsubscribe();
   }
 
-  colorfondocard(hora_extra: { estado: any }) {
-    if (hora_extra.estado === 1) {
+  colorfondocard(vacaciones:{estado: any}){
+    if(vacaciones.estado === 1){
       return "pendientes";
-    } else if (hora_extra.estado === 2) {
+    }else if(vacaciones.estado === 2){
       return "preautorizados"
-    } else if (hora_extra.estado === 3) {
+    }else if(vacaciones.estado === 3){
       return "autorizados";
-    } else {
+    }else{
       return "negados";
     }
   }
 
-  obtenerListaHoraExtra() {
-    this.subscripted = this.horasExtrasService.getListaHorasExtrasByCodigo(this.codigo)
+  obtenerListaVacaciones() {
+    this.subscripted = this.vacacionesService.getListaVacacionesByCodigo(this.codigo)
       .subscribe(
-        horas_extras => {
-          this.horas_extras = horas_extras;
-          this.horas_extras.forEach(h => {
-            h.fecha_inicio_ = this.validar.FormatearFecha(moment(h.fec_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-            h.hora_inicio_ = this.validar.FormatearHora(moment(h.fec_inicio).format('HH:mm:ss'), this.formato_hora);
+        vacaciones => {
+          this.vacaciones = vacaciones;
 
-            h.fecha_fin_ = this.validar.FormatearFecha(moment(h.fec_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);;
-            h.hora_fin_ = this.validar.FormatearHora(moment(h.fec_final).format('HH:mm:ss'), this.formato_hora);
+          this.vacaciones.sort((n1, n2) => {
+            if(n1.id > n2.id){
+              return -1;
+            }
+            if(n1.id < n2.id){
+              return +1;
+            }
+          });
 
-            h.fec_solicita_ = this.validar.FormatearFecha(String(h.fec_solicita), this.formato_fecha, this.validar.dia_completo);
+          this.vacaciones.forEach(v => {
+            // TRATAMIENTO DE FECHAS Y HORAS 
+            v.fec_ingreso_ = this.validar.FormatearFecha(String(v.fec_ingreso), this.formato_fecha, this.validar.dia_completo);
+            v.fec_inicio_ = this.validar.FormatearFecha(String(v.fec_inicio), this.formato_fecha, this.validar.dia_completo);
+            v.fec_final_ = this.validar.FormatearFecha(String(v.fec_final), this.formato_fecha, this.validar.dia_completo);
           })
 
-          const [ultimoNumeroHoraExtra] = horas_extras;
-          this.num_horasExtra = (ultimoNumeroHoraExtra) ? (ultimoNumeroHoraExtra.id) + 1 : 1;
-
-          if (horas_extras.length < 6) {
+          if(vacaciones.length < 6){
             return this.ver = true;
-          } else {
+          }else{
             return this.ver = false;
           }
+          
         },
         err => {
           console.log(err);
@@ -109,7 +108,7 @@ export class ListaHoraExtraComponent implements OnInit, OnDestroy {
 
   async presentModalNuevoRegistro() {
     const modal = await this.modalController.create({
-      component: RegistrarHoraExtraComponent,
+      component: RegistrarVacacionComponent,
       cssClass: 'my-custom-class'
     });
 
@@ -123,19 +122,19 @@ export class ListaHoraExtraComponent implements OnInit, OnDestroy {
     return;
   }
 
-  async presentModalVerRegistro(hora_extra: HoraExtra) {
+  async presentModalVerRegistro(vacacion: Vacacion) {
     const modal = await this.modalController.create({
-      component: VerHoraExtraComponent,
-      componentProps: { hora_extra },
+      component: VerVacacionComponent,
+      componentProps: { vacacion },
       cssClass: 'my-custom-class'
     });
     return await modal.present();
   }
 
-  async presentModalEditarRegistro(hora_extra: HoraExtra) {
+  async presentModalEditarRegistro(vacacion: Vacacion) {
     const modal = await this.modalController.create({
-      component: EditarHoraExtraComponent,
-      componentProps: { hora_extra },
+      component: EditarVacacionComponent,
+      componentProps: { vacacion },
       cssClass: 'my-custom-class'
     });
 

@@ -31,6 +31,7 @@ const routes: Routes = [
           }
         ]
       },
+      //Urls de las paginas del empleado
       {
         path: 'solicitar-permisos',
         loadChildren: () => import('../paginas-empleado/solicitar-permisos/solicitar-permisos.module').then(m => m.SolicitarPermisosPageModule)
@@ -38,6 +39,14 @@ const routes: Routes = [
       {
         path: 'solicitar-horas-extras',
         loadChildren: () => import('../paginas-empleado/solicitar-horas-extras/solicitar-horas-extras.module').then(m => m.SolicitarHorasExtrasPageModule)
+      },
+      {
+        path: 'solicitar-vacaciones',
+        loadChildren: () => import('../paginas-empleado/solicitar-vacaciones/solicitar-vacaciones.module').then(m => m.SolicitarVacacionesPageModule)
+      },
+      {
+        path: 'solicitar-planificar-alimentacion',
+        loadChildren: () => import('../paginas-empleado/solicitar-planificar-alimentacion/solicitar-planificar-alimentacion.module').then(m => m.SolicitarPlanificarAlimentacionPageModule)
       },
     ]
   },

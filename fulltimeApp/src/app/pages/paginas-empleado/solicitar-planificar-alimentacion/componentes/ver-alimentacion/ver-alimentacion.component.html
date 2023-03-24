@@ -1,0 +1,149 @@
+<app-close-modal titleModal="Información de Alimentación"></app-close-modal>
+
+<ion-content mode="md">
+
+  <ion-grid>
+    <ion-row>
+      <ion-col size="6">
+        <ion-item>
+          <ion-label>
+            <b> Solicitud </b> {{ alimentacion.id }}
+          </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col size="6">
+        <ion-item>
+          <ion-label *ngIf="alimentacion.aprobada === null" style=" font-size: 85%;">
+            <b> Estado: </b> <b style="font-size: 95%; float:right;" class="pendiente"> Pendiente </b>
+          </ion-label>
+          <ion-label *ngIf="alimentacion.aprobada === true" style=" font-size: 85%;">
+            <b> Estado: </b> <b style=" font-size: 95%; float:right; margin-top: 0.5%;" class="autorizada"> Autorizado </b>
+          </ion-label>
+          <ion-label *ngIf="alimentacion.aprobada === false" style=" font-size: 85%;">
+            <b> Estado: </b> <b style=" font-size: 95%; float:right; margin-top: 0.5%;" class="negado"> Negado </b>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <div style="text-align: center;">
+    <ion-text style="font-size: 80%; margin:6% 0% -2% 2%; margin-top: 2%;"> Informacion de la Solicitud </ion-text>
+  </div>
+ 
+  <ion-grid style="margin-top: 1%;">
+    <ion-row>
+      <ion-col size="6">
+        <div class="formdiv_tiempo">
+          <ion-item class="item_fondo">
+            <ion-label>
+              <b style="font-size: 85%;"> Servicio  </b><br>
+              <p style="margin-top: 6%; margin-left: 4%;"> {{ alimentacion.nservicio | titlecase }} </p>
+            </ion-label>
+          </ion-item>
+        </div>
+      </ion-col>
+
+      <ion-col size="6">
+        <div class="formdiv_tiempo">
+          <ion-item class="item_fondo">
+            <ion-label>
+              <b style="font-size: 85%;"> Detalle </b> <br>
+              <p style="margin-top: 6%; margin-left: 4%;"> {{ alimentacion.ncomida | titlecase }} </p>
+            </ion-label>
+          </ion-item>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-grid style="margin-top: -4%;">
+    <ion-row>
+      <ion-col size="6">
+        <div class="formdiv_tiempo">
+          <ion-item class="item_fondo">
+            <ion-label>
+              <b style="font-size: 85%;"> Descripción </b><br>
+              <p style="margin-top: 6%; margin-left: 4%;"> {{ alimentacion.ndetallecomida | titlecase }} </p>
+            </ion-label>
+          </ion-item>
+        </div>
+      </ion-col>
+
+      <ion-col size="6">
+        <div class="formdiv_tiempo">
+          <ion-item class="item_fondo">
+            <ion-label>
+              <b style="font-size: 85%;"> Precio </b> <br>
+              <p style="margin-top: 6%; margin-left: 4%;"> {{ alimentacion.nvalor | currency }} </p>
+            </ion-label>
+          </ion-item>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- INFORMACION FECHA -->
+  <ion-text class="text_info"> Informacion Fecha </ion-text>
+  <div class="formdiv">
+    <ion-item class="item_fondo">
+      <ion-label>
+        <b style="font-size: 85%;"> Fecha Solicitada </b> <br>
+        <p style="margin-top: 2%; margin-left: 4%;"> {{ alimentacion.fecha_ }} </p>
+      </ion-label>
+    </ion-item>
+  </div>
+
+  <div class="formdiv">
+    <ion-item class="item_fondo">
+      <ion-label>
+        <b style="font-size: 85%;"> Fecha Consumo </b> <br>
+        <p style="margin-top: 2%; margin-left: 4%;"> {{ alimentacion.fec_comida_ }} </p>
+      </ion-label>
+    </ion-item>
+  </div>
+
+  <!-- INFORMACION HORAS -->
+  <ion-text class="text_info"> Informacion Horas </ion-text>
+  <ion-grid style="margin-top: -2%;">
+    <ion-row>
+      <ion-col size="6">
+        <div class="formdiv_tiempo">
+          <ion-item class="item_fondo">
+            <ion-label>
+              <b style="font-size: 85%;"> Desde </b><br>
+              <p style="margin-top: 6%; margin-left: 4%;"> {{ alimentacion.hora_inicio_ }} </p>
+            </ion-label>
+          </ion-item>
+        </div>
+      </ion-col>
+
+      <ion-col size="6">
+        <div class="formdiv_tiempo">
+          <ion-item class="item_fondo">
+            <ion-label>
+              <b style="font-size: 85%;"> Hasta </b> <br>
+              <p style="margin-top: 6%; margin-left: 4%;"> {{ alimentacion.hora_fin_ }} </p>
+            </ion-label>
+          </ion-item>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- OBSERVACION -->
+  <ion-text class="text_info"> Observación de la Solicitud </ion-text>
+
+  <div class="formdiv">
+    <ion-item class="item_fondo" style="font-size: 85%;" mode="md">
+      <ion-text style="margin-top:2%; width: 100%;" >
+        <b> Observación </b>
+        <br>
+          <p style="margin-top: 2%; margin-left: 4%;">
+            {{ alimentacion.observacion }}
+          </p>
+      </ion-text>
+    </ion-item>
+  </div>
+  <br>
+</ion-content>

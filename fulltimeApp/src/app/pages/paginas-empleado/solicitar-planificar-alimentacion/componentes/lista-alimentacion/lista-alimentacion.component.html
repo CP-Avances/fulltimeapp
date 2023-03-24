@@ -28,86 +28,72 @@
   <ion-button expand="full" shape="round" style="margin: 10px 10px" color="primary"
     (click)="presentModalNuevoRegistro( )">
     <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-    Nueva hora extra
+    Nueva Alimentación
   </ion-button>
 
   <ion-list-header>
     <ion-label style="text-align: center;">
-      <h2>Tus Horas Extras</h2>
+      <h2>Tus solicitudes</h2>
     </ion-label>
   </ion-list-header>
 
-  <ion-card *ngFor="let hora_extra of horas_extras | paginate: { itemsPerPage: 5, currentPage: pageActual } " mode="md"
-    style="margin-top: 5%; border: solid 1px rgb(123, 124, 125);" [color]="colorfondocard(hora_extra)">
+  <ion-card *ngFor="let a of alimentacion | paginate: { itemsPerPage: 5, currentPage: pageActual }" mode="md"
+    style="margin-top: 5%; border: solid 1px rgb(123, 124, 125);" [color]="colorfondocard(a)">
     <ion-item>
       <div class="etiqueta" slot="start">
         <p style="font-size: 62%; margin-top: -4%;">
-          <strong> Solicitud {{ hora_extra.id }} </strong>
+          <strong> Solicitud {{ a.id }} </strong>
         </p>
-        <ion-icon class="icono" name="timer-outline" slot="start"></ion-icon>
+        <ion-icon class="icono" name="restaurant-outline"></ion-icon><br>
         <ion-text class="icono_texto">
           <p class="servicio">
-            <strong> Hora Extra </strong>
+            <strong> {{ a.nservicio | titlecase }} </strong>
           </p>
-          <p *ngIf="hora_extra.estado == 1 " class="pendiente">
+          <p *ngIf="a.aprobada === null" class="pendiente">
             Pendiente
           </p>
-          <p *ngIf="hora_extra.estado == 2" class="pre_autorizado">
-            Pre Autorizada
-          </p>
-          <p *ngIf="hora_extra.estado == 3" class="autorizada">
+          <p *ngIf="a.aprobada === true" class="autorizada">
             Autorizada
           </p>
-          <p *ngIf="hora_extra.estado == 4" class="negado">
+          <p *ngIf="a.aprobada === false" class="negado">
             Negada
           </p>
         </ion-text>
       </div>
 
-     
       <div class="info">
         <p>
-          <ion-text>
-            <strong>Fecha</strong><br>
-            Desde: {{ hora_extra.fecha_inicio_ }}<br>
-            Hasta: {{ hora_extra.fecha_fin_ }}
-          </ion-text>
-          <br>
-          <ion-text>
-            <strong>Horas</strong><br>
-            Inicio: {{ hora_extra.hora_inicio_ }}<br>
-            Fin: {{ hora_extra.hora_fin_ }}
-          </ion-text>
-          <br>
-          <ion-text>
-            <strong>Tiempo: </strong> 
-            {{ hora_extra.num_hora }} horas
-          </ion-text>
+          <strong>Solicitado para: </strong> <br> {{ a.fec_comida_ }} <br>
+          <strong>Precio: </strong> {{ a.nvalor |currency }}<br>
+          <strong>Horario:</strong><br>
+          Desde: {{ a.hora_inicio_ }} <br>
+          Hasta: {{ a.hora_fin_ }} <br>
         </p>
       </div>
 
       <div slot="end" style="text-align: center; font-size: 20px;">
         <!-- Ver registro -->
-        <ion-icon name="eye-outline" (click)="presentModalVerRegistro( hora_extra )"></ion-icon><br>
+        <ion-icon name="eye-outline" (click)="presentModalVerRegistro( a )"></ion-icon><br>
         <!-- Editar registro -->
-        <ion-icon *ngIf="hora_extra.estado === 1" name="create-outline"
-          (click)="presentModalEditarRegistro( hora_extra )" style="margin-bottom:15%;"></ion-icon><br>
+        <ion-icon *ngIf="a.aprobada === null" name="create-outline" (click)="presentModalEditarRegistro( a )"
+          style="margin-bottom:15%;"></ion-icon><br>
         <!-- Eliminar registro -->
-        <btn-delete *ngIf="hora_extra.estado === 1" (onDelete)="ngOnInit()" [isButtom]="false"
-          nameTable="hora_extr_pedidos" [idreg]="hora_extra.id" [userCodigo]="hora_extra.codigo"></btn-delete>
+        <btn-delete *ngIf="a.aprobada === null" (onDelete)="ngOnInit()" [isButtom]="false" nameTable="solicita_comidas"
+          [idreg]="a.id" [userCodigo]="a.codigo">
+        </btn-delete>
       </div>
     </ion-item>
 
     <ion-label style="font-size: 11px; margin: 2%; float:right">
-      <strong> Solicitud realizada &nbsp; {{ hora_extra.fec_solicita_ }} </strong>
+      <strong> Solicitud realizada &nbsp; {{ a.fecha_ }} </strong>
     </ion-label>
   </ion-card>
 
   <!--Configuracion del Pagination - ngxPaginationModulo-->
   <ion-item style="font-size: 70%; margin: 1% 0% 1% 0%;" [hidden]="ver">
-    <pagination-controls 
+    <pagination-controls
       class="paginacion" 
-      (pageChange)="pageActual = $event"
+      (pageChange)="pageActual = $event" 
       [maxSize] = maxSize
       [directionLinks] = directionLinks
       [responsive] = responsive 
