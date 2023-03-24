@@ -13,6 +13,5 @@ export class SolicitarHorasExtrasPage implements OnInit{
   ) {}
 
   ngOnInit(): void {
-
   }
 }

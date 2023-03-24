@@ -1,14 +1,18 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { ModalController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
+
 import { HoraExtra } from 'src/app/interfaces/HoraExtra';
-import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
-import { HorasExtrasService } from 'src/app/services/horas-extras.service';
-import { VerHoraExtraComponent } from '../ver-hora-extra/ver-hora-extra.component';
-import { EditarHoraExtraComponent } from '../editar-hora-extra/editar-hora-extra.component';
-import { RegistrarHoraExtraComponent } from '../registrar-hora-extra/registrar-hora-extra.component';
+
+import { HorasExtrasService } from '../../../../../services/horas-extras.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
+
+import { RegistrarHoraExtraComponent } from '../registrar-hora-extra/registrar-hora-extra.component';
+import { VerHoraExtraComponent } from '../ver-hora-extra/ver-hora-extra.component';
+import { EditarHoraExtraComponent } from '../editar-hora-extra/editar-hora-extra.component';
+
 import moment from 'moment';
 
 @Component({
@@ -144,18 +148,5 @@ export class ListaHoraExtraComponent implements OnInit, OnDestroy {
     }
     return;
   }
-
-  //variables de configuracion del componente de paginacion (pagination-controls)
-  public maxSize: number = 5;
-  public directionLinks: boolean = true;
-  public autoHide: boolean = false;
-  public responsive: boolean = true;
-  public labels: any = {
-    previousLabel: 'ante..',
-    nextLabel: 'sigui..',
-    screenReaderPaginationLabel: 'Pagination',
-    screenReaderPageLabel: 'page',
-    screenReaderCurrentLabel: `You're on page`
-  };
 
 }

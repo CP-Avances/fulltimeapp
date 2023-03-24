@@ -31,7 +31,7 @@ export class PermisosListaComponent implements OnInit, OnDestroy {
   permisos: Permiso[] = [];
   num_permiso: number = 0;
 
-  ver: boolean = false;
+  ver: boolean = true;
   codigo: any;
 
   @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
@@ -113,10 +113,10 @@ export class PermisosListaComponent implements OnInit, OnDestroy {
           const [ultimoNumeroPermiso] = permisos;
           this.num_permiso = (ultimoNumeroPermiso) ? ultimoNumeroPermiso.num_permiso! + 1 : 1;
 
-          if (permisos.length == 0) {
-            this.ver = true;
+          if (permisos.length < 6) {
+            return this.ver = true;
           } else {
-            this.ver = false;
+            return this.ver = false;
           }
 
         },

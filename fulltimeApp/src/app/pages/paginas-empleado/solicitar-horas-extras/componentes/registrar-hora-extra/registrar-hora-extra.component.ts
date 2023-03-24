@@ -1,18 +1,19 @@
-import { Component, OnInit, ViewChild, OnDestroy, Input } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { Component, Input, OnInit, ViewChild, OnDestroy,  } from '@angular/core';
+import { NgForm, FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { ValidacionesService } from 'src/app/libs/validaciones.service';
-import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
+import moment from 'moment';
+
 import { Autorizacion, autorizacionValueDefault } from 'src/app/interfaces/Autorizaciones';
 import { Notificacion, notificacionValueDefault } from 'src/app/interfaces/Notificaciones';
-import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { HoraExtra, horaExtraDefaultValue } from 'src/app/interfaces/HoraExtra';
-import { CloseModalComponent } from 'src/app/componentes/close-modal/close-modal.component';
-import moment, { min } from 'moment';
-moment.locale('es');
 
+import { HorasExtrasService } from 'src/app/services/horas-extras.service';
+import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { PermisosService } from 'src/app/services/permisos.service';
+
+import { CloseModalComponent } from 'src/app/componentes/close-modal/close-modal.component';
+import { ValidacionesService } from 'src/app/libs/validaciones.service';
 
 @Component({
   selector: 'app-registrar-hora-extra',
@@ -27,12 +28,13 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
   private closeModalComponent: CloseModalComponent;
 
   @Input() id_hora_extra: number;
+
   reg: HoraExtra = horaExtraDefaultValue;
   loadingBtn: boolean = false;
   nameFile: string;
-  mensajeFile: string;
+  mensajeFile: string | null;
+  archivoSubido: Array<File> | null;
   required: boolean = false;
-  archivoSubido: Array<File>;
 
   private subscripted: Subscription;
   private subs_bool: boolean = false;
@@ -45,6 +47,9 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
   hora_final: string = "";
 
   hora_iniHor: any;
+
+  //Campo de validacion de documento
+  CetificadoName = new FormControl('');
 
   constructor(
     public validar: ValidacionesService,
@@ -510,6 +515,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     }
     this.reg.fec_inicio = "";
     this.reg.fec_final = "";
+    this.formRegistro.resetForm();
   }
 
 

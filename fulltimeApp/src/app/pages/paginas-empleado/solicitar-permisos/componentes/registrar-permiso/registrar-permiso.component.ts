@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { NgForm, FormControl, MinValidator } from '@angular/forms';
+import { NgForm, FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import moment from 'moment';
 
@@ -17,10 +17,10 @@ import { CatalogosService } from 'src/app/services/catalogos.service';
 import { PermisosService } from 'src/app/services/permisos.service';
 import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { VacacionesService } from 'src/app/services/vacaciones.service';
+import { ParametrosService } from 'src/app/services/parametros.service';
 
 import { CloseModalComponent } from 'src/app/componentes/close-modal/close-modal.component';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
-import { ParametrosService } from 'src/app/services/parametros.service';
 import { AlertController, ModalController } from '@ionic/angular';
 
 

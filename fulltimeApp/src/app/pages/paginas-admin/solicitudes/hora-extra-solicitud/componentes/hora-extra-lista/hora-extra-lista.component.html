@@ -87,14 +87,14 @@
 
       <div slot="end" style="text-align: center; font-size: 20px;">
         <!-- Ver registro -->
-        <ion-icon name="eye-outline" (click)="presentModalVerRegistro( hora_extra )"></ion-icon><br>
+        <ion-icon color="dark" name="eye-outline" (click)="presentModalVerRegistro( hora_extra )"></ion-icon><br>
         <!-- Editar registro -->
-        <ion-icon *ngIf="hora_extra.estado === 1" name="create-outline"
+        <ion-icon color="success" *ngIf="hora_extra.estado === 1" name="create-outline"
           (click)="presentModalEditarRegistro( hora_extra )" style="margin-bottom:15%;"></ion-icon><br>
-        <!-- Eliminar registro 
+        <!-- Eliminar registro -->
         <btn-delete (onDelete)="ngOnInit()" [isButtom]="false" nameTable="hora_extr_pedidos" [idreg]="hora_extra.id"
           [userCodigo]="hora_extra.codigo">
-        </btn-delete>-->
+        </btn-delete>
       </div>
       
     </ion-item>

@@ -291,21 +291,20 @@
           <ion-input readonly="true" [(ngModel)]="reg.docu_nombre" name="file" id="file" [required]="required"></ion-input> 
 
             <!-- Esto, permite ingresar el documento-->
-            <ion-label  position="floating" style="font-size: 90%;"> 
+            <ion-label  position="floating" style="font-size: 90%; margin-bottom: 3%;"> 
               <ion-icon slot="start" color="theme" class="icon_upload" name="cloud-upload-outline"></ion-icon>&nbsp; &nbsp; 
-              &nbsp; &nbsp; Subir archivo /max 2Mb: 
+              &nbsp; &nbsp; Subir archivo /max 2Mb: &nbsp;
+              <!-- Mesaje que indica que no hay archivo subido -->
+              <ion-text *ngIf="reg.docu_nombre == null " style="font-size: 90%;  margin:3% 0% 3% 0%;" color="warning" >{{mensajeFile}}</ion-text> 
             </ion-label> 
 
             <ion-input readonly="true" type="file" (change)="fileChange($event)" id="file" [required]="required"></ion-input>
             
             <!-- Mesaje que tiene el nombre del archivo a subir -->
-            <ion-text *ngIf="reg.docu_nombre != '' " style="font-size: 80%; margin:3% 0% 3% 0%; " color="tertiary" >{{reg.docu_nombre}}</ion-text>   
+            <ion-text *ngIf="reg.docu_nombre != '' " style="font-size: 82%; margin:2% 0% 3% 0%; " color="tertiary" >{{reg.docu_nombre}}</ion-text>   
       
             <!-- Mesaje que indica el error en subir el archivo -->
-            <ion-text *ngIf="reg.docu_nombre == '' " style="font-size: 80%;  margin:3% 0% 3% 0%;" color="danger" >{{mensajeFile}}</ion-text> 
-
-            <!-- Mesaje que indica que no hay archivo subido -->
-            <ion-text *ngIf="reg.docu_nombre == null " style="font-size: 80%;  margin:3% 0% 3% 0%;" color="warning" >{{mensajeFile}}</ion-text> 
+            <ion-text *ngIf="reg.docu_nombre == '' " style="font-size: 82%;  margin:2% 0% 3% 0%;" color="danger" >{{mensajeFile}}</ion-text> 
 
         </ion-item>
         
@@ -316,7 +315,7 @@
         </div>
       </div>
 
-      <!-- BOTON GUARDAR DESDE OTRO COMPONENTE -->
+      <!-- BOTON GUARDAR COMPONENTE -->
       <div style="margin: 6% 3% 0% 3%;">
         <ion-text *ngIf="cg_permiso.documento == true " color="medium" class="text_info">
           Es obligatorio en {{cg_permiso.descripcion}} el documento de Respaldo 

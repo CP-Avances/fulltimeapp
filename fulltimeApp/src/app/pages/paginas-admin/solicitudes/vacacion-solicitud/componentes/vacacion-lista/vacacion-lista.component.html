@@ -78,9 +78,9 @@
 
       <div slot="end" style="text-align: center; font-size: 20px;">
         <!-- ver registro -->
-        <ion-icon slot="end" name="eye-outline" (click)="presentModalVerRegistro( vacacion )"></ion-icon><br>
+        <ion-icon color="dark" slot="end" name="eye-outline" (click)="presentModalVerRegistro( vacacion )"></ion-icon><br>
         <!-- editar registro -->
-        <ion-icon *ngIf="vacacion.estado === 1" slot="end" name="create-outline"
+        <ion-icon color="success" *ngIf="vacacion.estado === 1" slot="end" name="create-outline"
           (click)="presentModalEditarRegistro( vacacion )" style="margin-bottom:15%;"></ion-icon><br>
         <!-- eliminar registro -->
         <btn-delete (onDelete)="ngOnInit()" [isButtom]="false" nameTable="vacaciones" [idreg]="vacacion.id"

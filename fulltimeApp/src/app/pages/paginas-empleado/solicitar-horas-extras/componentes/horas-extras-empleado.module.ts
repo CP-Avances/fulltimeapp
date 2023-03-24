@@ -10,7 +10,6 @@ import { RegistrarHoraExtraComponent } from './registrar-hora-extra/registrar-ho
 import { VerHoraExtraComponent } from './ver-hora-extra/ver-hora-extra.component';
 import { EditarHoraExtraComponent } from './editar-hora-extra/editar-hora-extra.component';
 
-//Modulo paginacion NxgPaginationModule
 import {NgxPaginationModule} from 'ngx-pagination';
 
 @NgModule({
@@ -29,7 +28,7 @@ import {NgxPaginationModule} from 'ngx-pagination';
     FormsModule,
     ModulopipesModule,
     ComponentesModule,
-    NgxPaginationModule
+    NgxPaginationModule,
   ]
 })
 export class HorasExtrasEmpleadoModule { }

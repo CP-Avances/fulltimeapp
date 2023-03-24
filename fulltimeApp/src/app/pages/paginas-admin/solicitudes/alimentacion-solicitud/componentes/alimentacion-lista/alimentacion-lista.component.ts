@@ -23,7 +23,7 @@ export class AlimentacionListaComponent implements OnInit, OnDestroy {
   loading: boolean = true;
   pageActual: number = 1;
 
-  ver: boolean; 
+  ver: boolean = true; 
 
   colorfondo: any;
 
@@ -85,12 +85,6 @@ export class AlimentacionListaComponent implements OnInit, OnDestroy {
             }
           });
 
-          if(alimentacion.length == 0){
-            this.ver = true;
-          }else{
-            this.ver = false;
-          }
-
           alimentacion.forEach(c => {
             // TRATAMIENTO DE FECHAS Y HORAS
             c.fecha_ = this.validar.FormatearFecha(String(c.fecha), this.formato_fecha, this.validar.dia_completo);
@@ -99,6 +93,12 @@ export class AlimentacionListaComponent implements OnInit, OnDestroy {
             c.hora_fin_ = this.validar.FormatearHora(c.hora_fin, this.formato_hora);
       
           })
+
+          if(this.alimentacion.length < 6){
+            return this.ver = true;
+          }else{
+            return this.ver = false;
+          }
 
         },
         err => {

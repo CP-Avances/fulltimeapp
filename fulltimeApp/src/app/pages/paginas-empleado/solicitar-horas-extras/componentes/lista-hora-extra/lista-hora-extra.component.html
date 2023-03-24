@@ -105,18 +105,8 @@
 
   <!--Configuracion del Pagination - ngxPaginationModulo-->
   <ion-item style="font-size: 70%; margin: 1% 0% 1% 0%;" [hidden]="ver">
-    <pagination-controls 
-      class="paginacion" 
-      (pageChange)="pageActual = $event"
-      [maxSize] = maxSize
-      [directionLinks] = directionLinks
-      [responsive] = responsive 
-      [autoHide]="autoHide"
-      [previousLabel]="labels.previousLabel"
-      [nextLabel]="labels.nextLabel"
-      [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
-      [screenReaderPageLabel]="labels.screenReaderPageLabel"
-      [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+    <pagination-controls class="paginacion" (pageChange)="pageActual = $event" maxSize="5" directionLinks="true"
+      responsive="false" previousLabel="ante.." nextLabel="sigui..">
     </pagination-controls>
   </ion-item>
 

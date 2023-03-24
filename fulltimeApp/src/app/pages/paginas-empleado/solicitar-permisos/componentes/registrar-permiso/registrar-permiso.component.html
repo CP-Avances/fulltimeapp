@@ -1,4 +1,4 @@
-<app-close-modal titleModal="Solicita Permiso" [formRegistro]="formRegistro" [resetF]="true"></app-close-modal>
+<app-close-modal titleModal="Solicitud Permiso" [formRegistro]="formRegistro" [resetF]="true"></app-close-modal>
 
 <ion-content mode="md">
   <app-refresh-info (onRefresh)="ngOnInit()" removeItem="cg_tipo_permiso"></app-refresh-info>
@@ -40,6 +40,7 @@
             </ion-label>
           </ion-item>
       </div>
+
       <div style="text-align: center; margin: -1% 0% 4% 0%;">
         <ion-text *ngIf="legalizado == 'SI'" style="font-size: 70%;" > Recuerde despues de enviar la solicitud legalizar el permiso </ion-text>
       </div>
@@ -49,15 +50,15 @@
       <ion-text class="is-required" id="text_info">OBLIGATORIO LLENAR LOS CAMPOS CON </ion-text>
     </div>
 
-      <ion-text class="text_info"> Seleccione una opcion </ion-text>
-      <div class="formdiv">
-        <ion-item class="item_fondo" mode="md">
-          <ion-label class="is-required" position="floating"><b> Tipo de Permiso </b> </ion-label>
-          <ion-select name="id_tipo_permiso" mode="ios" interface="popover" [(ngModel)]="reg.id_tipo_permiso" (ionChange)="ChangeTipoPermiso($event)">
-            <ion-select-option *ngFor="let cg_permiso of cg_tipo_permisos" [value]="cg_permiso.id"> {{ cg_permiso.descripcion }} </ion-select-option>
-          </ion-select>
-        </ion-item>    
-      </div>
+    <ion-text class="text_info"> Seleccione una opcion </ion-text>
+    <div class="formdiv">
+      <ion-item class="item_fondo" mode="md">
+        <ion-label class="is-required" position="floating"><b> Tipo de Permiso </b> </ion-label>
+        <ion-select name="id_tipo_permiso" mode="ios" interface="popover" [(ngModel)]="reg.id_tipo_permiso" (ionChange)="ChangeTipoPermiso($event)">
+          <ion-select-option *ngFor="let cg_permiso of cg_tipo_permisos" [value]="cg_permiso.id"> {{ cg_permiso.descripcion }} </ion-select-option>
+        </ion-select>
+      </ion-item>    
+    </div>
 
     <ng-container *ngIf="reg.id_tipo_permiso != null">
       <div class="formdiv" style="margin-top: 3%;">
@@ -103,6 +104,7 @@
                   </ion-popover>
                 </div>
               </ion-col>
+
               <ion-col size="6">
                 <div class="formdiv_tiempo">
                   <ion-item class="item_fondo" id="open-regiPermiFechaFin" mode="md">
@@ -243,8 +245,7 @@
               </ion-col>
             </ion-row>
           </ion-grid>
-
-          <!--ion-grid *ngSwitchCase="'Días y Horas'" mode="md">
+          <ion-grid>
             <ion-row>
               <ion-col size="6">
                 <div class="formdiv_tiempo">
@@ -275,7 +276,7 @@
                 </div>
               </ion-col>
             </ion-row>
-          </ion-grid-->
+          </ion-grid>
 
         </ion-list>
 
@@ -297,17 +298,17 @@
               <ion-input [(ngModel)]="reg.docu_nombre" name="file" id="file" [required]="required"></ion-input> 
   
               <!-- Esto, permite ingresar el documento-->
-              <ion-label  position="floating" style="font-size: 90%; margin-bottom: 2%;"> 
+              <ion-label  position="floating" style="font-size: 90%; margin-bottom: 3%;"> 
                 <ion-icon slot="start" color="theme" class="icon_upload" name="cloud-upload-outline"></ion-icon>&nbsp; &nbsp; 
                 &nbsp;&nbsp; Subir archivo /max 2Mb: 
               </ion-label> 
               <ion-input reandoly="true" type="file" (change)="fileChange($event)" id="file" [required]="required"></ion-input>
   
               <!-- Mesaje que tiene el nombre del archivo a subir -->
-              <ion-text *ngIf="reg.docu_nombre != '' " style="font-size: 80%; margin:3% 0% 3% 0%; " color="tertiary">{{reg.docu_nombre}}</ion-text>   
+              <ion-text *ngIf="reg.docu_nombre != '' " style="font-size: 82%; margin:2% 0% 3% 0%; " color="tertiary">{{reg.docu_nombre}}</ion-text>   
           
               <!-- Mesaje que indica el error en subir el archivo -->
-              <ion-text *ngIf="reg.docu_nombre == '' " style="font-size: 80%;  margin:3% 0% 3% 0%;" color="danger">{{mensajeFile}}</ion-text>    
+              <ion-text *ngIf="reg.docu_nombre == '' " style="font-size: 82%;  margin:2% 0% 3% 0%;" color="danger">{{mensajeFile}}</ion-text>    
            
             </ion-item>
   

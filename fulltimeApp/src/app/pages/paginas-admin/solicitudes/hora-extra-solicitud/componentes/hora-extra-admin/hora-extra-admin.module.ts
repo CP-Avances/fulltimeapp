@@ -16,6 +16,7 @@ import {NgxPaginationModule} from 'ngx-pagination';
   ],
   exports: [
     HoraExtraListaComponent,
+    
   ],
   imports: [
     CommonModule,

@@ -1,15 +1,19 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ModalController } from '@ionic/angular';
-import { Subscription } from 'rxjs';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { HoraExtra } from 'src/app/interfaces/HoraExtra';
+import { ModalController } from '@ionic/angular';
 import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
-import { ValidacionesService } from 'src/app/libs/validaciones.service';
-import { EditarHoraExtraComponent } from 'src/app/pages/paginas-empleado/solicitar-horas-extras/componentes/editar-hora-extra/editar-hora-extra.component';
+import { LoadingController, IonInfiniteScroll } from '@ionic/angular';
+
+import { Subscription } from 'rxjs';
+
+import { HorasExtrasService } from 'src/app/services/horas-extras.service';
+import { EditarHoraExtraComponent } from 'src/app/pages/paginas-empleado/solicitar-horas-extras/componentes/editar-hora-extra/editar-hora-extra.component'
 import { RegistrarHoraExtraComponent } from 'src/app/pages/paginas-empleado/solicitar-horas-extras/componentes/registrar-hora-extra/registrar-hora-extra.component';
 import { VerHoraExtraComponent } from 'src/app/pages/paginas-empleado/solicitar-horas-extras/componentes/ver-hora-extra/ver-hora-extra.component';
-import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
+import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import moment from 'moment';
+
 
 @Component({
   selector: 'app-hora-extra-lista',
@@ -24,13 +28,16 @@ export class HoraExtraListaComponent implements OnInit, OnDestroy {
   loading: boolean = true;
   pageActual: number = 1;
 
-  ver: boolean;
+  horas_extras: HoraExtra[] = [];
+
+  ver: boolean = true;
   codigo: any;
 
-  horas_extras: HoraExtra[] = [];
+  @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
 
   constructor(
     private horasExtrasService: HorasExtrasService,
+    public loadingController: LoadingController,
     public modalController: ModalController,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
@@ -85,14 +92,8 @@ export class HoraExtraListaComponent implements OnInit, OnDestroy {
             }
           });
 
-          if (horas_extras.length == 0) {
-            this.ver = true;
-          } else {
-            this.ver = false;
-          }
-
           this.horas_extras.forEach(h => {
-
+            // TRATAMIENTO DE FECHAS Y HORAS
             h.fecha_inicio_ = this.validar.FormatearFecha(moment(h.fec_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
             h.hora_inicio_ = this.validar.FormatearHora(moment(h.fec_inicio).format('HH:mm:ss'), this.formato_hora);
 
@@ -102,12 +103,18 @@ export class HoraExtraListaComponent implements OnInit, OnDestroy {
             h.fec_solicita_ = this.validar.FormatearFecha(String(h.fec_solicita), this.formato_fecha, this.validar.dia_completo);
           })
 
+          if (horas_extras.length < 6) {
+            return this.ver = true;
+          } else {
+            return this.ver = false;
+          }
+
         },
         err => {
           console.log(err);
         },
         () => {
-          this.loading = false
+          this.loading = false;
         })
   }
 

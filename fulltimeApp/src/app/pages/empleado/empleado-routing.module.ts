@@ -35,6 +35,10 @@ const routes: Routes = [
         path: 'solicitar-permisos',
         loadChildren: () => import('../paginas-empleado/solicitar-permisos/solicitar-permisos.module').then(m => m.SolicitarPermisosPageModule)
       },
+      {
+        path: 'solicitar-horas-extras',
+        loadChildren: () => import('../paginas-empleado/solicitar-horas-extras/solicitar-horas-extras.module').then(m => m.SolicitarHorasExtrasPageModule)
+      },
     ]
   },
   {

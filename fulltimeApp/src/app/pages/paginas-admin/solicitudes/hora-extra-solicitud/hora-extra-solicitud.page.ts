@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-hora-extra-solicitud',
@@ -9,7 +8,6 @@ import { Platform } from '@ionic/angular';
 export class HoraExtraSolicitudPage implements OnInit {
 
   constructor(
-    public platform: Platform,
     ) {}
 
   ngOnInit() {

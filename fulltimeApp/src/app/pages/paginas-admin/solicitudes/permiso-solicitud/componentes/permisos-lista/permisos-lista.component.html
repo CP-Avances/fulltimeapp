@@ -84,13 +84,13 @@
 
       <div slot="end" style="text-align: center; font-size: 20px;">
         <!-- Ver registro -->
-        <ion-icon slot="end" name="eye-outline" (click)="presentModalVerRegistro( permiso )"></ion-icon><br>
+        <ion-icon color="dark" slot="end" name="eye-outline" (click)="presentModalVerRegistro( permiso )"></ion-icon><br>
         <!-- Editar registro -->
-        <ion-icon *ngIf="permiso.estado === 1" slot="end" name="create-outline"
+        <ion-icon color="success" *ngIf="permiso.estado === 1" slot="end" name="create-outline"
           (click)="presentModalEditarRegistro( permiso )" style="margin-bottom:15%;"></ion-icon><br>
-        <!-- Eliminar registro 
+        <!-- Eliminar registro -->
         <btn-delete (onDelete)="ngOnInit()" [isButtom]="false" nameTable="permisos" [idreg]="permiso.id"
-          [userCodigo]="permiso.codigo"></btn-delete>-->
+          [userCodigo]="permiso.codigo"></btn-delete>
       </div>
 
     </ion-item>

@@ -3,6 +3,7 @@ import { ModalController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import moment from 'moment';
+moment.locale('es');
 
 import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';

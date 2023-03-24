@@ -75,9 +75,9 @@
 
       <div slot="end" style="text-align: center; font-size: 20px;">
         <!-- Ver registro -->
-        <ion-icon name="eye-outline" (click)="presentModalVerRegistro( a )"></ion-icon><br>
+        <ion-icon color="dark" name="eye-outline" (click)="presentModalVerRegistro( a )"></ion-icon><br>
         <!-- Editar registro -->
-        <ion-icon *ngIf="a.aprobada === null" name="create-outline" (click)="presentModalEditarRegistro( a )"
+        <ion-icon color="success" *ngIf="a.aprobada === null" name="create-outline" (click)="presentModalEditarRegistro( a )"
           style="margin-bottom:15%;"></ion-icon><br>
         <!-- Eliminar registro -->
         <btn-delete (onDelete)="ngOnInit()" [isButtom]="false" nameTable="solicita_comidas" [idreg]="a.id"
