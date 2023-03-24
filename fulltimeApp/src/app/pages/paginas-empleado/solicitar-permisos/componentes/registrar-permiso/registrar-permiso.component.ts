@@ -772,9 +772,9 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       hasta + ' ' + h_fin;
 
     //Listado para eliminar el usuario duplicado
-    var allNotificaciones: any = [];
+    var allNotificaciones = [];
     //Ciclo por cada elemento del listado
-    permiso.EmpleadosSendNotiEmail!.forEach(function(elemento: any, indice: any, array: any) {
+    permiso.EmpleadosSendNotiEmail.forEach(function(elemento: any, indice: any, array: any) {
       // Discriminación de elementos iguales
       if(allNotificaciones.find((p: any)=> p.empleado == elemento.empleado) == undefined)
       {
@@ -790,13 +790,13 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       noti.id_receives_empl = e.empleado
 
       console.log("si envia notificaciones: ", e.permiso_noti);
+      console.log('Info de notificacion: ',noti);
 
 
       //  No dejar con el signo de esclamacion no se debe leer asi quitar 
       if (!e.permiso_noti) {
         this.autorizaciones.postNotificacion(noti).subscribe(
           resp => {
-
             this.permisoService.sendNotiRealTime(resp.respuesta);
           },
           err => { this.validaciones.showToast(err.error.message, 3000, 'danger') },

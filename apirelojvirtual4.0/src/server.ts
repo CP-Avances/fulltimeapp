@@ -93,10 +93,10 @@ class Servidor {
         });
 
 
-        this.app.use((req, res, next) => {
+        /*this.app.use((req, res, next) => {
             res.header('Access-Control-Allow-Origin', '*:*');
             next();
-        });
+        })*/;
 
 
         io.on('connection', (socket: any) => {

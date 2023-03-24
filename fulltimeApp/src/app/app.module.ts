@@ -21,8 +21,7 @@ registerLocaleData(localEsEC);
 
 // Configuracion del Socket.io
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
-import { environment } from 'src/environments/environment.prod';
-const config: SocketIoConfig = { url: environment.url, options: {}};
+const config: SocketIoConfig = { url: "http://186.4.226.49:8010", options: {}};
 
 
 @NgModule({

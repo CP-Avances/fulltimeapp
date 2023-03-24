@@ -8,6 +8,7 @@ import { NotificacionPopoverComponent } from '../notificacion-popover/notificaci
 
 import { Notificacion } from '../../interfaces/Notificaciones';
 import { NotificacionTimbre } from '../../interfaces/Notificaciones';
+import { LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
 
 import { Router } from '@angular/router';
 import { ParametrosService } from 'src/app/services/parametros.service';
@@ -34,6 +35,9 @@ export class NavegadorAdminComponent implements OnInit {
   public countbadge: number = 0;
   mensaje: string = "";
   empleEnvia: string = "";
+
+  ids: number [] = [];
+  resume: boolean = false;
 
   constructor(
     private userService: DataUserLoggedService,
@@ -70,13 +74,28 @@ export class NavegadorAdminComponent implements OnInit {
       if(data_llega.id_send_empl !== this.idEmpleadoIngresa){
         console.log("Notificacion recibida",data_llega.id);
 
+
         if(data_llega.id_receives_empl === this.idEmpleadoIngresa){
           this.mensaje = "Nueva Notificacion de " + data_llega.usuario;
           console.log("Usuario envio",this.empleEnvia);
           this.countbadge = this.countNoti + 1;
 
             try{
-              this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
+              //this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
+
+              var t = new Date();
+              t.setSeconds(t.getSeconds() + 5);
+              let id = this.ids.length;
+              this.ids.push(id);
+
+              let options:ScheduleOptions = { notifications: [{
+                id: data_llega.id,
+                title: "Fulltime Notificion: "+id,
+                body: this.mensaje,
+              }]}
+
+              LocalNotifications.schedule(options).then(()=> {});
+
             }catch (error) {
               this.mostrarToasNoti("No se pudo resibir la notificacion: \n"+ error);
               console.log("Problemas en la notificacion: ", error);

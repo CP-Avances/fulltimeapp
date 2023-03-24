@@ -4,7 +4,6 @@ import { HorarioE } from '../interfaces/Horarios';
 import { Cg_Feriados } from '../interfaces/Catalogos';
 
 import moment from 'moment';
-moment.locale('es');
 
 @Injectable({
     providedIn: 'root'

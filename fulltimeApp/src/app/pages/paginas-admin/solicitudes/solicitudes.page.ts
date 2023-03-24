@@ -36,6 +36,19 @@ import { Platform } from '@ionic/angular';
         </ion-col>
         
         <ion-col size="6">
+          <ion-button [color] = "colorh" expand="block" (click)="BtnHorasExtras_click()">
+            <div>
+              <ion-icon name="hourglass-outline"></ion-icon> <br>
+              <ion-text>
+                Horas Extras
+              </ion-text>
+            </div>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col size="6">
           <ion-button [color] = "colorv" expand="block" (click)="BtnVacaciones_click()">
             <div>
               <ion-icon name="airplane-outline"></ion-icon> <br>
@@ -45,25 +58,13 @@ import { Platform } from '@ionic/angular';
             </div>
           </ion-button>
         </ion-col>
-      </ion-row>
 
-      <ion-row>
         <ion-col size="6">
           <ion-button [color] = "colora" expand="block"  (click)="BtnAlimentacion_click()">
             <div>
               <ion-icon name="fast-food-outline"></ion-icon> <br>
               <ion-text>
                 Alimentación
-              </ion-text>
-            </div>
-          </ion-button>
-        </ion-col>
-        <ion-col size="6">
-          <ion-button [color] = "colorh" expand="block" (click)="BtnHorasExtras_click()">
-            <div>
-              <ion-icon name="hourglass-outline"></ion-icon> <br>
-              <ion-text>
-                Horas Extras
               </ion-text>
             </div>
           </ion-button>
@@ -136,13 +137,13 @@ export class SolicitudesPage implements OnInit {
   }
 
   ngOnInit() {
-    
+    this.VerificarFunciones();
   }
 
-  Btn_permisos: boolean = false;
-  Btn_horasExtras: boolean = false;
-  Btn_alimentacion: boolean = false;
-  Btn_vacaciones: boolean = false;
+  Btn_permisos: boolean;
+  Btn_horasExtras: boolean;
+  Btn_alimentacion: boolean;
+  Btn_vacaciones: boolean;
 
   colorp: any;
   colorh: any;
@@ -181,45 +182,58 @@ export class SolicitudesPage implements OnInit {
       }else{
         this.colorv = "deshabilitado";
       }
+    }, error => {
+      this.colorp = "deshabilitado";
+      this.colorh = "deshabilitado";
+      this.colorv = "deshabilitado";
+      this.colora = "deshabilitado";
     });
   }
 
   BtnPermisos_click(){
     if(this.Btn_permisos == true){
       this.router.navigateByUrl("/adminpage/solicitudes/permiso-solicitud");
-    }else{
+    }else if(this.Btn_permisos == false){
       this.usuarioIncorrectoToas(" Ups! No tiene habilitado el modulo de Permisos");
-    }    
+    }else{
+      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion. \n Comprueba tu conexion a internet o");
+    }
   }
 
   BtnHorasExtras_click(){
     if(this.Btn_horasExtras == true){
       this.router.navigateByUrl("/adminpage/solicitudes/hora-extra-solicitud");
+    }else if(this.Btn_horasExtras == false){
+      this.usuarioIncorrectoToas(" Ups! No tiene habilitado el modulo de Horas Extras\n\nTe gustaria activarlo?");
     }else{
-      this.usuarioIncorrectoToas(" Ups! No tiene habilitado el modulo de Horas Extras");
+      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion. \n Comprueba tu conexion a internet o");
     }
   }
 
   BtnAlimentacion_click(){
     if(this.Btn_alimentacion == true){
       this.router.navigateByUrl("/adminpage/solicitudes/alimentacion-solicitud");
+    }else if(this.Btn_alimentacion == false){
+      this.usuarioIncorrectoToas(" Ups! No tiene habilitado el modulo de Alimentacion\n\nTe gustaria activarlo?");
     }else{
-      this.usuarioIncorrectoToas(" Ups! No tiene habilitado el modulo de Alimentacion");
+      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion.\n Comprueba tu conexion a internet o");
     }
   }
 
   BtnVacaciones_click(){
     if(this.Btn_vacaciones == true){
       this.router.navigateByUrl("/adminpage/solicitudes/vacacion-solicitud");
+    }else if(this.Btn_vacaciones == false){
+      this.usuarioIncorrectoToas(" Ups! No tiene habilitado el modulo de Vacaciones\n\nTe gustaria activarlo?");
     }else{
-      this.usuarioIncorrectoToas(" Ups! No tiene habilitado el modulo de Vacaciones");
+      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion. \n Comprueba tu conexion a internet o");
     }
   }
 
 
   async usuarioIncorrectoToas(mensaje: string) {
     const toast = await this.toastController.create({
-      message: `<ion-icon name="information-circle-outline"></ion-icon>`+mensaje+"\n\n Te gustaria activarlo? \n Comunicate con nosotros: www.casapazmino.com.ec",
+      message: `<ion-icon name="information-circle-outline"></ion-icon>`+mensaje+`\n Comunicate con nosotros: www.casapazmino.com.ec`,
       duration: 4500,
       position: "top",
       color: "notificacicon",

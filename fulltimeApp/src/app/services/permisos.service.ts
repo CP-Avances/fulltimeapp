@@ -29,8 +29,7 @@ export class PermisosService {
 
   // Noti_realtime
   sendNotiRealTime(data: any) {
-    console.log("Socket conection: ",this.socket.connect())
-    console.log("Notificacion enviada: ",this.socket.emit('nueva_notificacion', data));
+    this.socket.emit('nueva_notificacion', data);
   }
 
   /*********************************************************************

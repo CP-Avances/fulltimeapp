@@ -1,0 +1,74 @@
+ion-select {
+    width: 100%;  
+    justify-content: center;
+}
+
+.radio-buttoms {
+    display: inline-flex;
+    width: 130px;
+    align-items: center;
+}
+
+.paginacion{
+  margin: auto;
+  padding-top: 2%;
+  padding-bottom: 2%;
+}
+.center{
+  display: block;
+  margin: auto;
+}
+
+.paginacion ::ng-deep .ngx-pagination {
+  padding: 0%;
+  margin: auto;
+}
+
+.paginacion ::ng-deep .ngx-pagination .current {
+  background: rgb(28, 133, 219);
+  color: rgb(255, 255, 255);
+  font-weight: bold;
+  border-radius: 5px;
+  padding: 0% -3% 0% -3%;
+  margin: 0% -1% 0% -1%;
+}
+  
+.paginacion :host ::ng-deep .ngx-pagination span {
+  color: rgb(177, 221, 255);
+  font-family:monospace;
+  margin: 0% -3% 0% -3%;
+}
+
+.paginacion ::ng-deep .ngx-pagination a{
+  background-color: transparent;
+  color: rgb(177, 221, 255);
+  margin: 0% -3% 0% -3%;
+}
+
+.icono_texto{
+  font-size: 68%;
+}
+
+.icono_texto .servicio{
+  margin-bottom: 10%;
+}
+
+.info{
+  margin: 0% 2% 0% 2%; 
+  font-size: 76%;
+}
+
+.icono{
+  font-size: 20px; 
+  margin-bottom: -4px;
+}
+
+.etiqueta{
+  text-align: center; 
+  margin-top: 5%; 
+  margin-right: 3%;
+}
+
+.servicio{
+  margin-bottom: 3px;
+}

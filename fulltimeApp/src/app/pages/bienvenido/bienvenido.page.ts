@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { Moment } from 'moment';
+import { ToastController, ModalController, Platform, AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-bienvenido',

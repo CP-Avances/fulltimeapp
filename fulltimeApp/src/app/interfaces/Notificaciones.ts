@@ -13,14 +13,14 @@ export interface Notificacion {
     nempleadoreceives?: string;
     ndepartamento?: string;
     mensaje: string;
-    tipo?: number;
+    tipo?: number | undefined;
 }
 
 export const notificacionValueDefault = {
-    id: 0,
-    id_send_empl: 0,
-    id_receives_empl: 0,
-    id_receives_depa: 0,
+    id: undefined,
+    id_send_empl: undefined,
+    id_receives_empl: undefined,
+    id_receives_depa: undefined,
     estado: '',
     create_at: '',
     visto: false,
@@ -28,7 +28,7 @@ export const notificacionValueDefault = {
     id_vacaciones: null,
     id_hora_extra: null,
     mensaje: '',
-    tipo: 0
+    tipo: undefined
 }
 
 export interface EmpleadosSendNotiEmail {
