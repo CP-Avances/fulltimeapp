@@ -11,6 +11,7 @@ import { ListaEmpleadosComponent } from './lista-empleados/lista-empleados.compo
 import { DataUserLoggedService } from '../services/data-user-logged.service';
 import { EmpleadosService } from '../services/empleados.service';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { RangoFechasComponent } from './rango-fechas/rango-fechas.component';
 import { CloseModalComponent } from './close-modal/close-modal.component';
 import { SaveRegisterComponent } from './accion-buttons/save-register/save-register.component';
 import { SearchRegisterComponent } from './accion-buttons/search-register/search-register.component';
@@ -36,7 +37,8 @@ import { AprobacionMultipleComponent } from './aprobacion-multiple/aprobacion-mu
         ListaEmpleadosComponent,
         ListaNotificacionComponent,
         AprobacionMultipleComponent,
-        PestaniasEstadosComponent
+        PestaniasEstadosComponent,
+        RangoFechasComponent,
     ],
     exports: [
         NavegadorAdminComponent,
@@ -50,7 +52,8 @@ import { AprobacionMultipleComponent } from './aprobacion-multiple/aprobacion-mu
         ListaEmpleadosComponent,
         ListaNotificacionComponent,
         AprobacionMultipleComponent,
-        PestaniasEstadosComponent
+        PestaniasEstadosComponent,
+        RangoFechasComponent,
     ],
     imports: [
         CommonModule,
