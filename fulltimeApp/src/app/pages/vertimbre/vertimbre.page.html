@@ -1,0 +1,352 @@
+<ion-header style="color: #000000;">
+  <div style="padding:1%; background: white">
+    <br><br>
+    <ion-img class="center" style="width:45%;" src="../../../assets/images/C_FTLOGORV.png"></ion-img>
+    <ion-label mode="md" color="medium" style="text-align:center">
+      <h1 style="font-size: 4.5vw"><b>Reloj Virtual</b></h1>
+    </ion-label>
+  </div>
+
+  <div>
+    <!-- Botones de Hora celular y la hora del servidor -->
+    <ion-segment *ngIf="rol_empleado === 1" color="primary" [(ngModel)]="verTipoTimbre" mode="md" (ionChange)="cambioHoraSC($event)">
+      
+      <ion-segment-button value="timbreCelular">
+        <ion-label>Hora del celular</ion-label>
+      </ion-segment-button>  
+      
+      <ion-segment-button value="timbreServidor">
+        <ion-label>Hora del Servidor</ion-label>
+      </ion-segment-button>
+
+    </ion-segment>
+
+    <!-- filtro de timbres por fechas -->
+    <app-rango-fechas></app-rango-fechas>
+   
+    <ion-row>
+      <ion-col size="6">
+        <ion-button color="acua" shape="round" expand="full" (click)="mostrarfiltro()" [disabled]="btn_filtro">
+         <ion-icon color="light" name="search-outline" style="margin-right: 3%;"></ion-icon>
+          <ion-label style="font-size: 72%;">FILTRAR TIMBRES</ion-label>
+        </ion-button>
+      </ion-col>
+
+      <ion-col size="6">
+        <ion-button color="theme" shape="round" expand="full" (click)="mostrarTimbres()" [disabled]="btn_todos">
+          <ion-icon color="light" name="list-outline" style="margin-right: 3%;"></ion-icon>
+          <ion-label style="font-size: 72%;">MOSTRAR TODOS</ion-label>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    <br>
+  </div>
+</ion-header>
+
+
+<ng-container>
+  <!--Contenedor de todos los timbres admin-->
+  <ion-content [hidden]="todos">
+    <div *ngIf="timbres.length === 0; else todo" style="text-align: center;">
+      <br>
+      <ion-text color="primary">
+        <span>Obteniendo timbres Por favor Espere</span>
+      </ion-text>
+      <ion-progress-bar type="indeterminate"></ion-progress-bar>
+      <br>
+    </div>
+
+    <ng-template #todo>
+      <ion-content>
+        <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
+        <ion-list *ngIf="verTipoTimbre === 'timbreCelular'">
+
+          <ion-item-group
+            *ngFor="let item of timbres | keyvalue : ordenOriginal | paginate: { itemsPerPage: 7, currentPage: pageTodos }">
+            <ion-item-divider mode='ios'  style="font-size: 90%; font-weight: 100;">
+              <ion-label color="dark"> {{item.key}} </ion-label> 
+            </ion-item-divider>
+
+            <ion-item *ngFor="let t of item.value">
+              <div>
+                <ion-label class="textoTimbreEmpleado" color="primary">
+                  <div [ngSwitch]="t.accion">
+                    <p *ngSwitchCase="'PES'">Entrada o salida permiso</p>
+                    <p *ngSwitchCase="'AES'">Entrada o salida almuerzo/p>
+                    <p *ngSwitchCase="'EoS'">Entrada o salida jornada</p>
+                    <p *ngSwitchCase="'E'">Inicio de la jornada</p>
+                    <p *ngSwitchCase="'S'">Fin de la jornada</p>
+                    <p *ngSwitchCase="'S/A'">Inicio almuerzo</p>
+                    <p *ngSwitchCase="'E/A'">Fin almuerzo</p>
+                    <p *ngSwitchCase="'S/P'">Inicio permiso</p>
+                    <p *ngSwitchCase="'E/P'">Fin permiso</p>
+                    <p *ngSwitchCase="'HA'">Timbre abierto</p>
+                    <p *ngSwitchDefault>Timbre desconocido</p>
+                  </div>
+
+                  <ion-label color="dark" class="textoObs" *ngIf="t.dispositivo_timbre!=''"
+                    (click)="presentAlert(t.observacion,t.hora_timbre_diferente, t.ubicacion, t.novedades_conexion, t.conexion)">
+                    <ion-icon color="danger" *ngIf="t.hora_timbre_diferente || t.conexion != true" name="alert-circle-outline"></ion-icon>
+                    Toque aquí para más info..
+                  </ion-label>
+                </ion-label>
+              </div>
+
+              <ion-button class="tamanoBotonDER" mode="ios" color="light">
+                <div>
+                  Hora: <br>
+                  {{t.hora}}
+                </div>
+              </ion-button>
+
+              <ion-button class="ubicacionDER" mode="ios" color="light" shape="round"
+                (click)="abrirMapa(t.latitud, t.longitud)">
+                <div>
+                  <ion-icon color="acua" class="tamanoIconoEmpleado" name="location-outline"></ion-icon>
+                  <ion-label color="dark"> Ubicación</ion-label> <br>
+                </div>
+              </ion-button>
+            </ion-item>
+          </ion-item-group>
+        </ion-list>
+
+        <ion-list *ngIf="rol_empleado === 1 && verTipoTimbre === 'timbreServidor'">
+          <ion-item-group
+            *ngFor="let item of timbres | keyvalue : ordenOriginal | paginate: { itemsPerPage: 7, currentPage: pageTodos }">
+            <ion-item-divider mode="md" mode="ios" style="font-size: 90%; font-weight: 100;">
+              <ion-label> {{item.key}}</ion-label>
+            </ion-item-divider>
+
+            <ion-item *ngFor="let t of item.value">
+              <div>
+                <ion-label class="textoTimbreEmpleado" color="primary">
+                  <div [ngSwitch]="t.accion">
+                    <p *ngSwitchCase="'PES'">Entrada o salida permiso</p>
+                    <p *ngSwitchCase="'AES'">Entrada o salida almuerzo/p>
+                    <p *ngSwitchCase="'EoS'">Entrada o salida jornada</p>
+                    <p *ngSwitchCase="'E'">Inicio de la jornada</p>
+                    <p *ngSwitchCase="'S'">Fin de la jornada</p>
+                    <p *ngSwitchCase="'S/A'">Inicio almuerzo</p>
+                    <p *ngSwitchCase="'E/A'">Fin almuerzo</p>
+                    <p *ngSwitchCase="'S/P'">Inicio permiso</p>
+                    <p *ngSwitchCase="'E/P'">Fin permiso</p>
+                    <p *ngSwitchCase="'HA'">Timbre abierto</p>
+                    <p *ngSwitchDefault>Timbre desconocido</p>
+                  </div>
+
+                  <ion-label color="dark" class="textoObs" *ngIf="t.dispositivo_timbre!=''"
+                    (click)="presentAlert(t.observacion,t.hora_timbre_diferente, t.ubicacion, t.novedades_conexion, t.conexion)">
+                    <ion-icon color="danger" *ngIf="t.hora_timbre_diferente || t.conexion != true" name="alert-circle-outline"></ion-icon>
+                    Toque aquí para más info..
+                  </ion-label>
+                </ion-label>
+              </div>
+
+              <ion-button class="tamanoBotonDER" mode="ios" color="light">
+                <div>
+                  Hora: <br>
+                  <ion-text >{{t.shora}}</ion-text>
+                </div>
+              </ion-button>
+
+              <ion-button class="ubicacionDER" mode="ios" color="light" shape="round"
+                (click)="abrirMapa(t.latitud, t.longitud)">
+                <div>
+                  <ion-icon color="primary" class="tamanoIconoEmpleado" name="location-outline"></ion-icon>
+                  <ion-label color="dark"> Ubicación</ion-label> <br>
+                </div>
+              </ion-button>
+            </ion-item>
+          </ion-item-group>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-content>
+
+  <!--Configuracion del Pagination - ngxPaginationModulo-->
+  <ion-footer style=" width: 100%; padding: 1%;" [hidden]=todos>
+    <ion-item style="font-size: 80%; margin: 1% 0% 1% 0%;">
+      <pagination-controls
+        class="paginacion" 
+        (pageChange)="pageTodos = $event" 
+        [maxSize] = maxSize
+        [directionLinks] = directionLinks
+        [responsive] = responsive 
+        [autoHide]="autoHide"
+        [previousLabel]="labels.previousLabel"
+        [nextLabel]="labels.nextLabel"
+        [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+        [screenReaderPageLabel]="labels.screenReaderPageLabel"
+        [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+    </pagination-controls>
+    </ion-item>
+  </ion-footer>
+
+
+<!-- Contenedor del filtro de timbres admin-->
+<ion-content [hidden]="filtro">
+
+  <div *ngIf="timbres_filtro.length === 0; else showTimbres" style="text-align: center;">
+    <br>
+    <ion-text color="primary">
+      <span>Obteniendo timbres Por favor Espere</span>
+    </ion-text>
+    <ion-progress-bar type="indeterminate"></ion-progress-bar>
+    <br>
+  </div>
+
+  <ng-template #showTimbres>
+    <ion-content>
+      <ion-list *ngIf="verTipoTimbre === 'timbreCelular'">
+
+        <ion-item-group
+          *ngFor="let item of timbres_filtro | keyvalue | paginate: { itemsPerPage: 7, currentPage: paginafiltro }">
+          <ion-item-divider mode="md" mode="ios" style="font-size: 90%; font-weight: 100;">
+            <ion-label> {{item.key}}</ion-label>
+          </ion-item-divider>
+
+          <ion-item *ngFor="let t of item.value">
+            <div>
+              <ion-label class="textoTimbreEmpleado" color="primary">
+
+                <div [ngSwitch]="t.accion">
+                  <p *ngSwitchCase="'PES'">Entrada o salida permiso</p>
+                  <p *ngSwitchCase="'AES'">Entrada o salida almuerzo/p>
+                  <p *ngSwitchCase="'EoS'">Entrada o salida jornada</p>
+                  <p *ngSwitchCase="'E'">Inicio de la jornada</p>
+                  <p *ngSwitchCase="'S'">Fin de la jornada</p>
+                  <p *ngSwitchCase="'S/A'">Inicio almuerzo</p>
+                  <p *ngSwitchCase="'E/A'">Fin almuerzo</p>
+                  <p *ngSwitchCase="'S/P'">Inicio permiso</p>
+                  <p *ngSwitchCase="'E/P'">Fin permiso</p>
+                  <p *ngSwitchCase="'HA'">Timbre abierto</p>
+                  <p *ngSwitchDefault>Timbre desconocido</p>
+                </div>
+
+                <ion-label color="dark" class="textoObs" *ngIf="t.dispositivo_timbre!=''"
+                  (click)="presentAlert(t.observacion,t.hora_timbre_diferente,t.ubicacion, t.novedades_conexion, t.conexion)">
+                  <ion-icon color="danger" *ngIf="t.hora_timbre_diferente || t.conexion != true" name="alert-circle-outline"></ion-icon>
+                  Toque aquí para más info..
+                </ion-label>
+              </ion-label>
+            </div>
+
+            <ion-button class="tamanoBotonDER" mode="ios" color="light">
+              <div>
+                Hora: <br>
+                {{t.hora}}
+              </div>
+            </ion-button>
+
+            <ion-button class="ubicacionDER" mode="ios" color="light" shape="round"
+              (click)="abrirMapa(t.latitud, t.longitud)">
+              <div>
+
+                <ion-icon color="acua" class="tamanoIconoEmpleado" name="location-outline"></ion-icon>
+                <ion-label color="dark"> Ubicación</ion-label> <br>
+              </div>
+            </ion-button>
+
+          </ion-item>
+        </ion-item-group>
+      </ion-list>
+
+      <ion-list *ngIf="rol_empleado === 1 && verTipoTimbre === 'timbreServidor'">
+        <ion-item-group
+          *ngFor="let item of timbres_filtro | keyvalue | paginate: { itemsPerPage: 7, currentPage: paginafiltro }">
+          <ion-item-divider mode="md" mode="ios" style="font-size: 90%; font-weight: 100;">
+            <ion-label> {{item.key}}</ion-label>
+          </ion-item-divider>
+          <ion-item *ngFor="let t of item.value">
+            <div>
+              <ion-label class="textoTimbreEmpleado" color="primary">
+
+                <div [ngSwitch]="t.accion">
+                  <p *ngSwitchCase="'PES'">Entrada o salida permiso</p>
+                  <p *ngSwitchCase="'AES'">Entrada o salida almuerzo/p>
+                  <p *ngSwitchCase="'EoS'">Entrada o salida jornada</p>
+                  <p *ngSwitchCase="'E'">Inicio de la jornada</p>
+                  <p *ngSwitchCase="'S'">Fin de la jornada</p>
+                  <p *ngSwitchCase="'S/A'">Inicio almuerzo</p>
+                  <p *ngSwitchCase="'E/A'">Fin almuerzo</p>
+                  <p *ngSwitchCase="'S/P'">Inicio permiso</p>
+                  <p *ngSwitchCase="'E/P'">Fin permiso</p>
+                  <p *ngSwitchCase="'HA'">Timbre abierto</p>
+                  <p *ngSwitchDefault>Timbre desconocido</p>
+                </div>
+
+                <ion-label color="dark" class="textoObs" *ngIf="t.dispositivo_timbre!=''"
+                  (click)="presentAlert(t.observacion,t.hora_timbre_diferente,t.ubicacion , t.novedades_conexion, t.conexion)">
+                  <ion-icon color="danger" *ngIf="t.hora_timbre_diferente || t.conexion != true" name="alert-circle-outline"></ion-icon>
+                  Toque aquí para más info..
+                </ion-label>
+              </ion-label>
+            </div>
+
+            <ion-button class="tamanoBotonDER" mode="ios" color="light">
+              <div>
+                Hora: <br>
+                {{t.shora}}
+
+              </div>
+            </ion-button>
+
+            <ion-button class="ubicacionDER" mode="ios" color="light" shape="round"
+              (click)="abrirMapa(t.latitud, t.longitud)">
+              <div>
+                <ion-icon color="primary" class="tamanoIconoEmpleado" name="location-outline"></ion-icon>
+                <ion-label color="dark"> Ubicación</ion-label> <br>
+              </div>
+            </ion-button>
+
+          </ion-item>
+        </ion-item-group>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-content>
+
+<!--Configuracion del Pagination - ngxPaginationModulo-->
+<ion-footer style=" width: 100%; padding: 1%;" [hidden]=filtro>
+  <ion-item style="font-size: 80%; margin: 1% 0% 1% 0%;">
+    <pagination-controls  
+      class="paginacion" 
+      (pageChange)="paginafiltro = $event" 
+      [maxSize] = maxSize
+      [directionLinks] = directionLinks
+      [responsive] = responsive 
+      [autoHide]="autoHide"
+      [previousLabel]="labels.previousLabel"
+      [nextLabel]="labels.nextLabel"
+      [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+      [screenReaderPageLabel]="labels.screenReaderPageLabel"
+      [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+    </pagination-controls>
+  </ion-item>
+</ion-footer>
+
+<!-- Ventana de empleado sin registro -->
+
+<ion-content [hidden]='vacio'>
+  <div style="text-align: center; padding-top: 2%;">
+    <ion-img class="tamanoImagen" src="../../../assets/images/Sin_registro.svg"></ion-img>
+    <br><br>
+    <ion-label>
+      El Empleado no tiene registrados timbres
+    </ion-label>
+  </div>
+</ion-content>
+
+<!-- Ventana de sin registro deacuerdo al filtro de fechas -->
+<ion-content [hidden]='filtro_mensaje'>
+  <div style="text-align: center; padding-top: 2%;">
+    <ion-img class="tamanoImagen" src="../../../assets/images/Sin_registro.svg"></ion-img>
+    <br><br>
+    <ion-label>
+      No existen timbres registrados en esas fechas
+    </ion-label>
+  </div>
+</ion-content>
+
+
+</ng-container>

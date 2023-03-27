@@ -3,21 +3,22 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { Tab3Page } from './tab3.page';
+import { VertimbrePage } from './vertimbre.page';
 import { ComponentesModule } from 'src/app/componentes/componentes.module';
-import { ExploreContainerComponentModule } from '../../explore-container/explore-container.module';
+import { VertimbrePageRoutingModule } from './vertimbre-routing.module';
 
-import { Tab3PageRoutingModule } from './tab3-routing.module';
+//modulo paginacion
+import {NgxPaginationModule} from 'ngx-pagination';
 
 @NgModule({
   imports: [
     IonicModule,
     CommonModule,
     FormsModule,
-    ExploreContainerComponentModule,
-    Tab3PageRoutingModule,
+    VertimbrePageRoutingModule,
     ComponentesModule,
+    NgxPaginationModule
   ],
-  declarations: [Tab3Page]
+  declarations: [VertimbrePage]
 })
-export class Tab3PageModule {}
+export class VertimbrePageModule {}

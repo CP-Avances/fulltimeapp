@@ -26,8 +26,8 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'tab3',
-        loadChildren: () => import('../tab3/tab3.module').then(m => m.Tab3PageModule)
+        path: 'verTimbre',
+        loadChildren: () => import('../vertimbre/vertimbre.module').then(m => m.VertimbrePageModule)
       },
       {
         path: 'solicitudes',
