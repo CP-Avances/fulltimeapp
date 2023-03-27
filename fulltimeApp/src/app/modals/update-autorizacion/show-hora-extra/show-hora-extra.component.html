@@ -1,0 +1,36 @@
+<div style="margin: 6% 3% 7% 3%;">
+  <ion-card style="padding: 3% 7% 3% 5%; font-size: 16px;">
+    <ion-card-title style="text-align: center; font-size: 100%;"><b> {{ hora_extra.nempleado | titlecase }} </b>
+    </ion-card-title>
+
+    <h6>
+
+      <p style="font-size: 90%; margin-top:-4%;" *ngIf="hora_extra.descripcion != null"> Solicita horas extras para
+        <br>{{ hora_extra.descripcion }}
+      </p>
+      <p style="font-size: 90%; margin-top:-4%;" *ngIf="hora_extra.descripcion == null"> El Usuario no ha ingresado una
+        descrcipcion</p>
+
+      <ion-card-title style="margin-top:-1%; margin-bottom:-4%; font-size: 90%;"><b> Informacion </b></ion-card-title>
+      <p style="font-size: 85%; margin: top -0.5em;">
+        <strong> Usuario - </strong>{{ hora_extra.nempleado | titlecase }} &nbsp;
+        <strong> Código - </strong>{{ hora_extra.codigo }}<br>
+        <strong> Cargo - </strong> {{ hora_extra.ncargo }}
+      </p>
+
+      <ion-card-title style="margin-top:-2%; margin-bottom:-3%; font-size: 90%;"><b> Fecha </b></ion-card-title>
+      <p style="font-size: 85%; margin: top -0.5em;">
+        <strong> Desde: </strong>{{ hora_extra.fecha_inicio_ }}<br>
+        <strong> Hasta: </strong> {{ hora_extra.fecha_fin_ }}<br><br>
+        <ion-card-title style="margin-top:-2%; margin-bottom:-3%; font-size: 95%;"><b> Horario </b></ion-card-title><br>
+        <strong> Hora inicia: </strong>{{ hora_extra.hora_inicio_ }}<br>
+        <strong> Hora finaliza: </strong> {{ hora_extra.hora_fin_ }}<br>
+        <strong> Tiempo: </strong> {{ hora_extra.num_hora }}<br>
+        <strong> Tiempo autorizado: </strong> {{ hora_extra.tiempo_autorizado }} <br>
+        <br>
+        <ion-card-title style="margin-top:-2%; margin-bottom:-3%; font-size: 95%;"> <b> Fecha solicita:</b> {{
+          hora_extra.fec_solicita_ }}</ion-card-title>
+      </p>
+    </h6>
+  </ion-card>
+</div>

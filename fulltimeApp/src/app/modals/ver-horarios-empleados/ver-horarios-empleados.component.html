@@ -1,0 +1,49 @@
+<app-close-modal titleModal="Horarios de empleado"></app-close-modal>
+<ion-content [hidden]="horariocontent">
+  <div *ngIf="horarios.length === 0; else showHorarios" style="text-align: center;">
+    <br>
+    <ion-text color="primary">
+      <span>Obteniendo horarios Por favor Espere</span>
+    </ion-text>
+    <ion-progress-bar type="indeterminate"></ion-progress-bar>
+    <br>
+  </div>
+
+  <ng-template #showHorarios>
+    <ion-list *ngFor="let h of horarios | paginate: { itemsPerPage: 7, currentPage: pageActual}">
+      <ion-item>
+        <ion-label class="ion-text-wrap">
+          <ion-text color="theme">
+            <p>Desde: {{h.fec_inicio_}}</p>
+            <p>Hasta: {{h.fec_final_}}</p>
+          </ion-text>
+        </ion-label>
+        <span slot="end" style="text-align:center;">
+          <ion-icon color="acua" name="alarm-outline" (click)="presentAlert(h.detalle_horario)"></ion-icon>
+          <br>
+          <ion-text color="acua" style="font-size: 80%;" >Detalle</ion-text>
+        </span>
+      </ion-item>
+    </ion-list>
+
+    <!--Configuracion del Pagination - ngxPaginationModulo-->
+    <ion-item style="font-size: 80%; margin: 2% 0% 2% 0%;">
+      <pagination-controls class="paginacion" (pageChange)="pageActual = $event" directionLinks="true" responsive="true"
+        previousLabel="anterior" nextLabel="siguiente">
+      </pagination-controls>
+    </ion-item>
+
+  </ng-template>
+
+</ion-content>
+
+<ion-content  style="text-align: center;" [hidden]="mensajeOcultar">
+  <div style="text-align: center; padding-top: 2%;" >
+    <br><br>
+    <img class="tamanoImagen" src="../../../assets/horario.svg">
+    <br>
+    <ion-label style="font-size: 80%;">
+      El empleado no tiene horarios asignados
+    </ion-label>
+  </div>
+</ion-content>

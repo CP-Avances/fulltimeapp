@@ -5,6 +5,7 @@ import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
 import { NotificacionPopoverComponent } from '../notificacion-popover/notificacion-popover.component';
+import { TimbresPerdidosComponent } from '../../pages/bienvenido/showTimbresGuardados.component';
 
 import { Notificacion } from '../../interfaces/Notificaciones';
 import { NotificacionTimbre } from '../../interfaces/Notificaciones';
@@ -324,6 +325,15 @@ export class NavegadorAdminComponent implements OnInit {
   cerrarSesion() {
     this.relojService.cerrarSesion();
     this.closeAdmin();
+  }
+
+  async presentModalTimbresPerdidos() {
+    this.closeAdmin();
+    const modal = await this.modalController.create({
+      component: TimbresPerdidosComponent,
+      cssClass: 'my-custom-class'
+    });
+    return await modal.present();
   }
 
 }

@@ -5,7 +5,6 @@ import { InicioPage } from './inicio.page';
 
 import localeEs from '@angular/common/locales/es';
 import { registerLocaleData } from '@angular/common';
-
 registerLocaleData(localeEs, 'es');
 
 const routes: Routes = [

@@ -1,0 +1,35 @@
+.tamanoImagen {
+  height: 55%;
+  width: 55%;
+  display: block;
+  margin: auto;
+  
+}
+
+.paginacion{
+    margin: auto;
+    padding-top: 2%;
+    padding-bottom: 2%;
+  }
+  
+  .paginacion ::ng-deep .ngx-pagination {
+    padding: 0%;
+    margin: auto;
+  }
+  
+.paginacion ::ng-deep .ngx-pagination .current {
+    background: rgb(28, 133, 219);
+    color: rgb(255, 255, 255);
+    font-weight: bold;
+    border-radius: 5px;
+}
+    
+.paginacion :host ::ng-deep .ngx-pagination span {
+    color: rgb(255, 255, 255);
+    font-family:monospace;
+}
+
+.paginacion ::ng-deep .ngx-pagination a{
+    background-color: transparent;
+    color: rgb(255, 255, 255);
+}

@@ -31,6 +31,16 @@ const routes: Routes = [
           }
         ]
       },
+      {
+        path: 'verTimbre',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../vertimbre/vertimbre.module').then(m => m.VertimbrePageModule)
+          }
+        ]
+      },
+      
       //Urls de las paginas del empleado
       {
         path: 'solicitar-permisos',

@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ToastController, ModalController, Platform, AlertController } from '@ionic/angular';
+import { TimbresPerdidosComponent } from './showTimbresGuardados.component';
 
 @Component({
   selector: 'app-bienvenido',
@@ -22,7 +23,9 @@ export class BienvenidoPage implements OnInit, OnDestroy{
   intervalo: any;
 
   constructor(
-    
+    public toastController: ToastController,
+    public modalController: ModalController,
+    public alertCrtl: AlertController,
   ) {
     this.cambioimagen();
     this.rol = localStorage.getItem('rol');
@@ -37,6 +40,24 @@ export class BienvenidoPage implements OnInit, OnDestroy{
       this.horaTransformada = this.pipe.transform(Date.now(), 'hh:mm:ss a');
       this.fechaTransformada = this.pipe.transform(Date.now(), 'fullDate');
     }, 1000);
+  }
+
+  async usuarioIncorrectoToas(mensaje: string, duracion: number) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: duracion,
+      color: "warning"
+    });
+    toast.present();
+  }
+
+  async presentModalTimbresPerdidos() {
+
+    const modal = await this.modalController.create({
+      component: TimbresPerdidosComponent,
+      cssClass: 'my-custom-class'
+    });
+    return await modal.present();
   }
 
    //Funcion para el cambio del sol y la luna en la imagen svg//

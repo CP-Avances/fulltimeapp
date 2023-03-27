@@ -27,11 +27,20 @@ const routes: Routes = [
       },
       {
         path: 'verTimbre',
-        loadChildren: () => import('../vertimbre/vertimbre.module').then(m => m.VertimbrePageModule)
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../vertimbre/vertimbre.module').then(m => m.VertimbrePageModule)
+          }
+        ]
       },
       {
         path: 'solicitudes',
         loadChildren: () => import('../paginas-admin/solicitudes/solicitudes.module').then(m => m.SolicitudesPageModule)
+      },
+      {
+        path: 'comunicado',
+        loadChildren: () => import('../paginas-admin/comunicado/comunicado.module').then(m => m.ComunicadoPageModule)
       },
       {
         path: '',

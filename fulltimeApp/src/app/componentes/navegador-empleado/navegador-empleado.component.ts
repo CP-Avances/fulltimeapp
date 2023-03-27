@@ -6,6 +6,7 @@ import { RelojServiceService } from '../../services/reloj-service.service';
 import { Notificacion } from '../../interfaces/Notificaciones';
 import { NotificacionTimbre } from '../../interfaces/Notificaciones';
 import { NotificacionPopoverComponent } from '../notificacion-popover/notificacion-popover.component';
+import { TimbresPerdidosComponent } from '../../pages/bienvenido/showTimbresGuardados.component';
 
 import { EmpleadoPage } from 'src/app/pages/empleado/empleado.page';
 import { Router } from '@angular/router';
@@ -288,6 +289,15 @@ export class NavegadorEmpleadoComponent implements OnInit {
 
   cerrarSesion() {
     this.relojService.cerrarSesion();
+  }
+
+  async presentModalTimbresPerdidos() {
+    this.closeEmpleado();
+    const modal = await this.modalController.create({
+      component: TimbresPerdidosComponent,
+      cssClass: 'my-custom-class'
+    });
+    return await modal.present();
   }
 
   // Diseno de Mensaje de notificacion con logo 
