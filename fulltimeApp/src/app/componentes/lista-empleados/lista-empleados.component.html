@@ -13,23 +13,23 @@
   </div>
 </ion-content>
 
-<ion-list>
-  <ion-item *ngFor="let e of empleados_filtro | paginate: { itemsPerPage: 20, currentPage: pageActual}">
+<ion-list style="margin: 2.5%; padding: -2%; border-radius: 3%;" 
+  *ngFor="let e of empleados_filtro | paginate: { itemsPerPage: 20, currentPage: pageActual}">
+  <ion-item>
     <ion-avatar slot="start">
-      <ion-icon name="person-circle-outline" color="theme" style="font-size: 175%;"></ion-icon>
+      <ion-icon name="person-circle-outline" color="theme" style="font-size: 35px;"></ion-icon>
     </ion-avatar>
     <ion-label>
       <h2> {{ e.fullname }}</h2>
       <p>Cédula: {{ e.cedula }} </p>
       <p>Código: {{ e.codigo }} </p>
     </ion-label>
-    <ion-icon name="navigate-circle-outline" color="acua" slot="end" style="font-size: 175%;" (click)="presentModal(e)"></ion-icon>
+    <ion-icon name="navigate-circle-outline" color="acua" slot="end" style="font-size: 30px;" (click)="presentModal(e)"></ion-icon>
   </ion-item>
 </ion-list>
 
  <!--Configuracion del Pagination - ngxPaginationModulo-->
- <div [hidden] = "ver" style="background-color: rgb(160, 160, 160);">
-  <ion-item style="font-size: 70%; margin: 1% 0% 0% 0%;" *ngIf="empleados_filtro != undefined || empleados_filtro != null">
+  <ion-item style="font-size: 70%; margin: 1% 0% 0% 0%;" [hidden] = "ver" *ngIf="empleados_filtro != undefined || empleados_filtro != null">
     <pagination-controls 
       class="paginacion" 
       (pageChange)="pageActual = $event" 
@@ -44,4 +44,4 @@
       [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
     </pagination-controls>
   </ion-item>
-</div>
+

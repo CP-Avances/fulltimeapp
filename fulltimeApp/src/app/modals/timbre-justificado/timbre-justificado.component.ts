@@ -8,7 +8,7 @@ import { DataUserLoggedService } from '../../services/data-user-logged.service';
   templateUrl: './timbre-justificado.component.html',
   styleUrls: ['./timbre-justificado.component.scss'],
 })
-export class TimbreJustificadoComponent implements OnInit {
+export class TimbreJustificadoComponent  implements OnInit {
 
   @Input() data: any;
 
@@ -93,4 +93,5 @@ export class TimbreJustificadoComponent implements OnInit {
       'refreshInfo': refreshInfo
     });
   }
+
 }

@@ -1,11 +1,11 @@
-<app-close-modal titleModal="Generar Reporte"></app-close-modal>
+<app-close-modal titleModal="Justificar Timbre"></app-close-modal>
 
 <ion-content>
 
   <div class="contenido">
     <ion-list>
       <ion-item>
-        <ion-icon slot="end" name="person"></ion-icon>
+        <ion-icon slot="end" name="person" color="secondary"></ion-icon>
         <b> NOMBRE DEL EMPLEADO:</b>
       </ion-item>
       <ion-item>
@@ -15,11 +15,11 @@
 
     <ion-list>
       <ion-item>
-        <ion-icon slot="end" name="time-outline"></ion-icon>
+        <ion-icon slot="end" name="time-outline" color="secondary"></ion-icon>
         <b> TIPO DE TIMBRE: </b>
       </ion-item>
       <ion-item>
-        <ion-select value="Ninguno" okText="Okay" cancelText="Cancel" (ionChange)="accionChange($event)">
+        <ion-select value="Ninguno" okText="Aceptar" cancelText="Cancelar" (ionChange)="accionChange($event)">
           <ion-select-option *ngFor="let t of selectOptions" [value]="t.accion">{{t.view}} </ion-select-option>
         </ion-select>
       </ion-item>
@@ -27,7 +27,7 @@
 
     <ion-list>
       <ion-item>
-        <ion-icon slot="end" name="calendar-outline"></ion-icon>
+        <ion-icon slot="end" name="calendar-outline" color="success"></ion-icon>
         <b> FECHA Y HORA TIMBRE:</b>
       </ion-item>
       <ion-item>

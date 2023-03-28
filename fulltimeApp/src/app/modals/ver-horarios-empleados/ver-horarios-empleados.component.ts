@@ -9,7 +9,7 @@ import { EmpleadosService } from '../../services/empleados.service';
   templateUrl: './ver-horarios-empleados.component.html',
   styleUrls: ['./ver-horarios-empleados.component.scss'],
 })
-export class VerHorariosEmpleadosComponent implements OnInit {
+export class VerHorariosEmpleadosComponent  implements OnInit {
 
   @Input() data: any;
 
@@ -18,13 +18,15 @@ export class VerHorariosEmpleadosComponent implements OnInit {
   mensajeOcultar: boolean = true;
   horariocontent: boolean = false;
 
+  ver: boolean = true;
+
   constructor(
     public modalController: ModalController,
     public alertController: AlertController,
     private empleadosService: EmpleadosService,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
-  ) { }
+  ) {}
 
   ngOnInit() {
     console.log('CODIGO DEL EMPLEADO: ', this.data);
@@ -65,10 +67,16 @@ export class VerHorariosEmpleadosComponent implements OnInit {
         this.horariocontent = true;
       }
 
+      if(this.horarios.length < 11){
+        this.ver = true;
+      }else{
+        this.ver = false;
+      }
+
       console.log(res);
 
     }, err => {
-      console.log(err);
+      console.log(err); this.ver = true
     })
   }
 
@@ -166,5 +174,18 @@ export class VerHorariosEmpleadosComponent implements OnInit {
     }
 
   }
+
+  //variables de configuracion del componente de paginacion (pagination-controls)
+  public maxSize: number = 5;
+  public directionLinks: boolean = true;
+  public autoHide: boolean = false;
+  public responsive: boolean = true;
+  public labels: any = {
+    previousLabel: 'ante..',
+    nextLabel: 'sigui..',
+    screenReaderPaginationLabel: 'Pagination',
+    screenReaderPageLabel: 'page',
+    screenReaderCurrentLabel: `You're on page`
+  };
 
 }

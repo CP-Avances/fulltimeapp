@@ -45,7 +45,7 @@ export class AprobacionMultipleComponent implements OnDestroy {
     }
   }
 
-  /*async presentModalAutorizarMultiple() {
+  async presentModalAutorizarMultiple() {
     if (this.permisos) {
       await this.permisosAutorizacion()
     }
@@ -55,14 +55,14 @@ export class AprobacionMultipleComponent implements OnDestroy {
     if (this.horas_extras) {
       await this.horasExtrasAutorizacion()
     }
-  }*/
+  }
 
-  /*private async permisosAutorizacion() {
+  private async permisosAutorizacion() {
     let permisos = await this.permisos.filter(o => { return o.isChecked === true });
 
     if (permisos.length === 0) return this.validacionService.showToast('Seleccione solicitudes.', 3000, 'danger');
 
-    const modal = await this.modalController.create({
+    /*const modal = await this.modalController.create({
       component: UpdateAutorizacionMultipleComponent,
       componentProps: {
         permisos,
@@ -77,7 +77,7 @@ export class AprobacionMultipleComponent implements OnDestroy {
 
     if (refreshInfo) {
       this.refeshSolicitudes(true)
-    }
+    }*/
     return;
   }
 
@@ -86,7 +86,7 @@ export class AprobacionMultipleComponent implements OnDestroy {
 
     if (vacaciones.length === 0) return this.validacionService.showToast('Seleccione solicitudes.', 3000, 'danger');
 
-    const modal = await this.modalController.create({
+    /*const modal = await this.modalController.create({
       component: UpdateAutorizacionMultipleComponent,
       componentProps: {
         vacaciones,
@@ -101,7 +101,7 @@ export class AprobacionMultipleComponent implements OnDestroy {
 
     if (refreshInfo) {
       this.refeshSolicitudes(true)
-    }
+    }*/
     return;
   }
 
@@ -110,7 +110,7 @@ export class AprobacionMultipleComponent implements OnDestroy {
 
     if (horas_extras.length === 0) return this.validacionService.showToast('Seleccione solicitudes.', 3000, 'danger');
 
-    const modal = await this.modalController.create({
+    /*const modal = await this.modalController.create({
       component: UpdateAutorizacionMultipleComponent,
       componentProps: {
         horas_extras,
@@ -125,9 +125,9 @@ export class AprobacionMultipleComponent implements OnDestroy {
 
     if (refreshInfo) {
       this.refeshSolicitudes(true)
-    }
+    }*/
     return;
-  }*/
+  }
 
   refeshSolicitudes(refreshInfo: boolean) {
     this.onRefreshOnInit.emit(refreshInfo)

@@ -69,20 +69,17 @@
           true,
           "single"
         ],
-        "@angular-eslint/component-class-suffix": [
-          "error",
-          {
-            "suffixes": [true, "Page", "Component"]
-          }
+        "@angular-eslint/component-class-suffix":[
+          true, 
+          "Page", 
+          "Component"
         ],
-        "@angular-eslint/component-selector": [true,
-          "error",
-          {
-            "type": "element",
-            "prefix": "app",
-            "page": "page",
-            "style": "kebab-case"
-          }
+        "@angular-eslint/component-selector": [
+          true,
+          "element",
+          "app",
+          "page",
+          "kebab-case"
         ],
         "@angular-eslint/trailing-comma": false,
         "@angular-eslint/no-output-on-prefix": true,
@@ -94,13 +91,11 @@
         "@angular-eslint/use-pipe-transform-interface": true,
         "@angular-eslint/one-variable-per-declaration": false,
         "@angular-eslint/directive-class-suffix": true,
-        "@angular-eslint/directive-selector": [ true,
-          "error",
-          {
-            "type": "attribute",
-            "prefix": "app",
-            "style": "camelCase"
-          }
+        "@angular-eslint/directive-selector": [ 
+          true,
+          "attribute",
+          "app",
+          "camelCase"
         ]
       }
     },

@@ -16,7 +16,7 @@ export class ListaEmpleadosComponent implements OnInit {
   empleados_filtro: Empleado[] = [];
 
   pageActual: number = 1;
-  ver: boolean = false;
+  ver: boolean = true;
   loading: boolean = true;
 
   @Input('open') presentModal!: (args: any) => void; //callback function
@@ -62,29 +62,32 @@ export class ListaEmpleadosComponent implements OnInit {
         sessionStorage.setItem('lista-empleados', JSON.stringify(this.empleados))
 
         this.loading = true;
-        if (Object.keys(res).length != 0) {
-          this.ver = false;
-        }else{
+        if (this.empleados_filtro.length < 21) {
           this.ver = true;
+        }else{
+          this.ver = false;
         }
 
       },error => {
         this.loading = true;
         console.log(error);
         this.ver = true;
-        this.abrirToas('Ups!, No fue posible conectarse con el servidor', 'danger', 3500, 'bottom')
+        return this.abrirToas('Ups!, No fue posible conectarse con el servidor', 'danger', 3500, 'bottom')
       });
-
     } else {
       this.empleados = JSON.parse(emp)
       this.empleados_filtro = [...this.empleados];
+      if (this.empleados_filtro.length < 21) {
+        this.ver = true;
+      }else{
+        this.ver = false;
+      }
     }
     
-    if(this.empleados_filtro == undefined){
+    if((this.empleados_filtro == undefined) || (this.empleados_filtro == null)){
       this.loading = false;
       this.ver = true;
     }
-
   }
 
   changeSearch(e: any) {

@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
-import { EmpleadoPage } from './empleado.page';
-import { EmpleadoPageRoutingModule } from './empleado-routing.module';
+import { JustificarTimbresPageRoutingModule } from './justificar-timbres-routing.module';
+import { JustificarTimbresPage } from './justificar-timbres.page';
 import { ComponentesModule } from 'src/app/componentes/componentes.module';
 
 @NgModule({
@@ -12,9 +12,9 @@ import { ComponentesModule } from 'src/app/componentes/componentes.module';
     CommonModule,
     FormsModule,
     IonicModule,
-    EmpleadoPageRoutingModule,
+    JustificarTimbresPageRoutingModule,
     ComponentesModule
   ],
-  declarations: [EmpleadoPage]
+  declarations: [JustificarTimbresPage]
 })
-export class EmpleadoPageModule {}
+export class JustificarTimbresPageModule { }

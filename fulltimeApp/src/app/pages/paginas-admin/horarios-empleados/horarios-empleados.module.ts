@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
-import { EmpleadoPage } from './empleado.page';
-import { EmpleadoPageRoutingModule } from './empleado-routing.module';
+import { HorariosEmpleadosPage } from './horarios-empleados.page';
+import { HorariosEmpleadosPageRoutingModule } from './horarios-empleados-routing.module';
 import { ComponentesModule } from 'src/app/componentes/componentes.module';
 
 @NgModule({
@@ -12,9 +12,9 @@ import { ComponentesModule } from 'src/app/componentes/componentes.module';
     CommonModule,
     FormsModule,
     IonicModule,
-    EmpleadoPageRoutingModule,
+    HorariosEmpleadosPageRoutingModule,
     ComponentesModule
   ],
-  declarations: [EmpleadoPage]
+  declarations: [HorariosEmpleadosPage]
 })
-export class EmpleadoPageModule {}
+export class HorariosEmpleadosPageModule {}

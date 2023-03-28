@@ -1,4 +1,5 @@
 <app-close-modal titleModal="Horarios de empleado"></app-close-modal>
+
 <ion-content [hidden]="horariocontent">
   <div *ngIf="horarios.length === 0; else showHorarios" style="text-align: center;">
     <br>
@@ -9,11 +10,12 @@
     <br>
   </div>
 
-  <ng-template #showHorarios>
-    <ion-list *ngFor="let h of horarios | paginate: { itemsPerPage: 7, currentPage: pageActual}">
+  <ng-template #showHorarios style="padding: 2%;">
+
+    <ion-list style="margin: 2%; border-radius: 4%;" *ngFor="let h of horarios | paginate: { itemsPerPage: 10, currentPage: pageActual}">
       <ion-item>
         <ion-label class="ion-text-wrap">
-          <ion-text color="theme">
+          <ion-text color="dark">
             <p>Desde: {{h.fec_inicio_}}</p>
             <p>Hasta: {{h.fec_final_}}</p>
           </ion-text>
@@ -27,9 +29,19 @@
     </ion-list>
 
     <!--Configuracion del Pagination - ngxPaginationModulo-->
-    <ion-item style="font-size: 80%; margin: 2% 0% 2% 0%;">
-      <pagination-controls class="paginacion" (pageChange)="pageActual = $event" directionLinks="true" responsive="true"
-        previousLabel="anterior" nextLabel="siguiente">
+    <ion-item style="font-size: 80%; margin: 1% 0% 1% 0%;" [hidden]="ver">
+      <pagination-controls 
+        class="paginacion" 
+        (pageChange)="pageActual = $event" 
+        [maxSize] = maxSize
+        [directionLinks] = directionLinks
+        [responsive] = responsive 
+        [autoHide]="autoHide"
+        [previousLabel]="labels.previousLabel"
+        [nextLabel]="labels.nextLabel"
+        [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+        [screenReaderPageLabel]="labels.screenReaderPageLabel"
+        [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
       </pagination-controls>
     </ion-item>
 
@@ -40,7 +52,7 @@
 <ion-content  style="text-align: center;" [hidden]="mensajeOcultar">
   <div style="text-align: center; padding-top: 2%;" >
     <br><br>
-    <img class="tamanoImagen" src="../../../assets/horario.svg">
+    <img class="tamanoImagen" src="../../../assets/images/horario.svg">
     <br>
     <ion-label style="font-size: 80%;">
       El empleado no tiene horarios asignados

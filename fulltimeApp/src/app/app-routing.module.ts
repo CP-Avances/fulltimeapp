@@ -23,6 +23,14 @@ const routes: Routes = [
   {
     path: 'empleado',
     loadChildren: () => import('./pages/empleado/empleado.module').then(m => m.EmpleadoPageModule)
+  },
+  {
+    path: 'modals',
+    loadChildren: () => import('./modals/modals.module').then( m => m.ModalsPageModule)
+  },
+  {
+    path: 'enviartimbre',
+    loadChildren: () => import('./pages/enviartimbre/enviartimbre.module').then( m => m.EnviartimbrePageModule)
   }
 ];
 @NgModule({

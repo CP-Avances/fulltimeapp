@@ -4,9 +4,11 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+
 import { NavegadorAdminComponent } from './navegador-admin/navegador-admin.component';
 import { NavegadorEmpleadoComponent } from './navegador-empleado/navegador-empleado.component';
 
+import { ConstruirPDFComponent } from './construir-pdf/construir-pdf.component';
 import { NotificacionPopoverComponent } from './notificacion-popover/notificacion-popover.component';
 import { ListaEmpleadosComponent } from './lista-empleados/lista-empleados.component';
 import { DataUserLoggedService } from '../services/data-user-logged.service';
@@ -30,6 +32,7 @@ import { AprobacionMultipleComponent } from './aprobacion-multiple/aprobacion-mu
         NavegadorAdminComponent,
         NavegadorEmpleadoComponent,
         NotificacionPopoverComponent,
+        ConstruirPDFComponent,
         CloseModalComponent,
         SaveRegisterComponent,
         SearchRegisterComponent,
@@ -46,6 +49,7 @@ import { AprobacionMultipleComponent } from './aprobacion-multiple/aprobacion-mu
         NavegadorAdminComponent,
         NavegadorEmpleadoComponent,
         NotificacionPopoverComponent,
+        ConstruirPDFComponent,
         CloseModalComponent,
         SaveRegisterComponent,
         SearchRegisterComponent,

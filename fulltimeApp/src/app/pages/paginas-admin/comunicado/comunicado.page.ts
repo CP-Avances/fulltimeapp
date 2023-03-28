@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController, Platform, ToastController } from '@ionic/angular';
 import { Socket } from 'ngx-socket-io';
-//import { EnviarUsuarioComponent } from './enviar-usuario/enviar-usuario.component';
+import { EnviarUsuarioComponent } from './enviar-usuario/enviar-usuario.component';
 
 @Component({
   selector: 'app-comunicado',
@@ -45,7 +45,7 @@ export class ComunicadoPage implements OnInit {
       this.mensajeVacioToas("Los campos no pueden estar vacios.", 3000)
     }
     else {
-      //this.presentModal(this.noti.asunto, this.noti.mensaje);
+      this.presentModal(this.noti.asunto, this.noti.mensaje);
     }
   }
 
@@ -66,7 +66,7 @@ export class ComunicadoPage implements OnInit {
     toast.present();
   }
 
-  /*async presentModal(asunto: string, mensaje: string) {
+  async presentModal(asunto: string, mensaje: string) {
     let comunicado = {
       asunto: asunto,
       mensaje: mensaje
@@ -87,6 +87,6 @@ export class ComunicadoPage implements OnInit {
     if (refreshInfo) {
       this.ngOnInit()
     }
-  }*/
+  }
 
 }

@@ -2,15 +2,14 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
 import { TimbresService } from '../../services/timbres.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
-import moment, { min } from 'moment';
-moment.locale('es');
+import moment from 'moment';
 
 @Component({
   selector: 'app-atraso-justificado',
   templateUrl: './atraso-justificado.component.html',
   styleUrls: ['./atraso-justificado.component.scss'],
 })
-export class AtrasoJustificadoComponent implements OnInit {
+export class AtrasoJustificadoComponent  implements OnInit {
 
   @Input() data: any;
 
@@ -20,16 +19,15 @@ export class AtrasoJustificadoComponent implements OnInit {
 
   //Variables para almacenar la fecha de y la hora que se ingresa en el Form
   Fecha: string = '';
- 
 
   constructor(
-    public modalController: ModalController,
+      public modalController: ModalController,
     public timbreservice: TimbresService,
     private toastController: ToastController,
     private validacion: ValidacionesService
   ) { }
 
-  ngOnInit() {
+  ngOnInit(){
     console.log('ATRASO | Data empleado: ', this.data);
   }
 
