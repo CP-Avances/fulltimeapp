@@ -63,7 +63,6 @@ export class NavegadorAdminComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log('inicio menu...');
     this.username = this.userService.username;
 
     this.idEmpleadoIngresa = parseInt(''+(localStorage.getItem('empleadoID')));

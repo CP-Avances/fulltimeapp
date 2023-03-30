@@ -59,6 +59,10 @@ const routes: Routes = [
         loadChildren: () => import('../paginas-admin/justificar-timbres/justificar-timbres.module').then(m => m.JustificarTimbresPageModule)
       },
       {
+        path: 'aprobar-permisos',
+        loadChildren: () => import('../paginas-admin/aprobar-permisos/aprobar-permisos.module').then(m => m.AprobarPermisosPageModule)
+      },
+      {
         path: '',
         redirectTo: '/adminpage/bienvenido',
         pathMatch: 'full'

@@ -25,8 +25,6 @@ import { ListaNotificacionComponent } from './lista-notificaciones/lista-notific
 import { PestaniasEstadosComponent } from './pestaniasEstados/pestaniasEstados.component';
 import { AprobacionMultipleComponent } from './aprobacion-multiple/aprobacion-multiple.component';
 
-
-
 @NgModule({
     declarations: [
         NavegadorAdminComponent,
