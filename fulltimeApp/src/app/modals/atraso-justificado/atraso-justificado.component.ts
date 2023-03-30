@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ModalController, ToastController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 import { TimbresService } from '../../services/timbres.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import moment from 'moment';
@@ -21,9 +21,8 @@ export class AtrasoJustificadoComponent  implements OnInit {
   Fecha: string = '';
 
   constructor(
-      public modalController: ModalController,
+    public modalController: ModalController,
     public timbreservice: TimbresService,
-    private toastController: ToastController,
     private validacion: ValidacionesService
   ) { }
 

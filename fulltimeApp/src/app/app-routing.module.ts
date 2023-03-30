@@ -25,12 +25,16 @@ const routes: Routes = [
     loadChildren: () => import('./pages/empleado/empleado.module').then(m => m.EmpleadoPageModule)
   },
   {
-    path: 'modals',
-    loadChildren: () => import('./modals/modals.module').then( m => m.ModalsPageModule)
+    path: 'enviartimbre/:idTimbre',
+    loadChildren: () => import('./pages/enviartimbre/enviartimbre.module').then(m => m.EnviartimbrePageModule), canActivate: [AutenticacionGuard]
   },
   {
-    path: 'enviartimbre',
-    loadChildren: () => import('./pages/enviartimbre/enviartimbre.module').then( m => m.EnviartimbrePageModule)
+    path: 'confirmaciontimbre',
+    loadChildren: () => import('./pages/confirmaciontimbre/confirmaciontimbre.module').then(m => m.ConfirmaciontimbrePageModule), canActivate: [AutenticacionGuard]
+  },
+  {
+    path: 'modals',
+    loadChildren: () => import('./modals/modals.module').then( m => m.ModalsPageModule)
   }
 ];
 @NgModule({

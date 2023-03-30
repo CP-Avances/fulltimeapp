@@ -46,7 +46,6 @@ export class NavegadorEmpleadoComponent implements OnInit {
     public modalController: ModalController,
     public pooverCtrl: PopoverController,
     private notificacionService: AutorizacionesService,
-    //private backgroundMode: BackgroundMode,
     public alertCrtl: AlertController,
     private router: Router,
     public socket: Socket,
@@ -55,6 +54,11 @@ export class NavegadorEmpleadoComponent implements OnInit {
   ) { 
     this.idEmpleadoIngresa = parseInt(String(localStorage.getItem('empleadoID')))
     this.LlamarNotificcaccciones(this.idEmpleadoIngresa); 
+  }
+
+  ionViewWillEnter(){
+    this.ngOnInit();
+    this.VerificarFunciones();
   }
 
   ngOnInit() {

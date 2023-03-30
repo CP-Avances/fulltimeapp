@@ -59,6 +59,7 @@ export class NavegadorAdminComponent implements OnInit {
 
   ionViewWillEnter(){
     this.ngOnInit();
+    this.VerificarFunciones();
   }
 
   ngOnInit() {

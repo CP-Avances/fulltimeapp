@@ -26,12 +26,13 @@ import { EmpleadosService } from 'src/app/services/empleados.service';
     </ion-text>
   </div>
 
-    <ion-list>
-      <ion-item *ngFor="let t of timbres">
+    <ion-list style="background-color: transparent;">
+      <ion-item style="margin: 2.5%; padding: -2%; border-radius: 3%;" *ngFor="let t of timbres">
         <ion-label>
-          <h2> <ion-icon name="calendar-outline"></ion-icon> {{ t.fec_hora_timbre }} </h2>
-          <h4 *ngIf="t.latitud !== null && t.latitud !== '0' && t.latitud !== undefined"> <ion-icon name="location-outline"></ion-icon> 
-            {{ t.latitud }} / {{ t.longitud }} 
+          <h2> <ion-icon color="dark" name="calendar-outline"></ion-icon> &nbsp;{{ t.fec_hora_timbre }} </h2>
+          <h4 *ngIf="t.latitud !== null && t.latitud !== '0' && t.latitud !== undefined"> 
+            <ion-icon color="dark" name="location-outline"></ion-icon> 
+            &nbsp;{{ t.latitud }} / {{ t.longitud }} 
           </h4>
           <h4 *ngIf="t.longitud == null || t.longitud == '0' || t.longitud == ''  "> <ion-icon name="location-outline"></ion-icon> Sin Coordenadas </h4>
         </ion-label>
@@ -56,17 +57,13 @@ import { EmpleadosService } from 'src/app/services/empleados.service';
 
   </ion-content>
 
-  <div style="margin: 2%; padding: 4%; text-align: center; border-radius: 2%;" [hidden] = 'btn_Enviar'>
+  <div style="margin: 2%; padding: 4%; text-align: center;" [hidden] = 'btn_Enviar'>
 
     <ion-icon color="success" name="checkmark-done-outline"></ion-icon>
     <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 75%;">
-      Conetado con el servidor 
+      Conetado con el servidor &nbsp;&nbsp; "Puede enviar los timbres"
     </ion-text>
-    <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 75%;">
-       "Puede enviar los timbres"
-    </ion-text>
-
-    <ion-button color="secondary" expand="full" (click)="Btn_enviar()">
+    <ion-button color="secondary" shape="round" expand="block" (click)="Btn_enviar()">
       <ng-container *ngIf="!loadingBtn; then sendReg; else spiner"></ng-container>
       <ng-template #sendReg>
         <ion-icon slot="end" name="send-outline"></ion-icon>
@@ -154,7 +151,7 @@ export class TimbresPerdidosComponent implements OnInit {
         () => {
           console.log('Sin conexion al servidor');
           this.mensage =  `<div class="card-alert">
-                            <img src="../../../assets/LOGOBLFT.png" class="img-alert">
+                            <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                             <br>
                             <p> Ups! Fallo la conexion con el servidor, no se podran enviar los timbre </p>
                             <p> Por favor intentelo mas tarde </p>
@@ -165,7 +162,7 @@ export class TimbresPerdidosComponent implements OnInit {
       ),() =>{
         console.log('Sin conexion al servidor');
           this.mensage =  `<div class="card-alert">
-                            <img src="../../../assets/LOGOBLFT.png" class="img-alert">
+                            <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                             <br>
                             <p> Ups! Fallo la conexion con el servidor, no se podran enviar los timbre </p>
                             <p> Por favor intentelo mas tarde prueba movil </p>
@@ -317,7 +314,7 @@ export class TimbresPerdidosComponent implements OnInit {
         err => {
           console.log('Sin conexion al servidor');
           this.mensage =  `<div class="card-alert">
-                            <img src="../../../assets/LOGOBLFT.png" class="img-alert">
+                            <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                             <br>
                             <p> Ups! Fallo la conexion con el servidor, no se podran enviar los timbre </p>
                             <p> Por favor intentelo mas tarde </p>

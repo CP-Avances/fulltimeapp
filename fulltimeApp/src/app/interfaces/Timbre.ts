@@ -9,7 +9,7 @@ export interface Timbre {
     id_empleado?: number,
     id_reloj?: number,
     tipo_autenticacion?: string,
-    dispositivo_timbre?: string,
+    dispositivo_timbre?: any,
     fec_hora_timbre_servidor?: string,
     hora_timbre_diferente?: string,
     ubicacion?: string,

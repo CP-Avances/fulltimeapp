@@ -117,11 +117,13 @@ export class RelojServiceService {
   //fin empresa
 
   // TIMBRE
-  enviarTimbre(timbre: any) {
+  enviarTimbre(timbre) {
+    console.log('dato de timbre a guardar en la base de datos: ',timbre.conexion)
     return this.http.post<any>(this.URL + '/ring/timbre', timbre);
   }
 
   enviarTimbreSinConexion(timbre: any) {
+    console.log('dato de timbre a guardar en la base de datos pero con novedades: ',timbre)
     return this.http.post<any>(this.URL + '/ring/timbreSinConexion', timbre);
   }
 

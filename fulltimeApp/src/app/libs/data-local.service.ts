@@ -57,7 +57,7 @@ export class DataLocalService {
     const existe = this.timbres.find(tim => tim.fec_hora_timbre === timbre.fec_hora_timbre)
     if (!existe) {
       this.mensaje =  `<div class="card-alert">
-                            <img src="../../../assets/LOGOBLFT.png" class="img-alert">
+                            <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                             <br>
                             <p> Timbre guardado en la memoria del telefono. Se enviaran cuando tenga conexion a internet 😅 </p>
                           </div>`;
@@ -78,7 +78,7 @@ export class DataLocalService {
     const existe = this.timbresPerdidos.find(tim => tim.fec_hora_timbre === timbre.fec_hora_timbre)
     if (!existe) {
       this.mensaje =  `<div class="card-alert">
-                            <img src="../../../assets/LOGOBLFT.png" class="img-alert">
+                            <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                             <br>
                             <p> Timbre enviado al listado "Timbres no enviados" </p>
                           </div>`;

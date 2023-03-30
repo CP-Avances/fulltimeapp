@@ -2,9 +2,8 @@ import { Component, ViewChild } from '@angular/core';
 import { DataUserLoggedService } from '../../services/data-user-logged.service';
 import { ToastController, LoadingController } from '@ionic/angular';
 import { NgForm } from '@angular/forms';
-import moment, { min } from 'moment';
+import moment from 'moment';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
-moment.locale('es');
 
 @Component({
   selector: 'app-rango-fechas',

@@ -11,6 +11,7 @@ import { AutenticacionGuard } from './guards/autenticacion.guard';
 import { TokenInterceptorService } from './services/token-interceptor.service';
 
 import { ComponentesModule } from './componentes/componentes.module';
+import { ModalsPageModule } from './modals/modals.module';
 import { Drivers } from '@ionic/storage';
 import { NgxPaginationModule } from 'ngx-pagination';
 
@@ -32,6 +33,7 @@ const config: SocketIoConfig = { url: "http://186.4.226.49:8010", options: {}};
     AppRoutingModule,
     HttpClientModule,
     ComponentesModule,
+    ModalsPageModule,
     NgxPaginationModule,
     SocketIoModule.forRoot(config),
     IonicStorageModule.forRoot({
