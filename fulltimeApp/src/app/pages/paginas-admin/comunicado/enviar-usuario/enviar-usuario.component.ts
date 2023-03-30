@@ -3,7 +3,6 @@ import { ModalController, ToastController } from '@ionic/angular';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import moment from 'moment';
-moment.locale('es');
 
 interface checkOptions {
   valor: number;

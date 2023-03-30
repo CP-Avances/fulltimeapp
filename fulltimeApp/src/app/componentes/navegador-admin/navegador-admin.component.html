@@ -14,7 +14,7 @@
             <ion-button slot="end" (click)="Mostrarpopnotificaciones($event)" id="notification-button" style="width: 40px;">
                 <ion-icon name="notifications-outline"></ion-icon>
             </ion-button>
-            <ion-badge *ngIf="valor" id="notifications-badge" mode="md">
+            <ion-badge *ngIf="(countNoti != 0) && (countNoti != null)" id="notifications-badge" mode="md">
                 {{countNoti}}
             </ion-badge>
         </ion-buttons>

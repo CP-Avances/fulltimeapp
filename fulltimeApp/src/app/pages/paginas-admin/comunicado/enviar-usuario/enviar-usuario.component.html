@@ -1,1 +1,92 @@
-<div>hola </div>
+<app-close-modal titleModal="Usuarios"></app-close-modal>
+<ion-content>
+    <ion-list>
+        <ion-radio-group [(ngModel)]="radioValue" (ionChange)="showValue()">
+            <ion-text mode="ios" color="dark" style="text-align: center;">
+                <h3>Criterios de Búsqueda</h3>
+            </ion-text>
+            <ion-item *ngFor="let c of solicitudes">
+                <ion-label>{{ c.nombre }}</ion-label>
+                <ion-radio slot="end" color="success" [value]="c.valor"></ion-radio>
+            </ion-item>
+        </ion-radio-group>
+    </ion-list>
+
+
+
+    <!-- LISTAR SUCURSALES -->
+
+    <ion-row *ngIf="opcion_sucursal">
+        <ion-col *ngIf="isChecked_sucu" size="2">
+            <ion-button color="secondary" (click)="checkedAll_sucu( isAllCheck_sucu )">
+                <ion-icon name="checkmark-done-outline"></ion-icon>
+            </ion-button>
+        </ion-col>
+        <ion-col [size]="isChecked_sucu ? 10: 12">
+            <ion-button (click)="EnviarSucursal()" shape="round" [disabled]="boton_enviar">
+                ENVIAR
+            </ion-button>
+        </ion-col>
+    </ion-row>
+
+    <ion-list *ngIf="opcion_sucursal">
+        <ion-text mode="ios" color="dark" style="text-align: center;">
+            <h3>Resultado Sucursales</h3>
+        </ion-text>
+        <ion-item *ngFor="let s of sucursales" class="item-pendientes-color" mode="md" lines="full">
+            <ion-checkbox *ngIf="isChecked_sucu" slot="start" [(ngModel)]="s.isChecked_sucu"></ion-checkbox>
+            <ion-label>{{ s.nombre }}</ion-label>
+        </ion-item>
+    </ion-list>
+
+    <!-- LISTAR DEPARTAMENTOS -->
+
+    <ion-row *ngIf="opcion_depa">
+        <ion-col *ngIf="isChecked_depa" size="2">
+            <ion-button color="secondary" (click)="checkedAll_depa( isAllCheck_depa )">
+                <ion-icon name="checkmark-done-outline"></ion-icon>
+            </ion-button>
+        </ion-col>
+        <ion-col [size]="isChecked_depa ? 10: 12">
+            <ion-button (click)="EnviarDepartamento()" shape="round" [disabled]="boton_enviar">
+                ENVIAR
+            </ion-button>
+        </ion-col>
+    </ion-row>
+
+    <ion-list *ngIf="opcion_depa">
+        <ion-text mode="ios" color="dark" style="text-align: center;">
+            <h3>Resultado Departamentos</h3>
+        </ion-text>
+        <ion-item *ngFor="let d of departamentos" class="item-pendientes-color" mode="md" lines="full">
+            <ion-checkbox *ngIf="isChecked_depa" slot="start" [(ngModel)]="d.isChecked_depa"></ion-checkbox>
+            <ion-label>{{ d.nombre }}</ion-label>
+        </ion-item>
+    </ion-list>
+
+    <!-- LISTAR EMPLEADOS -->
+
+    <ion-row *ngIf="opcion_empleado">
+        <ion-col *ngIf="isChecked_empl" size="2">
+            <ion-button color="secondary" (click)="checkedAll_empl( isAllCheck_empl )">
+                <ion-icon name="checkmark-done-outline"></ion-icon>
+            </ion-button>
+        </ion-col>
+        <ion-col [size]="isChecked_empl ? 10: 12">
+            <ion-button (click)="EnviarEmpleado()" shape="round" [disabled]="boton_enviar">
+                ENVIAR
+            </ion-button>
+        </ion-col>
+    </ion-row>
+
+    <ion-list *ngIf="opcion_empleado">
+        <ion-text mode="ios" color="dark" style="text-align: center;">
+            <h3>Resultado Usuarios</h3>
+        </ion-text>
+        <ion-item *ngFor="let e of empleados" class="item-pendientes-color" mode="md" lines="full">
+            <ion-checkbox *ngIf="isChecked_empl" slot="start" [(ngModel)]="e.isChecked_empl"></ion-checkbox>
+            <ion-label>{{ e.nombre }}</ion-label>
+        </ion-item>
+    </ion-list>
+
+</ion-content>

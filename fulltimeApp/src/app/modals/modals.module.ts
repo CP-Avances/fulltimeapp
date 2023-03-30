@@ -13,6 +13,7 @@ import { AtrasoJustificadoComponent } from './atraso-justificado/atraso-justific
 import { VerHorariosEmpleadosComponent } from './ver-horarios-empleados/ver-horarios-empleados.component';
 import { TimbreJustificadoComponent } from './timbre-justificado/timbre-justificado.component';
 import { VerTimbreEmpleadoComponent } from './ver-timbre-empleado/ver-timbre-empleado.component';
+import { EnviarUsuarioComponent } from '../pages/paginas-admin/comunicado/enviar-usuario/enviar-usuario.component';
 
 
 @NgModule({
@@ -20,12 +21,14 @@ import { VerTimbreEmpleadoComponent } from './ver-timbre-empleado/ver-timbre-emp
     AtrasoJustificadoComponent,
     VerHorariosEmpleadosComponent,
     TimbreJustificadoComponent,
-    VerTimbreEmpleadoComponent
+    VerTimbreEmpleadoComponent,
+    EnviarUsuarioComponent
   ],declarations: [
     AtrasoJustificadoComponent,
     VerHorariosEmpleadosComponent,
     TimbreJustificadoComponent,
-    VerTimbreEmpleadoComponent
+    VerTimbreEmpleadoComponent,
+    EnviarUsuarioComponent
   ],
   imports: [
     CommonModule,

@@ -108,7 +108,6 @@ const crearTimbreDesconectado = (req, res) => __awaiter(void 0, void 0, void 0, 
             timbre.latitud, timbre.longitud, timbre.id_empleado, timbre.id_reloj,
             timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fec_hora_timbre_servidor,
             timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion]);
-        console.log('Timbre guardado :) => ', timbre);
         res.jsonp({
             message: 'Timbre creado con éxito',
             respuestaBDD: response
