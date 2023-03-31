@@ -142,15 +142,15 @@ export class InformacionAdminPage implements OnInit {
   }
 
   //variables de configuracion del componente de paginacion (pagination-controls)
-    public maxSize: number = 5;
-    public directionLinks: boolean = true;
-    public autoHide: boolean = false;
-    public responsive: boolean = true;
-    public labels: any = {
+  public maxSize: number = 5;
+  public directionLinks: boolean = true;
+  public autoHide: boolean = false;
+  public responsive: boolean = true;
+  public labels: any = {
     previousLabel: 'ante..',
     nextLabel: 'sigui..',
     screenReaderPaginationLabel: 'Pagination',
     screenReaderPageLabel: 'page',
     screenReaderCurrentLabel: `You're on page`
-    };
+  };
 }

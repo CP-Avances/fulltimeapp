@@ -7,12 +7,16 @@ import { Permiso } from 'src/app/interfaces/Permisos';
   <div style="margin: 2% 0% 2% 5%; text-align: left;">
     <p style="font-size: 14px; margin-right:6%;">
       <ion-label *ngIf="permiso.estado == 1"> 
-        <strong>No. Permiso: </strong> {{ permiso.num_permiso }}
+        <strong>No. Solicitud: {{ permiso.num_permiso }}</strong>
         <strong style="color: #81F0FB; float:right"> Pendiente  </strong> 
       </ion-label>
       <ion-label *ngIf="permiso.estado != 1"> 
-        <strong>No. Permiso: </strong> {{ permiso.num_permiso }} 
-        <strong style="color: #81F0FB; float:right"> {{ permiso.estado | estadoSolicitudes }} </strong>
+        <strong>No. Solicitud: {{ permiso.num_permiso }}</strong>
+        <strong style="float:right"> 
+          <p *ngIf="permiso.estado == 2" class="pre_autorizado">{{ permiso.estado | estadoSolicitudes }}</p>
+          <p *ngIf="permiso.estado == 3" class="autorizada">{{ permiso.estado | estadoSolicitudes }}</p>
+          <p *ngIf="permiso.estado == 4" class="negado">{{ permiso.estado | estadoSolicitudes }}</p>
+        </strong>
       </ion-label>
     </p>
 
