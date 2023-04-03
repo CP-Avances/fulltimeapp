@@ -316,6 +316,7 @@ export class NavegadorAdminComponent implements OnInit {
   }
 
   async Mostrarpopnotificaciones(event: any){
+      this.countNoti = 0;
       this.valor = false;
       const popover = await this.pooverCtrl.create({
       component: NotificacionPopoverComponent, 
