@@ -73,7 +73,11 @@ const routes: Routes = [
       {
         path: 'aprobar-alimentacion',
          loadChildren: () => import('../paginas-admin/aprobar-alimentacion/aprobar-alimentacion.module').then(m => m.AprobarAlimentacionPageModule)
-        },
+      },
+      {
+        path: 'reportes',
+        loadChildren: () => import('../paginas-admin/reportes/reportes.module').then(m => m.ReportesPageModule)
+      },
       {
         path: '',
         redirectTo: '/adminpage/bienvenido',

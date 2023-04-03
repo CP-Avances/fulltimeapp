@@ -13,7 +13,7 @@
   </div>
 </ion-content>
 
-<ion-content>
+
   <ion-card style="margin: 2.5%; border-radius: 2%;" 
   *ngFor="let e of empleados_filtro | paginate: { itemsPerPage: 20, currentPage: pageActual}">
     <ion-item style="width: 95%; margin: auto;">
@@ -29,7 +29,7 @@
     </ion-item>
   </ion-card>
 
- <!--Configuracion del Pagination - ngxPaginationModulo-->
+  <!--Configuracion del Pagination - ngxPaginationModulo-->
   <ion-item style="font-size: 70%; margin: 1% 0% 0% 0%;" [hidden] = "ver" *ngIf="empleados_filtro != undefined || empleados_filtro != null">
     <pagination-controls 
       class="paginacion" 
@@ -45,6 +45,8 @@
       [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
     </pagination-controls>
   </ion-item>
-</ion-content>
+
+ 
+
 
 

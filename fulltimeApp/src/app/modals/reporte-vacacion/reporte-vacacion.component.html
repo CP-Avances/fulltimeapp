@@ -1,0 +1,67 @@
+<app-close-modal titleModal="Generar Reporte"></app-close-modal>
+
+
+<ion-content>
+
+  <br>
+  <ion-text color="primary" *ngIf="fechaInicio === '' || fechaFinal === ''; else showBoton">
+    <h1 style="margin: 5px 15px; text-align: center;">Falta agregar las fechas de consultas</h1>
+  </ion-text>
+
+  <ng-template #showBoton>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12">
+          <ion-text color="dark">
+            <h4 style="margin: 5px 15px; text-align: center;">{{data.fullname}}</h4>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+
+        <ion-col size="6">
+          <ion-button color="success" shape="round" expand="full" (click)="consultarDataReporte()" [disabled]="showBtnPdf">
+
+            <ng-container *ngIf="loading; then consultar; else spiner"></ng-container>
+            <ng-template #consultar>
+              <ion-icon name="search-outline"></ion-icon> Buscar
+            </ng-template>
+            <ng-template #spiner>
+              <ion-spinner name="circles"></ion-spinner>
+            </ng-template>
+
+          </ion-button>
+        </ion-col>
+
+        <ion-col size="6">
+          <ion-button color="secondary" shape="round" expand="full" (click)="generarPDF()" [disabled]="!showBtnPdf">
+            <ion-icon name="document-text-outline"></ion-icon>PDF
+          </ion-button>
+        </ion-col>
+
+      </ion-row>
+
+    </ion-grid>
+
+    <!-- <table id="tablaReporte">
+      <thead class="header-table">
+        <tr>
+
+          <td>Fecha y hora</td>
+        
+        </tr>
+      </thead>
+      <tbody class="detail-table">
+        <tr *ngFor="let v of vacaciones">
+
+          <td>{{v.id}}</td>
+         
+        </tr>
+      </tbody>
+    </table> -->
+
+  </ng-template>
+
+</ion-content>

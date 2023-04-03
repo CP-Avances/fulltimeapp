@@ -27,6 +27,16 @@ import { ShowHoraExtraMultipleComponent } from './update-autorizacion-multiple/s
 import { ShowPermisoMultipleComponent } from './update-autorizacion-multiple/show-permiso-multiple/show-permiso-multiple.component';
 import { ShowVacacionMultipleComponent } from './update-autorizacion-multiple/show-vacacion-multiple/show-vacacion-multiple.component';
 
+// componente modals Reporteria
+import { ReporteAtrasoComponent } from './reporte-atraso/reporte-atraso.component';
+import { ReporteInasistenciaComponent } from './reporte-inasistencia/reporte-inasistencia.component';
+import { ReporteTimbreComponent } from './reporte-timbre/reporte-timbre.component';
+import { ReporteTimbreConNovedadesComponent } from './reporte-timbreConNovedades/reporte-timbreConNovedades.component';
+import { ReporteSolicitudComponent } from './reporte-solicitud/reporte-solicitud.component';
+import { ReporteAlimentacionComponent } from './reporte-alimentacion/reporte-alimentacion.component';
+import { ReporteHoraExtraComponent } from './reporte-hora-extra/reporte-hora-extra.component';
+import { ReporteVacacionComponent } from './reporte-vacacion/reporte-vacacion.component';
+
 
 
 @NgModule({
@@ -44,6 +54,14 @@ import { ShowVacacionMultipleComponent } from './update-autorizacion-multiple/sh
     ShowHoraExtraMultipleComponent,
     ShowPermisoMultipleComponent,
     ShowVacacionMultipleComponent,
+    ReporteInasistenciaComponent,
+    ReporteAtrasoComponent,
+    ReporteTimbreComponent,
+    ReporteTimbreConNovedadesComponent,
+    ReporteSolicitudComponent,
+    ReporteAlimentacionComponent,
+    ReporteHoraExtraComponent,
+    ReporteVacacionComponent,
   ],
   exports:[
     AtrasoJustificadoComponent,
@@ -53,6 +71,14 @@ import { ShowVacacionMultipleComponent } from './update-autorizacion-multiple/sh
     EnviarUsuarioComponent,
     UpdateAutorizacionComponent,
     UpdateAutorizacionMultipleComponent,
+    ReporteInasistenciaComponent,
+    ReporteAtrasoComponent,
+    ReporteTimbreComponent,
+    ReporteTimbreConNovedadesComponent,
+    ReporteSolicitudComponent,
+    ReporteAlimentacionComponent,
+    ReporteHoraExtraComponent,
+    ReporteVacacionComponent,
   ],
   imports: [
     CommonModule,

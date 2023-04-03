@@ -5,8 +5,8 @@ import { ToastController, LoadingController, Platform } from '@ionic/angular';
 import { environment } from 'src/environments/environment';
 import { DataUserLoggedService } from '../services/data-user-logged.service';
 
+import { File, IWriteOptions } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
-import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -19,6 +19,7 @@ const PDF_TYPE = 'application/pdf';
 export class PlantillaReportesService {
 
   constructor(
+    private file: File,
     private fileOpener: FileOpener,
     public platform: Platform,
     public loadingController: LoadingController,
@@ -212,18 +213,15 @@ export class PlantillaReportesService {
 
   generarPdf(getDocumentDefinicion: any, filename = 'reporte.pdf') {
     this.presentLoading('Creando archivo PDF...');
-
     const documentDefinition = getDocumentDefinicion;
     const pdfDoc = pdfMake.createPdf(documentDefinition);
 
     pdfDoc.getBuffer((uint8Array: Uint8Array) => {
 
       let buffer = uint8Array.buffer;
-
-      if (this.platform.is('cordova')) {
+      if (this.platform.is('capacitor')) {
         this.descargarDeCelular(buffer, filename.split('.')[0], PDF_TYPE, '.pdf');
       } else {
-
         const data: Blob = new Blob([buffer]);
         var a = window.document.createElement('a');
         a.href = window.URL.createObjectURL(data);
@@ -231,8 +229,6 @@ export class PlantillaReportesService {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        this.dismissLoading();
-
       }
     });
 
@@ -240,57 +236,36 @@ export class PlantillaReportesService {
 
   private descargarDeCelular(buffer: any, nombreArchivo: string, tipo: string, extencion: string) {
 
-    const readFile = async () => {
-      await Filesystem.readFile({
-        path: 'file/'+nombreArchivo,
-        directory: Directory.Documents,
-        encoding: Encoding.UTF8,
-      })
-    }
-
-    const directory = readFile[0].directory;
+    const directory = this.file.dataDirectory;
     console.log(directory);
-
     const fileName = nombreArchivo + extencion;
-    //let options: IWriteOptions = { replace: true };
+
+    let options: IWriteOptions = { replace: true };
+    
     //Writing File to Device
-    Filesystem.writeFile({
-      path: `file/`+fileName,
-      data: buffer,
-      directory: directory,
-      encoding: Encoding.UTF8,
-      recursive: true
-    })
+    this.file.writeFile(directory, fileName, buffer, options)
       .then((success) => {
-        this.dismissLoading();
         console.log("Archivo creado satisfactoriamente" + JSON.stringify(success));
-        this.fileOpener.open(readFile[0].directory + fileName, tipo)
+        this.fileOpener.open(this.file.dataDirectory + fileName, tipo)
           .then(() => console.log('Archivo abierto'))
           .catch(e => { console.log('Error abriendo archivo', e); this.mostrarToas('Error abiendo el archivo', 4000) });
       })
       .catch((error) => {
-        this.dismissLoading();
         console.log("No se puede crear el archivo " + JSON.stringify(error));
       });
-
-
   }
 
   private async presentLoading(msg: string) {
-    const loading = await this.loadingController.create({
-      message: msg
+    this.loadingController.create({
+      message: msg,
+      duration: 1000,
+    }).then((response) => {
+      response.present();
+      response.onDidDismiss().then((response) => {});
     });
-    return await loading.present();
-  }
-
-  private async dismissLoading() {
-    while (await this.loadingController.getTop() !== undefined) {
-      await this.loadingController.dismiss();
-    }
   }
 
   private async mostrarToas(mensaje: string, duracion: number) {
-
     const toast = await this.toastController.create({
       message: mensaje,
       duration: duracion,
@@ -303,7 +278,8 @@ export class PlantillaReportesService {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: duracion,
-      color: color
+      color: color,
+      mode: 'ios',
     });
     toast.present();
   }
