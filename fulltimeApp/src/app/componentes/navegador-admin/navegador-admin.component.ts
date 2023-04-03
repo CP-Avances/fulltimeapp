@@ -62,6 +62,10 @@ export class NavegadorAdminComponent implements OnInit {
     this.VerificarFunciones();
   }
 
+  ionViewDidLoad(){
+    this.ngOnInit();
+  }
+
   ngOnInit() {
     this.username = this.userService.username;
 
@@ -69,17 +73,13 @@ export class NavegadorAdminComponent implements OnInit {
     this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
 
     this.socket.on('recibir_notificacion', (data_llega: any)=>{
-      console.log("notificacion recibida :)", data_llega);
-      
       this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
       if(data_llega.id_send_empl !== this.idEmpleadoIngresa){
         console.log("Notificacion recibida",data_llega.id);
 
-
         if(data_llega.id_receives_empl === this.idEmpleadoIngresa){
           this.mensaje = "Nueva Notificacion de " + data_llega.usuario;
           console.log("Usuario envio",this.empleEnvia);
-          this.countbadge = this.countNoti + 1;
 
             try{
               //this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
@@ -111,14 +111,27 @@ export class NavegadorAdminComponent implements OnInit {
       this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
       if(data_llega.id_send_empl !== this.idEmpleadoIngresa){
         console.log("Aviso recibido",data_llega.id);
-        this.countbadge = this.countNoti + 1;
 
         if(data_llega.id_receives_empl === this.idEmpleadoIngresa){
           this.mensaje = "Nuevo aviso de " + data_llega.usuario;
           console.log("Usuario envio",this.empleEnvia);
 
           try{
-            this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
+            //this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
+
+            var t = new Date();
+            t.setSeconds(t.getSeconds() + 5);
+            let id = this.ids.length;
+            this.ids.push(id);
+
+            let options:ScheduleOptions = { notifications: [{
+              id: data_llega.id,
+              title: "Fulltime Notificion: "+id,
+              body: this.mensaje,
+            }]}
+
+            LocalNotifications.schedule(options).then(()=> {});
+
           }catch (error) {
             this.mostrarToasNoti("No se pudo resibir la notificacion: \n"+ error);
             console.log("Problemas en la notificacion: ", error);
@@ -141,6 +154,8 @@ export class NavegadorAdminComponent implements OnInit {
           this.notificacionesAll = this.notificaciones.concat(this.notificacionestimbres);
           
           this.countNoti = 0;
+
+          //console.log('Notificacaciones: ',this.notificacionesAll)
           
           //cuenta las notificaciones que estan sin ver
           this.notificacionesAll.forEach((item: any) => {

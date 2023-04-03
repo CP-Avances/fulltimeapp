@@ -21,9 +21,12 @@
       <app-show-alimentacion-multiple [alimentacion]="alimentacion"></app-show-alimentacion-multiple>
     </ng-container>
 
-    <div style="text-align:center; width: 100%; margin: 2% 0% 4% 0%;">
-      <btn-update  (onUpdate)="UpdateRegister()" [loadingBtn]="loadingBtn" [formRegistro]="formRegistro"></btn-update>
-    </div>  
+    <!-- BOTON GUARDAR COMPONENTE -->
+    <div style="margin: 3% 4% 3% 4%;">
+      <button style="width: 100%; background-color: transparent;">
+        <btn-update  (onUpdate)="UpdateRegister()" [loadingBtn]="loadingBtn" [formRegistro]="formRegistro"></btn-update>
+      </button>
+    </div> 
   </form>
 
   <ng-template #showMessageAutorizacion>

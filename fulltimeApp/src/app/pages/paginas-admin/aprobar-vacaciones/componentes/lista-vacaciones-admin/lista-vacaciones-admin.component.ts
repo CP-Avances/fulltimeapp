@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { LoadingController, ModalController, ToastController } from '@ionic/angular';
 import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { Subscription } from 'rxjs';
-//import { UpdateAutorizacionComponent } from 'src/app/modals/update-autorizacion/update-autorizacion.component';
+import { UpdateAutorizacionComponent } from 'src/app/modals/update-autorizacion/update-autorizacion.component';
 import { Vacacion } from 'src/app/interfaces/Vacacion';
 import { VacacionesService } from 'src/app/services/vacaciones.service';
 import { DataUserLoggedService } from '../../../../../services/data-user-logged.service';
@@ -17,16 +17,14 @@ moment.locale('es');
   templateUrl: './lista-vacaciones-admin.component.html',
   styleUrls: ['../../aprobar-vacaciones.page.scss'],
 })
-export class ListaVacacionesAdminComponent implements OnInit, OnDestroy {
+export class ListaVacacionesAdminComponent implements OnInit {
 
   username: any;
   subscripted: Subscription;
   skeleton = SkeletonListPermisoArray;
   loading: boolean = true;
-
   pageActual: number = 1;
   Ver: boolean;
-  validarMensaje: boolean = false;
 
   vacaciones_pendientes: Vacacion[] = [];
   vacaciones_pre_autorizados: Vacacion[] = [];
@@ -71,13 +69,6 @@ export class ListaVacacionesAdminComponent implements OnInit, OnDestroy {
         this.obtenerAllVacaciones();
       }
     )
-  }
-
-
-  ngOnDestroy() {
-    this.subscripted.unsubscribe();
-    this.dataUserLoggedService.setFechaRangoInicio('');
-    this.dataUserLoggedService.setFechaRangoFinal('');
   }
 
   obtenerAllVacaciones() {
@@ -143,7 +134,7 @@ export class ListaVacacionesAdminComponent implements OnInit, OnDestroy {
   }
 
   async presentModalAutorizarVacacion(vacacion: Vacacion) {
-    /*const modal = await this.modalController.create({
+    const modal = await this.modalController.create({
       component: UpdateAutorizacionComponent,
       componentProps: {
         vacacion,
@@ -151,7 +142,13 @@ export class ListaVacacionesAdminComponent implements OnInit, OnDestroy {
       },
       cssClass: 'my-custom-class'
     });
-    return await modal.present();*/
+
+    await modal.present();
+    const { data: { refreshInfo } } = await modal.onDidDismiss()
+    if (refreshInfo) {
+      this.ngOnInit();
+    }
+    return;
   }
 
   pestaniaEstados: string = 'pendientes';
@@ -243,7 +240,7 @@ export class ListaVacacionesAdminComponent implements OnInit, OnDestroy {
   }
 
 
-//Metodos para cambiar de manera automatica el rango de fechas a filtrar
+  //Metodos para cambiar de manera automatica el rango de fechas a filtrar
    changeFechaInicio(e) {
     this.fechaFinal = null;
     this.fechaFi = null;

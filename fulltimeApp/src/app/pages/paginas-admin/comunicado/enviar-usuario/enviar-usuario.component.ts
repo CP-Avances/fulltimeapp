@@ -108,7 +108,9 @@ export class EnviarUsuarioComponent implements OnInit {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: duracion,
-      color: color
+      color: color,
+      mode: 'ios',
+      cssClass: 'showtoast-custom-class'
     });
     toast.present();
   }
@@ -192,8 +194,6 @@ export class EnviarUsuarioComponent implements OnInit {
         sucu.push(o);
 
       }
-
-
     });
     console.log('ver depa-------', sucu);
     this.ModelarSucursal(sucu)
@@ -251,6 +251,7 @@ export class EnviarUsuarioComponent implements OnInit {
     })
     console.log('ver usuario---------------------------', usuarios);
     this.EnviarNotificaciones(usuarios);
+    this.closeModal();
   }
 
   ModelarDepartamentos(dataDepartamentos) {
@@ -271,6 +272,7 @@ export class EnviarUsuarioComponent implements OnInit {
     })
     console.log('ver usuario---------------------------', usuarios);
     this.EnviarNotificaciones(usuarios);
+    this.closeModal();
   }
 
   ModelarEmpleados(dataEmpleados) {
@@ -285,6 +287,7 @@ export class EnviarUsuarioComponent implements OnInit {
 
     console.log('ver usuario---------------------------', respuesta);
     this.EnviarNotificaciones(respuesta);
+    this.closeModal();
   }
 
 
@@ -320,11 +323,11 @@ export class EnviarUsuarioComponent implements OnInit {
       else {
         this.mostrarAlertas('Trata de enviar un total de ' + this.cont_correo +
           ' correos, sin embargo solo tiene permitido enviar un total de ' + this.correos +
-          ' correos.', 1000, 'danger')
+          ' correos.', 3000, 'danger')
       }
     }
     else {
-      this.mostrarAlertas("No ha seleccionado usuarios.", 1000, 'danger')
+      this.mostrarAlertas("No ha seleccionado usuarios.", 3000, 'danger')
     }
   }
 

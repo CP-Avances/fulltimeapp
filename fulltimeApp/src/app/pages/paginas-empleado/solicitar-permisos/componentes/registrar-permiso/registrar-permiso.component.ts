@@ -42,7 +42,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   diasHoras = diasHoras;
   tipoPermiso = tipoPermiso;
   radioButton = estadoBoolean;
-  selectItemDiasHoras: string = '';
+  selectItemDiasHoras: string;
   horarioEmpleado: HorarioE;
   loadingBtn: boolean = false;
   mensajeFile: string | null;
@@ -53,8 +53,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   idEmpresa: number;
   fech_bloqu: boolean;
 
-  dia_inicio: string | null = "";
-  dia_fianl: string | null = "";
+  dia_inicio: string  = "";
+  dia_fianl: string = "";
   hora_inicio: string = "";
   hora_final: string = "";
 

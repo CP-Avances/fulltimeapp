@@ -7,13 +7,10 @@ import { Vacacion } from 'src/app/interfaces/Vacacion';
     <div style="margin: 2% 0% 2% 5%; text-align: left;">
 
       <p style="font-size: 14px; margin-right:6%;">
-        <ion-label *ngIf="vacacion.estado == 1">
-          <strong>No. Solicitud: {{ vacacion.id}}</strong>
-          <strong style="color: #81F0FB; float:right"> Pendiente </strong> 
-        </ion-label>
-        <ion-label *ngIf="vacacion.estado != 1"> 
+        <ion-label> 
           <strong>No. Solicitud: {{ vacacion.id}}</strong>
           <strong style="float:right">
+            <p *ngIf="vacacion.estado == 1" style="color: #81F0FB;"> Pendiente </p>
             <p *ngIf="vacacion.estado == 2" class="pre_autorizado">{{ vacacion.estado | estadoSolicitudes }}</p>
             <p *ngIf="vacacion.estado == 3" class="autorizada">{{ vacacion.estado | estadoSolicitudes }}</p>
             <p *ngIf="vacacion.estado == 4" class="negado">{{ vacacion.estado | estadoSolicitudes }}</p>

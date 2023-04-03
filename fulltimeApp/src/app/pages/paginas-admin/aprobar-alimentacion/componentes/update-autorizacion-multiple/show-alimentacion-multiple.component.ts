@@ -8,7 +8,8 @@ import { Alimentacion } from 'src/app/interfaces/Alimentacion';
     <ion-card *ngFor="let alimentacion of alimentacion" style="padding: 3% 7% 3% 5%; font-size: 16px;">
       <ion-card-title style="text-align: center; font-size: 100%;"> {{ alimentacion.nempleado | titlecase }}  </ion-card-title>
       <h6>
-        <p align="justify" style="font-size: 90%; margin-top:-4%;" *ngIf="alimentacion.observacion != null"> {{ alimentacion.observacion}}</p>
+        <ion-card-title style="font-size: 90%; margin-top:-2%;" *ngIf="alimentacion.observacion != null"> <b>Observacion</b></ion-card-title>
+        <p align="justify" style="font-size: 90%; margin-top:-1%;" *ngIf="alimentacion.observacion != null"> {{ alimentacion.observacion}}</p>
         <p style="font-size: 90%; margin-top:-4%;" *ngIf="alimentacion.observacion == null"> El Usuario no ha ingresado una Observacion</p>
 
         <ion-card-title style="margin-top:-1%; margin-bottom:-4%; font-size: 90%;"><b> Descripcion </b></ion-card-title>

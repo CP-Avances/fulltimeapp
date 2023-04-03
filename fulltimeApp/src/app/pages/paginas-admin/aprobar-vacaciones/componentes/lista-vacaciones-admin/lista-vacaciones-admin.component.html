@@ -4,10 +4,10 @@
 <ng-template #showList>
   <app-pestanias-estados (onChangeEstado)="cambioPestaniaEstados( $event )"></app-pestanias-estados>
 
+  <!-- filtro de timbres por fechas -->
   <ion-card>
     <ion-card-content>
       <ion-card-title style="text-align: center;"> Filtrar Por Fechas</ion-card-title>
-
 
       <ion-grid style="margin-top: -2%;" mode="md">
         <ion-row>
@@ -81,12 +81,13 @@
 
   <!-- PENDIENTES -->
   <ion-list *ngIf="pestaniaEstados === 'pendientes'" style="background-color: transparent;">
-    <app-aprobacion-multiple *ngIf="vacaciones_pendientes.length != 0" (onArrCheck)="allCheckPendientes( $event )" (onChecked)="ChangeAprobacionMultiple( $event )" [vacaciones]="vacaciones_pendientes" (onRefreshOnInit)="ngOnInit()">
-    </app-aprobacion-multiple>
+    <!--app-aprobacion-multiple *ngIf="vacaciones_pendientes.length != 0" (onArrCheck)="allCheckPendientes( $event )" 
+      (onChecked)="ChangeAprobacionMultiple( $event )" [vacaciones]="vacaciones_pendientes" (onRefreshOnInit)="ngOnInit()">
+    </app-aprobacion-multiple-->
 
     <ion-card *ngFor="let vacacion of vacaciones_pendientes | paginate: { itemsPerPage: 5, currentPage: pageActual }" class="item-pendientes-color">
-      <ng-container *ngIf="vacacion.nempleado == username else showpermisos"></ng-container>
-      <ng-template #showpermisos>
+      <ng-container *ngIf="vacacion.nempleado == username else showpendiente"></ng-container>
+      <ng-template #showpendiente>
         <div style="width:100%; margin-bottom: 7%;">
           <ion-checkbox *ngIf="isChecked" [(ngModel)]="vacacion.isChecked"></ion-checkbox>
           <item-vacacion [vacacion]="vacacion"></item-vacacion>
@@ -127,7 +128,7 @@
     <ion-card *ngFor="let vacacion of vacaciones_pre_autorizados | paginate: { itemsPerPage: 5, currentPage: pageActual }" class="item-pre_autorizados-color">
       <ng-container *ngIf="vacacion.nempleado == username else showpre_autorizados"></ng-container>
       <ng-template #showpre_autorizados>
-        <div style="width:100%; margin-bottom: 7%;">
+        <div style="width:100%; margin-bottom: 7%;" *ngIf="vacacion.nempleado !== username">
           <ion-checkbox *ngIf="isCheckedPre" [(ngModel)]="vacacion.isChecked"></ion-checkbox>
           <item-vacacion [vacacion]="vacacion"></item-vacacion>
 

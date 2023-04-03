@@ -145,7 +145,6 @@
 
   <!-- AUTORIZADOS -->
   <ion-list *ngIf="pestaniaEstados === 'autorizados' " style="background-color: transparent;">
-    <br>
     <ion-card *ngFor="let a of alimentacion_autorizado | paginate: { itemsPerPage: 5, currentPage: pageActual }"
       class="item-autorizados-color">
       <ng-container *ngIf="a.nempleado == username else showautorizado"></ng-container>
@@ -178,7 +177,6 @@
 
   <!-- NEGADOS -->
   <ion-list *ngIf="pestaniaEstados === 'negados' " style="background-color: transparent;">
-    <br>
     <ion-card *ngFor="let a of alimentacion_negado | paginate: { itemsPerPage: 5, currentPage: pageActual }"
       class="item-negados-color">
       <ng-container *ngIf="a.nempleado == username else shownegados"></ng-container>

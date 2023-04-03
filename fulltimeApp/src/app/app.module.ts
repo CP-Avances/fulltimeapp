@@ -14,6 +14,8 @@ import { ComponentesModule } from './componentes/componentes.module';
 import { ModalsPageModule } from './modals/modals.module';
 import { Drivers } from '@ionic/storage';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { FingerprintAIO } from '@ionic-native/fingerprint-aio/ngx';
+import { FileOpener } from '@ionic-native/file-opener/ngx';
 
 // Cambiar el local de la APP
 import localEsEC from '@angular/common/locales/es-EC';
@@ -42,6 +44,7 @@ const config: SocketIoConfig = { url: "http://186.4.226.49:8010", options: {}};
     })
   ],
   providers: [
+    FileOpener,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     AutenticacionGuard,{
       provide: HTTP_INTERCEPTORS,

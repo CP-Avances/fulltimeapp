@@ -23,18 +23,11 @@ export class ComunicadoPage implements OnInit {
     public modalController: ModalController,
     public platform: Platform,
     public socket: Socket,
-    ) {
-
-     
-    }
+    ) {}
 
   ngOnInit() {
     this.noti.asunto = '';
     this.noti.mensaje = '';
-
-    console.log("Conecion:", this.socket.connect());
-    console.log("Sokect recibe", this.socket.on('recibir_aviso', (data: any) => {}));
-    
   }
 
   EnviarComunicado() {

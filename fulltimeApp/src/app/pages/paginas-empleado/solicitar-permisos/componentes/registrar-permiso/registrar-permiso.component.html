@@ -70,7 +70,7 @@
         </ion-item>  
       </div>
 
-      <ng-container *ngIf="selectItemDiasHoras != ''">
+      <ng-container *ngIf="selectItemDiasHoras != null">
         <ion-text class="text_info">Ingrese los datos</ion-text>
         <ng-container *ngIf="selectItemDiasHoras != null ">
           <br>
@@ -135,7 +135,7 @@
         </ng-container>
 
         <ng-container *ngIf="selectItemDiasHoras == 'Horas' ||  selectItemDiasHoras == 'Días y Horas'">
-          <!-- FECHA INICIO Y HORA DE INICIO -->
+          <!-- HORA INICIO Y HORA FINAL -->
           <ion-grid style="margin-top: -2%;" mode="md">
             <ion-row>
               <ion-col size="6">
@@ -245,38 +245,6 @@
               </ion-col>
             </ion-row>
           </ion-grid>
-          <ion-grid>
-            <ion-row>
-              <ion-col size="6">
-                <div class="formdiv_tiempo">
-                  <ion-item class="item_fondo" mode="md">
-                    <ion-label class="is-required" position="floating"><b>Días Permiso</b></ion-label>
-                    <ion-input name="dia" [ngModel]="reg.dia" mode="ios" maxlengt="10" disabled="true" required></ion-input>
-                  </ion-item>
-                </div>
-              </ion-col>
-              <ion-col size="6">
-                <div class="formdiv_tiempo">
-                  <ion-item class="item_fondo" mode="md">
-                    <ion-label class="is-required" position="floating"><b>Días Libre</b></ion-label>
-                    <ion-input name="dia_libre" [ngModel]="reg.dia_libre" disabled="true" mode="ios" maxlengt="10" required></ion-input>
-                  </ion-item>
-                </div>
-              </ion-col>
-            </ion-row>
-            <ion-row>
-              <ion-col size="12">
-                <ion-text class="text_info"> Este resulatado es solo del día final que solicita </ion-text>
-                <div class="formdiv_tiempo">
-                  <ion-item class="item_fondo" mode="md">
-                    <ion-label class="is-required" position="floating"><b>Horas y minutos de permiso</b></ion-label>
-                    <ion-input name="hora_numero" displayFormat="HH:mm:ss" [ngModel]="reg.hora_numero" disabled="true" required></ion-input>
-                  </ion-item>
-                </div>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-
         </ion-list>
 
         <ng-container *ngIf="reg.dia !== null  || reg.hora_numero !== null ">

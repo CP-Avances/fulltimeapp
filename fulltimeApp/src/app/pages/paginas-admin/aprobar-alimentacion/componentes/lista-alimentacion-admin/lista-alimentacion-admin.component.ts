@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { LoadingController, ModalController, ToastController } from '@ionic/angular';
 import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { Subscription } from 'rxjs';
-//import { UpdateAutorizacionComponent } from 'src/app//modals/update-autorizacion/update-autorizacion.component';
+import { UpdateAutorizacionComponent } from 'src/app//modals/update-autorizacion/update-autorizacion.component';
 import { Alimentacion } from 'src/app/interfaces/Alimentacion';
 import { AlimentacionService } from 'src/app/services/alimentacion.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';

@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
-//import { UpdateAutorizacionMultipleComponent } from '../../modals/update-autorizacion-multiple/update-autorizacion-multiple.component';
+import { UpdateAutorizacionMultipleComponent } from '../../modals/update-autorizacion-multiple/update-autorizacion-multiple.component';
 import { Permiso } from '../../interfaces/Permisos';
 import { ValidacionesService } from '../../libs/validaciones.service';
 import { ModalController } from '@ionic/angular';
@@ -28,10 +28,13 @@ export class AprobacionMultipleComponent implements OnDestroy {
   ) { }
 
   ngOnDestroy() {
+    console.log('Esta en el componente de aprobacion multimple , ',this.isChecked)
     if (this.permisos) {
       this.onChecked.emit(false);
-      this.permisos.forEach(o => { o.isChecked = false })
-      this.onArrCheck.emit(this.permisos)
+      this.permisos.forEach(o => { console.log('permisos aprobacion multiple: ',o); o.isChecked = false })
+      this.onArrCheck.emit(this.permisos);
+      console.log('permisos aprobacion multiple onArrckeck: ',this.onArrCheck.emit(this.permisos))
+      return;
     }
     if (this.vacaciones) {
       this.onChecked.emit(false);
@@ -62,7 +65,7 @@ export class AprobacionMultipleComponent implements OnDestroy {
 
     if (permisos.length === 0) return this.validacionService.showToast('Seleccione solicitudes.', 3000, 'danger');
 
-    /*const modal = await this.modalController.create({
+    const modal = await this.modalController.create({
       component: UpdateAutorizacionMultipleComponent,
       componentProps: {
         permisos,
@@ -77,7 +80,7 @@ export class AprobacionMultipleComponent implements OnDestroy {
 
     if (refreshInfo) {
       this.refeshSolicitudes(true)
-    }*/
+    }
     return;
   }
 
@@ -86,7 +89,7 @@ export class AprobacionMultipleComponent implements OnDestroy {
 
     if (vacaciones.length === 0) return this.validacionService.showToast('Seleccione solicitudes.', 3000, 'danger');
 
-    /*const modal = await this.modalController.create({
+    const modal = await this.modalController.create({
       component: UpdateAutorizacionMultipleComponent,
       componentProps: {
         vacaciones,
@@ -101,7 +104,7 @@ export class AprobacionMultipleComponent implements OnDestroy {
 
     if (refreshInfo) {
       this.refeshSolicitudes(true)
-    }*/
+    }
     return;
   }
 
@@ -110,7 +113,7 @@ export class AprobacionMultipleComponent implements OnDestroy {
 
     if (horas_extras.length === 0) return this.validacionService.showToast('Seleccione solicitudes.', 3000, 'danger');
 
-    /*const modal = await this.modalController.create({
+    const modal = await this.modalController.create({
       component: UpdateAutorizacionMultipleComponent,
       componentProps: {
         horas_extras,
@@ -125,7 +128,7 @@ export class AprobacionMultipleComponent implements OnDestroy {
 
     if (refreshInfo) {
       this.refeshSolicitudes(true)
-    }*/
+    }
     return;
   }
 
@@ -135,7 +138,8 @@ export class AprobacionMultipleComponent implements OnDestroy {
 
   ChangeAprobacionMultiple(isChecked: boolean) {
     this.isChecked = !isChecked;
-    this.onChecked.emit(this.isChecked)
+    this.onChecked.emit(this.isChecked);
+    console.log('Esta en el componente de aprobacion cheked, ',this.isChecked)
   }
 
   isAllCheck: boolean = false;

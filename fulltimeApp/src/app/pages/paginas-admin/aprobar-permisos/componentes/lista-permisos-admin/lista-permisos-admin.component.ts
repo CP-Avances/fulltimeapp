@@ -4,7 +4,7 @@ import { ModalController, ToastController, LoadingController } from '@ionic/angu
 import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { PermisosService } from 'src/app/services/permisos.service';
 import { Subscription } from 'rxjs';
-//import { UpdateAutorizacionComponent } from 'src/app/modals/update-autorizacion/update-autorizacion.component';
+import { UpdateAutorizacionComponent } from 'src/app/modals/update-autorizacion/update-autorizacion.component';
 import { DataUserLoggedService } from '../../../../../services/data-user-logged.service';
 import { Socket } from 'ngx-socket-io';
 import { ParametrosService } from 'src/app/services/parametros.service';
@@ -139,7 +139,7 @@ export class ListaPermisosAdminComponent implements OnInit {
   }
 
   async presentModalAutorizarPermiso(permiso: Permiso) {
-    /*const modal = await this.modalController.create({
+    const modal = await this.modalController.create({
       component: UpdateAutorizacionComponent,
       componentProps: {
         permiso,
@@ -147,14 +147,13 @@ export class ListaPermisosAdminComponent implements OnInit {
       },
       cssClass: 'my-custom-class'
     });
+
     await modal.present();
-
     const { data: { refreshInfo } } = await modal.onDidDismiss()
-
     if (refreshInfo) {
       this.ngOnInit();
     }
-    return;*/
+    return;
   }
 
   pestaniaEstados: string = 'pendientes';
@@ -165,7 +164,8 @@ export class ListaPermisosAdminComponent implements OnInit {
 
   isChecked: boolean = false;
   isCheckedPre: boolean = false;
-  ChangeAprobacionMultiple(isChecked: boolean) {
+  async ChangeAprobacionMultiple(isChecked: boolean) {
+
     switch (this.pestaniaEstados) {
       case 'pendientes':
         this.isChecked = isChecked;
@@ -180,6 +180,7 @@ export class ListaPermisosAdminComponent implements OnInit {
 
   allCheckPendientes(data: Permiso[]) {
     this.permisos_pendientes = data
+    console.log('allckeched: .......',this.permisos_pendientes)
   }
 
   allCheckPreAutorizados(data: Permiso[]) {
@@ -206,25 +207,25 @@ export class ListaPermisosAdminComponent implements OnInit {
           })
 
           this.permisos_pendientes = permisos.filter(o => {
-            if (o.id_empl_contrato != this.idEmpleado) { // condicion para no mostrar las solicitudes del mismo admin
+            if (o.id_empl_contrato !== this.idEmpleado) { // condicion para no mostrar las solicitudes del mismo admin
               return o.estado === 1
             }
           });
 
           this.permisos_pre_autorizados = permisos.filter(o => {
-            if (o.id_empl_contrato != this.idEmpleado) { // condicion para no mostrar las solicitudes del mismo admin
+            if (o.id_empl_contrato !== this.idEmpleado) { // condicion para no mostrar las solicitudes del mismo admin
               return o.estado === 2
             }
           });
 
           this.permisos_autorizado = permisos.filter(o => {
-            if (o.id_empl_contrato != this.idEmpleado) { // condicion para no mostrar las solicitudes del mismo admin
+            if (o.id_empl_contrato !== this.idEmpleado) { // condicion para no mostrar las solicitudes del mismo admin
               return o.estado === 3
             }
           });
 
           this.permisos_negado = permisos.filter(o => {
-            if (o.id_empl_contrato != this.idEmpleado) { // condicion para no mostrar las solicitudes del mismo admin
+            if (o.id_empl_contrato !== this.idEmpleado) { // condicion para no mostrar las solicitudes del mismo admin
               return o.estado === 4
             }
           });

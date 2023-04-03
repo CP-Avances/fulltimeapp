@@ -5,6 +5,11 @@ import { ToastController, LoadingController, Platform } from '@ionic/angular';
 import { environment } from 'src/environments/environment';
 import { DataUserLoggedService } from '../services/data-user-logged.service';
 
+import { FileOpener } from '@ionic-native/file-opener/ngx';
+import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
+import pdfMake from 'pdfmake/build/pdfmake';
+import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const PDF_TYPE = 'application/pdf';
 
@@ -14,7 +19,7 @@ const PDF_TYPE = 'application/pdf';
 export class PlantillaReportesService {
 
   constructor(
-    public file: File,
+    private fileOpener: FileOpener,
     public platform: Platform,
     public loadingController: LoadingController,
     private http: HttpClient,
@@ -202,6 +207,72 @@ export class PlantillaReportesService {
         ]
       }
     }];
+
+  }
+
+  generarPdf(getDocumentDefinicion: any, filename = 'reporte.pdf') {
+    this.presentLoading('Creando archivo PDF...');
+
+    const documentDefinition = getDocumentDefinicion;
+    const pdfDoc = pdfMake.createPdf(documentDefinition);
+
+    pdfDoc.getBuffer((uint8Array: Uint8Array) => {
+
+      let buffer = uint8Array.buffer;
+
+      if (this.platform.is('cordova')) {
+        this.descargarDeCelular(buffer, filename.split('.')[0], PDF_TYPE, '.pdf');
+      } else {
+
+        const data: Blob = new Blob([buffer]);
+        var a = window.document.createElement('a');
+        a.href = window.URL.createObjectURL(data);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        this.dismissLoading();
+
+      }
+    });
+
+  }
+
+  private descargarDeCelular(buffer: any, nombreArchivo: string, tipo: string, extencion: string) {
+
+    const readFile = async () => {
+      await Filesystem.readFile({
+        path: 'file/'+nombreArchivo,
+        directory: Directory.Documents,
+        encoding: Encoding.UTF8,
+      })
+    }
+
+    const directory = readFile[0].directory;
+    console.log(directory);
+
+    const fileName = nombreArchivo + extencion;
+    //let options: IWriteOptions = { replace: true };
+    //Writing File to Device
+    Filesystem.writeFile({
+      path: `file/`+fileName,
+      data: buffer,
+      directory: directory,
+      encoding: Encoding.UTF8,
+      recursive: true
+    })
+      .then((success) => {
+        this.dismissLoading();
+        console.log("Archivo creado satisfactoriamente" + JSON.stringify(success));
+        this.fileOpener.open(readFile[0].directory + fileName, tipo)
+          .then(() => console.log('Archivo abierto'))
+          .catch(e => { console.log('Error abriendo archivo', e); this.mostrarToas('Error abiendo el archivo', 4000) });
+      })
+      .catch((error) => {
+        this.dismissLoading();
+        console.log("No se puede crear el archivo " + JSON.stringify(error));
+      });
+
 
   }
 

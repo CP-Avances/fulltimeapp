@@ -5,7 +5,7 @@ import { Socket } from 'ngx-socket-io';
 import moment from 'moment';
 import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { HoraExtra } from 'src/app/interfaces/HoraExtra';
-//import { UpdateAutorizacionComponent } from 'src/app/modals/update-autorizacion/update-autorizacion.component';
+import { UpdateAutorizacionComponent } from 'src/app/modals/update-autorizacion/update-autorizacion.component';
 import { DataUserLoggedService } from '../../../../../services/data-user-logged.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { HorasExtrasService } from 'src/app/services/horas-extras.service';
@@ -142,7 +142,7 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
   }
 
   async presentModalAutorizarHorasExtras(hora_extra: HoraExtra) {
-    /*const modal = await this.modalController.create({
+    const modal = await this.modalController.create({
       component: UpdateAutorizacionComponent,
       componentProps: {
         hora_extra,
@@ -157,7 +157,7 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
     if (refreshInfo) {
       this.ngOnInit()
     }
-    return;*/
+    return;
   }
 
   pestaniaEstados: string = 'pendientes';
