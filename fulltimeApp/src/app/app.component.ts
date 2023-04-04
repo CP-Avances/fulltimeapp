@@ -37,11 +37,6 @@ export class AppComponent {
   
   async initializeApp(){
 
-    if((!this.platform.is("mobileweb")) && (this.platform.is('mobile'))){
-      await StatusBar.hide();
-    }
-   
-
     await SplashScreen.show({
       showDuration: 2000,
       autoHide: true,

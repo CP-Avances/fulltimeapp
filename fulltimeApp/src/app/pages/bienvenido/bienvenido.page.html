@@ -3,6 +3,10 @@
     <app-navegador-admin style="z-index: 100"></app-navegador-admin>
   </ng-container>
 
+  <ng-container *ngIf="rol != 1" style="margin-top: 2%;" fullscreen>
+    <app-navegador-empleado style="z-index: 100"></app-navegador-empleado>
+  </ng-container>
+
   <ion-content [fullscreen]="true">
     <div class="fondo">   
       <img class="center" src="../../../assets/images/C_FTLOGORV.png">

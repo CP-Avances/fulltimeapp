@@ -161,8 +161,6 @@ export class ListaNotificacionComponent implements OnInit {
           return this.router.navigate(['/adminpage/solicitudes/alimentacion-solicitud']);
         }
 
-        return this.router.navigate(['/adminpage/solicitudes/alimentacion-solicitud']);
-
       }else{
         //Solicitudes Empleado envia
         if(noti.id_permiso != null){
@@ -202,6 +200,8 @@ export class ListaNotificacionComponent implements OnInit {
     else
     {
 
+      console.log('Notificacion que dio click 2: ',noti);
+
       console.log(noti.nempleadoreceives, " != ", noti.nempleadosend);
 
       if(localStorage.getItem("rol") === "1"){
@@ -221,9 +221,21 @@ export class ListaNotificacionComponent implements OnInit {
           console.log("Aprobar Alimentacion ",noti.tipo, " = ", noti.estado)
           return this.router.navigate(['/adminpage/solicitudes/alimentacion-solicitud']);
         }
-        else{
-          return this.router.navigate(['/adminpage/solicitudes/alimentacion-solicitud']);
+        
+        //Aprobaciones Admin envia
+        if(noti.id_permiso != null && noti.estado === "Pendiente"){
+          return this.router.navigate(['/adminpage/aprobar-permisos']);
+        }else if(noti.id_hora_extra != null && noti.estado === "Pendiente"){
+          return this.router.navigate(['/adminpage/aprobar-horas-extras']);
+        }else if(noti.id_vacaciones != null && noti.estado === "Pendiente"){
+          return this.router.navigate(['/adminpage/aprobar-vacaciones']);
         }
+
+        if(noti.tipo === 1 ){
+          return this.router.navigate(['/adminpage/aprobar-alimentacion']);
+        }
+
+
       }else{
          //Solicitudes Empleado Respuesta que recibe
          if(noti.id_permiso != null){
@@ -250,7 +262,6 @@ export class ListaNotificacionComponent implements OnInit {
           return this.router.navigate(['/adminpage/aprobar-alimentacion']);
         }
 
-        return this.router.navigate(['empleado/solicitar-planificar-alimentacion']);
       }
     }
 
@@ -325,8 +336,8 @@ export class ListaNotificacionComponent implements OnInit {
   public autoHide: boolean = false;
   public responsive: boolean = true;
   public labels: any = {
-    previousLabel: 'ante..',
-    nextLabel: 'sigui..',
+    previousLabel: 'Anterior',
+    nextLabel: 'Siguiente',
     screenReaderPaginationLabel: 'Pagination',
     screenReaderPageLabel: 'page',
     screenReaderCurrentLabel: `You're on page`
