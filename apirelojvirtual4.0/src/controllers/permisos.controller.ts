@@ -175,14 +175,18 @@ export const postNuevoPermiso = async (req: Request, res: Response): Promise<Res
  * Metodo para REGISTRAR DOCUMENTO DE RESPALDO DE PERMISO 
  * @returns Retorna mensaje actualizacion.
  
- export const GuardarDocumentoPermiso(req: Request, res: Response): Promise<> {
-    let list: any = req.files;
+ export const GuardarDocumentoPermiso = async (req: Request, res: Response): Promise<void> => {
+    let list: any = req.body;
+
+    console.log('documento: ',list);
     let doc = list.uploads[0].path.split("\\")[1];
-    let id = req.params.id
+    console.log('ver path ... ', list.uploads[0].path)
+        let { doc_nombre } = req.params;
     await pool.query(
         `
-        UPDATE permisos SET documento = $2 WHERE id = $1
-        `, [id, doc]);
+        INSERT INTO docmentacion (doc, doc_nombre) VALUES ($1, $2)
+        `
+        , [doc, doc_nombre]);
     res.jsonp({ message: 'Documento Actualizado' });
 }*/
 
