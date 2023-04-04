@@ -40,6 +40,8 @@ export class NavegadorAdminComponent implements OnInit {
   ids: number [] = [];
   resume: boolean = false;
 
+  colorNOtifi: string = '';
+
   constructor(
     private userService: DataUserLoggedService,
     private relojService: RelojServiceService,
@@ -62,28 +64,23 @@ export class NavegadorAdminComponent implements OnInit {
     this.VerificarFunciones();
   }
 
-  ionViewDidLoad(){
-    this.ngOnInit();
-  }
-
   ngOnInit() {
     this.username = this.userService.username;
 
-    this.idEmpleadoIngresa = parseInt(''+(localStorage.getItem('empleadoID')));
+    this.idEmpleadoIngresa = parseInt(localStorage.getItem('empleadoID'));
     this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
 
     this.socket.on('recibir_notificacion', (data_llega: any)=>{
       this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
       if(data_llega.id_send_empl !== this.idEmpleadoIngresa){
-        console.log("Notificacion recibida",data_llega.id);
+        console.log("Notificacion: ",data_llega);
 
         if(data_llega.id_receives_empl === this.idEmpleadoIngresa){
           this.mensaje = "Nueva Notificacion de " + data_llega.usuario;
           console.log("Usuario envio",this.empleEnvia);
-
+          
             try{
               //this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
-
               var t = new Date();
               t.setSeconds(t.getSeconds() + 5);
               let id = this.ids.length;
@@ -91,7 +88,8 @@ export class NavegadorAdminComponent implements OnInit {
 
               let options:ScheduleOptions = { notifications: [{
                 id: data_llega.id,
-                title: "Fulltime Notificion: "+id,
+                title: "Fulltime Notificacion",
+                groupSummary: true,
                 body: this.mensaje,
               }]}
 
@@ -118,7 +116,6 @@ export class NavegadorAdminComponent implements OnInit {
 
           try{
             //this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
-
             var t = new Date();
             t.setSeconds(t.getSeconds() + 5);
             let id = this.ids.length;
@@ -126,15 +123,16 @@ export class NavegadorAdminComponent implements OnInit {
 
             let options:ScheduleOptions = { notifications: [{
               id: data_llega.id,
-              title: "Fulltime Notificion: "+id,
+              title: "Fulltime Aviso",
+              groupSummary: true,
               body: this.mensaje,
             }]}
 
             LocalNotifications.schedule(options).then(()=> {});
 
           }catch (error) {
-            this.mostrarToasNoti("No se pudo resibir la notificacion: \n"+ error);
-            console.log("Problemas en la notificacion: ", error);
+            this.mostrarToasNoti("No se pudo resibir el Aviso: \n"+ error);
+            console.log("Problemas en el Aviso: ", error);
           } 
         }
       }

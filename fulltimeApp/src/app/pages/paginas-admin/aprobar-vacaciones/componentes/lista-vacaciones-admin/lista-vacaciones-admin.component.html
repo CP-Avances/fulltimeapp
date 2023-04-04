@@ -81,9 +81,9 @@
 
   <!-- PENDIENTES -->
   <ion-list *ngIf="pestaniaEstados === 'pendientes'" style="background-color: transparent;">
-    <!--app-aprobacion-multiple *ngIf="vacaciones_pendientes.length != 0" (onArrCheck)="allCheckPendientes( $event )" 
+    <app-aprobacion-multiple *ngIf="vacaciones_pendientes.length != 0" (onArrCheck)="allCheckPendientes( $event )" 
       (onChecked)="ChangeAprobacionMultiple( $event )" [vacaciones]="vacaciones_pendientes" (onRefreshOnInit)="ngOnInit()">
-    </app-aprobacion-multiple-->
+    </app-aprobacion-multiple>
 
     <ion-card *ngFor="let vacacion of vacaciones_pendientes | paginate: { itemsPerPage: 5, currentPage: pageActual }" class="item-pendientes-color">
       <ng-container *ngIf="vacacion.nempleado == username else showpendiente"></ng-container>

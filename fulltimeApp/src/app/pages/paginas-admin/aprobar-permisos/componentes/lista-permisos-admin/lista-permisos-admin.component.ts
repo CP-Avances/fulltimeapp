@@ -179,12 +179,19 @@ export class ListaPermisosAdminComponent implements OnInit {
   }
 
   allCheckPendientes(data: Permiso[]) {
-    this.permisos_pendientes = data
-    console.log('allckeched: .......',this.permisos_pendientes)
+    if(data.length > 0){
+      this.permisos_pendientes = data
+    } else{
+      this.permisos_pendientes = null;
+    }
   }
 
   allCheckPreAutorizados(data: Permiso[]) {
+    if(data.length > 0){
     this.permisos_pre_autorizados = data
+    }else{
+      this.permisos_pre_autorizados = null
+    }
   }
 
   BuscarByFecha() {

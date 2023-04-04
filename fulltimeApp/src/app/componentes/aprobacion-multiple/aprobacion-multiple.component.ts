@@ -28,23 +28,18 @@ export class AprobacionMultipleComponent implements OnDestroy {
   ) { }
 
   ngOnDestroy() {
-    console.log('Esta en el componente de aprobacion multimple , ',this.isChecked)
     if (this.permisos) {
       this.onChecked.emit(false);
-      this.permisos.forEach(o => { console.log('permisos aprobacion multiple: ',o); o.isChecked = false })
-      this.onArrCheck.emit(this.permisos);
-      console.log('permisos aprobacion multiple onArrckeck: ',this.onArrCheck.emit(this.permisos))
-      return;
+      this.permisos.forEach(o => { o.isChecked = false })
     }
     if (this.vacaciones) {
-      this.onChecked.emit(false);
-      this.vacaciones.forEach(o => { o.isChecked = false })
-      this.onArrCheck.emit(this.vacaciones)
+        this.onChecked.emit(false);
+        this.vacaciones.forEach(o => { o.isChecked = false })
     }
+    
     if (this.horas_extras) {
       this.onChecked.emit(false);
       this.horas_extras.forEach(o => { o.isChecked = false })
-      this.onArrCheck.emit(this.horas_extras)
     }
   }
 
@@ -139,7 +134,6 @@ export class AprobacionMultipleComponent implements OnDestroy {
   ChangeAprobacionMultiple(isChecked: boolean) {
     this.isChecked = !isChecked;
     this.onChecked.emit(this.isChecked);
-    console.log('Esta en el componente de aprobacion cheked, ',this.isChecked)
   }
 
   isAllCheck: boolean = false;

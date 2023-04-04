@@ -140,7 +140,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
       const loading = await this.loadingController.create({
         cssClass: 'my-custom-class',
         message: 'Procesando aprobaciones...',
-        duration: 4000
+        duration: 2500
       });
       await loading.present();
       this.generarPDF();

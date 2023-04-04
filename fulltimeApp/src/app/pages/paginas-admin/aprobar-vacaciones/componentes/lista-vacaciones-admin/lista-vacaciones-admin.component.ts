@@ -71,6 +71,12 @@ export class ListaVacacionesAdminComponent implements OnInit {
     )
   }
 
+  ngOnDestroy() {
+    this.subscripted.unsubscribe();
+    this.dataUserLoggedService.setFechaRangoInicio('');
+    this.dataUserLoggedService.setFechaRangoFinal('');
+  }
+
   obtenerAllVacaciones() {
     this.limpiarRango_fechas();
     this.subscripted = this.vacacionService.getAllVacaciones()
@@ -173,11 +179,20 @@ export class ListaVacacionesAdminComponent implements OnInit {
   }
 
   allCheckPendientes(data: Vacacion[]) {
-    this.vacaciones_pendientes = data
+    console.log("data vacaciones: ",data)
+    if(data.length > 0){
+      this.vacaciones_pendientes = data
+    }else{
+      this.vacaciones_pendientes = null;
+    }
   }
 
   allCheckPreAutorizados(data: Vacacion[]) {
-    this.vacaciones_pre_autorizados = data
+    if(data.length > 0){
+      this.vacaciones_pre_autorizados = data
+    }else{
+      this.vacaciones_pre_autorizados = null;
+    }
   }
 
   BuscarByFecha() {

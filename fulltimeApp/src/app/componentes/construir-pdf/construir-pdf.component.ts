@@ -2,13 +2,13 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ModalController, NavParams, LoadingController, ToastController, Platform } from '@ionic/angular';
 import { DatePipe } from '@angular/common';
 
-//import { FileOpener } from '@ionic-native/file-opener/ngx';
-// import jsPDF from 'jspdf/dist/jspdf.node.debug'
+import { FileOpener } from '@ionic-native/file-opener/ngx';
+//import jsPDF from 'jspdf/dist/jspdf.node.debug'
 // import { applyPlugin } from 'jspdf-autotable'
 //import jsPDF from 'jspdf'
 //import autoTable from 'jspdf-autotable'
 
-//import { File, IWriteOptions } from '@ionic-native/file/ngx';
+import { File, IWriteOptions } from '@ionic-native/file/ngx';
 //import * as XLSX from 'xlsx';
 
 import { Timbre } from 'src/app/interfaces/Timbre';
@@ -34,7 +34,7 @@ export class ConstruirPDFComponent implements OnInit {
     navParams: NavParams,
     public loadingController: LoadingController,
     private file: File,
-    //private fileOpener: FileOpener,
+    private fileOpener: FileOpener,
     private toastController: ToastController,
     private platform: Platform,
     private relojService: RelojServiceService

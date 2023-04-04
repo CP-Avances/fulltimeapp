@@ -30,7 +30,6 @@ export class AprobacionMultipleComponent implements OnDestroy {
     if (this.alimentacion) {
       this.onChecked.emit(false);
       this.alimentacion.forEach(o => { o.isChecked = false });
-      this.onArrCheck.emit(this.alimentacion);
       this.username = this.userService.UserFullname;
     }
   }

@@ -254,11 +254,16 @@ export class VertimbrePage implements OnInit {
   }
 
   //mensaje de cargando
-  async presentLoading(msg) {
-    const loading = await this.loadingController.create({
-      message: msg
+  private async presentLoading(msg: string) {
+    this.loadingController.create({
+      message: msg,
+      duration: 6500,
+    }).then((response) => {
+      response.present();
+      response.onDidDismiss().then((response) => {
+        return this.mostrarToas('Lo sentimos no fue posible conectar con la red', 3000, "danger");
+      });
     });
-    return await loading.present();
   }
   //fin mensaje cargando
 

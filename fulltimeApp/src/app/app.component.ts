@@ -12,10 +12,6 @@ import { StatusBar } from '@capacitor/status-bar';
 import { RelojServiceService } from './services/reloj-service.service';
 
 
-
-
-
-
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',

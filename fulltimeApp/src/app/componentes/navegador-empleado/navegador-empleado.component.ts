@@ -6,6 +6,8 @@ import { RelojServiceService } from '../../services/reloj-service.service';
 import { Notificacion } from '../../interfaces/Notificaciones';
 import { NotificacionTimbre } from '../../interfaces/Notificaciones';
 import { NotificacionPopoverComponent } from '../notificacion-popover/notificacion-popover.component';
+import { LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
+
 import { TimbresPerdidosComponent } from '../../pages/bienvenido/showTimbresGuardados.component';
 
 import { EmpleadoPage } from 'src/app/pages/empleado/empleado.page';
@@ -32,12 +34,17 @@ export class NavegadorEmpleadoComponent implements OnInit {
   valor: boolean = true;
 
   idEmpleadoIngresa: number;
-  countNoti: number = 0;
-  public countbadge: number = 0;
+  countNoti: number;
+  public countbadge: number;
   mensaje: string = "";
   empleEnvia: string = "";
 
+  ids: number [] = [];
+  resume: boolean = false;
+
   public rootPage: any = EmpleadoPage;
+
+  colorNOtifi: string = '';
 
   constructor(
     private userService: DataUserLoggedService,
@@ -51,10 +58,7 @@ export class NavegadorEmpleadoComponent implements OnInit {
     public socket: Socket,
     private toastController: ToastController,
     public parametros: ParametrosService
-  ) { 
-    this.idEmpleadoIngresa = parseInt(String(localStorage.getItem('empleadoID')))
-    this.LlamarNotificcaccciones(this.idEmpleadoIngresa); 
-  }
+  ) {}
 
   ionViewWillEnter(){
     this.ngOnInit();
@@ -62,16 +66,39 @@ export class NavegadorEmpleadoComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log('inicio menu empleado...');
     this.username = this.userService.username;
+
+    this.idEmpleadoIngresa = parseInt(localStorage.getItem('empleadoID'));
+    this.LlamarNotificcaccciones(this.idEmpleadoIngresa); 
 
     this.socket.on('recibir_notificacion', (data_llega: any)=>{
       this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
       if(data_llega.id_send_empl !== this.idEmpleadoIngresa){
         console.log("Notificacion recibida",data_llega.id);
+
         if(data_llega.id_receives_empl === this.idEmpleadoIngresa){
           this.mensaje = "Nueva Notificacion de " + data_llega.usuario;
           console.log("Usuario envio",this.empleEnvia);
+
+          try{
+            //this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
+            var t = new Date();
+            t.setSeconds(t.getSeconds() + 5);
+            let id = this.ids.length;
+            this.ids.push(id);
+
+            let options:ScheduleOptions = { notifications: [{
+              id: data_llega.id,
+              title: "Fulltime Notificacion",
+              groupSummary: true,
+              body: this.mensaje,
+            }]}
+            LocalNotifications.schedule(options).then(()=> {});
+
+          }catch (error) {
+            this.mostrarToasNoti("No se pudo resibir la notificacion: \n"+ error);
+            console.log("Problemas en la notificacion: ", error);
+          }   
         }
         
       }
@@ -87,6 +114,27 @@ export class NavegadorEmpleadoComponent implements OnInit {
         if(data_llega.id_receives_empl === this.idEmpleadoIngresa){
           this.mensaje = "Nuevo aviso de " + data_llega.usuario;
           console.log("Usuario envio",this.empleEnvia);
+
+          try{
+            //this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
+            var t = new Date();
+            t.setSeconds(t.getSeconds() + 5);
+            let id = this.ids.length;
+            this.ids.push(id);
+
+            let options:ScheduleOptions = { notifications: [{
+              id: data_llega.id,
+              title: "Fulltime Aviso",
+              groupSummary: true,
+              body: this.mensaje,
+            }]}
+            LocalNotifications.schedule(options).then(()=> {});
+
+          }catch (error) {
+            this.mostrarToasNoti("No se pudo resibir el Aviso: \n"+ error);
+            console.log("Problemas en el Avison: ", error);
+          }   
+
         }
       }
     });
