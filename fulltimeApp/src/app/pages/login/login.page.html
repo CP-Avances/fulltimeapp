@@ -13,18 +13,18 @@
 
       <ion-card-content>
         <form (submit)="iniciarSesion1()" mode="md" id="formulariologin">
-          <ion-item>
+          <ion-item style="font-size: 20px;">
             <ion-label position="floating" mode="md" color="medium">
               <ion-icon name="person-outline" color="medium"></ion-icon> Usuario <ion-text color="danger">*</ion-text>
             </ion-label>
             <ion-input required type="text" mode="ios" [(ngModel)]="user.usuario" name="username" class="form-control" minlength="3" maxlength="25"></ion-input>
           </ion-item>
 
-          <ion-item>
+          <ion-item style="font-size: 20px;" >
             <ion-label position="floating" mode="md" color="medium">
               <ion-icon mode="md" name="key-outline" color="medium"></ion-icon> Contraseña <ion-text color="danger">*</ion-text>
             </ion-label>
-            <ion-input required mode="ios" [(ngModel)]="user.contrasena" name="password" [type]="verPassword ? 'text' : 'password'" class="form-control" minlength="3" maxlength="15"></ion-input>
+            <ion-input  required mode="ios" [(ngModel)]="user.contrasena" name="password" [type]="verPassword ? 'text' : 'password'" class="form-control" minlength="3" maxlength="15"></ion-input>
             <ion-icon class="posicionOjo" slot="end" [name]="verPassword ? 'eye' : 'eye-off-outline'" (click)="mostrarPassword()"></ion-icon>   
           </ion-item>
 

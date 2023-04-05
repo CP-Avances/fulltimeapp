@@ -3,6 +3,7 @@ import { HoraExtra } from 'src/app/interfaces/HoraExtra';
 import { ModalController } from '@ionic/angular';
 import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { LoadingController, IonInfiniteScroll } from '@ionic/angular';
+import { Socket } from 'ngx-socket-io';
 
 import { Subscription } from 'rxjs';
 
@@ -41,7 +42,12 @@ export class HoraExtraListaComponent implements OnInit, OnDestroy {
     public modalController: ModalController,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
-  ) { }
+    public socket: Socket,
+  ) { 
+    this.socket.on('recibir_notificacion', (data_llega: any) => {
+      this.obtenerListaHoraExtra();
+    });
+  }
 
   ngOnInit() {
     this.codigo = localStorage.getItem('codigo')

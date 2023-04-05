@@ -73,7 +73,7 @@ export class ListaNotificacionComponent implements OnInit {
           );
 
           //si el objeto de los timbres esta vacion oculta las ventanas y muestra la ventana - 'vacio'.
-          if(Object.keys(this.notificacionesAll).length === 0){
+          if(Object.keys(this.notificacionesAll).length < 21 ){
             this.ver = true;
           }
           
@@ -97,7 +97,6 @@ export class ListaNotificacionComponent implements OnInit {
                 
               :-1
           );
-          console.log(this.notificacionesAll)
           },
           err => { console.log(err); this.ver = true},
           () => { this.loading = false;}
@@ -145,8 +144,6 @@ export class ListaNotificacionComponent implements OnInit {
     this.modalController.dismiss({});
 
     if(noti.nempleadoreceives === noti.nempleadosend){
-
-      console.log(noti.nempleadoreceives, " = ", noti.nempleadosend);
       
       if(localStorage.getItem("rol") == "1"){
         //Solicitudes Admin envia
@@ -199,10 +196,6 @@ export class ListaNotificacionComponent implements OnInit {
     }
     else
     {
-
-      console.log('Notificacion que dio click 2: ',noti);
-
-      console.log(noti.nempleadoreceives, " != ", noti.nempleadosend);
 
       if(localStorage.getItem("rol") === "1"){
         //Solicitudes Admin Respuesta que recibe

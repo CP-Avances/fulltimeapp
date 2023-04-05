@@ -3,6 +3,7 @@ import { Permiso } from 'src/app/interfaces/Permisos';
 import { ModalController } from '@ionic/angular';
 import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { LoadingController, IonInfiniteScroll } from '@ionic/angular';
+import { Socket } from 'ngx-socket-io';
 
 import { Subscription } from 'rxjs';
 
@@ -12,7 +13,6 @@ import { VerPermisoComponent } from 'src/app/pages/paginas-empleado/solicitar-pe
 import { EditarPermisoComponent } from 'src/app/pages/paginas-empleado/solicitar-permisos/componentes/editar-permiso/editar-permiso.component';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
-
 
 
 @Component({
@@ -42,7 +42,12 @@ export class PermisosListaComponent implements OnInit, OnDestroy {
     public modalController: ModalController,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
-  ) { }
+    public socket: Socket,
+  ) { 
+    this.socket.on('recibir_notificacion', (data_llega: any) => {
+      this.obtenerListaPermisos();
+    });
+  }
 
   ngOnInit() {
     this.codigo = localStorage.getItem('codigo')

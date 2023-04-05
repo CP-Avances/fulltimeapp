@@ -9,6 +9,7 @@ import { EditarAlimentacionComponent } from '../editar-alimentacion/editar-alime
 import { RegistrarAlimentacionComponent } from '../registrar-alimentacion/registrar-alimentacion.component';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
+import { Socket } from 'ngx-socket-io';
 
 @Component({
   selector: 'app-lista-alimentacion',
@@ -34,7 +35,12 @@ export class ListaAlimentacionComponent implements OnInit, OnDestroy {
     public modalController: ModalController,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
-  ) { }
+    public socket: Socket,
+  ) { 
+    this.socket.on('recibir_aviso', (data_llega: any) => {
+      this.obtenerListaAlimentacion();
+    });
+  }
 
   ngOnInit() {
     this.idEmpleado = localStorage.getItem('empleadoID');
@@ -49,7 +55,7 @@ export class ListaAlimentacionComponent implements OnInit, OnDestroy {
       resp => {
         this.formato_fecha = resp.fecha;
         this.formato_hora = resp.hora;
-        this.obtenerListaPermisos();
+        this.obtenerListaAlimentacion();
       }
     )
   }
@@ -68,7 +74,7 @@ export class ListaAlimentacionComponent implements OnInit, OnDestroy {
     }
   }
 
-  obtenerListaPermisos() {
+  obtenerListaAlimentacion() {
     this.subscripted = this.alimentacionService.getListaAlimentacionByIdEmpleado(this.idEmpleado)
       .subscribe(
         alimentacion => {

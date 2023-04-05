@@ -33,7 +33,6 @@ export class RelojServiceService {
   }
 
   iniciarSesion(user: any) {
-    console.log('Datos Usuario: ',user);
     return this.http.post<any>(this.URL + '/user/loginUsuario', user);
   }
 

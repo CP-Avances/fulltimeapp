@@ -106,10 +106,6 @@ export class LoginPage implements OnInit {
           this.usuarioObtenido = res.body.usuario;
           const id_empleado = parseInt((this.usuarioObtenido.codigo));
           let existeId_Dispositivo: boolean;
-          
-          console.log('usuarioObtenido: ',res);
-          console.log('usuarioObtenido.body: ',res.body);
-          console.log('Token impreso: ',res.body.autenticacion);
 
           this.relojService.obtenerIdDispositivosUsuario(id_empleado).subscribe(
                 dispositivos => {
@@ -152,7 +148,7 @@ export class LoginPage implements OnInit {
                     this.cambiodepantallas(this.usuarioObtenido.id_rol);  
 
                   }else{
-                    console.log("rango dispositivos: ",this.rango_dispositivos);
+
                     if(dispositivos.length >= this.rango_dispositivos){
                       this.usuarioIncorrectoToas("Ups! El usuario llego al limite de dispositivos permitidos", 3000);
                       var FormId = 'formulariologin';

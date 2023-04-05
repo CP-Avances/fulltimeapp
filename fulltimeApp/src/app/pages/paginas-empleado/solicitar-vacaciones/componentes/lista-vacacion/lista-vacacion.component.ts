@@ -10,6 +10,8 @@ import { RegistrarVacacionComponent } from '../registrar-vacacion/registrar-vaca
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 
+import { Socket } from 'ngx-socket-io';
+
 @Component({
   selector: 'app-lista-vacacion',
   templateUrl: './lista-vacacion.component.html',
@@ -33,7 +35,12 @@ export class ListaVacacionComponent implements OnInit, OnDestroy {
     public modalController: ModalController,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
-  ) { }
+    public socket: Socket,
+  ) { 
+    this.socket.on('recibir_notificacion', (data_llega: any) => {
+      this.obtenerListaVacaciones();
+    });
+  }
 
   ngOnInit() {
     this.codigo = localStorage.getItem('codigo')

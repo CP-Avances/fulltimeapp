@@ -35,7 +35,7 @@
      </ion-item>
    </ion-button>
 
-   <ion-card *ngFor="let noti of notificacionesAll | paginate: { itemsPerPage: 10, currentPage: pageActual} ">
+   <ion-card *ngFor="let noti of notificacionesAll | paginate: { itemsPerPage: 20, currentPage: pageActual} ">
      <ng-container>
        <div>
        <ion-item (click)="AbrirNoti(noti)" class="ion-activated" [color]='tiponotificacion(noti)'>

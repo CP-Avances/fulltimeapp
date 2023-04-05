@@ -9,6 +9,7 @@ import { RegistrarAlimentacionComponent } from 'src/app/pages/paginas-empleado/s
 import { VerAlimentacionComponent } from 'src/app/pages/paginas-empleado/solicitar-planificar-alimentacion/componentes/ver-alimentacion/ver-alimentacion.component';
 import { AlimentacionService } from 'src/app/services/alimentacion.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
+import { Socket } from 'ngx-socket-io';
 
 
 @Component({
@@ -37,7 +38,12 @@ export class AlimentacionListaComponent implements OnInit, OnDestroy {
     public modalController: ModalController,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
-  ) { }
+    public socket: Socket,
+  ) { 
+    this.socket.on('recibir_aviso', (data_llega: any) => {
+      this.obtenerListaAlimentacion();
+    });
+  }
 
   ngOnInit() {
     this.idEmpleado = localStorage.getItem('empleadoID')
@@ -52,7 +58,7 @@ export class AlimentacionListaComponent implements OnInit, OnDestroy {
       resp => {
         this.formato_fecha = resp.fecha;
         this.formato_hora = resp.hora;
-        this.obtenerListaPermisos();
+        this.obtenerListaAlimentacion();
       }
     )
   }
@@ -70,7 +76,7 @@ export class AlimentacionListaComponent implements OnInit, OnDestroy {
     }
   }
 
-  obtenerListaPermisos() {
+  obtenerListaAlimentacion() {
     this.subscripted = this.alimentacionService.getListaAlimentacionByIdEmpleado(this.idEmpleado)
       .subscribe(
         alimentacion => {

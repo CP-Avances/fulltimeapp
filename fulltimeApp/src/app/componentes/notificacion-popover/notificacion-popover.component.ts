@@ -156,8 +156,6 @@ export class NotificacionPopoverComponent implements OnInit {
     this.cambiovistanotitimbre(noti);
     this.pooverCtrl.dismiss({});  
 
-    console.log('Notificacion que dio click: ',noti);
-
     if(noti.nempleadoreceives === noti.nempleadosend){
 
       console.log(noti.nempleadoreceives, " = ", noti.nempleadosend);
@@ -213,8 +211,6 @@ export class NotificacionPopoverComponent implements OnInit {
     }
     else
     {
-
-      console.log('Notificacion que dio click 2: ',noti);
 
       console.log(noti.nempleadoreceives, " != ", noti.nempleadosend);
 
