@@ -89,11 +89,17 @@ export class NavegadorAdminComponent implements OnInit {
               let options:ScheduleOptions = { notifications: [{
                 id: data_llega.id,
                 title: "Fulltime Notificacion",
-                groupSummary: true,
                 body: this.mensaje,
+                schedule: {
+                  allowWhileIdle: true,
+                }
               }]}
 
-              LocalNotifications.schedule(options).then(()=> {});
+              LocalNotifications.schedule(options).then(()=> {
+                
+              });
+
+              this.mostrarToasNoti("Notificacion Recibida de "+LocalNotifications.getDeliveredNotifications()+"\n");
 
             }catch (error) {
               this.mostrarToasNoti("No se pudo resibir la notificacion: \n"+ error);
@@ -124,7 +130,6 @@ export class NavegadorAdminComponent implements OnInit {
             let options:ScheduleOptions = { notifications: [{
               id: data_llega.id,
               title: "Fulltime Aviso",
-              groupSummary: true,
               body: this.mensaje,
             }]}
 

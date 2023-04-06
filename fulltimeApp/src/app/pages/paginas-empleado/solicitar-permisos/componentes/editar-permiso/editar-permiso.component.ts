@@ -106,10 +106,8 @@ export class EditarPermisoComponent implements OnInit {
 
     this.reg.hora_salida = moment(this.permiso.fec_inicio).format();
     this.reg.hora_ingreso = moment(this.permiso.fec_final).format();
-
     this.dia_inicio = moment(this.reg.fec_inicio).format('YYYY-MM-DD');
     this.dia_fianl = moment(this.reg.fec_final).format('YYYY-MM-DD');
-
     this.hora_inicio = moment(this.reg.hora_salida).format('h:mm a');
     this.hora_final = moment(this.reg.hora_ingreso).format('h:mm a');
 
@@ -124,11 +122,6 @@ export class EditarPermisoComponent implements OnInit {
 
     this.horas_trabaja_seg = this.validaciones.HorasTrabajaToSegundos(String(localStorage.getItem('horas_trabaja')))
     this.horas_trabaja_string = this.validaciones.SegundosToHHMM(this.horas_trabaja_seg)
-    this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo).subscribe(
-      horario => { this.horarioEmpleado = horario },
-      err => { this.validaciones.showToast(err.error.message, 3000, 'danger') },
-      () => { }
-    )
 
     this.obtenerInformacionEmpleado();
     this.BuscarFormatos();
@@ -276,7 +269,7 @@ export class EditarPermisoComponent implements OnInit {
    async showAlert(){
     let alert = await this.alertCrtl.create({
       message: `<div class="card-alert">
-                  <img src="../../../assets/LOGOBLFT.png" class="img-alert">
+                  <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                   <br>
                   <p> Ups! El dia que ingreso esta fuera de su calendario laboral </p>
                   <p> Por favor cambie a un dia dentro de su calendario </p>
@@ -357,40 +350,97 @@ export class EditarPermisoComponent implements OnInit {
 
    // METODO VALIDAR Y CAMBIAR EL INPUT DE DIA INICIAL Y FINAL
    ChangeDiaInicio(e: any){
-    this.valoresDefectoValidacionResultados();
     if(!e.target.value){
+      this.valoresDefectoValidacionResultados();
       this.reg.fec_inicio = moment(new Date()).format('YYYY-MM-DD');
-      return this.dia_inicio = moment(this.reg.fec_inicio).format('YYYY-MM-DD');
+      const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
+
+      this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+        horario => { 
+          this.horarioEmpleado = horario;
+
+          if(this.cg_permiso.fec_validar == true){
+              if(this.dia_inicio == moment(this.cg_permiso.fecha).format('YYYY-MM-DD')){
+                this.validaciones.showToast('Lo Sentimos la fecha '+moment(this.cg_permiso.fecha).format('DD-MM-YYYY')+' esta reservada', 3500, 'warning');
+                this.valoresDefectoValidacionHoras();
+                this.btnOculto = true;
+                return this.readonly = true;
+              }
+            }
+      
+            if(this.DiaIniciolLibre() == 0){
+              this.btnOculto = true;
+              return this.readonly = true;
+            }
+            
+            this.valoresDefectoValidacionHoras();
+      
+            if(this.selectItemDiasHoras == 'Horas'){
+              this.reg.fec_final = this.reg.fec_inicio;
+              this.dia_fianl = this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');
+              this.readonly = true;
+            }else{
+              this.valoresDefectoValidacionHoras();
+              this.readonly = false;
+            }
+      
+            this.fech_bloqu = false;
+        },
+        err => { this.validar.showToast(err.error.message, 3000, 'danger');
+          return this.dia_inicio = '';
+        }
+      )
+
+
     }else{
-      this.reg.fec_final = null;
-      this.dia_fianl = '';
-      this.readonly = true;
+
+      if(!(moment(e.target.value).format('YYYY-MM-DD') == moment(this.dia_inicio).format('YYYY-MM-DD'))){
+        this.reg.fec_final = null;
+        this.dia_fianl = '';
+        this.readonly = true;
+        this.valoresDefectoValidacionResultados();
+        this.btnOcultoguardar = true;
+      }
+
       this.reg.fec_inicio = e.target.value;
       this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
+      const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
+        this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+          horario => { 
+            this.horarioEmpleado = horario;
 
-      if(this.cg_permiso.fec_validar == true){
-        if(this.dia_inicio == moment(this.cg_permiso.fecha).format('YYYY-MM-DD')){
-          this.validaciones.showToast('Lo Sentimos la fecha '+moment(this.cg_permiso.fecha).format('DD-MM-YYYY')+' esta reservada', 3500, 'warning');
-          this.valoresDefectoValidacionHoras();
-          this.btnOculto = true;
-          return this.readonly = true;
-        }
-      }
+            if(this.cg_permiso.fec_validar == true){
+              if(this.dia_inicio == moment(this.cg_permiso.fecha).format('YYYY-MM-DD')){
+                this.validaciones.showToast('Lo Sentimos la fecha '+moment(this.cg_permiso.fecha).format('DD-MM-YYYY')+' esta reservada', 3500, 'warning');
+                this.valoresDefectoValidacionHoras();
+                this.btnOculto = true;
+                return this.readonly = true;
+              }
+            }
+      
+            if(this.DiaIniciolLibre() == 0){
+              this.btnOculto = true;
+              return this.readonly = true;
+            }
+            
+            this.valoresDefectoValidacionHoras();
+      
+            if(this.selectItemDiasHoras == 'Horas'){
+              this.reg.fec_final = this.reg.fec_inicio;
+              this.dia_fianl = this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');
+              this.readonly = true;
+            }else{
+              this.valoresDefectoValidacionHoras();
+              this.readonly = false;
+            }
+      
+            this.fech_bloqu = false;
 
-      if(this.DiaIniciolLibre() == 0){
-        this.btnOculto = true;
-        return this.readonly = true;
-      }
-    
-      if(this.selectItemDiasHoras == 'Horas'){
-        this.reg.fec_final = this.reg.fec_inicio;
-        this.dia_fianl = this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');
-        this.readonly = true;
-      }else{
-        this.valoresDefectoValidacionHoras();
-        this.readonly = false;
-      }
-      this.fech_bloqu = false;
+          },
+          err => { this.validar.showToast(err.error.message, 3000, 'danger') 
+          return this.dia_inicio = '';  
+          }
+      )
     }
 
   }

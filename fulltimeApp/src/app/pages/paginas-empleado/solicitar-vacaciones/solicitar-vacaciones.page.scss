@@ -100,3 +100,20 @@ ion-icon {
   display: block;
   margin: auto;
 }
+
+.Imagen{
+  position: relative;
+  overflow: visible!important;
+  padding:3%;
+  margin: 5%;
+  border-radius: 2%;
+  background-color:rgb(255, 255, 255);
+}
+
+.center {
+  display: block;
+  position: absolute;
+  margin-left: auto;
+  margin-right: auto;
+  width: 35%;
+}

@@ -36,7 +36,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
   reg: Vacacion = vacacionValueDefault;
   radioButton = estadoBoolean;
   loadingBtn: boolean = false;
-  horarioEmpleado: HorarioE;
+  public horarioEmpleado: HorarioE;
   disabled_dia_fianl: boolean = false;
   disabled_dia_ingreso: boolean = false;
 
@@ -51,6 +51,10 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
   btnOculto: boolean = true;
   //variable para ocultar el boton de guardar
   btnOcultoguardar: boolean = true;
+
+  //variable para ocultar el formulario si no tiene asignado o registrado un periodo de vacaciones.
+  ocultar: boolean = true;
+  mensaje: boolean = false;
 
   private get cg_feriados(): Cg_Feriados[] {
     return this.catalogoService.cg_feriados
@@ -80,11 +84,6 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     this.reg.id_empl_cargo = parseInt(localStorage.getItem('ccargo'));
     this.reg.dia_laborable = undefined;
     this.reg.dia_libre = undefined;
-    this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo).subscribe(
-      horario => { this.horarioEmpleado = horario },
-      err => { this.validar.showToast(err.error.message, 3000, 'danger') },
-      () => { }
-    )
     
     this.obtenerInformacionEmpleado();
     this.BuscarFormatos();
@@ -119,7 +118,14 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
           estado: estado,
           correo: res.correo,
         }
-      });
+
+        if(!(Number.isNaN(this.reg.id_peri_vacacion))){
+          this.ocultar = false;
+          this.mensaje = true;
+        }
+
+      }
+    );
   }
 
   valoresDefectoValidacionFechas() {
@@ -150,7 +156,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
   async showAlert(){
     let alert = await this.alertCrtl.create({
       message: `<div class="card-alert">
-                  <img src="../../../assets/LOGOBLFT.png" class="img-alert">
+                  <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                   <br>
                   <p> Ups! El dia que ingreso esta fuera de su calendario laboral </p>
                   <p> Por favor cambie a un dia dentro de su calendario </p>
@@ -167,20 +173,58 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
 
   // METODO VALIDAR EL INPUT DE DIA INICIAL, FINAL y INGRESO
   ChangeDiaInicio(e){
+    this.reg.fec_final = null;
+    this.reg.fec_ingreso = null;
+    this.loadingBtn = false;
+    this.dia_fianl = '';
+    this.dia_ingreso = '';
+    this.reg.dia_laborable = null;
+    this.reg.dia_libre = null;
+
     if(!e.target.value){
-      this.reg.fec_inicio = moment(new Date()).format('YYYY-MM-DD');
-      return this.dia_fianl = moment(this.reg.fec_inicio).format('YYYY-MM-DD');
+      this.reg.fec_inicio = moment(new Date()).format('YYYY-MM-DD'); 
+      const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
+      this.dia_fianl = moment(this.reg.fec_inicio).format('YYYY-MM-DD');
+
+      this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+        horario => { 
+          this.horarioEmpleado = horario;
+
+          if(this.DiaIniciolLibre(this.reg.fec_inicio) == 0){
+            this.disabled_dia_fianl = true, this.disabled_dia_ingreso = true;
+          }else{
+            this.disabled_dia_fianl = false, this.disabled_dia_ingreso = false;
+          }
+          return this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
+        },
+        err => { this.validar.showToast(err.error.message, 3000, 'danger');
+          this.reg.fec_inicio = undefined;
+          return this.dia_inicio = '';
+        }
+      )
+
     }else{
-      this.reg.fec_final = null;
-      this.dia_fianl = '';
       this.reg.fec_inicio = e.target.value;
       this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
+
       if(this.reg.fec_inicio != '' || this.reg.fec_inicio != null){
-        if(this.DiaIniciolLibre(this.reg.fec_inicio) == 0){
-          return this.disabled_dia_fianl = true, this.disabled_dia_ingreso = true;
-        }else{
-          return this.disabled_dia_fianl = false, this.disabled_dia_ingreso = false;
-        }
+      
+        const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
+        this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+          horario => { 
+            this.horarioEmpleado = horario;
+
+            if(this.DiaIniciolLibre(this.reg.fec_inicio) == 0){
+              return this.disabled_dia_fianl = true, this.disabled_dia_ingreso = true;
+            }else{
+              return this.disabled_dia_fianl = false, this.disabled_dia_ingreso = false;
+            }
+
+          },
+          err => { this.validar.showToast(err.error.message, 3000, 'danger') 
+          return this.dia_inicio = '';  
+          }
+        )
       }
 
     }
@@ -188,6 +232,12 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
 
   ChangeDiaFinal(e){
     if(!e.target.value){
+      this.reg.fec_ingreso = null;
+      this.loadingBtn = false;
+      this.dia_ingreso = '';
+      this.reg.dia_laborable = null;
+      this.reg.dia_libre = null;
+
       if(moment(this.reg.fec_inicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
         this.reg.fec_final = this.reg.fec_inicio;
         return this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
@@ -199,6 +249,9 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     }else{
       this.reg.fec_ingreso = null;
       this.dia_ingreso = '';
+      this.loadingBtn = false;
+      this.reg.dia_laborable = null;
+      this.reg.dia_libre = null;
       this.reg.fec_final = e.target.value;
       this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD'); 
     }
@@ -212,6 +265,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
 
   ChangeDiaIngreso(e){
     if(!e.target.value){
+      this.reg.dia_laborable = null;
+      this.reg.dia_libre = null;
       if(moment(this.reg.fec_final).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
         this.reg.fec_ingreso = this.reg.fec_final;
         this.btnOculto = false;
@@ -222,6 +277,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
         return this.dia_ingreso = null
       }
     }else{
+      this.reg.dia_laborable = null;
+      this.reg.dia_libre = null;
       this.btnOculto = false;
       this.reg.fec_ingreso = e.target.value;
       this.dia_ingreso = moment(e.target.value).format('YYYY-MM-DD');

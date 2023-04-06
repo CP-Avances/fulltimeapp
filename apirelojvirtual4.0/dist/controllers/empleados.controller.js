@@ -64,7 +64,6 @@ exports.getListaHorariosEmpleadoByCodigo = getListaHorariosEmpleadoByCodigo;
 const getOneHorarioEmpleadoByCodigo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { codigo, fecha_hoy } = req.query;
-        console.log(codigo, fecha_hoy);
         const response = yield database_1.pool.query('SELECT id, codigo, CAST(fec_inicio AS VARCHAR), CAST(fec_final AS VARCHAR), lunes, martes, miercoles, jueves, viernes, sabado, domingo, id_horarios FROM empl_horarios WHERE codigo = $1 AND fec_inicio <= $2 AND fec_final >= $2 ', [codigo, fecha_hoy]);
         const horarios = response.rows;
         if (horarios.length === 0)

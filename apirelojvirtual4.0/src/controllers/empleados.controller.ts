@@ -59,7 +59,6 @@ export const getListaHorariosEmpleadoByCodigo = async (req: Request, res: Respon
 export const getOneHorarioEmpleadoByCodigo = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { codigo, fecha_hoy } = req.query;
-        console.log(codigo, fecha_hoy);
 
         const response: QueryResult = await pool.query('SELECT id, codigo, CAST(fec_inicio AS VARCHAR), CAST(fec_final AS VARCHAR), lunes, martes, miercoles, jueves, viernes, sabado, domingo, id_horarios FROM empl_horarios WHERE codigo = $1 AND fec_inicio <= $2 AND fec_final >= $2 ', [codigo, fecha_hoy]);
         const horarios: HorarioE[] = response.rows;

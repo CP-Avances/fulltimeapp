@@ -85,6 +85,10 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   //Campo de validacion de documento
   CetificadoName = new FormControl('');
 
+   //variable para ocultar el formulario si no tiene asignado o registrado un periodo de vacaciones.
+   ocultar: boolean = true;
+   mensaje: boolean = false;
+
   private subscripted: Subscription;
   private subs_bool: boolean = false;
   private horas_trabaja_seg: number = 0; // formato: 1000 seg
@@ -117,11 +121,6 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.reg.id_empl_cargo = parseInt(localStorage.getItem('ccargo')!)
     this.reg.id_empl_contrato = parseInt(localStorage.getItem('ccontr')!)
     this.horas_trabaja_seg = this.validaciones.HorasTrabajaToSegundos(localStorage.getItem('horas_trabaja')!)
-    this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo).subscribe(
-      horario => { this.horarioEmpleado = horario },
-      err => { this.validaciones.showToast(err.error.message, 3000, 'danger') },
-      () => { }
-    )
 
     if(this.reg.fec_inicio == null || this.reg.fec_inicio == undefined) {
       this.readonly = true;
@@ -162,7 +161,13 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
           estado: estado!,
           correo: res.correo,
         }
-      })
+
+        if(!(Number.isNaN(this.reg.id_peri_vacacion))){
+          this.ocultar = false;
+          this.mensaje = true;
+        }
+      }
+    );
   }
 
   /** ******************************************************************************************* **
@@ -336,41 +341,96 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.readonly = true;
     if(!e.target.value){
       this.reg.fec_inicio = moment(new Date()).format('YYYY-MM-DD');
-      return this.dia_inicio = moment(this.reg.fec_inicio).format('YYYY-MM-DD');
+      const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
+
+      this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+        horario => { 
+          this.horarioEmpleado = horario;
+          
+          if(this.cg_permiso.fec_validar == true){
+            if(this.dia_inicio == moment(this.cg_permiso.fecha).format('YYYY-MM-DD')){
+              this.validaciones.showToast('Lo Sentimos la fecha '+moment(this.cg_permiso.fecha).format('DD-MM-YYYY')+' esta reservada', 3500, 'warning');
+              this.valoresDefectoValidacionHoras();
+              this.btnOculto = true;
+              return this.readonly = true;
+            }
+          }
+    
+          if(this.DiaIniciolLibre() == 0){
+            this.valoresDefectoValidacionHoras();
+            this.btnOculto = true;
+            return this.readonly = true;
+          }
+          
+          this.valoresDefectoValidacionHoras();
+    
+          if(this.selectItemDiasHoras == 'Horas'){
+            this.reg.fec_final = this.reg.fec_inicio;
+            this.dia_fianl = moment(this.reg.fec_inicio).format('YYYY-MM-DD');
+            this.reg.hora_numero = null; 
+            this.readonly = true;
+            this.btnOcultoguardar = true;
+            return this.btnOculto = true;
+          }
+    
+          this.readonly = false;
+          this.fech_bloqu = false;
+
+        },
+        err => { this.validar.showToast(err.error.message, 3000, 'danger');
+          return this.dia_inicio = '';
+        }
+      )
+
     }else{
       this.reg.fec_final = null;
       this.dia_fianl = '';
       this.reg.fec_inicio = e.target.value;
       this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
 
-      if(this.cg_permiso.fec_validar == true){
-        if(this.dia_inicio == moment(this.cg_permiso.fecha).format('YYYY-MM-DD')){
-          this.validaciones.showToast('Lo Sentimos la fecha '+moment(this.cg_permiso.fecha).format('DD-MM-YYYY')+' esta reservada', 3500, 'warning');
-          this.valoresDefectoValidacionHoras();
-          this.btnOculto = true;
-          return this.readonly = true;
-        }
-      }
 
-      if(this.DiaIniciolLibre() == 0){
-        this.valoresDefectoValidacionHoras();
-        this.btnOculto = true;
-        return this.readonly = true;
-      }
+      if(this.reg.fec_inicio != '' || this.reg.fec_inicio != null){
       
-      this.valoresDefectoValidacionHoras();
+        const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
+        this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+          horario => { 
+            this.horarioEmpleado = horario;
 
-      if(this.selectItemDiasHoras == 'Horas'){
-        this.reg.fec_final = this.reg.fec_inicio;
-        this.dia_fianl = moment(this.reg.fec_inicio).format('YYYY-MM-DD');
-        this.reg.hora_numero = null; 
-        this.readonly = true;
-        this.btnOcultoguardar = true;
-        return this.btnOculto = true;
+            if(this.cg_permiso.fec_validar == true){
+              if(this.dia_inicio == moment(this.cg_permiso.fecha).format('YYYY-MM-DD')){
+                this.validaciones.showToast('Lo Sentimos la fecha '+moment(this.cg_permiso.fecha).format('DD-MM-YYYY')+' esta reservada', 3500, 'warning');
+                this.valoresDefectoValidacionHoras();
+                this.btnOculto = true;
+                return this.readonly = true;
+              }
+            }
+      
+            if(this.DiaIniciolLibre() == 0){
+              this.valoresDefectoValidacionHoras();
+              this.btnOculto = true;
+              return this.readonly = true;
+            }
+            
+            this.valoresDefectoValidacionHoras();
+      
+            if(this.selectItemDiasHoras == 'Horas'){
+              this.reg.fec_final = this.reg.fec_inicio;
+              this.dia_fianl = moment(this.reg.fec_inicio).format('YYYY-MM-DD');
+              this.reg.hora_numero = null; 
+              this.readonly = true;
+              this.btnOcultoguardar = true;
+              return this.btnOculto = true;
+            }
+      
+            this.readonly = false;
+            this.fech_bloqu = false;
+
+          },
+          err => { this.validar.showToast(err.error.message, 3000, 'danger') 
+          return this.dia_inicio = '';  
+          }
+        )
       }
-
-      this.readonly = false;
-      this.fech_bloqu = false;
     }
   }
 

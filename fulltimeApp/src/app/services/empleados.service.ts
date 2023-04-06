@@ -3,6 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { tap } from 'rxjs/operators';
 import { HorarioE } from '../interfaces/Horarios';
+import moment from 'moment';
+moment.locale('es');
 
 @Injectable({
   providedIn: 'root'
@@ -33,10 +35,7 @@ export class EmpleadosService {
       )
   }
 
-  ObtenerUnHorarioEmpleado(codigo: number,
-    fecha_hoy = new Date().toLocaleString("es-EC", { timeZone: "America/Guayaquil" })
-  ) {
-    // console.log(fecha_hoy);
+  ObtenerUnHorarioEmpleado(codigo: number, fecha_hoy: any) {
     const params = new HttpParams()
       .set('codigo', codigo)
       .set('fecha_hoy', fecha_hoy.split(' ')[0]);

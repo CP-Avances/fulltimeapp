@@ -316,11 +316,11 @@
       </div>
 
       <!-- BOTON GUARDAR COMPONENTE -->
-      <div style="margin: 6% 3% 0% 3%;">
+      <div style="margin: 6% 3% 0% 3%;" [hidden] = "btnOcultoguardar">
         <ion-text *ngIf="cg_permiso.documento == true " color="medium" class="text_info">
           Es obligatorio en {{cg_permiso.descripcion}} el documento de Respaldo 
         </ion-text>
-        <button [disabled] = "btnOcultoguardar" style="width: 100%; background-color: transparent;">
+        <button style="width: 100%; background-color: transparent;">
           <btn-update (onUpdate)="UpdateRegister()" [loadingBtn]="loadingBtn" [formRegistro]="formRegistro" ></btn-update>
         </button>
       </div>

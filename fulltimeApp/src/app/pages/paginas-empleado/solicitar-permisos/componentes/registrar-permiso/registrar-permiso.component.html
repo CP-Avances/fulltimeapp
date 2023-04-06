@@ -1,9 +1,10 @@
 <app-close-modal titleModal="Solicitud Permiso" [formRegistro]="formRegistro" [resetF]="true"></app-close-modal>
 
 <ion-content mode="md">
+  <br>
   <app-refresh-info (onRefresh)="ngOnInit()" removeItem="cg_tipo_permiso"></app-refresh-info>
 
-  <form #formRegistro="ngForm">
+  <form #formRegistro="ngForm" [hidden] = "ocultar">
 
     <ion-grid>
       <ion-row>
@@ -113,7 +114,7 @@
                   </ion-item>
                   <ion-popover trigger="open-regiPermiFechaFin">
                     <ng-template >
-                      <p style="margin: auto; padding: 4%;" *ngIf="(dia_inicio == '') && (reg.fec_inicio == null)">Ingrese la fecha de Inicio</p>
+                      <p style="margin: auto; padding: 4%;" *ngIf="(dia_inicio == '')">Ingrese la fecha de Inicio</p>
                       <ion-datetime *ngIf="dia_inicio != ''"
                         [disabled] = "readonly" 
                         presentation="date"
@@ -299,5 +300,26 @@
       </ng-container>
     </ng-container>
   </form>
-  <br><br>
+  <br>
+  
+  <div [hidden] = "mensaje">
+    <div style="margin: 2%; padding: 2%; text-align: center; border-radius: 2%;">
+      <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 90%;">
+        No tiene registrado el periodo de vacaciones para realizar una solicitud
+      </ion-text>
+    </div>
+    <div class="Imagen">
+      <span class="centerlogo">
+        <img src="../../../assets/images/C_FTLOGORV.png">
+        <ion-label style="text-align:center" mode="md" color="medium">  
+          <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
+        </ion-label>
+      </span>
+      <br>
+      <img style="margin-left: 15%;" src="../../../assets/images/permiso.png"/>
+      <br><br>
+    </div>
+  </div>
+
+  <br>
 </ion-content>

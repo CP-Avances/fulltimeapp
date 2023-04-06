@@ -9,7 +9,7 @@ export interface Vacacion {
     dia_laborable: number;
     legalizado: boolean;
     id?: number;
-    id_peri_vacacion: number;
+    id_peri_vacacion: number | null;
     id_empl_cargo: number;
     estado: number;
     codigo: number;

@@ -73,7 +73,7 @@
             </ion-item>
             <ion-popover trigger="open-popover">
               <ng-template>
-                <ion-datetime 
+                <ion-datetime
                   presentation="date"
                   [showDefaultButtons]="true" 
                     doneText="OK"
@@ -97,8 +97,9 @@
             </ion-item>
             <ion-popover trigger="open-popover1">
               <ng-template>
-                <ion-datetime 
-                [disabled] = "disabled_dia_fianl"
+                <p style="margin: auto; padding: 4%;" *ngIf="(dia_inicio == '')">Ingrese el dia Inicio</p>
+                <ion-datetime *ngIf="dia_inicio != ''"
+                  [disabled] = "disabled_dia_fianl"
                   presentation="date"
                   [showDefaultButtons]="true" 
                     doneText="OK"
@@ -175,8 +176,8 @@
     </ion-grid>
 
     <!-- BOTON GUARDAR COMPONENTE -->
-    <div style="margin: 6% 3% 0% 3%;">
-      <button [disabled] = "btnOcultoguardar" style="width: 100%; background-color: transparent;">
+    <div style="margin: 6% 3% 0% 3%;" [hidden] = "btnOcultoguardar">
+      <button style="width: 100%; background-color: transparent;">
         <btn-update (onUpdate)="UpdateRegister()" [loadingBtn]="loadingBtn" [formRegistro]="formRegistro"></btn-update>
       </button>
     </div>

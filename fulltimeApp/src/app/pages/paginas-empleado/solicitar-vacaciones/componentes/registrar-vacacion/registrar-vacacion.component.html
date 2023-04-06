@@ -2,8 +2,10 @@
 
 <!-- Content con mode = android -->
 <ion-content mode="md">
+  <br>
   <app-refresh-info (onRefresh)="ngOnInit()" removeItem="cg_feriado"></app-refresh-info>
-  <form #formRegistro="ngForm">
+
+  <form #formRegistro="ngForm" [hidden] = "ocultar" >
 
     <ion-grid>
       <ion-row>
@@ -69,7 +71,7 @@
             </ion-item>
             <ion-popover trigger="open-regisVacaFinal">
               <ng-template>
-                <p style="margin: auto; padding: 4%;" *ngIf="(dia_inicio == '') && (reg.fec_inicio == null)">Ingrese la fecha de Inicio</p>
+                <p style="margin: auto; padding: 4%;" *ngIf="(dia_inicio == '')">Ingrese la fecha de Inicio</p>
                 <ion-datetime *ngIf="dia_inicio != ''"
                   [disabled] = "disabled_dia_fianl"
                   presentation="date"
@@ -164,13 +166,33 @@
           </div>
         </ion-item>
       </div>
-    </div>
 
-    <br>
+      <br>
       <div style="margin: 0% 3% 0% 3%;" [hidden] = "btnOcultoguardar">
         <!-- BOTON GUARDAR DESDE OTRO COMPONENTE -->
-      <btn-save (onSave)="SaveRegister()" [loadingBtn]="loadingBtn" [formRegistro]="formRegistro"></btn-save>
+        <btn-save (onSave)="SaveRegister()" [loadingBtn]="loadingBtn" [formRegistro]="formRegistro"></btn-save>
+      </div>
     </div>
   </form>
   <br>
+
+  <div [hidden] = "mensaje">
+    <div style="margin: 2%; padding: 2%; text-align: center; border-radius: 2%;">
+      <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 90%;">
+        No tiene registrado el periodo de vacaciones para realizar una solicitud
+      </ion-text>
+    </div>
+    <div class="Imagen">
+      <span class="center">
+        <img src="../../../assets/images/C_FTLOGORV.png">
+        <ion-label style="text-align:center" mode="md" color="medium">  
+          <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
+        </ion-label>
+      </span>
+      <br><br>
+      <img style="margin-left: 5%;" src="../../../assets/images/vacaciones.png"/>
+      <br>
+    </div>
+  </div>
+
 </ion-content>

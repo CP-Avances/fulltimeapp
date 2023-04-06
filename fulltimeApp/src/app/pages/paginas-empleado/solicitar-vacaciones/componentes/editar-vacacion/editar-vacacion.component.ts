@@ -83,18 +83,13 @@ export class EditarVacacionComponent implements OnInit {
     this.reg = this.vacacion;
     this.fecha_inicio = this.vacacion.fec_inicio;
     this.fecha_final = this.vacacion.fec_final;
-
     this.dia_inicio = moment(this.fecha_inicio).format('YYYY-MM-DD');
     this.dia_fianl = moment(this.fecha_final).format('YYYY-MM-DD');
     this.dia_ingreso = moment(this.vacacion.fec_ingreso).format('YYYY-MM-DD');
-    console.log("dia ingreso: ",this.dia_ingreso);
-
     this.catalogoService.getFeriadosAnual()
-    this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo).subscribe(
-      horario => { this.horarioEmpleado = horario },
-      err => { this.validar.showToast(err.error.message, 3000, 'danger') },
-      () => { }
-    )
+
+    this.btnOcultoguardar = true;
+
     this.obtenerInformacionEmpleado();
     this.BuscarFormatos();
   }
@@ -158,7 +153,7 @@ export class EditarVacacionComponent implements OnInit {
   async showAlert(){
     let alert = await this.alertCrtl.create({
       message: `<div class="card-alert">
-                  <img src="../../../assets/LOGOBLFT.png" class="img-alert">
+                  <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                   <br>
                   <p> Ups! El dia que ingreso esta fuera de su calendario laboral </p>
                   <p> Por favor cambie a un dia dentro de su calendario </p>
@@ -175,24 +170,63 @@ export class EditarVacacionComponent implements OnInit {
 
   // METODO VALIDAR EL INPUT DE DIA INICIAL, FINAL y INGRESO
   ChangeDiaInicio(e){
-    this.valoresPorDefectoResultado();
     if(!e.target.value){
       this.reg.fec_inicio = moment(new Date()).format('YYYY-MM-DD');
-      return this.dia_inicio = moment(this.reg.fec_inicio).format('YYYY-MM-DD');
+
+      const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
+      this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+        horario => { 
+          this.horarioEmpleado = horario;
+          
+          if(this.DiaIniciolLibre(this.reg.fec_inicio) == 0){
+            this.disabled_dia_fianl = true, this.disabled_dia_ingreso = true;
+          }else{
+            this.disabled_dia_fianl = false, this.disabled_dia_ingreso = false;
+          }
+          return this.dia_inicio = moment(this.reg.fec_inicio).format('YYYY-MM-DD');
+        },
+        err => { this.validar.showToast(err.error.message, 3000, 'danger') 
+        this.reg.fec_inicio = undefined;
+        return this.dia_inicio = '';
+        },
+        () => { }
+      )
+
     }else{
-      this.reg.fec_final = null;
-      this.reg.fec_ingreso = null;
-      this.dia_fianl = '';
-      this.dia_ingreso = '';
+
+      if(!(moment(e.target.value).format('YYYY-MM-DD') == moment(this.dia_inicio).format('YYYY-MM-DD'))){
+        this.reg.fec_final = null;
+        this.reg.fec_ingreso = null;
+        this.reg.dia_laborable = null;
+        this.reg.dia_libre = null;
+        this.dia_fianl = '';
+        this.dia_ingreso = '';
+        this.btnOcultoguardar = true;
+      }
+
       this.reg.fec_inicio = e.target.value;
       this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
 
       if(this.reg.fec_inicio != '' || this.reg.fec_inicio != null){
-        if(this.DiaIniciolLibre(this.reg.fec_inicio) == 0){
-          return this.disabled_dia_fianl = true, this.disabled_dia_ingreso = true;
-        }else{
-          return this.disabled_dia_fianl = false, this.disabled_dia_ingreso = false;
-        }
+        
+        const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
+        this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+          horario => { 
+            this.horarioEmpleado = horario 
+            if(this.DiaIniciolLibre(this.reg.fec_inicio) == 0){
+              return this.disabled_dia_fianl = true, this.disabled_dia_ingreso = true;
+            }else{
+              return this.disabled_dia_fianl = false, this.disabled_dia_ingreso = false;
+            }
+          },
+          err => { 
+            this.validar.showToast(err.error.message, 3000, 'danger') 
+            return this.dia_inicio = '';  
+          },
+          () => { }
+        )
+
+        
       }
 
     }
