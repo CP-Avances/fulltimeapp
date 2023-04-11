@@ -69,8 +69,15 @@
           <strong>Motivo: </strong> {{ permiso.ntipopermiso | titlecase }}<br>
           <ion-text>
             <strong>Fecha</strong><br>
-            Desde: {{ permiso.fec_inicio_ }}<br>
-            Hasta: {{ permiso.fec_final_ }}<br>
+            <ion-text *ngIf="permiso.dia != 0">
+              Desde: {{ permiso.fec_inicio_ }}<br>
+              Hasta: {{ permiso.fec_final_ }}<br>
+            </ion-text>
+            <ion-text *ngIf="permiso.hora_numero != '00:00:00'">
+              Dia: {{ permiso.fec_inicio_ }}<br>
+              Hora salida: {{ permiso.hora_salida_}}<br>
+              Hora Ingreso: {{ permiso.hora_ingreso_}}<br>
+            </ion-text>
             <strong>Datos Tiempo</strong> <br>
             <ion-text *ngIf="permiso.dia != 0">
               Días permiso:  {{ permiso.dia }} <br>
@@ -94,6 +101,10 @@
       </div>
 
     </ion-item>
+
+    <ion-label style="font-size: 11px; margin: 2%; float:left">
+      <strong> id. {{ permiso.id}} </strong>
+    </ion-label>
 
     <ion-label style="font-size: 11px; margin: 2%; float:right">
       <strong> Solicitud realizada &nbsp; {{ permiso.fec_creacion_ }} </strong>

@@ -100,6 +100,56 @@ export const getlistaPermisosByFechasyCodigo = async (req: Request, res: Respons
 };
 
 /**
+ * Metodo para obtener listado de permisos de empleado por rango de fecha
+ * @returns Retorna un array de Permisos
+ */
+export const getlistaPermisosByHorasyCodigo = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const { fec_inicio, fec_final, hora_inicio, hora_final, codigo } = req.query;
+
+        console.log('Permiso fecha inicio: ',fec_inicio); 
+        console.log('Permiso fecha final: ', fec_final); 
+        console.log('Permiso hora inicio: ',hora_inicio);
+        console.log('Permiso hora final: ',hora_final);
+        console.log('Permiso codigo: ',codigo);
+
+        const PERMISO = await pool.query(`SELECT id FROM permisos p 
+        WHERE p.codigo::varchar = $1 
+        AND ((($2 BETWEEN p.fec_inicio::date AND p.fec_final::date ) OR ($3 BETWEEN p.fec_inicio::date AND p.fec_final::date)) OR ((p.fec_inicio::date BETWEEN $2 AND $3) OR (p.fec_final::date BETWEEN $2 AND $3))) 
+        AND p.dia = 0 
+        AND ((($4 BETWEEN p.hora_salida AND p.hora_ingreso) OR ($5 BETWEEN p.hora_salida AND p.hora_ingreso)) OR ((p.hora_salida BETWEEN $4 AND $5) OR (p.hora_ingreso BETWEEN $4 AND $5))) `
+            , [codigo, fec_inicio, fec_final, hora_inicio, hora_final]);
+
+        return res.status(200).jsonp(PERMISO.rows);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+};
+
+/**
+ * Metodo para obtener listado de permisos de empleado por rango de fecha
+ * @returns Retorna un array de Permisos
+ */
+export const getlistaPermisosByHorasyCodigoEdit = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const { fec_inicio, fec_final, hora_inicio, hora_final, codigo, id } = req.query;
+        const PERMISO = await pool.query(`SELECT id FROM permisos p 
+        WHERE p.codigo::varchar = $1 
+        AND ((($2 BETWEEN p.fec_inicio::date AND p.fec_final::date ) OR ($3 BETWEEN p.fec_inicio::date AND p.fec_final::date)) OR ((p.fec_inicio::date BETWEEN $2 AND $3) OR (p.fec_final::date BETWEEN $2 AND $3))) 
+        AND p.dia = 0 
+        AND ((($4 BETWEEN p.hora_salida AND p.hora_ingreso) OR ($5 BETWEEN p.hora_salida AND p.hora_ingreso)) OR ((p.hora_salida BETWEEN $4 AND $5) OR (p.hora_ingreso BETWEEN $4 AND $5)))
+        AND NOT p.id = $6 `
+            , [codigo, fec_inicio, fec_final, hora_inicio, hora_final, id]);
+
+        return res.status(200).jsonp(PERMISO.rows);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+};
+
+/**
  * METODO PARA INSERTAR UN PERMISO
  * @returns RETORNA DATOS PERMISO INGRESADO
  */
@@ -127,7 +177,6 @@ export const postNuevoPermiso = async (req: Request, res: Response): Promise<Res
 
         const permiso: Permiso = objetoPermiso
         console.log(permiso);
-        console.log(req.query);
 
         const { id_departamento } = req.query;
 

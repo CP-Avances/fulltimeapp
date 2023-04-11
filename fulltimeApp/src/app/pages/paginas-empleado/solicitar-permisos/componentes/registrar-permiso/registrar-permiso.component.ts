@@ -488,65 +488,107 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
      let minutosinicio = '00:00:00';
      let minutosfinal = '23:00:00';
 
-     if(this.selectItemDiasHoras === 'Horas'){
-      minutosinicio = moment(this.reg.hora_salida).format('HH:mm:ss');
-      minutosfinal = moment(this.reg.hora_ingreso).format('HH:mm:ss');
-     }
-
     if (this.reg.fec_inicio === null || this.reg.fec_final === null || this.reg.fec_inicio === undefined || this.reg.fec_final ===  undefined){
       this.loadingBtn = false;
       this.validaciones.showToast('Llenar todos los campos de ', 3000, 'warning')
       return false
     }
 
+    if(this.selectItemDiasHoras === 'Horas'){
+      minutosinicio = moment(this.reg.hora_salida).format('HH:mm:ss');
+      minutosfinal = moment(this.reg.hora_ingreso).format('HH:mm:ss');
+    }
+
     const fec_inicio = (moment(this.reg.fec_inicio).format('YYYY-MM-DD'))+' '+ minutosinicio;
     const fec_final = (moment(this.reg.fec_final).format('YYYY-MM-DD')) +' '+ minutosfinal;
     const codigo = parseInt(localStorage.getItem('codigo')!)
-    const id_solicitud = this.reg.id;
 
+    if(this.selectItemDiasHoras === 'Dias'){
+      this.permisoService.getlistaPermisosByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
+        if(solicitados.length != 0){
+          this.reg.dia = null;
+          this.reg.dia_libre = null;
+          this.reg.hora_numero = null;
+          this.validaciones.showToast('Ups! Ya existe permisos en esas fechas ', 3500, 'warning');
+          return false
+        }
+        else{
+          this.horasExtrasService.getlistaHorasExtrasByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
+            if(solicitados.length != 0){
+              this.reg.dia = null;
+              this.reg.dia_libre = null;
+              this.reg.hora_numero = null;
+              this.validaciones.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
+              return false
+            }
+            else{
+              this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
+                if(solicitados.length != 0){
+                  this.reg.dia = null;
+                  this.reg.dia_libre = null;
+                  this.reg.hora_numero = null;
+                  this.validaciones.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
+                  return false
+                }
+                else{
+                  this.calcularhoras();
+                }
+              }, err => {
+                this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
+              }); 
+  
+            }
+          }, err => {
+            this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
+          }); 
+        }
+      }, err => {
+        this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
+      });
+    }else{
 
-    this.permisoService.getlistaPermisosByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
-      if(solicitados.length != 0){
-        this.reg.dia = null;
-        this.reg.dia_libre = null;
-        this.reg.hora_numero = null;
-        this.validaciones.showToast('Ups! Ya existe permisos en esas fechas ', 3500, 'warning');
-        return false
-      }
-      else{
-        this.horasExtrasService.getlistaHorasExtrasByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
-          if(solicitados.length != 0){
-            this.reg.dia = null;
-            this.reg.dia_libre = null;
-            this.reg.hora_numero = null;
-            this.validaciones.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
-            return false
-          }
-          else{
-            this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
-              if(solicitados.length != 0){
-                this.reg.dia = null;
-                this.reg.dia_libre = null;
-                this.reg.hora_numero = null;
-                this.validaciones.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
-                return false
-              }
-              else{
-                this.calcularhoras();
-              }
-            }, err => {
-              this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
-            }); 
-
-          }
-        }, err => {
-          this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
-        }); 
-      }
-    }, err => {
-      this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
-    });
-
+      this.permisoService.getlistaPermisosByHorasyCodigo(fec_inicio, fec_final, minutosinicio, minutosfinal, codigo).subscribe(solicitados => {
+        if(solicitados.length != 0){
+          this.reg.dia = null;
+          this.reg.dia_libre = null;
+          this.reg.hora_numero = null;
+          this.validaciones.showToast('Ups! Ya existe permisos en esas fecha y hora ', 3500, 'warning');
+          return false
+        }
+        else{
+          this.horasExtrasService.getlistaHorasExtrasByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
+            if(solicitados.length != 0){
+              this.reg.dia = null;
+              this.reg.dia_libre = null;
+              this.reg.hora_numero = null;
+              this.validaciones.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
+              return false
+            }
+            else{
+              this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
+                if(solicitados.length != 0){
+                  this.reg.dia = null;
+                  this.reg.dia_libre = null;
+                  this.reg.hora_numero = null;
+                  this.validaciones.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
+                  return false
+                }
+                else{
+                  this.calcularhoras();
+                }
+              }, err => {
+                this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
+              }); 
+  
+            }
+          }, err => {
+            this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
+          }); 
+        }
+      }, err => {
+        this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
+      });
+    } 
   }
 
 

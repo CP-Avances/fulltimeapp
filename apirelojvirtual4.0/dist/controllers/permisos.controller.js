@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.putPermiso = exports.postNuevoPermiso = exports.getlistaPermisosByFechasyCodigoEdit = exports.getlistaPermisosByFechasyCodigo = exports.getlistaPermisosByFechas = exports.getlistaPermisos = exports.getlistaPermisosByCodigo = void 0;
+exports.putPermiso = exports.postNuevoPermiso = exports.getlistaPermisosByHorasyCodigoEdit = exports.getlistaPermisosByHorasyCodigo = exports.getlistaPermisosByFechasyCodigoEdit = exports.getlistaPermisosByFechasyCodigo = exports.getlistaPermisosByFechas = exports.getlistaPermisos = exports.getlistaPermisosByCodigo = void 0;
 const database_1 = require("../database");
 /**
  * Metodo para obtener listado de permisos por codigo del empleado
@@ -109,6 +109,52 @@ const getlistaPermisosByFechasyCodigoEdit = (req, res) => __awaiter(void 0, void
 });
 exports.getlistaPermisosByFechasyCodigoEdit = getlistaPermisosByFechasyCodigoEdit;
 /**
+ * Metodo para obtener listado de permisos de empleado por rango de fecha
+ * @returns Retorna un array de Permisos
+ */
+const getlistaPermisosByHorasyCodigo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { fec_inicio, fec_final, hora_inicio, hora_final, codigo } = req.query;
+        console.log('Permiso fecha inicio: ', fec_inicio);
+        console.log('Permiso fecha final: ', fec_final);
+        console.log('Permiso hora inicio: ', hora_inicio);
+        console.log('Permiso hora final: ', hora_final);
+        console.log('Permiso codigo: ', codigo);
+        const PERMISO = yield database_1.pool.query(`SELECT id FROM permisos p 
+        WHERE p.codigo::varchar = $1 
+        AND ((($2 BETWEEN p.fec_inicio::date AND p.fec_final::date ) OR ($3 BETWEEN p.fec_inicio::date AND p.fec_final::date)) OR ((p.fec_inicio::date BETWEEN $2 AND $3) OR (p.fec_final::date BETWEEN $2 AND $3))) 
+        AND p.dia = 0 
+        AND ((($4 BETWEEN p.hora_salida AND p.hora_ingreso) OR ($5 BETWEEN p.hora_salida AND p.hora_ingreso)) OR ((p.hora_salida BETWEEN $4 AND $5) OR (p.hora_ingreso BETWEEN $4 AND $5))) `, [codigo, fec_inicio, fec_final, hora_inicio, hora_final]);
+        return res.status(200).jsonp(PERMISO.rows);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+});
+exports.getlistaPermisosByHorasyCodigo = getlistaPermisosByHorasyCodigo;
+/**
+ * Metodo para obtener listado de permisos de empleado por rango de fecha
+ * @returns Retorna un array de Permisos
+ */
+const getlistaPermisosByHorasyCodigoEdit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { fec_inicio, fec_final, hora_inicio, hora_final, codigo, id } = req.query;
+        const PERMISO = yield database_1.pool.query(`SELECT id FROM permisos p 
+        WHERE p.codigo::varchar = $1 
+        AND ((($2 BETWEEN p.fec_inicio::date AND p.fec_final::date ) OR ($3 BETWEEN p.fec_inicio::date AND p.fec_final::date)) OR ((p.fec_inicio::date BETWEEN $2 AND $3) OR (p.fec_final::date BETWEEN $2 AND $3))) 
+        AND p.dia = 0 
+        AND ((($4 BETWEEN p.hora_salida AND p.hora_ingreso) OR ($5 BETWEEN p.hora_salida AND p.hora_ingreso)) OR ((p.hora_salida BETWEEN $4 AND $5) OR (p.hora_ingreso BETWEEN $4 AND $5)))
+        AND NOT p.id = $6 `, [codigo, fec_inicio, fec_final, hora_inicio, hora_final, id]);
+        return res.status(200).jsonp(PERMISO.rows);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+});
+exports.getlistaPermisosByHorasyCodigoEdit = getlistaPermisosByHorasyCodigoEdit;
+/**
  * METODO PARA INSERTAR UN PERMISO
  * @returns RETORNA DATOS PERMISO INGRESADO
  */
@@ -128,7 +174,6 @@ const postNuevoPermiso = (req, res) => __awaiter(void 0, void 0, void 0, functio
             return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
         const permiso = objetoPermiso;
         console.log(permiso);
-        console.log(req.query);
         const { id_departamento } = req.query;
         const JefesDepartamentos = yield database_1.pool.query('SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc, ' +
             'cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato, ' +

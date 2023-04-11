@@ -39,6 +39,8 @@ class PermisoRoutes {
         this.router.get('/lista-permisos', PERMISOS.getlistaPermisosByCodigo);
         this.router.get('/lista-permisosfechas', PERMISOS.getlistaPermisosByFechasyCodigo);
         this.router.get('/lista-permisosfechasedit', PERMISOS.getlistaPermisosByFechasyCodigoEdit);
+        this.router.get('/lista-permisoshoras', PERMISOS.getlistaPermisosByHorasyCodigo);
+        this.router.get('/lista-permisoshorasedit', PERMISOS.getlistaPermisosByHorasyCodigoEdit);
         this.router.post('/insert-permiso', verificarToken_1.verificarToken, PERMISOS.postNuevoPermiso);
         this.router.put('/update-permiso', PERMISOS.putPermiso);
     }

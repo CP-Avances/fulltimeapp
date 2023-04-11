@@ -274,12 +274,6 @@ export class EditarVacacionComponent implements OnInit {
       this.reg.fec_ingreso = e.target.value;
       this.dia_ingreso = moment(e.target.value).format('YYYY-MM-DD');
     }
-
-    if(this.DiaIniciolLibre(this.reg.fec_ingreso) == 0){
-      return this.btnOculto = true;;
-    }else{
-      this.validar.showToast('Calcule el tiempo para actualizar.', 3000, 'warning')
-    }
     
   }
 
