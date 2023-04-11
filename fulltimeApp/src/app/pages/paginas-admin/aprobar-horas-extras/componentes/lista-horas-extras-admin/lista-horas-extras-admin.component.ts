@@ -119,13 +119,13 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
           if (this.horasExtras_pendientes.length == 0 && this.horasExtras_pre_autorizados.length == 0 && this.horasExtras_autorizado.length == 0 && this.horasExtras_negado.length == 0) {
             this.Ver = true;
           } else {
-            if((this.pestaniaEstados == 'pendientes') && (this.horasExtras_pendientes.length < 5)){
+            if((this.pestaniaEstados == 'pendientes') && (this.horasExtras_pendientes.length < 6)){
               return this.Ver = true;
-            }else if((this.pestaniaEstados == 'pre_autorizados') && (this.horasExtras_pre_autorizados.length < 5)){
+            }else if((this.pestaniaEstados == 'pre_autorizados') && (this.horasExtras_pre_autorizados.length < 6)){
               return this.Ver = true;
-            }else if((this.pestaniaEstados == 'autorizados') && (this.horasExtras_autorizado.length < 5)){
+            }else if((this.pestaniaEstados == 'autorizados') && (this.horasExtras_autorizado.length < 6)){
               return this.Ver = true;
-            }else if((this.pestaniaEstados == 'negados') && (this.horasExtras_negado.length < 5)){
+            }else if((this.pestaniaEstados == 'negados') && (this.horasExtras_negado.length < 6)){
               return this.Ver = true;
             }else{
               this.Ver = false;
@@ -234,13 +234,13 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
             }
           });
 
-          if((this.pestaniaEstados == 'pendientes') && (this.horasExtras_pendientes.length < 5)){
+          if((this.pestaniaEstados == 'pendientes') && (this.horasExtras_pendientes.length < 6)){
             return this.Ver = true;
-          }else if((this.pestaniaEstados == 'pre_autorizados') && (this.horasExtras_pre_autorizados.length < 5)){
+          }else if((this.pestaniaEstados == 'pre_autorizados') && (this.horasExtras_pre_autorizados.length < 6)){
             return this.Ver = true;
-          }else if((this.pestaniaEstados == 'autorizados') && (this.horasExtras_autorizado.length < 5)){
+          }else if((this.pestaniaEstados == 'autorizados') && (this.horasExtras_autorizado.length < 6)){
             return this.Ver = true;
-          }else if((this.pestaniaEstados == 'negados') && (this.horasExtras_negado.length < 5)){
+          }else if((this.pestaniaEstados == 'negados') && (this.horasExtras_negado.length < 6)){
             return this.Ver = true;
           }else{
             this.Ver = false;

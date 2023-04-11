@@ -117,13 +117,13 @@ export class ListaPermisosAdminComponent implements OnInit {
           if (this.permisos_pendientes.length == 0 && this.permisos_pre_autorizados.length == 0 && this.permisos_autorizado.length == 0 && this.permisos_negado.length == 0) {
             return this.Ver = true;
           } else {
-            if((this.pestaniaEstados == 'pendientes') && (this.permisos_pendientes.length < 5)){
+            if((this.pestaniaEstados == 'pendientes') && (this.permisos_pendientes.length < 6)){
               return this.Ver = true;
-            }else if((this.pestaniaEstados == 'pre_autorizados') && (this.permisos_pre_autorizados.length < 5)){
+            }else if((this.pestaniaEstados == 'pre_autorizados') && (this.permisos_pre_autorizados.length < 6)){
               return this.Ver = true;
-            }else if((this.pestaniaEstados == 'autorizados') && (this.permisos_autorizado.length < 5)){
+            }else if((this.pestaniaEstados == 'autorizados') && (this.permisos_autorizado.length < 6)){
               return this.Ver = true;
-            }else if((this.pestaniaEstados == 'negados') && (this.permisos_negado.length < 5)){
+            }else if((this.pestaniaEstados == 'negados') && (this.permisos_negado.length < 6)){
               return this.Ver = true;
             }else{
               this.Ver = false;
@@ -237,13 +237,13 @@ export class ListaPermisosAdminComponent implements OnInit {
             }
           });
 
-          if((this.pestaniaEstados == 'pendientes') && (this.permisos_pendientes.length < 5)){
+          if((this.pestaniaEstados == 'pendientes') && (this.permisos_pendientes.length < 6)){
             return this.Ver = true;
-          }else if((this.pestaniaEstados == 'pre_autorizados') && (this.permisos_pre_autorizados.length < 5)){
+          }else if((this.pestaniaEstados == 'pre_autorizados') && (this.permisos_pre_autorizados.length < 6)){
             return this.Ver = true;
-          }else if((this.pestaniaEstados == 'autorizados') && (this.permisos_autorizado.length < 5)){
+          }else if((this.pestaniaEstados == 'autorizados') && (this.permisos_autorizado.length < 6)){
             return this.Ver = true;
-          }else if((this.pestaniaEstados == 'negados') && (this.permisos_negado.length < 5)){
+          }else if((this.pestaniaEstados == 'negados') && (this.permisos_negado.length < 6)){
             return this.Ver = true;
           }else{
             this.Ver = false;

@@ -110,11 +110,11 @@ export class ListaAlimentacionAdminComponent implements OnInit, OnDestroy {
           if (this.alimentacion_pendientes.length == 0 && this.alimentacion_autorizado.length == 0 && this.alimentacion_negado.length == 0) {
             this.Ver = true;
           } else {
-            if((this.pestaniaEstados == 'pendientes') && (this.alimentacion_pendientes.length < 5)){
+            if((this.pestaniaEstados == 'pendientes') && (this.alimentacion_pendientes.length < 6)){
               return this.Ver = true;
-            }else if((this.pestaniaEstados == 'autorizados') && (this.alimentacion_autorizado.length < 5)){
+            }else if((this.pestaniaEstados == 'autorizados') && (this.alimentacion_autorizado.length < 6)){
               return this.Ver = true;
-            }else if((this.pestaniaEstados == 'negados') && (this.alimentacion_negado.length < 5)){
+            }else if((this.pestaniaEstados == 'negados') && (this.alimentacion_negado.length < 6)){
               return this.Ver = true;
             }else{
               this.Ver = false;
@@ -196,11 +196,11 @@ export class ListaAlimentacionAdminComponent implements OnInit, OnDestroy {
             }
           });
 
-          if((this.pestaniaEstados == 'pendientes') && (this.alimentacion_pendientes.length < 5)){
+          if((this.pestaniaEstados == 'pendientes') && (this.alimentacion_pendientes.length < 6)){
             return this.Ver = true;
-          }else if((this.pestaniaEstados == 'autorizados') && (this.alimentacion_autorizado.length < 5)){
+          }else if((this.pestaniaEstados == 'autorizados') && (this.alimentacion_autorizado.length < 6)){
             return this.Ver = true;
-          }else if((this.pestaniaEstados == 'negados') && (this.alimentacion_negado.length < 5)){
+          }else if((this.pestaniaEstados == 'negados') && (this.alimentacion_negado.length < 6)){
             return this.Ver = true;
           }else{
             this.Ver = false;

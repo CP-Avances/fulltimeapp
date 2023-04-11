@@ -117,13 +117,13 @@ export class ListaVacacionesAdminComponent implements OnInit {
           if (this.vacaciones_pendientes.length == 0 && this.vacaciones_pre_autorizados.length == 0 && this.vacaciones_autorizado.length == 0 && this.vacaciones_negado.length == 0) {
             this.Ver = true;
           } else {
-            if((this.pestaniaEstados == 'pendientes') && (this.vacaciones_pendientes.length < 5)){
+            if((this.pestaniaEstados == 'pendientes') && (this.vacaciones_pendientes.length < 6)){
               this.Ver = true;
-            }else if((this.pestaniaEstados == 'pre_autorizados') && (this.vacaciones_pre_autorizados.length < 5)){
+            }else if((this.pestaniaEstados == 'pre_autorizados') && (this.vacaciones_pre_autorizados.length < 6)){
               this.Ver = true;
-            }else if((this.pestaniaEstados == 'autorizados') && (this.vacaciones_autorizado.length < 5)){
+            }else if((this.pestaniaEstados == 'autorizados') && (this.vacaciones_autorizado.length < 6)){
               this.Ver = true;
-            }else if((this.pestaniaEstados == 'negados') && (this.vacaciones_negado.length < 5)){
+            }else if((this.pestaniaEstados == 'negados') && (this.vacaciones_negado.length < 6)){
               this.Ver = true;
             }else{
               this.Ver = false;
@@ -235,13 +235,13 @@ export class ListaVacacionesAdminComponent implements OnInit {
           }
         });
 
-        if((this.pestaniaEstados == 'pendientes') && (this.vacaciones_pendientes.length < 5)){
+        if((this.pestaniaEstados == 'pendientes') && (this.vacaciones_pendientes.length < 6)){
           this.Ver = true;
-        }else if((this.pestaniaEstados == 'pre_autorizados') && (this.vacaciones_pre_autorizados.length < 5)){
+        }else if((this.pestaniaEstados == 'pre_autorizados') && (this.vacaciones_pre_autorizados.length < 6)){
           this.Ver = true;
-        }else if((this.pestaniaEstados == 'autorizados') && (this.vacaciones_autorizado.length < 5)){
+        }else if((this.pestaniaEstados == 'autorizados') && (this.vacaciones_autorizado.length < 6)){
           this.Ver = true;
-        }else if((this.pestaniaEstados == 'negados') && (this.vacaciones_negado.length < 5)){
+        }else if((this.pestaniaEstados == 'negados') && (this.vacaciones_negado.length < 6)){
           this.Ver = true;
         }else{
           this.Ver = false;
