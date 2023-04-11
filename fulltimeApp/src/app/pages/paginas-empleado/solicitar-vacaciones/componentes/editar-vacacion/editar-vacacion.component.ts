@@ -290,11 +290,13 @@ export class EditarVacacionComponent implements OnInit {
     const fec_inicio = (moment(this.reg.fec_inicio).format('YYYY-MM-DD'))+' '+ minutosinicio;
     const fec_final = (moment(this.reg.fec_final).format('YYYY-MM-DD')) +' '+ minutosfinal;
     const codigo = parseInt(localStorage.getItem('codigo'));
+    const id_solicitud = this.reg.id;
+
 
     if(moment(fec_inicio).format('YYYY-MM-DD') != moment(this.fecha_inicio).format('YYYY-MM-DD') || 
        moment(fec_final).format('YYYY-MM-DD') != moment(this.fecha_final).format('YYYY-MM-DD')){
       
-      this.permisoService.getlistaPermisosByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
+      this.permisoService.getlistaPermisosByFechasyCodigoEdit(fec_inicio, fec_final, codigo, id_solicitud).subscribe(solicitados => {
         if(solicitados.length != 0){
           this.reg.dia_laborable = null;
           this.reg.dia_libre = null;
@@ -310,7 +312,7 @@ export class EditarVacacionComponent implements OnInit {
               return this.btnOcultoguardar = true;
             }
             else{
-              this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
+              this.vacacionService.getlistaVacacionesByFechasyCodigoEdit(fec_inicio, fec_final, codigo, id_solicitud).subscribe(solicitados => {
                 if(solicitados.length != 0){
                   this.reg.dia_laborable = null;
                   this.reg.dia_libre = null;

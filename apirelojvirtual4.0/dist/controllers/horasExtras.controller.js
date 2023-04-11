@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.putHoraExtra = exports.postNuevaHoraExtra = exports.getlistaHorasExtrasByFechasyCodigo = exports.getlistaHorasExtrasByCodigo = exports.getlistaByFechas = exports.getlistaHorasExtras = void 0;
+exports.putHoraExtra = exports.postNuevaHoraExtra = exports.getlistaHorasExtrasByFechasyCodigoEdit = exports.getlistaHorasExtrasByFechasyCodigo = exports.getlistaHorasExtrasByCodigo = exports.getlistaByFechas = exports.getlistaHorasExtras = void 0;
 const database_1 = require("../database");
 /**
  * Metodo para obtener listado de las primeras 100 horas extras de empleados
@@ -101,6 +101,30 @@ const getlistaHorasExtrasByFechasyCodigo = (req, res) => __awaiter(void 0, void 
     }
 });
 exports.getlistaHorasExtrasByFechasyCodigo = getlistaHorasExtrasByFechasyCodigo;
+/**
+ * Metodo para obtener listado de HORAS EXTRAS por codigo y un rango de fechas del empleado filtrado por la id
+ * @returns Retorna un array de HORAS EXTRAS
+ */
+const getlistaHorasExtrasByFechasyCodigoEdit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { fec_inicio, fec_final, codigo, id } = req.query;
+        console.log('fec_inicio: ', fec_inicio);
+        console.log('fec_final: ', fec_final);
+        console.log('codigo: ', codigo);
+        console.log('id: ', id);
+        const HorasExtras = yield database_1.pool.query(`SELECT h.* FROM hora_extr_pedidos h 
+        WHERE h.codigo::varchar = $1 
+        AND ((($2 BETWEEN h.fec_inicio AND h.fec_final ) OR ($3 BETWEEN h.fec_inicio AND h.fec_final)) OR ((h.fec_inicio BETWEEN $2 AND $3) OR (h.fec_final BETWEEN $2 AND $3))) 
+        AND NOT h.id = $4 `, [codigo, fec_inicio, fec_final, id]);
+        console.log('lista solicitudes: ', HorasExtras.rows);
+        return res.status(200).jsonp(HorasExtras.rows);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+});
+exports.getlistaHorasExtrasByFechasyCodigoEdit = getlistaHorasExtrasByFechasyCodigoEdit;
 /**
  * Metodo para insertar una hora extra
  * @returns Retorna datos hora extra ingresado

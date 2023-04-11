@@ -16,6 +16,7 @@ class HorasExtrasRoutes {
         this.router.get('/rangofechas', HORAS_EXTRAS.getlistaByFechas)
         this.router.get('/lista-horas-extras', HORAS_EXTRAS.getlistaHorasExtrasByCodigo)
         this.router.get('/lista-horas-extrasfechas', HORAS_EXTRAS.getlistaHorasExtrasByFechasyCodigo);
+        this.router.get('/lista-horas-extrasfechasedit', HORAS_EXTRAS.getlistaHorasExtrasByFechasyCodigoEdit);
         this.router.post('/insert-horas-extras', verificarToken, HORAS_EXTRAS.postNuevaHoraExtra)
         this.router.put('/update-horas-extras', HORAS_EXTRAS.putHoraExtra)
     }

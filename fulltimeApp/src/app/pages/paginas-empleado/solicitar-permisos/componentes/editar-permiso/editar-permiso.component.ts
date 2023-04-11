@@ -479,7 +479,7 @@ export class EditarPermisoComponent implements OnInit {
       if(this.selectItemDiasHoras == 'Horas'){
         this.readonly = true;
       }else{
-        this.validar.showToast('Calcule el tiempo para actualizar.', 3000, 'warning')
+        this.validar.showToast('Calcule el tiempo para actualizar.', 2000, 'warning')
         this.valoresDefectoValidacionHoras();
       }
       this.btnOculto = false;
@@ -505,11 +505,13 @@ export class EditarPermisoComponent implements OnInit {
     const fec_inicio = (moment(this.reg.fec_inicio).format('YYYY-MM-DD'))+' '+ minutosinicio;
     const fec_final = (moment(this.reg.fec_final).format('YYYY-MM-DD')) +' '+ minutosfinal;
     const codigo = parseInt(String(localStorage.getItem('codigo')));
+    const id_solicitud = this.reg.id;
 
     if(moment(fec_inicio).format('YYYY-MM-DD') != moment(this.fecha_inicio).format('YYYY-MM-DD') || 
        moment(fec_final).format('YYYY-MM-DD') != moment(this.permiso.fec_final).format('YYYY-MM-DD')){
       
-      this.permisoService.getlistaPermisosByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
+      this.permisoService.getlistaPermisosByFechasyCodigoEdit(fec_inicio, fec_final, codigo, id_solicitud).subscribe(solicitados => {
+
         if(solicitados.length != 0){
           this.valoresDefectoValidacionResultados();
           this.validaciones.showToast('Ups! Ya existe permisos en esas fechas ', 3500, 'warning');

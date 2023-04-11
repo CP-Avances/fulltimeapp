@@ -15,7 +15,6 @@ import { ModalsPageModule } from './modals/modals.module';
 import { Drivers } from '@ionic/storage';
 import { NgxPaginationModule } from 'ngx-pagination';
 
-import { FingerprintAIO } from '@ionic-native/fingerprint-aio/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { File } from '@ionic-native/file/ngx';
 

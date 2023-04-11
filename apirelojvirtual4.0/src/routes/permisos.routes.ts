@@ -16,6 +16,7 @@ class PermisoRoutes {
         this.router.get('/rangofechas', PERMISOS.getlistaPermisosByFechas)
         this.router.get('/lista-permisos', PERMISOS.getlistaPermisosByCodigo)
         this.router.get('/lista-permisosfechas', PERMISOS.getlistaPermisosByFechasyCodigo)
+        this.router.get('/lista-permisosfechasedit', PERMISOS.getlistaPermisosByFechasyCodigoEdit)
         this.router.post('/insert-permiso', verificarToken, PERMISOS.postNuevoPermiso)
         this.router.put('/update-permiso', PERMISOS.putPermiso)
 

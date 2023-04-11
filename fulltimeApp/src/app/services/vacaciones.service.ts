@@ -80,8 +80,21 @@ export class VacacionesService {
       )
   }
 
-  postNuevoVacacion(vacacion: Vacacion): Observable<Vacacion> {
+  getlistaVacacionesByFechasyCodigoEdit(fec_inicio: string, fec_final: string, codigo: number | string, id: number): Observable <Vacacion[]>{
+    const url = `${this.apiUrl}/vacaciones/lista-vacacionesfechasedit`;
+    const params = new HttpParams()
+      .set('fec_inicio', fec_inicio)
+      .set('fec_final', fec_final)
+      .set('codigo', codigo)
+      .set('id', id)
+    return this.http.get<Vacacion[]>(url, { params })
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
+      )
+  }
 
+  postNuevoVacacion(vacacion: Vacacion): Observable<Vacacion> {
     const cdepar: any = localStorage.getItem('cdepar');
     const url = `${this.apiUrl}/vacaciones/insert-vacacion`;
     const params = new HttpParams()

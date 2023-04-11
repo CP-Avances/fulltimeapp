@@ -25,6 +25,7 @@ export interface Permiso {
     docu_nombre: string | null;
     ntipopermiso?: string;
     nempleado?: string;
+    
     // FORMATEAR FECHAS Y HORAS
     fec_creacion_: string;
     fec_inicio_: string;

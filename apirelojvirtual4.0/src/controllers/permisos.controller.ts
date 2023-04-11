@@ -63,20 +63,36 @@ export const getlistaPermisosByFechas = async (req: Request, res: Response): Pro
  * Metodo para obtener listado de permisos de empleado por rango de fecha
  * @returns Retorna un array de Permisos
  */
- export const getlistaPermisosByFechasyCodigo = async (req: Request, res: Response): Promise<Response> => {
+export const getlistaPermisosByFechasyCodigo = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const { fec_inicio, fec_final, codigo } = req.query;
-        const query = `SELECT p.fec_inicio, p.fec_final FROM permisos p WHERE p.codigo = \'${codigo}'\ AND (
-        ((\'${fec_inicio}\' BETWEEN p.fec_inicio AND p.fec_final ) OR 
-         (\'${fec_final}\' BETWEEN p.fec_inicio AND p.fec_final)) 
-        OR
-        ((p.fec_inicio BETWEEN \'${fec_inicio}\' AND \'${fec_final}\') OR 
-         (p.fec_final BETWEEN \'${fec_inicio}\' AND \'${fec_final}\'))
-        )`
+        const { fec_inicio, fec_final, codigo} = req.query;
+        const PERMISO = await pool.query(`SELECT * FROM permisos p 
+        WHERE p.codigo::varchar = $1 
+        AND ((($2 BETWEEN p.fec_inicio::date AND p.fec_final::date ) OR ($3 BETWEEN p.fec_inicio::date AND p.fec_final::date)) OR ((p.fec_inicio::date BETWEEN $2 AND $3) OR (p.fec_final::date BETWEEN $2 AND $3)))
+         `
+         , [codigo, fec_inicio, fec_final]);
 
-        const response: QueryResult = await pool.query(query);
-        const permisos: Permiso[] = response.rows;
-        return res.status(200).jsonp(permisos);
+        return res.status(200).jsonp(PERMISO.rows);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+};
+
+/**
+ * Metodo para obtener listado de permisos de empleado por rango de fecha
+ * @returns Retorna un array de Permisos
+ */
+ export const getlistaPermisosByFechasyCodigoEdit = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const { fec_inicio, fec_final, codigo, id } = req.query;
+        const PERMISO = await pool.query(`SELECT * FROM permisos p 
+        WHERE p.codigo::varchar = $1 
+        AND ((($2 BETWEEN p.fec_inicio::date AND p.fec_final::date ) OR ($3 BETWEEN p.fec_inicio::date AND p.fec_final::date)) OR ((p.fec_inicio::date BETWEEN $2 AND $3) OR (p.fec_final::date BETWEEN $2 AND $3))) 
+        AND NOT p.id = $4 `
+            , [codigo, fec_inicio, fec_final, id]);
+
+        return res.status(200).jsonp(PERMISO.rows);
     } catch (error) {
         console.log(error);
         return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });

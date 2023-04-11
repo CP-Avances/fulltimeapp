@@ -214,6 +214,35 @@ export class EditarHoraExtraComponent implements OnInit {
     this.validar.showToast('Calcule el tiempo para actualizar.', 3000, 'warning')
   }
 
+
+  /* ********************************************************************************** *
+     *                 METODO PARA MOSTRAR EL CALCULO EN LOS INPUTS                   *
+   * ********************************************************************************** */
+  mostrarCalculos(){
+    //variables para validar el dia de inicio completo y el dia final completo y buscar duplicidad.
+    const minutosinicio = moment(this.reg.hora_salida).format('HH:mm');
+    const minutosfinal = moment(this.reg.hora_ingreso).format('HH:mm');
+    const fec_inicio = (moment(this.reg.fec_inicio).format('YYYY-MM-DD')) + ' ' + minutosinicio;
+    const fec_final = (moment(this.reg.fec_final).format('YYYY-MM-DD')) + ' ' + minutosfinal;
+    const codigo = parseInt(localStorage.getItem('codigo'));
+    const id_solicitud = this.reg.id;
+
+    this.horasExtrasService.getlistaHorasExtrasByFechasyCodigoEdit(fec_inicio, fec_final, codigo, id_solicitud).subscribe(solicitados => {
+      if(solicitados.length != 0){
+        this.reg.num_hora = null;
+        this.reg.tiempo_autorizado = null;
+        this.validar.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
+        return false
+      }else{
+        this.calcularTiempo();
+      }
+    }, error => {
+      this.validar.showToast('Lo sentimos tenemos problemas para verificar su Solicitud\n Contactese con el administrador', 3500, 'danger');
+      //this.calcularhoras();
+    });
+  }
+
+
   calcularTiempo(registrarFechas = false) {
 
     if (this.validar.vacio(this.reg.hora_ingreso) || this.validar.vacio(this.reg.hora_salida)) {

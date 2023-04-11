@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.putPermiso = exports.postNuevoPermiso = exports.getlistaPermisosByFechasyCodigo = exports.getlistaPermisosByFechas = exports.getlistaPermisos = exports.getlistaPermisosByCodigo = void 0;
+exports.putPermiso = exports.postNuevoPermiso = exports.getlistaPermisosByFechasyCodigoEdit = exports.getlistaPermisosByFechasyCodigo = exports.getlistaPermisosByFechas = exports.getlistaPermisos = exports.getlistaPermisosByCodigo = void 0;
 const database_1 = require("../database");
 /**
  * Metodo para obtener listado de permisos por codigo del empleado
@@ -77,16 +77,11 @@ exports.getlistaPermisosByFechas = getlistaPermisosByFechas;
 const getlistaPermisosByFechasyCodigo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { fec_inicio, fec_final, codigo } = req.query;
-        const query = `SELECT p.fec_inicio, p.fec_final FROM permisos p WHERE p.codigo = \'${codigo}'\ AND (
-        ((\'${fec_inicio}\' BETWEEN p.fec_inicio AND p.fec_final ) OR 
-         (\'${fec_final}\' BETWEEN p.fec_inicio AND p.fec_final)) 
-        OR
-        ((p.fec_inicio BETWEEN \'${fec_inicio}\' AND \'${fec_final}\') OR 
-         (p.fec_final BETWEEN \'${fec_inicio}\' AND \'${fec_final}\'))
-        )`;
-        const response = yield database_1.pool.query(query);
-        const permisos = response.rows;
-        return res.status(200).jsonp(permisos);
+        const PERMISO = yield database_1.pool.query(`SELECT * FROM permisos p 
+        WHERE p.codigo::varchar = $1 
+        AND ((($2 BETWEEN p.fec_inicio::date AND p.fec_final::date ) OR ($3 BETWEEN p.fec_inicio::date AND p.fec_final::date)) OR ((p.fec_inicio::date BETWEEN $2 AND $3) OR (p.fec_final::date BETWEEN $2 AND $3)))
+         `, [codigo, fec_inicio, fec_final]);
+        return res.status(200).jsonp(PERMISO.rows);
     }
     catch (error) {
         console.log(error);
@@ -94,6 +89,25 @@ const getlistaPermisosByFechasyCodigo = (req, res) => __awaiter(void 0, void 0, 
     }
 });
 exports.getlistaPermisosByFechasyCodigo = getlistaPermisosByFechasyCodigo;
+/**
+ * Metodo para obtener listado de permisos de empleado por rango de fecha
+ * @returns Retorna un array de Permisos
+ */
+const getlistaPermisosByFechasyCodigoEdit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { fec_inicio, fec_final, codigo, id } = req.query;
+        const PERMISO = yield database_1.pool.query(`SELECT * FROM permisos p 
+        WHERE p.codigo::varchar = $1 
+        AND ((($2 BETWEEN p.fec_inicio::date AND p.fec_final::date ) OR ($3 BETWEEN p.fec_inicio::date AND p.fec_final::date)) OR ((p.fec_inicio::date BETWEEN $2 AND $3) OR (p.fec_final::date BETWEEN $2 AND $3))) 
+        AND NOT p.id = $4 `, [codigo, fec_inicio, fec_final, id]);
+        return res.status(200).jsonp(PERMISO.rows);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+});
+exports.getlistaPermisosByFechasyCodigoEdit = getlistaPermisosByFechasyCodigoEdit;
 /**
  * METODO PARA INSERTAR UN PERMISO
  * @returns RETORNA DATOS PERMISO INGRESADO

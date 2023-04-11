@@ -83,6 +83,22 @@ export class PermisosService {
       )
   }
 
+  getlistaPermisosByFechasyCodigoEdit(fec_inicio: string, fec_final: string, codigo: number | string, id: number): Observable <Permiso[]>{
+    const url = `${this.apiUrl}/permisos/lista-permisosfechasedit`;
+    const params = new HttpParams()
+      .set('fec_inicio', fec_inicio)
+      .set('fec_final', fec_final)
+      .set('codigo', codigo)
+      .set('id', id)
+    return this.http.get<Permiso[]>(url, { params })
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
+      )
+  }
+
+
+
   postNuevoPermiso(permiso: Permiso): Observable<Permiso> {
     const cdepar: any = localStorage.getItem('cdepar');
     const url = `${this.apiUrl}/permisos/insert-permiso`;

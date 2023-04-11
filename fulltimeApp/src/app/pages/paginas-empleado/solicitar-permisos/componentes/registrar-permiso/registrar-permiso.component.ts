@@ -502,6 +502,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     const fec_inicio = (moment(this.reg.fec_inicio).format('YYYY-MM-DD'))+' '+ minutosinicio;
     const fec_final = (moment(this.reg.fec_final).format('YYYY-MM-DD')) +' '+ minutosfinal;
     const codigo = parseInt(localStorage.getItem('codigo')!)
+    const id_solicitud = this.reg.id;
+
 
     this.permisoService.getlistaPermisosByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
       if(solicitados.length != 0){

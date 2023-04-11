@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.putVacacion = exports.postNuevaVacacion = exports.getlistaVacacionesByFechasyCodigo = exports.getlistaVacacionesByFechas = exports.getlistaVacaciones = exports.getlistaVacacionesByCodigo = void 0;
+exports.putVacacion = exports.postNuevaVacacion = exports.getlistaVacacionesByFechasyCodigoEdit = exports.getlistaVacacionesByFechasyCodigo = exports.getlistaVacacionesByFechas = exports.getlistaVacaciones = exports.getlistaVacacionesByCodigo = void 0;
 const database_1 = require("../database");
 /**
  * Metodo para obtener listado de vacaciones por codigo del empleado
@@ -101,6 +101,25 @@ const getlistaVacacionesByFechasyCodigo = (req, res) => __awaiter(void 0, void 0
     }
 });
 exports.getlistaVacacionesByFechasyCodigo = getlistaVacacionesByFechasyCodigo;
+/**
+ * Metodo para obtener listado de Vacaciones por codigo y un rango de fechas del empleado sin tomar en cuenta la solicitud por la id
+ * @returns Retorna un array de vacaciones
+ */
+const getlistaVacacionesByFechasyCodigoEdit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { fec_inicio, fec_final, codigo, id } = req.query;
+        const VACACIONES = yield database_1.pool.query(`SELECT v.* FROM vacaciones v 
+        WHERE v.codigo::varchar = $1 
+        AND ((($2 BETWEEN p.fec_inicio::date AND p.fec_final::date ) OR ($3 BETWEEN p.fec_inicio::date AND p.fec_final::date)) OR ((p.fec_inicio::date BETWEEN $2 AND $3) OR (p.fec_final::date BETWEEN $2 AND $3))) 
+        AND NOT v.id = $4 `, [codigo, fec_inicio, fec_final, id]);
+        return res.status(200).jsonp(VACACIONES.rows);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+});
+exports.getlistaVacacionesByFechasyCodigoEdit = getlistaVacacionesByFechasyCodigoEdit;
 /**
  * METODO PARA INSERTAR UNA VACACION
  * @returns RETORNA DATOS DE VACACION INGRESADA
