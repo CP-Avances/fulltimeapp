@@ -54,7 +54,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
 
   //variable para ocultar el formulario si no tiene asignado o registrado un periodo de vacaciones.
   ocultar: boolean = true;
-  mensaje: boolean = false;
+  mensaje: boolean = true;
 
   private get cg_feriados(): Cg_Feriados[] {
     return this.catalogoService.cg_feriados
@@ -84,6 +84,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     this.reg.id_empl_cargo = parseInt(localStorage.getItem('ccargo'));
     this.reg.dia_laborable = undefined;
     this.reg.dia_libre = undefined;
+
+    console.log('peri_vacaciones: ',this.reg.id_peri_vacacion);
     
     this.obtenerInformacionEmpleado();
     this.BuscarFormatos();

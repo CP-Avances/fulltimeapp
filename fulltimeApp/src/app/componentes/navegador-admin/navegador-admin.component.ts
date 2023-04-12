@@ -74,10 +74,8 @@ export class NavegadorAdminComponent implements OnInit {
       this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
       if(data_llega.id_send_empl !== this.idEmpleadoIngresa){
         console.log("Notificacion: ",data_llega);
-
         if(data_llega.id_receives_empl === this.idEmpleadoIngresa){
-          this.mensaje = "Nueva Notificacion de " + data_llega.usuario;
-          console.log("Usuario envio",this.empleEnvia);
+          this.mensaje = data_llega.usuario;
           
             try{
               //this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
@@ -91,15 +89,14 @@ export class NavegadorAdminComponent implements OnInit {
                 title: "Fulltime Notificacion",
                 body: this.mensaje,
                 schedule: {
-                  allowWhileIdle: true,
-                }
+                  allowWhileIdle: false,
+                },
+                largeBody: this.mensaje+"\n"+data_llega.mensaje,
               }]}
 
               LocalNotifications.schedule(options).then(()=> {
                 
               });
-
-              this.mostrarToasNoti("Notificacion Recibida de "+LocalNotifications.getDeliveredNotifications()+"\n");
 
             }catch (error) {
               this.mostrarToasNoti("No se pudo resibir la notificacion: \n"+ error);
@@ -117,7 +114,7 @@ export class NavegadorAdminComponent implements OnInit {
         console.log("Aviso recibido",data_llega.id);
 
         if(data_llega.id_receives_empl === this.idEmpleadoIngresa){
-          this.mensaje = "Nuevo aviso de " + data_llega.usuario;
+          this.mensaje = data_llega.usuario;
           console.log("Usuario envio",this.empleEnvia);
 
           try{
@@ -131,6 +128,10 @@ export class NavegadorAdminComponent implements OnInit {
               id: data_llega.id,
               title: "Fulltime Aviso",
               body: this.mensaje,
+              largeBody: this.mensaje+"\n"+data_llega.descripcion,
+              schedule: {
+                allowWhileIdle: true,
+              }
             }]}
 
             LocalNotifications.schedule(options).then(()=> {});

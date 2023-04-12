@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { LoadingController, ModalController, ToastController } from '@ionic/angular';
 import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { Subscription } from 'rxjs';
@@ -9,8 +9,7 @@ import { DataUserLoggedService } from '../../../../../services/data-user-logged.
 import { Socket } from 'ngx-socket-io';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
-import moment, { min } from 'moment';
-moment.locale('es');
+import moment from 'moment';
 
 @Component({
   selector: 'app-all-vacaciones',

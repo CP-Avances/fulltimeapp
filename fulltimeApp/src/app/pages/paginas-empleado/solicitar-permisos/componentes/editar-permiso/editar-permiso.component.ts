@@ -110,17 +110,14 @@ export class EditarPermisoComponent implements OnInit {
     /*Esta tranformacion se realizada debido a que el formato  de la variables this.permiso.hora_salida_ no es correcto y se 
       realiza la configuracion para adaptar ese dato y transforma a una dato de tipo Date que permita visualizar en el input con el foprmato correcto.
     */ 
-    let hora_ini = this.permiso.hora_salida_.replace(" ", "");
-    const hora_i = String(hora_ini.replace("AM", ""));
-    const Horainicio = this.validaciones.Unir_Fecha_Hora(String(this.reg.fec_inicio), hora_i);
-
-    let hora_fin = this.reg.hora_ingreso_.replace(" ", "");
-    const hora_f = String(hora_fin.replace("AM", ""));
-    const HoraFinal = this.validaciones.Unir_Fecha_Hora(String(this.reg.fec_final), hora_f);
-    
+    let hora_ini = this.permiso.hora_salida;
+    const Horainicio = this.validaciones.Unir_Fecha_Hora(String(this.dia_inicio), hora_ini);
     this.reg.hora_salida = moment(Horainicio).format();
-    this.reg.hora_ingreso = moment(HoraFinal).format();
     this.hora_inicio = moment(Horainicio).format('hh:ss a');
+
+    let hora_fin = this.permiso.hora_ingreso;
+    const HoraFinal = this.validaciones.Unir_Fecha_Hora(String(this.dia_fianl), hora_fin);
+    this.reg.hora_ingreso = moment(HoraFinal).format();
     this.hora_final = moment(HoraFinal).format('hh:ss a');
 
     if(this.reg.dia != 0 && this.reg.hora_numero == '00:00:00'){

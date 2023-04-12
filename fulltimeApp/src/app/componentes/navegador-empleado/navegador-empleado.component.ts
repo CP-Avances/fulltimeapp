@@ -77,8 +77,7 @@ export class NavegadorEmpleadoComponent implements OnInit {
         console.log("Notificacion recibida",data_llega.id);
 
         if(data_llega.id_receives_empl === this.idEmpleadoIngresa){
-          this.mensaje = "Nueva Notificacion de " + data_llega.usuario;
-          console.log("Usuario envio",this.empleEnvia);
+          this.mensaje = data_llega.usuario+" "+data_llega.mensaje;
 
           try{
             //this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
@@ -92,6 +91,10 @@ export class NavegadorEmpleadoComponent implements OnInit {
               title: "Fulltime Notificacion",
               groupSummary: true,
               body: this.mensaje,
+              largeBody: this.mensaje+"\n"+data_llega.descripcion,
+              schedule: {
+                allowWhileIdle: true,
+              }
             }]}
             LocalNotifications.schedule(options).then(()=> {});
 
@@ -112,8 +115,7 @@ export class NavegadorEmpleadoComponent implements OnInit {
         this.countbadge = this.countNoti + 1;
 
         if(data_llega.id_receives_empl === this.idEmpleadoIngresa){
-          this.mensaje = "Nuevo aviso de " + data_llega.usuario;
-          console.log("Usuario envio",this.empleEnvia);
+          this.mensaje = "Nuevo aviso de " + data_llega.usuario +"\n"+data_llega.descripcion;
 
           try{
             //this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
@@ -127,6 +129,10 @@ export class NavegadorEmpleadoComponent implements OnInit {
               title: "Fulltime Aviso",
               groupSummary: true,
               body: this.mensaje,
+              largeBody: this.mensaje+"\n"+data_llega.descripcion,
+              schedule: {
+                allowWhileIdle: true,
+              }
             }]}
             LocalNotifications.schedule(options).then(()=> {});
 

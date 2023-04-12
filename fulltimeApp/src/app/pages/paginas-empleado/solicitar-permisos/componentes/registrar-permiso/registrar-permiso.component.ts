@@ -87,7 +87,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
    //variable para ocultar el formulario si no tiene asignado o registrado un periodo de vacaciones.
    ocultar: boolean = true;
-   mensaje: boolean = false;
+   mensaje: boolean = true;
 
   private subscripted: Subscription;
   private subs_bool: boolean = false;
@@ -290,7 +290,6 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     }
   }
 
-
   // Diseno de Mensaje de notificacion con logo 
   async showAlert(){
     let alert = await this.alertCrtl.create({
@@ -309,7 +308,6 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       backdropDismiss: false,
     });await alert.present();
   }
-
 
   // METODO ALIDAR Y CAMBIAR EL INPUT DE HORA INICAL Y FINAL
   ChangeHoraInicio(e: any){
@@ -793,7 +791,6 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       }
     }
   }
-
   //Metodo para subir (cargar) el archivo al servidor
   subirRespaldo(permiso: any){
     var id = permiso.id;
@@ -817,7 +814,6 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         
     });
   }
-
   //Metodo para eliminar el archivo de permiso
   deleteDocumentoPermiso(){
     console.log('El archivo ', this.reg.docu_nombre, ' Se quito Correctamente')
@@ -939,7 +935,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       // LECTURA DE DATOS LEIDOS
       cont = cont + 1;
 
-      // SI EL USUARIO SE ENCUENTRA ACTIVO Y TIENEN CONFIGURACIÓN RECIBIRA CORREO DE SOLICITUD DE VACACIÓN
+      // SI EL USUARIO SE ENCUENTRA ACTIVO Y TIENEN CONFIGURACIÓN RECIBIRA CORREO DE SOLICITUD DE PERMISOS
       if (e.permiso_mail) {
         if (e.estado === true) {
           if (correo_usuarios === '') {
