@@ -179,7 +179,12 @@ export class ValidacionesService {
         const fecha2 = moment(final);
         let diaslibre = 0;
 
+        console.log("fecha1: ",fecha1)
+        console.log("fecha2: ",fecha2)
+
         const diasDiferencia = fecha2.diff(fecha1, 'days');//variable de los dias de diferencia que hay entre el dia final y el inicial
+
+        console.log("diasDiferencia: ",diasDiferencia)
 
         let res: Array<any> = [];
         // se aplica logica matematica

@@ -110,7 +110,7 @@ const getlistaVacacionesByFechasyCodigoEdit = (req, res) => __awaiter(void 0, vo
         const { fec_inicio, fec_final, codigo, id } = req.query;
         const VACACIONES = yield database_1.pool.query(`SELECT v.* FROM vacaciones v 
         WHERE v.codigo::varchar = $1 
-        AND ((($2 BETWEEN p.fec_inicio::date AND p.fec_final::date ) OR ($3 BETWEEN p.fec_inicio::date AND p.fec_final::date)) OR ((p.fec_inicio::date BETWEEN $2 AND $3) OR (p.fec_final::date BETWEEN $2 AND $3))) 
+        AND ((($2 BETWEEN v.fec_inicio::date AND v.fec_final::date ) OR ($3 BETWEEN v.fec_inicio::date AND v.fec_final::date)) OR ((v.fec_inicio::date BETWEEN $2 AND $3) OR (v.fec_final::date BETWEEN $2 AND $3))) 
         AND NOT v.id = $4 `, [codigo, fec_inicio, fec_final, id]);
         return res.status(200).jsonp(VACACIONES.rows);
     }

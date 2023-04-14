@@ -113,13 +113,13 @@ export class PermisosService {
       )
   }
 
-  getlistaPermisosByHorasyCodigoEdit(fec_inicio: string, fec_final: string, hora_inicio: any, hora_final: any, codigo: number | string, id: number): Observable <Permiso[]>{
+  getlistaPermisosByHorasyCodigoEdit(fec_inicio: string, fec_final: string, hora_inicio: string, hora_final: string, codigo: number | string, id: number): Observable <Permiso[]>{
     const url = `${this.apiUrl}/permisos/lista-permisoshorasedit`;
     const params = new HttpParams()
       .set('fec_inicio', fec_inicio)
       .set('fec_final', fec_final)
-      .set('hora_salida', hora_inicio)
-      .set('hora_ingreso', hora_final)
+      .set('hora_inicio', hora_inicio)
+      .set('hora_final', hora_final)
       .set('codigo', codigo)
       .set('id', id)
  

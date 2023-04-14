@@ -107,16 +107,14 @@ export const getlistaPermisosByHorasyCodigo = async (req: Request, res: Response
     try {
         const { fec_inicio, fec_final, hora_inicio, hora_final, codigo } = req.query;
 
-        console.log('Permiso fecha inicio: ',fec_inicio); 
-        console.log('Permiso fecha final: ', fec_final); 
-        console.log('Permiso hora inicio: ',hora_inicio);
-        console.log('Permiso hora final: ',hora_final);
-        console.log('Permiso codigo: ',codigo);
+        console.log("fecha Inicio: ",fec_inicio,)
+        console.log("fecha Inicio: ",fec_final,)
+        console.log('hora inicio: ',hora_inicio)
+        console.log('hora final: ',hora_final)
 
         const PERMISO = await pool.query(`SELECT id FROM permisos p 
         WHERE p.codigo::varchar = $1 
         AND ((($2 BETWEEN p.fec_inicio::date AND p.fec_final::date ) OR ($3 BETWEEN p.fec_inicio::date AND p.fec_final::date)) OR ((p.fec_inicio::date BETWEEN $2 AND $3) OR (p.fec_final::date BETWEEN $2 AND $3))) 
-        AND p.dia = 0 
         AND ((($4 BETWEEN p.hora_salida AND p.hora_ingreso) OR ($5 BETWEEN p.hora_salida AND p.hora_ingreso)) OR ((p.hora_salida BETWEEN $4 AND $5) OR (p.hora_ingreso BETWEEN $4 AND $5))) `
             , [codigo, fec_inicio, fec_final, hora_inicio, hora_final]);
 
@@ -137,7 +135,6 @@ export const getlistaPermisosByHorasyCodigoEdit = async (req: Request, res: Resp
         const PERMISO = await pool.query(`SELECT id FROM permisos p 
         WHERE p.codigo::varchar = $1 
         AND ((($2 BETWEEN p.fec_inicio::date AND p.fec_final::date ) OR ($3 BETWEEN p.fec_inicio::date AND p.fec_final::date)) OR ((p.fec_inicio::date BETWEEN $2 AND $3) OR (p.fec_final::date BETWEEN $2 AND $3))) 
-        AND p.dia = 0 
         AND ((($4 BETWEEN p.hora_salida AND p.hora_ingreso) OR ($5 BETWEEN p.hora_salida AND p.hora_ingreso)) OR ((p.hora_salida BETWEEN $4 AND $5) OR (p.hora_ingreso BETWEEN $4 AND $5)))
         AND NOT p.id = $6 `
             , [codigo, fec_inicio, fec_final, hora_inicio, hora_final, id]);

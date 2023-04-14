@@ -188,8 +188,7 @@ export class EditarVacacionComponent implements OnInit {
         err => { this.validar.showToast(err.error.message, 3000, 'danger') 
         this.reg.fec_inicio = undefined;
         return this.dia_inicio = '';
-        },
-        () => { }
+        }
       )
 
     }else{
@@ -222,11 +221,8 @@ export class EditarVacacionComponent implements OnInit {
           err => { 
             this.validar.showToast(err.error.message, 3000, 'danger') 
             return this.dia_inicio = '';  
-          },
-          () => { }
+          }
         )
-
-        
       }
 
     }
@@ -237,7 +233,25 @@ export class EditarVacacionComponent implements OnInit {
     if(!e.target.value){
       if(moment(this.reg.fec_inicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
         this.reg.fec_final = this.reg.fec_inicio;
-        return this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
+        const hoy = moment(this.reg.fec_final).format("DD/MM/YYYY, HH:mm:ss")
+        this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
+
+        this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+          horario => { 
+            this.horarioEmpleado = horario;
+          
+            if(this.DiaIniciolLibre(this.reg.fec_final) == 0){
+              return this.disabled_dia_ingreso = true;
+            }else{
+              return this.disabled_dia_ingreso = false;
+            }
+          },
+          err => { this.validar.showToast(err.error.message, 3000, 'danger') 
+          this.reg.fec_final = null;
+          return this.dia_fianl = '';
+          }
+        )
+        
       }else{
         this.reg.fec_final = null;
         this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
@@ -247,12 +261,29 @@ export class EditarVacacionComponent implements OnInit {
       this.dia_ingreso = "";
       this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');
       this.reg.fec_final = e.target.value;
+      const hoy = moment(this.reg.fec_final).format("DD/MM/YYYY, HH:mm:ss")
 
       if(moment(this.reg.fec_final).format('YYYY-MM-DD') == moment(this.reg.fec_inicio).format('YYYY-MM-DD')){
         this.validar.showToast('Las fechas no pueden ser iguales', 3000, "warning");
         return this.disabled_dia_ingreso = true;
       }
-      return this.disabled_dia_ingreso = false;
+
+      this.disabled_dia_ingreso = false;
+
+      this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+        horario => { 
+          this.horarioEmpleado = horario;
+
+          if(this.DiaIniciolLibre(this.reg.fec_final) == 0){
+            return this.disabled_dia_ingreso = true;
+          }else{
+            return this.disabled_dia_ingreso = false;
+          }
+        },
+        err => { this.validar.showToast(err.error.message, 3000, 'danger');
+          return this.dia_fianl = '';
+        }
+      )
     }
   }
 
@@ -261,23 +292,50 @@ export class EditarVacacionComponent implements OnInit {
     if(!e.target.value){
       if(moment(this.reg.fec_final).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
         this.reg.fec_ingreso = this.reg.fec_final;
-        this.btnOculto = false;
+
+        const hoy = moment(this.reg.fec_ingreso).format("DD/MM/YYYY, HH:mm:ss")
+        this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+          horario => { 
+            this.horarioEmpleado = horario;
+          },
+          err => { this.validar.showToast(err.error.message, 3000, 'danger') 
+          this.reg.fec_ingreso = null;
+          return this.dia_ingreso = '';
+          }
+        )
         this.validar.showToast('Calcule el tiempo para actualizar.', 3000, 'warning')
         return this.dia_ingreso = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
+     
       }else{
         this.reg.fec_ingreso = null;
         this.validar.showToast('Seleccione una Fecha Ingreso', 3000, "warning");
         return this.dia_ingreso = null
       }
     }else{
-      this.btnOculto = false;
+      this.validar.showToast('Calcule el tiempo para actualizar.', 3000, 'warning')
       this.reg.fec_ingreso = e.target.value;
       this.dia_ingreso = moment(e.target.value).format('YYYY-MM-DD');
+
+      const hoy = moment(this.reg.fec_ingreso).format("DD/MM/YYYY, HH:mm:ss")
+      this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+        horario => { 
+          this.horarioEmpleado = horario;
+          return this.btnOculto = false;
+        },
+        err => { this.validar.showToast(err.error.message, 3000, 'danger') 
+          this.reg.fec_ingreso = null;
+          this.btnOculto = true;
+          return this.dia_ingreso = '';
+        }
+      )
     }
-    
+
   }
 
   mostrarCalculos(){
+
+    console.log("this.horariempleado: ",this.horarioEmpleado);
+
     //variables para validar el dia de inicio completo y el dia final completo y buscar duplicidad.
     const minutosinicio = '00:00:00';
     const minutosfinal = '23:00:00';
@@ -318,15 +376,15 @@ export class EditarVacacionComponent implements OnInit {
                   return this.btnOcultoguardar = false;
                 }
               }, error => {
-                this.validar.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
+                this.validar.showToast('Lo sentimos tenemos problemas para verificar si existen vacaciones', 3500, 'warning');
               }); 
             }
           }, error => {
-            this.validar.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
+            this.validar.showToast('Lo sentimos tenemos problemas para verificar su existen horas', 3500, 'warning');
           });
         }
       }, error => {
-        this.validar.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
+        this.validar.showToast('Lo sentimos tenemos problemas para verificar su existen permisos', 3500, 'warning');
       });
     }else{
       this.calcularDiasVacaciones();

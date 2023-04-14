@@ -72,6 +72,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     this.reg.tipo_funcion = 1;
     this.reg.observacion = false;
     this.reg.num_hora = null;
+
     this.obtenerInformacionEmpleado();
     this.BuscarFormatos();
   }
@@ -142,8 +143,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     this.valoresDefectoValidacionHoras();
     //Validamos si hay un cambio en el ingreso de la Fecha.
     if(!e.target.value){//Si no cambia nada en el ingreso de la fecha y pone ok directamente, se ingresa la hora actual que indica el componente
-      this.reg.fec_inicio = moment(new Date()).format();
-      this.dia_inicio = moment(this.reg.fec_inicio).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
+      this.validar.showToast('Selecciones una fecha', 3500, 'warning');
     }else{
       this.reg.fec_inicio = e.target.value;//Igualamos la variable a la fecha ingresada
       this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
@@ -156,14 +156,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     this.valoresDefectoValidacionResultados();
      //Validamos si hay un cambio en el ingreso de la Fecha.
     if(!e.target.value){//Si no cambia nada en el ingreso de la fecha y pone ok directamente, se ingresa la hora actual que indica el componente
-      if(moment(this.reg.fec_inicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
-        this.reg.fec_final = this.reg.fec_inicio;
-        this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
-      }else{
-        this.reg.fec_final = null;
-        this.dia_fianl = null
-        this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
-      }
+      this.validar.showToast('Selecciones una fecha', 3500, 'warning');
     }else{
       this.reg.fec_final = e.target.value; //Igualamos la variable a la fecha ingresada
       this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input

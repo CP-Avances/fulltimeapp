@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { NgForm, FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { DatePipe } from '@angular/common';
 import moment from 'moment';
 
 import { cg_permisoValueDefault, diasHoras, Permiso, permisoValueDefault, tipoPermiso } from 'src/app/interfaces/Permisos';
@@ -21,7 +22,7 @@ import { ParametrosService } from 'src/app/services/parametros.service';
 
 import { CloseModalComponent } from 'src/app/componentes/close-modal/close-modal.component';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
-import { AlertController, ModalController } from '@ionic/angular';
+import { AlertController, IonDatetime, ModalController } from '@ionic/angular';
 
 
 @Component({
@@ -37,6 +38,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   private closeModalComponent: CloseModalComponent;
 
   @Input() num_permiso: number;
+  @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
+  @ViewChild(IonDatetime) datetimeFinal: IonDatetime;
 
   reg: Permiso = permisoValueDefault;
   diasHoras = diasHoras;
@@ -53,10 +56,10 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   idEmpresa: number;
   fech_bloqu: boolean;
 
-  dia_inicio: string  = "";
-  dia_fianl: string = "";
-  hora_inicio: string = "";
-  hora_final: string = "";
+  dia_inicio: string;
+  dia_fianl: string;
+  hora_inicio: string;
+  hora_final: string;
 
   //variable para ocultar el boton de calculos de acuerdo a la opcion que se ingresa
   btnOculto: boolean = true;
@@ -70,6 +73,10 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   //Variables para almacenar la fecha de y la hora que se ingresa en el Form
   fecha_inicio: any;
   fecha_final: any;
+
+  //Variables para almacenar la hora del horario que tiene el usuario registrado
+  horario_ingreso: any;
+  horario_salida: any;
 
   cg_permiso: Cg_TipoPermiso = cg_permisoValueDefault;
 
@@ -337,62 +344,27 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   ChangeDiaInicio(e: any){
     this.valoresDefectoValidacionResultados();
     this.readonly = true;
-    if(!e.target.value){
-      this.reg.fec_inicio = moment(new Date()).format('YYYY-MM-DD');
-      const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
-
-      this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
-        horario => { 
-          this.horarioEmpleado = horario;
-          
-          if(this.cg_permiso.fec_validar == true){
-            if(this.dia_inicio == moment(this.cg_permiso.fecha).format('YYYY-MM-DD')){
-              this.validaciones.showToast('Lo Sentimos la fecha '+moment(this.cg_permiso.fecha).format('DD-MM-YYYY')+' esta reservada', 3500, 'warning');
-              this.valoresDefectoValidacionHoras();
-              this.btnOculto = true;
-              return this.readonly = true;
-            }
-          }
-    
-          if(this.DiaIniciolLibre() == 0){
-            this.valoresDefectoValidacionHoras();
-            this.btnOculto = true;
-            return this.readonly = true;
-          }
-          
-          this.valoresDefectoValidacionHoras();
-    
-          if(this.selectItemDiasHoras == 'Horas'){
-            this.reg.fec_final = this.reg.fec_inicio;
-            this.dia_fianl = moment(this.reg.fec_inicio).format('YYYY-MM-DD');
-            this.reg.hora_numero = null; 
-            this.readonly = true;
-            this.btnOcultoguardar = true;
-            return this.btnOculto = true;
-          }
-    
-          this.readonly = false;
-          this.fech_bloqu = false;
-
-        },
-        err => { this.validar.showToast(err.error.message, 3000, 'danger');
-          return this.dia_inicio = '';
-        }
-      )
-
-    }else{
+    if(e.target.value){
       this.reg.fec_final = null;
       this.dia_fianl = '';
       this.reg.fec_inicio = e.target.value;
       this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
+      this.valoresDefectoValidacionHoras();
 
-
-      if(this.reg.fec_inicio != '' || this.reg.fec_inicio != null){
-      
+      if(this.reg.fec_inicio != '' || this.reg.fec_inicio != null){      
         const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
         this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
           horario => { 
             this.horarioEmpleado = horario;
+            this.horarioEmpleado.detalle_horario.forEach(item => {
+              if(item.tipo_accion === 'E'){
+                this.horario_salida = item.hora;
+              }
+
+              if(item.tipo_accion === 'S'){
+                this.horario_ingreso = item.hora;
+              }
+            });
 
             if(this.cg_permiso.fec_validar == true){
               if(this.dia_inicio == moment(this.cg_permiso.fecha).format('YYYY-MM-DD')){
@@ -409,20 +381,20 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
               return this.readonly = true;
             }
             
-            this.valoresDefectoValidacionHoras();
-      
             if(this.selectItemDiasHoras == 'Horas'){
               this.reg.fec_final = this.reg.fec_inicio;
               this.dia_fianl = moment(this.reg.fec_inicio).format('YYYY-MM-DD');
               this.reg.hora_numero = null; 
               this.readonly = true;
               this.btnOcultoguardar = true;
+              this.datetimeInicio.confirm(true);
               return this.btnOculto = true;
             }
-      
+
+            this.datetimeInicio.confirm(true);
+
             this.readonly = false;
             this.fech_bloqu = false;
-
           },
           err => { this.validar.showToast(err.error.message, 3000, 'danger') 
           return this.dia_inicio = '';  
@@ -434,46 +406,51 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
   ChangeDiaFinal(e: any){
     this.valoresDefectoValidacionResultados();
-    if(!e.target.value){
-      if(moment(this.reg.fec_inicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
-        this.reg.fec_final = this.reg.fec_inicio;
-        return this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
-      }else{
-        this.reg.fec_final = null;
-        this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
-        return this.dia_fianl = null
-      }
-    }else{
+    if(e.target.value){
       this.reg.fec_final = e.target.value;
       this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');
-
-      if(this.cg_permiso.fec_validar == true)
-      {
-        if(this.dia_fianl == moment(this.cg_permiso.fecha).format('YYYY-MM-DD'))
-        {
-          this.validaciones.showToast('Lo Sentimos la fecha '+moment(this.cg_permiso.fecha).format('DD-MM-YYYY')+' esta reservada', 3500, 'warning');
-          this.valoresDefectoValidacionHoras();
-          this.fech_bloqu = true;
-          this.btnOculto = true;
-          return false;
-        }
-      }
-      
-      if(this.DiaFinalLibre() == 0){
-        return this.btnOculto = true;
-      }
-
+      const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
       this.valoresDefectoValidacionHoras();
      
-      if(this.selectItemDiasHoras == 'Horas'){
-        this.readonly = true;
-        return this.btnOculto = true;
-      }
+      this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+        horario => { 
+          this.horarioEmpleado = horario;
 
-      this.btnOculto = false;
-      this.fech_bloqu = false;
+          this.horarioEmpleado.detalle_horario.forEach(item => {
+            if(item.tipo_accion === 'S'){
+              this.horario_ingreso = item.hora;
+            }
+          });
+
+          if(this.cg_permiso.fec_validar == true){
+            if(this.dia_fianl == moment(this.cg_permiso.fecha).format('YYYY-MM-DD')){
+              this.validaciones.showToast('Lo Sentimos la fecha '+moment(this.cg_permiso.fecha).format('DD-MM-YYYY')+' esta reservada', 3500, 'warning');
+              this.valoresDefectoValidacionHoras();
+              this.fech_bloqu = true;
+              this.btnOculto = true;
+              return false;
+            }
+          }
+      
+          if(this.DiaFinalLibre() == 0){
+            return this.btnOculto = true;
+          }
+            
+          if(this.selectItemDiasHoras == 'Horas'){
+            this.readonly = true;
+            return this.btnOculto = true;
+          }
+
+          this.datetimeFinal.confirm(true);
+          this.btnOculto = false;
+          this.fech_bloqu = false;
+        },
+        err => { 
+          this.validar.showToast(err.error.message, 3000, 'danger') 
+          return this.dia_fianl = '';  
+        }
+      )
     }
-
   }
   
 
@@ -483,8 +460,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   mostrarCalculos(){
 
     //variables para validar el dia de inicio completo y el dia final completo y buscar duplicidad.
-     let minutosinicio = '00:00:00';
-     let minutosfinal = '23:00:00';
+     let minutosinicio = this.horario_ingreso;
+     let minutosfinal = this.horario_salida;
 
     if (this.reg.fec_inicio === null || this.reg.fec_final === null || this.reg.fec_inicio === undefined || this.reg.fec_final ===  undefined){
       this.loadingBtn = false;
@@ -501,7 +478,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     const fec_final = (moment(this.reg.fec_final).format('YYYY-MM-DD')) +' '+ minutosfinal;
     const codigo = parseInt(localStorage.getItem('codigo')!)
 
-    if(this.selectItemDiasHoras === 'Dias'){
+    if(this.selectItemDiasHoras === 'Días'){
       this.permisoService.getlistaPermisosByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
         if(solicitados.length != 0){
           this.reg.dia = null;
@@ -544,7 +521,6 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
       });
     }else{
-
       this.permisoService.getlistaPermisosByHorasyCodigo(fec_inicio, fec_final, minutosinicio, minutosfinal, codigo).subscribe(solicitados => {
         if(solicitados.length != 0){
           this.reg.dia = null;
@@ -601,16 +577,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
       //Se optiene la hora por defecto del dia de salida que es la hora en la que se crea el permiso 
       //Esto se lee por defecto ya que el tipo de permiso es por dias
-      const hora_ingreso =  '09:00:00'; //Hasta validar con el registro de horarios, tomar la la tabla de horario empleado la hora de ingreso
-      const hora_salida = '09:00:00'; //Hasta validar con el registro de horarios
-      this.reg.hora_salida =  hora_salida;
-      this.reg.hora_ingreso = hora_ingreso;
-
-      const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fec_inicio!, hora_salida);
-      const fec_comp_final = this.validaciones.Unir_Fecha_Hora(this.reg.fec_final!, hora_ingreso);
-      this.fecha_inicio = moment(fec_comp_inicio).format();
-      this.fecha_final = moment(fec_comp_final).format();
-
+      const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fec_inicio!, this.horario_ingreso);
+      const fec_comp_final = this.validaciones.Unir_Fecha_Hora(this.reg.fec_final!, this.horario_ingreso);
       const total = this.validaciones.MilisegToSegundos( fec_comp_final.valueOf() - fec_comp_inicio.valueOf() )
 
       // 86400 seg ==> es un dia de 24 horas
@@ -620,23 +588,15 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         dia = 1;
       }
 
+      this.fecha_inicio = moment(fec_comp_inicio).format();
+      this.fecha_final = moment(fec_comp_final).format();
+      this.reg.hora_salida= this.horario_salida;
+      this.reg.hora_ingreso =  this.horario_ingreso;
       this.reg.dia = dia
       this.reg.dia_libre = dia_libre;
       this.reg.hora_numero = '00:00:00'; //Por defecto ya que es permiso por dias
     }
     else {
-   
-      //Validacion de Dias y Horas
-      if(this.selectItemDiasHoras === 'Días y Horas'){
-      //si los dias son iguales, en la opcion de dias y horas no permite
-      if(moment(this.reg.fec_inicio).format('YYYY-MM-DD') == moment(this.reg.fec_final).format('YYYY-MM-DD')){
-        this.reg.hora_numero = null;
-        this.valoresDefectoValidacionFechas();
-        this.valoresDefectoValidacionHoras(); 
-        this.validaciones.showToast('Ups!, si decea ingresar solo un dia, seleccione la opcion de Horas', 3500, 'warning');
-        return false;
-        }
-      }
 
       const fechasValidas = this.validaciones.validarRangoFechasIngresa(this.reg.fec_inicio!, this.reg.fec_final!, true);
       if (!fechasValidas){ return this.valoresDefectoValidacionFechas();}
@@ -652,26 +612,26 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       const horasValidas = this.validaciones.validarHorasIngresadas(fec_comp_inicio, fec_comp_final) // evaluacion de fechas completas 
       if (!horasValidas) {return this.valoresDefectoValidacionHoras(), this.reg.hora_numero = null, this.reg.dia = null }
 
-      //Si el tipo de tiempo es de horas y dias, las horas se calcula por el dia final que va a ingresar si es el caso
-      if(this.selectItemDiasHoras === 'Días y Horas'){ 
-        const fec_comp_ini = this.validaciones.Unir_Fecha_Hora(this.reg.fec_final!, hora_salida );
-        const fec_comp_fin = this.validaciones.Unir_Fecha_Hora(this.reg.fec_final!, hora_ingreso);
+      //Esta parte valida el ingreso de las horas con respecto al horario que tiene el usuaio con su hora de ingreso y salida del trabajo
+      const HorarioInicio = this.validaciones.Unir_Fecha_Hora(String(this.dia_inicio), this.horario_salida);      
+      const HorarioFinal = this.validaciones.Unir_Fecha_Hora(String(this.dia_fianl), this.horario_ingreso);   
 
-        const horasValidas = this.validaciones.validarHorasIngresadas(fec_comp_ini, fec_comp_fin) // evaluacion de fechas completas 
-        if (!horasValidas) {return this.valoresDefectoValidacionHoras();}
-        
-        const totalhoras = this.validaciones.MilisegToSegundos( fec_comp_fin.valueOf() - fec_comp_ini.valueOf());
-        this.totalhoras = totalhoras;
-
-        if(this.totalhoras > this.horas_trabaja_seg){
-          this.validaciones.showToast('Ups!, lo sentimos el rango de horas excede su jornada laboral', 3500, 'warning');
-          this.reg.hora_numero = null;
-          this.btnOcultoguardar = true;
-          return false;
-        }
-        this.btnOcultoguardar = false;
+      if(fec_comp_inicio < HorarioInicio){
+        this.validaciones.showToast('Ups! La hora de Inicio esta fuera de su horario de ingreso', 3500, 'warning');
+        return false;
+      }else if(fec_comp_inicio > HorarioFinal){
+        this.validaciones.showToast('Ups! La hora de Inicio esta fuera de su horario de ingreso', 3500, 'warning');
+        return false;
       }
-
+      
+      if(fec_comp_final > HorarioFinal){
+        this.validaciones.showToast('Ups! La hora Final esta fuera de su horario de Salida', 3500, 'warning');
+        return false;
+      }else if(fec_comp_final < HorarioInicio){
+        this.validaciones.showToast('Ups! La hora Final esta fuera de su horario de Salida', 3500, 'warning');
+        return false;
+      }
+      
       const total = this.validaciones.MilisegToSegundos( fec_comp_final.valueOf() - fec_comp_inicio.valueOf());
 
       //Condicion que valida el tiempo calculado de horas con la jornada laboral la cual es el numero de horas en segundos que trabaja el empleado
@@ -688,7 +648,6 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       // 86400 seg ==> es un dia de 24 horas
       const { dia, tiempo_transcurrido, dia_libre } = 
       this.validaciones.SegundosTransformDiaLaboral(this.reg.fec_inicio!.toString(), this.reg.fec_final!.toString(), total, this.totalhoras, this.horarioEmpleado, this.horas_trabaja_seg, this.cg_feriados)
-      //this.validaciones.SegundosTransformDiaLaboral( fec_comp_inicio, fec_comp_final, total, this.horarioEmpleado, this.horas_trabaja_seg)
       this.reg.dia = dia
       this.reg.hora_numero = tiempo_transcurrido
       this.reg.dia_libre = dia_libre;
@@ -697,7 +656,6 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         case 'Horas':
           this.reg.dia = 0; // por defecto ya q es permiso por solo horas.
           break;
-        case 'Días y Horas': break;
         default: break;
       }
     }

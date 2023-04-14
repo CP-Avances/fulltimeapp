@@ -87,6 +87,12 @@ export class VacacionesService {
       .set('fec_final', fec_final)
       .set('codigo', codigo)
       .set('id', id)
+
+      console.log("fec_inicio: ",fec_inicio)
+      console.log('fec_final: ', fec_final)
+      console.log('codigo: ', codigo)
+      console.log('id: ', id)
+
     return this.http.get<Vacacion[]>(url, { params })
       .pipe(
         tap(console.log),
