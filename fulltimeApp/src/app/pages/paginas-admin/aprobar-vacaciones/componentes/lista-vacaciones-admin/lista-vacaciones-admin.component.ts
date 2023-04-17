@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { LoadingController, ModalController, ToastController } from '@ionic/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { LoadingController, ModalController, ToastController, IonDatetime } from '@ionic/angular';
 import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { Subscription } from 'rxjs';
 import { UpdateAutorizacionComponent } from 'src/app/modals/update-autorizacion/update-autorizacion.component';
@@ -17,6 +17,9 @@ import moment from 'moment';
   styleUrls: ['../../aprobar-vacaciones.page.scss'],
 })
 export class ListaVacacionesAdminComponent implements OnInit {
+
+  @ViewChild (IonDatetime) datetimeInicio: IonDatetime;
+  @ViewChild (IonDatetime) datetimeFinal: IonDatetime;
 
   username: any;
   subscripted: Subscription;
@@ -263,6 +266,7 @@ export class ListaVacacionesAdminComponent implements OnInit {
       return this.fechaIn = moment(e.target.value).format('YYYY-MM-DD');
     }else{
       this.fechaInicio = e.target.value;
+      this.datetimeInicio.confirm(true);
       if(this.fechaInicio == null || this.fechaInicio == ''){
         this.fechaIn = null;
       }else{
@@ -283,6 +287,7 @@ export class ListaVacacionesAdminComponent implements OnInit {
       }
     }else{
       this.fechaFinal = e.target.value;
+      this.datetimeFinal.confirm(true);
       if(this.fechaFinal == null || this.fechaFinal == ''){
         this.fechaFi = null;
       }else{

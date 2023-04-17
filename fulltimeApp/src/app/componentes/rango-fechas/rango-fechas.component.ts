@@ -4,6 +4,7 @@ import { ToastController, LoadingController } from '@ionic/angular';
 import { NgForm } from '@angular/forms';
 import moment from 'moment';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
+import { IonDatetime } from '@ionic/angular';
 
 @Component({
   selector: 'app-rango-fechas',
@@ -11,7 +12,10 @@ import { ValidacionesService } from 'src/app/libs/validaciones.service';
   styleUrls: ['./rango-fechas.component.scss'],
 })
 export class RangoFechasComponent {
+
   @ViewChild('formRegistro', { static: true }) ngForm: NgForm;
+  @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
+  @ViewChild(IonDatetime) datetimeFinal: IonDatetime;
   
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
@@ -35,6 +39,7 @@ export class RangoFechasComponent {
       this.fechaFi = '';
       this.dataUserService.setFechaRangoInicio(event.target.value);
       this.fechaIn = moment(this.fechaInicio).format('YYYY-MM-DD');
+      this.datetimeInicio.confirm(true);
     }
     
   }
@@ -50,6 +55,8 @@ export class RangoFechasComponent {
 
       const f_inicio = new Date(this.fechaInicio);
       const f_final = new Date(e.target.value);
+
+      this.datetimeFinal.confirm(true);
 
       if (f_final < f_inicio ) {
         this.dataUserService.setFechaRangoFinal('');

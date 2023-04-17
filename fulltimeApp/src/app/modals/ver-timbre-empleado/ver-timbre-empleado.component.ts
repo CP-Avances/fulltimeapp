@@ -1,10 +1,9 @@
-import { ModalController, AlertController, LoadingController, ToastController } from '@ionic/angular';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import moment from 'moment';
+import { ModalController, AlertController, LoadingController, ToastController, IonDatetime  } from '@ionic/angular';
 
 import { Timbre } from '../../interfaces/Timbre';
-
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
@@ -19,6 +18,9 @@ import { TimbresService } from '../../services/timbres.service';
 export class VerTimbreEmpleadoComponent  implements OnInit {
 
   @Input() data: any;
+
+  @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
+  @ViewChild(IonDatetime) datetimeFinal: IonDatetime;
 
   timbres: any = [];//esta variable contiene los timbres que se muestran en la lista y se VAN A ENVIAR
   timbres_filtro: any = []; //esta variable contiene los timbres filtrados que se muestran en la lista
@@ -115,6 +117,7 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
       return this.fechaIn = moment(e.target.value).format('YYYY-MM-DD');
     }else{
       this.dataUserService.setFechaRangoInicio(e.target.value);
+      this.datetimeInicio.confirm(true);
       if(this.fechaInicio == null || this.fechaInicio == ''){
         this.fechaIn = null;
       }else{
@@ -137,6 +140,7 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
       this.dataUserService.setFechaRangoFinal(e.target.value);
       const f_inicio = new Date(this.fechaInicio);
       const f_final = new Date(e.target.value);
+      this.datetimeFinal.confirm(true);
 
       if (f_final < f_inicio ) {
         this.limpiarRango_fechas();

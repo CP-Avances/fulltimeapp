@@ -1,5 +1,5 @@
-import { LoadingController, ModalController, ToastController } from '@ionic/angular';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { LoadingController, ModalController, ToastController, IonDatetime } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { Socket } from 'ngx-socket-io';
 import moment from 'moment';
@@ -18,6 +18,9 @@ import { ParametrosService } from 'src/app/services/parametros.service';
 })
 
 export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
+
+  @ViewChild (IonDatetime) datetimeInicio: IonDatetime;
+  @ViewChild (IonDatetime) datetimeFinal: IonDatetime;
 
   username: any;
   subscripted: Subscription;
@@ -263,6 +266,7 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
       return this.fechaIn = moment(e.target.value).format('YYYY-MM-DD');
     }else{
       this.dataUserLoggedService.setFechaRangoInicio(e.target.value);
+      this.datetimeInicio.confirm(true);
       if(this.fechaInicio == null || this.fechaInicio == ''){
         this.fechaIn = null;
       }else{
@@ -284,6 +288,7 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
     }else{
       this.dataUserLoggedService.setFechaRangoInicio(this.fechaInicio);
       this.dataUserLoggedService.setFechaRangoFinal(e.target.value);
+      this.datetimeFinal.confirm(true);
       if(this.fechaFinal == null || this.fechaFinal == ''){
         this.fechaFi = null;
       }else{

@@ -34,7 +34,7 @@ import { AlertController, IonDatetime, ModalController } from '@ionic/angular';
 export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
   @ViewChild('formRegistro', { static: false }) formRegistro: NgForm;
-  @ViewChild(CloseModalComponent, { static: true })
+  @ViewChild(CloseModalComponent, { static: false })
   private closeModalComponent: CloseModalComponent;
 
   @Input() num_permiso: number;

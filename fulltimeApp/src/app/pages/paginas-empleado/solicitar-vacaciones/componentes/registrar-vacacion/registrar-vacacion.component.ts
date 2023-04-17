@@ -18,7 +18,7 @@ import { CloseModalComponent } from 'src/app/componentes/close-modal/close-modal
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { PermisosService } from 'src/app/services/permisos.service';
-import { AlertController } from '@ionic/angular';
+import { AlertController, IonDatetime } from '@ionic/angular';
 
 @Component({
   selector: 'app-registrar-vacacion',
@@ -32,7 +32,10 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
   private closeModalComponent: CloseModalComponent;
 
   @Input() num_vacacion: number;
-
+  @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
+  @ViewChild(IonDatetime) datetimeFinal: IonDatetime;
+  @ViewChild(IonDatetime) datetimeIngreso: IonDatetime;
+  
   reg: Vacacion = vacacionValueDefault;
   radioButton = estadoBoolean;
   loadingBtn: boolean = false;
@@ -208,7 +211,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     }else{
       this.reg.fec_inicio = e.target.value;
       this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
-
+      this.datetimeInicio.confirm(true);
       if(this.reg.fec_inicio != '' || this.reg.fec_inicio != null){
       
         const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
@@ -256,6 +259,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
       this.reg.dia_libre = null;
       this.reg.fec_final = e.target.value;
       this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD'); 
+      this.datetimeFinal.confirm(true);
     }
 
     if(moment(this.reg.fec_final).format('YYYY-MM-DD') == moment(this.reg.fec_inicio).format('YYYY-MM-DD')){
@@ -284,6 +288,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
       this.btnOculto = false;
       this.reg.fec_ingreso = e.target.value;
       this.dia_ingreso = moment(e.target.value).format('YYYY-MM-DD');
+      this.datetimeIngreso.confirm(true);
     }
   }
 

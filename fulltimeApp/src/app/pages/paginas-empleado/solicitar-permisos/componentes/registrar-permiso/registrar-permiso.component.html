@@ -102,9 +102,9 @@
                         (ionChange)="ChangeDiaInicio($event)"
                         [value]="reg.fec_inicio"
                         required></ion-datetime>
-                      <div style="width: 95%;">
-                        <ion-label style="float:right; margin: 2%; font-size: medium;" color="success" (click)="datetimeInicio.cancel(true)">Cancelar</ion-label>
-                      </div>
+                        <div style="width: 95%;">
+                          <ion-label style="float:right; margin: 2%; font-size: medium;" color="success" (click)="datetimeInicio.cancel(true)">Cancelar</ion-label>
+                        </div>
                       </ion-content>
                     </ng-template>
                   </ion-modal>
@@ -141,7 +141,7 @@
                   <ion-popover *ngIf="(dia_inicio == '')" trigger="open-regiPermiFechaFin">
                     <ion-content>
                       <ng-template>
-                        <p style="padding:1%" >Ingrese la fecha de Inicio</p>
+                        <p style="margin: auto; padding: 4%;" >Ingrese la fecha de Inicio</p>
                       </ng-template>
                     </ion-content>
                   </ion-popover>

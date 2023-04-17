@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { AlertController, ModalController } from '@ionic/angular';
+import { AlertController, ModalController, IonDatetime } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { Vacacion } from 'src/app/interfaces/Vacacion';
 import { NgForm } from '@angular/forms';
@@ -30,6 +30,9 @@ export class EditarVacacionComponent implements OnInit {
 
   @Input() vacacion!: Vacacion;
   reg: Vacacion;
+  @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
+  @ViewChild(IonDatetime) datetimeFinal: IonDatetime;
+  @ViewChild(IonDatetime) datetimeIngreso: IonDatetime;
 
   @ViewChild('formRegistro', { static: true }) ngForm: NgForm;
   radioButton = estadoBoolean;
@@ -172,8 +175,8 @@ export class EditarVacacionComponent implements OnInit {
   ChangeDiaInicio(e){
     if(!e.target.value){
       this.reg.fec_inicio = moment(new Date()).format('YYYY-MM-DD');
-
       const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
+      this.datetimeInicio.confirm(true);
       this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
         horario => { 
           this.horarioEmpleado = horario;
@@ -205,7 +208,7 @@ export class EditarVacacionComponent implements OnInit {
 
       this.reg.fec_inicio = e.target.value;
       this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
-
+      this.datetimeInicio.confirm(true);
       if(this.reg.fec_inicio != '' || this.reg.fec_inicio != null){
         
         const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
@@ -262,7 +265,7 @@ export class EditarVacacionComponent implements OnInit {
       this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');
       this.reg.fec_final = e.target.value;
       const hoy = moment(this.reg.fec_final).format("DD/MM/YYYY, HH:mm:ss")
-
+      this.datetimeFinal.confirm(true);
       if(moment(this.reg.fec_final).format('YYYY-MM-DD') == moment(this.reg.fec_inicio).format('YYYY-MM-DD')){
         this.validar.showToast('Las fechas no pueden ser iguales', 3000, "warning");
         return this.disabled_dia_ingreso = true;
@@ -290,32 +293,14 @@ export class EditarVacacionComponent implements OnInit {
   ChangeDiaIngreso(e){
     this.valoresPorDefectoResultado();
     if(!e.target.value){
-      if(moment(this.reg.fec_final).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
-        this.reg.fec_ingreso = this.reg.fec_final;
-
-        const hoy = moment(this.reg.fec_ingreso).format("DD/MM/YYYY, HH:mm:ss")
-        this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
-          horario => { 
-            this.horarioEmpleado = horario;
-          },
-          err => { this.validar.showToast(err.error.message, 3000, 'danger') 
-          this.reg.fec_ingreso = null;
-          return this.dia_ingreso = '';
-          }
-        )
-        this.validar.showToast('Calcule el tiempo para actualizar.', 3000, 'warning')
-        return this.dia_ingreso = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
-     
-      }else{
-        this.reg.fec_ingreso = null;
-        this.validar.showToast('Seleccione una Fecha Ingreso', 3000, "warning");
-        return this.dia_ingreso = null
-      }
+      this.reg.fec_ingreso = null;
+      this.validar.showToast('Seleccione una Fecha Ingreso', 3000, "warning");
+      return this.dia_ingreso = null
     }else{
       this.validar.showToast('Calcule el tiempo para actualizar.', 3000, 'warning')
       this.reg.fec_ingreso = e.target.value;
       this.dia_ingreso = moment(e.target.value).format('YYYY-MM-DD');
-
+      this.datetimeIngreso.confirm(true);
       const hoy = moment(this.reg.fec_ingreso).format("DD/MM/YYYY, HH:mm:ss")
       this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
         horario => { 

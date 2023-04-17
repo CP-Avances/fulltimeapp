@@ -41,13 +41,13 @@
               <ion-label class="is-required" position="floating" >Día Inicio</ion-label>
               <ion-input readonly="true" name="fec_inicio" [ngModel]="dia_inicio" mode="md"></ion-input>
             </ion-item>
-            <ion-popover trigger="open-EditorHorasFechaIni">
+            <ion-modal trigger="open-EditorHorasFechaIni" class="inputDateFecha">
               <ng-template>
-                <ion-datetime 
+                <ion-content>
+                  <ion-datetime 
+                  #datetimeInicio
                   presentation="date"
-                  [showDefaultButtons]="true"
-                    doneText="OK"
-                    cancelText="Cancelar"  
+                  [showDefaultButtons]="false" 
                   name="fec_inicio" 
                   color="success" 
                   mode="md" 
@@ -55,8 +55,12 @@
                   (ionChange)="ChangeDiaInicio($event)" 
                   [value]="dia_inicio" 
                   required></ion-datetime>
+                  <div style="width: 95%;">
+                    <ion-label style="float:right; margin: 2%; font-size: medium;" color="success" (click)="datetimeInicio.cancel(true)">Cancelar</ion-label>
+                  </div>
+                </ion-content>
               </ng-template>
-            </ion-popover>
+            </ion-modal>
           </div>
         </ion-col>
 
@@ -66,21 +70,25 @@
               <ion-label class="is-required" position="floating" >Día Final</ion-label>
               <ion-input readonly="true" name="fec_final" [ngModel]="dia_fianl" mode="md"></ion-input>
             </ion-item>
-            <ion-popover trigger="open-EditorHorasFechaFin">
+            <ion-modal trigger="open-EditorHorasFechaFin" *ngIf="(dia_inicio != '')" class="inputDateFecha">
               <ng-template>
-                <ion-datetime 
+                <ion-content>
+                  <ion-datetime
+                  #datetimeFinal 
                   presentation="date" 
-                  [showDefaultButtons]="true"
-                    doneText="OK"
-                    cancelText="Cancelar" 
+                  [showDefaultButtons]="false"
                   name="fec_final" 
                   mode="md" 
                   [min]="reg.fec_inicio"  max="2050-12-31" 
                   (ionChange)="ChangeDiaFinal($event)" 
                   [value]="dia_fianl" 
                   required></ion-datetime>
+                  <div style="width: 95%;">
+                    <ion-label style="float:right; margin: 2%; font-size: medium;" color="primary" (click)="datetimeFinal.cancel(true)">Cancelar</ion-label>
+                  </div>
+                </ion-content>
               </ng-template>
-            </ion-popover>
+            </ion-modal>
           </div>
           </ion-col>
         </ion-row>

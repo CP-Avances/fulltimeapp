@@ -21,28 +21,32 @@
       <ion-label class="is-required" position="floating" >Fecha Atraso</ion-label>
       <ion-input readonly="true" name="fec_inicio" [ngModel]="Fecha" mode="md"></ion-input>
     </ion-item>
-    <ion-popover trigger="open-Atraso">
+    <ion-modal trigger="open-Atraso" class="inputDateFecha">
       <ng-template>
-        <ion-datetime 
-        presentation="date"
-        [showDefaultButtons]="true"
-          doneText="OK"
-          cancelText="Cancelar" 
-        name="fec_inicio" 
-        color="success" 
-        mode="md" 
-        min="1990-01-01" max="2050-12-31" 
-        (ionChange)="fechaJustificacionChange($event)" 
-        [value]="Fecha" 
-        required></ion-datetime>
+        <ion-content>
+          <ion-datetime 
+            #datetimeInicio
+            presentation="date"
+            [showDefaultButtons]="false" 
+            name="fec_inicio" 
+            color="success" 
+            mode="md" 
+            min="1990-01-01" max="2050-12-31" 
+            (ionChange)="fechaJustificacionChange($event)" 
+            [value]="Fecha" 
+            required></ion-datetime>
+            <div style="width: 95%;">
+              <ion-label style="float:right; margin: 2%; font-size: medium;" color="primary" (click)="datetimeInicio.cancel(true)">Cancelar</ion-label>
+            </div>
+        </ion-content>
       </ng-template>
-    </ion-popover>
-  
+    </ion-modal>
+
     <ion-item>
-      <ion-label position="floating" class="is-required"><ion-text> Descripción del Atraso</ion-text>  </ion-label>
-      <ion-textarea spellcheck="true" placeholder="Ingres el comentario" rows="6" cols="20" 
-        (ionChange)="descripcionChange($event)" (ionFocus)="onFocus()" id="textarea"
-        type="text" autocapitalize="on" autocomplete="off" clearInput="true" maxlength="254" mode="md" required></ion-textarea>
+      <ion-label position="floating"  mode="md" class="is-required"><ion-text> Descripción del Atraso</ion-text>  </ion-label>
+      <ion-textarea placeholder="Ingres el comentario" rows="7" cols="20" 
+        (ionChange)="descripcionChange($event)" id="textarea"
+        autocapitalize="on" autocomplete="off" clearInput="true" maxlength="254" required></ion-textarea>
     </ion-item>
     <br>
     <ion-button shape="round" expand="block" (click)="enviarJustificacion()">Enviar</ion-button>

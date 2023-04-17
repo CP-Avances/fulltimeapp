@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { ModalController, IonDatetime } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import moment from 'moment';
@@ -12,6 +12,7 @@ import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { Notificacion, notificacionValueDefault } from 'src/app/interfaces/Notificaciones';
 import { HoraExtra } from 'src/app/interfaces/HoraExtra';
 import { ParametrosService } from 'src/app/services/parametros.service';
+import { PermisosService } from 'src/app/services/permisos.service';
 
 @Component({
   selector: 'app-editar-hora-extra',
@@ -22,6 +23,10 @@ export class EditarHoraExtraComponent implements OnInit {
 
   @Input() hora_extra!: HoraExtra;
   @ViewChild('formRegistro', { static: true }) ngForm: NgForm;
+
+  @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
+  @ViewChild(IonDatetime) datetimeFinal: IonDatetime;
+
   reg: HoraExtra;
   loadingBtn: boolean = false;
   idEmpresa: number;
@@ -47,6 +52,7 @@ export class EditarHoraExtraComponent implements OnInit {
     private validar: ValidacionesService,
     public modalController: ModalController,
     public parametro: ParametrosService,
+    private permisoService: PermisosService,
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('id_empresa'));
   }
@@ -152,6 +158,7 @@ export class EditarHoraExtraComponent implements OnInit {
     }else{
       this.reg.fec_inicio = e.target.value;//Igualamos la variable a la fecha ingresada
       this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
+      return this.datetimeInicio.confirm(true);
     }
   }
 
@@ -181,6 +188,7 @@ export class EditarHoraExtraComponent implements OnInit {
         this.dia_fianl = '';
         this.validar.showToast('La fecha Final no puede ser MENOR a la fecha de Inicio', 3000, "warning");
       }
+      return this.datetimeFinal.confirm(true);
     }
   }
 
@@ -234,7 +242,19 @@ export class EditarHoraExtraComponent implements OnInit {
         this.validar.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
         return false
       }else{
-        this.calcularTiempo();
+        this.permisoService.getlistaPermisosByHorasyCodigo(fec_inicio, fec_final, minutosinicio, minutosfinal, codigo).subscribe(solicitados => {
+          if(solicitados.length != 0){
+            this.reg.num_hora = null;
+            this.reg.tiempo_autorizado = null;
+            this.validar.showToast('Ups! Ya existe permisos en esas fecha y hora ', 3500, 'warning');
+            return false
+          }
+          else{
+            this.calcularTiempo();
+          }
+        },err => {
+          this.validar.showToast('Lo sentimos tenemos problemas para verificar su solicitud\n Contactese con el administrador', 3500, 'warning');
+        }); 
       }
     }, error => {
       this.validar.showToast('Lo sentimos tenemos problemas para verificar su Solicitud\n Contactese con el administrador', 3500, 'danger');

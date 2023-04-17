@@ -79,13 +79,13 @@
                   <ion-label class="is-required" position="floating" >Fecha de Consumo</ion-label>
                   <ion-input readonly="true" name="fec_comida" [ngModel]="fecha_comida" mode="md"></ion-input>
                 </ion-item>
-                <ion-popover trigger="open-registroAlimen">
+                <ion-modal trigger="open-registroAlimen" class="inputDateFecha">
                   <ng-template>
-                    <ion-datetime 
+                    <ion-content>
+                      <ion-datetime 
+                      #datetimeInicio
                       presentation="date"
-                      [showDefaultButtons]="true" 
-                        doneText="OK"
-                        cancelText="Cancelar"  
+                      [showDefaultButtons]="false" 
                       name="fec_comida" 
                       color="success" 
                       mode="md" 
@@ -93,8 +93,12 @@
                       max="2050-12-31" 
                       (ionChange)="mostrarCalculos($event)" 
                       [value]="reg.fec_comida" required></ion-datetime>
+                      <div style="width: 95%;">
+                        <ion-label style="float:right; margin: 2%; font-size: medium;" color="success" (click)="datetimeInicio.cancel(true)">Cancelar</ion-label>
+                      </div>
+                    </ion-content>
                   </ng-template>
-                </ion-popover>
+                </ion-modal>
                 </div>
               </ion-col>
             </ion-row>

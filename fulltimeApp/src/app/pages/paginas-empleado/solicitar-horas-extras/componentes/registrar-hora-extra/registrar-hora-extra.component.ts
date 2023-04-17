@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, ViewChild, OnDestroy,  } from '@angular/core';
 import { NgForm, FormControl } from '@angular/forms';
+import { IonDatetime } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import moment from 'moment';
 
@@ -28,6 +29,8 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
   private closeModalComponent: CloseModalComponent;
 
   @Input() id_hora_extra: number;
+  @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
+  @ViewChild(IonDatetime) datetimeFinal: IonDatetime;
 
   reg: HoraExtra = horaExtraDefaultValue;
   loadingBtn: boolean = false;
@@ -143,10 +146,11 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     this.valoresDefectoValidacionHoras();
     //Validamos si hay un cambio en el ingreso de la Fecha.
     if(!e.target.value){//Si no cambia nada en el ingreso de la fecha y pone ok directamente, se ingresa la hora actual que indica el componente
-      this.validar.showToast('Selecciones una fecha', 3500, 'warning');
+      return this.validar.showToast('Selecciones una fecha', 3500, 'warning');
     }else{
       this.reg.fec_inicio = e.target.value;//Igualamos la variable a la fecha ingresada
       this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
+      return this.datetimeInicio.confirm(true);
     }
   }
 
@@ -156,10 +160,11 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     this.valoresDefectoValidacionResultados();
      //Validamos si hay un cambio en el ingreso de la Fecha.
     if(!e.target.value){//Si no cambia nada en el ingreso de la fecha y pone ok directamente, se ingresa la hora actual que indica el componente
-      this.validar.showToast('Selecciones una fecha', 3500, 'warning');
+      return this.validar.showToast('Selecciones una fecha', 3500, 'warning');
     }else{
       this.reg.fec_final = e.target.value; //Igualamos la variable a la fecha ingresada
       this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
+      return this.datetimeFinal.confirm(true);
     }
   }
 
@@ -173,6 +178,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     }else{//Si hay un cambion en la seleccion de la hora en el componente ingresa la hora seleccionada
       this.reg.hora_salida = e.target.value;
       this.hora_inicio = moment(e.target.value).format('h:mm a');
+      
     }
   }
 
@@ -185,6 +191,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     }else{//Si hay un cambion en la seleccion de la hora en el componente ingresa la hora seleccionada
       this.reg.hora_ingreso = e.target.value;
       this.hora_final = moment(e.target.value).format('h:mm a');
+      
     }
   }
 
@@ -207,7 +214,19 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
         this.validar.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
         return false
       }else{
-        this.calcularTiempo();
+        this.permisoService.getlistaPermisosByHorasyCodigo(fec_inicio, fec_final, minutosinicio, minutosfinal, codigo).subscribe(solicitados => {
+          if(solicitados.length != 0){
+            this.reg.num_hora = null;
+            this.reg.tiempo_autorizado = null;
+            this.validar.showToast('Ups! Ya existe permisos en esas fecha y hora ', 3500, 'warning');
+            return false
+          }
+          else{
+            this.calcularTiempo();
+          }
+        },err => {
+          this.validar.showToast('Lo sentimos tenemos problemas para verificar su solicitud\n Contactese con el administrador', 3500, 'warning');
+        }); 
       }
     }, error => {
       this.validar.showToast('Lo sentimos tenemos problemas para verificar su Solicitud\n Contactese con el administrador', 3500, 'danger');

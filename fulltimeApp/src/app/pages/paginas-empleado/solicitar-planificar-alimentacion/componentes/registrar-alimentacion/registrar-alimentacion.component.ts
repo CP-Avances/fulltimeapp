@@ -10,6 +10,8 @@ import { Cg_DetalleMenu, Servicios_Comida, Menu_Servicios } from 'src/app/interf
 import { Alimentacion, alimentacionValueDefault } from 'src/app/interfaces/Alimentacion';
 import { CloseModalComponent } from 'src/app/componentes/close-modal/close-modal.component';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
+import { IonDatetime } from '@ionic/angular'
+
 import moment from 'moment';
 import { ParametrosService } from 'src/app/services/parametros.service';
 moment.locale('es');
@@ -24,6 +26,8 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
   @ViewChild('formRegistro', { static: true }) formRegistro: NgForm;
   @ViewChild(CloseModalComponent, { static: true })
   private closeModalComponent: CloseModalComponent;
+
+  @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
 
   reg: Alimentacion = alimentacionValueDefault;
   radioButton = estadoBoolean;
@@ -224,6 +228,7 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
       this.fecha_comida = moment(e.target.value).format('YYYY-MM-DD');
       const fec_comida = (moment(this.reg.fec_comida).format('YYYY-MM-DD'));
       const codigo = parseInt(localStorage.getItem('empleadoID'))
+      this.datetimeInicio.confirm(true);
       if(this.reg.fec_comida != null || this.reg.fec_comida != undefined){
         this.alimentacionService.getlistaAlimentacionByFechasyCodigo(fec_comida, codigo).subscribe(solicitados => {
           if(solicitados.length != 0){

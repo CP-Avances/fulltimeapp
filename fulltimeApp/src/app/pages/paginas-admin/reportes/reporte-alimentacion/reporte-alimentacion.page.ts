@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { LoadingController, ModalController, ToastController } from '@ionic/angular';
+import { Component, ViewChild } from '@angular/core';
+import { LoadingController, ModalController, ToastController, IonDatetime } from '@ionic/angular';
 import { ReporteAlimentacionComponent } from 'src/app/modals/reporte-alimentacion/reporte-alimentacion.component';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import moment from 'moment';
@@ -13,6 +13,9 @@ export class ReporteAlimentacionPage {
 
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
+
+  @ViewChild (IonDatetime) datetimeInicio: IonDatetime;
+  @ViewChild (IonDatetime) datetimeFinal: IonDatetime;
 
   fechaIn: string = "";
   fechaFi: string = "";
@@ -32,6 +35,7 @@ export class ReporteAlimentacionPage {
       return this.fechaIn = moment(e.target.value).format('YYYY-MM-DD');
     }else{
       this.dataUserService.setFechaRangoInicio(e.target.value);
+      this.datetimeInicio.confirm(true);
       if(this.fechaInicio == null || this.fechaInicio == ''){
         this.fechaIn = null;
       }else{
@@ -52,6 +56,7 @@ export class ReporteAlimentacionPage {
       }
     }else{
       this.dataUserService.setFechaRangoFinal(e.target.value);
+      this.datetimeFinal.confirm(true);
       if(this.fechaFinal == null || this.fechaFinal == ''){
         this.fechaFi = null;
       }else{

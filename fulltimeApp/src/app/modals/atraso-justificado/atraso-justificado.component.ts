@@ -1,5 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
+import { ModalController, IonDatetime } from '@ionic/angular';
 import { TimbresService } from '../../services/timbres.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import moment from 'moment';
@@ -12,6 +12,7 @@ import moment from 'moment';
 export class AtrasoJustificadoComponent  implements OnInit {
 
   @Input() data: any;
+  @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
 
   descripcion: string = "";
   fec_justifica: string = "";
@@ -45,6 +46,7 @@ export class AtrasoJustificadoComponent  implements OnInit {
     }else{
       this.fec_justifica = e.target.value;
       this.Fecha = moment(this.fec_justifica).format('YYYY-MM-DD');
+      this.datetimeInicio.confirm(true);
     }
   }
 

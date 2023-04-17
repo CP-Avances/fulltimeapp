@@ -71,21 +71,25 @@
               <ion-label class="is-required" position="floating" >Día Inicio</ion-label>
               <ion-input readonly="true" name="fec_inicio" [ngModel]="dia_inicio" mode="md"></ion-input>
             </ion-item>
-            <ion-popover trigger="open-popover">
+            <ion-modal trigger="open-popover"  class="inputDateFecha">
               <ng-template>
-                <ion-datetime
+                <ion-content>
+                  <ion-datetime
+                  #datetimeInicio
                   presentation="date"
-                  [showDefaultButtons]="true" 
-                    doneText="OK"
-                    cancelText="Cancelar"  
+                  [showDefaultButtons]="false" 
                   name="fec_inicio" 
                   color="success" 
                   mode="md" 
                   min="1990-01-01" max="2050-12-31" 
                   (ionChange)="ChangeDiaInicio($event)" 
                   [value]="reg.fec_inicio" required></ion-datetime>
+                  <div style="width: 95%;">
+                    <ion-label style="float:right; margin: 2%; font-size: medium;" color="success" (click)="datetimeInicio.cancel(true)">Cancelar</ion-label>
+                  </div>
+                </ion-content>
               </ng-template>
-            </ion-popover>
+            </ion-modal>
           </div>
         </ion-col>
 
@@ -95,22 +99,25 @@
               <ion-label class="is-required" position="floating" >Día Final</ion-label>
               <ion-input readonly="true" name="fec_final" [ngModel]="dia_fianl" mode="md"></ion-input>
             </ion-item>
-            <ion-popover trigger="open-popover1">
+            <ion-modal trigger="open-popover1" *ngIf="dia_inicio != ''" class="inputDateFecha">
               <ng-template>
-                <p style="margin: auto; padding: 4%;" *ngIf="(dia_inicio == '')">Ingrese el dia Inicio</p>
-                <ion-datetime *ngIf="dia_inicio != ''"
+                <ion-content>
+                  <ion-datetime 
+                  #datetimeFinal
                   [disabled] = "disabled_dia_fianl"
                   presentation="date"
-                  [showDefaultButtons]="true" 
-                    doneText="OK"
-                    cancelText="Cancelar"  
+                  [showDefaultButtons]="false" 
                   name="fec_final" 
                   mode="md" 
                   [min]="dia_inicio" max="2050-12-31" 
                   (ionChange)="ChangeDiaFinal($event)" 
                   [value]="dia_fianl" required></ion-datetime>
+                  <div style="width: 95%;">
+                    <ion-label style="float:right; margin: 2%; font-size: medium;" color="primary" (click)="datetimeFinal.cancel(true)">Cancelar</ion-label>
+                  </div>
+                </ion-content>
               </ng-template>
-            </ion-popover>
+            </ion-modal>
           </div>
         </ion-col>
       </ion-row>
@@ -122,22 +129,32 @@
         <ion-label class="is-required" position="floating" >Fecha ingreso</ion-label>
         <ion-input readonly="true" name="fec_ingreso" [ngModel]="dia_ingreso" mode="md"></ion-input>
       </ion-item>
-      <ion-popover trigger="open-popover2">
+      <ion-modal trigger="open-popover2" *ngIf="dia_fianl != ''" class="inputDateFecha">
         <ng-template>
-          <p style="margin: auto; padding: 4%;" *ngIf="(dia_fianl == '')">Ingrese el dia Final</p>
-          <ion-datetime *ngIf="dia_fianl != ''"
+          <ion-content>
+            <ion-datetime 
+            #datetimeIngreso
             [disabled] = "disabled_dia_ingreso"
             presentation="date"
-            [showDefaultButtons]="true" 
-              doneText="OK"
-              cancelText="Cancelar"   
+            [showDefaultButtons]="false" 
             name="fec_ingreso" 
             model="md"
             [min]="dia_fianl" max="2050-12-31"  
             color="warning" 
             [value]= "dia_ingreso" 
             (ionChange)="ChangeDiaIngreso($event)" required></ion-datetime>
+            <div style="width: 95%;">
+              <ion-label style="float:right; margin: 2%; font-size: medium;" color="warning" (click)="datetimeIngreso.cancel(true)">Cancelar</ion-label>
+            </div>
+          </ion-content>
         </ng-template>
+      </ion-modal>
+      <ion-popover *ngIf="(dia_fianl == '')" trigger="open-popover2">
+        <ion-content>
+          <ng-template>
+            <p style="margin: auto; padding: 4%;" >Ingrese el dia Final</p>
+          </ng-template>
+        </ion-content>
       </ion-popover>
     </div>
 

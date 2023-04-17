@@ -1,6 +1,6 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit, ViewChild} from '@angular/core';
 import { Permiso } from 'src/app/interfaces/Permisos';
-import { ModalController, ToastController, LoadingController } from '@ionic/angular';
+import { ModalController, ToastController, LoadingController, IonDatetime } from '@ionic/angular';
 import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { PermisosService } from 'src/app/services/permisos.service';
 import { Subscription } from 'rxjs';
@@ -18,6 +18,9 @@ import moment from 'moment';
   styleUrls: ['../../aprobar-permisos.page.scss'],
 })
 export class ListaPermisosAdminComponent implements OnInit {
+
+  @ViewChild (IonDatetime) datetimeInicio: IonDatetime;
+  @ViewChild (IonDatetime) datetimeFinal: IonDatetime;
 
   username: any;
   subscripted: Subscription;
@@ -265,6 +268,7 @@ export class ListaPermisosAdminComponent implements OnInit {
       return this.fechaIn = moment(e.target.value).format('YYYY-MM-DD');
     }else{
       this.fechaInicio = e.target.value;
+      this.datetimeInicio.confirm(true);
       if(this.fechaInicio == null || this.fechaInicio == ''){
         this.fechaIn = null;
       }else{
@@ -285,6 +289,7 @@ export class ListaPermisosAdminComponent implements OnInit {
       }
     }else{
       this.fechaFinal = e.target.value;
+      this.datetimeFinal.confirm(true);
       if(this.fechaFinal == null || this.fechaFinal == ''){
         this.fechaFi = null;
       }else{

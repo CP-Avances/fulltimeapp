@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { ModalController, IonDatetime } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import moment from 'moment';
@@ -26,6 +26,9 @@ export class EditarAlimentacionComponent implements OnInit {
 
   @ViewChild('formRegistro', { static: true }) ngForm: NgForm;
   @Input() alimentacion!: Alimentacion;
+
+  @ViewChild(IonDatetime) datetimeInicio: IonDatetime
+
   reg: Alimentacion;
   radioButton = estadoBoolean;
   loadingBtn: boolean = false;
@@ -231,10 +234,9 @@ export class EditarAlimentacionComponent implements OnInit {
         this.reg.fec_comida = e.target.value;
         const fec_comida = (moment(this.reg.fec_comida).format('YYYY-MM-DD'));
         this.fecha_consumo = fec_comida;
-
         const codigo = parseInt(localStorage.getItem('empleadoID'));
+        this.datetimeInicio.confirm(true);
 
-        console.log("Fecha ingresada: ",fec_comida)
         if(fec_comida != moment(this.fecha_comida).format('YYYY-MM-DD')){
           this.alimentacionService.getlistaAlimentacionByFechasyCodigo(fec_comida, codigo).subscribe(solicitados => {
             if(solicitados.length != 0){
