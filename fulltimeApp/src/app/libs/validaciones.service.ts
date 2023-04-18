@@ -145,7 +145,6 @@ export class ValidacionesService {
             console.log('----Dias----');
             //logica de validacion de dias laborales y libres.
             const { dia_laborable, dia_libre } = this.vacacionesByFeriadoAndHorarioE(inicio, final, horario, feriado);
-            console.log('Dias: ', dia_laborable, ' Dias Libres: ',dia_libre);
             return {
                 dia: dia_laborable,
                 tiempo_transcurrido: this.SegundosToHHMM(tiempo_total),// el tiempo es 00:00:00

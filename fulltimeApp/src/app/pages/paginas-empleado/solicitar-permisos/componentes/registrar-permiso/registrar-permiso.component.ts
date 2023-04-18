@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import { DatePipe } from '@angular/common';
 import moment from 'moment';
 
-import { cg_permisoValueDefault, diasHoras, Permiso, permisoValueDefault, tipoPermiso } from 'src/app/interfaces/Permisos';
+import { cg_permisoValueDefault, diasHoras, Permiso, permisoValueDefault } from 'src/app/interfaces/Permisos';
 import { Autorizacion, autorizacionValueDefault } from 'src/app/interfaces/Autorizaciones';
 import { Notificacion, notificacionValueDefault } from 'src/app/interfaces/Notificaciones';
 import { Cg_TipoPermiso } from 'src/app/interfaces/Catalogos';
@@ -43,7 +43,6 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
   reg: Permiso = permisoValueDefault;
   diasHoras = diasHoras;
-  tipoPermiso = tipoPermiso;
   radioButton = estadoBoolean;
   selectItemDiasHoras: string;
   horarioEmpleado: HorarioE;
@@ -227,21 +226,20 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   
   // METODO VALIDAR EL ITEM DE TIPO DE PERMISO SELECCIONADO
   ChangeTipoPermiso($event: any) {
-    this.valoresDefectoValidacionFechas();
-    this.valoresDefectoValidacionHoras();
-    this.valoresDefectoValidacionResultados();
-    this.dia_inicio = '';
-    this.dia_fianl = '';
-
     //Metodo para mostrar el mensaje al seleccionar
     if(!$event.target.value){
-      return console.log('Salio ', $event.target.value);
+      return console.log('Salio');
     }else{
+      this.valoresDefectoValidacionFechas();
+      this.valoresDefectoValidacionHoras();
+      this.valoresDefectoValidacionResultados();
+      this.dia_inicio = '';
+      this.dia_fianl = '';
+
       const [cg_permiso] = this.cg_tipo_permisos.filter(o => {return o.id === this.reg.id_tipo_permiso})
       this.cg_permiso = cg_permiso;
       
       if(this.cg_permiso.id == this.reg.id_tipo_permiso ){
-        const [tipoPermiso] = this.tipoPermiso.filter(res => { return res.id === this.reg.id_tipo_permiso;})
         const num_maxPermiso = this.cg_permiso.num_dia_maximo;
         const permilegalizado = this.cg_permiso.legalizar;
   
@@ -260,7 +258,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         }else{
           this.required = false;
         }
-        this.validaciones.abrirToas(tipoPermiso.message+num_maxPermiso, 3000, 'tertiary', 'top');
+        
+        this.validaciones.abrirToas(' Dias maximos de Permiso - '+num_maxPermiso, 3000, 'tertiary', 'top');
         return console.log('Se requiere documento ',this.required)
       }
     }
@@ -570,9 +569,9 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
      *              METODO PARA CALCULAR Y VALIDAR EL RESULTADO MOSTRADO              *
    * ********************************************************************************** */
   calcularhoras() {
-
     if(this.selectItemDiasHoras == 'Días'){
-      const fechasValidas = this.validaciones.validarRangoFechasIngresa(this.reg.fec_inicio!, this.reg.fec_final!, true);
+      const fechasValidas = this.validaciones.validarRangoFechasIngresa(this.reg.fec_inicio, this.reg.fec_final, true);
+      console.log('fechasValidas: ',fechasValidas)
       if (!fechasValidas) { return this.valoresDefectoValidacionFechas();}
 
       //Se optiene la hora por defecto del dia de salida que es la hora en la que se crea el permiso 
@@ -660,7 +659,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       }
     }
 
-    if(this.cg_permiso.num_dia_maximo < this.reg.dia!){
+    if((this.cg_permiso.num_dia_maximo < this.reg.dia!) &&  (this.cg_permiso.num_dia_maximo != 0)){
       this.validaciones.showToast('Lo Sentimos el maximo de dias de permiso es '+this.cg_permiso.num_dia_maximo, 3500, 'warning');
       this.reg.fec_final = null;
       return false;
@@ -674,8 +673,14 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
    * ********************************************************************************** */
   //Metodo para registrar la solicitud y guardar
   SaveRegister() {
+
+    this.reg.fec_inicio = this.fecha_inicio;
+    this.reg.fec_final = this.fecha_final;
+
     const validadionesFechasHoras = this.calcularhoras()
     this.loadingBtn = true;
+
+    console.log("validacionesFechasHoras: ",validadionesFechasHoras)
 
     if (!validadionesFechasHoras) return
 
@@ -683,9 +688,6 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
       const f = moment();
       this.reg.fec_creacion = moment(f).format('YYYY-MM-DD HH:mm:ss');
-
-      this.reg.fec_inicio = this.fecha_inicio;
-      this.reg.fec_final = this.fecha_final;
 
       if(this.selectItemDiasHoras != 'Días'){
         this.reg.hora_salida = this.validar.TiempoFormatoHHMMSS(this.reg.hora_salida!);
@@ -880,14 +882,20 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
     // LEYENDO DATOS DE TIPO DE PERMISO
     var tipo_permiso = '';
+    let correo_crear: boolean;
+
     this.cg_tipo_permisos.filter(o => {
       if (o.id === permiso.id_tipo_permiso) {
         tipo_permiso = o.descripcion
+        correo_crear = o.correo_crear
       }
       return tipo_permiso;
     })
 
-    // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
+    console.log('Envio de correo: ',correo_crear)
+
+    if(correo_crear === true){
+      // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
     permiso.EmpleadosSendNotiEmail!.forEach(e => {
 
       // LECTURA DE DATOS LEIDOS
@@ -927,6 +935,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
           solicitado_por: (localStorage.getItem('nom')) + ' ' + (localStorage.getItem('ap'))
         }
         if (correo_usuarios != '') {
+
           this.autorizaciones.EnviarCorreoPermiso(this.idEmpresa, datosPermisoCreado).subscribe(
             resp => {
               if (resp.message === 'ok') {
@@ -941,10 +950,11 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
             },
             () => { },
           )
+
         }
       }
     })
-
+    }
   }
 
   ngOnDestroy() {

@@ -11,7 +11,7 @@ import { CatalogosService } from 'src/app/services/catalogos.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
 import { PermisosService } from 'src/app/services/permisos.service';
 
-import { Permiso, diasHoras, cg_permisoValueDefault, tipoPermiso } from 'src/app/interfaces/Permisos';
+import { Permiso, diasHoras, cg_permisoValueDefault } from 'src/app/interfaces/Permisos';
 import { Notificacion, notificacionValueDefault } from 'src/app/interfaces/Notificaciones';
 import { Cg_TipoPermiso } from 'src/app/interfaces/Catalogos';
 import { Cg_Feriados } from 'src/app/interfaces/Catalogos';
@@ -36,7 +36,6 @@ export class EditarPermisoComponent implements OnInit {
   @Input() permiso!: Permiso;
   reg: Permiso;
   diasHoras = diasHoras;
-  tipoPermiso = tipoPermiso;
   radioButton = estadoBoolean;
   selectItemDiasHoras: string = '';
   horarioEmpleado: HorarioE;
@@ -241,7 +240,6 @@ export class EditarPermisoComponent implements OnInit {
       this.cg_permiso = cg_permiso;
       
       if(this.cg_permiso.id == this.reg.id_tipo_permiso ){
-        const [tipoPermiso] = this.tipoPermiso.filter(res => { return res.id === this.reg.id_tipo_permiso;})
         const num_maxPermiso = this.cg_permiso.num_dia_maximo;
         console.log('Dias maximo ',this.cg_permiso.num_dia_maximo);
 
@@ -262,7 +260,8 @@ export class EditarPermisoComponent implements OnInit {
         }else{
           this.required = false;
         }
-        this.validaciones.abrirToas(tipoPermiso.message+num_maxPermiso, 3000, 'tertiary', 'top');
+
+        this.validaciones.abrirToas(' Dias maximos de Permiso - '+num_maxPermiso, 3000, 'tertiary', 'top');
         return console.log('Se requiere documento ',this.required), this.cg_permiso.num_dia_maximo;
       }
     }
@@ -786,7 +785,7 @@ export class EditarPermisoComponent implements OnInit {
     const [cg_permiso] = this.cg_tipo_permisos.filter(o => {return o.id === this.reg.id_tipo_permiso})
     this.cg_permiso = cg_permiso;
 
-    if(this.cg_permiso.num_dia_maximo < this.reg.dia!){
+    if((this.cg_permiso.num_dia_maximo < this.reg.dia!) &&  (this.cg_permiso.num_dia_maximo != 0)){
       this.validaciones.showToast('Lo Sentimos el maximo de dias de permiso es '+this.cg_permiso.num_dia_maximo, 3500, 'warning');
       this.reg.fec_final = null;
       return false;
@@ -930,6 +929,7 @@ export class EditarPermisoComponent implements OnInit {
     }
     this.autorizacion.BuscarJefes(datos).subscribe(permiso => {
       permiso.EmpleadosSendNotiEmail.push(this.solInfo);
+      console.log('dato permiso: ',permiso)
       this.EnviarCorreoPermiso(permiso);
       this.EnviarNotificacionPermiso(permiso);
     });
@@ -961,78 +961,83 @@ export class EditarPermisoComponent implements OnInit {
 
     // LEYENDO DATOS DE TIPO DE PERMISO
     var tipo_permiso = '';
+    var correo_editar: boolean;
     this.cg_tipo_permisos.filter(o => {
       if (o.id === permiso.id_tipo_permiso) {
         tipo_permiso = o.descripcion
+        correo_editar = o.correo_editar;
       }
       return tipo_permiso;
     })
 
-    // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
-    permiso.EmpleadosSendNotiEmail.forEach((e: any) => {
+    console.log("Envio de correo: ",correo_editar);
 
-      // LECTURA DE DATOS LEIDOS
-      cont = cont + 1;
+    if(correo_editar === true){
+       // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
+      permiso.EmpleadosSendNotiEmail.forEach((e: any) => {
+        // LECTURA DE DATOS LEIDOS
+        cont = cont + 1;
 
-      // SI EL USUARIO SE ENCUENTRA ACTIVO Y TIENEN CONFIGURACIÓN RECIBIRA CORREO DE SOLICITUD DE VACACIÓN
-      if (e.permiso_mail) {
-        if (e.estado === true) {
-          if (correo_usuarios === '') {
-            correo_usuarios = e.correo;
+        // SI EL USUARIO SE ENCUENTRA ACTIVO Y TIENEN CONFIGURACIÓN RECIBIRA CORREO DE SOLICITUD DE VACACIÓN
+        if (e.permiso_mail) {
+          if (e.estado === true) {
+            if (correo_usuarios === '') {
+              correo_usuarios = e.correo;
+            }
+            else {
+              correo_usuarios = correo_usuarios + ', ' + e.correo
+            }
           }
-          else {
-            correo_usuarios = correo_usuarios + ', ' + e.correo
+        }
+
+        console.log('contadores', permiso.EmpleadosSendNotiEmail.length + ' cont ' + cont)
+
+        if (cont === permiso.EmpleadosSendNotiEmail.length) {
+
+          console.log('data entra correo usuarios', correo_usuarios)
+
+          let datosPermisoCreado = {
+            solicitud: solicitud,
+            desde: desde,
+            hasta: hasta,
+            h_inicio: this.validar.FormatearHora(permiso.hora_salida, this.formato_hora),
+            h_fin: this.validar.FormatearHora(permiso.hora_ingreso, this.formato_hora),
+            id_empl_contrato: permiso.id_empl_contrato,
+            tipo_solicitud: 'Permiso actualizado por',
+            horas_permiso: permiso.hora_numero,
+            observacion: permiso.descripcion,
+            tipo_permiso: tipo_permiso,
+            dias_permiso: permiso.dia,
+            estado_p: estado_p,
+            proceso: 'actualizado',
+            id_dep: e.id_dep,
+            id_suc: e.id_suc,
+            correo: correo_usuarios,
+            asunto: 'ACTUALIZACION DE SOLICITUD DE PERMISO',
+            id: permiso.id,
+            solicitado_por: (localStorage.getItem('nom')) + ' ' + (localStorage.getItem('ap')),
+          }
+          if (correo_usuarios != '') {
+            console.log('data entra enviar correo')
+
+            this.autorizacion.EnviarCorreoPermiso(this.idEmpresa, datosPermisoCreado).subscribe(
+              resp => {
+                if (resp.message === 'ok') {
+                  this.validaciones.abrirToas('Correo de solicitud enviado exitosamente.', 4000, 'success', 'top');
+                }
+                else {
+                  this.validaciones.showToast('Ups algo salio mal !!! No fue posible enviar correo de solicitud.', 5000, 'warning');
+                }
+              },
+              err => {
+                this.validaciones.showToast(err.error.message, 5000, 'danger');
+              },
+              () => { },
+            )
           }
         }
-      }
-
-      console.log('contadores', permiso.EmpleadosSendNotiEmail.length + ' cont ' + cont)
-
-      if (cont === permiso.EmpleadosSendNotiEmail.length) {
-
-        console.log('data entra correo usuarios', correo_usuarios)
-
-        let datosPermisoCreado = {
-          solicitud: solicitud,
-          desde: desde,
-          hasta: hasta,
-          h_inicio: this.validar.FormatearHora(permiso.hora_salida, this.formato_hora),
-          h_fin: this.validar.FormatearHora(permiso.hora_ingreso, this.formato_hora),
-          id_empl_contrato: permiso.id_empl_contrato,
-          tipo_solicitud: 'Permiso actualizado por',
-          horas_permiso: permiso.hora_numero,
-          observacion: permiso.descripcion,
-          tipo_permiso: tipo_permiso,
-          dias_permiso: permiso.dia,
-          estado_p: estado_p,
-          proceso: 'actualizado',
-          id_dep: e.id_dep,
-          id_suc: e.id_suc,
-          correo: correo_usuarios,
-          asunto: 'ACTUALIZACION DE SOLICITUD DE PERMISO',
-          id: permiso.id,
-          solicitado_por: (localStorage.getItem('nom')) + ' ' + (localStorage.getItem('ap')),
-        }
-        if (correo_usuarios != '') {
-          console.log('data entra enviar correo')
-
-          this.autorizacion.EnviarCorreoPermiso(this.idEmpresa, datosPermisoCreado).subscribe(
-            resp => {
-              if (resp.message === 'ok') {
-                this.validaciones.abrirToas('Correo de solicitud enviado exitosamente.', 4000, 'success', 'top');
-              }
-              else {
-                this.validaciones.showToast('Ups algo salio mal !!! No fue posible enviar correo de solicitud.', 5000, 'warning');
-              }
-            },
-            err => {
-              this.validaciones.showToast(err.error.message, 5000, 'danger');
-            },
-            () => { },
-          )
-        }
-      }
-    })
+      })
+    }
   }
 
   EnviarNotificacionPermiso(permiso: any) {

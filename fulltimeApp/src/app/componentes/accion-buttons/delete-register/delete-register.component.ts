@@ -223,16 +223,20 @@ export class DeleteRegisterComponent {
 
     // LEYENDO DATOS DE TIPO DE PERMISO
     var tipo_permiso = '';
+    let correo_envia: boolean;
     this.cg_tipo_permisos.filter(o => {
-      console.log(' permiso id_tipo .. ', permiso.id_tipo_permiso)
       if (o.id === permiso.id_tipo_permiso) {
         tipo_permiso = o.descripcion
+        correo_envia = o.correo_eliminar
       }
       return tipo_permiso;
     })
 
+    console.log('Envio de correo: ',correo_envia)
     console.log('tipo_permiso -... ', tipo_permiso)
-    // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
+
+    if(correo_envia == true){
+      // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
     permiso.EmpleadosSendNotiEmail.forEach((e: any) => {
 
       // LECTURA DE DATOS LEIDOS
@@ -292,6 +296,7 @@ export class DeleteRegisterComponent {
         }
       }
     })
+    }
   }
 
   EnviarNotificacionPermiso(permiso: any, nota: string, user: string) {

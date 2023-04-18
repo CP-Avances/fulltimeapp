@@ -2,14 +2,16 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { AutorizacionesService } from '../../services/autorizaciones.service';
 import { ValidacionesService } from '../../libs/validaciones.service';
+import { Cg_TipoPermiso } from 'src/app/interfaces/Catalogos';
 
 import { estadoSelectItems, EstadoSolicitudes } from '../../interfaces/Estados';
-import { Permiso } from '../../interfaces/Permisos';
+import { Permiso, cg_permisoValueDefault } from '../../interfaces/Permisos';
 import { Vacacion } from 'src/app/interfaces/Vacacion';
 import { HoraExtra } from 'src/app/interfaces/HoraExtra';
 
 import { Autorizacion, autorizacionValueDefault } from '../../interfaces/Autorizaciones';
 import { Notificacion, NotificacionTimbre, notificacionTimbreValueDefault, notificacionValueDefault } from 'src/app/interfaces/Notificaciones';
+import { CatalogosService } from 'src/app/services/catalogos.service';
 
 import { ModalController } from '@ionic/angular';
 import moment from 'moment';
@@ -46,7 +48,13 @@ export class UpdateAutorizacionComponent implements OnInit {
   idEmpresa: number;
   solInfo: any;
 
+  cg_permiso: Cg_TipoPermiso = cg_permisoValueDefault;
+  public get cg_tipo_permisos(): Cg_TipoPermiso[] {
+    return this.catalogos.cg_tipo_permisos
+  }
+
   constructor(
+    private catalogos: CatalogosService,
     private autoService: AutorizacionesService,
     private validaciones: ValidacionesService,
     public modalController: ModalController,
@@ -314,12 +322,36 @@ export class UpdateAutorizacionComponent implements OnInit {
       var estado_p = 'Negado';
       var estado_c = 'Negada';
     }
+
+    let correo_envia;
+    this.cg_tipo_permisos.filter(o => {
+      if(o.id === permiso.id_tipo_permiso){
+        if(permiso.estado === 2){
+          if(o.id === permiso.id_tipo_permiso){
+            console.log('correo_envia: ',o, " : ",o.correo_preautorizar)
+            return correo_envia = o.correo_preautorizar;
+          }
+        }else if(permiso.estado === 3){
+          if(o.id === permiso.id_tipo_permiso){
+            console.log('correo_envia: ',o, " : ",o.correo_autorizar)
+            return correo_envia = o.correo_autorizar;
+          }
+        }else if(permiso.estado === 4){
+          if(o.id === permiso.id_tipo_permiso){
+            console.log('correo_envia: ',o, " : ",o.correo_negar)
+            return correo_envia = o.correo_negar;
+        }
+      } 
+      }
+    })
+
+    console.log('correo_envia: ',correo_envia)
     this.autoService.BuscarJefes(datos).subscribe(permiso => {
       permiso.EmpleadosSendNotiEmail.push(this.solInfo);
-      console.log(permiso);
-      this.EnviarCorreoPermiso(permiso, estado_p, estado_c);
+      if(correo_envia === true){
+        this.EnviarCorreoPermiso(permiso, estado_p, estado_c);
+      }
       this.EnviarNotificacionPermiso(permiso, estado_p, infoUsuario);
-
       this.validaciones.showToast('Proceso realizado exitosamente.', 4000, 'success');
     });
   }

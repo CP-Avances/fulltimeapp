@@ -15,6 +15,14 @@ export interface Cg_TipoPermiso {
     legalizar: boolean;
     acce_empleado: number;
     documento: boolean;
+    correo_crear: boolean;
+    correo_editar: boolean;
+    correo_eliminar: boolean;
+    correo_preautorizar: boolean;
+    correo_autorizar: boolean;
+    correo_negar: boolean;
+    correo_legalizar: boolean;
+    contar_feriados: boolean;
 }
 
 export interface Cg_Feriados {

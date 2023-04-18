@@ -83,7 +83,15 @@ export const cg_permisoValueDefault: Cg_TipoPermiso = {
     gene_justificacion: false,
     legalizar: false,
     acce_empleado: 0,
-    documento: false
+    documento: false,
+    correo_crear: false,
+    correo_editar: false,
+    correo_eliminar: false,
+    correo_autorizar: false,
+    correo_legalizar: false,
+    correo_negar: false,
+    correo_preautorizar: false,
+    contar_feriados: null,
 }
 
 interface opcionesDiasHoras {
@@ -102,9 +110,4 @@ export const diasHoras: opcionesDiasHoras[] = [
     { label: 'Días', value: 'Días', message: 'Ingrese el rango de días a Solicitar' },
     { label: 'Horas', value: 'Horas', message: 'Ingrese el rango de horas y minutos a Solicitar' },
     //{ label: 'Días y Horas', value: 'Días y Horas', message: 'Ingrese el rango de días y horas a Solicitar' },
-];
-
-export const tipoPermiso: opcionesTipoPermiso [] = [
-    { label: 'Asuntos Personales', id: 1, message: 'Dias maximos de Permiso - '},
-    { label: 'Calamidad Doméstica', id: 2, message: 'Dias maximos de Permiso - '},
 ];
