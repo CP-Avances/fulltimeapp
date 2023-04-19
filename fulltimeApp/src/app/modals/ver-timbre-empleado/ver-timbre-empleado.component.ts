@@ -303,11 +303,10 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
 
   }
 
-  async presentAlert(obs: any, tdispsitivo: any, idcelularUsuario?: any) {
+  async presentAlert(obs: any, hora_timbre_diferente: any, ubicacion: any, novedades_conexion:any, conexion:any ) {
     const alert = await this.alertController.create({
       header: 'Observación',
-      //  message: obs + " <br> Dispositivo desde el que se timbró: "  + tdispsitivo + "<br> Dispositivo registrado para este usuario: " + idcelularUsuario,
-      message: obs,
+      message: obs + " Ubicacion: " + ubicacion + "<br>" + novedades_conexion,
 
       buttons: ['OK']
     });
@@ -321,8 +320,8 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
   public autoHide: boolean = false;
   public responsive: boolean = true;
   public labels: any = {
-  previousLabel: 'ante..',
-  nextLabel: 'sigui..',
+  previousLabel: 'anterior',
+  nextLabel: 'siguiente',
   screenReaderPaginationLabel: 'Pagination',
   screenReaderPageLabel: 'page',
   screenReaderCurrentLabel: `You're on page`

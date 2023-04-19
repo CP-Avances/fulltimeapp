@@ -83,7 +83,7 @@
         </ion-col>
       </ion-row>
       <div style="margin: 3%; text-align: center;">
-        <h6> Lista de Timbres</h6>
+        <ion-text color="light"> Lista de Timbres</ion-text>
       </div>
   </div>
 </ion-header>
@@ -132,8 +132,8 @@
 
 
               <ion-label color="dark" class="textoObs" *ngIf="t.dispositivo_timbre!=''"
-                (click)="presentAlert(t.observacion,t.dispositivo_timbre)">
-                <ion-icon color="danger" *ngIf="t.hora_timbre_diferente" name="alert-circle-outline"></ion-icon>
+                (click)="presentAlert(t.observacion,t.hora_timbre_diferente, t.ubicacion, t.novedades_conexion, t.conexion)">
+                <ion-icon color="danger" *ngIf="t.hora_timbre_diferente || t.conexion != true" name="alert-circle-outline"></ion-icon>
                 Toque aquí para más info..
               </ion-label>
             </ion-label>
@@ -227,8 +227,8 @@
 
 
               <ion-label color="dark" class="textoObs" *ngIf="t.dispositivo_timbre!=''"
-                (click)="presentAlert(t.observacion,t.dispositivo_timbre)">
-                <ion-icon color="danger" *ngIf="t.hora_timbre_diferente" name="alert-circle-outline"></ion-icon>
+                (click)="presentAlert(t.observacion,t.hora_timbre_diferente, t.ubicacion, t.novedades_conexion, t.conexion)">
+                <ion-icon color="danger" *ngIf="t.hora_timbre_diferente || t.conexion != true" name="alert-circle-outline"></ion-icon>
                 Toque aquí para más info..
               </ion-label>
             </ion-label>
