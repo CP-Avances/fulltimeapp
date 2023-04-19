@@ -39,7 +39,8 @@ export class DeleteService {
             message: mensaje,
             duration: duracion,
             color: color,
-            mode: 'ios'
+            mode: 'ios',
+            cssClass: 'showtoast-custom-class'
         });
         toast.present();
     }

@@ -14,7 +14,7 @@ import { Socket } from 'ngx-socket-io';
 export class PermisosService {
 
   private apiUrl = environment.url;
-  private recursoURL = 'http://192.168.0.193:3001';
+  private recursoURL = 'http://192.168.0.145:3001';
   //private recursoURL = 'http://186.4.226.49:3001';
 
 
@@ -156,8 +156,8 @@ export class PermisosService {
   }
 
   // METODO PARA SUBIR ARCHIVOS DE PERMISOS
-  SubirArchivoRespaldo(formData: any, id: number, documento: string) {
-    return this.http.put(`${this.recursoURL}/empleadoPermiso/${id}/documento-movil/${documento}`, formData)
+  SubirArchivoRespaldo(formData: any, id: number, documento: string, archivo: any) {
+    return this.http.put(`${this.recursoURL}/empleadoPermiso/${id}/documento-movil/${documento}/archivo/${archivo}`, formData)
   }
 
   // METODO PARA ELIMINAR ARCHIVOS DE PERMISOS

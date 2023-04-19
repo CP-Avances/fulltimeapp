@@ -40,7 +40,7 @@ class Servidor {
         io = require('socket.io')(this.server,{
             cors: {
                 origins: '*',
-                methods: ['GET', 'POST'],
+                methods: ['GET, DELETE, HEAD, OPTIONS'],
             }
         });
     }
@@ -93,10 +93,10 @@ class Servidor {
         });
 
 
-        /*this.app.use((req, res, next) => {
-            res.header('Access-Control-Allow-Origin', '*:*');
+        this.app.use((req, res, next) => {
+            res.header('Access-Control-Allow-Origin', '*');
             next();
-        })*/;
+        });
 
 
         io.on('connection', (socket: any) => {

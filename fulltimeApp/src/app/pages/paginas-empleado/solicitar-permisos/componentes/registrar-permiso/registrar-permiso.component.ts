@@ -729,10 +729,10 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.archivoSubido = element.target.files;
     console.log(this.archivoSubido);
 
-    const name = this.archivoSubido![0].name;
+    const name = this.archivoSubido[0].name;
 
     if(this.archivoSubido!.length != 0){
-      if(this.archivoSubido![0].size >= 2e+6){
+      if(this.archivoSubido[0].size >= 2e+6){
         this.archivoSubido = null;
         this.reg.docu_nombre = '';
         this.mensajeFile = "Ingrese un archivo maximo de 2Mb";
@@ -755,21 +755,21 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   subirRespaldo(permiso: any){
     var id = permiso.id;
     let formData = new FormData();
-    console.log("tamaño: ", this.archivoSubido![0].size);
-
+    console.log("tamaño: ", this.archivoSubido[0].size);
     if(this.archivoSubido == undefined){
       return this.archivoSubido = null;
     }
 
     for(var i = 0; i < this.archivoSubido.length; i++){
-      formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.permisoService.SubirArchivoRespaldo(formData, id, this.archivoSubido[0].name).subscribe(res => {
+
+    console.log('formData: ',formData);
+    this.permisoService.SubirArchivoRespaldo(formData, id, this.archivoSubido[0].name, null).subscribe(res => {
       this.validaciones.showToast('El archivo se Cargo Correctamente', 3500, 'success');
       this.reg.docu_nombre = '';
-
     }, err => {
-        console.log(formData)
+        console.log(err)
         return this.validaciones.showToast('El archivo no se pudo Cargar al Servidor', 3500, 'danger');
         
     });

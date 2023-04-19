@@ -12,7 +12,7 @@ import { Socket } from 'ngx-socket-io';
 export class HorasExtrasService {
 
   private apiUrl = environment.url;
-  private recursoURL = 'http://192.168.0.193:3001';
+  private recursoURL = 'http://192.168.0.145:3001';
   //private recursoURL = 'http://186.4.226.49:3001';
 
   private handleError(error: any) {
@@ -123,8 +123,8 @@ export class HorasExtrasService {
   }
 
   // SUBIR RESPALDOS DE HORAS EXTRAS
-  SubirArchivoRespaldo(formData: any, id: number, nombre: string) {
-    return this.http.put(`${this.recursoURL}/horas-extras-pedidas/${id}/documento-movil/${nombre}`, formData)
+  SubirArchivoRespaldo(formData: any, id: number, nombre: string, archivo: any) {
+    return this.http.put(`${this.recursoURL}/horas-extras-pedidas/${id}/documento-movil/${nombre}/archivo/${archivo}`, formData)
   }
 
   // ELIMINAR RESPALDOS DE HORAS EXTRAS

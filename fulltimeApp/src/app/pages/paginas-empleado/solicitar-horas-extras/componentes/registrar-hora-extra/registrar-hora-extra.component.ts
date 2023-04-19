@@ -334,7 +334,6 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
 
   //Metodo para actualizar un archivo
   updataArchivo(horaExtra: any){
-    
     if(this.archivoSubido[0].name == this.reg.docu_nombre){
       this.horasExtrasService.EliminarArchivoRespaldo(this.reg.documento).subscribe(res => {
         this.subirRespaldo(horaExtra);
@@ -355,10 +354,10 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     }
     
     for(var i = 0; i < this.archivoSubido.length; i++){
-      formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
 
-    this.horasExtrasService.SubirArchivoRespaldo(formData, id, this.archivoSubido[0].name).subscribe(res => {
+    this.horasExtrasService.SubirArchivoRespaldo(formData, id, this.archivoSubido[0].name, null).subscribe(res => {
       this.validar.showToast('El archivo se Cargo Correctamente', 3000, 'success');
       this.reg.docu_nombre = '';
 

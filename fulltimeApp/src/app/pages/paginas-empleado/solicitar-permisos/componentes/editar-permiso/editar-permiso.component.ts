@@ -887,7 +887,7 @@ export class EditarPermisoComponent implements OnInit {
   subirRespaldo(permiso: any){
     var id = permiso.id;
     let formData = new FormData();
-    console.log("tamaño: ", this.archivoSubido![0].size);
+    console.log("tamaño: ", this.archivoSubido[0].size);
 
     if(this.archivoSubido == undefined){
       return this.archivoSubido = null;
@@ -897,12 +897,12 @@ export class EditarPermisoComponent implements OnInit {
       formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
     }
 
-    this.permisoService.SubirArchivoRespaldo(formData, id, this.archivoSubido[0].name).subscribe(res => {
+    this.permisoService.SubirArchivoRespaldo(formData, id, this.archivoSubido[0].name, null).subscribe(res => {
       this.validaciones.showToast('El archivo se actualizo Correctamente', 3000, 'success');
       this.reg.docu_nombre = '';
 
     }, err => {
-        console.log(formData)
+        console.log(err)
         return this.validaciones.showToast('El archivo no se pudo Cargar al Servidor', 3500, 'danger');
         
     });

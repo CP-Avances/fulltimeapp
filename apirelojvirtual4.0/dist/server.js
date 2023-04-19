@@ -36,7 +36,7 @@ class Servidor {
         io = require('socket.io')(this.server, {
             cors: {
                 origins: '*',
-                methods: ['GET', 'POST'],
+                methods: ['GET, DELETE, HEAD, OPTIONS'],
             }
         });
     }
@@ -77,10 +77,10 @@ class Servidor {
         this.server.listen(this.app.get('puerto'), () => {
             console.log('Servidor en el puerto', this.app.get('puerto'));
         });
-        /*this.app.use((req, res, next) => {
-            res.header('Access-Control-Allow-Origin', '*:*');
+        this.app.use((req, res, next) => {
+            res.header('Access-Control-Allow-Origin', '*');
             next();
-        })*/ ;
+        });
         io.on('connection', (socket) => {
             console.log('Connected client on port %s.', this.app.get('puerto'));
             socket.on("nueva_notificacion", (data) => {

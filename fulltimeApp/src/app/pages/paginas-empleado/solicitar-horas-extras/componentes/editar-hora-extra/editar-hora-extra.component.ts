@@ -380,9 +380,9 @@ export class EditarHoraExtraComponent implements OnInit {
     }
 
     for(var i = 0; i < this.archivoSubido.length; i++){
-      formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.horasExtrasService.SubirArchivoRespaldo(formData, id, this.archivoSubido[0].name).subscribe(res => {
+    this.horasExtrasService.SubirArchivoRespaldo(formData, id, this.archivoSubido[0].name, null).subscribe(res => {
       this.validar.showToast('El archivo se Actualizo Correctamente', 3500, 'success');
       this.reg.docu_nombre = '';
 
