@@ -9,11 +9,12 @@ import { TimbresPerdidosComponent } from '../../pages/bienvenido/showTimbresGuar
 
 import { Notificacion } from '../../interfaces/Notificaciones';
 import { NotificacionTimbre } from '../../interfaces/Notificaciones';
-import { LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
+import { ActionPerformed, LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
 
 import { Router } from '@angular/router';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { Socket } from 'ngx-socket-io';
+import { PluginListenerHandle } from '@capacitor/core';
 
 
 @Component({
@@ -94,9 +95,12 @@ export class NavegadorAdminComponent implements OnInit {
                 largeBody: this.mensaje+"\n"+data_llega.mensaje,
               }]}
 
-              LocalNotifications.schedule(options).then(()=> {
-                
-              });
+              LocalNotifications.schedule(options);
+
+              /*LocalNotifications.addListener('localNotificationActionPerformed', (notificationAction: ActionPerformed) => void {})
+              .then((value: PluginListenerHandle) => {
+                this.router.navigate(['/empleado/solicitar-permisos']);
+              });*/
 
             }catch (error) {
               this.mostrarToasNoti("No se pudo resibir la notificacion: \n"+ error);
