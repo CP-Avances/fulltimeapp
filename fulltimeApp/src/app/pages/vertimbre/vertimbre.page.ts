@@ -197,7 +197,7 @@ export class VertimbrePage implements OnInit {
 
   filtrarFechas() {
     this.timbres_filtro = [];
-    if (this.fechaInicio < this.fechaFinal) {
+    if (this.fechaInicio <= this.fechaFinal) {
       var datos = { fecInicio: this.fechaInicio, fecFinal: this.fechaFinal, id_empleado: localStorage.getItem('codigo') }
       this.filtimbre.PostFiltrotimbres(datos).subscribe(
         ress => {
