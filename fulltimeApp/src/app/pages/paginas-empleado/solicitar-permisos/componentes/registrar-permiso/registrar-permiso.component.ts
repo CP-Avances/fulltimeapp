@@ -454,8 +454,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   
 
  /* ********************************************************************************** *
-     *                 METODO PARA MOSTRAR EL CALCULO EN LOS INPUTS                   *
-   * ********************************************************************************** */
+    *                 METODO PARA MOSTRAR EL CALCULO EN LOS INPUTS                   *
+  * ********************************************************************************** */
   mostrarCalculos(){
 
     //variables para validar el dia de inicio completo y el dia final completo y buscar duplicidad.
