@@ -193,6 +193,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
             { text: 'HORA', style: 'tableHeader' },
             '', '', '', '', ''
           ],
+          
           ...data.map(obj => {
             c = c + 1
             let accionT: string = '';

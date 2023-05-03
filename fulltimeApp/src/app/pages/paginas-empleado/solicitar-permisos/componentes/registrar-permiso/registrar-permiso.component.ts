@@ -171,7 +171,10 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         if(!(Number.isNaN(this.reg.id_peri_vacacion))){
           this.ocultar = false;
           this.mensaje = true;
+        }else{
+          this.mensaje = false;
         }
+
       }
     );
   }

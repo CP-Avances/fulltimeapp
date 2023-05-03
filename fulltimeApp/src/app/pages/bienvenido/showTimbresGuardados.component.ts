@@ -55,7 +55,7 @@ import { EmpleadosService } from 'src/app/services/empleados.service';
       </ion-text>
     </div>
 
-  </ion-content>
+
 
   <div style="margin: 2%; padding: 4%; text-align: center;" [hidden] = 'btn_Enviar'>
 
@@ -75,6 +75,8 @@ import { EmpleadosService } from 'src/app/services/empleados.service';
     </ion-button>
 
   </div>
+
+  </ion-content>
 
     
   `,
