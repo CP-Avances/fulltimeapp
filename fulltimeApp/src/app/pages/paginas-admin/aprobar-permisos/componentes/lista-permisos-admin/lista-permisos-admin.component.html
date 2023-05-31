@@ -106,6 +106,11 @@
           <item-permiso [permiso]="permiso"></item-permiso>
   
           <div style="font-size: 10px; margin-right: 5%; padding-bottom: 1%;" *ngIf="!isChecked">
+
+            <span style="float:left">
+              <ion-label style="color: rgb(255, 123, 123); font-size: 13px;" >{{permiso.fec_creacion_}}</ion-label>
+            </span>
+
             <!-- Eliminar registro SOLO EN PERMISOS--> 
             <span style="float:right">
               <btn-delete (onDelete)="ngOnInit()"  nameTable="permisos" [isButtom]="false" [idreg]="permiso.id" [userCodigo]="permiso.codigo" style="color: rgb(255, 123, 123); font-size: 13px;" ></btn-delete>BORRAR
@@ -148,6 +153,10 @@
           <ion-checkbox *ngIf="isCheckedPre" slot="start" [(ngModel)]="permiso.isChecked"></ion-checkbox>
           <item-permiso [permiso]="permiso"></item-permiso>
 
+          <span style="float:left; margin-left: 5%;">
+            <ion-label style="font-size: 11px;" >Fecha creacion: {{permiso.fec_creacion_}}</ion-label>
+          </span>
+
           <div style="font-size: 10px; margin-right: 5%; padding-bottom: 1%;" *ngIf="!isCheckedPre">
             <!-- Eliminar registro SOLO EN PERMISOS--> 
             <span style="float:right">
@@ -185,6 +194,10 @@
         <div style="width:100%; margin-bottom: 7%;"  *ngIf="permiso.nempleado !== username" >
           <item-permiso [permiso]="permiso"></item-permiso>
           <div style="font-size: 10px; margin-right: 5%; padding-bottom: 1%;">
+            <span style="float:left; margin-left: 5%;">
+              <ion-label style="font-size: 11px;" >Fecha creacion: {{permiso.fec_creacion_}}</ion-label>
+            </span>
+
             <!-- Eliminar registro SOLO EN PERMISOS--> 
             <span style="float:right">
               <btn-delete (onDelete)="ngOnInit()"  nameTable="permisos" [isButtom]="false" [idreg]="permiso.id" [userCodigo]="permiso.codigo" style="color: rgb(255, 123, 123); font-size: 13px;" ></btn-delete>BORRAR
@@ -215,6 +228,10 @@
         <div style="width:100%; margin-bottom: 7%;"  *ngIf="permiso.nempleado !== username">
           <item-permiso [permiso]="permiso"></item-permiso>
           <div style="font-size: 10px; margin-right: 5%; padding-bottom: 1%;">
+            <span style="float:left; margin-left: 5%;">
+              <ion-label style="font-size: 11px;" >Fecha creacion: {{permiso.fec_creacion_}}</ion-label>
+            </span>
+            
             <!-- Eliminar registro SOLO EN PERMISOS--> 
             <span style="float:right">
               <btn-delete (onDelete)="ngOnInit()"  nameTable="permisos" [isButtom]="false" [idreg]="permiso.id" [userCodigo]="permiso.codigo" style="color: rgb(255, 123, 123); font-size: 13px;" ></btn-delete>BORRAR

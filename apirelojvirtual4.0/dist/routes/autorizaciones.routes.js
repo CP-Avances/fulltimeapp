@@ -37,6 +37,9 @@ class AutorizacionesRoutes {
         this.router.put('/estado', AUTORIZACIONES.updateAutorizacion);
         // RUTA DE ACTUALIZACION DE ESTADO DE SOLICITUDES
         this.router.put('/solicitud', AUTORIZACIONES.updateEstadoSolicitudes);
+        //RUTA BUSQUEDA AUTORIZACION POR DEPARTAMENTO
+        this.router.get('/autorizaUsuarioDepa/:id_empleado', AUTORIZACIONES.EncontrarAutorizacionUsuario);
+        this.router.get('/listaDepaAutoriza/:id_depar', AUTORIZACIONES.ObtenerListaAutorizaDepa);
         // RUTA DE BUSQUEDA DE JEFES DE DEPARTAMENTOS
         this.router.post('/buscar-jefes', AUTORIZACIONES.BuscarJefes);
     }

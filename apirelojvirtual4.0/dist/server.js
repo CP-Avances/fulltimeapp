@@ -36,7 +36,7 @@ class Servidor {
         io = require('socket.io')(this.server, {
             cors: {
                 origins: '*',
-                methods: ['GET, DELETE, HEAD, OPTIONS'],
+                methods: ['GET, DELETE, POST, PUT'],
             }
         });
     }

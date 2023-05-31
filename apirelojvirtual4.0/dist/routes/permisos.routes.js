@@ -43,6 +43,7 @@ class PermisoRoutes {
         this.router.get('/lista-permisoshorasedit', PERMISOS.getlistaPermisosByHorasyCodigoEdit);
         this.router.post('/insert-permiso', verificarToken_1.verificarToken, PERMISOS.postNuevoPermiso);
         this.router.put('/update-permiso', PERMISOS.putPermiso);
+        this.router.get('/consulta', PERMISOS.pruebaConsulta);
     }
 }
 const PERMISO_Routes = new PermisoRoutes();

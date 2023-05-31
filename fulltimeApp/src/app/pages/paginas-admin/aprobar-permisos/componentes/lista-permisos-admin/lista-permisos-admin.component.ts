@@ -10,6 +10,8 @@ import { Socket } from 'ngx-socket-io';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import moment from 'moment';
+import { RelojServiceService } from 'src/app/services/reloj-service.service';
+import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 
 
 @Component({
@@ -18,6 +20,7 @@ import moment from 'moment';
   styleUrls: ['../../aprobar-permisos.page.scss'],
 })
 export class ListaPermisosAdminComponent implements OnInit {
+  public permisos: any = [];
 
   @ViewChild (IonDatetime) datetimeInicio: IonDatetime;
   @ViewChild (IonDatetime) datetimeFinal: IonDatetime;
@@ -51,10 +54,11 @@ export class ListaPermisosAdminComponent implements OnInit {
     private socket: Socket,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
+    public restAutoriza: AutorizacionesService,
+    public usuarioDepa: RelojServiceService,
   ) {
-
     this.socket.on('recibir_notificacion', (data_llega: any) => {
-      this.obtenerAllPermisos();
+      this.BuscarFormatos();
     });
   }
 
@@ -67,6 +71,7 @@ export class ListaPermisosAdminComponent implements OnInit {
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
   formato_fecha: string;
   formato_hora: string;
+  ArrayAutorizacionTipos: any = [];
   BuscarFormatos() {
     this.parametro.ObtenerFormatos().subscribe(
       resp => {
@@ -75,39 +80,38 @@ export class ListaPermisosAdminComponent implements OnInit {
         this.obtenerAllPermisos();
       }
     )
+
+    this.restAutoriza.BuscarAutoridadUsuarioDepa(this.idEmpleado).subscribe(
+      (res) => {
+        this.ArrayAutorizacionTipos = res;
+      }
+    );
+
   }
 
+  listaPermisosFiltradas: any = [];
+  listaPermisosDeparta: any = [];
+  permilista: any = [];
+  gerencia: boolean;
   obtenerAllPermisos() {
     this.limpiarRango_fechas();
+    this.pageActual = 1;
+    this.listaPermisosFiltradas = [];
+    this.listaPermisosDeparta = [];
+    this.permilista = [];
     this.subscripted = this.permisosService.getAllPermisos()
       .subscribe(
         permisos => {
-          this.permisos_pendientes = permisos.filter(o => {
-            if (this.idEmpleado !== o.id_empl_contrato) { // condicion para no mostrar las solicitudes del mismo admin
-              return o.estado === 1;
+          this.permisos = permisos;
+
+          //Filtra la lista de Permisos para descartar las solicitudes del mismo usuario y almacena en una nueva lista
+          this.listaPermisosFiltradas = this.permisos.filter((o) => {
+            if (this.idEmpleado !== o.id_empl_contrato) {
+              return this.listaPermisosFiltradas.push(o);
             }
           });
 
-          this.permisos_pre_autorizados = permisos.filter(o => {
-            if (this.idEmpleado !== o.id_empl_contrato) { // condicion para no mostrar las solicitudes del mismo admin
-              return o.estado === 2;
-            }
-
-          });
-
-          this.permisos_autorizado = permisos.filter(o => {
-            if (this.idEmpleado !== o.id_empl_contrato) { // condicion para no mostrar las solicitudes del mismo admin
-              return o.estado === 3
-            }
-          });
-
-          this.permisos_negado = permisos.filter(o => {
-            if (this.idEmpleado !== o.id_empl_contrato) { // condicion para no mostrar las solicitudes del mismo admin
-              return o.estado === 4
-            }
-          });
-
-          permisos.forEach(p => {
+          this.listaPermisosFiltradas.forEach(p => {
             // TRATAMIENTO DE FECHAS Y HORAS
             p.fec_creacion_ = this.validar.FormatearFecha(p.fec_creacion, this.formato_fecha, this.validar.dia_completo);
             p.fec_inicio_ = this.validar.FormatearFecha(String(p.fec_inicio), this.formato_fecha, this.validar.dia_completo);
@@ -117,21 +121,102 @@ export class ListaPermisosAdminComponent implements OnInit {
             p.hora_salida_ = this.validar.FormatearHora(p.hora_salida, this.formato_hora);
           })
 
-          if (this.permisos_pendientes.length == 0 && this.permisos_pre_autorizados.length == 0 && this.permisos_autorizado.length == 0 && this.permisos_negado.length == 0) {
-            return this.Ver = true;
-          } else {
-            if((this.pestaniaEstados == 'pendientes') && (this.permisos_pendientes.length < 6)){
-              return this.Ver = true;
-            }else if((this.pestaniaEstados == 'pre_autorizados') && (this.permisos_pre_autorizados.length < 6)){
-              return this.Ver = true;
-            }else if((this.pestaniaEstados == 'autorizados') && (this.permisos_autorizado.length < 6)){
-              return this.Ver = true;
-            }else if((this.pestaniaEstados == 'negados') && (this.permisos_negado.length < 6)){
-              return this.Ver = true;
-            }else{
-              this.Ver = false;
-            }
-          }
+          let i = 0;
+          this.listaPermisosFiltradas.filter(item => {   
+            this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_empl_contrato).subscribe(
+              (usuaDep) => {
+                i = i+1;
+                this.ArrayAutorizacionTipos.filter(x => {
+                  if((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)){
+                    this.gerencia = true;
+                    if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
+                      this.permilista.push(item);
+                    }else if(item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)){
+                      this.permilista.push(item);
+                    }else{
+                      this.permilista.push(item);
+                    }
+                  }else if((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
+                    if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true){
+                      this.permilista.push(item);
+                    }else if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true){
+                      this.permilista.push(item);
+                    }else{
+                      this.permilista.push(item);
+                    }
+                  }
+                });
+
+                //Filtra la lista de autorizacion para almacenar en un array
+                if(this.listaPermisosFiltradas.length === i){
+                  this.listaPermisosDeparta = this.permilista
+
+                  this.permisos_pendientes = this.listaPermisosDeparta.filter(o => {
+                    if (this.idEmpleado !== o.id_empl_contrato) { // condicion para no mostrar las solicitudes del mismo admin
+                      return o.estado === 1;
+                    }
+                  });
+        
+                  this.permisos_pre_autorizados = this.listaPermisosDeparta.filter(o => {
+                    if (this.idEmpleado !== o.id_empl_contrato) { // condicion para no mostrar las solicitudes del mismo admin
+                      return o.estado === 2;
+                    }
+        
+                  });
+        
+                  this.permisos_autorizado = this.listaPermisosDeparta.filter(o => {
+                    if (this.idEmpleado !== o.id_empl_contrato) { // condicion para no mostrar las solicitudes del mismo admin
+                      return o.estado === 3
+                    }
+                  });
+        
+                  this.permisos_negado = this.listaPermisosDeparta.filter(o => {
+                    if (this.idEmpleado !== o.id_empl_contrato) { // condicion para no mostrar las solicitudes del mismo admin
+                      return o.estado === 4
+                    }
+                  });
+
+                  this.permisos_pendientes.sort(
+                    (firstObject: Permiso, secondObject: Permiso) =>  
+                      (firstObject.num_permiso >  secondObject.num_permiso)? -1 : 1
+                  );
+
+                  this.permisos_pre_autorizados.sort(
+                    (firstObject: Permiso, secondObject: Permiso) =>  
+                      (firstObject.num_permiso >  secondObject.num_permiso)? -1 : 1
+                  );
+
+                  this.permisos_autorizado.sort(
+                    (firstObject: Permiso, secondObject: Permiso) =>  
+                      (firstObject.num_permiso >  secondObject.num_permiso)? -1 : 1
+                  );
+
+                  this.permisos_negado.sort(
+                    (firstObject: Permiso, secondObject: Permiso) =>  
+                      (firstObject.num_permiso >  secondObject.num_permiso)? -1 : 1
+                  );
+
+                  if (this.permisos_pendientes.length == 0 && this.permisos_pre_autorizados.length == 0 && this.permisos_autorizado.length == 0 && this.permisos_negado.length == 0) {
+                    return this.Ver = true;
+                  } else {
+                    if((this.pestaniaEstados == 'pendientes') && (this.permisos_pendientes.length < 6)){
+                      return this.Ver = true;
+                    }else if((this.pestaniaEstados == 'pre_autorizados') && (this.permisos_pre_autorizados.length < 6)){
+                      return this.Ver = true;
+                    }else if((this.pestaniaEstados == 'autorizados') && (this.permisos_autorizado.length < 6)){
+                      return this.Ver = true;
+                    }else if((this.pestaniaEstados == 'negados') && (this.permisos_negado.length < 6)){
+                      return this.Ver = true;
+                    }else{
+                      this.Ver = false;
+                    }
+                  }
+
+                }
+            });
+            
+          });
+          
         },
         err => {
           console.log(err);

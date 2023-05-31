@@ -78,3 +78,29 @@ export const getOneHorarioEmpleadoByCodigo = async (req: Request, res: Response)
         return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
 };
+
+export const getInformarEmpleadoAutoriza = async (req: Request, res: Response): Promise<Response> => {
+    try{
+        const { id_empleado } = req.params;
+        const DATOS = await pool.query(
+            `
+            SELECT (da.nombre ||' '|| da.apellido) AS fullname, da.cedula, tc.cargo, 
+                cd.nombre AS departamento
+            FROM datos_actuales_empleado AS da, empl_cargos AS ec, tipo_cargo AS tc,
+                cg_departamentos AS cd
+            WHERE da.id_cargo = ec.id AND ec.cargo = tc.id AND cd.id = da.id_departamento AND 
+            da.id = $1
+            `
+            , [id_empleado]);
+        if (DATOS.rowCount > 0) {
+            return res.jsonp(DATOS.rows)
+        }
+        else {
+            return res.status(404).jsonp({ text: 'error' });
+        }
+
+    }catch(error){
+        console.log(error);
+        return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+}

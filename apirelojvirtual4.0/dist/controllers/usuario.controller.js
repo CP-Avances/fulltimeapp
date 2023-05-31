@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getidDispositivo = exports.ingresarIDdispositivo = exports.actualizarIDcelular = exports.getUserByIdEmpresa = exports.getEmpleadosActivos = exports.getUserAdmin = exports.loginUsuario = exports.getUserById = exports.getUsers = void 0;
+exports.ObtenerDepartamentoUsuarios = exports.getidDispositivo = exports.ingresarIDdispositivo = exports.actualizarIDcelular = exports.getUserByIdEmpresa = exports.getEmpleadosActivos = exports.getUserAdmin = exports.loginUsuario = exports.getUserById = exports.getUsers = void 0;
 const md5_typescript_1 = require("md5-typescript");
 const database_1 = require("../database");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -306,3 +306,28 @@ const getidDispositivo = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.getidDispositivo = getidDispositivo;
+/**
+ * BUSCAR DEPARTAMENTOS POR EL ID DEL USUARIOS.
+ * @returns
+ */
+const ObtenerDepartamentoUsuarios = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id_empleado } = req.params;
+        const EMPLEADO = yield database_1.pool.query(`
+            SELECT e.id, e.id_departamento, e.id_contrato, cg_departamentos.nombre FROM datos_actuales_empleado AS e 
+            INNER JOIN cg_departamentos ON e.id_departamento = cg_departamentos.id 
+            WHERE id_contrato = $1
+            `, [id_empleado]);
+        if (EMPLEADO.rowCount > 0) {
+            return res.status(200).jsonp(EMPLEADO.rows);
+        }
+        else {
+            return res.status(404).jsonp({ text: 'Registros no encontrados' });
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+});
+exports.ObtenerDepartamentoUsuarios = ObtenerDepartamentoUsuarios;

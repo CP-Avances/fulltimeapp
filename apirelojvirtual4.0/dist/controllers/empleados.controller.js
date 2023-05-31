@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getOneHorarioEmpleadoByCodigo = exports.getListaHorariosEmpleadoByCodigo = exports.getUbicacion = exports.getListaEmpleados = void 0;
+exports.getInformarEmpleadoAutoriza = exports.getOneHorarioEmpleadoByCodigo = exports.getListaHorariosEmpleadoByCodigo = exports.getUbicacion = exports.getListaEmpleados = void 0;
 const database_1 = require("../database");
 const getListaEmpleados = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -82,3 +82,27 @@ const getOneHorarioEmpleadoByCodigo = (req, res) => __awaiter(void 0, void 0, vo
     }
 });
 exports.getOneHorarioEmpleadoByCodigo = getOneHorarioEmpleadoByCodigo;
+const getInformarEmpleadoAutoriza = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id_empleado } = req.params;
+        const DATOS = yield database_1.pool.query(`
+            SELECT (da.nombre ||' '|| da.apellido) AS fullname, da.cedula, tc.cargo, 
+                cd.nombre AS departamento
+            FROM datos_actuales_empleado AS da, empl_cargos AS ec, tipo_cargo AS tc,
+                cg_departamentos AS cd
+            WHERE da.id_cargo = ec.id AND ec.cargo = tc.id AND cd.id = da.id_departamento AND 
+            da.id = $1
+            `, [id_empleado]);
+        if (DATOS.rowCount > 0) {
+            return res.jsonp(DATOS.rows);
+        }
+        else {
+            return res.status(404).jsonp({ text: 'error' });
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+});
+exports.getInformarEmpleadoAutoriza = getInformarEmpleadoAutoriza;

@@ -157,8 +157,6 @@ export const postNuevoPermiso = async (req: Request, res: Response): Promise<Res
             id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
             documento, docu_nombre, estado, id_empl_cargo, hora_salida, hora_ingreso, codigo } = req.body;
 
-        console.log(req.body);
-
         const response: QueryResult = await pool.query(
             'INSERT INTO permisos (fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, ' +
             'dia_libre, id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso, ' +
@@ -173,53 +171,35 @@ export const postNuevoPermiso = async (req: Request, res: Response): Promise<Res
         if (!objetoPermiso) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
 
         const permiso: Permiso = objetoPermiso
-        console.log(permiso);
-
         const { id_departamento } = req.query;
-
         const JefesDepartamentos = await pool.query(
-            'SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc, ' +
-            'cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato, ' +
-            'e.id AS empleado, (e.nombre || \' \' || e.apellido) as fullname , e.cedula, e.correo, ' +
-            'c.permiso_mail, c.permiso_noti ' +
-            'FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, ' +
-            'sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c ' +
-            'WHERE da.id_departamento = $1 AND ' +
-            'da.id_empl_cargo = ecr.id AND ' +
-            'da.id_departamento = cg.id AND ' +
-            'da.estado = true AND ' +
-            'cg.id_sucursal = s.id AND ' +
-            'ecr.id_empl_contrato = ecn.id AND ' +
-            'ecn.id_empleado = e.id AND ' +
-            'e.id = c.id_empleado', [id_departamento]).then(result => { return result.rows });
-        console.log(JefesDepartamentos);
-
+            `
+            SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel,
+                da.estado, dae.id_contrato, da.id_empl_cargo, (dae.nombre || ' ' || dae.apellido) as fullname,
+                dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti 
+            FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae,
+                config_noti AS c, cg_departamentos AS cg
+            WHERE n.id_departamento = $1
+                AND da.id_departamento = n.id_dep_nivel
+                AND dae.id_cargo = da.id_empl_cargo
+                AND dae.id_contrato = c.id_empleado
+                AND cg.id = $1
+            ORDER BY nivel ASC
+            `, 
+            [id_departamento]).then(result => { return result.rows });
+       
         if (JefesDepartamentos.length === 0) return res.status(400)
             .jsonp({ message: 'Ups!!! algo salio mal. Solicitud ingresada, pero es necesario verificar configuraciones "jefes de departamento".' });
 
-        const [obj] = JefesDepartamentos;
-        let depa_padre = obj.depa_padre;
-        let JefeDepaPadre;
-
+        const obj = JefesDepartamentos[JefesDepartamentos.length - 1];
+        let depa_padre = obj.id_dep_nivel;
+        var JefeDepaPadre: any = [];
         if (depa_padre !== null) {
-            do {
-                JefeDepaPadre = await pool.query('SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, ' +
-                    'cg.nivel, s.id AS id_suc, cg.nombre AS departamento, s.nombre AS sucursal, ' +
-                    'ecr.id AS cargo, ecn.id AS contrato, e.id AS empleado, ' +
-                    '(e.nombre || \' \' || e.apellido) as fullname, e.cedula, e.correo, c.permiso_mail, ' +
-                    'c.permiso_noti ' +
-                    'FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, ' +
-                    'sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c ' +
-                    'WHERE da.id_departamento = $1 AND da.id_empl_cargo = ecr.id AND ' +
-                    'da.id_departamento = cg.id AND ' +
-                    'da.estado = true AND cg.id_sucursal = s.id AND ecr.id_empl_contrato = ecn.id AND ' +
-                    'ecn.id_empleado = e.id AND e.id = c.id_empleado', [depa_padre]);
+            JefesDepartamentos.filter((item: any) => {
+                JefeDepaPadre.push(item)
+                permiso.EmpleadosSendNotiEmail = JefesDepartamentos
+            })
 
-                depa_padre = JefeDepaPadre.rows[0].depa_padre;
-                JefesDepartamentos.push(JefeDepaPadre.rows[0]);
-
-            } while (depa_padre !== null);
-            permiso.EmpleadosSendNotiEmail = JefesDepartamentos
             return res.status(200).jsonp(permiso);
 
         } else {
@@ -283,8 +263,6 @@ export const putPermiso = async (req: Request, res: Response): Promise<Response>
 
                 return res.status(400).jsonp({ message: 'No se actualizo el registro.' });
             }
-
-
         }
 
         return res.status(400).jsonp({ message: 'El estado debe ser pendiente para editar la solicitud.' });
@@ -292,4 +270,13 @@ export const putPermiso = async (req: Request, res: Response): Promise<Response>
         console.log(error);
         return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
+}
+
+export const pruebaConsulta = async (req:Request , res: Response): Promise<Response> => {
+        const query = `SELECT p.* FROM permisos p`
+        const response = await pool.query(query);
+        const permisos = response.rows;
+        return res.status(200).jsonp(permisos);
+
+        //return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
 }

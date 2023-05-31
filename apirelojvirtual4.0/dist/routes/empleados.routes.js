@@ -37,6 +37,7 @@ class EmpleadoRoutes {
         this.router.get('/horarios', EMPLEADO.getListaHorariosEmpleadoByCodigo);
         this.router.get('/un-horario', EMPLEADO.getOneHorarioEmpleadoByCodigo);
         this.router.get('/ubicacion/:codigo', EMPLEADO.getUbicacion);
+        this.router.get('/empleadoAutoriza/:id_empleado', EMPLEADO.getInformarEmpleadoAutoriza);
     }
 }
 const EMPLEADOS_Routes = new EmpleadoRoutes();

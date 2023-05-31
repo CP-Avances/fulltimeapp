@@ -47,4 +47,9 @@ export class EmpleadosService {
     return this.http.get<any>(this.apiUrl + '/empleado/ubicacion/' + codigo);
   }
 
+  // METODO PARA BUSCAR INFORMACION DEL USUARIO QUE APRUEBA SOLICITUDES
+  InformarEmpleadoAutoriza(id_empleado: number) {
+    return this.http.get(`${environment.url}/empleado/empleadoAutoriza/${id_empleado}`);
+  }
+
 }

@@ -151,6 +151,17 @@ export class PermisosService {
       )
   }
 
+  pruebaConsulta(): Observable<any>{
+    const url = `${this.apiUrl}/permisos/consulta`;
+    return this.http.get<any>(url)
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
+      )
+  }
+
+ 
+
   BuscarPermisosSolicitados(datos: any) {
     return this.http.post<any>(`${this.recursoURL}/empleadoPermiso/permisos-solicitados/movil`, datos);
   }

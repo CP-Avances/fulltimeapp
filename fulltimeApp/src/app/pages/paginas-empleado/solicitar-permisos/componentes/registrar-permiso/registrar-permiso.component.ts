@@ -712,6 +712,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
           this.SendEmailsEmpleados(permiso);
           this.num_permiso = this.num_permiso + 1;
           this.closeModalComponent.closeModal(true);
+          console.log('entro aqui: ');
           this.validaciones.abrirToas('Solicitud registrada Exitosamente.', 4000, 'success', 'top');
         },
         err => { 
@@ -970,5 +971,5 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     }
     this.formRegistro.resetForm();
   }
-
+  
 }

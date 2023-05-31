@@ -103,6 +103,23 @@ export class AutorizacionesService {
       )
   }
 
+  // METODO PARA BUSCAR USUARIO AUTORIZA
+  BuscarAutoridadUsuarioDepa(id: any): Observable <Autorizacion> {
+    const url = `${this.apiUrl}/autorizaciones/autorizaUsuarioDepa/${id}`;
+    const params = new HttpParams()
+      .set('id_empleado', id)
+      .set('campo', 'id')
+    return this.http.get<Autorizacion>(url, {params})
+    .pipe(
+      tap(console.log),
+      catchError(this.handleError)
+    )
+  }
+
+  BuscarListaAutorizaDepa(id_depar: any) {
+    return this.http.get(`${environment.url}/autorizaciones/listaDepaAutoriza/${id_depar}`);
+  }
+
   /******************************************************
    * 
    *        BUSQUEDA DE JEFES DE DEPARTAMENTOS

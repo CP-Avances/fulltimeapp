@@ -42,6 +42,7 @@ class UserRoutes {
         this.router.put('/actualizarIDcelular/:id_usuario', USUARIO.actualizarIDcelular);
         this.router.post('/ingresarIDdispositivo', USUARIO.ingresarIDdispositivo);
         this.router.get('/IDdispositivos/:id_empleado', USUARIO.getidDispositivo);
+        this.router.get('/dato/:id_empleado', USUARIO.ObtenerDepartamentoUsuarios);
     }
 }
 const USUARIO_Routes = new UserRoutes();
