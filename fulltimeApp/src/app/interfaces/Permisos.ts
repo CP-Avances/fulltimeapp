@@ -25,6 +25,7 @@ export interface Permiso {
     docu_nombre: string | null;
     ntipopermiso?: string;
     nempleado?: string;
+    id_departamento?: number;
     
     // FORMATEAR FECHAS Y HORAS
     fec_creacion_: string;
@@ -59,6 +60,7 @@ export const permisoValueDefault: Permiso = {
     nempleado: undefined,
     docu_nombre: '',
     ntipopermiso: undefined,
+    id_departamento: null,
     // FORMATEAR FECHAS Y HORAS
     fec_creacion_: '',
     fec_inicio_: '',

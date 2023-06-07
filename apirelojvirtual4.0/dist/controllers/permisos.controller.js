@@ -39,7 +39,8 @@ const getlistaPermisos = (req, res) => __awaiter(void 0, void 0, void 0, functio
     try {
         const subquery = '( select (nombre || \' \' || apellido) from empleados i where i.codigo = CAST(p.codigo AS VARCHAR) ) as nempleado ';
         const subquery1 = '( select i.descripcion from cg_tipo_permisos i where i.id = p.id_tipo_permiso) as ntipopermiso ';
-        const query = `SELECT p.*, ${subquery}, ${subquery1} FROM permisos p ORDER BY p.fec_inicio DESC`;
+        const subquery2 = '( select da.id_departamento FROM datos_actuales_empleado AS da WHERE da.codigo::int = p.codigo ) AS id_departamento ';
+        const query = `SELECT p.*, ${subquery}, ${subquery1}, ${subquery2} FROM permisos p ORDER BY p.fec_inicio DESC`;
         const response = yield database_1.pool.query(query);
         const permisos = response.rows;
         return res.status(200).jsonp(permisos);
@@ -59,7 +60,8 @@ const getlistaPermisosByFechas = (req, res) => __awaiter(void 0, void 0, void 0,
         const { fec_inicio, fec_final } = req.query;
         const subquery = '( select (nombre || \' \' || apellido) from empleados i where i.codigo = CAST(p.codigo AS VARCHAR) ) as nempleado ';
         const subquery1 = '( select i.descripcion from cg_tipo_permisos i where i.id = p.id_tipo_permiso) as ntipopermiso ';
-        const query = `SELECT p.*, ${subquery}, ${subquery1} FROM permisos p WHERE p.fec_inicio BETWEEN \'${fec_inicio}\' AND \'${fec_final}\' ORDER BY p.fec_inicio DESC`;
+        const subquery2 = '( select da.id_departamento FROM datos_actuales_empleado AS da WHERE da.codigo::int = p.codigo ) AS id_departamento ';
+        const query = `SELECT p.*, ${subquery}, ${subquery1}, ${subquery2} FROM permisos p WHERE p.fec_inicio BETWEEN \'${fec_inicio}\' AND \'${fec_final}\' ORDER BY p.fec_inicio DESC`;
         const response = yield database_1.pool.query(query);
         const permisos = response.rows;
         return res.status(200).jsonp(permisos);

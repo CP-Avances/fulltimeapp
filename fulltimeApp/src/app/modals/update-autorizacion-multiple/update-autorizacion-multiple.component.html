@@ -1,37 +1,65 @@
 <app-close-modal titleModal="Actualizar Autorización"></app-close-modal>
 
 <ion-content>
-
-  <ion-text mode="ios" color="dark" style="text-align: center;">
-    <br>
+  <ion-text mode="ios" color="dark" style="text-align: center; margin-top: 8px;">
     <h3>{{ labelAutorizacion }}</h3>
   </ion-text>
 
   <form #formRegistro="ngForm" *ngIf="showForm; else showMessageAutorizacion">
 
-    <div class="Contenido">
+    <div class="Contenido" [hidden] = "oculDepa">
       <ion-item class="stilo_selection" color="horas_extras">
-        <ion-label position="floating">Autorización</ion-label>
-        <ion-select mode="ios" interface="popover" style="color: rgb(0, 0, 0);" placeholder="Pendiente" name="estado" [(ngModel)]="estadoChange.id" okText="Guardar" cancelText="Cancelar" (ionChange)="ChangeEstado()" required>
-          <ion-select-option *ngFor="let e of estadoSelectItems" [value]="e.id" [disabled]=" e.id === 1 ? true : false"> {{ e.nombre }} </ion-select-option>
+        <ion-label position="floating">Departamento ha Aprobar</ion-label>
+        <ion-select mode="ios" interface="popover" style="color: rgb(0, 0, 0);" placeholder="Seleccione el departamento" name="departamento" (ngModel)="departamentoChange.id" (ionChange)="ChangeDepa($event)" required>
+          <ion-select-option *ngFor="let depa of nuevoAutorizacionTipos" [value]="depa.id_depa_confi"> {{ depa.nombre }} </ion-select-option>
         </ion-select>
       </ion-item>
     </div>
 
-    <ng-container *ngIf="permisos !== undefined">
-      <app-show-permiso-multiple [permisos]="permisos"></app-show-permiso-multiple>
+    <div class="Contenido" [hidden] = "ocultar">
+      <ion-item class="stilo_selection" color="horas_extras">
+        <ion-label position="floating">Autorización</ion-label>
+        <ion-select mode="ios" interface="popover" style="color: rgb(0, 0, 0);" placeholder="Seleccione una opción" name="estado" (ngModel)="estadoChange.id" (ionChange)="ChangeEstado($event)" required>
+          <ion-select-option *ngFor="let e of estados" [value]="e.id"> {{ e.nombre }} </ion-select-option>
+        </ion-select>
+      </ion-item>
+    </div>
+
+    <ng-container *ngIf="ListaPermisos !== undefined">
+      <ion-card style="margin: 5% 4% 2% 4%;" *ngIf="ListaPermisos.length === 0">
+        <div style="font-size: 14px; text-align: center;">
+          <p>{{mensaje}}</p>
+        </div>
+      </ion-card>
+      <div style="margin: 5% 4% 2% 4%;" *ngFor="let permiso of ListaPermisos">
+        <app-show-permiso-multiple [permiso]="permiso"></app-show-permiso-multiple>
+      </div>
     </ng-container>
   
-    <ng-container *ngIf="vacaciones !== undefined">
-      <app-show-vacacion-multiple [vacaciones]="vacaciones"></app-show-vacacion-multiple>
+    <ng-container *ngIf="ListaVacaciones !== undefined">
+      <ion-card style="margin: 5% 4% 2% 4%;" *ngIf="ListaVacaciones.length === 0">
+        <div style="font-size: 14px; text-align: center;">
+          <p>{{mensaje}}</p>
+        </div>
+      </ion-card>
+      <div style="margin: 5% 4% 2% 4%;" *ngFor="let vacacion of ListaVacaciones">
+        <app-show-vacacion-multiple [vacacion]="vacacion"></app-show-vacacion-multiple>
+      </div>
     </ng-container>
   
-    <ng-container *ngIf="horas_extras !== undefined">
-      <app-show-hora-extra-multiple [horas_extras]="horas_extras"> </app-show-hora-extra-multiple>
+    <ng-container *ngIf="ListaHoras_extras !== undefined" >
+      <ion-card style="margin: 5% 4% 2% 4%;" *ngIf="ListaHoras_extras.length === 0">
+        <div style="font-size: 14px; text-align: center;">
+          <p>{{mensaje}}</p>
+        </div>
+      </ion-card>
+      <div style="margin: 5% 4% 2% 4%;" *ngFor="let hora_extra of ListaHoras_extras">
+        <app-show-hora-extra-multiple [hora_extra]="hora_extra" > </app-show-hora-extra-multiple>
+      </div>
     </ng-container>
 
      <!-- BOTON GUARDAR COMPONENTE -->
-     <div style="margin: 3% 4% 3% 4%;">
+     <div style="margin: 3% 4% 3% 4%;" [hidden] = "ocultar">
       <button style="width: 100%; background-color: transparent;">
         <btn-update (onUpdate)="UpdateRegister()" [loadingBtn]="loadingBtn" [formRegistro]="formRegistro"></btn-update>
       </button>
@@ -54,6 +82,5 @@
       <br>
     </ion-text>
   </ng-container>
-
 
 </ion-content>

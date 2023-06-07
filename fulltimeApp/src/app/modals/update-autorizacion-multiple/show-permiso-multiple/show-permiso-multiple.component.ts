@@ -1,34 +1,39 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Permiso } from '../../../interfaces/Permisos';
+import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 
 @Component({
   selector: 'app-show-permiso-multiple',
   template: `
-  <div style="margin: 5% 4% 2% 4%;">
-    <ion-card *ngFor="let permiso of permisos" style="padding: 3% 7% 3% 5%;">
-        <ion-card-title style="text-align: center; font-size: 13px;"><b> N° de permiso:</b> {{ permiso.num_permiso }}</ion-card-title>
-   
+  <div>
+    <ion-card style="padding: 3% 7% 3% 5%;">
+        <ion-card-title style="text-align: center; font-size: 13px;">
+          <strong style="float:right; margin-left:-10%;"> Soli #: {{ PermisoDato.num_permiso }}</strong> 
+          {{PermisoDato.nempleado | titlecase }}
+        </ion-card-title>
+          
+  
         <h6>
-          <p style="font-size: 12px; margin-top:-4%;"> Solicita Permiso por {{ permiso.ntipopermiso | titlecase }}</p>
-          <p style="font-size: 12px; margin-top:-2%;" *ngIf="permiso.descripcion != null">Descripcion<br>{{ permiso.descripcion }}</p>
-          <p style="font-size: 12px; margin-top:-2%;" *ngIf="permiso.descripcion == null" > El Usuario no ha ingresado una descrcipcion</p>
+          <ion-card-title style="margin-top:-2%; margin-bottom:2%; font-size: 12px;"><b> Informacion </b></ion-card-title>
 
-          <ion-card-title style="margin-top:-2%; margin-bottom:-3%; font-size: 12px;"><b> Informacion </b></ion-card-title>
-          <p style="font-size: 11px; margin: top -0.5em;">
-            <strong> Usuario - </strong>{{ permiso.nempleado | titlecase }} &nbsp;
-            <strong> Código - </strong>{{ permiso.codigo }}<br> 
+          <p style="font-size: 12px; margin-top:-2%;"> Solicita Permiso por {{ PermisoDato.ntipopermiso | titlecase }}</p>
+          <p style="font-size: 12px; margin-top:-2%;" *ngIf="PermisoDato.descripcion != null">Descripcion<br>{{ PermisoDato.descripcion }}</p>
+          <p style="font-size: 12px; margin-top:-2%;" *ngIf="PermisoDato.descripcion == null" > El Usuario no ha ingresado una descrcipcion</p>
+
+          <p style="font-size: 11px; margin-top:-2%">
+            <strong> Código del usuario - </strong>{{ PermisoDato.codigo }}<br> 
           </p>
 
           <ion-card-title style="margin-top:-2%; margin-bottom:-3%; font-size: 12px;"><b> Fecha </b></ion-card-title>
           <p style="font-size: 10px; margin: top -0.5em;">   
-            <strong> Desde: </strong>{{ permiso.fec_inicio_ }} - 
-            <strong> Hasta: </strong> {{ permiso.fec_final_ }}<br>
-            <strong> Hora inicia: </strong> {{ permiso.hora_salida_ }} - 
-            <strong> Hora finaliza:</strong> {{ permiso.hora_ingreso_ }} <br>
-            <strong> Permiso - Horas: </strong> {{ permiso.hora_numero }} /&nbsp;
-            <strong> Dias: </strong> {{ permiso.dia }} <br>
+            <strong> Desde: </strong>{{ PermisoDato.fec_inicio_ }} - 
+            <strong> Hasta: </strong> {{ PermisoDato.fec_final_ }}<br>
+            <strong> Hora inicia: </strong> {{ PermisoDato.hora_salida_ }} - 
+            <strong> Hora finaliza:</strong> {{ PermisoDato.hora_ingreso_ }} <br>
+            <strong> Permiso - Horas: </strong> {{ PermisoDato.hora_numero }} /&nbsp;
+            <strong> Dias: </strong> {{ PermisoDato.dia }} <br>
             <br>
-            <ion-card-title style="margin-top:-2%; margin-bottom:-3%; font-size: 100%;"> <b> Fecha solicita:</b> {{ permiso.fec_creacion_ }}</ion-card-title> 
+            <ion-card-title style="margin-top:-2%; margin-bottom:-3%; font-size: 100%; float: right;"> <b> Fecha solicitada:</b> {{ PermisoDato.fec_creacion_ }}</ion-card-title> 
           </p>
         </h6>
  
@@ -37,8 +42,58 @@ import { Permiso } from '../../../interfaces/Permisos';
   `,
   // styleUrls: ['./show-permiso.component.scss'],
 })
-export class ShowPermisoMultipleComponent {
+export class ShowPermisoMultipleComponent implements OnInit {
+  @Input() permiso: Permiso[];
 
-  @Input() permisos: Permiso[];
+  idEmpleado: any;
+  estado_auto: any;
+  autorizacion: any = [];
+  ArrayAutorizacionTipos: any = [];
+  Filtropermisos: any = [];
+  PermisoDato: any = [];
 
+  constructor(
+    private autoService: AutorizacionesService,
+  ){
+    this.idEmpleado = parseInt(localStorage.getItem('empleadoID'));
+  }
+
+  ngOnInit(){
+    this.ConfiguracionAutorizacion();
+  }
+
+  nivel_padre: number = 0;
+  mensaje: any;
+  listadoDepaAutoriza: any = []
+  ConfiguracionAutorizacion(){
+    this.listadoDepaAutoriza = [];
+    this.Filtropermisos = [];
+    this.PermisoDato = this.permiso;
+    /*
+    let i = 0;
+    this.permiso.filter(item => {
+      this.autoService.getAutorizacionPermiso(item.id).subscribe(
+        autorizacion => { 
+          this.autorizacion = autorizacion
+          var autorizaciones = this.autorizacion.id_documento.split(',');
+          this.autoService.BuscarListaAutorizaDepa(this.autorizacion.id_departamento).subscribe(res => {
+            this.listadoDepaAutoriza = res;
+            i = i+1;
+            this.listadoDepaAutoriza.filter(i => {
+              this.nivel_padre = i.nivel_padre;
+              if((this.idEmpleado == i.id_contrato) && (autorizaciones.length ==  i.nivel)){
+                return this.Filtropermisos.push(item);
+              }
+            })
+    
+            if (this.permiso.length === i) {
+              console
+              this.mensaje = 'No tiene Solicitudes de Permisos para APROBAR';
+            }
+          });
+        }
+      )
+    });
+    */
+  }
 }

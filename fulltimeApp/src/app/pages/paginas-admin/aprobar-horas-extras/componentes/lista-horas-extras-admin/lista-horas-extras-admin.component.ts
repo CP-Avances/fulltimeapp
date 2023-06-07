@@ -10,6 +10,8 @@ import { DataUserLoggedService } from '../../../../../services/data-user-logged.
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
+import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
+import { RelojServiceService } from 'src/app/services/reloj-service.service';
 
 @Component({
   selector: 'app-all-horas-extras',
@@ -22,12 +24,16 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
   @ViewChild (IonDatetime) datetimeInicio: IonDatetime;
   @ViewChild (IonDatetime) datetimeFinal: IonDatetime;
 
+  public horasExtras : any = [];
+
   username: any;
   subscripted: Subscription;
   skeleton = SkeletonListPermisoArray;
   loading: boolean = true;
   pageActual: number = 1;
   Ver: boolean;
+
+  idEmpleado: any;
 
   horasExtras_pendientes: HoraExtra[] = [];
   horasExtras_pre_autorizados: HoraExtra[] = [];
@@ -40,6 +46,13 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
   fechaIn: string = "";
   fechaFi: string = "";
 
+  ArrayAutorizacionTipos: any = [];
+
+  msPendiente: boolean = false;
+  msPreautorizado: boolean = false;
+  msAutorizado: boolean = false;
+  msNegado: boolean = false;
+
   constructor(
     private dataUserLoggedService: DataUserLoggedService,
     private horasExtrasService: HorasExtrasService,
@@ -50,6 +63,8 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
     public modalController: ModalController,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
+    public restAutoriza: AutorizacionesService,
+    public usuarioDepa: RelojServiceService,
   ) {
 
     this.socket.on('recibir_aviso', (data_llega: any) => {
@@ -60,6 +75,7 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.username = this.userService.UserFullname;
+    this.idEmpleado = parseInt(localStorage.getItem('empleadoID'));
     this.BuscarFormatos();
   }
 
@@ -74,20 +90,53 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
         this.obtenerAllHorasExtras();
       }
     )
+
+    this.restAutoriza.BuscarAutoridadUsuarioDepa(this.idEmpleado).subscribe(
+      (res) => {
+        this.ArrayAutorizacionTipos = res;
+      }
+    );
+
   }
 
   ngOnDestroy() {
     this.subscripted.unsubscribe();
   }
 
+  EncerarListas(){
+    this.horasExtras_pendientes = [];
+    this.horasExtras_pre_autorizados = [];
+    this.horasExtras_autorizado = [];
+    this.horasExtras_negado = [];
+    this.msPendiente = false;
+    this.msAutorizado = false;
+    this.msPreautorizado = false;
+    this.msNegado = false;
+  }
 
+  listaHorasFiltradas: any = [];
+  listaHorasDeparta: any = [];
+  horalista: any = [];
+  gerencia: boolean;
   obtenerAllHorasExtras() {
     this.limpiarRango_fechas();
+    this.EncerarListas();
+    this.pageActual = 1;
+    this.listaHorasFiltradas = [];
+    this.listaHorasDeparta = [];
+    this.horalista = [];
     this.subscripted = this.horasExtrasService.getAllHorasExtras()
       .subscribe(
         horasExtras => {
+          this.horasExtras = horasExtras;
+          //Filtra la lista de Horas Extras para descartar las solicitudes del mismo usuario y almacena en una nueva lista
+          this.listaHorasFiltradas = this.horasExtras.filter(o => {
+            if (o.nempleado !== this.username) { // condicion para no mostrar las solicitudes del mismo admin
+              return this.listaHorasFiltradas.push(o)
+            }
+          });
 
-          horasExtras.forEach(h => {
+          this.listaHorasFiltradas.forEach(h => {
             h.fecha_inicio_ = this.validar.FormatearFecha(moment(h.fec_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
             h.hora_inicio_ = this.validar.FormatearHora(moment(h.fec_inicio).format('HH:mm:ss'), this.formato_hora);
             h.fecha_fin_ = this.validar.FormatearFecha(moment(h.fec_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);;
@@ -95,45 +144,121 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
             h.fec_solicita_ = this.validar.FormatearFecha(String(h.fec_solicita), this.formato_fecha, this.validar.dia_completo);
           })
 
-          this.horasExtras_pendientes = horasExtras.filter(o => {
-            if (o.nempleado !== this.username) { // condicion para no mostrar las solicitudes del mismo admin
-              return o.estado === 1
-            }
-          });
 
-          this.horasExtras_pre_autorizados = horasExtras.filter(o => {
-            if (o.nempleado !== this.username) { // condicion para no mostrar las solicitudes del mismo admin
-              return o.estado === 2
-            }
-          });
+          let i = 0;
+          this.listaHorasFiltradas.filter(item => {   
+            this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_contrato).subscribe(
+              (usuaDep) => {
+                i = i+1;
+                this.ArrayAutorizacionTipos.filter(x => {
+                  if((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)){
+                    this.gerencia = true;
+                    if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
+                      this.horalista.push(item);
+                    }else if(item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)){
+                      this.horalista.push(item);
+                    }else{
+                      this.horalista.push(item);
+                    }
+                  }else if((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
+                    if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true){
+                      this.horalista.push(item);
+                    }else if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true){
+                      this.horalista.push(item);
+                    }else{
+                      this.horalista.push(item);
+                    }
+                  }
+                });
 
-          this.horasExtras_autorizado = horasExtras.filter(o => {
-            if (o.nempleado !== this.username) { // condicion para no mostrar las solicitudes del mismo admin
-              return o.estado === 3
-            }
-          });
+                //Filtra la lista de autorizacion para almacenar en un array
+                if(this.listaHorasFiltradas.length === i){
+                  this.listaHorasDeparta = this.horalista;
 
-          this.horasExtras_negado = horasExtras.filter(o => {
-            if (o.nempleado !== this.username) { // condicion para no mostrar las solicitudes del mismo admin
-              return o.estado === 4
-            }
-          });
+                  this.horasExtras_pendientes = this.listaHorasDeparta.filter(o => {
+                    return o.estado === 1
+                  });
 
-          if (this.horasExtras_pendientes.length == 0 && this.horasExtras_pre_autorizados.length == 0 && this.horasExtras_autorizado.length == 0 && this.horasExtras_negado.length == 0) {
-            this.Ver = true;
-          } else {
-            if((this.pestaniaEstados == 'pendientes') && (this.horasExtras_pendientes.length < 6)){
-              return this.Ver = true;
-            }else if((this.pestaniaEstados == 'pre_autorizados') && (this.horasExtras_pre_autorizados.length < 6)){
-              return this.Ver = true;
-            }else if((this.pestaniaEstados == 'autorizados') && (this.horasExtras_autorizado.length < 6)){
-              return this.Ver = true;
-            }else if((this.pestaniaEstados == 'negados') && (this.horasExtras_negado.length < 6)){
-              return this.Ver = true;
-            }else{
-              this.Ver = false;
-            }
-          }
+                  this.horasExtras_pre_autorizados = this.listaHorasDeparta.filter(o => {
+                      return o.estado === 2
+                  });
+        
+                  this.horasExtras_autorizado = this.listaHorasDeparta.filter(o => {
+                      return o.estado === 3
+                  });
+        
+                  this.horasExtras_negado = this.listaHorasDeparta.filter(o => {
+                      return o.estado === 4
+                  });
+
+                  //Listado para eliminar el usuario duplicado
+                  var ListaSinDuplicadosPendie = [];
+                  var cont = 0;
+                  this.horasExtras_pendientes.forEach(function(elemento, indice, array) {
+                    cont = cont + 1;
+                    if(ListaSinDuplicadosPendie.find(p=>p.id == elemento.id) == undefined)
+                    {
+                      ListaSinDuplicadosPendie.push(elemento);
+                    }
+                  });
+
+                  if(this.horasExtras_pendientes.length == cont){
+                    this.horasExtras_pendientes = ListaSinDuplicadosPendie;
+
+                    this.horasExtras_pendientes.sort(
+                      (firstObject: HoraExtra, secondObject: HoraExtra) =>  
+                        (firstObject.id >  secondObject.id)? -1 : 1
+                    );
+                  }
+
+                  this.horasExtras_pre_autorizados.sort(
+                    (firstObject: HoraExtra, secondObject: HoraExtra) =>  
+                      (firstObject.id >  secondObject.id)? -1 : 1
+                  );
+
+                  this.horasExtras_autorizado.sort(
+                    (firstObject: HoraExtra, secondObject: HoraExtra) =>  
+                      (firstObject.id >  secondObject.id)? -1 : 1
+                  );
+
+                  this.horasExtras_negado.sort(
+                    (firstObject: HoraExtra, secondObject: HoraExtra) =>  
+                      (firstObject.id >  secondObject.id)? -1 : 1
+                  );
+
+                  if(this.horasExtras_pendientes.length == 0){
+                    this.msPendiente = true;
+                  }else if(this.horasExtras_pre_autorizados.length == 0){
+                    this.msPreautorizado = true;
+                  }else if(this.horasExtras_autorizado.length == 0){
+                    this.msAutorizado = true;
+                  }else if(this.horasExtras_negado.length == 0){
+                    this.msNegado = true;
+                  }
+
+                  if (this.horasExtras_pendientes.length == 0 && this.horasExtras_pre_autorizados.length == 0 && this.horasExtras_autorizado.length == 0 && this.horasExtras_negado.length == 0) {
+                    this.msPendiente = true;
+                    this.msAutorizado = true;
+                    this.msPreautorizado = true;
+                    this.msNegado = true;
+                    this.Ver = true;
+                  } else {
+                    if((this.pestaniaEstados == 'pendientes') && (this.horasExtras_pendientes.length < 6)){
+                      return this.Ver = true;
+                    }else if((this.pestaniaEstados == 'pre_autorizados') && (this.horasExtras_pre_autorizados.length < 6)){
+                      return this.Ver = true;
+                    }else if((this.pestaniaEstados == 'autorizados') && (this.horasExtras_autorizado.length < 6)){
+                      return this.Ver = true;
+                    }else if((this.pestaniaEstados == 'negados') && (this.horasExtras_negado.length < 6)){
+                      return this.Ver = true;
+                    }else{
+                      this.Ver = false;
+                    }
+                  }        
+                }
+              }
+            );
+          });
 
         },
         err => {
@@ -193,19 +318,27 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
   }
 
   BuscarByFecha() {
-    this.horasExtras_pendientes = [];
-    this.horasExtras_pre_autorizados = [];
-    this.horasExtras_autorizado = [];
-    this.horasExtras_negado = [];
-
+    this.EncerarListas();
+    this.pageActual = 1;
+    this.listaHorasFiltradas = [];
+    this.listaHorasDeparta = [];
+    this.horalista = [];
     if (this.fechaFinal < this.fechaInicio) {
       this.limpiarRango_fechas();
       return this.mostrarToas('La fecha de inicio no puede ser mayor a la fecha final de consulta', 3000, "danger");
     } else {
       this.horasExtrasService.getAllHorasExtrasByFechas(this.fechaInicio.split('T')[0], this.fechaFinal.split('T')[0]).subscribe(
         horasExtras => {
+          this.horasExtras = horasExtras;
 
-          horasExtras.forEach(h => {
+          //Filtra la lista de Horas Extras para descartar las solicitudes del mismo usuario y almacena en una nueva lista
+          this.listaHorasFiltradas = this.horasExtras.filter(o => {
+            if (o.nempleado !== this.username) { // condicion para no mostrar las solicitudes del mismo admin
+              return this.listaHorasFiltradas.push(o)
+            }
+          });
+
+          this.listaHorasFiltradas.forEach(h => {
             h.fecha_inicio_ = this.validar.FormatearFecha(moment(h.fec_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
             h.hora_inicio_ = this.validar.FormatearHora(moment(h.fec_inicio).format('HH:mm:ss'), this.formato_hora);
             h.fecha_fin_ = this.validar.FormatearFecha(moment(h.fec_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);;
@@ -213,42 +346,92 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
             h.fec_solicita_ = this.validar.FormatearFecha(String(h.fec_solicita), this.formato_fecha, this.validar.dia_completo);
           })
 
-          this.horasExtras_pendientes = horasExtras.filter(o => {
-            if (o.nempleado !== this.username) { // condicion para no mostrar las solicitudes del mismo admin
-              return o.estado === 1
-            }
+          let i = 0;
+          this.listaHorasFiltradas.filter(item => {   
+            this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_contrato).subscribe(
+              (usuaDep) => {
+                i = i+1;
+                this.ArrayAutorizacionTipos.filter(x => {
+                  if((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)){
+                    this.gerencia = true;
+                    if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
+                      this.horalista.push(item);
+                    }else if(item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)){
+                      this.horalista.push(item);
+                    }else{
+                      this.horalista.push(item);
+                    }
+                  }else if((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
+                    if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true){
+                      this.horalista.push(item);
+                    }else if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true){
+                      this.horalista.push(item);
+                    }else{
+                      this.horalista.push(item);
+                    }
+                  }
+                });
+
+                //Filtra la lista de autorizacion para almacenar en un array
+                if(this.listaHorasFiltradas.length === i){
+                  this.listaHorasDeparta = this.horalista;
+
+                  this.horasExtras_pendientes = this.listaHorasDeparta.filter(o => {
+                    return o.estado === 1
+                  });
+
+                  this.horasExtras_pre_autorizados = this.listaHorasDeparta.filter(o => {
+                      return o.estado === 2
+                  });
+        
+                  this.horasExtras_autorizado = this.listaHorasDeparta.filter(o => {
+                      return o.estado === 3
+                  });
+        
+                  this.horasExtras_negado = this.listaHorasDeparta.filter(o => {
+                      return o.estado === 4
+                  });
+                  
+                  this.horasExtras_pendientes.sort(
+                    (firstObject: HoraExtra, secondObject: HoraExtra) =>  
+                      (firstObject.id >  secondObject.id)? -1 : 1
+                  );
+
+                  this.horasExtras_pre_autorizados.sort(
+                    (firstObject: HoraExtra, secondObject: HoraExtra) =>  
+                      (firstObject.id >  secondObject.id)? -1 : 1
+                  );
+
+                  this.horasExtras_autorizado.sort(
+                    (firstObject: HoraExtra, secondObject: HoraExtra) =>  
+                      (firstObject.id >  secondObject.id)? -1 : 1
+                  );
+
+                  this.horasExtras_negado.sort(
+                    (firstObject: HoraExtra, secondObject: HoraExtra) =>  
+                      (firstObject.id >  secondObject.id)? -1 : 1
+                  );
+                  
+
+                  if (this.horasExtras_pendientes.length == 0 && this.horasExtras_pre_autorizados.length == 0 && this.horasExtras_autorizado.length == 0 && this.horasExtras_negado.length == 0) {
+                    this.Ver = true;
+                  } else {
+                    if((this.pestaniaEstados == 'pendientes') && (this.horasExtras_pendientes.length < 6)){
+                      return this.Ver = true;
+                    }else if((this.pestaniaEstados == 'pre_autorizados') && (this.horasExtras_pre_autorizados.length < 6)){
+                      return this.Ver = true;
+                    }else if((this.pestaniaEstados == 'autorizados') && (this.horasExtras_autorizado.length < 6)){
+                      return this.Ver = true;
+                    }else if((this.pestaniaEstados == 'negados') && (this.horasExtras_negado.length < 6)){
+                      return this.Ver = true;
+                    }else{
+                      this.Ver = false;
+                    }
+                  }        
+                }
+              }
+            );
           });
-
-          this.horasExtras_pre_autorizados = horasExtras.filter(o => {
-            if (o.nempleado !== this.username) { // condicion para no mostrar las solicitudes del mismo admin
-              return o.estado === 2
-            }
-          });
-
-          this.horasExtras_autorizado = horasExtras.filter(o => {
-            if (o.nempleado !== this.username) { // condicion para no mostrar las solicitudes del mismo admin
-              return o.estado === 3
-            }
-          });
-
-          this.horasExtras_negado = horasExtras.filter(o => {
-            if (o.nempleado !== this.username) { // condicion para no mostrar las solicitudes del mismo admin
-              return o.estado === 4
-            }
-          });
-
-          if((this.pestaniaEstados == 'pendientes') && (this.horasExtras_pendientes.length < 6)){
-            return this.Ver = true;
-          }else if((this.pestaniaEstados == 'pre_autorizados') && (this.horasExtras_pre_autorizados.length < 6)){
-            return this.Ver = true;
-          }else if((this.pestaniaEstados == 'autorizados') && (this.horasExtras_autorizado.length < 6)){
-            return this.Ver = true;
-          }else if((this.pestaniaEstados == 'negados') && (this.horasExtras_negado.length < 6)){
-            return this.Ver = true;
-          }else{
-            this.Ver = false;
-          }
-
         },
         err => {
           console.log(err);

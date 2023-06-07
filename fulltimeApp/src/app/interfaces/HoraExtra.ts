@@ -28,6 +28,7 @@ export interface HoraExtra {
     fec_solicita_: Date | string;
     hora_inicio_?: string;
     hora_fin_?: string;
+    id_departamento?: number;
 }
 
 export const horaExtraDefaultValue = {
@@ -55,4 +56,5 @@ export const horaExtraDefaultValue = {
     fec_solicita_: null,
     hora_inicio_: null,
     hora_fin_: null,
+    id_departamento: null
 }

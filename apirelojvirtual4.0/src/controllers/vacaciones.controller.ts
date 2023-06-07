@@ -34,8 +34,9 @@ export const getlistaVacaciones = async (req: Request, res: Response): Promise<R
         const subquery2 = '( SELECT t.cargo FROM empl_cargos i, tipo_cargo t WHERE i.id = v.id_empl_cargo AND i.cargo = t.id) AS ncargo '
         const subquery3 = '( SELECT (nombre || \' \' || apellido) FROM empleados i WHERE i.codigo = CAST(v.codigo AS VARCHAR) ) AS nempleado '
         const subquery4 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo::int = v.codigo) AS id_contrato '
+        const subquery5 = '( SELECT da.id_departamento FROM datos_actuales_empleado AS da WHERE da.codigo::int = v.codigo ) AS id_departamento '
 
-        const query = `SELECT v.*, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4} FROM vacaciones v ORDER BY v.fec_inicio DESC LIMIT 100`
+        const query = `SELECT v.*, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4}, ${subquery5} FROM vacaciones v ORDER BY v.fec_inicio DESC LIMIT 100`
         const response: QueryResult = await pool.query(query);
         const vacaciones: Vacacion[] = response.rows;
         return res.status(200).jsonp(vacaciones);
@@ -56,8 +57,9 @@ export const getlistaVacacionesByFechas = async (req: Request, res: Response): P
         const subquery2 = '( SELECT t.cargo FROM empl_cargos i, tipo_cargo t WHERE i.id = v.id_empl_cargo AND i.cargo = t.id) AS ncargo '
         const subquery3 = '( SELECT (nombre || \' \' || apellido) FROM empleados i WHERE i.codigo = CAST(v.codigo AS VARCHAR) ) AS nempleado '
         const subquery4 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo::int = v.codigo) AS id_contrato '
+        const subquery5 = '( SELECT da.id_departamento FROM datos_actuales_empleado AS da WHERE da.codigo::int = v.codigo ) AS id_departamento '
 
-        const query = `SELECT v.*, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4} 
+        const query = `SELECT v.*, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4}, ${subquery5} 
         FROM vacaciones v WHERE v.fec_inicio BETWEEN \'${fec_inicio}\' AND \'${fec_final}\' 
         ORDER BY v.fec_inicio DESC LIMIT 100`
         const response: QueryResult = await pool.query(query);
@@ -143,51 +145,33 @@ export const postNuevaVacacion = async (req: Request, res: Response): Promise<Re
         const { id_departamento } = req.query;
 
         const JefesDepartamentos = await pool.query(
-            'SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc, ' +
-            'cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato, ' +
-            'e.id AS empleado, (e.nombre || \' \' || e.apellido) as fullname , e.cedula, e.correo, ' +
-            'c.vaca_mail, c.vaca_noti ' +
-            'FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, ' +
-            'sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c ' +
-            'WHERE da.id_departamento = $1 AND ' +
-            'da.id_empl_cargo = ecr.id AND ' +
-            'da.id_departamento = cg.id AND ' +
-            'da.estado = true AND ' +
-            'cg.id_sucursal = s.id AND ' +
-            'ecr.id_empl_contrato = ecn.id AND ' +
-            'ecn.id_empleado = e.id AND ' +
-            'e.id = c.id_empleado', [id_departamento]).then(result => { return result.rows });
-        console.log(JefesDepartamentos);
+            `
+            SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel,
+                da.estado, dae.id_contrato, da.id_empl_cargo, (dae.nombre || ' ' || dae.apellido) as fullname,
+                dae.cedula, dae.correo, c.vaca_mail, c.vaca_noti 
+            FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae,
+                config_noti AS c, cg_departamentos AS cg
+            WHERE n.id_departamento = $1
+                AND da.id_departamento = n.id_dep_nivel
+                AND dae.id_cargo = da.id_empl_cargo
+                AND dae.id_contrato = c.id_empleado
+                AND cg.id = $1
+            ORDER BY nivel ASC
+            `, 
+            [id_departamento]).then(result => { return result.rows });
 
         if (JefesDepartamentos.length === 0) return res.status(400)
             .jsonp({ message: 'Ups !!! algo salio mal. Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.' });
 
-        const [obj] = JefesDepartamentos;
-        let depa_padre = obj.depa_padre;
-        let JefeDepaPadre;
-
+        const obj = JefesDepartamentos[JefesDepartamentos.length - 1];
+        let depa_padre = obj.id_dep_nivel;
+        var JefeDepaPadre: any = [];
         if (depa_padre !== null) {
-            do {
-                JefeDepaPadre = await pool.query(`
-                    SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,
-                    cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato,
-                    e.id AS empleado, (e.nombre || \' \' || e.apellido) as fullname , e.cedula, e.correo, c.vaca_mail, c.vaca_noti
-                    FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-                    sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-                    WHERE da.id_departamento = $1 AND 
-                    da.id_empl_cargo = ecr.id AND 
-                    da.id_departamento = cg.id AND 
-                    da.estado = true AND 
-                    cg.id_sucursal = s.id AND 
-                    ecr.id_empl_contrato = ecn.id AND 
-                    ecn.id_empleado = e.id AND 
-                    e.id = c.id_empleado `, [depa_padre]);
+            JefesDepartamentos.filter((item: any) => {
+                JefeDepaPadre.push(item)
+                vacacion.EmpleadosSendNotiEmail = JefesDepartamentos
+            })
 
-                depa_padre = JefeDepaPadre.rows[0].depa_padre;
-                JefesDepartamentos.push(JefeDepaPadre.rows[0]);
-
-            } while (depa_padre !== null);
-            vacacion.EmpleadosSendNotiEmail = JefesDepartamentos
             return res.status(200).jsonp(vacacion);
 
         } else {

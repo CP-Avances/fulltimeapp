@@ -8,41 +8,44 @@
   <ion-card>
     <ion-card-content>
       <ion-card-title style="text-align: center;"> Filtrar Por Fechas</ion-card-title>
-
-      <ion-grid style="margin-top: -2%;" mode="md">
+      <ion-grid mode="md">
         <ion-row>
           <ion-col size="6">
-            <ion-item style="border-radius: 5%;" class="item_fondo" id="permiso_fechaInicio" fill="solid">
+            <div class="formdiv_tiempo" style="margin-left: -7%;">
+              <ion-item class="item_fondo" id="permiso_fechaInicio" mode="md">
                 <ion-label position="floating">Fecha inicial</ion-label>
                 <ion-input readonly="true" name="finicio" [ngModel]="fechaIn"></ion-input>
-                <ion-modal trigger="permiso_fechaInicio" class="inputDateFecha">
-                  <ng-template>
-                    <ion-content>
-                      <ion-datetime
-                        #datetimeInicio 
-                        presentation="date" 
-                        [showDefaultButtons]="false"
-                        [value]="fechaInicio"
-                        name="finicio" 
-                        mode="md" 
-                        (ionChange)="changeFechaInicio($event)" 
-                        min="1990-01-01" 
-                        max="2050-12-31"
-                        color="success">
-                      </ion-datetime>
-                      <div style="width: 95%">
-                        <ion-label style="float: right; margin: 2%; font-size: medium;" color="success" (click) = "datetimeInicio.cancel(true)">Cancelar</ion-label>
-                      </div>
-                    </ion-content>
-                  </ng-template>
-                </ion-modal>
-            </ion-item>
+              </ion-item>
+              <ion-modal trigger="permiso_fechaInicio" class="inputDateFecha">
+                <ng-template>
+                  <ion-content>
+                    <ion-datetime
+                      #datetimeInicio 
+                      presentation="date" 
+                      [showDefaultButtons]="false"
+                      [value]="fechaInicio"
+                      name="finicio" 
+                      mode="md" 
+                      (ionChange)="changeFechaInicio($event)" 
+                      min="1990-01-01" 
+                      max="2050-12-31"
+                      color="success">
+                    </ion-datetime>
+                    <div style="width: 95%">
+                      <ion-label style="float: right; margin: 2%; font-size: medium;" color="success" (click) = "datetimeInicio.cancel(true)">Cancelar</ion-label>
+                    </div>
+                  </ion-content>
+                </ng-template>
+              </ion-modal>
+            </div>
           </ion-col>
     
           <ion-col size="6">
-            <ion-item style="border-radius: 5%;" class="item_fondo" id="permiso_fechaFinal" fill="solid">
-              <ion-label position="floating" >Fecha final</ion-label>
-              <ion-input readonly="true" name="ffinal" [ngModel]="fechaFi"></ion-input>
+            <div class="formdiv_tiempo" style="margin-right: -7%;">
+              <ion-item class="item_fondo" id="permiso_fechaFinal" mode="md">
+                <ion-label position="floating" >Fecha final</ion-label>
+                <ion-input readonly="true" name="ffinal" [ngModel]="fechaFi"></ion-input>
+              </ion-item>
               <ion-modal trigger="permiso_fechaFinal" class="inputDateFecha" *ngIf="fechaIn != ''">
                 <ng-template>
                   <ion-content>
@@ -70,22 +73,22 @@
                   </ng-template>
                 </ion-content>
               </ion-popover>
-            </ion-item>
+            </div>
           </ion-col>
         </ion-row>
       </ion-grid>
 
       <ion-row>
         <ion-col size="6">
-          <ion-button color="acua" shape="round" expand="full" (click)="BuscarByFecha()" [disabled]="fechaInicio === '' || fechaFinal === '' ">
-           <ion-icon color="light" name="search-outline" style="margin-right: 3%;"></ion-icon>
-            <ion-label style="font-size: 72%;">BUSCAR</ion-label>
+          <ion-button style="margin-right: 5%;" color="acua" shape="round" expand="full" (click)="BuscarByFecha()" [disabled]="fechaInicio === '' || fechaFinal === '' ">
+           <ion-icon color="light" name="search-outline" style="margin-right: 4%;"></ion-icon>
+            <ion-label style="font-size: 72%;">FILTRAR</ion-label>
           </ion-button>
         </ion-col>
         <ion-col size="6">
-          <ion-button color="theme" shape="round" expand="full" (click)="obtenerAllPermisos()">
-            <ion-icon color="light" name="list-outline" style="margin-right: 3%;"></ion-icon>
-            <ion-label style="font-size: 72%;">MOSTRAR TODOS</ion-label>
+          <ion-button style="margin-left: 5%;" color="theme" shape="round" expand="full" (click)="obtenerAllPermisos()">
+            <ion-icon color="light" name="list-outline" style="margin-right: 4%;"></ion-icon>
+            <ion-label style="font-size: 72%;">LISTAR TODOS</ion-label>
           </ion-button>
         </ion-col>
       </ion-row>
@@ -106,9 +109,8 @@
           <item-permiso [permiso]="permiso"></item-permiso>
   
           <div style="font-size: 10px; margin-right: 5%; padding-bottom: 1%;" *ngIf="!isChecked">
-
-            <span style="float:left">
-              <ion-label style="color: rgb(255, 123, 123); font-size: 13px;" >{{permiso.fec_creacion_}}</ion-label>
+            <span style="float:left; margin-left: 3%;">
+              <ion-label color="dark" style="font-size: 13px;" >{{permiso.fec_creacion_}}</ion-label>
             </span>
 
             <!-- Eliminar registro SOLO EN PERMISOS--> 
@@ -126,7 +128,15 @@
     </ion-card>
 
     <ion-card *ngIf="permisos_pendientes.length == 0" style="margin-top: 1%; margin-bottom: 3%; padding: 5%;">
-      <ion-label >
+      <div *ngIf="msPendiente != true" style="text-align: center;">
+        <br>
+        <ion-text color="primary">
+          <span>Obteniendo Información Por favor Espere</span>
+        </ion-text>
+        <ion-progress-bar type="indeterminate" ></ion-progress-bar>
+        <br>
+      </div>
+      <ion-label *ngIf="msPendiente == true">
         <h4 style="text-align: center; font-size: 95%;"> No tiene Solicitudes de Permisos para Aprobar </h4>
           <div style="text-align: center; margin-top: 10%;">
               <img class="tamanoImagen" src="../../../assets/images/Sin_internet.svg"/>
@@ -153,11 +163,11 @@
           <ion-checkbox *ngIf="isCheckedPre" slot="start" [(ngModel)]="permiso.isChecked"></ion-checkbox>
           <item-permiso [permiso]="permiso"></item-permiso>
 
-          <span style="float:left; margin-left: 5%;">
-            <ion-label style="font-size: 11px;" >Fecha creacion: {{permiso.fec_creacion_}}</ion-label>
-          </span>
-
           <div style="font-size: 10px; margin-right: 5%; padding-bottom: 1%;" *ngIf="!isCheckedPre">
+            <span style="float:left; margin-left: 3%;">
+              <ion-label color="dark" style="font-size: 13px;" >{{permiso.fec_creacion_}}</ion-label>
+            </span>
+
             <!-- Eliminar registro SOLO EN PERMISOS--> 
             <span style="float:right">
               <btn-delete (onDelete)="ngOnInit()"  nameTable="permisos" [isButtom]="false" [idreg]="permiso.id" [userCodigo]="permiso.codigo" style="color: rgb(255, 123, 123); font-size: 13px;" ></btn-delete>BORRAR
@@ -173,7 +183,15 @@
     </ion-card>
 
     <ion-card *ngIf="permisos_pre_autorizados.length == 0" style="margin-top: 1%; margin-bottom: 3%; padding: 5%;">
-      <ion-label >
+      <div *ngIf="msPreautorizado != true" style="text-align: center;">
+        <br>
+        <ion-text color="primary">
+          <span>Obteniendo Información Por favor Espere</span>
+        </ion-text>
+        <ion-progress-bar type="indeterminate" ></ion-progress-bar>
+        <br>
+      </div>
+      <ion-label *ngIf="msPreautorizado == true">
         <h4 style="text-align: center; font-size: 95%;"> No tiene Solicitudes de Permisos Pre-Autorizadas </h4>
           <div style="text-align: center; margin-top: 10%;">
               <img class="tamanoImagen" src="../../../assets/images/Sin_internet.svg"/>
@@ -194,10 +212,9 @@
         <div style="width:100%; margin-bottom: 7%;"  *ngIf="permiso.nempleado !== username" >
           <item-permiso [permiso]="permiso"></item-permiso>
           <div style="font-size: 10px; margin-right: 5%; padding-bottom: 1%;">
-            <span style="float:left; margin-left: 5%;">
-              <ion-label style="font-size: 11px;" >Fecha creacion: {{permiso.fec_creacion_}}</ion-label>
+            <span style="float:left; margin-left: 3%;">
+              <ion-label color="dark" style="font-size: 13px;" >{{permiso.fec_creacion_}}</ion-label>
             </span>
-
             <!-- Eliminar registro SOLO EN PERMISOS--> 
             <span style="float:right">
               <btn-delete (onDelete)="ngOnInit()"  nameTable="permisos" [isButtom]="false" [idreg]="permiso.id" [userCodigo]="permiso.codigo" style="color: rgb(255, 123, 123); font-size: 13px;" ></btn-delete>BORRAR
@@ -208,7 +225,15 @@
     </ion-card>
 
     <ion-card *ngIf="permisos_autorizado.length == 0" style="margin-top: 1%; margin-bottom: 3%; padding: 5%;">
-      <ion-label >
+      <div *ngIf="msAutorizado != true" style="text-align: center;">
+        <br>
+        <ion-text color="primary">
+          <span>Obteniendo Información Por favor Espere</span>
+        </ion-text>
+        <ion-progress-bar type="indeterminate" ></ion-progress-bar>
+        <br>
+      </div>
+      <ion-label *ngIf="msAutorizado == true">
         <h4 style="text-align: center; font-size: 95%;"> No tiene Solicitudes de Permisos Autorizadas </h4>
           <div style="text-align: center; margin-top: 10%;">
               <img class="tamanoImagen" src="../../../assets/images/Sin_internet.svg"/>
@@ -228,10 +253,9 @@
         <div style="width:100%; margin-bottom: 7%;"  *ngIf="permiso.nempleado !== username">
           <item-permiso [permiso]="permiso"></item-permiso>
           <div style="font-size: 10px; margin-right: 5%; padding-bottom: 1%;">
-            <span style="float:left; margin-left: 5%;">
-              <ion-label style="font-size: 11px;" >Fecha creacion: {{permiso.fec_creacion_}}</ion-label>
+            <span style="float:left; margin-left: 3%;">
+              <ion-label color="dark" style="font-size: 13px;" >{{permiso.fec_creacion_}}</ion-label>
             </span>
-            
             <!-- Eliminar registro SOLO EN PERMISOS--> 
             <span style="float:right">
               <btn-delete (onDelete)="ngOnInit()"  nameTable="permisos" [isButtom]="false" [idreg]="permiso.id" [userCodigo]="permiso.codigo" style="color: rgb(255, 123, 123); font-size: 13px;" ></btn-delete>BORRAR
@@ -242,7 +266,15 @@
     </ion-card>
 
     <ion-card *ngIf="permisos_negado.length == 0" style="margin-top: 1%; margin-bottom: 3%; padding: 5%;">
-      <ion-label >
+      <div *ngIf="msNegado != true" style="text-align: center;">
+        <br>
+        <ion-text color="primary">
+          <span>Obteniendo Información Por favor Espere</span>
+        </ion-text>
+        <ion-progress-bar type="indeterminate" ></ion-progress-bar>
+        <br>
+      </div>
+      <ion-label *ngIf="msNegado == true">
         <h4 style="text-align: center; font-size: 95%;"> No tiene Solicitudes de Permisos Negadas </h4>
           <div style="text-align: center; margin-top: 10%;">
               <img class="tamanoImagen" src="../../../assets/images/Sin_internet.svg"/>
@@ -284,13 +316,3 @@
     </ion-item>
   </ion-list>
 </ng-template>
-
-<!--<ion-card style="margin-top: 6%; margin-bottom: 3%; margin-top: 10%; padding: 5%;">
-  <ion-label >
-    <h4 style="text-align: center; font-size: 95%;"> Sin Conexion la Servidor </h4>
-      <div style="text-align: center; margin-top: 20%;">
-          <ion-img class="tamanoImagen" src="../../../assets/images/Sin_internet.svg"></ion-img>
-          <br><br>
-      </div>
-  </ion-label>
-</ion-card>-->

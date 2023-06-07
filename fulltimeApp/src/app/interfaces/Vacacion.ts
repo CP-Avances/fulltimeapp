@@ -20,6 +20,7 @@ export interface Vacacion {
     fec_inicio_: string;
     fec_final_: string;
     fec_ingreso_: string;
+    id_departamento?: number;
 }
 export const vacacionValueDefault = {
     isChecked: false,
@@ -36,4 +37,5 @@ export const vacacionValueDefault = {
     fec_inicio_: null,
     fec_final_: null,
     fec_ingreso_: null,
+    id_departamento: null,
 }
