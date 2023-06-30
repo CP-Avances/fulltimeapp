@@ -188,9 +188,9 @@
                   </ion-item>
                   <ion-popover trigger="open-regiPermiHoraFin">
                     <ng-template>
-                      <p style="margin: auto; padding: 4%;" *ngIf="(dia_fianl == '') && (reg.fec_final == null)">Ingrese las fechas</p>
-                      <ion-datetime *ngIf="dia_fianl != ''"
-                        [disabled] = "fech_bloqu" 
+                      <p style="margin: auto; padding: 4%;" *ngIf="(hora_inicio == '') && (reg.hora_salida == null)">Ingrese la hora inicio</p>
+                      <ion-datetime *ngIf="hora_inicio != ''"
+                        [disabled] = "fech_bloquf" 
                         presentation="time" 
                         mode="md" 
                         name="hora_final" 
@@ -304,7 +304,7 @@
           </div>
   
           <div style="margin: 6% 3% 0% 3%;" [hidden] = "btnOcultoguardar">
-            <ion-text *ngIf="cg_permiso.documento === true " color="medium" class="text_info">
+            <ion-text *ngIf="cg_permiso.documento === true " color="medium" class="text_info" style="margin: 0% 10% 0% 10%;">
               Es obligatorio en {{cg_permiso.descripcion}} el documento de Respaldo 
             </ion-text>
             <!-- BOTON GUARDAR DESDE OTRO COMPONENTE -->

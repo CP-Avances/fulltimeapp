@@ -13,6 +13,7 @@ export const getCgFeriados = async (req: Request, res: Response): Promise<Respon
         const fecha = new Date();
         const response: QueryResult = await pool.query('SELECT id, descripcion, CAST(fecha AS VARCHAR),CAST(fec_recuperacion AS VARCHAR) FROM cg_feriados WHERE CAST(fecha AS VARCHAR) LIKE $1 || \'%\' ORDER BY descripcion ASC', [fecha.toJSON().split("-")[0]]);
         const cg_feriados: Cg_Feriados[] = response.rows;
+        console.log('cg_feriados: ',cg_feriados);
         return res.status(200).jsonp(cg_feriados);
     } catch (error) {
         console.log(error);

@@ -216,7 +216,26 @@ ion-modal{
 
   ion-content{
     --background: transparent;
-    --padding-top: 25vh;
+    --padding-top: 23vh;
+    --padding-start: 30px;
+    --padding-end: 20px;
+
+    ion-datetime{
+      border-radius: 10px;
+      
+    }
+  }
+}
+
+.modalHorario{
+  
+  &::part(content){
+    backdrop-filter: blur(6px);
+  }
+
+  ion-content{
+    --background: transparent;
+    --padding-top: 10vh;
     --padding-start: 30px;
     --padding-end: 20px;
 

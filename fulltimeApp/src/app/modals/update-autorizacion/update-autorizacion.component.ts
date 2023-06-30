@@ -97,7 +97,6 @@ export class UpdateAutorizacionComponent implements OnInit {
         this.ArrayAutorizacionTipos = res;
         this.ArrayAutorizacionTipos.filter(x => {
           if(x.nombre == 'GERENCIA' && x.estado == true && (datos.id_dep == x.id_departamento)){
-            console.log('entro en gerencia');
             this.gerencia = true;
             this.autorizaDirecto = false;
             this.InfoListaAutoriza = x;
@@ -114,7 +113,6 @@ export class UpdateAutorizacionComponent implements OnInit {
             }
           }
           else if((this.gerencia == false) && (x.estado == true) && (datos.id_dep == x.id_departamento)){
-            console.log('esta fuera de gerencia');
             this.autorizaDirecto = true;
             this.InfoListaAutoriza = x;
             if(x.autorizar == true){

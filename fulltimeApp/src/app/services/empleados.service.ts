@@ -33,6 +33,36 @@ export class EmpleadosService {
       )
   }
 
+  getHorariosEmpleadobyCodigo(datos){
+    const params = new HttpParams()
+      .set('codigo', datos.codigo)
+      .set('fecha_inicio', datos.fecha)
+    return this.http.get<HorarioE[]>(`${this.apiUrl}/empleado/horariosEmpleado`, { params })
+      .pipe(
+        tap(console.log)
+      )
+  }
+
+  getPlanificacionHorariosEmplbyCodigo(codigo){
+    const params = new HttpParams()
+      .set('codigo', codigo)
+    return this.http.get<HorarioE[]>(`${this.apiUrl}/empleado/planificacionHorarioEmplCodigo`, { params })
+      .pipe(
+        tap(console.log)
+      )
+  }
+
+  BuscarPlanificacionHorarioEmple(datos: any){
+    const params = new HttpParams()
+      .set('fecha_inicio', datos.fecha_inicio)
+      .set('fecha_final', datos.fecha_final)
+      .set('codigo', datos.codigo);
+    return this.http.get<HorarioE[]>(`${this.apiUrl}/empleado/horarioEmplefecha`, { params })
+      .pipe(
+        tap(console.log)
+      )
+  }
+
   ObtenerUnHorarioEmpleado(codigo: number, fecha_hoy: any) {
     const params = new HttpParams()
       .set('codigo', codigo)

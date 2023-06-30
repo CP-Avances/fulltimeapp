@@ -1,6 +1,7 @@
 <app-close-modal titleModal="Editar Solicitud Permiso"></app-close-modal>
 
 <ion-content mode="md">
+  <br>
   <app-refresh-info (onRefresh)="ngOnInit()" removeItem="cg_tipo_permiso"></app-refresh-info>
   <form #formRegistro="ngForm">
 
@@ -178,9 +179,10 @@
                   </ion-item>
                   <ion-popover trigger="open-editPermisoHoraFinal">
                     <ng-template>
-                      <p style="margin: auto; padding: 4%;" *ngIf="(dia_fianl == '') && (reg.fec_final == null)">Ingrese las fechas</p>
-                      <ion-datetime *ngIf="dia_fianl != ''"
-                      [disabled] = "fech_bloqu" 
+                      <p style="margin: auto; padding: 4%;" *ngIf="(hora_inicio == '') && (reg.hora_salida == null)">Ingrese la hora inicio</p>
+                      <ion-datetime *ngIf="hora_inicio != ''"
+                      [disabled] = "fech_bloquf"
+                      locale="es-ES"
                       presentation="time" 
                       mode="md" 
                       name="hora_final" 
@@ -292,7 +294,7 @@
         <div class="formdiv">
           <ion-item class="item_fondo" mode="md">
             <ion-label position="floating"><b>Observación </b></ion-label>
-            <ion-textarea style="font-size: 90%;" mode="md" name="descripcion" [(ngModel)]="reg.descripcion" rows="2" cols="20" mode="ios" minlength="3" maxlengt="55"></ion-textarea>
+            <ion-textarea style="font-size: 90%;" mode="md" name="descripcion" (ionChange)="ChangeObservacion($event)"  [(ngModel)]="reg.descripcion" rows="2" cols="20" mode="ios" minlength="3" maxlengt="55"></ion-textarea>
           </ion-item>
         </div>
 
@@ -330,8 +332,8 @@
       </div>
 
       <!-- BOTON GUARDAR COMPONENTE -->
-      <div style="margin: 6% 3% 0% 3%;" [hidden] = "btnOcultoguardar">
-        <ion-text *ngIf="cg_permiso.documento == true " color="medium" class="text_info">
+      <div style="margin: 6% 3% 0% 3%;" [hidden]= "btnOcultoguardar" *ngIf="btnOcultoguardar === false">
+        <ion-text *ngIf="cg_permiso.documento == true " color="medium" class="text_info" style="margin: 0% 10% 0% 10%;">
           Es obligatorio en {{cg_permiso.descripcion}} el documento de Respaldo 
         </ion-text>
         <button style="width: 100%; background-color: transparent;">

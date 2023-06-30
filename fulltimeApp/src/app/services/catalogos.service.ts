@@ -72,7 +72,6 @@ export class CatalogosService {
   }
 
   getFeriadosAnual(): void {
-
     if (!!sessionStorage.getItem('cg_feriado')) {
       const lista: any = sessionStorage.getItem('cg_feriado')
       this.lista_feriados = JSON.parse(lista)
