@@ -68,7 +68,7 @@ const ObtenerListaAutorizaDepa = (req, res) => __awaiter(void 0, void 0, void 0,
     try {
         const { id_depar } = req.params;
         const EMPLEADOS = yield database_1.pool.query(`
-            SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel, cg.depa_padre, cg.nivel AS nivel_padre,
+            SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel,
                 da.estado, dae.id_contrato, da.id_empl_cargo, (dae.nombre || ' ' || dae.apellido) as fullname, 
                 dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail, 
                 c.hora_extra_noti  

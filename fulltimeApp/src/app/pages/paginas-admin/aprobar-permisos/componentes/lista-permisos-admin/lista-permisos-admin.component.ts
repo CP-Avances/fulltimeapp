@@ -141,6 +141,7 @@ export class ListaPermisosAdminComponent implements OnInit {
             this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_empl_contrato).subscribe(
               (usuaDep) => {
                 i = i+1;
+
                 this.ArrayAutorizacionTipos.filter(x => {
                   if((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)){
                     this.gerencia = true;
@@ -356,6 +357,9 @@ export class ListaPermisosAdminComponent implements OnInit {
             this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_empl_contrato).subscribe(
               (usuaDep) => {
                 i = i+1;
+
+                console.log('ArrayAutorizacionTipos: ',this.ArrayAutorizacionTipos);
+
                 this.ArrayAutorizacionTipos.filter(x => {
                   if((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)){
                     this.gerencia = true;

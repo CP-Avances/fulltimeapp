@@ -322,8 +322,8 @@ export class EditarPermisoComponent implements OnInit {
       message: `<div class="card-alert">
                   <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                   <br>
-                  <p> Ups! El dia que ingreso esta fuera de su calendario laboral </p>
-                  <p> Por favor cambie a un dia dentro de su calendario </p>
+                  <p style="color:#ffff"> Ups! El dia que ingreso esta fuera de su calendario laboral </p>
+                  <p style="color:#ffff"> Por favor cambie a un dia dentro de su calendario </p>
                 </div>`,
       buttons: [
         {
@@ -603,7 +603,7 @@ export class EditarPermisoComponent implements OnInit {
     var data = {
       fecha_inicio: moment(this.reg.fec_inicio).format('YYYY-MM-D'), 
       fecha_final: moment(this.reg.fec_final).format('YYYY-MM-D'), 
-      codigo: this.reg.codigo
+      codigo: '\''+this.reg.codigo+'\''
     }
 
     this.empleadoService.BuscarPlanificacionHorarioEmple(data).subscribe(horario => {

@@ -13,7 +13,7 @@ import { Autorizacion, autorizacionValueDefault } from '../../interfaces/Autoriz
 import { Notificacion, NotificacionTimbre, notificacionTimbreValueDefault, notificacionValueDefault } from 'src/app/interfaces/Notificaciones';
 import { CatalogosService } from 'src/app/services/catalogos.service';
 
-import { ModalController } from '@ionic/angular';
+import { AlertController, ModalController } from '@ionic/angular';
 import moment from 'moment';
 
 import { HorasExtrasService } from 'src/app/services/horas-extras.service';
@@ -72,6 +72,8 @@ export class UpdateAutorizacionComponent implements OnInit {
     public validar: ValidacionesService,
     public restAutoriza: AutorizacionesService,
     public restGeneral: EmpleadosService,
+    public horario: EmpleadosService,
+    public alertCrtl: AlertController,
 
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('id_empresa'));
@@ -80,7 +82,6 @@ export class UpdateAutorizacionComponent implements OnInit {
 
   tiempo: any;
   ngOnInit() {
-
     console.log('pantalla update-autorizacion .. ', this.permiso, ' ', this.vacacion, ' ', this.hora_extra)
     this.tiempo = moment();
     this.BuscarFormatos();
@@ -178,7 +179,7 @@ export class UpdateAutorizacionComponent implements OnInit {
       return this.autoService.getAutorizacionPermiso(this.permiso.id).subscribe(
         autorizacion => { 
           this.autorizacion = autorizacion;
-          this.ConfiguracionAutorizacion(this.autorizacion);
+          this.ConfiguracionAutorizacion(this.autorizacion, this.permiso);
         },
         err => { this.errorResponse(err.error.message) },
         () => { }
@@ -213,7 +214,7 @@ export class UpdateAutorizacionComponent implements OnInit {
       return this.autoService.getAutorizacionVacacion(this.vacacion.id).subscribe(
         autorizacion => { 
           this.autorizacion = autorizacion;
-          this.ConfiguracionAutorizacion(this.autorizacion); 
+          this.ConfiguracionAutorizacion(this.autorizacion, this.vacacion); 
         },
         err => { this.errorResponse(err.error.message) },
         () => { }
@@ -248,7 +249,7 @@ export class UpdateAutorizacionComponent implements OnInit {
       return this.autoService.getAutorizacionHoraExtra(this.hora_extra.id).subscribe(
         autorizacion => { 
           this.autorizacion = autorizacion;
-          this.ConfiguracionAutorizacion(this.autorizacion); 
+          this.ConfiguracionAutorizacion(this.autorizacion, this.hora_extra); 
         },
         err => { this.errorResponse(err.error.message) },
         () => { }
@@ -259,7 +260,7 @@ export class UpdateAutorizacionComponent implements OnInit {
   nivel_padre: number = 0;
   cont: number = 0;
   mensaje: any;
-  ConfiguracionAutorizacion(autorizacion: any){
+  ConfiguracionAutorizacion(autorizacion: any, solicitud: any){
     var autorizaciones = autorizacion.id_documento.split(',');
     autorizaciones.map((obj: string) => {
       this.lectura = this.lectura + 1;
@@ -290,7 +291,7 @@ export class UpdateAutorizacionComponent implements OnInit {
               this.cont = this.cont + 1;
               this.nivel_padre = item.nivel_padre;
               if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
-                return this.ocultar = false;
+                this.obtenerPlanificacionHoraria(solicitud.fec_inicio, solicitud.fec_final, solicitud.codigo, solicitud);
               }
             })
 
@@ -320,7 +321,7 @@ export class UpdateAutorizacionComponent implements OnInit {
           this.listadoDepaAutoriza = res;
             this.listadoDepaAutoriza.filter(item => {
               if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
-                return this.ocultar = false;
+                this.obtenerPlanificacionHoraria(solicitud.fec_inicio, solicitud.fec_final, solicitud.codigo, solicitud);
               }
             })
             this.empleado_estado = this.empleado_estado.concat(',');
@@ -329,6 +330,38 @@ export class UpdateAutorizacionComponent implements OnInit {
         );
       }
     });
+  }
+
+  listahorario: any = [];
+  color: string = '';
+  dia: any;
+  obtenerPlanificacionHoraria(fecha_i: any, fehca_f: any, codigo: any, solicitud: any){
+    this.mensaje = '';
+    var datos = {
+      fecha_inicio: fecha_i, 
+      fecha_final: fehca_f, 
+      codigo: '\''+codigo+'\''
+    }
+
+    this.horario.BuscarPlanificacionHorarioEmple(datos).subscribe(res => {
+      this.listahorario = res;
+      if(this.listahorario.length == 0){
+        solicitud.aprobacion = 'NO';
+        this.color = 'danger'
+        this.mensaje = 'No tiene registrado la planificacion horaria en esas fechas';
+        return this.ocultar = true;
+      }else{
+        this.color = ''
+        solicitud.aprobacion = 'SI';
+        return this.ocultar = false;
+      }
+    },error => {
+      solicitud.aprobacion = 'NO';
+      this.color = 'danger'
+      this.mensaje = 'Problemas con validar su planificacion horaria en esas fechas';
+      return this.ocultar = true;
+    });
+
   }
 
   // METODO PARA INGRESAR NOMBRE Y CARGO DEL USUARIO QUE REVISÓ LA SOLICITUD 

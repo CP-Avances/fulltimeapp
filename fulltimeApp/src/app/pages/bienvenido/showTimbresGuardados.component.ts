@@ -155,8 +155,8 @@ export class TimbresPerdidosComponent implements OnInit {
           this.mensage =  `<div class="card-alert">
                             <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                             <br>
-                            <p> Ups! Fallo la conexion con el servidor, no se podran enviar los timbre </p>
-                            <p> Por favor intentelo mas tarde </p>
+                            <p style="color:#ffff"> Ups! Fallo la conexion con el servidor, no se podran enviar los timbre </p>
+                            <p style="color:#ffff"> Por favor intentelo mas tarde </p>
                           </div>`;
           this.presentAlert(this.mensage);
           return this.btn_Enviar = true;
@@ -166,8 +166,8 @@ export class TimbresPerdidosComponent implements OnInit {
           this.mensage =  `<div class="card-alert">
                             <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                             <br>
-                            <p> Ups! Fallo la conexion con el servidor, no se podran enviar los timbre </p>
-                            <p> Por favor intentelo mas tarde prueba movil </p>
+                            <p style="color:#ffff"> Ups! Fallo la conexion con el servidor, no se podran enviar los timbre </p>
+                            <p style="color:#ffff"> Por favor intentelo mas tarde prueba movil </p>
                           </div>`;
           this.presentAlert(this.mensage);
           return this.btn_Enviar = true;
@@ -318,8 +318,8 @@ export class TimbresPerdidosComponent implements OnInit {
           this.mensage =  `<div class="card-alert">
                             <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                             <br>
-                            <p> Ups! Fallo la conexion con el servidor, no se podran enviar los timbre </p>
-                            <p> Por favor intentelo mas tarde </p>
+                            <p style="color:#ffff"> Ups! Fallo la conexion con el servidor, no se podran enviar los timbre </p>
+                            <p style="color:#ffff"> Por favor intentelo mas tarde </p>
                           </div>`;
           this.presentAlert(this.mensage);
           return this.btn_Enviar = true;

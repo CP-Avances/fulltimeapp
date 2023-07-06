@@ -59,7 +59,7 @@ export class DataLocalService {
       this.mensaje =  `<div class="card-alert">
                             <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                             <br>
-                            <p> Timbre guardado en la memoria del telefono. Se enviaran cuando tenga conexion a internet 😅 </p>
+                            <p style="color:#ffff"> Timbre guardado en la memoria del telefono. Se enviaran cuando tenga conexion a internet 😅 </p>
                           </div>`;
       this.showAlert(this.mensaje);
       this.timbres.push(timbre);
@@ -80,7 +80,7 @@ export class DataLocalService {
       this.mensaje =  `<div class="card-alert">
                             <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                             <br>
-                            <p> Timbre enviado al listado "Timbres no enviados" </p>
+                            <p style="color:#ffff"> Timbre enviado al listado "Timbres no enviados" </p>
                           </div>`;
       this.showAlert(this.mensaje);
       this.timbresPerdidos.push(timbre);

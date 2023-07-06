@@ -158,8 +158,8 @@ export class EditarVacacionComponent implements OnInit {
       message: `<div class="card-alert">
                   <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                   <br>
-                  <p> Ups! El dia que ingreso esta fuera de su calendario laboral </p>
-                  <p> Por favor cambie a un dia dentro de su calendario </p>
+                  <p style="color:#ffff"> Ups! El dia que ingreso esta fuera de su calendario laboral </p>
+                  <p style="color:#ffff"> Por favor cambie a un dia dentro de su calendario </p>
                 </div>`,
       buttons: [
         {

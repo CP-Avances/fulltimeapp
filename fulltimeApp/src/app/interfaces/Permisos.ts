@@ -26,6 +26,7 @@ export interface Permiso {
     ntipopermiso?: string;
     nempleado?: string;
     id_departamento?: number;
+    aprobacion?: string;
     
     // FORMATEAR FECHAS Y HORAS
     fec_creacion_: string;

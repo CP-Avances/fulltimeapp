@@ -8,6 +8,8 @@ import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
   <div>
     <ion-card style="padding: 3% 7% 3% 5%;">
         <ion-card-title style="text-align: center; font-size: 13px;">
+          <strong *ngIf="PermisoDato.aprobacion === 'NO'" style="float:left; margin-left:1%; color:#e0065d " > {{ PermisoDato.aprobacion }} </strong> 
+          <strong *ngIf="PermisoDato.aprobacion === 'SI'" style="float:left; margin-left:1%; color:#3de006"> {{ PermisoDato.aprobacion }} </strong> 
           <strong style="float:right; margin-left:-10%;"> Soli #: {{ PermisoDato.num_permiso }}</strong> 
           {{PermisoDato.nempleado | titlecase }}
         </ion-card-title>
@@ -51,6 +53,7 @@ export class ShowPermisoMultipleComponent implements OnInit {
   ArrayAutorizacionTipos: any = [];
   Filtropermisos: any = [];
   PermisoDato: any = [];
+  colorApro: any;
 
   constructor(
     private autoService: AutorizacionesService,
@@ -59,6 +62,7 @@ export class ShowPermisoMultipleComponent implements OnInit {
   }
 
   ngOnInit(){
+    this.PermisoDato = this.permiso;
     this.ConfiguracionAutorizacion();
   }
 
@@ -68,32 +72,5 @@ export class ShowPermisoMultipleComponent implements OnInit {
   ConfiguracionAutorizacion(){
     this.listadoDepaAutoriza = [];
     this.Filtropermisos = [];
-    this.PermisoDato = this.permiso;
-    /*
-    let i = 0;
-    this.permiso.filter(item => {
-      this.autoService.getAutorizacionPermiso(item.id).subscribe(
-        autorizacion => { 
-          this.autorizacion = autorizacion
-          var autorizaciones = this.autorizacion.id_documento.split(',');
-          this.autoService.BuscarListaAutorizaDepa(this.autorizacion.id_departamento).subscribe(res => {
-            this.listadoDepaAutoriza = res;
-            i = i+1;
-            this.listadoDepaAutoriza.filter(i => {
-              this.nivel_padre = i.nivel_padre;
-              if((this.idEmpleado == i.id_contrato) && (autorizaciones.length ==  i.nivel)){
-                return this.Filtropermisos.push(item);
-              }
-            })
-    
-            if (this.permiso.length === i) {
-              console
-              this.mensaje = 'No tiene Solicitudes de Permisos para APROBAR';
-            }
-          });
-        }
-      )
-    });
-    */
   }
 }

@@ -13,11 +13,11 @@
   <ng-template #showHorarios style="padding: 2%;">
     <div *ngIf="mensajeOcultar == true">
       <br>
-    <div style="width: 100%; text-align: center;">
-      <ion-text class="text_info"> Ingrese los datos para consultar su planificacion por mes </ion-text>
-    </div>
+      <div style="width: 100%; text-align: center;">
+        <ion-text class="text_info"> Ingrese los datos para consultar su planificacion por mes </ion-text>
+      </div>
 
-    <ion-grid style="margin-top: -1%;" mode="md">
+      <ion-grid style="margin-top: -1%;" mode="md">
       <ion-row>
         <ion-col *ngIf="listaAnios.length > 1">
           <div class="formdiv">
@@ -41,12 +41,12 @@
           </div>
         </ion-col>
       </ion-row>
-    </ion-grid>
+      </ion-grid>
 
-    <div style="width: 100%; text-align: center; margin-top: 13px;">
-      <ion-text> Calendario Planificacion Horaria </ion-text>
-    </div>
-    <div style="margin: 3%; padding: auto;" [hidden]= "tablaPlanificacion">
+      <div style="width: 100%; text-align: center; margin-top: 13px;">
+      <ion-text> Calendario Planificación Horaria </ion-text>
+      </div>
+      <div style="margin: 3%; padding: auto;" [hidden]= "tablaPlanificacion">
       <ion-grid class="calendario">
         <ion-row class="columnaCabecera">
           <ion-col *ngFor="let day of week" class="day-name" style="text-align: center;">{{day | slice: 0:3}}</ion-col>
@@ -59,12 +59,15 @@
             <div *ngIf="day?.labora === 0" (click)="presentAlert(day)" style="margin-bottom: 20px; margin-top: 5px; margin-bottom: 5px;"  > 
               <ion-icon color="success" name="alarm-outline" style="font-size: 22px;"></ion-icon>
             </div>
+            <div *ngIf="day?.labora === 1" style="margin-bottom: 20px; margin-top: 5px; margin-bottom: 5px;" > 
+              <ion-icon color="medium" name="tablet-portrait-outline"></ion-icon>
+            </div>
           </ion-col>
         </ion-row>
       </ion-grid>
-    </div>
+      </div>
 
-    <div>
+      <div>
       <ion-modal [isOpen]="isModalOpen" class="modalHorario">  
         <ng-template #showcalendario>
           <ion-content>
@@ -116,24 +119,19 @@
           </ion-content>
         </ng-template>
       </ion-modal>
-    </div>
+      </div>
 
-    <!--Configuracion del Pagination - ngxPaginationModulo-->
-    <ion-item style="font-size: 80%; margin: 1% 0% 1% 0%;" [hidden]="ver">
-      <pagination-controls 
-        class="paginacion" 
-        (pageChange)="pageActual = $event" 
-        [maxSize] = maxSize
-        [directionLinks] = directionLinks
-        [responsive] = responsive 
-        [autoHide]="autoHide"
-        [previousLabel]="labels.previousLabel"
-        [nextLabel]="labels.nextLabel"
-        [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
-        [screenReaderPageLabel]="labels.screenReaderPageLabel"
-        [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
-      </pagination-controls>
-    </ion-item>
+      <div style="margin: 3%; padding: auto;" [hidden]= "tablaPlanificacion">
+        <ion-card style="font-size: 80%; margin: 1% 0% 1% 0%;">
+          <ion-item>
+            <ion-icon color="success" name="alarm-outline" style="font-size: 22px;"></ion-icon>
+            <ion-label>&nbsp;&nbsp;&nbsp; Día Laboral </ion-label>
+            <ion-icon color="medium" name="tablet-portrait-outline"></ion-icon>
+            <ion-label>&nbsp;&nbsp;&nbsp; Día Libre </ion-label>
+          </ion-item>
+        </ion-card>
+      </div>
+    
     </div>
   </ng-template>
 </ion-content>

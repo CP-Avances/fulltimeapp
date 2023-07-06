@@ -62,7 +62,7 @@ export class ListaEmpleadosComponent implements OnInit {
         sessionStorage.setItem('lista-empleados', JSON.stringify(this.empleados))
 
         this.loading = true;
-        if (this.empleados_filtro.length < 21) {
+        if (this.empleados_filtro.length < 11) {
           this.ver = true;
         }else{
           this.ver = false;
@@ -77,7 +77,7 @@ export class ListaEmpleadosComponent implements OnInit {
     } else {
       this.empleados = JSON.parse(emp)
       this.empleados_filtro = [...this.empleados];
-      if (this.empleados_filtro.length < 21) {
+      if (this.empleados_filtro.length < 11) {
         this.ver = true;
       }else{
         this.ver = false;

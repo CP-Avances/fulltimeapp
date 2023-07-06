@@ -15,7 +15,7 @@
 
 
   <ion-card style="margin: 2.5%; border-radius: 2%;" 
-  *ngFor="let e of empleados_filtro | paginate: { itemsPerPage: 20, currentPage: pageActual}">
+  *ngFor="let e of empleados_filtro | paginate: { itemsPerPage: 10, currentPage: pageActual}">
     <ion-item style="width: 95%; margin: auto;">
       <ion-avatar slot="start">
         <ion-icon name="person-circle-outline" color="theme" style="font-size: 35px;"></ion-icon>

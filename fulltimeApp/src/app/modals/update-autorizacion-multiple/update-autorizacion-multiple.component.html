@@ -10,8 +10,8 @@
     <div class="Contenido" [hidden] = "oculDepa">
       <ion-item class="stilo_selection" color="horas_extras">
         <ion-label position="floating">Departamento ha Aprobar</ion-label>
-        <ion-select mode="ios" interface="popover" style="color: rgb(0, 0, 0);" placeholder="Seleccione el departamento" name="departamento" (ngModel)="departamentoChange.id" (ionChange)="ChangeDepa($event)" required>
-          <ion-select-option *ngFor="let depa of nuevoAutorizacionTipos" [value]="depa.id_depa_confi"> {{ depa.depa_autoriza }} </ion-select-option>
+        <ion-select mode="ios" interface="popover" style="color: rgb(0, 0, 0);" placeholder="Seleccione el departamento" name="departamento" [(ngModel)]="departamentoChange.id" (ionChange)="ChangeDepa($event)">
+          <ion-select-option *ngFor="let depa of nuevoAutorizacionTipos" [value]="depa.id_departamento"> {{ depa.depa_autoriza }} </ion-select-option>
         </ion-select>
       </ion-item>
     </div>
