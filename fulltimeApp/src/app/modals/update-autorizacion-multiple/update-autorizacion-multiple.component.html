@@ -10,7 +10,7 @@
     <div class="Contenido" [hidden] = "oculDepa">
       <ion-item class="stilo_selection" color="horas_extras">
         <ion-label position="floating">Departamento ha Aprobar</ion-label>
-        <ion-select mode="ios" interface="popover" style="color: rgb(0, 0, 0);" placeholder="Seleccione el departamento" name="departamento" [(ngModel)]="departamentoChange.id" (ionChange)="ChangeDepa($event)">
+        <ion-select mode="ios" interface="popover" style="color: rgb(0, 0, 0);" placeholder="Seleccione el departamento" name="departamento" [(ngModel)]="departamentoChange.id" (ionChange)="ChangeDepa($event, estado)">
           <ion-select-option *ngFor="let depa of nuevoAutorizacionTipos" [value]="depa.id_departamento"> {{ depa.depa_autoriza }} </ion-select-option>
         </ion-select>
       </ion-item>
@@ -19,7 +19,7 @@
     <div class="Contenido" [hidden] = "ocultar">
       <ion-item class="stilo_selection" color="horas_extras">
         <ion-label position="floating">Autorización</ion-label>
-        <ion-select mode="ios" interface="popover" style="color: rgb(0, 0, 0);" placeholder="Seleccione una opción" name="estado" (ngModel)="estadoChange.id" (ionChange)="ChangeEstado($event)" required>
+        <ion-select #estado mode="ios" interface="popover" style="color: rgb(0, 0, 0);" placeholder="Seleccione una opción" name="estado" (ngModel)="estadoChange.id" (ionChange)="ChangeEstado($event)" required>
           <ion-select-option *ngFor="let e of estados" [value]="e.id"> {{ e.nombre }} </ion-select-option>
         </ion-select>
       </ion-item>

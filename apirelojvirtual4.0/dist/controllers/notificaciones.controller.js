@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EnviarNotificacionGeneral = exports.NotifiTimbreVisto = exports.NotificaVisto = exports.DatosGenerales = exports.sendCorreoEmpleados = exports.getInfoEmpleadoById = exports.getInfoEmpleadoByCodigo = exports.EnviarNotificacionComidas = exports.postAvisosGenerales = exports.getNotificacionTimbres = exports.postNotificacion = exports.getNotificacion = void 0;
+exports.ObtenerConfigEmpleado = exports.EnviarNotificacionGeneral = exports.NotifiTimbreVisto = exports.NotificaVisto = exports.DatosGenerales = exports.sendCorreoEmpleados = exports.getInfoEmpleadoById = exports.getInfoEmpleadoByCodigo = exports.EnviarNotificacionComidas = exports.postAvisosGenerales = exports.getNotificacionTimbres = exports.postNotificacion = exports.getNotificacion = void 0;
 const database_1 = require("../database");
 const nodemailer_1 = __importDefault(require("nodemailer"));
 /**
@@ -366,3 +366,22 @@ const EnviarNotificacionGeneral = (req, res) => __awaiter(void 0, void 0, void 0
         .jsonp({ message: 'Comunicado enviado exitosamente.', respuesta: notificiacion });
 });
 exports.EnviarNotificacionGeneral = EnviarNotificacionGeneral;
+// METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES
+const ObtenerConfigEmpleado = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id_empleado = req.params.id;
+    if (id_empleado != 'NaN') {
+        const CONFIG_NOTI = yield database_1.pool.query(`
+        SELECT * FROM config_noti WHERE id_empleado = $1
+        `, [id_empleado]);
+        if (CONFIG_NOTI.rowCount > 0) {
+            return res.status(200).jsonp(CONFIG_NOTI.rows);
+        }
+        else {
+            return res.status(404).jsonp({ text: 'Registro no encontrados.' });
+        }
+    }
+    else {
+        return res.status(500).jsonp({ text: 'Sin registros encontrados.' });
+    }
+});
+exports.ObtenerConfigEmpleado = ObtenerConfigEmpleado;

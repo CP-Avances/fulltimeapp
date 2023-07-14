@@ -22,22 +22,16 @@ class NotificacionesRoutes {
         this.router.post('/send-email', NOTIFICACIONES.sendCorreoEmpleados);
         // RUTA PARA ENVIO DE COMUNICADOS
         this.router.get('/datos_generales/:estado', NOTIFICACIONES.DatosGenerales);
-
         //RUTA PARA ENVIO DE VISTO NOTIFICACION
         this.router.put('/notifica_visto/', NOTIFICACIONES.NotificaVisto);
-
         //RUTA PARA ENVIO DE VISTO NOTIFICACION_TIMBRES
         this.router.put('/notifiTimbre_visto/', NOTIFICACIONES.NotifiTimbreVisto);
-
-
         // METODO DE ENVIO DE NOTIFICACIONES DE SOLICITUDES
         this.router.post('/send/comida/', NOTIFICACIONES.EnviarNotificacionComidas);
-
         // METODO DE ENVIO DE NOTIFICACIONES DE COMUNICADOS
         this.router.post('/noti-comunicado-movil/', NOTIFICACIONES.EnviarNotificacionGeneral);
-
-
-
+        // METODO PARA BUSCAR LA CONFIGURACION DEL USUARIO PARA RECIBIR CORREOS
+        this.router.get('/config/:id', NOTIFICACIONES.ObtenerConfigEmpleado);
 
     }
 }

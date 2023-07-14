@@ -27,6 +27,7 @@ export interface Permiso {
     nempleado?: string;
     id_departamento?: number;
     aprobacion?: string;
+    observacion?: string;
     
     // FORMATEAR FECHAS Y HORAS
     fec_creacion_: string;

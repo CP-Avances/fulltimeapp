@@ -28,10 +28,17 @@ export const getlistaPermisosByCodigo = async (req: Request, res: Response): Pro
  */
 export const getlistaPermisos = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const subquery = '( select (nombre || \' \' || apellido) from empleados i where i.codigo = CAST(p.codigo AS VARCHAR) ) as nempleado ';
-        const subquery1 = '( select i.descripcion from cg_tipo_permisos i where i.id = p.id_tipo_permiso) as ntipopermiso ';
-        const subquery2 = '( select da.id_departamento FROM datos_actuales_empleado AS da WHERE da.codigo::int = p.codigo ) AS id_departamento '
-        const query = `SELECT p.*, ${subquery}, ${subquery1}, ${subquery2} FROM permisos p ORDER BY p.fec_inicio DESC`
+        const query = `
+        SELECT p.*, (e.nombre || \' \' || e.apellido) AS nempleado, i.descripcion AS ntipopermiso, da.id_departamento,
+		    da.correo AS correo, depa.nombre AS nombre_depa
+        FROM permisos AS p, empleados AS e, cg_tipo_permisos AS i, datos_actuales_empleado AS da,
+	        cg_departamentos AS depa
+        WHERE e.codigo = CAST(p.codigo AS VARCHAR)
+	        AND da.codigo::int = p.codigo
+	        AND i.id = p.id_tipo_permiso
+	        AND depa.id = da.id_departamento
+        ORDER BY p.fec_inicio DESC
+        `
         const response: QueryResult = await pool.query(query);
         const permisos: Permiso[] = response.rows;
         return res.status(200).jsonp(permisos);

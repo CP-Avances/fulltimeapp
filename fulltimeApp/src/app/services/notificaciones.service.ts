@@ -12,7 +12,7 @@ export class NotificacionesService {
 
   private apiUrl = environment.url;
 
-  private recursoURL = 'http://192.168.0.193:3001';
+  private recursoURL = 'http://192.168.0.110:3001';
   //private recursoURL = 'http://186.4.226.49:3001';
 
 
@@ -60,6 +60,21 @@ export class NotificacionesService {
   // ALERTAS DE NOTIFICACIÓN DE COMUNICADOS
   EnviarMensajeComunicado(data: any) {
     return this.http.post<any>(`${environment.url}/notificaciones/noti-comunicado-movil/`, data);
+  }
+
+
+  /** ************************************************************************************ **
+   ** **                   MÉTODOS PARA ENVIO DE CORREOS MULTIPLES                      ** ** 
+   ** ************************************************************************************ **/
+  // METODO PARA ENVIO DE CORREO MULTIPLE
+  EnviarCorreoMultiple(datos: any){
+    console.log('datos  11: ',datos);
+    return this.http.post<any>(`${this.recursoURL}/noti-real-time/mail-multiple-movil`, datos)
+  }
+
+  // METODO DE BUSQUEDA DE CONFIGURACION DE RECEPCION DE NOTIFICACIONES
+  ObtenerConfiguracionEmpleado(id_empleado: number) {
+    return this.http.get<any>(`${environment.url}/notificaciones/config/${id_empleado}`);
   }
 
 }

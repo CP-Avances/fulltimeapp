@@ -425,4 +425,24 @@ export const EnviarNotificacionGeneral = async (req: Request, res: Response): Pr
       .jsonp({ message: 'Comunicado enviado exitosamente.', respuesta: notificiacion });
 }
 
+// METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES
+export const ObtenerConfigEmpleado = async (req: Request, res: Response): Promise<Response> => {
+    const id_empleado = req.params.id;
+    if (id_empleado != 'NaN') {
+      const CONFIG_NOTI = await pool.query(
+        `
+        SELECT * FROM config_noti WHERE id_empleado = $1
+        `
+        , [id_empleado]);
+      if (CONFIG_NOTI.rowCount > 0) {
+        return res.status(200).jsonp(CONFIG_NOTI.rows);
+      }
+      else {
+        return res.status(404).jsonp({ text: 'Registro no encontrados.' });
+      }
+    } else {
+      return res.status(500).jsonp({ text: 'Sin registros encontrados.' });
+    }
+}
+
 

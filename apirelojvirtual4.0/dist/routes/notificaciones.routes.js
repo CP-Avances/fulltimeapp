@@ -52,6 +52,8 @@ class NotificacionesRoutes {
         this.router.post('/send/comida/', NOTIFICACIONES.EnviarNotificacionComidas);
         // METODO DE ENVIO DE NOTIFICACIONES DE COMUNICADOS
         this.router.post('/noti-comunicado-movil/', NOTIFICACIONES.EnviarNotificacionGeneral);
+        // METODO PARA BUSCAR LA CONFIGURACION DEL USUARIO PARA RECIBIR CORREOS
+        this.router.get('/config/:id', NOTIFICACIONES.ObtenerConfigEmpleado);
     }
 }
 const NOTIFICACIONES_Routes = new NotificacionesRoutes();
