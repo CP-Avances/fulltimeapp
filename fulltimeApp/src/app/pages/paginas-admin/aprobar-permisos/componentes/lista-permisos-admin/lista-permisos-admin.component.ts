@@ -228,7 +228,7 @@ export class ListaPermisosAdminComponent implements OnInit {
                     this.msNegado = true;
                   }
 
-                  if (this.permisos_pendientes.length == 0 && this.permisos_pre_autorizados.length == 0 && this.permisos_autorizado.length == 0 && this.permisos_negado.length == 0) {
+                  if (this.permisos_pendientes.length == 0 || this.permisos_pre_autorizados.length == 0 || this.permisos_autorizado.length == 0 || this.permisos_negado.length == 0) {
                     this.msPendiente = true;
                     this.msAutorizado = true;
                     this.msPreautorizado = true;
