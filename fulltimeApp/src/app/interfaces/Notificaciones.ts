@@ -1,8 +1,8 @@
 export interface Notificacion {
     id?: number;
     id_send_empl: number;
-    id_receives_empl: number;
-    id_receives_depa: number;
+    id_receives_empl: any;
+    id_receives_depa: any;
     estado: string;
     create_at: string;
     visto: boolean;
@@ -19,8 +19,8 @@ export interface Notificacion {
 export const notificacionValueDefault = {
     id: undefined,
     id_send_empl: undefined,
-    id_receives_empl: undefined,
-    id_receives_depa: undefined,
+    id_receives_empl: null,
+    id_receives_depa: null,
     estado: '',
     create_at: '',
     visto: false,
@@ -32,32 +32,29 @@ export const notificacionValueDefault = {
 }
 
 export interface EmpleadosSendNotiEmail {
-    cargo: number;
+    id_empleado: number;
     cedula: string;
     contrato: number;
     correo: string;
-    depa_padre: number | null;
+    comida_mail?: boolean;
+    comida_noti?: boolean;
+    id_dep_nivel: number | null;
+    depa_nivel: string;
     departamento: string;
     empleado: number;
     estado: boolean;
     fullname: string;
+    hora_extra_mail?: boolean;
+    hora_extra_noti?: boolean;
     id: number;
     id_dep: number;
     id_suc: number;
     nivel: number;
     permiso_mail?: boolean;
     permiso_noti?: boolean;
+    sucursal: string;
     vaca_mail?: boolean;
     vaca_noti?: boolean;
-    hora_extra_mail?: boolean;
-    hora_extra_noti?: boolean;
-    comida_mail?: boolean;
-    comida_noti?: boolean;
-    sucursal: string;
-
-
-
-
 }
 
 export interface NotificacionTimbre {

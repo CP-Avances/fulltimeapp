@@ -38,7 +38,7 @@ exports.getlistaPermisosByCodigo = getlistaPermisosByCodigo;
 const getlistaPermisos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const query = `
-        SELECT p.*, (e.nombre || \' \' || e.apellido) AS nempleado, i.descripcion AS ntipopermiso, da.id_departamento,
+        SELECT p.*, e.id AS id_empleado, (e.nombre || \' \' || e.apellido) AS nempleado, i.descripcion AS ntipopermiso, da.id_departamento,
 		    da.correo AS correo, depa.nombre AS nombre_depa
         FROM permisos AS p, empleados AS e, cg_tipo_permisos AS i, datos_actuales_empleado AS da,
 	        cg_departamentos AS depa
@@ -180,13 +180,13 @@ const postNuevoPermiso = (req, res) => __awaiter(void 0, void 0, void 0, functio
         const permiso = objetoPermiso;
         const { id_departamento } = req.query;
         const JefesDepartamentos = yield database_1.pool.query(`
-            SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel,
-                da.estado, dae.id_contrato, da.id_empl_cargo, (dae.nombre || ' ' || dae.apellido) as fullname,
-                dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti 
+            SELECT da.id_empleado AS id_empleado, dae.cedula, dae.id_contrato AS contrato, dae.correo, 
+	            n.id_dep_nivel, n.dep_nivel_nombre AS depa_nivel, n.id_departamento AS id_dep, cg.nombre AS departamento, cg.id_sucursal AS id_suc, 
+                n.nivel, da.estado, (dae.nombre || ' ' || dae.apellido) as fullname, c.permiso_mail, c.permiso_noti 
             FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae,
                 config_noti AS c, cg_departamentos AS cg
             WHERE n.id_departamento = $1
-                AND da.id_departamento = n.id_dep_nivel
+	            AND da.id_departamento = n.id_dep_nivel
                 AND dae.id_cargo = da.id_empl_cargo
                 AND dae.id_contrato = c.id_empleado
                 AND cg.id = $1

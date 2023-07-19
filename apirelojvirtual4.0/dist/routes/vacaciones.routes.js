@@ -41,6 +41,7 @@ class VacacionesRoutes {
         this.router.get('/lista-vacacionesfechasedit', VACACIONES.getlistaVacacionesByFechasyCodigoEdit);
         this.router.post('/insert-vacacion', verificarToken_1.verificarToken, VACACIONES.postNuevaVacacion);
         this.router.put('/update-vacacion', VACACIONES.putVacacion);
+        this.router.get('/listarPeriVacaciones', VACACIONES.listarPeriVacaciones);
     }
 }
 const VACACIONES_Routes = new VacacionesRoutes();

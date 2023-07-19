@@ -89,7 +89,9 @@ export class ListaPermisosAdminComponent implements OnInit {
       (res) => {
         this.ArrayAutorizacionTipos = res;
       }
-    );
+    ),error => {
+      this.mostrarToas(error.text, 3000, "danger");
+    };
 
   }
 
@@ -119,9 +121,10 @@ export class ListaPermisosAdminComponent implements OnInit {
       .subscribe(
         permisos => {
           this.permisos = permisos;
+
           //Filtra la lista de Permisos para descartar las solicitudes del mismo usuario y almacena en una nueva lista
           this.listaPermisosFiltradas = this.permisos.filter((o) => {
-            if (this.idEmpleado !== o.id_empl_contrato) {
+            if (this.idEmpleado !== o.id_empleado) {
               return this.listaPermisosFiltradas.push(o);
             }
           });
@@ -337,7 +340,7 @@ export class ListaPermisosAdminComponent implements OnInit {
           this.permisos = permisos;
           //Filtra la lista de Permisos para descartar las solicitudes del mismo usuario y almacena en una nueva lista
           this.listaPermisosFiltradas = this.permisos.filter((o) => {
-            if (this.idEmpleado !== o.id_empl_contrato) {
+            if (this.idEmpleado !== o.id_empleado) {
               return this.listaPermisosFiltradas.push(o);
             }
           });
@@ -357,8 +360,6 @@ export class ListaPermisosAdminComponent implements OnInit {
             this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_empl_contrato).subscribe(
               (usuaDep) => {
                 i = i+1;
-
-                console.log('ArrayAutorizacionTipos: ',this.ArrayAutorizacionTipos);
 
                 this.ArrayAutorizacionTipos.filter(x => {
                   if((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)){

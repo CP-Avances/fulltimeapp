@@ -55,8 +55,7 @@ export const postNotificacion = async (req: Request, res: Response): Promise<Res
       
           notificiacion.usuario = USUARIO.rows[0].usuario;
 
-        return res.status(200)
-            .jsonp({ message: 'Se ha enviado la respectiva notificación.', respuesta: notificiacion });
+        return res.status(200).jsonp({ message: 'Se ha enviado la respectiva notificación.', respuesta: notificiacion });
 
     } catch (error) {
         console.log(error);

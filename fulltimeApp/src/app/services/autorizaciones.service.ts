@@ -16,7 +16,7 @@ export class AutorizacionesService {
   private apiUrl = environment.url;
 
   //private recursoURL = 'http://192.168.0.124:3001';
-  private recursoURL = 'http://186.4.226.49:3001';
+  private recursoURL = 'http://192.168.0.110:3001';
 
   private handleError(error: any) {
     console.log('ERROR CAPTURADO: ', error);
@@ -152,10 +152,10 @@ export class AutorizacionesService {
       )
   }
 
-  postNotificacion(notificacion: Notificacion): Observable<any> {
-    console.log("Notificacion enviada: ",notificacion);
+  postNotificacion(datos: any): Observable<any> {
+    console.log("Notificacion enviada: ",datos);
     const url = `${this.apiUrl}/notificaciones/`;
-    return this.http.post<any>(url, notificacion)
+    return this.http.post<any>(url, datos)
       .pipe(
         tap(console.log)
       )

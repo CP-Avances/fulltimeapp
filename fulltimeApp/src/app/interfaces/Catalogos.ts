@@ -2,7 +2,7 @@ export interface Cg_TipoPermiso {
     id: number;
     descripcion: string;
     fecha: Date;
-    tipo_descuento: string;
+    tipo_descuento: any;
     num_dia_maximo: number;
     num_dia_ingreso: number;
     vaca_afecta: boolean;

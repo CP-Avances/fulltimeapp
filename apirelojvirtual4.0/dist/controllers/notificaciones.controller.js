@@ -57,8 +57,7 @@ const postNotificacion = (req, res) => __awaiter(void 0, void 0, void 0, functio
             FROM empleados WHERE id = $1
             `, [id_send_empl]);
         notificiacion.usuario = USUARIO.rows[0].usuario;
-        return res.status(200)
-            .jsonp({ message: 'Se ha enviado la respectiva notificación.', respuesta: notificiacion });
+        return res.status(200).jsonp({ message: 'Se ha enviado la respectiva notificación.', respuesta: notificiacion });
     }
     catch (error) {
         console.log(error);

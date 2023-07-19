@@ -57,7 +57,8 @@ export class VacacionesService {
       )
   }
 
-  getListaVacacionesByCodigo(codigo: number | string): Observable<Vacacion[]> {
+  getListaVacacionesByCodigo(codigo: any): Observable<Vacacion[]> {
+    console.log('codigo: ',codigo);
     const url = `${this.apiUrl}/vacaciones/lista-vacaciones`;
     const params = new HttpParams().set('codigo', codigo)
     return this.http.get<Vacacion[]>(url, { params })
@@ -66,6 +67,19 @@ export class VacacionesService {
         catchError(this.handleError)
       )
   }
+
+  getlistarPeriVacacionesByCodigo(codigo: any): Observable<Vacacion[]> {
+    console.log('codigo: ',codigo);
+    const url = `${this.apiUrl}/vacaciones/listarPeriVacaciones`;
+    const params = new HttpParams().set('codigo', codigo)
+    return this.http.get<Vacacion[]>(url, { params })
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
+      )
+  }
+
+  
 
   getlistaVacacionesByFechasyCodigo(fec_inicio: string, fec_final: string, codigo: number | string): Observable <Vacacion[]>{
     const url = `${this.apiUrl}/vacaciones/lista-vacacionesfechas`;

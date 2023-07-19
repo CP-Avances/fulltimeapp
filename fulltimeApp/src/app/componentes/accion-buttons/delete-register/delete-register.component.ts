@@ -358,6 +358,7 @@ export class DeleteRegisterComponent {
     NotificacionesPermisoFiltrados.forEach((e: any) => {
       noti.id_receives_depa = e.id_dep;
       noti.id_receives_empl = e.empleado;
+      
       if (e.permiso_noti) {
         this.autoriza.postNotificacion(noti).subscribe(
           resp => {

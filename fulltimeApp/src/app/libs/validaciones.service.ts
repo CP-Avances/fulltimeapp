@@ -185,8 +185,6 @@ export class ValidacionesService {
         //let diaslibre: any = 0;
         const diasDiferencia = fecha2.diff(fecha1, 'days');//variable de los dias de diferencia que hay entre el dia final y el inicial
 
-        console.log("diasDiferencia: ",diasDiferencia)
-
         let res: Array<any> = [];
         // se aplica logica matematica
         for (let i = 0; i <= diasDiferencia; i++) {
@@ -200,7 +198,6 @@ export class ValidacionesService {
                 }
             })
 
-            console.log('lista filtrada de calculo: ',this.filtro);
             let horario_laboral = {
                 fecha: fec_string,
                 labora: this.ObtenerPlanHorarioPorDia(this.filtro, dia, true),

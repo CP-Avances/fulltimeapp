@@ -301,12 +301,13 @@ export class UpdateAutorizacionComponent implements OnInit {
                 filtroArray.push(elemento);
               }
             });
-            this.FilDepartamentosAprueban = filtroArray;
 
+            this.FilDepartamentosAprueban = filtroArray;
             this.listadoDepaAutoriza.filter(item => {
               this.cont = this.cont + 1;
               this.nivel_padre = item.nivel_padre;
-              if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
+              console.log('item: ',item);
+              if((this.idEmpleado == item.id_empleado) && (autorizaciones.length ==  item.nivel)){
                 this.obtenerPlanificacionHoraria(solicitud.fec_inicio, solicitud.fec_final, solicitud.codigo, solicitud);
               }
             })
@@ -344,7 +345,7 @@ export class UpdateAutorizacionComponent implements OnInit {
           this.FilDepartamentosAprueban = filtroArray;
 
           this.listadoDepaAutoriza.filter(item => {
-            if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
+            if((this.idEmpleado == item.id_empleado) && (autorizaciones.length ==  item.nivel)){
               this.obtenerPlanificacionHoraria(solicitud.fec_inicio, solicitud.fec_final, solicitud.codigo, solicitud);
             }
           })
@@ -430,12 +431,12 @@ export class UpdateAutorizacionComponent implements OnInit {
       }
 
       if (this.permiso){
-
         this.autoService.putAutorizacionPermiso(this.permiso.id, data).subscribe(
           autorizacion => { this.successResponse(autorizacion, 'permiso') },
           err => { this.errorResponse(err.error.message) },
           () => { this.loadingBtn = false }
         )
+
       }
 
       else if (this.vacacion){
@@ -472,12 +473,14 @@ export class UpdateAutorizacionComponent implements OnInit {
     switch (solicitud) {
       case 'permiso':
         this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.permiso.id }, 'permisos').subscribe(
-          resp => { this.validaciones.showToast(resp.message, 3000, 'success') },
-          err => { this.validaciones.showToast(err.error.message, 3000, 'danger') },
-        )
-        console.log('ver autoriza permiso.... ', this.permiso, 'INFO.. ', this.infoEmpleadoRecibe)
-        this.permiso.estado = this.estadoChange.id;
-        this.NotificarAprobacionPermisos(this.permiso, this.infoEmpleadoRecibe);
+          resp => { 
+            this.validaciones.showToast(resp.message, 3000, 'success');
+            console.log('ver autoriza permiso.... ', this.permiso, 'INFO.. ', this.infoEmpleadoRecibe);
+            this.permiso.estado = this.estadoChange.id;
+            this.NotificarAprobacionPermisos(this.permiso, this.infoEmpleadoRecibe); 
+          },err => { 
+            this.validaciones.showToast(err.error.message, 3000, 'danger') 
+          });
         break;
 
       case 'vacacion':
@@ -505,7 +508,7 @@ export class UpdateAutorizacionComponent implements OnInit {
         break;
     }
 
-    return this.showMessageSuccess()
+    //return this.showMessageSuccess()
   }
 
   errorResponse(message) {
@@ -575,7 +578,7 @@ export class UpdateAutorizacionComponent implements OnInit {
         this.configuracionCorreo(permiso, estado_p, estado_c);
       }
       this.EnviarNotificacionPermiso(permiso, estado_p, infoUsuario);
-      this.validaciones.showToast('Proceso realizado exitosamente.', 4000, 'success');
+      //this.validaciones.showToast('Proceso realizado exitosamente.', 4000, 'success');
     });
   }
 
@@ -715,8 +718,7 @@ export class UpdateAutorizacionComponent implements OnInit {
             },
             err => {
               this.validaciones.showToast(err.error.message, 5000, 'danger');
-            },
-            () => { },
+            }
           )
 
         }
@@ -743,49 +745,34 @@ export class UpdateAutorizacionComponent implements OnInit {
       h_fin = '';
     }
 
-    const noti: Notificacion = notificacionValueDefault;
-    noti.id_vacaciones = noti.id_hora_extra = null;
-    noti.id_send_empl = parseInt(localStorage.getItem('empleadoID'));
-    noti.id_permiso = permiso.id;
-    noti.create_at = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
-    noti.estado = estado_p;
-    noti.tipo = 2;
-    noti.mensaje = 'Ha ' + estado_p.toLowerCase() + ' la solicitud de permiso para ' +
-      infoUsuario.fullname + ' desde ' +
-      desde + ' ' + h_inicio + ' hasta ' +
-      hasta + ' ' + h_fin;
-
-    
-    //Listado para eliminar el usuario duplicado
-    var allNotificacionesPermisos = [];
-    //Ciclo por cada elemento del listado
-    permiso.EmpleadosSendNotiEmail.forEach(function(elemento, indice, array) {
-      // Discriminación de elementos iguales
-      if(allNotificacionesPermisos.find(p=>p.empleado == elemento.empleado) == undefined)
-      {
-        // Nueva lista de empleados que reciben la notificacion
-        allNotificacionesPermisos.push(elemento);
+    permiso.EmpleadosSendNotiEmail.forEach(e => {
+      let noti: any = {
+        id_send_empl: parseInt(localStorage.getItem('empleadoID')),
+        id_receives_empl: e.empleado,
+        id_receives_depa: e.id_dep,
+        create_at: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
+        estado: estado_p,
+        id_permiso: permiso.id,
+        id_vacaciones: null,
+        id_hora_extra: null,
+        mensaje: 'Ha ' + estado_p.toLowerCase() + ' la solicitud de permiso para ' + infoUsuario.fullname + ' desde ' + desde + ' ' + h_inicio + ' hasta ' + hasta + ' ' + h_fin,
+        tipo: 2,
       }
-    });
-
-    console.log("Usuarios que reciben la notificacion: ",allNotificacionesPermisos);
-
-    allNotificacionesPermisos.forEach(e => {
-
-      noti.id_receives_depa = e.id_dep;
-      noti.id_receives_empl = e.empleado;
 
       if (e.permiso_noti) {
         this.autoService.postNotificacion(noti).subscribe(
           resp => {
             this.permisoService.sendNotiRealTime(resp.respuesta);
           },
-          err => { this.validaciones.showToast(err.error.message, 3000, 'danger') },
-          () => { },
+          err => { this.validaciones.showToast(err.error.message, 3000, 'danger') }
         )
       }
     })
   }
+
+
+
+
 
   /** ************************************************************************************************** ** 
    ** **                           METODOS APROBACION DE VACACIONES                                   ** ** 
@@ -948,7 +935,7 @@ export class UpdateAutorizacionComponent implements OnInit {
                 this.validaciones.showToast('Correo de solicitud enviado exitosamente.', 5000, 'success');
               }
               else {
-                this.validaciones.showToast('Ups algo salio mal !!! No fue posible enviar correo de solicitud.', 5000, 'warning');
+                this.validaciones.showToast('Ups algo salio mal !!! No fue posible enviar correo de aprobación.', 5000, 'warning');
               }
             },
             err => { this.validaciones.showToast(err.error.message, 5000, 'danger'); },

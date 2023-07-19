@@ -19,6 +19,7 @@ class VacacionesRoutes {
         this.router.get('/lista-vacacionesfechasedit', VACACIONES.getlistaVacacionesByFechasyCodigoEdit)
         this.router.post('/insert-vacacion', verificarToken, VACACIONES.postNuevaVacacion)
         this.router.put('/update-vacacion', VACACIONES.putVacacion)
+        this.router.get('/listarPeriVacaciones', VACACIONES.listarPeriVacaciones)
     }
 }
 

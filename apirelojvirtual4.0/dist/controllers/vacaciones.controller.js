@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.putVacacion = exports.postNuevaVacacion = exports.getlistaVacacionesByFechasyCodigoEdit = exports.getlistaVacacionesByFechasyCodigo = exports.getlistaVacacionesByFechas = exports.getlistaVacaciones = exports.getlistaVacacionesByCodigo = void 0;
+exports.listarPeriVacaciones = exports.putVacacion = exports.postNuevaVacacion = exports.getlistaVacacionesByFechasyCodigoEdit = exports.getlistaVacacionesByFechasyCodigo = exports.getlistaVacacionesByFechas = exports.getlistaVacaciones = exports.getlistaVacacionesByCodigo = void 0;
 const database_1 = require("../database");
 /**
  * Metodo para obtener listado de vacaciones por codigo del empleado
@@ -18,6 +18,7 @@ const database_1 = require("../database");
 const getlistaVacacionesByCodigo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { codigo } = req.query;
+        console.log('codigo: ', codigo);
         const subquery1 = '( SELECT i.descripcion FROM peri_vacaciones i WHERE i.id = v.id_peri_vacacion) AS nperivacacion ';
         const subquery2 = '( SELECT t.cargo FROM empl_cargos i, tipo_cargo t WHERE i.id = v.id_empl_cargo AND i.cargo = t.id) AS ncargo ';
         const subquery3 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo::int = v.codigo) AS id_contrato ';
@@ -207,3 +208,23 @@ const putVacacion = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.putVacacion = putVacacion;
+/**
+ * Metodo para optener el listado de periodo vacaciones la tabla peri_vacaciones por el codigo del usuario
+ * @returns Retorna mensaje actualizacion.
+ */
+const listarPeriVacaciones = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { codigo } = req.query;
+        const query = `
+            SELECT periv.* FROM peri_vacaciones AS periv WHERE periv.codigo = ${codigo} 
+            `;
+        const response = yield database_1.pool.query(query);
+        const vacaciones = response.rows;
+        return res.status(200).jsonp(vacaciones);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+});
+exports.listarPeriVacaciones = listarPeriVacaciones;

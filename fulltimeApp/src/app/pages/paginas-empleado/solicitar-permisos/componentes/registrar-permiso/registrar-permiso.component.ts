@@ -18,6 +18,7 @@ import { CatalogosService } from 'src/app/services/catalogos.service';
 import { PermisosService } from 'src/app/services/permisos.service';
 import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { VacacionesService } from 'src/app/services/vacaciones.service';
+import { Vacacion } from '../../../../../interfaces/Vacacion';
 import { ParametrosService } from 'src/app/services/parametros.service';
 
 import { CloseModalComponent } from 'src/app/componentes/close-modal/close-modal.component';
@@ -100,6 +101,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   private subs_bool: boolean = false;
   private horas_trabaja_seg: number = 0; // formato: 1000 seg
 
+
   constructor(
     private validaciones: ValidacionesService,
     private permisoService: PermisosService,
@@ -116,15 +118,18 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.idEmpresa = parseInt(localStorage.getItem('id_empresa')!);
   }
 
+  peri_vacaciones: any = [];
+  vacaciones: Vacacion[] = [];
   tiempo: any;
   ngOnInit() {
+    this.peri_vacaciones = [];
     this.tiempo = moment();
     this.catalogos.getCgPermisos();
     this.reg.fec_creacion = this.tiempo.format('YYYY-MM-DD');
     this.reg.num_permiso = this.num_permiso;
     this.reg.estado = 1;
-    this.reg.codigo = parseInt(localStorage.getItem('codigo')!)
-    this.reg.id_peri_vacacion = parseInt(localStorage.getItem('cperi_vacacion')!)
+    this.reg.codigo = parseInt(localStorage.getItem('codigo'));
+    this.reg.id_peri_vacacion = parseInt(localStorage.getItem('cperi_vacacion'));
     this.reg.id_empl_cargo = parseInt(localStorage.getItem('ccargo')!)
     this.reg.id_empl_contrato = parseInt(localStorage.getItem('ccontr')!)
     this.horas_trabaja_seg = this.validaciones.HorasTrabajaToSegundos(localStorage.getItem('horas_trabaja')!);
@@ -162,22 +167,27 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         this.solInfo = {
           permiso_mail: res.permiso_mail,
           permiso_noti: res.permiso_noti,
-          empleado: res.id_empleado,
+          id_empleado: res.id_empleado,
           id_dep: res.id_departamento,
           id_suc: res.id_sucursal,
           estado: estado!,
           correo: res.correo,
+          
         }
-
-        if(!(Number.isNaN(this.reg.id_peri_vacacion))){
-          this.ocultar = false;
-          this.mensaje = true;
-        }else{
-          this.mensaje = false;
-        }
-
       }
     );
+
+    if(!(Number.isNaN(this.reg.id_peri_vacacion))){
+      this.ocultar = false;
+      this.mensaje = true;
+    }else{
+      this.mensaje = false;
+      this.vacacionService.getlistarPeriVacacionesByCodigo(this.reg.codigo).subscribe(vacaciones => {
+        localStorage.setItem('cperi_vacacion',vacaciones[0].id.toString());
+      },error => {
+        this.validaciones.showToast(error.message, 4000, 'danger');
+      });
+    }
   }
 
   /** ******************************************************************************************* **
@@ -262,6 +272,13 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         }else{
           this.required = false;
         }
+
+        //Cambiar esta validacion del dato id_peri_vacacion se debe leer por la consulta no por el valor almacenado
+        if(this.cg_permiso.tipo_descuento == 1){
+          this.validaciones.showToast('Sin descuento a vacaciones.', 4000, 'tertiary');
+        }else if(this.cg_permiso.tipo_descuento == null || this.cg_permiso.tipo_descuento == undefined){
+          this.validaciones.showToast('No tiene registrado periodo de vacaciones.', 4000, 'warning');
+        }
         
         this.validaciones.abrirToas(' Dias maximos de Permiso - '+num_maxPermiso, 3000, 'tertiary', 'top');
         return console.log('Se requiere documento ',this.required)
@@ -296,13 +313,11 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         });
 
         if(this.cont_tipo_dia_libre == this.plan_horario.length){
-          console.log('dia libre')
           this.showAlert();
           this.valoresDefectoValidacionHoras();
           this.btnOculto = true;
           return this.readonly = true;
         }else{
-          console.log('dia laboral')
           if(this.cg_permiso.fec_validar == true){
             if(this.dia_inicio == moment(this.cg_permiso.fecha).format('YYYY-MM-DD')){
               this.validaciones.showToast('Lo Sentimos la fecha '+moment(this.cg_permiso.fecha).format('DD-MM-YYYY')+' esta reservada', 3500, 'warning');
@@ -360,11 +375,9 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         });
 
         if(this.cont_tipo_dia_libre == this.plan_horario.length){
-          console.log('dia libre')
           this.showAlert();
           return this.btnOculto = true;;
         }else{
-          console.log('dia laboral')
           if(this.cg_permiso.fec_validar == true){
             if(this.dia_fianl == moment(this.cg_permiso.fecha).format('YYYY-MM-DD')){
               this.validaciones.showToast('Lo Sentimos la fecha '+moment(this.cg_permiso.fecha).format('DD-MM-YYYY')+' esta reservada', 3500, 'warning');
@@ -731,8 +744,6 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     const validadionesFechasHoras = this.calcularhoras();
     this.loadingBtn = true;
 
-    console.log("validacionesFechasHoras: ",validadionesFechasHoras)
-
     if (!validadionesFechasHoras) return
 
       console.log('PASO VALIDACIONES DE FECHAS Y HORAS');
@@ -753,11 +764,9 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
       this.subscripted = this.permisoService.postNuevoPermiso(this.reg).subscribe(
         permiso => {
-          permiso.EmpleadosSendNotiEmail?.push(this.solInfo);
-          if(this.archivoSubido != null){this.subirRespaldo(permiso)}
+          permiso.EmpleadosSendNotiEmail.push(this.solInfo);
+          if(this.archivoSubido != null){this.subirRespaldo(permiso)};
           this.CrearNuevaAutorizacion(permiso);
-          this.CrearNuevaNotificacion(permiso);
-          this.SendEmailsEmpleados(permiso);
           this.num_permiso = this.num_permiso + 1;
           this.closeModalComponent.closeModal(true);
           this.validaciones.abrirToas('Solicitud registrada Exitosamente.', 4000, 'success', 'top');
@@ -845,13 +854,17 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     autorizacion.orden = 1; // ORDEN DE AUTORIZACION
     autorizacion.id_departamento = parseInt(localStorage.getItem('cdepar')!);
     autorizacion.id_vacacion = autorizacion.id_hora_extra = autorizacion.id_plan_hora_extra = null;
-    autorizacion.id_permiso = permiso.id!;
+    autorizacion.id_permiso = permiso.id;
     autorizacion.id_documento = ''
 
     this.autorizaciones.postNuevaAutorizacion(autorizacion).subscribe(
-      resp => { //this.validaciones.showToast(resp.message, 3000, 'success') 
-      },
-      err => { //this.validaciones.showToast(err.error.message, 3000, 'danger') 
+      resp => { 
+        this.CrearNuevaNotificacion(permiso);
+        this.SendEmailsEmpleados(permiso);
+      },err => { 
+        this.CrearNuevaNotificacion(permiso);
+        this.SendEmailsEmpleados(permiso);
+        this.validaciones.showToast(err.error.message, 3000, 'danger') 
       },
     )
   }
@@ -871,45 +884,29 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     if (h_fin === '00:00') {
       h_fin = '';
     }
-    const noti: Notificacion = notificacionValueDefault;
-    noti.id_vacaciones = noti.id_hora_extra = null;
-    noti.id_send_empl = parseInt(localStorage.getItem('empleadoID')!);
-    noti.id_permiso = permiso.id!;
-    noti.create_at = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
-    noti.estado = 'Pendiente';
-    noti.tipo = 1;
-    noti.mensaje = 'Ha realizado una solicitud de permiso desde ' +
-      desde + ' ' + h_inicio + ' hasta ' +
-      hasta + ' ' + h_fin;
 
-    //Listado para eliminar el usuario duplicado
-    var allNotificaciones = [];
-    //Ciclo por cada elemento del listado
-    permiso.EmpleadosSendNotiEmail.forEach(function(elemento: any, indice: any, array: any) {
-      // Discriminación de elementos iguales
-      if(allNotificaciones.find((p: any)=> p.empleado == elemento.empleado) == undefined)
-      {
-        // Nueva lista de empleados que reciben la notificacion
-        allNotificaciones.push(elemento);
+    permiso.EmpleadosSendNotiEmail.forEach(item => {
+      let notificacion: any = {
+        id_send_empl: parseInt(localStorage.getItem('empleadoID')),
+        id_receives_empl: item.id_empleado,
+        id_receives_depa: item.id_dep,
+        create_at: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
+        estado: 'Pendiente',
+        id_permiso: permiso.id,
+        id_vacaciones: null,
+        id_hora_extra: null,
+        mensaje: 'Ha realizado una solicitud de permiso desde ' + desde + ' ' + h_inicio + ' hasta ' + hasta + ' ' + h_fin,
+        tipo: 1,
       }
-    });
 
-    console.log("Usuarios que reciben la notificacion: ",allNotificaciones);
-
-    allNotificaciones.forEach((e: any) => {
-      noti.id_receives_depa = e.id_dep
-      noti.id_receives_empl = e.empleado
-
-      console.log("si envia notificaciones: ", e.permiso_noti);
-      console.log('Info de notificacion: ',noti);
-
-      if (e.permiso_noti) {
-        this.autorizaciones.postNotificacion(noti).subscribe(
+      if (item.permiso_noti) {
+        this.autorizaciones.postNotificacion(notificacion).subscribe(
           resp => {
             this.permisoService.sendNotiRealTime(resp.respuesta);
           },
-          err => { this.validaciones.showToast(err.error.message, 3000, 'danger') },
-          () => { },
+          err => { 
+            this.validaciones.showToast('No se pudo enviar la notificacion', 3000, 'danger') 
+          },
         )
       }
     })
@@ -947,7 +944,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
     if(correo_crear === true){
       // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
-    permiso.EmpleadosSendNotiEmail!.forEach(e => {
+    permiso.EmpleadosSendNotiEmail.forEach(e => {
 
       // LECTURA DE DATOS LEIDOS
       cont = cont + 1;
@@ -964,7 +961,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         }
       }
 
-      if (cont === permiso.EmpleadosSendNotiEmail!.length) {
+      if (cont === permiso.EmpleadosSendNotiEmail.length) {
         let datosPermisoCreado = {
           tipo_solicitud: 'Permiso solicitado por',
           solicitud: solicitud,
@@ -985,6 +982,9 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
           asunto: 'SOLICITUD DE PERMISO',
           solicitado_por: (localStorage.getItem('nom')) + ' ' + (localStorage.getItem('ap'))
         }
+
+        console.log('datosPermisoCreado: ',datosPermisoCreado);
+        
         if (correo_usuarios != '') {
 
           this.autorizaciones.EnviarCorreoPermiso(this.idEmpresa, datosPermisoCreado).subscribe(
@@ -998,8 +998,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
             },
             err => {
               this.validaciones.showToast(err.error.message, 5000, 'danger');
-            },
-            () => { },
+            }
           )
 
         }
