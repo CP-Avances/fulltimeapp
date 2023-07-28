@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, Input } from '@angular/core';
+import { Component, EventEmitter, Output, Input, ViewChild } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import moment from 'moment';
 moment.locale('es');
@@ -29,7 +29,7 @@ import { ParametrosService } from 'src/app/services/parametros.service';
   `],
 })
 
-export class DeleteRegisterComponent {
+export class DeleteRegisterComponent{
 
   // @Input() formRegistro: NgForm;
   @Input() loadingBtn: boolean;
@@ -85,10 +85,7 @@ export class DeleteRegisterComponent {
   }
 
   async presentAlertConfirm() {
-
     if (this.nameTable === '' && this.idreg === '') return this.deleteSevice.showToast('Código de registro no encontrado para eliminar', 3000, 'danger')
-
-
     const alert = await this.alertController.create({
       cssClass: 'my-custom-class',
       header: '⚠ Alerta!',
@@ -103,11 +100,8 @@ export class DeleteRegisterComponent {
           handler: () => {
             this.deleteSevice.EliminarRegistro(this.idreg, this.nameTable).subscribe(
               data => {
-                console.log('ver datos eliminar ... ', this.nameTable, ' id ... ',
-                  this.idreg, ' codigo .... ', this.userCodigo)
-
+                console.log('Datos a eliminar -> ', this.nameTable, ' id: ', this.idreg, ' codigo: ', this.userCodigo)
                 this.obtenerInformacionEmpleado(data, this.nameTable, parseInt(this.userCodigo));
-
                 this.deleteSevice.showToast('Registro Eliminado', 3000, 'success')
               },
               err => { this.deleteSevice.showToast(err.error.message, 3000, 'danger') },
@@ -124,12 +118,9 @@ export class DeleteRegisterComponent {
 
 
   obtenerInformacionEmpleado(info: any, tabla: string, codigo: number) {
-
     var codigoUser = parseInt(String(localStorage.getItem('codigo')));
-
     var nota = 'su solicitud';
     var user = '';
-
     this.autoriza.getInfoEmpleadoByCodigo(codigo).subscribe(
       res => {
         var estado = false
@@ -175,8 +166,8 @@ export class DeleteRegisterComponent {
       data.EmpleadosSendNotiEmail.push(infoUsuario);
       if (tabla === 'permisos') {
         this.EliminarDocumentoPermiso(data);
-        this.EnviarCorreoPermiso(data);
-        this.EnviarNotificacionPermiso(data, nota, user);
+        //this.EnviarCorreoPermiso(data); 
+        //this.EnviarNotificacionPermiso(data, nota, user);
       }
       else if (tabla === 'vacaciones') {
         this.EnviarCorreoVacacion(data, infoUsuario);
@@ -231,9 +222,6 @@ export class DeleteRegisterComponent {
       }
       return tipo_permiso;
     })
-
-    console.log('Envio de correo: ',correo_envia)
-    console.log('tipo_permiso -... ', tipo_permiso)
 
     if(correo_envia == true){
       // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
@@ -374,8 +362,10 @@ export class DeleteRegisterComponent {
 
   // ELIMINAR ARCHIVO DE PERMISO
   EliminarDocumentoPermiso(data: any) {
-    this.permisoService.EliminarArchivo(data.documento).subscribe(
-      resp => { })
+    if(data.documento != null && data.documento != undefined && data.documento != ''){
+      this.permisoService.EliminarArchivo(data.documento, parseInt(this.userCodigo)).subscribe(
+        resp => { })
+    }
   }
 
   /** ************************************************************************************************** ** 

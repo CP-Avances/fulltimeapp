@@ -11,7 +11,7 @@ export interface Permiso {
     id_tipo_permiso: number | null;
     codigo: number | any;
     descripcion: string;
-    fec_creacion: string;
+    fec_creacion: any;
     fec_inicio: string | null;
     fec_final: string | null;
     hora_salida: string | null;
@@ -23,7 +23,7 @@ export interface Permiso {
     legalizado: boolean;
     documento: string | null;
     docu_nombre: string | null;
-    ntipopermiso?: string;
+    tipo_permiso?: string;
     nempleado?: string;
     id_departamento?: number;
     aprobacion?: string;
@@ -61,7 +61,7 @@ export const permisoValueDefault: Permiso = {
     documento: '',
     nempleado: undefined,
     docu_nombre: '',
-    ntipopermiso: undefined,
+    tipo_permiso: undefined,
     id_departamento: null,
     // FORMATEAR FECHAS Y HORAS
     fec_creacion_: '',
@@ -74,10 +74,12 @@ export const permisoValueDefault: Permiso = {
 export const cg_permisoValueDefault: Cg_TipoPermiso = {
     id: 0,
     descripcion: '',
-    fecha: new Date(),
+    fecha_inicio: new Date(),
+    fecha_fin: new Date(),
     tipo_descuento: '',
     num_dia_maximo: 0,
-    num_dia_ingreso: 0,
+    num_dia_anticipo: 0,
+    num_dia_anterior: 0,
     vaca_afecta: false,
     anio_acumula: false,
     num_dia_justifica: 0,

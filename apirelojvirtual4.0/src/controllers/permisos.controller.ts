@@ -10,7 +10,7 @@ import { Permiso } from '../interfaces/Permisos'
 export const getlistaPermisosByCodigo = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { codigo } = req.query;
-        const subquery = '( select i.descripcion from cg_tipo_permisos i where i.id = p.id_tipo_permiso) as ntipopermiso ';
+        const subquery = '( select i.descripcion from cg_tipo_permisos i where i.id = p.id_tipo_permiso) as tipo_permiso ';
         const subquery1 = '( select (nombre || \' \' || apellido) from empleados i where i.codigo = CAST(p.codigo AS VARCHAR) ) as nempleado ';
         const query = `SELECT p.*, ${subquery}, ${subquery1} FROM permisos p WHERE p.codigo = ${codigo} ORDER BY p.num_permiso DESC LIMIT 100`
         const response: QueryResult = await pool.query(query);
@@ -29,7 +29,7 @@ export const getlistaPermisosByCodigo = async (req: Request, res: Response): Pro
 export const getlistaPermisos = async (req: Request, res: Response): Promise<Response> => {
     try {
         const query = `
-        SELECT p.*, e.id AS id_empleado, (e.nombre || \' \' || e.apellido) AS nempleado, i.descripcion AS ntipopermiso, da.id_departamento,
+        SELECT p.*, e.id AS id_empleado, (e.nombre || \' \' || e.apellido) AS nempleado, da.cedula, i.descripcion AS tipo_permiso, da.id_departamento,
 		    da.correo AS correo, depa.nombre AS nombre_depa
         FROM permisos AS p, empleados AS e, cg_tipo_permisos AS i, datos_actuales_empleado AS da,
 	        cg_departamentos AS depa
@@ -56,7 +56,7 @@ export const getlistaPermisosByFechas = async (req: Request, res: Response): Pro
     try {
         const { fec_inicio, fec_final } = req.query;
         const subquery = '( select (nombre || \' \' || apellido) from empleados i where i.codigo = CAST(p.codigo AS VARCHAR) ) as nempleado ';
-        const subquery1 = '( select i.descripcion from cg_tipo_permisos i where i.id = p.id_tipo_permiso) as ntipopermiso '
+        const subquery1 = '( select i.descripcion from cg_tipo_permisos i where i.id = p.id_tipo_permiso) as tipo_permiso '
         const subquery2 = '( select da.id_departamento FROM datos_actuales_empleado AS da WHERE da.codigo::int = p.codigo ) AS id_departamento '
         const query = `SELECT p.*, ${subquery}, ${subquery1}, ${subquery2} FROM permisos p WHERE p.fec_inicio BETWEEN \'${fec_inicio}\' AND \'${fec_final}\' ORDER BY p.fec_inicio DESC`
         const response: QueryResult = await pool.query(query);
@@ -164,17 +164,17 @@ export const postNuevoPermiso = async (req: Request, res: Response): Promise<Res
 
         const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
             id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
-            documento, docu_nombre, estado, id_empl_cargo, hora_salida, hora_ingreso, codigo } = req.body;
+            documento, estado, id_empl_cargo, hora_salida, hora_ingreso, codigo } = req.body;
 
         const response: QueryResult = await pool.query(
             'INSERT INTO permisos (fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, ' +
             'dia_libre, id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso, ' +
-            'documento, docu_nombre, estado, id_empl_cargo, hora_salida, hora_ingreso, codigo) ' +
-            'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19 ) ' +
+            'documento, estado, id_empl_cargo, hora_salida, hora_ingreso, codigo) ' +
+            'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) ' +
             'RETURNING * ',
             [fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
                 id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
-                documento, docu_nombre, estado, id_empl_cargo, hora_salida, hora_ingreso, codigo]);
+                documento, estado, id_empl_cargo, hora_salida, hora_ingreso, codigo]);
         const [objetoPermiso] = response.rows;
 
         if (!objetoPermiso) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
@@ -249,7 +249,7 @@ export const putPermiso = async (req: Request, res: Response): Promise<Response>
     try {
         const { id, fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre, id_tipo_permiso,
             hora_numero,
-            documento, docu_nombre, estado, hora_salida, hora_ingreso } = req.body;
+            documento, estado, hora_salida, hora_ingreso } = req.body;
         console.log(req.body);
 
         if (estado === 1) {
@@ -257,12 +257,12 @@ export const putPermiso = async (req: Request, res: Response): Promise<Response>
                 `
                 UPDATE permisos SET fec_creacion = $2 , descripcion = $3, fec_inicio = $4, fec_final = $5, 
                 dia = $6, legalizado = $7, dia_libre = $8, id_tipo_permiso = $9, hora_numero = $10, documento = $11, 
-                docu_nombre = $12, estado = $13, hora_salida = $14, hora_ingreso = $15
+                estado = $12, hora_salida = $13, hora_ingreso = $14
                 WHERE id = $1  RETURNING *
                 `,
                 [id, fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre, id_tipo_permiso, 
                     hora_numero,
-                    documento, docu_nombre, estado, hora_salida, hora_ingreso]);
+                    documento, estado, hora_salida, hora_ingreso]);
 
             const [objetoPermiso] = response.rows;
 

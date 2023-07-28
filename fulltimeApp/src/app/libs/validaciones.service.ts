@@ -89,6 +89,10 @@ export class ValidacionesService {
         return miliseg / 1000
     }
 
+    MinutosToSegundos(dato: number): number {
+        return dato * 60;
+    }
+
     TiempoFormatoHHMMSS(hora: string): string {
         return hora.split('.')[0].split("T")[1]
     }
@@ -125,12 +129,14 @@ export class ValidacionesService {
         return hora + ':' + min + ':' + seg
     }
 
+    
+
     //SegundosTransformDiaLaboral( inicio: Date, final: Date, tiempo_total: number, horario: HorarioE, horas_trabaja: number): any {
     //inicio = hora_inicio / final = hora_final
     SegundosTransformDiaLaboral(inicio: string, final: string, tiempo_total: number, totalHorar: number, horario: HorarioE, horas_trabaja: number, feriado: Cg_Feriados[] ): any {
 
         //Condicion para calcular horas de permiso tomando simepre un dia de permiso
-        if (tiempo_total <= horas_trabaja) { // validacion para permisos de un mismo dia laboral 
+        if (tiempo_total <= (horas_trabaja)) { // validacion para permisos de un mismo dia laboral 
             console.log('----Horas----');
             let tiempo_transcurrido_horas =  this.SegundosToHHMM(tiempo_total);
             console.log('horas: ',tiempo_transcurrido_horas);

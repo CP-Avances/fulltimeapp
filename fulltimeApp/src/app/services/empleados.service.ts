@@ -82,4 +82,14 @@ export class EmpleadosService {
     return this.http.get(`${environment.url}/empleado/empleadoAutoriza/${id_empleado}`);
   }
 
+  // METODO PARA BUSCAR HORARIO DEL USUARIO POR HORAS MISMO DIA (MD)
+  BuscarComidaHorarioHorasMD(datos: any) {
+    return this.http.post<any>(`${environment.url}/empleado/horario-comida-horas-mismo-dia/`, datos);
+  }
+
+  // METODO PARA BUSCAR HORARIO DEL USUARIO POR HORAS DIAS DIFERENTES (DD)
+  BuscarComidaHorarioHorasDD(datos: any) {
+    return this.http.post<any>(`${environment.url}/empleado/horario-comida-horas-dias-diferentes/`, datos);
+  }
+
 }

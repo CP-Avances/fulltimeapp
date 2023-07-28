@@ -59,6 +59,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
   dia_inicio: string;
   dia_fianl: string;
+  dia_siguiente: string;
   hora_inicio: string;
   hora_final: string;
 
@@ -93,9 +94,9 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   //Campo de validacion de documento
   CetificadoName = new FormControl('');
 
-   //variable para ocultar el formulario si no tiene asignado o registrado un periodo de vacaciones.
-   ocultar: boolean = true;
-   mensaje: boolean = true;
+  //variable para ocultar el formulario si no tiene asignado o registrado un periodo de vacaciones.
+  ocultar: boolean = true;
+  mensaje: boolean = true;
 
   private subscripted: Subscription;
   private subs_bool: boolean = false;
@@ -176,18 +177,6 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         }
       }
     );
-
-    if(!(Number.isNaN(this.reg.id_peri_vacacion))){
-      this.ocultar = false;
-      this.mensaje = true;
-    }else{
-      this.mensaje = false;
-      this.vacacionService.getlistarPeriVacacionesByCodigo(this.reg.codigo).subscribe(vacaciones => {
-        localStorage.setItem('cperi_vacacion',vacaciones[0].id.toString());
-      },error => {
-        this.validaciones.showToast(error.message, 4000, 'danger');
-      });
-    }
   }
 
   /** ******************************************************************************************* **
@@ -239,6 +228,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   }
   
   // METODO VALIDAR EL ITEM DE TIPO DE PERMISO SELECCIONADO
+  informacion_comida: string = ''
   ChangeTipoPermiso($event: any) {
     //Metodo para mostrar el mensaje al seleccionar
     if(!$event.target.value){
@@ -273,14 +263,50 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
           this.required = false;
         }
 
+        if(this.cg_permiso.almu_incluir === true){
+          this.informacion_comida = `Aplica descuento de minutos de alimentación si el permiso es solicitado por horas y se encuentra dentro del horario de alimentación.`;
+        }
+
         //Cambiar esta validacion del dato id_peri_vacacion se debe leer por la consulta no por el valor almacenado
         if(this.cg_permiso.tipo_descuento == 1){
-          this.validaciones.showToast('Sin descuento a vacaciones.', 4000, 'tertiary');
+          if(!(Number.isNaN(this.reg.id_peri_vacacion))){
+            this.vacacionService.getlistarPeriVacacionesByCodigo(this.reg.codigo).subscribe(vacaciones => {
+              if(vacaciones.length == 0){
+                this.ocultar = true;
+                this.mensaje = false;
+              }else{
+                this.validaciones.showToast('Sin descuento a vacaciones.', 4000, 'tertiary');
+                localStorage.setItem('cperi_vacacion',vacaciones[0].id.toString());
+                this.reg.id_peri_vacacion = parseInt(localStorage.getItem('cperi_vacacion'));
+                this.ocultar = false;
+                this.mensaje = true;
+              }
+
+            },error => {
+              this.ocultar = true;
+              this.mensaje = false;
+              this.validaciones.showToast(error.message, 4000, 'danger');
+            });
+
+          }else{
+            this.mensaje = false;
+          }
         }else if(this.cg_permiso.tipo_descuento == null || this.cg_permiso.tipo_descuento == undefined){
-          this.validaciones.showToast('No tiene registrado periodo de vacaciones.', 4000, 'warning');
+          this.ocultar = true;
+          this.mensaje = false;
+          this.validaciones.showToast('No tiene registrado periodo de vacaciones.', 3000, 'warning');
+        }else{
+          this.reg.id_peri_vacacion = 0;
+          this.ocultar = false;
+          this.mensaje = true;
+        }
+
+        //Numero maxio de días y horas de permiso
+        this.validaciones.abrirToas(' Dias maximos de Permiso - '+num_maxPermiso, 3000, 'tertiary', 'top');
+        if(this.cg_permiso.num_hora_maximo != '00:00:00'){
+          this.horas_trabaja_seg = this.validaciones.HorasTrabajaToSegundos(this.cg_permiso.num_hora_maximo);
         }
         
-        this.validaciones.abrirToas(' Dias maximos de Permiso - '+num_maxPermiso, 3000, 'tertiary', 'top');
         return console.log('Se requiere documento ',this.required)
       }
     }
@@ -299,6 +325,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         fecha: moment(this.reg.fec_inicio).format('YYYY-MM-D'), 
         codigo: this.reg.codigo
       }
+
       this.empleadoService.getHorariosEmpleadobyCodigo(busqueda).subscribe(datos => { 
         this.plan_horario = this.validaciones.ObtenerDetallesPlanificacion(datos);
 
@@ -307,7 +334,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         }
 
         this.plan_horario.filter(item => {
-          if(item.tipo_dia == 'L' ||  item.tipo_dia == 'FD'){
+          if(item.tipo_dia == 'L' ||  item.tipo_dia == 'FD' || item.tipo_dia == '-'){
             this.cont_tipo_dia_libre += 1;
           }
         });
@@ -318,24 +345,31 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
           this.btnOculto = true;
           return this.readonly = true;
         }else{
+
+          //Validación fechas reservadas
           if(this.cg_permiso.fec_validar == true){
-            if(this.dia_inicio == moment(this.cg_permiso.fecha).format('YYYY-MM-DD')){
-              this.validaciones.showToast('Lo Sentimos la fecha '+moment(this.cg_permiso.fecha).format('DD-MM-YYYY')+' esta reservada', 3500, 'warning');
+            if((this.dia_inicio >= moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD')) && (this.dia_inicio <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'))){
+              this.validaciones.showToast('Lo Sentimos la fecha '+this.dia_inicio+' esta dentro del rango de los días reservados', 3500, 'warning');
               this.valoresDefectoValidacionHoras();
               this.readonly = true
               return this.btnOculto = true;
             }
           }
 
+          //Esta variable permite contar el dia siguiente ingresado en el campo de dia inicial y que 
+          //sea este dato el valor a leer en la fecha maxima
+          var fechasiguiente = new Date(this.reg.fec_inicio);
+          fechasiguiente.setDate(fechasiguiente.getDate() + 1);
           if(this.selectItemDiasHoras == 'Horas'){
-            this.reg.fec_final = this.reg.fec_inicio;
-            this.dia_fianl = moment(this.reg.fec_inicio).format('YYYY-MM-DD');
+            this.dia_siguiente = moment(fechasiguiente).format('YYYY-MM-DD');
             this.reg.hora_numero = null; 
-            this.readonly = true;
+            this.readonly = false;
+            this.fech_bloqu = false;
             this.btnOcultoguardar = true;
             this.datetimeInicio.confirm(true);
             return this.btnOculto = true;
           }else{
+            this.dia_siguiente = '2050-12-31';
             this.readonly = false;
             this.fech_bloqu = false;
             this.datetimeInicio.confirm(true);
@@ -347,6 +381,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         this.validaciones.showToast('Ups! No tiene registrado un horario en ese día para solicitar un permiso', 3500, 'warning');
         return this.dia_inicio = ''
       });
+
       
     }
   }
@@ -369,7 +404,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         }
         
         this.plan_horario.filter(item => {
-          if(item.tipo_dia == 'L' ||  item.tipo_dia == 'FD'){
+          if(item.tipo_dia == 'L' ||  item.tipo_dia == 'FD' || item.tipo_dia == '-'){
             this.cont_tipo_dia_libre += 1;
           }
         });
@@ -378,18 +413,26 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
           this.showAlert();
           return this.btnOculto = true;;
         }else{
+          //Validación fechas reservadas
           if(this.cg_permiso.fec_validar == true){
-            if(this.dia_fianl == moment(this.cg_permiso.fecha).format('YYYY-MM-DD')){
-              this.validaciones.showToast('Lo Sentimos la fecha '+moment(this.cg_permiso.fecha).format('DD-MM-YYYY')+' esta reservada', 3500, 'warning');
+            if((this.dia_fianl >= moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD')) && (this.dia_fianl <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'))){
+              this.validaciones.showToast('Lo Sentimos la fecha '+this.dia_fianl+' esta dentro del rango de los días reservados', 3500, 'warning');
               this.valoresDefectoValidacionHoras();
               this.btnOculto = true;
-              this.readonly = true;
-              return this.dia_validado;;
+              this.readonly = false;
+              return this.dia_validado;
+            }else if((this.dia_inicio <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD') && (this.dia_fianl >= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD')))){
+              this.validaciones.showToast('El rango de dias de permiso estan reservados, no puede pedir en el rango de '+moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD')+' - '+moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'), 4000, 'warning');
+              this.valoresDefectoValidacionHoras();
+              this.btnOculto = true;
+              this.readonly = false;
+              return this.dia_validado;
             }
           }
 
           if(this.selectItemDiasHoras == 'Horas'){
-            this.readonly = true;
+            this.readonly = false;
+            this.datetimeFinal.confirm(true);
             return this.btnOculto = true;
           }else{
             this.datetimeFinal.confirm(true);
@@ -426,6 +469,63 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     });await alert.present();
   }
 
+  // METODO VALIDAR Y CAMBIAR EL INPUT DE DIA INICIAL Y FINAL
+  conteo_dia_antisipo: any;
+  dia1: any; dia2: any;
+  mes1: any; mes2: any;
+  ChangeDiaInicio(e: any){
+    this.dia1 = ''; this.dia2 = '';
+    this.mes1 = ''; this.mes2 = '';
+    this.conteo_dia_antisipo = 0;
+    this.dia_siguiente = '';
+    this.valoresDefectoValidacionResultados();
+    this.readonly = true;
+    if(e.target.value){
+      this.horario_salida = '00:00:00'
+      this.reg.fec_final = null;
+      this.dia_fianl = '';
+      this.reg.fec_inicio = e.target.value;
+      this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
+      this.valoresDefectoValidacionHoras();
+      this.dia_siguiente = '2050-12-31';
+
+      if(this.reg.fec_inicio != '' || this.reg.fec_inicio != null){      
+        //conteo de días para validar el num de dias de anticipacion para pedir el permiso
+        this.dia1 = moment(this.dia_inicio).format('D');
+        this.dia2 = moment(this.reg.fec_creacion).format('D');
+        this.mes1 = moment(this.dia_inicio).format('MM');
+        this.mes2 = moment(this.reg.fec_creacion).format('MM');
+
+        if(this.cg_permiso.num_dia_anticipo != null && this.cg_permiso.num_dia_anticipo != 0){
+          if(this.mes1 == this.mes2){
+            this.conteo_dia_antisipo = parseInt(this.dia1) - parseInt(this.dia2);
+            if(this.conteo_dia_antisipo >= this.cg_permiso.num_dia_anticipo ){
+              this.DiaIniciolLibre();
+            }else{
+              this.validaciones.showToast('Lo sentimos, el tipo de solicitud seleccionado debe ser solicitado con '+this.cg_permiso.num_dia_anticipo+' días de anticipación', 4500, 'warning'); 
+            }
+          }else{
+            this.DiaIniciolLibre();
+          }
+        }else{
+          this.DiaIniciolLibre();
+        }
+      }
+    }
+  }
+
+  ChangeDiaFinal(e: any){
+    this.valoresDefectoValidacionResultados();
+    if(e.target.value){
+      this.horario_ingreso = '23:59:59'
+      this.reg.fec_final = e.target.value;
+      this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');
+      const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
+      this.valoresDefectoValidacionHoras();
+      this.DiaFinalLibre();
+    }
+  }
+
   horario: number;
   // METODO ALIDAR Y CAMBIAR EL INPUT DE HORA INICAL Y FINAL
   ChangeHoraInicio(e: any){
@@ -433,17 +533,18 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.horario = 0;
     this.valoresDefectoValidacionResultados();
     if(!e.target.value){
-      this.reg.hora_salida = moment(new Date()).format();
+      var hora = new Date().setSeconds(0);
+      this.reg.hora_salida = moment(hora).format();
       return this.hora_inicio = moment(this.reg.hora_salida).format('h:mm a');
     }else{
+      this.btnOculto = true;
       this.hora_final = ''; 
+      this.reg.hora_ingreso = null;
       this.reg.hora_salida = e.target.value;
       this.hora_inicio = moment(e.target.value).format('h:mm a');
 
       const hora_salida = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_salida);
       const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fec_inicio!, hora_salida );
-
-      console.log('plan_horario: ',this.plan_horario);
 
       this.plan_horario.filter(item => {
         const HorarioInicio = this.validaciones.Unir_Fecha_Hora(String(this.dia_inicio),item.entrada);      
@@ -466,7 +567,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.btnOculto = true;
     console.log('horario: ',this.horario);
     if(!e.target.value){
-      this.reg.hora_ingreso = moment(new Date()).format();
+      var hora = new Date().setSeconds(0);
+      this.reg.hora_ingreso = moment(hora).format();
       return this.hora_final = moment(this.reg.hora_ingreso).format('h:mm a');
     }else{
       this.reg.hora_ingreso = e.target.value;
@@ -488,46 +590,90 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       if(this.btnOculto == true){
         this.validaciones.showToast('Ups! La hora Final esta fuera de su horario de Salida', 3500, 'warning');
       }
+      
     }
   }
 
-  // METODO VALIDAR Y CAMBIAR EL INPUT DE DIA INICIAL Y FINAL
-  ChangeDiaInicio(e: any){
-    this.valoresDefectoValidacionResultados();
-    this.readonly = true;
-    if(e.target.value){
-      this.horario_salida = '00:00:00'
-      this.reg.fec_final = null;
-      this.dia_fianl = '';
-      this.reg.fec_inicio = e.target.value;
-      this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
-      this.valoresDefectoValidacionHoras();
-
-      if(this.reg.fec_inicio != '' || this.reg.fec_inicio != null){      
-        const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss");
-        this.DiaIniciolLibre();
+  AlmuerzoIncluidoCalculo(){
+    if(this.cg_permiso.almu_incluir == true){
+      if(this.selectItemDiasHoras == 'Horas'){
+        if(this.dia_inicio == this.dia_fianl){
+          this.VerificarFechasIgualesComida(this.dia_inicio);
+        }else{
+          this.VerificarFechasDiferentesComida(this.dia_inicio, this.dia_fianl);
+        }
       }
     }
   }
 
-  ChangeDiaFinal(e: any){
-    this.valoresDefectoValidacionResultados();
-    if(e.target.value){
-      this.horario_ingreso = '23:59:59'
-      this.reg.fec_final = e.target.value;
-      this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');
-      const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
-      this.valoresDefectoValidacionHoras();
-      this.DiaFinalLibre();
+  dato_comida: any;
+  valor_comida: any;
+  VerificarFechasIgualesComida(fecha_inicio: any){
+    let datos: any = [];
+    this.dato_comida = 0;
+    this.valor_comida = 0;
+    let horario = {
+      codigo: this.reg.codigo,
+      fecha_inicio: fecha_inicio,
+      hora_inicio: moment(this.reg.hora_salida).format('HH:mm:ss'),
+      hora_final: moment(this.reg.hora_ingreso).format('HH:mm:ss'),
     }
+
+    this.empleadoService.BuscarComidaHorarioHorasMD(horario).subscribe(informacion => {
+      datos = informacion.respuesta;
+      //Horarios con finalizacion de jornada en el mismo día
+      if(informacion.message === 'CASO_1'){
+        console.log('calculo caso 1');
+        console.log('datos: ',datos);
+        this.dato_comida = datos[0].min_almuerzo;
+        this.valor_comida = this.validar.MinutosToSegundos(this.dato_comida);
+      }else if(informacion.message === 'CASO_2'){
+        console.log('calculo caso 2');
+        console.log('datos: ',datos);
+        this.dato_comida = datos[0].min_almuerzo;
+        this.valor_comida = this.validar.MinutosToSegundos(this.dato_comida);
+      }
+      this.validaciones.showToast('Se descontaron los minutos de la alimentacion', 3500, 'warning');
+
+    },error => {
+      this.validaciones.showToast('No se descontara la alimentacion', 3500, 'warning');
+    });
+  }
+
+  VerificarFechasDiferentesComida(fecha_inicio: any, fecha_final: any){
+    let datos: any = [];
+    this.dato_comida = 0;
+    this.valor_comida = 0;
+    let horario = {
+      fecha_inicio: fecha_inicio,
+      fecha_final: fecha_final,
+      hora_inicio: moment(this.reg.hora_salida).format('HH:mm:ss'),
+      hora_final: moment(this.reg.hora_ingreso).format('HH:mm:ss'),
+      codigo: this.reg.codigo
+    }
+
+    this.empleadoService.BuscarComidaHorarioHorasDD(horario).subscribe(informacion => {
+      console.log('informacion dias diferentes: ',informacion);
+      datos = informacion.respuesta;
+      //Horarios con finalizacion de jornada en el mismo día
+      if (informacion.message === 'CASO_4') {
+        console.log('calculo caso 1');
+        console.log('datos: ',datos);
+        this.dato_comida = datos[0].min_almuerzo;
+        this.valor_comida = this.validar.MinutosToSegundos(this.dato_comida);
+      }
+
+
+    },error => {
+      this.validaciones.showToast('No se ha encontrado registro minutos de alimentacion', 3500, 'warning');
+    });
+
   }
   
-
  /* ********************************************************************************** *
     *                 METODO PARA MOSTRAR EL CALCULO EN LOS INPUTS                   *
   * ********************************************************************************** */
-  mostrarCalculos(){
-
+  mostrarCalculos(){ 
     //variables para validar el dia de inicio completo y el dia final completo y buscar duplicidad.
      let minutosinicio = this.horario_salida;
      let minutosfinal = this.horario_ingreso;
@@ -548,6 +694,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       this.horarioEmpleado = horario;
 
       if(this.selectItemDiasHoras === 'Horas'){
+        this.AlmuerzoIncluidoCalculo();
         minutosinicio = moment(this.reg.hora_salida).format('HH:mm:ss');
         minutosfinal = moment(this.reg.hora_ingreso).format('HH:mm:ss');
       }
@@ -644,15 +791,16 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     });
   }
 
-
   /* ********************************************************************************** *
      *              METODO PARA CALCULAR Y VALIDAR EL RESULTADO MOSTRADO              *
    * ********************************************************************************** */
+  validacion: boolean = false;
   calcularhoras() {
+    this.reg.docu_nombre = null;
     if(this.selectItemDiasHoras == 'Días'){
       const fechasValidas = this.validaciones.validarRangoFechasIngresa(this.reg.fec_inicio, this.reg.fec_final, true);
       console.log('fechasValidas: ',fechasValidas)
-      if (!fechasValidas) { return this.valoresDefectoValidacionFechas();}
+      if (!fechasValidas) { return this.valoresDefectoValidacionFechas(), this.validacion = false;}
 
       //Se optiene la hora por defecto del dia de salida que es la hora en la que se crea el permiso 
       //Esto se lee por defecto ya que el tipo de permiso es por dias
@@ -678,34 +826,41 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     else {
 
       const fechasValidas = this.validaciones.validarRangoFechasIngresa(this.reg.fec_inicio!, this.reg.fec_final!, true);
-      if (!fechasValidas){ return this.valoresDefectoValidacionFechas();}
+      if (!fechasValidas){ return this.valoresDefectoValidacionFechas(), this.validacion = false;}
   
       const hora_salida = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_salida);
       const hora_ingreso = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_ingreso);
       const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fec_inicio!, hora_salida );
       const fec_comp_final = this.validaciones.Unir_Fecha_Hora(this.reg.fec_final!, hora_ingreso);
 
+      
+
       this.fecha_inicio = moment(fec_comp_inicio).format();
       this.fecha_final = moment(fec_comp_final).format();
 
       const horasValidas = this.validaciones.validarHorasIngresadas(fec_comp_inicio, fec_comp_final) // evaluacion de fechas completas 
-      if (!horasValidas) {return this.valoresDefectoValidacionHoras(), this.reg.hora_numero = null, this.reg.dia = null }
+      if (!horasValidas) {return this.valoresDefectoValidacionHoras(), this.reg.hora_numero = null, this.reg.dia = null, this.validacion = false }
 
       //Esta parte valida el ingreso de las horas con respecto al horario que tiene el usuaio con su hora de ingreso y salida del trabajo
       //const HorarioInicio = this.validaciones.Unir_Fecha_Hora(String(this.dia_inicio), this.horario_salida);      
       //const HorarioFinal = this.validaciones.Unir_Fecha_Hora(String(this.dia_fianl), this.horario_ingreso);   
       
-      const total = this.validaciones.MilisegToSegundos( fec_comp_final.valueOf() - fec_comp_inicio.valueOf());
+      var total = this.validaciones.MilisegToSegundos( fec_comp_final.valueOf() - fec_comp_inicio.valueOf());
 
       //Condicion que valida el tiempo calculado de horas con la jornada laboral la cual es el numero de horas en segundos que trabaja el empleado
       if(this.selectItemDiasHoras === 'Horas'){
-        if(total > this.horas_trabaja_seg){
-          this.validaciones.showToast('Ups!, lo sentimos el rango de horas excede su jornada laboral', 3500, 'warning');
+        if(total >= this.horas_trabaja_seg){
+          this.validaciones.showToast('Ups!, El rango de horas exedio las permitidas para un permiso, por favor realice un permiso por días', 4500, 'warning');
           this.reg.hora_numero = null;
           this.btnOcultoguardar = true;
-          return false;
+          return this.validacion = false;
         }
         this.btnOcultoguardar = false;
+      }
+
+      //Esta condición calcula el tiempo total con el descuento de minutos de alimentación.
+      if(this.dato_comida != 0 && this.cg_permiso.almu_incluir == true){
+        total = total -  this.valor_comida;
       }
       
       // 86400 seg ==> es un dia de 24 horas
@@ -717,7 +872,9 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
       switch (this.selectItemDiasHoras) {
         case 'Horas':
-          this.reg.dia = 0; // por defecto ya q es permiso por solo horas.
+          //Por defecto ya q es permiso por solo horas.
+          this.reg.dia = 0; 
+          this.reg.dia_libre = 0;
           break;
         default: break;
       }
@@ -726,10 +883,10 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     if((this.cg_permiso.num_dia_maximo < this.reg.dia!) &&  (this.cg_permiso.num_dia_maximo != 0)){
       this.validaciones.showToast('Lo Sentimos el maximo de dias de permiso es '+this.cg_permiso.num_dia_maximo, 3500, 'warning');
       this.reg.fec_final = null;
-      return false;
+      return this.validacion = false;
     }
     
-    return true;
+    return this.validacion = true;
   }
 
   /* ********************************************************************************** *
@@ -741,7 +898,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.reg.fec_inicio = this.fecha_inicio;
     this.reg.fec_final = this.fecha_final;
 
-    const validadionesFechasHoras = this.calcularhoras();
+    const validadionesFechasHoras = this.validacion;
     this.loadingBtn = true;
 
     if (!validadionesFechasHoras) return
@@ -825,7 +982,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     }
 
     console.log('formData: ',formData);
-    this.permisoService.SubirArchivoRespaldo(formData, id, this.archivoSubido[0].name, null).subscribe(res => {
+    this.permisoService.SubirArchivoRespaldo(formData, id, this.reg.codigo, null).subscribe(res => {
       this.validaciones.showToast('El archivo se Cargo Correctamente', 3500, 'success');
       this.reg.docu_nombre = '';
     }, err => {
@@ -843,9 +1000,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.archivoSubido = null;
   }
 
-
-    /* ********************************************************************************** *
-     *                       CREAR NUEVA AUTORIZACION DE PERMISOS                    *
+  /* ********************************************************************************** *
+    *                       CREAR NUEVA AUTORIZACION DE PERMISOS                    *
    * ********************************************************************************** */
 
   CrearNuevaAutorizacion(permiso: Permiso) {
@@ -885,7 +1041,21 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       h_fin = '';
     }
 
-    permiso.EmpleadosSendNotiEmail.forEach(item => {
+    //Listado para eliminar el usuario duplicado
+    var allNotificaciones = [];
+    //Ciclo por cada elemento del listado
+    permiso.EmpleadosSendNotiEmail.forEach(function(elemento: any, indice: any, array: any) {
+      // Discriminación de elementos iguales
+      if(allNotificaciones.find((p: any)=> p.id_empleado == elemento.id_empleado) == undefined)
+      {
+        // Nueva lista de empleados que reciben la notificacion
+        allNotificaciones.push(elemento);
+      }
+    });
+
+    console.log("Usuarios que reciben la notificacion: ",allNotificaciones);
+
+    allNotificaciones.forEach(item => {
       let notificacion: any = {
         id_send_empl: parseInt(localStorage.getItem('empleadoID')),
         id_receives_empl: item.id_empleado,
@@ -905,7 +1075,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
             this.permisoService.sendNotiRealTime(resp.respuesta);
           },
           err => { 
-            this.validaciones.showToast('No se pudo enviar la notificacion', 3000, 'danger') 
+            this.validaciones.showToast('No se pudo enviar la notificacion', 3000, 'danger'); 
           },
         )
       }
@@ -942,9 +1112,21 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
     console.log('Envio de correo: ',correo_crear)
 
+    //Listado para eliminar el usuario duplicado
+    var allCorreos = [];
+    //Ciclo por cada elemento del listado
+    permiso.EmpleadosSendNotiEmail.forEach(function(elemento: any, indice: any, array: any) {
+      // Discriminación de elementos iguales
+      if(allCorreos.find((p: any)=> p.id_empleado == elemento.id_empleado) == undefined)
+      {
+        // Nueva lista de empleados que reciben la notificacion
+        allCorreos.push(elemento);
+      }
+    });
+
     if(correo_crear === true){
       // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
-    permiso.EmpleadosSendNotiEmail.forEach(e => {
+      allCorreos.forEach(e => {
 
       // LECTURA DE DATOS LEIDOS
       cont = cont + 1;
@@ -961,7 +1143,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         }
       }
 
-      if (cont === permiso.EmpleadosSendNotiEmail.length) {
+      if (cont === allCorreos.length) {
         let datosPermisoCreado = {
           tipo_solicitud: 'Permiso solicitado por',
           solicitud: solicitud,

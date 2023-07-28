@@ -21,7 +21,7 @@ import { Permiso } from 'src/app/interfaces/Permisos';
       <strong>Usuario </strong> {{ permiso.nempleado }} <br>
       <ion-label> 
         <strong> Realizo un permiso por </strong> 
-        <strong style="float:right; margin-right: 3%"> {{ permiso.ntipopermiso | titlecase }} </strong> 
+        <strong style="float:right; margin-right: 3%"> {{ permiso.tipo_permiso | titlecase }} </strong> 
       </ion-label>
     </p>
 

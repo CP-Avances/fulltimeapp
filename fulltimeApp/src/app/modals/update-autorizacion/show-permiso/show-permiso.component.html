@@ -6,7 +6,7 @@
     </ion-card-title>
 
     <h6>
-      <p style="font-size: 77%; margin-top:-2%;"> Solicita Permiso por {{ permiso.ntipopermiso | titlecase }}</p>
+      <p style="font-size: 77%; margin-top:-2%;"> Solicita Permiso por {{ permiso.tipo_permiso | titlecase }}</p>
       <ion-card-title style="margin-top:-2%; font-size: 90%;" *ngIf="permiso.descripcion != null"><b> Descripcion </b>
       </ion-card-title><br>
       <p style="font-size: 84%; margin-top:-5.5%;" *ngIf="permiso.descripcion != null"> {{ permiso.descripcion }}</p>

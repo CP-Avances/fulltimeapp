@@ -96,6 +96,7 @@ export class ListaPermisosAdminComponent implements OnInit {
   }
 
   InicializarListas(){
+    this.permisos = [];
     this.permisos_pendientes = [];
     this.permisos_pre_autorizados = [];
     this.permisos_autorizado = [];

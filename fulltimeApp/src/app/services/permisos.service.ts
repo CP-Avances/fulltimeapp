@@ -167,13 +167,13 @@ export class PermisosService {
   }
 
   // METODO PARA SUBIR ARCHIVOS DE PERMISOS
-  SubirArchivoRespaldo(formData: any, id: number, documento: string, archivo: any) {
-    return this.http.put(`${this.recursoURL}/empleadoPermiso/${id}/documento-movil/${documento}/archivo/${archivo}`, formData)
+  SubirArchivoRespaldo(formData: any, id: number, codigo: any, archivo: any) {
+    return this.http.put(`${this.recursoURL}/empleadoPermiso/${id}/archivo/${archivo}/validar/${codigo}`, formData)
   }
 
   // METODO PARA ELIMINAR ARCHIVOS DE PERMISOS
-  EliminarArchivo(documento: string) {
-    return this.http.delete(`${this.recursoURL}/empleadoPermiso/eliminar-movil/${documento}`);
+  EliminarArchivo(documento: string, codigo: any) {
+    return this.http.delete(`${this.recursoURL}/empleadoPermiso/eliminar-movil/${documento}/validar/${codigo}`);
   }
 
   

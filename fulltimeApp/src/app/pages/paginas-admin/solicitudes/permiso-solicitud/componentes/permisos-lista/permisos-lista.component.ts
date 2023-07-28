@@ -52,6 +52,7 @@ export class PermisosListaComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.codigo = localStorage.getItem('codigo')
     this.BuscarFormatos();
+    this.cambioPaginaActual();
   }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
@@ -100,11 +101,14 @@ export class PermisosListaComponent implements OnInit, OnDestroy {
     }
   }
 
+  conteoSolicitudes: number = 0;
   obtenerListaPermisos() {
+    this.conteoSolicitudes = 0;
     this.subscripted = this.permisosService.getListaPermisosByCodigo(this.codigo)
       .subscribe(
         permisos => {
           this.permisos = permisos;
+
           this.permisos.forEach(p => {
             // TRATAMIENTO DE FECHAS Y HORAS EN FORMATO DD/MM/YYYYY
             p.fec_creacion_ = this.validar.FormatearFecha(String(p.fec_creacion), this.formato_fecha, this.validar.dia_completo);
@@ -117,6 +121,8 @@ export class PermisosListaComponent implements OnInit, OnDestroy {
           })
           const [ultimoNumeroPermiso] = permisos;
           this.num_permiso = (ultimoNumeroPermiso) ? ultimoNumeroPermiso.num_permiso! + 1 : 1;
+
+          this.conteoSolicitudes = this.permisos.length;
 
           if (permisos.length < 6) {
             return this.ver = true;
@@ -150,6 +156,12 @@ export class PermisosListaComponent implements OnInit, OnDestroy {
       this.ngOnInit()
     }
     return;
+  }
+
+  cambioPaginaActual(){
+    if((this.permisos.length < (this.pageActual * 5)) && ((this.pageActual * 5) - this.permisos.length  == 4)){
+      return this.pageActual = this.pageActual - 1;
+    }
   }
 
   async presentModalVerRegistro(permiso: Permiso) {

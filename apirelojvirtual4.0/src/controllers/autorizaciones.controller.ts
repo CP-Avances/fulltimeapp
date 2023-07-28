@@ -64,16 +64,18 @@ export const ObtenerListaAutorizaDepa = async (req: Request, res: Response): Pro
         const EMPLEADOS = await pool.query(
             `
             SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel,
+                n.id_establecimiento AS id_suc, s.nombre AS sucursal,
                 da.estado, dae.id_contrato, da.id_empl_cargo, c.id_empleado, (dae.nombre || ' ' || dae.apellido) as fullname, 
                 dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail, 
                 c.hora_extra_noti  
             FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae, 
-                config_noti AS c, cg_departamentos AS cg 
+                config_noti AS c, cg_departamentos AS cg, sucursales AS s 
             WHERE n.id_departamento = $1 
                 AND da.id_departamento = n.id_dep_nivel 
                 AND dae.id_cargo = da.id_empl_cargo 
                 AND dae.id = c.id_empleado 
-                AND cg.id = $1 
+                AND cg.id = $1
+                AND s.id = n.id_establecimiento 
             ORDER BY nivel ASC
             `
             ,[id_depar]);

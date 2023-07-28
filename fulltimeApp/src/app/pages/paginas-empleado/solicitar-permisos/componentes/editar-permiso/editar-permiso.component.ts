@@ -50,6 +50,7 @@ export class EditarPermisoComponent implements OnInit {
 
   dia_inicio: string | null = "";
   dia_fianl: string | null = "";
+  dia_siguiente: string | null = "";
   hora_inicio: string = "";
   hora_final: string = "";
 
@@ -105,6 +106,9 @@ export class EditarPermisoComponent implements OnInit {
   }
 
   tiempo: any;
+  mensajedocumentBloqueado: string = '';
+  blockDocument: boolean = true;
+  position: string = '';
   ngOnInit() {
     this.btnOcultoguardar = true;
     this.plan_horario = [];
@@ -114,10 +118,38 @@ export class EditarPermisoComponent implements OnInit {
     this.fecha_inicio = this.permiso.fec_inicio;
     this.fecha_final = this.permiso.fec_final;
     this.aux_descripcion = this.reg.descripcion;
-  
+
+    var [cg_permiso] = this.cg_tipo_permisos.filter(o => {return o.id === this.reg.id_tipo_permiso})
+    this.cg_permiso = cg_permiso;
+    console.log('this.reg: ',this.reg);
+    console.log('this.cg_permiso: ',this.cg_permiso);
+
     if(this.reg.docu_nombre == null){
       this.mensajeFile = "No hay archivo subido";
+
+      if(this.cg_permiso.gene_justificacion == true){
+        //conteo de días para validar el num de dias para justificar y subir el documento
+        var diahoy: any = new Date();
+        var diaCreacion = new Date(this.reg.fec_creacion).getTime();
+        var diasDiferencia: number =  diahoy - diaCreacion;
+        //Ponemos la hora en 00:00:00 para tomar el dia completo
+        diahoy.setHours(0, 0, 0, 0);
+        diahoy = diahoy.getTime();
+        //Obtenemos el valor de los dias trasncuridos con la siguiente formula donde el 24 es la hora, 60 son minutos, 60 son segundos y 1000 son milisegun
+        let dias: number = Math.floor(diasDiferencia / (24 * 60 * 60 * 1000));
+       
+        if( dias > this.cg_permiso.num_dia_justifica){
+          this.mensajedocumentBloqueado = 'Lo sentimos, el plazo para subir el documento es de '+this.cg_permiso.num_dia_justifica+' días y usted esta fuera el plazo'
+          this.blockDocument = true;
+        }else{
+          this.blockDocument = false;
+          this.mensajedocumentBloqueado = '';
+        }
+      }else{
+        this.blockDocument = false;
+      }
     }
+
     this.dia_inicio = moment(this.reg.fec_inicio).format('YYYY-MM-DD');
     this.dia_fianl = moment(this.reg.fec_final).format('YYYY-MM-DD');
     
@@ -137,7 +169,7 @@ export class EditarPermisoComponent implements OnInit {
       this.selectItemDiasHoras = 'Días';
     }else if(this.reg.dia == 0 && this.reg.hora_numero != '00:00:00'){
       this.selectItemDiasHoras = 'Horas';
-      this.readonly = true;
+      this.readonly = false;
     }
 
     this.horas_trabaja_seg = this.validaciones.HorasTrabajaToSegundos(String(localStorage.getItem('horas_trabaja')))
@@ -171,6 +203,15 @@ export class EditarPermisoComponent implements OnInit {
     },err => { 
       this.validar.showToast(err.error.message, 3000, 'danger')
     });
+
+    if(this.selectItemDiasHoras == 'Horas'){
+      //Esta variable permite contar el dia siguiente ingresado en el campo de dia inicial y que sea este dato el valor a leer en la fecha maxima
+      var fechasiguiente = new Date(this.reg.fec_inicio);
+      fechasiguiente.setDate(fechasiguiente.getDate() + 1);
+      this.dia_siguiente = moment(fechasiguiente).format('YYYY-MM-DD');
+    }else{
+      this.dia_siguiente = '2050-12-31';
+    }
 
     this.obtenerInformacionEmpleado();
     this.BuscarFormatos();
@@ -247,6 +288,7 @@ export class EditarPermisoComponent implements OnInit {
 
   // METODO VALIDAR EL ITEM DE TIPO DE PERMISO SELECCIONADO
   ChangeTipoPermiso($event: any) {
+    this.cg_permiso = cg_permisoValueDefault;
     this.valoresDefectoValidacionResultados();
     //Metodo para mostrar el mensaje al seleccionar
     if(!$event.target.value){
@@ -369,22 +411,29 @@ export class EditarPermisoComponent implements OnInit {
         }else{
           console.log('dia laboral')
           if(this.cg_permiso.fec_validar == true){
-            if(this.dia_inicio == moment(this.cg_permiso.fecha).format('YYYY-MM-DD')){
-              this.validaciones.showToast('Lo Sentimos la fecha '+moment(this.cg_permiso.fecha).format('DD-MM-YYYY')+' esta reservada', 3500, 'warning');
+            if((this.dia_inicio >= moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD')) && (this.dia_inicio <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'))){
+              this.validaciones.showToast('Lo Sentimos la fecha '+this.dia_inicio+' esta dentro del rango de los días reservados', 3500, 'warning');
               this.valoresDefectoValidacionHoras();
-              this.btnOculto = true;
-              return this.readonly = true;
+              this.readonly = true
+              return this.btnOculto = true;
             }
           }
+
+            //Esta variable permite contar el dia siguiente ingresado en el campo de dia inicial y que sea este dato el valor a leer en la fecha maxima
+            var fechasiguiente = new Date(this.reg.fec_inicio);
+            fechasiguiente.setDate(fechasiguiente.getDate() + 1);
+
+            console.log('fechasiguiente: ',fechasiguiente);
+
             if(this.selectItemDiasHoras == 'Horas'){
-              this.reg.fec_final = this.reg.fec_inicio;
-              this.dia_fianl = moment(this.reg.fec_inicio).format('YYYY-MM-DD');
+              this.dia_siguiente = moment(fechasiguiente).format('YYYY-MM-DD');
               this.reg.hora_numero = null; 
-              this.readonly = true;
+              this.readonly = false;
               this.btnOcultoguardar = true;
               this.datetimeInicio.confirm(true);
               return this.btnOculto = false;
             }else{
+              this.dia_siguiente = '2050-12-31';
               this.readonly = false;
               this.fech_bloqu = false;
               return this.datetimeInicio.confirm(true);;
@@ -428,17 +477,23 @@ export class EditarPermisoComponent implements OnInit {
         }else{
           console.log('dia laboral');
           if(this.cg_permiso.fec_validar == true){
-            if(this.dia_fianl == moment(this.cg_permiso.fecha).format('YYYY-MM-DD')){
-              this.validaciones.showToast('Lo Sentimos la fecha '+moment(this.cg_permiso.fecha).format('DD-MM-YYYY')+' esta reservada', 3500, 'warning');
+            if((this.dia_fianl >= moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD')) && (this.dia_fianl <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'))){
+              this.validaciones.showToast('Lo Sentimos la fecha '+this.dia_fianl+' esta dentro del rango de los días reservados', 3500, 'warning');
               this.valoresDefectoValidacionHoras();
               this.btnOculto = true;
-              return this.readonly = true;
+              return this.readonly = false;
+            }else if((this.dia_inicio <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD') && (this.dia_fianl >= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD')))){
+              this.validaciones.showToast('El rango de dias de permiso estan reservados, no puede pedir en el rango de '+moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD')+' - '+moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'), 4000, 'warning');
+              this.valoresDefectoValidacionHoras();
+              this.btnOculto = true;
+              return this.readonly = false;
             }
           }
 
           if(this.selectItemDiasHoras == 'Horas'){
-            this.readonly = true;
-            return this.btnOculto = true;
+            this.datetimeFinal.confirm(true);
+            this.fech_bloqu = false;
+            return this.btnOculto = false;
           }else{
             this.datetimeFinal.confirm(true);
             this.btnOculto = false;
@@ -522,8 +577,13 @@ export class EditarPermisoComponent implements OnInit {
   }
 
   // METODO VALIDAR Y CAMBIAR EL INPUT DE DIA INICIAL Y FINAL
+  conteo_dia_antisipo: any;
+  dia1: any; dia2: any;
+  mes1: any; mes2: any;
   ChangeDiaInicio(e: any){
-    
+    this.dia1 = ''; this.dia2 = '';
+    this.mes1 = ''; this.mes2 = '';
+    this.conteo_dia_antisipo = 0;
     if(!e.target.value){
       this.reg.fec_inicio = moment(new Date()).format('YYYY-MM-DD');
       this.fecha_inicio = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
@@ -540,7 +600,27 @@ export class EditarPermisoComponent implements OnInit {
       this.reg.fec_inicio = e.target.value;
       this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
       this.fecha_inicio = this.reg.fec_inicio
-      this.DiaIniciolLibre();
+
+      //conteo de días para validar el num de dias de anticipacion para pedir el permiso
+      this.dia1 = moment(this.dia_inicio).format('D');
+      this.dia2 = moment(this.reg.fec_creacion).format('D');
+      this.mes1 = moment(this.dia_inicio).format('MM');
+      this.mes2 = moment(this.reg.fec_creacion).format('MM');
+
+      if(this.cg_permiso.num_dia_anticipo != null){
+        if(this.mes1 == this.mes2){
+          this.conteo_dia_antisipo = parseInt(this.dia1) - parseInt(this.dia2);
+          if(this.conteo_dia_antisipo >= this.cg_permiso.num_dia_anticipo ){
+            this.DiaIniciolLibre();
+          }else{
+            this.validaciones.showToast('Lo sentimos, el tipo de solicitud seleccionada debe ser solicitada con '+this.cg_permiso.num_dia_anticipo+' días de anticipación', 4500, 'warning'); 
+          }
+        }else{
+          this.DiaIniciolLibre();
+        }
+      }else{
+        this.DiaIniciolLibre();
+      }
     }
   }
 
@@ -819,7 +899,7 @@ export class EditarPermisoComponent implements OnInit {
       if(this.archivoSubido != null){
         this.reg.docu_nombre = this.archivoSubido[0].name; // Inserta el nombre del archivo al subir
       }else{
-        this.permisoService.EliminarArchivo(this.reg.documento!).subscribe(res => {}) //Elimina el archivo del servidos si se quita y se guarda sin documento
+        this.permisoService.EliminarArchivo(this.reg.documento!, this.permiso.codigo).subscribe(res => {}) //Elimina el archivo del servidos si se quita y se guarda sin documento
         this.reg.docu_nombre = null;
         this.reg.documento = null;
       }
@@ -846,8 +926,8 @@ export class EditarPermisoComponent implements OnInit {
   fileChange(element: any){
     this.archivoSubido = element.target.files;
     console.log(this.archivoSubido);
-    const name = this.archivoSubido![0].name;
-    if(this.archivoSubido!.length != 0){
+    const name = this.archivoSubido[0].name;
+    if(this.archivoSubido.length != 0){
       if(this.archivoSubido![0].size >= 2e+6){
         this.archivoSubido = null;
         this.reg.docu_nombre = '';
@@ -870,9 +950,8 @@ export class EditarPermisoComponent implements OnInit {
 
   //Metodo para actualizar un archivo
   updataArchivo(permiso: any){
-    
     if(this.archivoSubido![0].name == this.reg.docu_nombre){
-      this.permisoService.EliminarArchivo(this.reg.documento!).subscribe(res => {
+      this.permisoService.EliminarArchivo(this.reg.documento!,this.permiso.codigo).subscribe(res => {
         this.subirRespaldo(permiso);
       })
     }else{
@@ -894,7 +973,7 @@ export class EditarPermisoComponent implements OnInit {
       formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
     }
 
-    this.permisoService.SubirArchivoRespaldo(formData, id, this.archivoSubido[0].name, null).subscribe(res => {
+    this.permisoService.SubirArchivoRespaldo(formData, id, this.permiso.codigo, null).subscribe(res => {
       this.validaciones.showToast('El archivo se actualizo Correctamente', 3000, 'success');
       this.reg.docu_nombre = '';
 

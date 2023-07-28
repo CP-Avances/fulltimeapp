@@ -245,6 +245,6 @@ export const listarPeriVacaciones = async (req: Request, res: Response): Promise
         
     } catch (error) {
         console.log(error);
-        return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+        return res.status(500).jsonp({ message: 'No fue posible verificar el periodo a vacaciones - Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
 }

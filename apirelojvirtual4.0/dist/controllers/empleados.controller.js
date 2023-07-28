@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPlanificacionMesesCodigoEmple = exports.BuscarPlanificacionHorarioEmple = exports.getHorariosEmpleadoByCodigo = exports.getInformarEmpleadoAutoriza = exports.getOneHorarioEmpleadoByCodigo = exports.getListaHorariosEmpleadoByCodigo = exports.getUbicacion = exports.getListaEmpleados = void 0;
+exports.ObtenerComidaHorarioHorasDD = exports.ObtenerComidaHorarioHorasMD = exports.getPlanificacionMesesCodigoEmple = exports.BuscarPlanificacionHorarioEmple = exports.getHorariosEmpleadoByCodigo = exports.getInformarEmpleadoAutoriza = exports.getOneHorarioEmpleadoByCodigo = exports.getListaHorariosEmpleadoByCodigo = exports.getUbicacion = exports.getListaEmpleados = void 0;
 const database_1 = require("../database");
 const getListaEmpleados = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -260,3 +260,78 @@ const getPlanificacionMesesCodigoEmple = (req, res) => __awaiter(void 0, void 0,
     }
 });
 exports.getPlanificacionMesesCodigoEmple = getPlanificacionMesesCodigoEmple;
+// METODO PARA BUSCAR HORAS DE ALIMENTACION EN EL MISMO DIA (MD)
+const ObtenerComidaHorarioHorasMD = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let { codigo, fecha_inicio, hora_inicio, hora_final } = req.body;
+        // CONSULTA DE HORARIO DEL USUARIO INGRESO = SALIDA
+        let CASO_1 = yield database_1.pool.query(`
+            SELECT * FROM vista_comida_inicio AS ci
+            JOIN vista_comida_fin AS cf ON ci.codigo = cf.codigo AND ci.fecha_entrada = cf.fecha_salida 
+                AND ci.id_horario = cf.id_horario AND salida_otro_dia = 0 AND ci.codigo::varchar = $1
+                AND ci.fecha_entrada = $2
+                AND ((($3 BETWEEN hora_inicio AND hora_final) OR ($4 BETWEEN hora_inicio AND hora_final))
+                OR ((hora_inicio BETWEEN $3 AND $4) OR (hora_final BETWEEN $3 AND $4)))
+            `, [codigo, fecha_inicio, hora_inicio, hora_final])
+            .then((result) => { return result.rows; });
+        console.log('CASO_1.length === 0: ', CASO_1.length === 0);
+        if (CASO_1.length === 0) {
+            // CONSULTA DE HORARIO DEL USUARIO INGRESO != SALIDA (SEGUNDO DIA)
+            let CASO_2 = yield database_1.pool.query(`
+                SELECT * FROM vista_comida_inicio AS ci
+                JOIN vista_comida_fin AS cf ON ci.codigo = cf.codigo 
+                    AND cf.fecha_salida = (ci.fecha_entrada + interval '1 day')
+                    AND ci.id_horario = cf.id_horario AND salida_otro_dia = 1 AND ci.codigo::varchar = $1
+                    AND ($2 = ci.fecha_entrada OR $2 = cf.fecha_salida)
+                `, [codigo, fecha_inicio])
+                .then((result) => { return result.rows; });
+            if (CASO_2.length === 0) {
+                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+            }
+            else {
+                return res.status(200).jsonp({ message: 'CASO_2', respuesta: CASO_2 });
+            }
+        }
+        else {
+            return res.status(200).jsonp({ message: 'CASO_1', respuesta: CASO_1 });
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+});
+exports.ObtenerComidaHorarioHorasMD = ObtenerComidaHorarioHorasMD;
+// METODO PARA CONSULTAR MINUTOS DE ALIMENTACION EN DIAS DIFERENTES (DD)
+const ObtenerComidaHorarioHorasDD = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let { codigo, fecha_inicio, fecha_final, hora_inicio, hora_final } = req.body;
+        console.log('codigo: ', codigo);
+        console.log('fecha_inicio: ', fecha_inicio);
+        console.log('fecha_final: ', fecha_final);
+        console.log('hora_inicio: ', hora_inicio);
+        console.log('hora_final: ', hora_final);
+        // CONSULTA DE HORARIO DEL USUARIO INGRESO != SALIDA
+        let CASO_4 = yield database_1.pool.query(`
+            SELECT * FROM vista_comida_inicio AS ci
+            JOIN vista_comida_fin AS cf ON ci.codigo = cf.codigo 
+            AND cf.fecha_salida = (ci.fecha_entrada + interval '1 day')
+            AND ci.id_horario = cf.id_horario AND salida_otro_dia = 1 AND ci.codigo::varchar = $1
+            AND $2 = ci.fecha_entrada AND $3 = cf.fecha_salida
+            AND ((($4 BETWEEN hora_inicio AND hora_final) OR ($5 BETWEEN hora_inicio AND hora_final))
+			OR ((hora_inicio BETWEEN $4 AND $5) OR (hora_final BETWEEN $4 AND $5)))
+            `, [codigo, fecha_inicio, fecha_final, hora_inicio, hora_final])
+            .then((result) => { return result.rows; });
+        if (CASO_4.length === 0) {
+            return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+        }
+        else {
+            return res.status(200).jsonp({ message: 'CASO_4', respuesta: CASO_4 });
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+});
+exports.ObtenerComidaHorarioHorasDD = ObtenerComidaHorarioHorasDD;
