@@ -919,6 +919,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         this.reg.docu_nombre = null;
       }
 
+      console.log('this.reg: ',this.reg);
+
       this.subscripted = this.permisoService.postNuevoPermiso(this.reg).subscribe(
         permiso => {
           permiso.EmpleadosSendNotiEmail.push(this.solInfo);

@@ -242,7 +242,6 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
                 this.ConfiguracionAutorizacion(autorizacion, o, this.ListaPermisos.length); 
               },
               err => { 
-                this.errorResponse(err.error.message);
                 o.observacion = 'La solicitud tiene problemas con el registro de autorización';
                 o.aprobacion = 'SI';
                 this.listafiltrada.push(o);
@@ -587,7 +586,6 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
           return this.validar.showToast("Seleccione la Autorización", 2000, 'warning');
         }
         else {
-
           this.loadingBtn = true;
           await this.autorizaciones.forEach(a => {
             a.estado = this.estadoChange.id

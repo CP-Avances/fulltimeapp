@@ -185,6 +185,8 @@ export class ValidacionesService {
         this.lista_plan = horario;
         this.filtro = [];
 
+        console.log('horario: ',horario);
+
         const fec_aux = new Date(inicio.split('T')[0])//variable auxiliar de la fecha de inicio, me toma un dia anterior.90p-[=]
         const fecha1 = moment(inicio);
         const fecha2 = moment(final);
@@ -193,11 +195,19 @@ export class ValidacionesService {
 
         let res: Array<any> = [];
         // se aplica logica matematica
+
+        console.log('diasDiferencia: ',diasDiferencia);
+
+
         for (let i = 0; i <= diasDiferencia; i++) {
             const fec_string = fec_aux.toJSON().split('T')[0];
             const [fer] = feriado.filter(o => { return o.fecha === fec_string })       
             var dia: any = moment(fec_string).format('D');
-            var mes: any = moment(fec_string).format('M')
+            var mes: any = moment(fec_string).format('M');
+
+            console.log('dia: ',dia);
+            console.log('mes: ',mes);
+
             this.lista_plan.filter(item =>{
                 if(item.mes == mes){
                     this.filtro = item;

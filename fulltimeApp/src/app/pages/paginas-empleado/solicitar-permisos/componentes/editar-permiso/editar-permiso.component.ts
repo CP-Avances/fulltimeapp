@@ -33,7 +33,7 @@ export class EditarPermisoComponent implements OnInit {
   @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
   @ViewChild(IonDatetime) datetimeFinal: IonDatetime;
 
-  @Input() permiso!: Permiso;
+  @Input() permiso: Permiso;
   reg: Permiso;
   diasHoras = diasHoras;
   radioButton = estadoBoolean;
@@ -48,11 +48,11 @@ export class EditarPermisoComponent implements OnInit {
   fech_bloqu: boolean;
   fech_bloquf: boolean;
 
-  dia_inicio: string | null = "";
-  dia_fianl: string | null = "";
-  dia_siguiente: string | null = "";
-  hora_inicio: string = "";
-  hora_final: string = "";
+  dia_inicio: string  = "";
+  dia_fianl: string = "";
+  dia_siguiente: string = "";
+  hora_inicio: string = '';
+  hora_final: string = '';
 
   //variable para ocultar el boton de calculos de acuerdo a la opcion que se ingresa
   btnOculto: boolean = true;
@@ -109,6 +109,9 @@ export class EditarPermisoComponent implements OnInit {
   mensajedocumentBloqueado: string = '';
   blockDocument: boolean = true;
   position: string = '';
+  diaPermiso_refe: number = 0;
+  dialibre_refe: number = 0;
+  horas_refe: any;
   ngOnInit() {
     this.btnOcultoguardar = true;
     this.plan_horario = [];
@@ -118,11 +121,12 @@ export class EditarPermisoComponent implements OnInit {
     this.fecha_inicio = this.permiso.fec_inicio;
     this.fecha_final = this.permiso.fec_final;
     this.aux_descripcion = this.reg.descripcion;
+    this.diaPermiso_refe = 0;
+    this.dialibre_refe = 0;
+    this.horas_refe = '00:00:00';
 
     var [cg_permiso] = this.cg_tipo_permisos.filter(o => {return o.id === this.reg.id_tipo_permiso})
     this.cg_permiso = cg_permiso;
-    console.log('this.reg: ',this.reg);
-    console.log('this.cg_permiso: ',this.cg_permiso);
 
     if(this.reg.docu_nombre == null){
       this.mensajeFile = "No hay archivo subido";
@@ -167,8 +171,11 @@ export class EditarPermisoComponent implements OnInit {
 
     if(this.reg.dia != 0 && this.reg.hora_numero == '00:00:00'){
       this.selectItemDiasHoras = 'Días';
+      this.diaPermiso_refe = this.reg.dia;
+      this.dialibre_refe = this.reg.dia_libre;
     }else if(this.reg.dia == 0 && this.reg.hora_numero != '00:00:00'){
       this.selectItemDiasHoras = 'Horas';
+      this.horas_refe = this.reg.hora_numero;
       this.readonly = false;
     }
 
@@ -674,8 +681,16 @@ export class EditarPermisoComponent implements OnInit {
         this.validar.showToast('Llenar todos los campos solicitados.', 3000, 'warning')
         return false;
       }
+    }else if(this.selectItemDiasHoras == 'Días'){
+      if (this.validar.vacio(this.reg.fec_inicio) || this.validar.vacio(this.reg.fec_final)) {
+        this.loadingBtn = false;
+        this.validar.showToast('Llenar todos los campos solicitados.', 3000, 'warning')
+        return false;
+      }else{
+        this.horario_salida = '00:00:00';
+      }
     }
-    
+
     //variables para validar el dia de inicio completo y el dia final completo y buscar duplicidad.
     let minutosinicio = this.horario_salida;
     let minutosfinal = this.horario_ingreso;
@@ -696,7 +711,7 @@ export class EditarPermisoComponent implements OnInit {
   
       const fec_inicio = (moment(this.reg.fec_inicio).format('YYYY-MM-DD'))+' '+ minutosinicio;
       const fec_final = (moment(this.reg.fec_final).format('YYYY-MM-DD')) +' '+ minutosfinal;
-      const codigo = parseInt(String(localStorage.getItem('codigo')));
+      const codigo = parseInt((localStorage.getItem('codigo')));
       const id_solicitud = this.reg.id;
 
       if(this.selectItemDiasHoras === 'Días'){
@@ -728,7 +743,7 @@ export class EditarPermisoComponent implements OnInit {
                     this.calcularhoras();
                   }
                 }, error => {
-                  this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
+                  this.validaciones.showToast('!Ups Lo sentimos tenemos problemas para verificar su permiso ', 3500, 'warning');
                 }); 
               }
             }, error => {
@@ -736,7 +751,7 @@ export class EditarPermisoComponent implements OnInit {
             });
           }
         }, error => {
-          this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
+          this.validaciones.showToast('Tenemos problemas para verificar su permiso', 3500, 'warning');
         });
 
       }else{
@@ -787,6 +802,7 @@ export class EditarPermisoComponent implements OnInit {
      *              METODO PARA CALCULAR Y VALIDAR EL RESULTADO MOSTRADO              *
    * ********************************************************************************** */
   calcularhoras() {
+
     if(this.selectItemDiasHoras == 'Días'){
       const fechasValidas = this.validaciones.validarRangoFechasIngresa(this.reg.fec_inicio!, this.reg.fec_final!, true);
       console.log('fechasValidas: ',fechasValidas)
@@ -875,10 +891,20 @@ export class EditarPermisoComponent implements OnInit {
      *                          ACTUALIZA LA SOLICITUD CREADA                            *
    * ********************************************************************************** */
   //Metodo para actualizar la solicitud
+  permisoEdit: any = [];
   UpdateRegister() {
-    const validadionesFechasHoras = this.calcularhoras()
+
+    let validadionesFechasHoras: boolean;
     this.loadingBtn = true;
 
+    if(this.reg.dia != this.diaPermiso_refe){
+      validadionesFechasHoras= this.calcularhoras();
+    }else if(this.reg.hora_numero != this.horas_refe){
+      validadionesFechasHoras = this.calcularhoras();
+    }else{
+      validadionesFechasHoras = true;
+    }
+    
     if (!validadionesFechasHoras) return
 
     console.log('PASO VALIDACIONES DE FECHAS Y HORAS: ');
@@ -887,9 +913,12 @@ export class EditarPermisoComponent implements OnInit {
     this.reg.fec_final = this.fecha_final;
 
     if(this.selectItemDiasHoras != 'Días'){
-      this.reg.hora_salida = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_salida!);
-      this.reg.hora_ingreso = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_ingreso!);
+      this.reg.hora_salida = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_salida);
+      this.reg.hora_ingreso = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_ingreso);
     }
+
+    this.reg.hora_salida = moment(this.reg.hora_salida).format('hh:mm:ss');
+    this.reg.hora_ingreso = moment(this.reg.hora_ingreso).format('hh:mm:ss');
 
     if(this.reg.docu_nombre != null){
       if(this.archivoSubido != null){
@@ -994,8 +1023,8 @@ export class EditarPermisoComponent implements OnInit {
   }
 
   /** ******************************************************************************************* **
-   ** **                           MANEJO DE NOTIFICACIONES DE PERMISOS                          ** **
-   ** ******************************************************************************************* **/
+   ** **                           MANEJO DE NOTIFICACIONES DE PERMISOS                       ** **
+  ** ******************************************************************************************* **/
 
   // METODO DE ENVIO DE NOTIFICACIONES 
   NotificarEdicionPermiso(permiso: any) {

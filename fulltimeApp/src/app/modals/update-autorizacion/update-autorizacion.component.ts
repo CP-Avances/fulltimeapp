@@ -189,11 +189,12 @@ export class UpdateAutorizacionComponent implements OnInit {
               setTimeout(() => {
                 this.ConfiguracionAutorizacion(this.autorizacion, this.permiso, this.solInfo);
               }, 2000);
-            },
-            err => { this.errorResponse(err.error.message) },
-            () => { }
+            },err => {
+              this.ocultar = false;
+              this.empleado_estado.length = 1;
+              return this.mensaje = 'Falta la Aprobacion del nivel 1';
+            }
           )
-
         },
         err => { this.errorResponse(err.error.message) },
       )
@@ -368,7 +369,7 @@ export class UpdateAutorizacionComponent implements OnInit {
               }
 
               if((this.idEmpleado == item.id_empleado) && (autorizaciones.length ==  item.nivel)){
-                this.UsuaAprueba = item;
+                this.UsuaAprueba.push(item);
               }
             })
 
