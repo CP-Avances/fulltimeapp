@@ -104,7 +104,7 @@ export const postAutorizacion = async (req: Request, res: Response): Promise<Res
         const response: QueryResult = await pool.query('INSERT INTO autorizaciones( orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_documento, id_plan_hora_extra ) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING * ', [orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_documento, id_plan_hora_extra]);
         const [autorizacion]: Autorizacion[] = response.rows;
         if (!autorizacion) return res.status(400).jsonp({ message: 'No se creo autorización' });
-        return res.status(200).jsonp({ message: 'Autorización creada' });
+        return res.status(200).jsonp({ message: 'Autorización creada', autorizacion: autorizacion});
     } catch (error) {
         console.log(error);
         return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
@@ -119,6 +119,11 @@ export const updateAutorizacion = async (req: Request, res: Response): Promise<R
     try {
         const { id_auto, campo } = req.query;
         const { estado, id_documento } = req.body;
+
+        console.log('id_auto: ',id_auto);
+        console.log('campo: ',campo);
+        console.log('id_auto: ',estado);
+        console.log('id_documento: ',id_documento);
 
         const query = `UPDATE autorizaciones SET estado = ${estado} , id_documento = \'${id_documento}\' WHERE ${campo} = ${id_auto} RETURNING *`;
 

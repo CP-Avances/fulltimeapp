@@ -914,9 +914,9 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       }
      
       if(this.archivoSubido != null){
-        this.reg.docu_nombre = this.archivoSubido[0].name; // Inserta el nombre del archivo al subir
+        this.reg.documento = this.archivoSubido[0].name; // Inserta el nombre del archivo al subir
       }else{
-        this.reg.docu_nombre = null;
+        this.reg.documento = '';
       }
 
       console.log('this.reg: ',this.reg);
@@ -953,19 +953,19 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     if(this.archivoSubido!.length != 0){
       if(this.archivoSubido[0].size >= 2e+6){
         this.archivoSubido = null;
-        this.reg.docu_nombre = '';
+        this.reg.documento = '';
         this.mensajeFile = "Ingrese un archivo maximo de 2Mb";
         this.validaciones.showToast('Ups el archivo pesa mas de 2Mb',3500, 'danger');
 
       }else if(this.archivoSubido![0].name.length > 50){
         this.archivoSubido = null;
-        this.reg.docu_nombre = '';
+        this.reg.documento = '';
         this.mensajeFile = "El nombre debe tener 50 caracteres como maximo";
         this.validaciones.showToast('Ups el nombre del archivo es muy largo', 3500, 'warning');
 
       }else{
         console.log(this.archivoSubido![0].name);
-        this.reg.docu_nombre = name;
+        this.reg.documento = name;
         this.validaciones.showToast('Archivo valido', 3500, 'success');
       }
     }
@@ -984,9 +984,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     }
 
     console.log('formData: ',formData);
-    this.permisoService.SubirArchivoRespaldo(formData, id, this.reg.codigo, null).subscribe(res => {
+    this.permisoService.SubirArchivoRespaldo(formData, id, this.reg.codigo, this.archivoSubido[0].name).subscribe(res => {
       this.validaciones.showToast('El archivo se Cargo Correctamente', 3500, 'success');
-      this.reg.docu_nombre = '';
     }, err => {
         console.log(err)
         return this.validaciones.showToast('El archivo no se pudo Cargar al Servidor', 3500, 'danger');
@@ -995,9 +994,9 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   }
   //Metodo para eliminar el archivo de permiso
   deleteDocumentoPermiso(){
-    console.log('El archivo ', this.reg.docu_nombre, ' Se quito Correctamente')
+    console.log('El archivo ', this.reg.documento, ' Se quito Correctamente')
     this.validaciones.showToast('El archivo se quito correctamente', 3500, 'acua');
-    this.reg.docu_nombre = null;
+    this.reg.documento = '';
     this.mensajeFile = null;
     this.archivoSubido = null;
   }

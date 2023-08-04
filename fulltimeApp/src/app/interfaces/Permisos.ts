@@ -3,26 +3,26 @@ import { Cg_TipoPermiso } from './Catalogos';
 
 export interface Permiso {
     isChecked?: boolean;
-    num_permiso: number | null;
+    num_permiso: number;
     id?: number | any;
-    id_empl_cargo: number | null;
-    id_empl_contrato: number | null;
-    id_peri_vacacion: number | null;
-    id_tipo_permiso: number | null;
+    id_empl_cargo: number;
+    id_empl_contrato: number;
+    id_peri_vacacion: number;
+    id_tipo_permiso: number;
     codigo: number | any;
     descripcion: string;
     fec_creacion: any;
-    fec_inicio: string | null;
-    fec_final: string | null;
-    hora_salida: string | null;
-    hora_ingreso: string | null;
-    hora_numero: string | null;
+    fec_inicio: string;
+    fec_final: string;
+    hora_salida: string;
+    hora_ingreso: string;
+    hora_numero: string;
     dia: number | null;
-    dia_libre: number | null;
+    dia_libre: number;
     estado: number;
     legalizado: boolean;
-    documento: string | null;
-    docu_nombre: string | null;
+    documento: string;
+    docu_nombre: string;
     tipo_permiso?: string;
     nempleado?: string;
     id_departamento?: number;
@@ -41,11 +41,11 @@ export interface Permiso {
 
 export const permisoValueDefault: Permiso = {
     isChecked: false,
-    num_permiso: null,
-    id_empl_cargo: null,
-    id_empl_contrato: null,
-    id_peri_vacacion: null,
-    id_tipo_permiso: null,
+    num_permiso: 0,
+    id_empl_cargo: 0,
+    id_empl_contrato: 0,
+    id_peri_vacacion: 0,
+    id_tipo_permiso: 0,
     codigo: 0,
     descripcion: '',
     fec_creacion: '',
@@ -59,10 +59,10 @@ export const permisoValueDefault: Permiso = {
     estado: 0,
     legalizado: false,
     documento: '',
-    nempleado: undefined,
+    nempleado: '',
     docu_nombre: '',
-    tipo_permiso: undefined,
-    id_departamento: null,
+    tipo_permiso: '',
+    id_departamento: 0,
     // FORMATEAR FECHAS Y HORAS
     fec_creacion_: '',
     fec_inicio_: '',

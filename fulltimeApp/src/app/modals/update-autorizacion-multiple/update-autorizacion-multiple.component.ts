@@ -194,9 +194,6 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
   cont: number = 0;
   obtenerAutorizacion() {
     this.cont = 0;
-
-    console.log('this.permisos: ',this.permisos);
-
     if (this.permisos) {
       var conteo = 0;
       this.ListaPermisos = [];
@@ -250,9 +247,8 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
               )
             }
           });
-
-        
           return
+
         }else{
           this.mensaje = 'No hay solicitudes seleccionadas del departamento de '+this.departamentoChange.depa_autoriza;
           this.ocultar = true;
@@ -396,7 +392,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
   }
 
   ChangeDepa(e: any, select: IonSelect) {
-    if (e.target.value != null && e.target.value != undefined) {
+    if (e.target.value != null && e.target.value != undefined && e.target.value != '') {
       select.value = null;
       select.selectedText = '';
       const [departamento] = this.ArrayAutorizacionTipos.filter(o => {
@@ -412,7 +408,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
 
 
   ChangeEstado(e: any) {
-    if (e.target.value != 1 && e.target.value != null && e.target.value != undefined) {
+    if (e.target.value != 1 && e.target.value != null && e.target.value != undefined && e.target.value != '') {
       const [autorizacion] = this.estadoSelectItems.filter(o => {
         return o.id === e.target.value
       })

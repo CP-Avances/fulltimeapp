@@ -301,30 +301,28 @@
       <p *ngIf="mensajedocumentBloqueado != ''" style="margin: 1% 2% 0% 2%; font-size: 76%; text-align: center; color: rgb(245, 130, 7);">{{mensajedocumentBloqueado}}</p>
       <div class="formdiv" >
         <ion-item class="item_fondo" for="file" mode="md" [disabled] = "blockDocument">
-          <ion-label style="margin: 2.5% 0% -1.5% 0%; font-size: 75%;" ><b>Justificar Permiso</b>  </ion-label>
-
+          <ion-label position ="floating" style="margin: 1% 0% -2% 0%; font-size: 100%;" ><b>Justificar Permiso</b>  </ion-label>
+          <br>
           <!--Este input, permite validar el boton btn_save, que se active o este desactivado deacurdo al documento ingresado-->
-          <ion-input readonly="true" [(ngModel)]="reg.docu_nombre" name="file" id="file" [required]="required"></ion-input> 
+          <ion-input readonly="true" [(ngModel)]="reg.documento" name="file" id="file" [required]="required"></ion-input> 
 
             <!-- Esto, permite ingresar el documento-->
-            <ion-label *ngIf="reg.docu_nombre == null || reg.docu_nombre == undefined" position ="floating" style="font-size: 90%; margin-bottom: 3%;"> 
+            <ion-label *ngIf="reg.documento == null || reg.documento == ''" position ="floating" style="font-size: 95%; margin-bottom: 2%;"> 
               <ion-icon slot="start" color="theme" class="icon_upload" name="cloud-upload-outline"></ion-icon>&nbsp; &nbsp; 
               &nbsp; &nbsp; Subir archivo /max 2Mb: &nbsp;
-              <!-- Mesaje que indica que no hay archivo subido -->
-              <ion-text style="font-size: 90%;  margin:3% 0% 3% 0%;" color="warning" >{{mensajeFile}}</ion-text> 
             </ion-label>
 
             <ion-input style="width: max-content; height: max-content;" (change)="fileChange($event)" readonly="true" type="file"  id="file" [required]="required"></ion-input>
             
             <!-- Mesaje que tiene el nombre del archivo a subir -->
-            <ion-text *ngIf="reg.docu_nombre != '' " style="font-size: 82%; margin:4% 0% 3% 0%; " color="tertiary" >{{reg.documento}}</ion-text>   
+            <ion-text *ngIf="reg.documento != '' " style="font-size: 90%; margin:2% 0% 3% 0%; " color="primary" >{{reg.documento}}</ion-text>   
       
             <!-- Mesaje que indica el error en subir el archivo -->
-            <ion-text *ngIf="reg.docu_nombre == '' " style="font-size: 82%;  margin:4% 0% 3% 0%;" color="danger" >{{mensajeFile}}</ion-text> 
+            <ion-text *ngIf="reg.documento == '' " style="font-size: 90%;  margin:3% 0% 3% 0%;" color="warning" >{{mensajeFile}}</ion-text> 
 
         </ion-item>
         
-        <div *ngIf="reg.docu_nombre != '' && reg.docu_nombre !== null && reg.docu_nombre !== undefined" >
+        <div *ngIf="reg.documento != '' && reg.documento !== null && reg.documento !== undefined" >
           <ion-button color="medium" shape="round" expand="block"  (click)="deleteDocumentoPermiso()">
             <ion-text style="font-size: 90%;"> <ion-icon color="danger" name="trash-outline"></ion-icon> Quitar documento </ion-text>
           </ion-button>

@@ -166,8 +166,8 @@ export class DeleteRegisterComponent{
       data.EmpleadosSendNotiEmail.push(infoUsuario);
       if (tabla === 'permisos') {
         this.EliminarDocumentoPermiso(data);
-        //this.EnviarCorreoPermiso(data); 
-        //this.EnviarNotificacionPermiso(data, nota, user);
+        this.EnviarCorreoPermiso(data); 
+        this.EnviarNotificacionPermiso(data, nota, user);
       }
       else if (tabla === 'vacaciones') {
         this.EnviarCorreoVacacion(data, infoUsuario);

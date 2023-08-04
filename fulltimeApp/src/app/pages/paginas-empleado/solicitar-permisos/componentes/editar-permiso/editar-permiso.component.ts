@@ -128,30 +128,11 @@ export class EditarPermisoComponent implements OnInit {
     var [cg_permiso] = this.cg_tipo_permisos.filter(o => {return o.id === this.reg.id_tipo_permiso})
     this.cg_permiso = cg_permiso;
 
-    if(this.reg.docu_nombre == null){
+    if(this.reg.documento == null || this.reg.documento == ''){
       this.mensajeFile = "No hay archivo subido";
-
-      if(this.cg_permiso.gene_justificacion == true){
-        //conteo de días para validar el num de dias para justificar y subir el documento
-        var diahoy: any = new Date();
-        var diaCreacion = new Date(this.reg.fec_creacion).getTime();
-        var diasDiferencia: number =  diahoy - diaCreacion;
-        //Ponemos la hora en 00:00:00 para tomar el dia completo
-        diahoy.setHours(0, 0, 0, 0);
-        diahoy = diahoy.getTime();
-        //Obtenemos el valor de los dias trasncuridos con la siguiente formula donde el 24 es la hora, 60 son minutos, 60 son segundos y 1000 son milisegun
-        let dias: number = Math.floor(diasDiferencia / (24 * 60 * 60 * 1000));
-       
-        if( dias > this.cg_permiso.num_dia_justifica){
-          this.mensajedocumentBloqueado = 'Lo sentimos, el plazo para subir el documento es de '+this.cg_permiso.num_dia_justifica+' días y usted esta fuera el plazo'
-          this.blockDocument = true;
-        }else{
-          this.blockDocument = false;
-          this.mensajedocumentBloqueado = '';
-        }
-      }else{
-        this.blockDocument = false;
-      }
+      this.subirTiempoDocument();
+    }else{
+      this.subirTiempoDocument()
     }
 
     this.dia_inicio = moment(this.reg.fec_inicio).format('YYYY-MM-DD');
@@ -234,6 +215,31 @@ export class EditarPermisoComponent implements OnInit {
         this.formato_hora = resp.hora;
       }
     )
+  }
+
+  //METODO VALIDAR TIEMPO MAXIMO DE SUBIR DOCUMENTO
+  subirTiempoDocument(){
+    if(this.cg_permiso.gene_justificacion == true){
+      //conteo de días para validar el num de dias para justificar y subir el documento
+      var diahoy: any = new Date();
+      var diaCreacion = new Date(this.reg.fec_creacion).getTime();
+      var diasDiferencia: number =  diahoy - diaCreacion;
+      //Ponemos la hora en 00:00:00 para tomar el dia completo
+      diahoy.setHours(0, 0, 0, 0);
+      diahoy = diahoy.getTime();
+      //Obtenemos el valor de los dias trasncuridos con la siguiente formula donde el 24 es la hora, 60 son minutos, 60 son segundos y 1000 son milisegun
+      let dias: number = Math.floor(diasDiferencia / (24 * 60 * 60 * 1000));
+     
+      if( dias > this.cg_permiso.num_dia_justifica){
+        this.mensajedocumentBloqueado = 'Lo sentimos, el plazo para subir el documento es de '+this.cg_permiso.num_dia_justifica+' días y usted esta fuera el plazo'
+        this.blockDocument = true;
+      }else{
+        this.blockDocument = false;
+        this.mensajedocumentBloqueado = '';
+      }
+    }else{
+      this.blockDocument = false;
+    }
   }
 
   solInfo: any;
@@ -656,6 +662,7 @@ export class EditarPermisoComponent implements OnInit {
       return this.btnOcultoguardar = true;
     }else{
       if(e.target.value != this.aux_descripcion){
+        this.reg.descripcion = e.target.value;
         if(this.selectItemDiasHoras == 'Horas'){
           if(this.reg.hora_numero != null){
             this.btnOcultoguardar = false;
@@ -909,28 +916,20 @@ export class EditarPermisoComponent implements OnInit {
 
     console.log('PASO VALIDACIONES DE FECHAS Y HORAS: ');
 
-    this.reg.fec_inicio = this.fecha_inicio;
-    this.reg.fec_final = this.fecha_final;
+    this.reg.fec_inicio = moment(this.fecha_inicio).format('YYYY-MM-DD');
+    this.reg.fec_final = moment(this.fecha_final).format('YYYY-MM-DD');
 
-    if(this.selectItemDiasHoras != 'Días'){
-      this.reg.hora_salida = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_salida);
-      this.reg.hora_ingreso = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_ingreso);
+    this.reg.hora_salida = moment(this.reg.hora_salida).format('HH:mm:ss');
+    this.reg.hora_ingreso = moment(this.reg.hora_ingreso).format('HH:mm:ss');
+
+    if(this.selectItemDiasHoras === 'Días'){
+      this.reg.hora_salida = '00:00:00';
+      this.reg.hora_ingreso = '00:00:00';
     }
 
-    this.reg.hora_salida = moment(this.reg.hora_salida).format('hh:mm:ss');
-    this.reg.hora_ingreso = moment(this.reg.hora_ingreso).format('hh:mm:ss');
-
-    if(this.reg.docu_nombre != null){
+    if(this.reg.documento == null || this.reg.documento == ''){
       if(this.archivoSubido != null){
-        this.reg.docu_nombre = this.archivoSubido[0].name; // Inserta el nombre del archivo al subir
-      }
-    }else{
-      if(this.archivoSubido != null){
-        this.reg.docu_nombre = this.archivoSubido[0].name; // Inserta el nombre del archivo al subir
-      }else{
-        this.permisoService.EliminarArchivo(this.reg.documento!, this.permiso.codigo).subscribe(res => {}) //Elimina el archivo del servidos si se quita y se guarda sin documento
-        this.reg.docu_nombre = null;
-        this.reg.documento = null;
+        this.reg.documento = this.archivoSubido[0].name; // Inserta el nombre del archivo al subir
       }
     }
 
@@ -956,22 +955,24 @@ export class EditarPermisoComponent implements OnInit {
     this.archivoSubido = element.target.files;
     console.log(this.archivoSubido);
     const name = this.archivoSubido[0].name;
+    this.btnOcultoguardar = true;
     if(this.archivoSubido.length != 0){
       if(this.archivoSubido![0].size >= 2e+6){
         this.archivoSubido = null;
-        this.reg.docu_nombre = '';
+        this.reg.documento = '';
         this.mensajeFile = "Ingrese un archivo maximo de 2Mb";
         this.validaciones.showToast('Ups el archivo pesa mas de 2Mb',3500, 'danger');
 
       }else if(this.archivoSubido![0].name.length > 50){
         this.archivoSubido = null;
-        this.reg.docu_nombre = ''
+        this.reg.documento = ''
         this.mensajeFile = "El nombre debe tener 50 caracteres como maximo";
         this.validaciones.showToast('Ups el nombre del archivo es muy largo', 3500, 'warning');
 
       }else{
         console.log(this.archivoSubido![0].name);
-        this.reg.docu_nombre = name;
+        this.reg.documento = name;
+        this.btnOcultoguardar = false;
         this.validaciones.showToast('Archivo valido', 3500, 'success');
       }
     }
@@ -979,7 +980,7 @@ export class EditarPermisoComponent implements OnInit {
 
   //Metodo para actualizar un archivo
   updataArchivo(permiso: any){
-    if(this.archivoSubido![0].name == this.reg.docu_nombre){
+    if(this.archivoSubido[0].name != this.reg.documento){
       this.permisoService.EliminarArchivo(this.reg.documento!,this.permiso.codigo).subscribe(res => {
         this.subirRespaldo(permiso);
       })
@@ -1004,7 +1005,7 @@ export class EditarPermisoComponent implements OnInit {
 
     this.permisoService.SubirArchivoRespaldo(formData, id, this.permiso.codigo, null).subscribe(res => {
       this.validaciones.showToast('El archivo se actualizo Correctamente', 3000, 'success');
-      this.reg.docu_nombre = '';
+      this.reg.documento = '';
 
     }, err => {
         console.log(err)
@@ -1017,9 +1018,10 @@ export class EditarPermisoComponent implements OnInit {
   deleteDocumentoPermiso(){
     console.log('El archivo ', this.reg.documento, ' Se quito Correctamente');
     this.validaciones.showToast('El archivo se quito correctamente', 3500, 'acua');
-    this.reg.docu_nombre = null;
+    this.reg.documento = '';
     this.mensajeFile = null;
     this.archivoSubido = null;
+    this.btnOcultoguardar = false;
   }
 
   /** ******************************************************************************************* **

@@ -107,7 +107,7 @@ const postAutorizacion = (req, res) => __awaiter(void 0, void 0, void 0, functio
         const [autorizacion] = response.rows;
         if (!autorizacion)
             return res.status(400).jsonp({ message: 'No se creo autorización' });
-        return res.status(200).jsonp({ message: 'Autorización creada' });
+        return res.status(200).jsonp({ message: 'Autorización creada', autorizacion: autorizacion });
     }
     catch (error) {
         console.log(error);
@@ -123,6 +123,10 @@ const updateAutorizacion = (req, res) => __awaiter(void 0, void 0, void 0, funct
     try {
         const { id_auto, campo } = req.query;
         const { estado, id_documento } = req.body;
+        console.log('id_auto: ', id_auto);
+        console.log('campo: ', campo);
+        console.log('id_auto: ', estado);
+        console.log('id_documento: ', id_documento);
         const query = `UPDATE autorizaciones SET estado = ${estado} , id_documento = \'${id_documento}\' WHERE ${campo} = ${id_auto} RETURNING *`;
         const response = yield database_1.pool.query(query);
         const [autorizacion] = response.rows;

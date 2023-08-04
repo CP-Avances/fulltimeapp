@@ -127,6 +127,9 @@ export class UpdateAutorizacionComponent implements OnInit {
             }
           }
         });
+      }, error => {
+        this.ocultar = true;
+        this.showMessageError('!!Ups, No se puedo encontrar su configuracion de Autorización');
       }
     );
   }
@@ -151,7 +154,6 @@ export class UpdateAutorizacionComponent implements OnInit {
       })
       this.estadoChange = autorizacion
       this.autorizacion.estado = this.estadoChange.id;
-      console.log('this.listaEnvioCorreo: ',this.listaEnvioCorreo);
     }
   }
 
@@ -192,6 +194,15 @@ export class UpdateAutorizacionComponent implements OnInit {
             },err => {
               this.ocultar = false;
               this.empleado_estado.length = 1;
+              var datos = {
+                depa_user_loggin: this.solInfo.id_departamento,
+                objeto: this.permiso,
+              }
+              //Se emplea este servicio para optener los jefes que autorizan el permiso, al ser un permiso,
+              //si este permisos no tiene autorización es decir esta en estado pendiente, se Notifican y se envia el correo a todos.
+              this.autoService.BuscarJefes(datos).subscribe(permisos => {
+                this.listaEnvioCorreo = permisos.EmpleadosSendNotiEmail;
+              });
               return this.mensaje = 'Falta la Aprobacion del nivel 1';
             }
           )
@@ -407,19 +418,19 @@ export class UpdateAutorizacionComponent implements OnInit {
         solicitud.aprobacion = 'NO';
         this.color = 'danger'
         this.mensaje = 'No tiene registrado la planificacion horaria en esas fechas';
-        return console.log('this.ocultar: ',this.ocultar = true);
+        return this.ocultar = true;
       }else{
         this.color = ''
         solicitud.aprobacion = 'SI';
         this.mensaje = 'Falta la Aprobacion del nivel '+this.FilDepartamentosAprueban[autorizaciones.length - 1].nivel +'. Departamento ' + this.FilDepartamentosAprueban[autorizaciones.length - 1].dep_nivel_nombre;
-        return console.log('this.ocultar: ',this.ocultar = false);
+        return this.ocultar = false;
       }
       
     },error => {
       solicitud.aprobacion = 'NO';
       this.color = 'danger'
       this.mensaje = 'Problemas con validar su planificacion horaria en esas fechas';
-      return console.log('this.ocultar: ',this.ocultar = true);
+      return this.ocultar = true;
     });
 
   }
@@ -452,7 +463,50 @@ export class UpdateAutorizacionComponent implements OnInit {
     this.infoEmpleadoRecibe = info;
   }
 
+
+  /** ******************************************************************************************* **
+    ** **   METODO PARA CREAR LA AUTORIZACION DEL PERMISOS CUANDO NO EXISTE EN LA BASE        ** **
+   ** ******************************************************************************************* **/
+  IngresarDatos(solicitud: string, data: any) {
+    // Arreglo de datos para ingresar una autorización
+    let newAutorizaciones = {
+      orden: 1,
+      estado: data.estado,
+      id_departamento: this.solInfo.id_departamento,
+      id_permiso: this.permiso.id,
+      id_vacacion: null,
+      id_hora_extra: null,
+      id_documento: data.id_documento,
+      id_plan_hora_extra: null,
+    }
+
+    if(solicitud === 'permiso'){
+      newAutorizaciones.id_permiso = this.permiso.id,
+      newAutorizaciones.id_vacacion = null,
+      newAutorizaciones.id_hora_extra = null;
+    }else if(solicitud === 'vacacion'){
+      newAutorizaciones.id_permiso = null,
+      newAutorizaciones.id_vacacion = this.vacacion.id,
+      newAutorizaciones.id_hora_extra = null;
+    }else if(solicitud === 'hora_extra'){
+      newAutorizaciones.id_permiso = null,
+      newAutorizaciones.id_vacacion = null,
+      newAutorizaciones.id_hora_extra = this.hora_extra.id;
+    }
+
+    this.autoService.postNuevaAutorizacion(newAutorizaciones).subscribe(autorizacion => {
+      this.successResponse(autorizacion, solicitud, this.autorizacion.estado);
+    })
+    
+  }
+
+  /** ******************************************************************************************* **
+    ** **                        METODO PARA ACTUALIZAR PERMISO                               ** **
+   ** ******************************************************************************************* **/
   UpdateRegister() {
+    if(this.autorizacion.id_documento == null && this.autorizacion.id_documento == undefined){
+      this.autorizacion.id_documento = '';
+    }
 
     if (this.autorizacion.estado == 1) {
       return this.validaciones.showToast("Seleccione el tipo de Autorización", 2000, 'warning');
@@ -460,22 +514,26 @@ export class UpdateAutorizacionComponent implements OnInit {
 
       this.loadingBtn = true;
       const data = {
-        estado: this.autorizacion.estado,
+        estado: this.estadoChange.id,
         id_documento: this.autorizacion.id_documento + `${localStorage.getItem("empleadoID")}_${this.estadoChange.id},`
       }
 
       if (this.permiso){
         this.autoService.putAutorizacionPermiso(this.permiso.id, data).subscribe(
-          autorizacion => { this.successResponse(autorizacion, 'permiso') },
-          err => { this.errorResponse(err.error.message) },
-          () => { this.loadingBtn = false }
+          autorizacion => { 
+            this.successResponse(autorizacion, 'permiso', this.autorizacion.estado);
+          },err => { 
+            this.IngresarDatos('permiso', data);
+            this.errorResponse(err.error.message); 
+          },() => { 
+            this.loadingBtn = false 
+          }
         )
-
       }
 
       else if (this.vacacion){
         this.autoService.putAutorizacionVacacion(this.vacacion.id, data).subscribe(
-          autorizacion => { this.successResponse(autorizacion, 'vacacion') },
+          autorizacion => { this.successResponse(autorizacion, 'vacacion', this.autorizacion.estado) },
           err => { this.errorResponse(err.error.message) },
           () => { this.loadingBtn = false }
         )
@@ -483,7 +541,7 @@ export class UpdateAutorizacionComponent implements OnInit {
       
       else if(this.hora_extra){
         this.autoService.putAutorizacionHoraExtra(this.hora_extra.id, data).subscribe(
-          autorizacion => { this.successResponse(autorizacion, 'hora_extra') },
+          autorizacion => { this.successResponse(autorizacion, 'hora_extra', this.autorizacion.estado) },
           err => { this.errorResponse(err.error.message) },
           () => { this.loadingBtn = false }
         )
@@ -499,7 +557,7 @@ export class UpdateAutorizacionComponent implements OnInit {
     });
   }
 
-  successResponse(autorizacion: Autorizacion, solicitud: string) {
+  successResponse(autorizacion: Autorizacion, solicitud: string, estado: any) {
     this.autorizacion = autorizacionValueDefault;
 
     this.autorizacion = autorizacion;
@@ -511,7 +569,7 @@ export class UpdateAutorizacionComponent implements OnInit {
             this.validaciones.showToast(resp.message, 3000, 'success');
             console.log('ver autoriza permiso.... ', this.permiso, 'INFO.. ', this.infoEmpleadoRecibe);
             this.permiso.estado = this.estadoChange.id;
-            this.NotificarAprobacionPermisos(this.permiso, this.infoEmpleadoRecibe); 
+            this.NotificarAprobacionPermisos(this.permiso, this.infoEmpleadoRecibe, estado); 
           },err => { 
             this.validaciones.showToast(err.error.message, 3000, 'danger') 
           });
@@ -550,7 +608,7 @@ export class UpdateAutorizacionComponent implements OnInit {
     this.showMessageError(message)
   }
 
-  showMessageError(message = 'Error') {
+  showMessageError(message) {
     this.validaciones.showToast(message, 3000, 'danger')
   }
 
@@ -564,14 +622,14 @@ export class UpdateAutorizacionComponent implements OnInit {
    ** ******************************************************************************************* **/
 
   // METODO DE ENVIO DE NOTIFICACIONES RESPECTO A LA APROBACION
-  NotificarAprobacionPermisos(permiso: any, infoUsuario: any) {
+  NotificarAprobacionPermisos(permiso: any, infoUsuario: any ,estado) {
     var datos = {
       depa_user_loggin: infoUsuario.id_departamento,
       objeto: permiso,
     }
 
     // CAPTURANDO ESTADO DE LA SOLICITUD DE PERMISO
-    if (permiso.estado === 2) {
+    if (estado === 2) {
       var estado_p = 'Preautorizado';
       var estado_c = 'Preautorizada';
     }
@@ -583,9 +641,6 @@ export class UpdateAutorizacionComponent implements OnInit {
       var estado_p = 'Negado';
       var estado_c = 'Negada';
     }
-
-    console.log('permiso.estado: ',permiso.estado);
-    console.log('estado_p: ',estado_p);
 
     this.autoService.BuscarJefes(datos).subscribe(permisos => {
       this.configuracionCorreoNoti(permisos, estado_p, estado_c, infoUsuario);

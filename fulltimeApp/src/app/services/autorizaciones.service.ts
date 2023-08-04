@@ -96,6 +96,7 @@ export class AutorizacionesService {
   }
 
   postNuevaAutorizacion(data: Autorizacion): Observable<any> {
+    console.log('autorizacion creada: ',data);
     const url = `${this.apiUrl}/autorizaciones/insert`;
     return this.http.post<any>(url, data)
       .pipe(

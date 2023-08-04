@@ -282,24 +282,24 @@
                 <ion-label style="margin: 3% 0% -1.5% 0%; font-size: 75%;" class="is-required"> Justificar Permiso </ion-label>
                 
                 <!--Este input, permite validar el boton btn_save, que se active o este desactivado deacurdo al documento ingresado-->
-                <ion-input [(ngModel)]="reg.docu_nombre" name="file" id="file" [required]="required"></ion-input> 
+                <ion-input [(ngModel)]="reg.documento" name="file" id="file" [required]="required"></ion-input> 
     
                 <!-- Esto, permite ingresar el documento-->
-                <ion-label *ngIf="reg.docu_nombre == null || reg.docu_nombre == undefined" position="floating" style="font-size: 90%; margin-bottom: 3%;"> 
+                <ion-label *ngIf="reg.documento == null || reg.documento == ''" position="floating" style="font-size: 90%; margin-bottom: 3%;"> 
                   <ion-icon slot="start" color="theme" class="icon_upload" name="cloud-upload-outline"></ion-icon>&nbsp; &nbsp; 
                   &nbsp;&nbsp; Subir archivo /max 2Mb: 
                 </ion-label> 
                 <ion-input reandoly="true" type="file" (change)="fileChange($event)" id="file" [required]="required"></ion-input>
     
                 <!-- Mesaje que tiene el nombre del archivo a subir -->
-                <ion-text *ngIf="reg.docu_nombre != '' " style="font-size: 82%; margin:3% 0% 3% 0%; " color="tertiary">{{reg.docu_nombre}}</ion-text>   
+                <ion-text *ngIf="reg.documento != '' " style="font-size: 82%; margin:3% 0% 3% 0%; " color="tertiary">{{reg.docu_nombre}}</ion-text>   
             
                 <!-- Mesaje que indica el error en subir el archivo -->
-                <ion-text *ngIf="reg.docu_nombre == '' " style="font-size: 82%;  margin:3% 0% 3% 0%;" color="danger">{{mensajeFile}}</ion-text>    
+                <ion-text *ngIf="reg.documento == '' " style="font-size: 82%;  margin:3% 0% 3% 0%;" color="danger">{{mensajeFile}}</ion-text>    
              
               </ion-item>
     
-              <div *ngIf="reg.docu_nombre != '' && reg.docu_nombre !== null && reg.docu_nombre !== undefined" >
+              <div *ngIf="reg.documento != '' && reg.documento !== null && reg.documento !== undefined" >
                 <ion-button color="medium" shape="round" expand="block"  (click)="deleteDocumentoPermiso()">
                   <ion-text style="font-size: 90%;"> <ion-icon color="danger" name="trash-outline"></ion-icon> Quitar documento </ion-text>
                 </ion-button>
