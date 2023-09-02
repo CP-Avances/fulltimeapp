@@ -1,0 +1,12 @@
+<ion-button color="secondary" shape="round" expand="block" (click)="BuscarDataTable()">
+
+  <ng-container *ngIf="!loadingBtn; then searchReg; else spiner"></ng-container>
+  <ng-template #searchReg>
+    <ion-icon slot="start" name="save-outline"></ion-icon>
+    {{ label }}
+  </ng-template>
+  <ng-template #spiner>
+    <ion-spinner name="circles"></ion-spinner>
+  </ng-template>
+
+</ion-button>

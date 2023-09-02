@@ -1,0 +1,79 @@
+<br><br><br>
+<ion-content>
+  <ion-text mode="ios" color="dark" style="text-align: center;">
+    <ion-button color="primary" [routerLink]="['/adminpage/reportes']" expand="full">
+      <ion-icon slot="start" name="chevron-back-outline"></ion-icon>
+      <ion-label style="font-size: 20px;">REPORTE DE ATRASOS</ion-label>
+    </ion-button>
+  </ion-text>
+
+  <br>
+  <ion-grid style="margin-top: -2%;" mode="md">
+    <ion-row>
+      <ion-col size="6">
+        <ion-item style="border-radius: 5%;" class="item_fondo" id="ReporteAtraso_fechaInicial" fill="solid">
+          <ion-label position="floating">Fecha inicial</ion-label>
+          <ion-input readonly="true" name="finicio" [ngModel]="fechaIn"></ion-input>
+          <ion-modal trigger="ReporteAtraso_fechaInicial" class="inputDateFecha">
+            <ng-template>
+              <ion-content>
+                <ion-datetime
+                  #datetimeInicio 
+                  presentation="date" 
+                  [showDefaultButtons]="false"
+                  [value]="fechaInicio"
+                  name="finicio" 
+                  mode="md" 
+                  (ionChange)="changeFechaInicio($event)" 
+                  min="1990-01-01" 
+                  max="2050-12-31"
+                  color="success">
+                </ion-datetime>
+                <div style="width: 95%">
+                  <ion-label style="float: right; margin: 2%; font-size: medium;" color="success" (click) = "datetimeInicio.cancel(true)">Cancelar</ion-label>
+                </div>
+              </ion-content>
+            </ng-template>
+          </ion-modal>
+        </ion-item>
+      </ion-col>
+      
+      <ion-col size="6">
+        <ion-item style="border-radius: 5%;" class="item_fondo" id="ReporteAtraso_fechaFinal" fill="solid">
+          <ion-label position="floating" >Fecha final</ion-label>
+          <ion-input readonly="true" name="ffinal" [ngModel]="fechaFi"></ion-input>
+          <ion-modal trigger="ReporteAtraso_fechaFinal" class="inputDateFecha" *ngIf="fechaIn != ''">
+            <ng-template>
+              <ion-content>
+                <ion-datetime
+                  #datetimeFinal 
+                  presentation="date"
+                  [showDefaultButtons]="false"
+                  [value]="fechaFi"
+                  name="ffinal" 
+                  mode="md" 
+                  (ionChange)="changeFechaFinal($event)" 
+                  [min]="fechaIn" 
+                  max="2050-12-31">
+                </ion-datetime>
+                <div style="width: 95%">
+                  <ion-label style="float: right; margin: 2%; font-size: medium;" color="primary" (click) = "datetimeFinal.cancel(true)">Cancelar</ion-label>
+                </div>
+              </ion-content>
+            </ng-template>
+          </ion-modal>
+          <ion-popover *ngIf="fechaIn == ''"  trigger="ReporteAtraso_fechaFinal">
+            <ion-content>
+              <ng-template>
+                <p style="margin: auto; padding: 4%;" >Ingrese la fecha de Inicio</p>
+              </ng-template>
+            </ion-content>
+          </ion-popover>
+        </ion-item>
+      </ion-col>
+     </ion-row>
+  </ion-grid>
+
+  <app-lista-empleados [open]="presentModal"></app-lista-empleados>
+
+</ion-content>

@@ -1,0 +1,56 @@
+.img {
+    display: block;
+    max-width: 100%;
+  }
+
+ion-content{
+  font-weight: 15%;
+}
+
+
+ion-list-header{
+    text-align: center;
+}
+#label{
+    align-items: center;
+}
+
+.link {
+  margin-left: 20px;
+  text-decoration: none;
+}
+
+.center{
+  display: block;
+  margin: auto;
+}
+
+.paginacion{
+  margin: auto;
+  padding-top: 2%;
+  padding-bottom: 2%;
+}
+
+.paginacion ::ng-deep .ngx-pagination {
+  padding: 0%;
+  margin: auto;
+}
+
+.paginacion ::ng-deep .ngx-pagination .current {
+  background: rgb(29, 121, 197);
+  color: rgb(255, 255, 255);
+  font-weight: bold;
+  border-radius: 5px;
+}
+  
+.paginacion :host ::ng-deep .ngx-pagination span {
+  color: rgb(120, 193, 250);
+  font-family:monospace;
+  font-weight: bold;
+}
+
+.paginacion ::ng-deep .ngx-pagination a{
+  background-color: transparent;
+  color: rgb(67, 149, 226);
+  font-weight: bold;
+}

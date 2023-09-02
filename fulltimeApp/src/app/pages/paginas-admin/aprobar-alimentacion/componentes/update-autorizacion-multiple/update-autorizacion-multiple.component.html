@@ -1,0 +1,50 @@
+<app-close-modal titleModal="Actualizar Autorización"></app-close-modal>
+
+<ion-content>
+
+  <ion-text color="dark" style="text-align: center; margin-bottom: 2%;">
+    <h3>{{ labelAutorizacion }}</h3>
+  </ion-text>
+
+  <form #formRegistro="ngForm" *ngIf="showForm; else showMessageAutorizacion" style="align-content: center;">
+    
+    <div  class="contenido">
+        <ion-item class="stilo_selection" color="alimentacion1">
+          <ion-label position="floating">Autorización </ion-label>
+          <ion-select mode="ios" interface="popover" placeholder="Pendiente" name="estado" [(ngModel)]="estadoChange.id" (ionChange)="ChangeEstado()" required>
+          <ion-select-option *ngFor="let e of estadoSelectItems" [value]="e.id" [disabled]=" e.id === 1 ? true : false"> {{ e.nombre }} </ion-select-option>
+          </ion-select>
+        </ion-item>
+    </div>
+
+    <ng-container *ngIf="alimentacion !== undefined">
+      <app-show-alimentacion-multiple [alimentacion]="alimentacion"></app-show-alimentacion-multiple>
+    </ng-container>
+
+    <!-- BOTON GUARDAR COMPONENTE -->
+    <div style="margin: 3% 4% 3% 4%;">
+      <button style="width: 100%; background-color: transparent;">
+        <btn-update  (onUpdate)="UpdateRegister()" [loadingBtn]="loadingBtn" [formRegistro]="formRegistro"></btn-update>
+      </button>
+    </div> 
+  </form>
+
+  <ng-template #showMessageAutorizacion>
+    <ion-text mode="ios" color="primary" style="text-align: center;">
+      <br>
+      <h3> No hay autorización para este registro de {{ labelAutorizacion | lowercase }} </h3>
+      <br>
+    </ion-text>
+  </ng-template>
+
+  <ng-container *ngIf="alimentacion === undefined ">
+    <ion-text mode="ios" color="danger" style="text-align: center;">
+      <br>
+      <h3 style="margin: 0px 20px;"> No se puede procesar la información porque no coincide el código de empleado del
+        registro de {{ labelAutorizacion | lowercase }} con los registros de empleados del sistema. </h3>
+      <br>
+    </ion-text>
+  </ng-container>
+
+
+</ion-content>

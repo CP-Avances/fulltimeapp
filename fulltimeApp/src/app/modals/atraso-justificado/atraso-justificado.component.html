@@ -1,0 +1,55 @@
+<app-close-modal titleModal="Justificar Atraso"></app-close-modal>
+
+<ion-content>
+  <div class="Imagen">
+    <img class="center" src="../../../assets/images/C_FTLOGORV.png">
+      <ion-label style="text-align:center" mode="md" color="medium">
+        <h1 style="font-size: 3vw; margin-bottom: 5%;"><b>Reloj Virtual</b></h1>
+      </ion-label>
+      <img class="tamanoImagen" src="../../../assets/images/Justificar.svg">
+  </div>
+
+  <div class="contenido">
+    <ion-item>
+      <ion-text slot="start"><ion-icon name="person"></ion-icon>&nbsp; Usuario </ion-text> 
+      <p class="nombre"> {{ data.fullname }} </p>
+    </ion-item>
+
+    <h6> Ingrese la informacion solicitada </h6>
+
+    <ion-item id="open-Atraso" mode="md">
+      <ion-label class="is-required" position="floating" >Fecha Atraso</ion-label>
+      <ion-input readonly="true" name="fec_inicio" [ngModel]="Fecha" mode="md"></ion-input>
+    </ion-item>
+    <ion-modal trigger="open-Atraso" class="inputDateFecha">
+      <ng-template>
+        <ion-content>
+          <ion-datetime 
+            #datetimeInicio
+            presentation="date"
+            [showDefaultButtons]="false" 
+            name="fec_inicio" 
+            color="success" 
+            mode="md" 
+            min="1990-01-01" max="2050-12-31" 
+            (ionChange)="fechaJustificacionChange($event)" 
+            [value]="Fecha" 
+            required></ion-datetime>
+            <div style="width: 95%;">
+              <ion-label style="float:right; margin: 2%; font-size: medium;" color="primary" (click)="datetimeInicio.cancel(true)">Cancelar</ion-label>
+            </div>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+
+    <ion-item>
+      <ion-label position="floating"  mode="md" class="is-required"><ion-text> Descripción del Atraso</ion-text>  </ion-label>
+      <ion-textarea placeholder="Ingres el comentario" rows="7" cols="20" 
+        (ionChange)="descripcionChange($event)" id="textarea"
+        autocapitalize="on" autocomplete="off" clearInput="true" maxlength="254" required></ion-textarea>
+    </ion-item>
+    <br>
+    <ion-button shape="round" expand="block" (click)="enviarJustificacion()">Enviar</ion-button>
+  </div>
+
+</ion-content>

@@ -1,0 +1,81 @@
+<ion-toolbar color="">
+  <ion-buttons slot="start">
+    <ion-button color="dark" (click)="dismiss()">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+    </ion-button>
+    <h5>Descargar</h5>
+  </ion-buttons>
+
+  <ion-buttons slot="primary">
+    <p>PDF</p>
+    <ion-button>
+
+      <ion-icon slot="icon-only" color="danger" name="document-outline" class="tamanoLetra"></ion-icon>
+    </ion-button >
+    
+    <p *ngIf="esAdministrador">Excel</p>
+    <ion-button *ngIf="esAdministrador">
+      <ion-icon slot="icon-only" color="success" name="calculator-outline" class="tamanoLetra"></ion-icon>
+    </ion-button>
+
+  </ion-buttons>
+
+
+
+</ion-toolbar>
+
+<ion-content>
+  <p class="margenIzqTitulo">REPORTE DE TIMBRES</p>
+  <div class="printable-content">
+    <div class="printable-area" id="printable-area">
+
+      <table id="tablaTimbres">
+        <thead class="header-table">
+
+          <tr>
+   
+            <td>Fecha y hora</td>
+          
+            <td>Servidor</td>
+          
+            <td>Descripción</td>
+            <td>Latitud</td>
+            <td>Longitud</td>
+            <!--
+            <td>Aut</td>
+            <td>ID dispositivo</td>
+            -->
+          </tr>
+        </thead>
+        <tbody class="detail-table">
+          <tr *ngFor="let timbre of timbres">
+
+            <td>{{timbre.fec_hora_timbre | date: 'dd/MM/yyyy HH:mm'}}</td>
+            <td>{{timbre.fec_hora_timbre_servidor | date: 'dd/MM/yyyy HH:mm'}}</td>
+           <!--
+            <td *ngIf="horaServidor">{{timbre.fec_hora_timbre | date: 'HH:mm'}}</td>
+            <td *ngIf="!horaServidor">{{timbre.fec_hora_timbre | date: 'HH:mm'}}</td>
+            -->
+            <td [ngSwitch]="timbre.tecl_funcion">
+              <p *ngSwitchCase="1">Inicio de la jornada</p>
+              <p *ngSwitchCase="2">Fin de la jornada</p>
+              <p *ngSwitchCase="3">Inicio almuerzo</p>
+              <p *ngSwitchCase="4">Fin almuerzo</p>
+              <p *ngSwitchCase="5">Inicio permiso</p>
+              <p *ngSwitchCase="6">Fin permiso</p>
+              <p *ngSwitchDefault>Timbre desconocido</p>
+            </td>
+
+            <td>{{timbre.latitud}}</td>
+            <td>{{timbre.longitud}}</td>
+            <!--
+            <td>{{timbre.tipo_identificacion}}</td>
+            <td>{{timbre.dispositivo_timbre}}</td>
+             -->
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</ion-content>

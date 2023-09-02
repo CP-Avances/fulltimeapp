@@ -1,0 +1,94 @@
+<!-- Back button with a default href -->
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/login"></ion-back-button>
+    </ion-buttons>
+    <div class="titulotimbre">
+      <ion-title> <b>{{nombre_timbre}}</b> </ion-title>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+
+  <div style="padding:2%; background: white; margin-bottom: 2%;">
+    <ion-img class="center" style="width:40%;" src="../../../assets/images/C_FTLOGORV.png"></ion-img>
+    <ion-label mode="md" color="medium" style="text-align:center">
+      <h1 style="font-size: 4vw"><b>Reloj Virtual</b></h1>
+    </ion-label>
+  </div>
+
+  <app-refresh-info (onRefresh)="refrescoEspecial()" removeItem="noClean"></app-refresh-info>
+
+  <ion-card style="margin: 3%; border-radius: 3%;" >
+    <ion-item>
+      <ion-icon slot="end" name="person" color="secondary"></ion-icon>
+      <b> USUARIO: &nbsp;&nbsp;</b>
+      <ion-label>{{nombre_usuario}} {{apellido_usuario}}</ion-label>
+    </ion-item>
+  </ion-card>
+
+  <ion-card style="margin: 3%; border-radius: 3%;" >
+    <ion-item>
+      <ion-icon slot="end" name="phone-portrait-outline" color="secondary"></ion-icon>
+      <b>DISPOSITIVO:</b>
+    </ion-item>
+    <ion-item>
+      <ion-label> {{modelo_dispositivo}} </ion-label> 
+    </ion-item>
+  </ion-card>
+
+  <ion-card style="margin: 3%; border-radius: 3%;">
+    <ion-item>
+      <ion-icon slot="end" name="location-outline" color="secondary"></ion-icon>
+      <b> UBICACÍON:</b>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Longitud: {{geoLongitude}} </ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Latitud: {{geoLatitude}}</ion-label>
+    </ion-item>
+  </ion-card>
+
+  <ion-card style="margin: 3%; border-radius: 3%;">
+    <ion-item>
+      <ion-icon slot="end" name="time-outline" color="secondary"></ion-icon>
+      <b> INFORMACION DE TIMBRE:</b>
+    </ion-item>
+    <ion-item>
+      <ion-label>
+        {{nombreInfo_timbre}} a las <b>{{horaTransformada}}</b>
+      </ion-label>
+    </ion-item>
+  </ion-card>
+
+  <ion-card style="margin: 3%; border-radius: 3%;">
+    <ion-item>
+      <ion-icon slot="end" name="receipt-outline" color="secondary"></ion-icon>
+      <b> OBSERVACIONES: </b>
+
+    </ion-item>
+    <ion-item class="textarea">
+
+      <ion-textarea placeholder="Escriba aquí..." maxlength=299 spellcheck (ionChange)="ionChange()" [(ngModel)]="nuevoTimbre.observacion"> </ion-textarea>
+      <p class="letraPeque">{{numeroCaracteres}}/299</p>
+    </ion-item>
+  </ion-card>
+
+  <div style="margin: 5% 3% 2% 3%;" *ngIf="!cargandoPosicion; else elseBlock" >
+    <ion-button shape="round" expand="block" (click)="enviarTimbre()"><ion-icon name="paper-plane-outline"></ion-icon>&nbsp;&nbsp; Enviar Timbre</ion-button>
+  </div>
+
+  <ng-template #elseBlock>
+    <ion-progress-bar type="indeterminate"></ion-progress-bar>
+
+    <ion-text color="primary">
+      <span>Por favor, espere...</span>
+    </ion-text>
+  </ng-template>
+
+</ion-content>

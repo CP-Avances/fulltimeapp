@@ -1,0 +1,57 @@
+<ion-content>
+  <h6 style="text-align: center; font-size: 90%;">
+    <ion-icon name="notifications-outline" style="margin-left: 1%; margin-right: 2%;"></ion-icon>
+    Notificaciones <b *ngIf="countNoti != 0" style="text-align: center; font-size: 80%; color: rgb(39, 224, 36); margin-left: 3%"> {{countNoti}}</b>
+  </h6>
+  
+  <ng-container *ngIf="loading; then showSkeletor else showList"></ng-container>
+
+  <ng-template #showList>
+
+    <ion-card *ngIf="countNoti == 0" style="margin-top: 6%; margin-bottom: -5%; padding: 5%;">
+      <ion-label >
+        <h4 style="text-align: center; font-size: 90%;">No tiene nuevas notificaciones</h4>
+      </ion-label>
+    </ion-card>
+
+    <ion-card *ngFor="let noti of notificacionesAll | paginate: { itemsPerPage: 3, currentPage: pageActual} " style="margin-bottom: 2%;">
+      <ng-container *ngIf="noti.visto === true else shownotific"></ng-container>
+      <ng-template #shownotific>
+        <div>
+        <ion-item (click)="AbrirNoti(noti)" class="ion-activated" [color]='tiponotificacion(noti)'>
+          <ion-label>
+
+            <small> 
+              <h4 style="font-size: 85%;"><b>Colaborador: {{ noti.nempleadosend }} </b> 
+                <strong *ngIf="noti.id_permiso != null" style="font-size: 90%; float: right;"> Per. {{noti.id_permiso}} </strong> 
+                <strong *ngIf="noti.id_vacaciones != null" style="font-size: 90%; float: right;"> Vac. {{noti.id_vacaciones}} </strong> 
+                <strong *ngIf="noti.id_hora_extra != null" style="font-size: 90%; float: right;"> Hor. {{noti.id_hora_extra}} </strong> 
+              </h4>  
+              <p style="font-size: 80%;">
+                  {{ noti.mensaje}}
+              </p>
+              <h5 style="font-size: 85%;"> <b>Fecha: </b> {{noti.create_at | date:'dd MMM y '}}   <b> Hora: </b> {{noti.create_at | date:'h:mm:ss a'}} </h5>
+            </small>
+
+          </ion-label>
+        </ion-item>
+        </div>
+      </ng-template>
+    </ion-card>
+
+  </ng-template>
+
+  <ng-template #showSkeletor>
+    <ion-card style="margin-top: 6%; margin-bottom: 3%; padding: 5%;">
+      <ion-label >
+        <h4 style="text-align: center; font-size: 90%;"> Sin Conexion </h4>
+      </ion-label>
+    </ion-card>
+  </ng-template>
+
+    <ion-item (click)="abrirNotificaciones()" style="background-color: rgb(20, 21, 21); font-size: 70%; align-items: center; margin-top: 2%;">
+      <p style="margin: auto;"> Mostras Todas las notificaciones </p>
+    </ion-item>
+
+  <ion-content>
+

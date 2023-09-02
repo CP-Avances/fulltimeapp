@@ -1,0 +1,190 @@
+<app-close-modal titleModal="Información de hora extra"></app-close-modal>
+
+<ion-content mode="md">
+
+  <ion-grid>
+    <ion-row>
+      <ion-col size="6">
+        <ion-item>
+          <ion-label>
+            <b> Solicitud:</b> {{ hora_extra.id }}
+          </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col size="6">
+        <ion-item>
+          <ion-label *ngIf="hora_extra.estado == 1" style=" font-size: 85%;">
+            <b> Estado: </b> <b style="font-size: 95%; float:right;" class="pendiente"> Pendiente </b>
+          </ion-label>
+          <ion-label *ngIf="hora_extra.estado == 2" style=" font-size: 80%;">
+            <b> Estado: </b> <b style=" font-size: 90%; float:right; margin-top: 0.8%;" class="pre_autorizado"> 
+              {{ hora_extra.estado | estadoSolicitudes }} </b>
+          </ion-label>
+          <ion-label *ngIf="hora_extra.estado == 3"style=" font-size: 85%;">
+            <b> Estado: </b> <b style=" font-size: 95%; float:right; margin-top: 0.5%;" class="autorizada"> 
+              {{ hora_extra.estado | estadoSolicitudes }} </b>
+          </ion-label>
+          <ion-label *ngIf="hora_extra.estado == 4" style=" font-size: 85%;">
+            <b> Estado: </b> <b style=" font-size: 95%; float:right; margin-top: 0.5%;" class="negado"> 
+              {{ hora_extra.estado | estadoSolicitudes }} </b>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <div style="text-align: center;">
+    <ion-text style="font-size: 80%; margin:6% 0% -2% 2%; margin-top: 2%;"> Informacion de la Solicitud </ion-text>
+  </div>
+
+  <ion-grid style="margin-top: 1%;">
+    <ion-row>
+      <ion-col size="6">
+        <div class="formdiv_tiempo">
+          <ion-item class="item_fondo">
+            <ion-label>
+              <b style="font-size: 85%;"> Código Personal </b><br>
+              <p style="margin-top: 6%; margin-left: 4%;">{{ hora_extra.codigo }}</p>
+            </ion-label>
+          </ion-item>
+        </div>
+      </ion-col>
+
+      <ion-col size="6">
+        <div class="formdiv_tiempo">
+          <ion-item class="item_fondo">
+            <ion-label>
+              <b style="font-size: 85%;"> Cargo</b> <br>
+              <p style="margin-top: 6%; margin-left: 4%;">{{ hora_extra.ncargo }}</p>
+            </ion-label>
+          </ion-item>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-text class="text_info"> Informacion Fecha </ion-text>
+  <div class="formdiv">
+    <ion-item class="item_fondo">
+      <ion-label>
+        <b style="font-size: 85%;"> Fecha de creacion</b> <br>
+        <p style="margin-top: 2%; margin-left: 4%;">
+          {{ hora_extra.fec_solicita_ }}
+        </p>
+      </ion-label>
+    </ion-item>
+  </div>
+
+  <div class="formdiv">
+    <ion-item class="item_fondo">
+      <ion-label>
+        <b style="font-size: 85%;"> Dia a laborar </b> <br>
+        <p style="margin-top: 2%; margin-left: 4%;"> {{ hora_extra.fecha_inicio_ }} </p>
+      </ion-label>
+    </ion-item>
+  </div>
+
+  <!--
+    <div class="formdiv">
+    <ion-item class="item_fondo">
+      <ion-label>
+        <b style="font-size: 85%;"> Hasta </b> <br>
+        <p style="margin-top: 2%; margin-left: 4%;"> {{ hora_extra.fecha_fin_ }} </p>
+      </ion-label>
+    </ion-item>
+  </div>
+  -->
+  
+  <ion-text class="text_info"> Informacion Horas </ion-text>
+  <ion-grid style="margin-top: -2%;">
+    <ion-row>
+      <ion-col size="6">
+        <div class="formdiv_tiempo">
+          <ion-item class="item_fondo">
+            <ion-label>
+              <b style="font-size: 85%;"> Hora Inicio</b> <br>
+              <p style="margin-top: 2%; margin-left: 3%; font-size: 89%;">
+                {{ hora_extra.hora_inicio_ }}
+              </p>
+            </ion-label>
+          </ion-item>
+        </div>
+      </ion-col>
+
+      <ion-col size="6">
+        <div class="formdiv_tiempo">
+          <ion-item class="item_fondo">
+            <ion-label>
+              <b style="font-size: 85%;"> Hora Final</b> <br>
+              <p style="margin-top: 2%; margin-left: 3%; font-size: 89%;">
+                {{ hora_extra.hora_fin_ }}
+              </p>
+            </ion-label>
+          </ion-item>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-text class="text_info"> Informacion Tiempo Calculado </ion-text>
+  <ion-grid style="margin-top: -2%;">
+    <ion-row>
+      <ion-col size="6">
+        <div class="formdiv_tiempo">
+          <ion-item class="item_fondo">
+            <ion-label>
+              <b style="font-size: 85%;"> Tiempo solicitado</b> <br>
+              <p style="margin-top: 3%; margin-left: 4%;"> {{ hora_extra.num_hora }} </p>
+            </ion-label>
+          </ion-item>
+        </div>
+      </ion-col>
+  
+      <ion-col size="6">
+        <div class="formdiv_tiempo">
+          <ion-item class="item_fondo">
+            <ion-label>
+              <b style="font-size: 85%;"> Tiempo Aprobado </b><br>
+              <p style="margin-top: 3%; margin-left: 4%;"> {{ hora_extra.tiempo_autorizado }} </p>
+            </ion-label>
+          </ion-item>
+         </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-text color="medium" class="text_info"> Observación de la Solicitud </ion-text>
+  <div class="formdiv">
+    <ion-item class="item_fondo">
+      <ion-text style="margin-top:3%; width: 100%;">
+        <b style="font-size: 85%;"> Observación </b>
+        <br>
+          <p style="margin-top: 4%; margin-left: 2%; margin-right: 2%;">
+            {{ hora_extra.descripcion }}
+          </p>
+      </ion-text>
+    </ion-item>
+  </div>
+
+  <ion-text class="text_info"> Documento Respaldo </ion-text>
+  <div class="formdiv">
+    <ion-item class="item_fondo" >
+      <ion-label style="font-size: 85%;">
+        <b> Ver Certificado de la Solicitud </b><br>
+        <a *ngIf="hora_extra.docu_nombre != null"
+          href="{{hipervinculo}}/horas-extras-pedidas/documentos/{{hora_extra.documento}}" target="_black"
+          style="text-decoration:none;">
+          <ion-label color="acua" style="margin-top: 3%; margin-left: 2%;">
+            {{hora_extra.docu_nombre}}
+          </ion-label>
+        </a>
+
+        <ion-label *ngIf="hora_extra.docu_nombre == null" color="warning"
+          style="margin-top: 3%; margin-left: 2%;">
+          No ha subido ningun documento
+        </ion-label>
+      </ion-label>
+    </ion-item>
+  </div>
+  <br>
+</ion-content>

@@ -1,0 +1,222 @@
+<app-close-modal titleModal="Solicita Vacación" [formRegistro]="formRegistro" [resetF]="true"></app-close-modal>
+
+<!-- Content con mode = android -->
+<ion-content mode="md">
+  <br>
+  <app-refresh-info (onRefresh)="ngOnInit()" removeItem="cg_feriado"></app-refresh-info>
+
+  <form #formRegistro="ngForm" [hidden] = "ocultar" >
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6">
+          <ion-item>
+            <ion-icon slot="start" name="document-text-outline"></ion-icon>
+            <ion-label>
+              <b> Solicitud </b>
+            </ion-label>
+          </ion-item>
+        </ion-col>
+        <ion-col size="6">
+          <ion-item>
+            <ion-label *ngIf="reg.estado == 1" style=" font-size: 85%;">
+              <b> Estado: </b> <b style="font-size: 95%; float:right;" class="pendiente"> Pendiente </b>
+            </ion-label>
+            <ion-label *ngIf="reg.estado != 1" style=" font-size: 85%;">
+              <b> Estado: </b> <b style=" font-size: 95%;">{{ reg.estado | estadoSolicitudes }}</b>
+            </ion-label>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <div style="text-align: center;">
+      <ion-text class="is-required" style="font-size: 70%; margin:6% 0% -2% 2%; margin-top: 2%;">OBLIGATORIO LLENAR LOS CAMPOS CON </ion-text>
+    </div>
+
+    <ion-text class="text_info">Ingrese los datos</ion-text>
+    <!-- FECHA INICIO Y FINAL -->
+    <ion-grid style="margin-top: -2%;">
+      <ion-row>
+        <ion-col size="6" >
+          <div class="formdiv_tiempo">
+            <ion-item class="item_fondo" id="open-regisVacaInicio" mode="md">
+              <ion-label class="is-required" position="floating" >Día Inicio</ion-label>
+              <ion-input readonly="true" name="fec_inicio" [ngModel]="dia_inicio" mode="md"></ion-input>
+            </ion-item>
+            <ion-modal trigger="open-regisVacaInicio" class="inputDateFecha">
+              <ng-template>
+                <ion-content>
+                  <ion-datetime 
+                  #datetimeInicio
+                  presentation="date"
+                  [showDefaultButtons]="false" 
+                  name="fec_inicio" 
+                  color="success" 
+                  mode="md" 
+                  min="1990-01-01" max="2050-12-31" 
+                  (ionChange)="ChangeDiaInicio($event)" 
+                  [value]="reg.fec_inicio" 
+                  required></ion-datetime>
+                  <div style="width: 95%;">
+                    <ion-label style="float:right; margin: 2%; font-size: medium;" color="success" (click)="datetimeInicio.cancel(true)">Cancelar</ion-label>
+                  </div>
+                </ion-content>
+              </ng-template>
+            </ion-modal>
+          </div>
+        </ion-col>
+        
+        <ion-col size="6">
+          <div class="formdiv_tiempo">
+            <ion-item  class="item_fondo" id="open-regisVacaFinal" mode="md">
+              <ion-label class="is-required" position="floating" >Día Final</ion-label>
+              <ion-input readonly="true" name="fec_final" [ngModel]="dia_fianl" mode="md"></ion-input>
+            </ion-item>
+            <ion-modal *ngIf="dia_inicio != ''" trigger="open-regisVacaFinal" class="inputDateFecha">
+              <ng-template>
+                <ion-content>
+                  <ion-datetime 
+                  #datetimeFinal
+                  [disabled] = "disabled_dia_fianl"
+                  presentation="date"
+                  [showDefaultButtons]="false" 
+                  name="fec_final" 
+                  mode="md" 
+                  [min]="dia_inicio" max="2050-12-31" 
+                  (ionChange)="ChangeDiaFinal($event)" 
+                  [value]="dia_fianl" 
+                  required></ion-datetime>
+                  <div style="width: 95%;">
+                    <ion-label style="float:right; margin: 2%; font-size: medium;" color="primary" (click)="datetimeFinal.cancel(true)">Cancelar</ion-label>
+                  </div>
+                </ion-content>
+              </ng-template>
+            </ion-modal>
+            <ion-popover *ngIf="(dia_inicio == '')" trigger="open-regisVacaFinal">
+              <ion-content>
+                <ng-template>
+                  <p style="margin: auto; padding: 4%;" >Ingrese la fecha de Inicio</p>
+                </ng-template>
+              </ion-content>
+            </ion-popover>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- FECHA INGRESA -->
+    <div class="formdiv" style="margin-top:-0.5%;">
+      <ion-item  class="item_fondo" id="open-regisVacaRegreso" mode="md">
+        <ion-label class="is-required" position="floating" >Fecha ingreso</ion-label>
+        <ion-input readonly="true" name="fec_ingreso" [ngModel]="dia_ingreso" mode="md"></ion-input>
+      </ion-item>
+      <ion-modal *ngIf="dia_fianl != ''" trigger="open-regisVacaRegreso" class="inputDateFecha">
+        <ng-template>
+          <ion-content>
+            <ion-datetime 
+            #datetimeIngreso
+            [disabled] = "disabled_dia_ingreso"
+            presentation="date"
+            [showDefaultButtons]="false" 
+            name="fec_ingreso" 
+            mode="md" 
+            color="warning" 
+            [min]="dia_fianl" max="2050-12-31" 
+            (ionChange)="ChangeDiaIngreso($event)" 
+            [value]="dia_ingreso" 
+            required></ion-datetime>
+            <div style="width: 95%;">
+              <ion-label style="float:right; margin: 2%; font-size: medium;" color="warning" (click)="datetimeIngreso.cancel(true)">Cancelar</ion-label>
+            </div>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+      <ion-popover *ngIf="(dia_fianl == '')" trigger="open-regisVacaRegreso">
+        <ion-content>
+          <ng-template>
+            <p style="margin: auto; padding: 4%;" >Ingrese la fecha Final</p>
+          </ng-template>
+        </ion-content>
+      </ion-popover>
+    </div>
+       
+     <!-- CALCULO DE DIAS DE VACACION -->
+     <ion-button [disabled]="(btnOculto == true) || (validar.vacio(reg.fec_inicio) ||  validar.vacio(reg.fec_final) || validar.vacio(reg.fec_ingreso))"  
+      shape="round" expand="block" color="tertiary" (click)="mostrarCalculos()" style="margin: 4% 3% 2% 3%;">
+      <ion-icon slot="start" name="calculator-outline"></ion-icon>
+      Calcular días.
+    </ion-button>
+
+    <!-- CAMPOS CALCULOS DE DIAS SEGUN FECHAS -->
+    <ion-text class="text_info">Resultado del calculo</ion-text>
+    <ion-grid style="margin-top: -2%;">
+      <ion-row>
+        <ion-col size="6">
+          <div class="formdiv_tiempo">
+            <ion-item class="item_fondo">
+              <ion-label class="is-required" position="floating">
+                <b style="font-size: 85%;">Días laborables</b></ion-label>
+              <ion-input name="dia" [ngModel]="reg.dia_laborable" mode="ios" disabled="true" maxlengt="10" required></ion-input>
+            </ion-item>
+          </div>
+        </ion-col>
+
+        <ion-col size="6">
+          <div class="formdiv_tiempo">
+            <ion-item class="item_fondo">
+              <ion-label class="is-required" position="floating">
+                <b style="font-size: 85%;">Días Libre y Feriado</b></ion-label>
+              <ion-input name="dia_libre" [ngModel]="reg.dia_libre" mode="ios" maxlengt="10" disabled="true" required></ion-input>
+            </ion-item>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <div *ngIf="(reg.dia_libre != null) && (reg.dia_laborable != null)">
+      <ion-text class="text_info"> Seleccione una opcion </ion-text>
+      <!-- LEGALIZAR SOLICITUD DE VACACIONES -->
+      <div class="formdiv">
+        <ion-item class="item_fondo">
+          <div>
+            <ion-label style="margin: 4% 0% -4% 0%; font-size: 80%;" class="is-required"><b> Vacacion Legalizada </b></ion-label><br>
+            <ion-radio-group  name="legalizado" *ngFor="let r of radioButton" [(ngModel)]="reg.legalizado" [value]="reg.legalizado" required>
+              <ion-item  class="radio-buttoms">
+                <ion-label> {{ r.label }} </ion-label>
+                <ion-radio slot="end" mode="md" [value]="r.value" style="margin-left: 2%;"></ion-radio>
+              </ion-item>
+            </ion-radio-group>
+          </div>
+        </ion-item>
+      </div>
+
+      <br>
+      <div style="margin: 0% 3% 0% 3%;" [hidden] = "btnOcultoguardar">
+        <!-- BOTON GUARDAR DESDE OTRO COMPONENTE -->
+        <btn-save (onSave)="SaveRegister()" [loadingBtn]="loadingBtn" [formRegistro]="formRegistro"></btn-save>
+      </div>
+    </div>
+  </form>
+  <br>
+
+  <div [hidden] = "mensaje">
+    <div style="margin: 2%; padding: 2%; text-align: center; border-radius: 2%;">
+      <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 90%;">
+        No tiene registrado el periodo de vacaciones para realizar una solicitud
+      </ion-text>
+    </div>
+    <div class="Imagen">
+      <span class="center">
+        <img src="../../../assets/images/C_FTLOGORV.png">
+        <ion-label style="text-align:center" mode="md" color="medium">  
+          <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
+        </ion-label>
+      </span>
+      <br><br>
+      <img style="margin-left: 5%;" src="../../../assets/images/vacaciones.png"/>
+      <br>
+    </div>
+  </div>
+
+</ion-content>

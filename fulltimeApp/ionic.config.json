@@ -1,0 +1,7 @@
+{
+  "name": "fulltimeApp",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

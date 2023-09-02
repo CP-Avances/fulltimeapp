@@ -1,0 +1,49 @@
+<ion-app>
+  <ion-content fullscreen>
+    <ion-img class="center"  src="../../../assets/images/C_FTLOGORV.png"></ion-img>
+    <ion-label style="text-align:center" mode="md" color="medium">
+      <h1 style="font-size: 8vw"><b>Reloj Virtual</b></h1>
+    </ion-label>
+    <br><br>
+    <ion-card mode="md">
+      <ion-card-header>
+        <ion-card-title style="font: 150% sans-serif;"> Iniciar Sesión</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <form (submit)="iniciarSesion1()" mode="md" id="formulariologin">
+          <ion-item style="font-size: 20px;">
+            <ion-label position="floating" mode="md" color="medium">
+              <ion-icon name="person-outline" color="medium"></ion-icon> Usuario <ion-text color="danger">*</ion-text>
+            </ion-label>
+            <ion-input required type="text" mode="ios" [(ngModel)]="user.usuario" name="username" class="form-control" minlength="3" maxlength="25"></ion-input>
+          </ion-item>
+
+          <ion-item style="font-size: 20px;" >
+            <ion-label position="floating" mode="md" color="medium">
+              <ion-icon mode="md" name="key-outline" color="medium"></ion-icon> Contraseña <ion-text color="danger">*</ion-text>
+            </ion-label>
+            <ion-input  required mode="ios" [(ngModel)]="user.contrasena" name="password" [type]="verPassword ? 'text' : 'password'" class="form-control" minlength="3" maxlength="15"></ion-input>
+            <ion-icon class="posicionOjo" slot="end" [name]="verPassword ? 'eye' : 'eye-off-outline'" (click)="mostrarPassword()"></ion-icon>   
+          </ion-item>
+
+          <br>
+
+          <ion-button type="submit" mode="md" shape="round">Iniciar sesión </ion-button>
+          <br>
+          <div *ngIf="iniciandoSesion">
+            <ion-progress-bar type="indeterminate"></ion-progress-bar>
+          </div>
+          <br>
+        </form>
+      </ion-card-content>
+    </ion-card>
+
+    <div style=" width: 100%; padding: 2%;">
+      <ion-label style="float:left; font-size: 60%;" mode="md" color="medium"> {{id_celular}} </ion-label>
+      <ion-label style="float:right; font-size: 60%;" mode="md" color="medium"> {{dispositi}} </ion-label>
+    </div>
+
+  </ion-content>
+  
+</ion-app>

@@ -1,0 +1,108 @@
+{
+  "root": true,
+  "ignorePatterns": ["projects/**/*"],
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "parserOptions": {
+        "project": ["tsconfig.json"],
+        "createDefaultProgram": true
+      },
+      "extends": [
+        "plugin:@angular-eslint/recommended",
+        "plugin:@angular-eslint/template/process-inline-templates"
+      ],
+      "rules": {
+        "@angular-eslint/array-type": false,
+        "@angular-eslint/arrow-parens": false,
+        "@angular-eslint/deprecation": {
+          "severity": "warn"
+        },
+        "@angular-eslint/import-blacklist": [
+          true,
+          "rxjs/Rx"
+        ],
+        "@angular-eslint/interface-name": false,
+        "@angular-eslint/max-classes-per-file": false,
+        "@angular-eslint/max-line-length": [
+          true,
+          140
+        ],
+        "@angular-eslint/member-access": false,
+        "@angular-eslint/member-ordering": [
+          true,
+          {
+            "order": [
+            "static-field",
+            "instance-field",
+            "static-method",
+            "instance-method"
+            ]
+          }
+        ],
+        "@angular-eslint/no-consecutive-blank-lines": false,
+        "@angular-eslint/no-console": [
+          true,
+          "debug",
+          "info",
+          "time",
+          "timeEnd",
+          "trace"
+        ],
+        "@angular-eslint/no-empty": false,
+        "@angular-eslint/no-inferrable-types": [
+          true,
+          "ignore-params"
+        ],
+        "@angular-eslint/no-non-null-assertion": true,
+        "@angular-eslint/no-redundant-jsdoc": true,
+        "@angular-eslint/no-switch-case-fall-through": true,
+        "@angular-eslint/no-use-before-declare": true,
+        "@angular-eslint/no-var-requires": false,
+        "@angular-eslint/object-literal-key-quotes": [
+          true,
+          "as-needed"
+        ],
+        "@angular-eslint/object-literal-sort-keys": false,
+        "@angular-eslint/ordered-imports": false,
+        "@angular-eslint/quotemark": [
+          true,
+          "single"
+        ],
+        "@angular-eslint/component-class-suffix":[
+          true, 
+          "Page", 
+          "Component"
+        ],
+        "@angular-eslint/component-selector": [
+          true,
+          "element",
+          "app",
+          "page",
+          "kebab-case"
+        ],
+        "@angular-eslint/trailing-comma": false,
+        "@angular-eslint/no-output-on-prefix": true,
+        "@angular-eslint/no-inputs-metadata-property": true,
+        "@angular-eslint/no-host-metadata-property": true,
+        "@angular-eslint/no-input-rename": true,
+        "@angular-eslint/no-output-rename": true,
+        "@angular-eslint/use-lifecycle-interface": true,
+        "@angular-eslint/use-pipe-transform-interface": true,
+        "@angular-eslint/one-variable-per-declaration": false,
+        "@angular-eslint/directive-class-suffix": true,
+        "@angular-eslint/directive-selector": [ 
+          true,
+          "attribute",
+          "app",
+          "camelCase"
+        ]
+      }
+    },
+    {
+      "files": ["*.html"],
+      "extends": ["plugin:@angular-eslint/template/recommended"],
+      "rules": {}
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+<app-close-modal titleModal="Solicita Comida" [formRegistro]="formRegistro" [resetF]="true"></app-close-modal>
+
+<ion-content mode="md">
+  <app-refresh-info (onRefresh)="ngOnInit()" removeItem=""></app-refresh-info>
+
+  <form #formRegistro="ngForm">
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6">
+          <ion-item>
+            <ion-icon slot="start" name="document-text-outline"></ion-icon>
+            <ion-label>
+              <b> Solicitud </b> 
+            </ion-label>
+          </ion-item>
+        </ion-col>
+        <ion-col size="6">
+          <ion-item>
+            <ion-label style=" font-size: 85%;">
+              <b> Estado: </b> <b style="font-size: 95%; float:right;" class="pendiente"> Pendiente </b>
+            </ion-label>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <div style="text-align: center;">
+      <ion-text class="is-required" style="font-size: 70%; margin:6% 0% -2% 2%; margin-top: 2%;">OBLIGATORIO LLENAR LOS CAMPOS CON </ion-text>
+    </div>
+
+    <ion-text class="text_info"> Seleccione una opcion </ion-text>
+    <div class="formdiv">
+      <ion-item class="item_fondo">
+        <ion-label class="is-required" position="floating"><b> Servicio </b></ion-label>
+        <ion-select name="id_servicio" interface="popover" mode="ios" [(ngModel)]="reg.id_servicio" okText="Guardar" cancelText="Cancelar" (ionChange)="ChangeServiciosMenu()" required>
+          <ion-select-option  *ngFor="let servicios of servicios" [value]="servicios.id">{{ servicios.nombre }}</ion-select-option>
+        </ion-select>
+      </ion-item>    
+    </div>
+
+    <ng-container *ngIf="reg.id_servicio != null">
+      <div class="formdiv">
+        <ion-item class="item_fondo">
+          <ion-label class="is-required" position="floating"><b> Menú </b></ion-label>
+          <ion-select name="id_plato" interface="popover" mode="ios" [(ngModel)]="reg.id_plato" okText="Guardar" cancelText="Cancelar" (ionChange)="ChangePlatoMenu()" required>
+            <ion-select-option *ngFor="let menu of menu_selected" [value]="menu.id"> {{ menu.nombre }} </ion-select-option>
+          </ion-select>
+        </ion-item>    
+      </div>
+
+      <div class="formdiv">
+        <ion-item class="item_fondo">
+          <ion-label class="is-required" position="floating"><b> Plato </b></ion-label>
+          <ion-select name="id_comida" interface="popover" mode="ios" [(ngModel)]="reg.id_comida" okText="Guardar" cancelText="Cancelar" (ionChange)="ChangeDetalleComida()" required [disabled]="activar_plato">
+            <ion-select-option *ngFor="let plato of plato_selected" [value]="plato.id"> {{ plato.nombre }} </ion-select-option>
+          </ion-select>
+        </ion-item>    
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="reg.id_comida != null">
+      <ion-text class="text_info"> Ingrese los datos </ion-text>
+        <ion-grid style="margin-top: -2%;">
+          <ion-row>
+            <ion-col size="4">
+              <div class="formdiv_tiempo" style="margin-top: 3%; padding-bottom: 3%;">
+                <ion-item class="item_fondo">
+                  <ion-label class="is-required" position="floating"><b> Precio </b></ion-label>
+                  <ion-input name="precio" value="{{ detalle_menu_selected.valor | currency }}" readonly ="true"></ion-input>
+                </ion-item>
+              </div>
+            </ion-col>
+            
+            <ion-col size="8">
+            <!-- FECHA QUE VA A COMER -->
+              <div class="formdiv_tiempo">
+                <ion-item class="item_fondo" id="open-registroAlimen" mode="md">
+                  <ion-label class="is-required" position="floating" >Fecha de Consumo</ion-label>
+                  <ion-input readonly="true" name="fec_comida" [ngModel]="fecha_comida" mode="md"></ion-input>
+                </ion-item>
+                <ion-modal trigger="open-registroAlimen" class="inputDateFecha">
+                  <ng-template>
+                    <ion-content>
+                      <ion-datetime 
+                      #datetimeInicio
+                      presentation="date"
+                      [showDefaultButtons]="false" 
+                      name="fec_comida" 
+                      color="success" 
+                      mode="md" 
+                      [min]="fec_actual_formato" 
+                      max="2050-12-31" 
+                      (ionChange)="mostrarCalculos($event)" 
+                      [value]="reg.fec_comida" required></ion-datetime>
+                      <div style="width: 95%;">
+                        <ion-label style="float:right; margin: 2%; font-size: medium;" color="success" (click)="datetimeInicio.cancel(true)">Cancelar</ion-label>
+                      </div>
+                    </ion-content>
+                  </ng-template>
+                </ion-modal>
+                </div>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+
+          <!-- FECHA INICIO Y HORA DE INICIO -->
+          <ion-grid style="margin-top: -3%;">
+            <ion-row>
+              <ion-col size="6">
+                <div class="formdiv_tiempo">
+                  <ion-item class="item_fondo">
+                    <ion-label class="is-required" position="floating"><b> Hora Inicio </b></ion-label>
+                    <ion-input name="hora_inicio" displayFormat="h:mm a" disabled="true" [(ngModel)]="reg.hora_inicio" readonly></ion-input>
+                  </ion-item>
+                </div>
+              </ion-col>
+              <ion-col size="6">
+                <div class="formdiv_tiempo">
+                  <ion-item class="item_fondo">
+                    <ion-label class="is-required" position="floating"><b> Hora Final </b></ion-label>
+                    <ion-input name="hora_fin" displayFormat="h:mm a" disabled="true" [(ngModel)]="reg.hora_fin" readonly></ion-input>
+                  </ion-item>
+                </div>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+    </ng-container>
+
+    <ng-container *ngIf="reg.fec_comida != null ">
+      <ion-text class="text_info">Escriba la razon de la solicitud</ion-text>
+      <div class="formdiv">
+        <ion-item class="item_fondo">
+          <ion-label position="floating"><b> Observación </b>  </ion-label>
+          <ion-textarea name="observacion" [(ngModel)]="reg.observacion" rows="2" cols="20" mode="md" minlength="3" maxlengt="255"></ion-textarea>
+        </ion-item>
+      </div>
+
+      <!-- INGRESAR EXTRA -->
+      <ion-text class="text_info"> Seleccione una opcion </ion-text>
+      <div class="formdiv">
+      <ion-item class="item_fondo">
+        <div>
+          <ion-label style="margin: 4% 0% -4% 0%; font-size: 80%;" class="is-required"><b> Extra (si requiere de algo adicional) </b></ion-label><br>
+          <ion-radio-group name="extra" *ngFor="let r of radioButton" [(ngModel)]="reg.extra" [value]="reg.extra" required>
+            <ion-item class="radio-buttoms">
+              <ion-label>{{r.label}}</ion-label>
+              <ion-radio slot="end" mode="md" [value]="r.value" style="margin-left: 2%;"></ion-radio>
+            </ion-item>
+          </ion-radio-group>
+        </div>
+      </ion-item>
+    </div>
+    </ng-container>
+
+    <div style="margin: 5% 3% 4% 3%;" [hidden] = "btnOcultoguardar">
+      <!-- BOTON GUARDAR DESDE OTRO COMPONENTE -->
+      <btn-save (onSave)="SaveRegister()" [loadingBtn]="loadingBtn" [formRegistro]="formRegistro"></btn-save>
+    </div>
+  </form>
+  <br>
+
+</ion-content>

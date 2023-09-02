@@ -1,0 +1,61 @@
+ion-fab {
+    z-index: 101;
+    ion-fab-button{
+        z-index: 102;
+    }
+}
+
+.paginacion{
+  margin: auto;
+  padding-top: 2%;
+  padding-bottom: 2%;
+}
+
+.paginacion ::ng-deep .ngx-pagination {
+  padding: 0%;
+  margin: auto;
+}
+
+.paginacion ::ng-deep .ngx-pagination .current {
+  background: rgb(28, 133, 219);
+  color: rgb(255, 255, 255);
+  font-weight: bold;
+  border-radius: 5px;
+  padding: 0% -3% 0% -3%;
+  margin: 0% -1% 0% -1%;
+}
+  
+.paginacion :host ::ng-deep .ngx-pagination span {
+  color: rgb(177, 221, 255);
+  font-family:monospace;
+  margin: 0% -3% 0% -3%;
+}
+
+.paginacion ::ng-deep .ngx-pagination a{
+  background-color: transparent;
+  color: rgb(67, 149, 226);
+  margin: 0% -3% 0% -3%;
+}
+
+.center{
+  display: block;
+  margin: auto;
+}
+
+.tamanoImagen{
+  width: 62%;
+  margin: auto;
+}
+
+.formdiv_tiempo{
+  margin: 0% 2% 0% 2%;
+  padding-bottom: 0.6%;
+  border-radius: 8px;
+  background-color: rgba(58, 84, 106, 0.961);
+}
+
+.item_fondo{
+  border-radius: 6px 6px 0px 0px; 
+  background-color: rgba(65, 65, 64, 0.961); 
+  margin-bottom: 2%;
+}

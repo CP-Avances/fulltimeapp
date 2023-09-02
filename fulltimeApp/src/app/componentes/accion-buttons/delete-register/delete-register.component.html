@@ -1,0 +1,21 @@
+<ng-container *ngIf="isButtom; then showBtn; else showIcon"></ng-container>
+
+<ng-template #showBtn>
+  <ion-button color="danger" shape="round" expand="block" (click)="presentAlertConfirm()">
+
+    <ng-container *ngIf="!loadingBtn; then deleteReg; else spiner"></ng-container>
+    <ng-template #deleteReg>
+      <ion-icon slot="start" name="trash-outline"></ion-icon>
+      {{ label }}
+    </ng-template>
+    <ng-template #spiner>
+      <ion-spinner name="circles"></ion-spinner>
+    </ng-template>
+
+  </ion-button>
+</ng-template>
+<ng-template #showIcon>
+
+  <ion-icon color="danger" slot="end" name="trash-outline" (click)="presentAlertConfirm()"></ion-icon>
+
+</ng-template>

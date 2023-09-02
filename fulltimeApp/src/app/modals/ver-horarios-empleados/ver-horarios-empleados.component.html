@@ -1,0 +1,148 @@
+<app-close-modal titleModal="Horarios de empleado"></app-close-modal>
+
+<ion-content [hidden]="horariocontent">
+  <div *ngIf="horarios.length === 0 && mensajeOcultar == true ; else showHorarios" style="text-align: center;">
+    <br>
+    <ion-text color="primary">
+      <span>Obteniendo horarios Por favor Espere</span>
+    </ion-text>
+    <ion-progress-bar type="indeterminate"></ion-progress-bar>
+    <br>
+  </div>
+
+  <ng-template #showHorarios style="padding: 2%;">
+    <div *ngIf="mensajeOcultar == true">
+      <br>
+      <div style="width: 100%; text-align: center;">
+        <ion-text class="text_info"> Ingrese los datos para consultar su planificacion por mes </ion-text>
+      </div>
+
+      <ion-grid style="margin-top: -1%;" mode="md">
+      <ion-row>
+        <ion-col *ngIf="listaAnios.length > 1">
+          <div class="formdiv">
+            <ion-item class="item_fondo" mode="md">
+              <ion-label class="is-required" position="floating"><b> Año </b> </ion-label>
+              <ion-select name="anio" mode="ios" interface="popover" [(ngModel)]="anio" (ionChange)="ChangeAnio($event)">
+                <ion-select-option *ngFor="let item of listaAnios" [value]="item.anio"> {{ item.anio }} </ion-select-option>
+              </ion-select>
+            </ion-item>    
+          </div>
+        </ion-col>
+
+        <ion-col>
+          <div class="formdiv">
+            <ion-item class="item_fondo" mode="md" id="meses">
+              <ion-label class="is-required" position="floating"><b> Mes </b> </ion-label>
+              <ion-select name="mes" mode="ios" interface="popover" [(ngModel)]="mes" (ionChange)="ChangeMes($event)">
+                <ion-select-option *ngFor="let item of meseFiltradosPorAnio" [value]="item.id"> {{ item.mes }} </ion-select-option>
+              </ion-select>
+            </ion-item>    
+          </div>
+        </ion-col>
+      </ion-row>
+      </ion-grid>
+
+      <div style="width: 100%; text-align: center; margin-top: 13px;">
+      <ion-text> Calendario Planificación Horaria </ion-text>
+      </div>
+      <div style="margin: 3%; padding: auto;" [hidden]= "tablaPlanificacion">
+      <ion-grid class="calendario">
+        <ion-row class="columnaCabecera">
+          <ion-col *ngFor="let day of week" class="day-name" style="text-align: center;">{{day | slice: 0:3}}</ion-col>
+        </ion-row>  
+        <ion-row class="columna">
+          <ion-col class="cuadroDia" [style.gridColumnStart] = "first ? day?.indexWeek : 'auto'"
+            *ngFor="let day of monthSelect; let first = first">
+            <span style="float: left; margin-left: 5%; margin-bottom: 10px; color: rgb(255, 255, 255);">{{day?.value}}</span>
+            <br>
+            <div *ngIf="day?.labora === 0" (click)="presentAlert(day)" style="margin-bottom: 20px; margin-top: 5px; margin-bottom: 5px;"  > 
+              <ion-icon color="success" name="alarm-outline" style="font-size: 22px;"></ion-icon>
+            </div>
+            <div *ngIf="day?.labora === 1" style="margin-bottom: 20px; margin-top: 5px; margin-bottom: 5px;" > 
+              <ion-icon color="medium" name="tablet-portrait-outline"></ion-icon>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      </div>
+
+      <div>
+      <ion-modal [isOpen]="isModalOpen" class="modalHorario">  
+        <ng-template #showcalendario>
+          <ion-content>
+            <div>
+              <button color="danger" style="float:right; margin: 3%; border-radius: 20px; background-color: rgb(240, 6, 6); font-size: large;" 
+                (click)="confirm()"><ion-icon name="close-outline" style="margin: 3px 3px 0px 3px;"></ion-icon></button>
+            </div>
+            <ion-card style="width: 95%; margin-bottom: 3%; text-align: center; background-color: rgb(19, 96, 111);" *ngFor="let ph of plan_horario">
+              <ion-card-title><h6 style="color: rgb(255, 255, 255);">Horario</h6></ion-card-title>
+              <div *ngIf="ph.entrada != '' && ph.entrada != undefined">
+                  <ion-item>
+                    <ion-icon slot="start" name="time-outline" color="theme" style="font-size: 25px;"></ion-icon>
+                    <ion-label>
+                      <h2>Entrada: {{ ph.entrada}}</h2>
+                    </ion-label>
+                  </ion-item>
+              </div>
+              <div *ngIf="ph.inicio_comida != '' && ph.inicio_comida != undefined">
+                  <ion-item>
+                    <ion-avatar  slot="start" >
+                      <ion-icon  name="restaurant-outline" color="theme" style="font-size: 25px;"></ion-icon>
+                    </ion-avatar>
+                    <ion-label>
+                      <h2>Inicio comida: {{ ph.inicio_comida}}</h2>
+                      </ion-label>
+                  </ion-item>
+              </div>
+              <div *ngIf="ph.fin_comida != '' && ph.fin_comida != undefined">
+                  <ion-item>
+                    <ion-avatar  slot="start" >
+                      <ion-icon  name="restaurant-outline" color="theme" style="font-size: 25px;"></ion-icon>
+                    </ion-avatar>
+                    <ion-label>
+                      <h2> Fin comida: {{ ph.fin_comida}}</h2>
+                      </ion-label>
+                  </ion-item>
+              </div>
+              <div *ngIf="ph.salida != '' && ph.salida != undefined">
+                  <ion-item>
+                    <ion-avatar  slot="start" >
+                      <ion-icon name="time-outline" color="theme" style="font-size: 25px;"></ion-icon>
+                    </ion-avatar>
+                    <ion-label>
+                      <h2> Salida: {{ ph.salida}}</h2>
+                      </ion-label>
+                  </ion-item>
+              </div>
+            </ion-card>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+      </div>
+
+      <div style="margin: 3%; padding: auto;" [hidden]= "tablaPlanificacion">
+        <ion-card style="font-size: 80%; margin: 1% 0% 1% 0%;">
+          <ion-item>
+            <ion-icon color="success" name="alarm-outline" style="font-size: 22px;"></ion-icon>
+            <ion-label>&nbsp;&nbsp;&nbsp; Día Laboral </ion-label>
+            <ion-icon color="medium" name="tablet-portrait-outline"></ion-icon>
+            <ion-label>&nbsp;&nbsp;&nbsp; Día Libre </ion-label>
+          </ion-item>
+        </ion-card>
+      </div>
+    
+    </div>
+  </ng-template>
+</ion-content>
+
+<ion-content  style="text-align: center;" [hidden]="mensajeOcultar">
+  <div style="text-align: center; padding-top: 2%;" >
+    <br><br>
+    <img class="tamanoImagen" src="../../../assets/images/horario.svg">
+    <br>
+    <ion-label style="font-size: 80%;">
+      El empleado no tiene horarios asignados
+    </ion-label>
+  </div>
+</ion-content>

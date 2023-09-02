@@ -1,0 +1,248 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "~@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "~@ionic/angular/css/normalize.css";
+@import "~@ionic/angular/css/structure.css";
+@import "~@ionic/angular/css/typography.css";
+@import '~@ionic/angular/css/display.css';
+
+/* Optional CSS utils that can be commented out */
+@import "~@ionic/angular/css/padding.css";
+@import "~@ionic/angular/css/float-elements.css";
+@import "~@ionic/angular/css/text-alignment.css";
+@import "~@ionic/angular/css/text-transformation.css";
+@import "~@ionic/angular/css/flex-utils.css";
+
+.pendiente{
+  color: rgb(18, 166, 193); 
+  margin-top: -1%;
+  font-size: 3vw;
+}
+  
+.pre_autorizado{
+  color: rgb(99, 112, 255); 
+  margin-top: 1%;
+  font-size: 3vw;
+}
+  
+.autorizada{
+  color: rgb(43, 207, 43); 
+  margin-top: -2%;
+  font-size: 3vw;
+}
+  
+.negado{
+  color: rgb(243, 65, 127); 
+  margin-top: -2%;
+  font-size: 3.5vw;
+}
+  
+.item-pendientes-color{
+  --ion-item-background:#333333c3;
+  --ion-item-color:#ffffffd5;
+  margin-bottom: 1%;
+  margin-left: 4%;
+  margin-right: 4%;
+}
+  
+.item-pre_autorizados-color{
+  --ion-item-background:#052344c7;
+  --ion-item-color:#ffffffd5;
+  margin-bottom: 1%;
+  margin-left: 4%;
+  margin-right: 4%;
+}
+  
+.item-autorizados-color{
+  --ion-item-background:#064432c9;
+  --ion-item-color:#ffffffd5;
+  margin-top: 1%;
+  margin-left: 4%;
+  margin-right: 4%;
+}
+  
+.item-negados-color{
+  --ion-item-background:#43042dc6;
+  --ion-item-color:#ffffffd5;
+  margin-top: 1%;
+  margin-left: 4%;
+  margin-right: 4%;
+}
+
+#notification-button {            
+  position: relative;
+  width: 60%;
+  overflow: visible!important;
+}
+
+#notifications-badge {
+    background-color: rgb(255, 0, 0);
+    position: absolute;
+    top: -2px;
+    right: 20px;
+    border-radius: 100%;
+    font-size: 65%;
+}
+
+ion-alert.custom-alert {
+  --backdrop-opacity: 0.7;
+}
+
+button.alert-button.alert-button-confirm {
+  background-color: var(--ion-color-acua);
+  color: var(--ion-color-acua-contrast);
+}
+
+button.alert-button.alert-button-cancel{
+  background-color: var(--ion-color-danger);
+  color: var(--ion-color-danger-contrast);
+}
+
+.md button.alert-button.alert-button-confirm {
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.ios .custom-alert button.alert-button {
+  border: 0.55px solid rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.2)
+}
+
+.ios button.alert-button.alert-button-confirm {
+  border-bottom-right-radius: 13px;
+}
+
+.img-alert{
+  width: 55%;
+  height: 50%;
+  margin-top: 2%;
+}
+
+.card-alert{
+  width: 100%;
+  height: 100%;
+  padding: 5%;
+  align-items: center;
+  border-radius: 5%;
+  background-color: rgb(47, 46, 46);
+  color:rgb(255, 255, 255)
+}
+
+//notificaciones de tipo toast
+.card-activacion{
+  width: 30%;
+  height: 30%;
+  padding: 2%;
+}
+
+/* DOES NOT WORK - not specific enough */
+div#alert-90msg.alert-message.sc-io-alert-ios {
+  background-color: var(--ion-color-acua);
+  color: var(--ion-color-acua-contrast);
+}
+
+button.alert-button.alert-button-salir-confirm{
+    background-color: var(--ion-color-danger);
+    color: var(--ion-color-danger-contrast);
+}
+
+button.alert-button.alert-button-salir-cancel{
+  background-color: var(--ion-color-success);
+  color: var(--ion-color-success-contrast);
+}
+  
+.MsIngreso{
+  position:relative;
+  margin-bottom: 10%;
+  animation-name: MsIngreso;
+  animation-duration: 1.5s;
+  overflow:hidden;
+}
+
+@keyframes MsIngreso {
+  0%{transform: translateX(100%)}
+  100%{transform: translateX(0%)}
+}
+
+.toast-custom-class {
+  text-align: center;
+  width:90%;
+  margin: 10% 5% 0% 5%;
+  font-size: 15px;
+  height:30%;
+}
+
+.toast-custom-noti{
+  text-align: center;
+  width:60%;
+  margin: 8% 5% 0% 5%;
+  font-size: 12.2px;
+  height:40%;
+  margin-left: 30%;
+  position:relative;
+  transition: opacity 0.1s;
+}
+
+@keyframes blured {
+  0%{transition: none;}
+  50%{transition: ease-in-out;}
+}
+
+.showtoast-custom-class{
+  text-align: center;
+  font-size: 14px;
+}
+
+ion-modal{
+  --background: rgba(39, 36, 40, 0.566);
+}
+
+.inputDateFecha{
+  
+  &::part(content){
+    backdrop-filter: blur(6px);
+  }
+
+  ion-content{
+    --background: transparent;
+    --padding-top: 23vh;
+    --padding-start: 30px;
+    --padding-end: 20px;
+
+    ion-datetime{
+      border-radius: 10px;
+      
+    }
+  }
+}
+
+.modalHorario{
+  
+  &::part(content){
+    backdrop-filter: blur(6px);
+  }
+
+  ion-content{
+    --background: transparent;
+    --padding-top: 10vh;
+    --padding-start: 30px;
+    --padding-end: 20px;
+
+    ion-datetime{
+      border-radius: 10px;
+      
+    }
+  }
+}
+

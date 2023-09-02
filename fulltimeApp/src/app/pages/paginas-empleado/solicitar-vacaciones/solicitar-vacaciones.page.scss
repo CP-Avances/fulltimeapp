@@ -1,0 +1,112 @@
+.radio-buttoms {
+    display: inline-flex;
+    width: 130px;
+    align-items: center;
+}
+
+ion-icon {
+    margin: 0px 5px
+}
+
+.paginacion{
+  margin: auto;
+  padding-top: 2%;
+  padding-bottom: 2%;
+}
+
+.paginacion ::ng-deep .ngx-pagination {
+  padding: 0%;
+  margin: auto;
+}
+
+.paginacion ::ng-deep .ngx-pagination .current {
+  background: rgb(28, 133, 219);
+  color: rgb(255, 255, 255);
+  font-weight: bold;
+  border-radius: 5px;
+  padding: 0% -3% 0% -3%;
+  margin: 0% -1% 0% -1%;
+}
+  
+.paginacion :host ::ng-deep .ngx-pagination span {
+  color: rgb(177, 221, 255);
+  font-family:monospace;
+  margin: 0% -3% 0% -3%;
+}
+
+.paginacion ::ng-deep .ngx-pagination a{
+  background-color: transparent;
+  color: rgb(177, 221, 255);
+  margin: 0% -3% 0% -3%;
+}
+
+.icono_texto{
+  font-size: 68%;
+}
+
+.icono_texto .servicio{
+  margin-bottom: 5%;
+}
+
+.info{
+  margin: 0% 2% 0% 0%; 
+  font-size: 76%;
+}
+
+.icono{
+  font-size: 25px; 
+  margin-bottom: -6px;
+}
+
+.etiqueta{
+  text-align: center; 
+  margin-top: 5%; 
+  margin-right: 4%;
+}
+
+.formdiv{
+  margin: 1% 3% 1% 3%;
+  border: solid 1px rgba(58, 84, 106, 0.961);
+  border-radius: 8px;
+  background-color: rgba(58, 84, 106, 0.961);
+}
+
+.formdiv_tiempo{
+  margin: 1% 1% 2% 1%;
+  padding-bottom: 0.5%;
+  border: solid 1px rgba(58, 84, 106, 0.961);
+  border-radius: 8px;
+  background-color: rgba(58, 84, 106, 0.961);
+}
+
+#text_info{
+  font-size: 70%; 
+  margin:6% 0% -2% 2%; 
+  margin-top: 2%;
+}
+
+.text_info{
+  font-size: 70%; 
+  margin:6% 0% -2% 2%; 
+  margin-top: 2%;
+}
+
+.item_fondo{
+  border-radius: 6px 6px 0px 0px; 
+  background-color: rgba(65, 65, 64, 0.961); 
+  margin-bottom: 2%;
+}
+.center{
+  display: block;
+  margin: auto;
+}
+
+.Imagen{
+  position: relative;
+  overflow: visible!important;
+  padding:3%;
+  margin: 5%;
+  border-radius: 2%;
+  background-color:rgb(255, 255, 255);
+}
+

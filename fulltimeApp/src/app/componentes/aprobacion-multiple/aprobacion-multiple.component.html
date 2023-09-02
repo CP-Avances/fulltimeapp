@@ -1,0 +1,28 @@
+<ion-grid>
+
+  <ion-row>
+    <ion-col *ngIf="isChecked" size="2">
+      <ion-button color="secondary" (click)="checkedAll( isAllCheck )">
+        <ion-icon style="margin-top: -50%;" name="checkmark-done-outline"></ion-icon>
+        <label style="position:fixed; margin-top: 35%; font-size: 65%;">Todos</label>
+      </ion-button>
+    </ion-col>
+
+    <ion-col [size]="isChecked ? 10: 12">
+      <ion-button (click)="ChangeAprobacionMultiple( isChecked )">
+        {{!isChecked ? 'Habilitar' : 'Deshabilitar'}} Aprobación Multiple
+      </ion-button>
+    </ion-col>
+  </ion-row>
+
+  <ion-row *ngIf="isChecked">
+    <ion-col size="12">
+      <ion-button shape="round" color="success" expand="full" fill="solid" (click)="presentModalAutorizarMultiple( )">
+        <ion-icon name="chevron-forward-circle-outline" slot="end"></ion-icon>
+        Aprobar seleccionados
+      </ion-button>
+    </ion-col>
+  </ion-row>
+
+
+</ion-grid>

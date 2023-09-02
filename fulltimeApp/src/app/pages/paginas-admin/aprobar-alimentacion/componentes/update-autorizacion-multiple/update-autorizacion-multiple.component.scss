@@ -1,0 +1,19 @@
+.contenido{
+  width: 94%; 
+  border-radius: 10px; 
+  margin: 1% 3% 1% 3%;
+}
+
+.stilo_selection{
+  border-radius: 10px;
+  border: 2px outset #fde1bc;
+}
+
+.stilo_selection::-ms-expand{
+  display: none;
+}
+
+.stilo_selection:hover{
+  border-color: rgb(252, 180, 107);
+}
+

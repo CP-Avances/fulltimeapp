@@ -1,0 +1,83 @@
+.tamanoImagen {
+    height: 55%;
+    width: 55%;
+    display: block;
+    margin: auto;
+    
+  }
+  
+  .paginacion{
+      margin: auto;
+      padding-top: 2%;
+      padding-bottom: 2%;
+    }
+    
+    .paginacion ::ng-deep .ngx-pagination {
+      padding: 0%;
+      margin: auto;
+    }
+    
+  .paginacion ::ng-deep .ngx-pagination .current {
+      background: rgb(28, 133, 219);
+      color: rgb(255, 255, 255);
+      font-weight: bold;
+      border-radius: 5px;
+  }
+      
+  .paginacion :host ::ng-deep .ngx-pagination span {
+      color: rgb(255, 255, 255);
+      font-family:monospace;
+  }
+  
+  .paginacion ::ng-deep .ngx-pagination a{
+      background-color: transparent;
+      color: rgb(67, 149, 226);
+  }
+
+.text_info{
+  font-size: 75%; 
+  margin:7% 0% 0% 0%; 
+  margin-top: 3%;
+}
+
+.formdiv{
+  margin: 1% 1% 2% 1%;
+  padding-bottom: 0.5%;
+  border: solid 1px rgba(58, 84, 106, 0.961);
+  border-radius: 8px;
+  background-color: rgba(58, 84, 106, 0.961);
+}
+
+.item_fondo{
+  border-radius: 6px 6px 0px 0px; 
+  background-color: rgba(65, 65, 64, 0.961); 
+  margin-bottom: 2%;
+}
+
+.columnaCabecera{
+  background-color: rgba(6, 74, 125, 0.666);
+  color: rgb(255, 255, 255);
+  grid-template-columns: repeat(7, 1fr);
+  display: grid;
+  margin: -1% -1% 0% -1.5%;
+  padding: 2% 0% 2% 0%;
+  border-radius: 10px 10px 0px 0px;
+}
+.columna {
+  border-radius: 0px 0px 10px 10px;
+  border: solid 0.3px rgba(6, 74, 125, 0.666);
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin: 0% -1% 0% -1%;
+  padding: 1%;
+}
+
+.cuadroDia{
+  text-align: center;
+  font-size: 1.5ch;
+  background-color: rgba(68, 68, 68, 0.652);
+  //border: solid 0.2px rgba(155, 155, 155, 0.961);
+  padding-bottom: 4%;
+  margin: 0.5px;
+  border-radius: 5px 5px 5px 5px;
+}

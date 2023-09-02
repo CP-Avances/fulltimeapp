@@ -1,0 +1,236 @@
+<app-close-modal titleModal="Editar Solicitud Hora Extra"></app-close-modal>
+
+<ion-content mode="md">
+  <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
+  <form #formRegistro="ngForm">
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6">
+          <ion-item style=" font-size: 85%;">
+            <ion-icon slot="start" name="document-text-outline"></ion-icon>
+            <ion-label>
+              <b>Solici.. </b> {{ reg.id }}
+            </ion-label>
+          </ion-item>
+        </ion-col>
+        <ion-col size="6">
+          <ion-item style=" font-size: 85%;">
+            <ion-label *ngIf="reg.estado == 1">
+              <b> Estado: </b> <b style="font-size: 95%; float:right;" class="pendiente"> Pendiente </b>
+            </ion-label>
+            <ion-label *ngIf="reg.estado != 1">
+              <b> Estado: </b> <b style=" font-size: 95%;">{{ reg.estado | estadoSolicitudes }}</b>
+            </ion-label>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <div style="text-align: center;">
+      <ion-text id="text_info"> TOME EN CUENTA LOS DATOS QUE VA A CAMBIAR </ion-text>
+    </div>
+
+    <ion-text class="text_info">Ingrese los datos</ion-text>
+    <!-- FECHA INICIO Y FECHA FINAL -->
+    <ion-grid style="margin-top: -2%;">
+      <ion-row>
+        <ion-col size="6" >
+          <div class="formdiv_tiempo">
+            <ion-item class="item_fondo" id="open-EditorHorasFechaIni" fill="solid" mode="md">
+              <ion-label class="is-required" position="floating" >Día Inicio</ion-label>
+              <ion-input readonly="true" name="fec_inicio" [ngModel]="dia_inicio" mode="md"></ion-input>
+            </ion-item>
+            <ion-modal trigger="open-EditorHorasFechaIni" class="inputDateFecha">
+              <ng-template>
+                <ion-content>
+                  <ion-datetime 
+                  #datetimeInicio
+                  presentation="date"
+                  [showDefaultButtons]="false" 
+                  name="fec_inicio" 
+                  color="success" 
+                  mode="md" 
+                  min="1990-01-01" max="2050-12-31" 
+                  (ionChange)="ChangeDiaInicio($event)" 
+                  [value]="dia_inicio" 
+                  required></ion-datetime>
+                  <div style="width: 95%;">
+                    <ion-label style="float:right; margin: 2%; font-size: medium;" color="success" (click)="datetimeInicio.cancel(true)">Cancelar</ion-label>
+                  </div>
+                </ion-content>
+              </ng-template>
+            </ion-modal>
+          </div>
+        </ion-col>
+
+        <ion-col size="6">
+          <div class="formdiv_tiempo">
+            <ion-item class="item_fondo" id="open-EditorHorasFechaFin" fill="solid" mode="md">
+              <ion-label class="is-required" position="floating" >Día Final</ion-label>
+              <ion-input readonly="true" name="fec_final" [ngModel]="dia_fianl" mode="md"></ion-input>
+            </ion-item>
+            <ion-modal trigger="open-EditorHorasFechaFin" *ngIf="(dia_inicio != '')" class="inputDateFecha">
+              <ng-template>
+                <ion-content>
+                  <ion-datetime
+                  #datetimeFinal 
+                  presentation="date" 
+                  [showDefaultButtons]="false"
+                  name="fec_final" 
+                  mode="md" 
+                  [min]="reg.fec_inicio"  max="2050-12-31" 
+                  (ionChange)="ChangeDiaFinal($event)" 
+                  [value]="dia_fianl" 
+                  required></ion-datetime>
+                  <div style="width: 95%;">
+                    <ion-label style="float:right; margin: 2%; font-size: medium;" color="primary" (click)="datetimeFinal.cancel(true)">Cancelar</ion-label>
+                  </div>
+                </ion-content>
+              </ng-template>
+            </ion-modal>
+          </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+       <!-- HORA INICIO Y HORA FINAL -->
+       <ion-grid style="margin-top: -4%;">
+        <ion-row>
+          <ion-col size="6">
+            <div class="formdiv_tiempo">
+              <ion-item class="item_fondo" id="open-EditorHorasHoraIni" fill="solid" mode="md">
+                <ion-label class="is-required" position="floating" >Hora Inicio</ion-label>
+                <ion-input readonly="true" name="hora_inicio" [ngModel]="hora_inicio" mode="md"></ion-input>
+              </ion-item>
+              <ion-popover trigger="open-EditorHorasHoraIni">
+                <ng-template>
+                  <p style="margin: auto; padding: 4%;" *ngIf="(dia_fianl == '')">Ingrese las fechas</p>
+                  <ion-datetime *ngIf="dia_fianl != ''" 
+                    presentation="time" 
+                    mode="md" 
+                    name="hora_inicio" 
+                    [showDefaultButtons]="true"
+                      doneText="OK"
+                      cancelText="Cancelar" 
+                    hourCycle="h12" 
+                    (ionChange)="ChangeHoraInicio($event)" 
+                    [value] = "reg.hora_salida"
+                    required></ion-datetime>
+                </ng-template>
+              </ion-popover>
+            </div>
+          </ion-col>
+          <ion-col size="6">
+            <div class="formdiv_tiempo">
+              <ion-item class="item_fondo" id="open-EditorHorasHoraFin" fill="solid" mode="md">
+                <ion-label class="is-required" position="floating" >Hora Final</ion-label>
+                <ion-input readonly="true" name="hora_final" [ngModel]="hora_final" mode="md"></ion-input>
+              </ion-item>
+              <ion-popover trigger="open-EditorHorasHoraFin">
+                <ng-template>
+                  <p style="margin: auto; padding: 4%;" *ngIf="(dia_fianl == '')">Ingrese las fechas</p>
+                  <ion-datetime *ngIf="dia_fianl != ''"
+                    presentation="time" 
+                    mode="md" 
+                    name="hora_final" 
+                    [showDefaultButtons]="true"
+                      doneText="OK"
+                      cancelText="Cancelar"  
+                    hourCycle="h12" 
+                    (ionChange)="ChangeHoraFinal($event)" 
+                    [value] = "reg.hora_ingreso"
+                    required></ion-datetime>
+                </ng-template>
+              </ion-popover>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+        <!-- CALCULO DE TIEMPOS -->
+        <div lines="none">
+          <ion-button shape="round" expand="block" color="tertiary" (click)="mostrarCalculos()" style="margin: 0% 3% 2% 3%;" [disabled] = "btnBloq">
+            <ion-icon slot="start" name="calculator-outline"></ion-icon>
+            Calcular Tiempo
+          </ion-button>
+        </div> 
+
+
+      <ion-text class="text_info">Resultado del calculo</ion-text>
+        <!-- CAMPOS DE REFERENCIA A DIAS Y HORAS DE LOS PERMISOS -->
+        <ion-grid style="margin-top: -2%;">
+            <ion-row>
+              <ion-col size="6">
+                <div class="formdiv_tiempo">
+                  <ion-item  class="item_fondo" >
+                    <ion-label position="floating"><b>Tiempo</b></ion-label>
+                    <ion-input disabled="true" name="num_hora" [ngModel]="reg.num_hora" mode="md" maxlengt="10" required></ion-input>
+                  </ion-item>
+                </div>
+              </ion-col>
+
+              <ion-col size="6">
+                <div class="formdiv_tiempo">
+                  <ion-item  class="item_fondo" >
+                    <ion-label class="is-required" position="floating">Tiempo Autorizado</ion-label>
+                    <ion-input disabled="true" name="tiempo_autorizado" [ngModel]="reg.tiempo_autorizado" mode="md" maxlengt="10" required></ion-input>
+                  </ion-item>
+                </div>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+
+        <ion-text class="text_info"> Detalle la Observación de la solicitud maximo 55 palabras</ion-text>
+        <div class="formdiv">
+          <ion-item class="item_fondo" >
+            <ion-label position="floating"><b> Observación </b></ion-label>
+            <ion-textarea style="font-size: 90%;" name="descripcion" [(ngModel)]="reg.descripcion" rows="2" cols="20" mode="ios" minlength="3" maxlengt="55" required></ion-textarea>
+          </ion-item>
+        </div>
+
+        <ion-text class="text_info">Subir documento de respaldo</ion-text>
+          <div class="formdiv" >
+            <ion-item class="item_fondo" for="file">
+            <ion-label style="margin: 3% 0% -1.5% 0%; font-size: 75%;" ><b> Justificar Permiso </b></ion-label>
+
+            <!--Este input, permite validar el boton btn_save, que se active o este desactivado deacurdo al documento ingresado-->
+            <ion-input [(ngModel)]="reg.docu_nombre" name="file" id="file" [required]="required"></ion-input> 
+
+            <!-- Esto, permite ingresar el documento-->
+            <ion-label  position="floating" style="font-size: 90%; margin-bottom: 3%;"> 
+              <ion-icon slot="start" color="theme" class="icon_upload" name="cloud-upload-outline"></ion-icon>&nbsp; &nbsp; 
+              &nbsp; &nbsp; Subir archivo /max 2Mb: &nbsp;
+              <!-- Mesaje que indica que no hay archivo subido -->
+              <ion-text *ngIf="reg.docu_nombre == null " style="font-size: 90%; margin:2% 0% 3% 0%; " color="warning">{{mensajeFile}}</ion-text> 
+            </ion-label> 
+
+            <ion-input readonly="true" type="file" (change)="fileChange($event)" id="file" [required]="required"></ion-input>
+            
+            <!-- Mesaje que tiene el nombre del archivo a subir -->
+            <ion-text *ngIf="reg.docu_nombre != '' " style="font-size: 82%; margin:2% 0% 3% 0%; " color="theme">{{reg.docu_nombre}}</ion-text>   
+      
+            <!-- Mesaje que indica el error en subir el archivo -->
+            <ion-text *ngIf="reg.docu_nombre == '' " style="font-size: 82%; margin:2% 0% 3% 0%; " color="warning">{{mensajeFile}}</ion-text> 
+
+        </ion-item>
+        
+        <div *ngIf="reg.docu_nombre != '' && reg.docu_nombre !== null && reg.docu_nombre !== undefined" >
+          <ion-button color="medium" shape="round" expand="block"  (click)="deleteDocumentohorasExtras()">
+            <ion-text style="font-size: 90%;"> <ion-icon color="danger" name="trash-outline"></ion-icon> Quitar documento </ion-text>
+          </ion-button>
+        </div>
+      </div>
+
+        <!-- BOTON GUARDAR COMPONENTE -->
+        <div style="margin: 6% 3% 0% 3%;">
+          <ion-text  *ngIf="reg.documento != null && reg.docu_nombre == '' " color="medium" class="text_info" > 
+            Si actualiza, se quitara el documento guardado 
+          </ion-text>
+          <button [disabled] = "btnBloqueadoGuardar" style="width: 100%; background-color: transparent;">
+            <btn-update (onUpdate)="UpdateRegister()" [loadingBtn]="loadingBtn" [formRegistro]="formRegistro"></btn-update>
+          </button>
+        </div>
+  </form>
+  <br>
+</ion-content>

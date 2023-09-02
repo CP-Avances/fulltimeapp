@@ -1,0 +1,38 @@
+ion-content {
+    text-align: center;
+}
+.button.customBtn {
+    width: 230px;
+}
+
+.titulotimbre{
+    text-align: center;
+    margin-left: -11%;
+    font-size: 85%;
+}
+
+.center {
+    margin-top: 0;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 75%;
+}
+.letraPeque {
+    font-size: 80%;
+
+    color: gray;
+}
+
+p {
+    font-size: 80%;
+    color: var(--ion-color-step-600, #000000);
+}
+
+ion-text{
+    margin: 5%;
+}
+
+ion-title{
+    font-size: 16px;
+}

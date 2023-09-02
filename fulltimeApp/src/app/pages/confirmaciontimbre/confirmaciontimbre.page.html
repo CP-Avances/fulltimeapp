@@ -1,0 +1,34 @@
+<ion-app>
+  <ion-content fullscreen>
+    
+    <div style="text-align: center; margin-top: 3%;">
+      <img class="center" style="width:78%;" src="../../../assets/images/C_FTLOGORV.png">
+      <ion-label mode="md" style="text-align:center; font-size: 7.5vw;" color="medium">
+        <b>Reloj Virtual</b>
+      </ion-label>
+    </div>
+
+    <div>
+      <h1> <label>Timbre enviado con éxito</label></h1>
+
+      <h4> <label>{{nombre_usuario}} {{apellido_usuario}}</label></h4>
+
+    </div><br>
+    <div>
+      <img class="img2" src="../../../assets/images/woman.png">
+    </div>
+    <br><br>
+    <div>
+      <label>Timbre enviado el: </label>
+      <p>{{fechaTransformada}} a las {{horaTransformada}} </p>
+      <p *ngIf="ubicacion != null || ubicacion != undefined"> Ubicacion: {{ubicacion}}</p>
+      <p *ngIf="ubicacion == null || ubicacion == undefined"> Ubicacion: Sin Ubicacion</p>
+    </div>
+
+    <ion-chip outline color="primary" (click)="irABienvenido()">
+      <ion-icon name="home-outline" color="primary"></ion-icon>
+      <ion-label>Ir a inicio</ion-label>
+    </ion-chip>
+
+  </ion-content>
+</ion-app>

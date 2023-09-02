@@ -1,0 +1,85 @@
+.fondo{
+    background-color: #ffffff;
+    position: static;
+    display: block; 
+    padding-top: 1%;
+}
+
+ion-content {
+    text-align: center;
+}
+
+h3{
+    margin-top: 6%;
+}
+
+.textarea {
+    text-align: center;
+}
+
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 30%;
+}
+
+.tamano {
+    font-size: 3vw;
+}
+
+.tamanoHora {
+    font-size: 200%;
+}
+.tamanoBoton {
+    height: 8vh;
+    width: 97%;
+    margin-bottom: -0.5vh;
+}
+
+
+.imgsvg{
+    display: block;
+    margin-top: auto;
+}
+
+
+//Css, variables para dar animacion
+#Sol{
+    animation: animacion 40s;
+    animation-iteration-count:infinite; 
+
+}
+
+#Luna{
+    animation: animacion 40s;
+    animation-iteration-count:infinite;
+}
+
+#Nubes{
+    transform: translate(2%);
+    animation-name: movie_nubes;
+    animation-duration: 5s;
+    animation-iteration-count:infinite;    
+}
+
+
+//Css, permite dar animacion al sol y la luna y a las nubes
+@keyframes animacion{
+    0%{transform: translateX(0%)}
+    50%{transform: translateX(24%)}
+}
+
+@keyframes movie_nubes {
+    50%{transform: inherit}
+  
+}
+
+.Info_hora{
+    position: relative;
+    display: block; 
+}
+
+.botones{
+    position: static;
+}

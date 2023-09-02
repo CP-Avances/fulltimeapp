@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title style="text-align: center;">Visualizar</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-segment scrollable swipe-gesture color="primary" [(ngModel)]="pestaniaEstados" mode="md" (ionChange)="cambioPestaniaEstados($event)">
+        <ion-segment-button value="pendientes">
+          <ion-label>Pendientes</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="autorizados">
+          <ion-label>Autorizados</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="negados">
+          <ion-label>Negados</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </ion-card-content>
+
+  </ion-card>
+</ion-header>

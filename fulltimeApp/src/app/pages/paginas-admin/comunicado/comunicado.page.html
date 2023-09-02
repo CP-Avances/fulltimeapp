@@ -1,0 +1,35 @@
+<ion-header>
+  <div style="padding:10% 1% 3% 1%; background: white">
+    <img class="center" style="width:45%;" src="../../../assets/images/C_FTLOGORV.png"/>
+  </div>
+</ion-header>
+
+<ion-content>
+
+  <ion-text mode="ios" style="text-align:center;">
+    <h3 style="font-size: 5vw"><ion-icon name="megaphone-outline"></ion-icon> 
+      Comunicados 
+    </h3>
+  </ion-text>
+
+    <form  (submit)="EnviarComunicado()" mode="md">
+      <!-- MENSAJE DE COMUNICADO -->
+      <div class="formComini">
+        <ion-item>
+          <ion-label position="floating" mode="md" class="is-required">Asunto</ion-label>
+          <ion-input type="text" mode="md" [(ngModel)]="noti.asunto" name="asunto_" class="form-control" minlength="3"
+            maxlength="45"></ion-input>
+        </ion-item>
+  
+        <ion-item>
+          <ion-label position="floating" mode="md" class="is-required">Mensaje</ion-label>
+          <ion-textarea name="mensaje_" [(ngModel)]="noti.mensaje" rows="7" cols="20" mode="md" minlength="3" maxlengt="255"
+            (ionChange)="textareaMaxLengthValidation()"></ion-textarea>
+        </ion-item>
+
+      </div>
+      <br>
+      <ion-button type="submit" mode="md" shape="round">Siguiente</ion-button>
+    </form>
+  
+</ion-content>
