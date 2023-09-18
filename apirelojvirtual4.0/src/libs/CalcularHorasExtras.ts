@@ -1,7 +1,7 @@
 import { pool } from '../database';
 import { HHMMtoSegundos } from './metodos';
 
-export const CalcularHoraExtra = async function (id_empleado: number, codigo: number, fec_desde: Date, fec_hasta: Date) {
+export const CalcularHoraExtra = async function (id_empleado: number, codigo: number | string, fec_desde: Date, fec_hasta: Date) {
     console.log(id_empleado, codigo, fec_desde, fec_hasta);
     try {
 
@@ -70,7 +70,7 @@ function SumaValorPagoEmpleado(horas_extras: any[]) {
     return sumador
 }
 
-async function ListaHorasExtras(cg_horas_extras: any, codigo: number, id_cargo: number, fec_desde: Date, fec_hasta: Date, sueldo: number, horas_trabaja: number) {
+async function ListaHorasExtras(cg_horas_extras: any, codigo: number | string, id_cargo: number, fec_desde: Date, fec_hasta: Date, sueldo: number, horas_trabaja: number) {
     let arrayUno = await HorasExtrasSolicitadas(codigo, id_cargo, fec_desde, fec_hasta)
     let arrayDos = await PlanificacionHorasExtrasSolicitadas(codigo, id_cargo, fec_desde, fec_hasta)
     console.log('array uno ===', arrayUno); console.log('array dos ===', arrayDos);
@@ -141,7 +141,7 @@ function HorasSuplementarias(valor_dia: number, valor_hora: number, num_hora: nu
     }
 }
 
-async function HorasExtrasSolicitadas(id_empleado: number, id_cargo: number, fec_desde: Date, fec_hasta: Date) {
+async function HorasExtrasSolicitadas(codigo: number|string, id_cargo: number, fec_desde: Date, fec_hasta: Date) {
     return await pool.query('SELECT h.fec_inicio, h.fec_final, h.descripcion, h.num_hora, h.tiempo_autorizado ' +
         'FROM hora_extr_pedidos AS h WHERE h.id_empl_cargo = $1 AND h.fec_inicio between $2 and $3 ' +
         'AND h.fec_final between $2 and $3 ORDER BY h.fec_inicio', [id_cargo, fec_desde, fec_hasta])
@@ -168,13 +168,13 @@ async function HorasExtrasSolicitadas(id_empleado: number, id_cargo: number, fec
                     valores_calculos: new Array,
                     calculos: new Array,
                     nocturno: false,
-                    timbres: await ObtenerTimbres(id_empleado, f1.toJSON().split('T')[0] + 'T00:00:00', f2.toJSON().split('T')[0] + 'T23:59:59')
+                    timbres: await ObtenerTimbres(codigo, f1.toJSON().split('T')[0] + 'T00:00:00', f2.toJSON().split('T')[0] + 'T23:59:59')
                 }
             }))
         });
 }
 
-async function PlanificacionHorasExtrasSolicitadas(id_empleado: number, id_cargo: number, fec_desde: Date, fec_hasta: Date) {
+async function PlanificacionHorasExtrasSolicitadas(codigo: number|string, id_cargo: number, fec_desde: Date, fec_hasta: Date) {
     return await pool.query('SELECT h.fecha_desde, h.hora_inicio, h.fecha_hasta, h.hora_fin, h.descripcion, h.horas_totales, ph.tiempo_autorizado ' +
         'FROM plan_hora_extra_empleado AS ph, plan_hora_extra AS h WHERE ph.id_empl_cargo = $1 AND ph.id_plan_hora = h.id ' +
         'AND h.fecha_desde between $2 and $3 AND h.fecha_hasta between $2 and $3 ORDER BY h.fecha_desde', [id_cargo, fec_desde, fec_hasta])
@@ -201,15 +201,15 @@ async function PlanificacionHorasExtrasSolicitadas(id_empleado: number, id_cargo
                     valores_calculos: [],
                     calculos: [],
                     nocturno: false,
-                    timbres: await ObtenerTimbres(id_empleado, f1.toJSON().split('T')[0] + 'T00:00:00', f2.toJSON().split('T')[0] + 'T23:59:59')
+                    timbres: await ObtenerTimbres(codigo, f1.toJSON().split('T')[0] + 'T00:00:00', f2.toJSON().split('T')[0] + 'T23:59:59')
                 }
             }))
         })
 }
 
-async function ObtenerTimbres(id_empleado: number, fec_desde: string, fec_hasta: string) {
+async function ObtenerTimbres(codigo: number|string, fec_desde: string, fec_hasta: string) {
     // console.log('$$$$$$$$$$$$', fec_desde, fec_hasta);
-    return await pool.query('SELECT fec_hora_timbre, accion FROM timbres WHERE id_empleado = $1 AND accion  in (\'EoS\', \'E\', \'S\') AND fec_hora_timbre BETWEEN $2 AND $3 ORDER BY fec_hora_timbre', [id_empleado, fec_desde, fec_hasta])
+    return await pool.query('SELECT fec_hora_timbre, accion FROM timbres WHERE codigo = $1 AND accion  in (\'EoS\', \'E\', \'S\') AND fec_hora_timbre BETWEEN $2 AND $3 ORDER BY fec_hora_timbre', [codigo, fec_desde, fec_hasta])
         .then(result => {
             return result.rows.map(obj => {
                 var f1 = new Date(obj.fec_hora_timbre.toJSON().split('.')[0])

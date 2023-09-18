@@ -143,7 +143,7 @@ function HorasSuplementarias(valor_dia, valor_hora, num_hora, porcentaje) {
         valor_pago: vp
     };
 }
-function HorasExtrasSolicitadas(id_empleado, id_cargo, fec_desde, fec_hasta) {
+function HorasExtrasSolicitadas(codigo, id_cargo, fec_desde, fec_hasta) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.pool.query('SELECT h.fec_inicio, h.fec_final, h.descripcion, h.num_hora, h.tiempo_autorizado ' +
             'FROM hora_extr_pedidos AS h WHERE h.id_empl_cargo = $1 AND h.fec_inicio between $2 and $3 ' +
@@ -171,13 +171,13 @@ function HorasExtrasSolicitadas(id_empleado, id_cargo, fec_desde, fec_hasta) {
                     valores_calculos: new Array,
                     calculos: new Array,
                     nocturno: false,
-                    timbres: yield ObtenerTimbres(id_empleado, f1.toJSON().split('T')[0] + 'T00:00:00', f2.toJSON().split('T')[0] + 'T23:59:59')
+                    timbres: yield ObtenerTimbres(codigo, f1.toJSON().split('T')[0] + 'T00:00:00', f2.toJSON().split('T')[0] + 'T23:59:59')
                 };
             })));
         });
     });
 }
-function PlanificacionHorasExtrasSolicitadas(id_empleado, id_cargo, fec_desde, fec_hasta) {
+function PlanificacionHorasExtrasSolicitadas(codigo, id_cargo, fec_desde, fec_hasta) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.pool.query('SELECT h.fecha_desde, h.hora_inicio, h.fecha_hasta, h.hora_fin, h.descripcion, h.horas_totales, ph.tiempo_autorizado ' +
             'FROM plan_hora_extra_empleado AS ph, plan_hora_extra AS h WHERE ph.id_empl_cargo = $1 AND ph.id_plan_hora = h.id ' +
@@ -205,16 +205,16 @@ function PlanificacionHorasExtrasSolicitadas(id_empleado, id_cargo, fec_desde, f
                     valores_calculos: [],
                     calculos: [],
                     nocturno: false,
-                    timbres: yield ObtenerTimbres(id_empleado, f1.toJSON().split('T')[0] + 'T00:00:00', f2.toJSON().split('T')[0] + 'T23:59:59')
+                    timbres: yield ObtenerTimbres(codigo, f1.toJSON().split('T')[0] + 'T00:00:00', f2.toJSON().split('T')[0] + 'T23:59:59')
                 };
             })));
         });
     });
 }
-function ObtenerTimbres(id_empleado, fec_desde, fec_hasta) {
+function ObtenerTimbres(codigo, fec_desde, fec_hasta) {
     return __awaiter(this, void 0, void 0, function* () {
         // console.log('$$$$$$$$$$$$', fec_desde, fec_hasta);
-        return yield database_1.pool.query('SELECT fec_hora_timbre, accion FROM timbres WHERE id_empleado = $1 AND accion  in (\'EoS\', \'E\', \'S\') AND fec_hora_timbre BETWEEN $2 AND $3 ORDER BY fec_hora_timbre', [id_empleado, fec_desde, fec_hasta])
+        return yield database_1.pool.query('SELECT fec_hora_timbre, accion FROM timbres WHERE codigo = $1 AND accion  in (\'EoS\', \'E\', \'S\') AND fec_hora_timbre BETWEEN $2 AND $3 ORDER BY fec_hora_timbre', [codigo, fec_desde, fec_hasta])
             .then(result => {
             return result.rows.map(obj => {
                 var f1 = new Date(obj.fec_hora_timbre.toJSON().split('.')[0]);

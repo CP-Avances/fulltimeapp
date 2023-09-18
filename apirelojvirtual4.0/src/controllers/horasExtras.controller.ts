@@ -11,8 +11,8 @@ export const getlistaHorasExtras = async (req: Request, res: Response): Promise<
     try {
         const subquery1 = '( SELECT (nombre || \' \' || apellido) FROM empleados i WHERE i.id = h.id_usua_solicita) AS nempleado '
         const subquery2 = '( SELECT t.cargo FROM empl_cargos i, tipo_cargo t WHERE i.id = h.id_empl_cargo and i.cargo = t.id) AS ncargo '
-        const subquery3 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo::int = h.codigo ) AS id_contrato '
-        const subquery4 = '( SELECT da.id_departamento FROM datos_actuales_empleado AS da WHERE da.codigo::int = h.codigo ) AS id_departamento '
+        const subquery3 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo = h.codigo ) AS id_contrato '
+        const subquery4 = '( SELECT da.id_departamento FROM datos_actuales_empleado AS da WHERE da.codigo = h.codigo ) AS id_departamento '
         const query = `SELECT h.*, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4}  FROM hora_extr_pedidos h ORDER BY h.fec_inicio DESC LIMIT 100`
         const response: QueryResult = await pool.query(query);
         const horas_extras: HoraExtra[] = response.rows;
@@ -32,8 +32,8 @@ export const getlistaByFechas = async (req: Request, res: Response): Promise<Res
         const { fec_inicio, fec_final } = req.query;
         const subquery1 = '( SELECT (nombre || \' \' || apellido) FROM empleados i WHERE i.id = h.id_usua_solicita) as nempleado '
         const subquery2 = '( SELECT t.cargo FROM empl_cargos i, tipo_cargo t WHERE i.id = h.id_empl_cargo and i.cargo = t.id) as ncargo '
-        const subquery3 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo::int = h.codigo ) AS id_contrato '
-        const subquery4 = '( SELECT da.id_departamento FROM datos_actuales_empleado AS da WHERE da.codigo::int = h.codigo ) AS id_departamento '
+        const subquery3 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo = h.codigo ) AS id_contrato '
+        const subquery4 = '( SELECT da.id_departamento FROM datos_actuales_empleado AS da WHERE da.codigo = h.codigo ) AS id_departamento '
 
         const query = `SELECT h.*, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4} 
         FROM hora_extr_pedidos h WHERE h.fec_inicio BETWEEN \'${fec_inicio}\' AND \'${fec_final}\' 
@@ -56,7 +56,7 @@ export const getlistaHorasExtrasByCodigo = async (req: Request, res: Response): 
     try {
         const { codigo } = req.query;
         const subquery1 = '( SELECT t.cargo FROM empl_cargos i, tipo_cargo t WHERE i.id = h.id_empl_cargo and i.cargo = t.id) as ncargo '
-        const subquery2 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo::int = h.codigo ) AS id_contrato '
+        const subquery2 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo = h.codigo ) AS id_contrato '
 
         const query = `SELECT h.*, ${subquery1}, ${subquery2} 
         FROM hora_extr_pedidos h WHERE h.codigo = ${codigo} 
@@ -80,7 +80,7 @@ export const getlistaHorasExtrasByCodigo = async (req: Request, res: Response): 
     try {
         const { fec_inicio, fec_final, codigo } = req.query;
 
-        const query = `SELECT h.* FROM hora_extr_pedidos h WHERE h.codigo = \'${codigo}'\ AND (
+        const query = `SELECT h.* FROM hora_extr_pedidos h WHERE h.codigo = ${codigo} AND (
             ((\'${fec_inicio}\' BETWEEN h.fec_inicio AND h.fec_final ) OR 
              (\'${fec_final}\' BETWEEN h.fec_inicio AND h.fec_final)) 
             OR

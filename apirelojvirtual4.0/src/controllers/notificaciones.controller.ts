@@ -178,11 +178,11 @@ export const getInfoEmpleadoByCodigo = async (req: Request, res: Response): Prom
         const query =
             `
             SELECT da.id_departamento,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, da.cedula,
-            da.correo, CAST (da.codigo AS INTEGER), da.estado, da.id_sucursal, da.id_contrato,
+            da.correo, da.codigo, da.estado, da.id_sucursal, da.id_contrato,
             (SELECT cd.nombre FROM cg_departamentos AS cd WHERE cd.id = da.id_departamento) AS ndepartamento,
             (SELECT s.nombre FROM sucursales AS s WHERE s.id = da.id_sucursal) AS nsucursal
             FROM datos_actuales_empleado AS da, config_noti AS cn            
-            WHERE da.codigo = '${codigo}' AND cn.id_empleado = da.id
+            WHERE da.codigo = ${codigo} AND cn.id_empleado = da.id
             `
         const response: QueryResult = await pool.query(query);
         const [infoEmpleado]: SettingsInfoEmpleado[] = response.rows;
@@ -207,7 +207,7 @@ export const getInfoEmpleadoById = async (req: Request, res: Response): Promise<
         const query =
             `
             SELECT da.id_departamento,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, da.cedula,
-            da.correo, CAST (da.codigo AS INTEGER), da.estado, da.id_sucursal,
+            da.correo, da.codigo, da.estado, da.id_sucursal,
             (SELECT cd.nombre FROM cg_departamentos AS cd WHERE cd.id = da.id_departamento) AS ndepartamento,
             (SELECT s.nombre FROM sucursales AS s WHERE s.id = da.id_sucursal) AS nsucursal
             FROM datos_actuales_empleado AS da, config_noti AS cn 

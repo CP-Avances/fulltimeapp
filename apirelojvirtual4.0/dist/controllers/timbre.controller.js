@@ -138,9 +138,9 @@ const crearTimbreJustificadoAdmin = (req, res) => __awaiter(void 0, void 0, void
 exports.crearTimbreJustificadoAdmin = crearTimbreJustificadoAdmin;
 const FiltrarTimbre = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { fecInicio, fecFinal, id_empleado } = req.body;
+        const { fecInicio, fecFinal, codigo } = req.body;
         console.log(req.body);
-        const response = yield database_1.pool.query('SELECT * FROM timbres WHERE id_empleado = $3 AND fec_hora_timbre BETWEEN $1 AND $2 ORDER BY fec_hora_timbre DESC ', [fecInicio, fecFinal, id_empleado]);
+        const response = yield database_1.pool.query('SELECT * FROM timbres WHERE codigo = $3 AND fec_hora_timbre BETWEEN $1 AND $2 ORDER BY fec_hora_timbre DESC ', [fecInicio, fecFinal, codigo]);
         const timbres = response.rows;
         return res.jsonp(timbres);
     }

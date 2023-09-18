@@ -19,7 +19,7 @@ export const getListaEmpleados = async (req: Request, res: Response): Promise<Re
 
 export const getUbicacion = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const codigo = parseInt(req.params.codigo);
+        const codigo = req.params.codigo;
         const response: QueryResult = await pool.query('SELECT longitud, latitud FROM empleados WHERE codigo = $1', [codigo]);
         const ubicacion: Ubicacion[] = response.rows;
         console.log(ubicacion);

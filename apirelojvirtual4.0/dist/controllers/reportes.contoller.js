@@ -17,7 +17,7 @@ const CalcularHorasExtras_1 = require("../libs/CalcularHorasExtras");
 const getInfoReporteTimbres = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { codigo, fec_inicio, fec_final } = req.query;
-        const response = yield database_1.pool.query('SELECT t.*, CAST(t.fec_hora_timbre AS VARCHAR) AS stimbre, CAST(t.fec_hora_timbre_servidor AS VARCHAR) AS stimbre_servidor FROM timbres as t WHERE id_empleado = $3 AND fec_hora_timbre BETWEEN $1 AND $2 ORDER BY fec_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo]);
+        const response = yield database_1.pool.query('SELECT t.*, CAST(t.fec_hora_timbre AS VARCHAR) AS stimbre, CAST(t.fec_hora_timbre_servidor AS VARCHAR) AS stimbre_servidor FROM timbres as t WHERE codigo = $3 AND fec_hora_timbre BETWEEN $1 AND $2 ORDER BY fec_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo]);
         const timbres = response.rows;
         // console.log(timbres);
         if (timbres.length === 0)
@@ -33,7 +33,7 @@ exports.getInfoReporteTimbres = getInfoReporteTimbres;
 const getInfoReporteTimbresNovedad = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { codigo, fec_inicio, fec_final, conexion } = req.query;
-        const response = yield database_1.pool.query('SELECT t.*, CAST(t.fec_hora_timbre AS VARCHAR) AS stimbre, CAST(t.fecha_subida_servidor AS VARCHAR) AS stimbre_servidor FROM timbres as t WHERE id_empleado = $3 AND fec_hora_timbre BETWEEN $1 AND $2 AND conexion = $4 ORDER BY fec_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo, conexion]);
+        const response = yield database_1.pool.query('SELECT t.*, CAST(t.fec_hora_timbre AS VARCHAR) AS stimbre, CAST(t.fecha_subida_servidor AS VARCHAR) AS stimbre_servidor FROM timbres as t WHERE codigo = $3 AND fec_hora_timbre BETWEEN $1 AND $2 AND conexion = $4 ORDER BY fec_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo, conexion]);
         const timbres = response.rows;
         // console.log(timbres);
         if (timbres.length === 0)
@@ -46,6 +46,7 @@ const getInfoReporteTimbresNovedad = (req, res) => __awaiter(void 0, void 0, voi
     }
 });
 exports.getInfoReporteTimbresNovedad = getInfoReporteTimbresNovedad;
+//TODO Revisar query incompleto
 const getInfoReporteInasistencia = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { codigo, fec_inicio, fec_final } = req.query;
@@ -84,7 +85,8 @@ const getInfoReporteHorasExtras = (req, res) => __awaiter(void 0, void 0, void 0
     try {
         const qReport = req.query;
         const { id_empleado, codigo, fec_inicio, fec_final } = qReport;
-        const horasExtras = yield (0, CalcularHorasExtras_1.CalcularHoraExtra)(parseInt(id_empleado), parseInt(codigo), new Date(fec_inicio), new Date(fec_final));
+        //TODO CalcularHoraExtra
+        const horasExtras = yield (0, CalcularHorasExtras_1.CalcularHoraExtra)(parseInt(id_empleado), codigo, new Date(fec_inicio), new Date(fec_final));
         console.log(horasExtras);
         if (horasExtras.message) {
             return res.status(400).jsonp(horasExtras);
@@ -99,6 +101,7 @@ const getInfoReporteHorasExtras = (req, res) => __awaiter(void 0, void 0, void 0
     }
 });
 exports.getInfoReporteHorasExtras = getInfoReporteHorasExtras;
+//TODO revisar query
 const getInfoReporteSolicitudes = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { codigo, fec_inicio, fec_final } = req.query;

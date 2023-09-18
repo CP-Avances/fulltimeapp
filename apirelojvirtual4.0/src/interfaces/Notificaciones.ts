@@ -45,5 +45,5 @@ export interface SettingsInfoEmpleado {
     correo: string;
     ndepartamento: string;
     nsucursal: string;
-    codigo: number;
+    codigo: number | string;
 }

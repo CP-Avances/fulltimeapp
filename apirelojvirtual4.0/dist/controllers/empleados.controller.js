@@ -26,7 +26,7 @@ const getListaEmpleados = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.getListaEmpleados = getListaEmpleados;
 const getUbicacion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const codigo = parseInt(req.params.codigo);
+        const codigo = req.params.codigo;
         const response = yield database_1.pool.query('SELECT longitud, latitud FROM empleados WHERE codigo = $1', [codigo]);
         const ubicacion = response.rows;
         console.log(ubicacion);

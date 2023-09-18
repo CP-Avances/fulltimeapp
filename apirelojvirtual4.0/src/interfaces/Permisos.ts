@@ -18,7 +18,7 @@ export interface Permiso {
     id_empl_cargo: number;
     hora_salida: string;
     hora_ingreso: string;
-    codigo: number;
+    codigo: number | string;
     ntipopermiso?: string;
     EmpleadosSendNotiEmail?: EmpleadosSendNotiEmail[];
 }

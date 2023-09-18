@@ -18,7 +18,7 @@ export const getlistaAlimentacionByIdEmpleado = async (req: Request, res: Respon
         const subquery4 = '( SELECT t.nombre from tipo_comida t, cg_tipo_comidas ct, detalle_menu i where i.id = a.id_comida AND i.id_menu = ct.id AND ct.tipo_comida = t.id )  as nservicio '
         const subquery5 = '( SELECT t.id from tipo_comida t, cg_tipo_comidas ct, detalle_menu i where i.id = a.id_comida AND i.id_menu = ct.id AND ct.tipo_comida = t.id )  as id_servicio '
         const subquery6 = '( SELECT i.id_menu from detalle_menu i where i.id = a.id_comida )  as id_plato '
-        const subquery7 = `(SELECT CAST (e.codigo AS INTEGER) FROM empleados AS e WHERE e.id = a.id_empleado) AS codigo`
+        const subquery7 = `(SELECT e.codigo FROM empleados AS e WHERE e.id = a.id_empleado) AS codigo`
 
         const query = `SELECT a.*, ${subquery}, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4}, 
         ${subquery5}, ${subquery6}, ${subquery7} FROM solicita_comidas a WHERE a.id_empleado = ${idEmpleado} 
@@ -44,7 +44,7 @@ export const getlistaAlimentacion = async (req: Request, res: Response): Promise
         const subquery2 = '( SELECT i.valor from detalle_menu i where i.id = a.id_comida )  as nvalor '
         const subquery3 = '( SELECT i.observacion from detalle_menu i where i.id = a.id_comida )  as ndetallecomida '
         const subquery4 = '( SELECT t.nombre from tipo_comida t, cg_tipo_comidas ct, detalle_menu i where i.id = a.id_comida AND i.id_menu = ct.id AND ct.tipo_comida = t.id )  as nservicio '
-        const subquery5 = `(SELECT CAST (e.codigo AS INTEGER) FROM empleados AS e WHERE e.id = a.id_empleado) AS codigo`
+        const subquery5 = `(SELECT e.codigo FROM empleados AS e WHERE e.id = a.id_empleado) AS codigo`
         const query = `SELECT a.*, ${subquery}, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4}, ${subquery5} FROM solicita_comidas a ORDER BY a.fecha DESC LIMIT 100`
         const response: QueryResult = await pool.query(query);
         const alimentacion: Alimentacion[] = response.rows;
@@ -68,7 +68,7 @@ export const getlistaAlimentacionByFechas = async (req: Request, res: Response):
         const subquery2 = '( SELECT i.valor from detalle_menu i where i.id = a.id_comida )  as nvalor '
         const subquery3 = '( SELECT i.observacion from detalle_menu i where i.id = a.id_comida )  as ndetallecomida '
         const subquery4 = '( SELECT t.nombre from tipo_comida t, cg_tipo_comidas ct, detalle_menu i where i.id = a.id_comida AND i.id_menu = ct.id AND ct.tipo_comida = t.id )  as nservicio '
-        const subquery5 = `(SELECT CAST (e.codigo AS INTEGER) FROM empleados AS e WHERE e.id = a.id_empleado) AS codigo`
+        const subquery5 = `(SELECT e.codigo FROM empleados AS e WHERE e.id = a.id_empleado) AS codigo`
         
         const query = `SELECT a.*, ${subquery}, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4}, ${subquery5} 
         FROM solicita_comidas a WHERE a.fec_comida BETWEEN \'${fec_inicio}\' AND \'${fec_final}\' 

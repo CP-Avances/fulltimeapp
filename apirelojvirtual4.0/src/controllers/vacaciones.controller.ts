@@ -15,7 +15,7 @@ export const getlistaVacacionesByCodigo = async (req: Request, res: Response): P
 
         const subquery1 = '( SELECT i.descripcion FROM peri_vacaciones i WHERE i.id = v.id_peri_vacacion) AS nperivacacion '
         const subquery2 = '( SELECT t.cargo FROM empl_cargos i, tipo_cargo t WHERE i.id = v.id_empl_cargo AND i.cargo = t.id) AS ncargo '
-        const subquery3 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo::int = v.codigo) AS id_contrato '
+        const subquery3 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo = v.codigo) AS id_contrato '
 
         const query = `SELECT v.*, ${subquery1}, ${subquery2}, ${subquery3} FROM vacaciones v WHERE v.codigo = ${codigo} ORDER BY v.fec_inicio DESC LIMIT 100`
         const response: QueryResult = await pool.query(query);
@@ -35,9 +35,9 @@ export const getlistaVacaciones = async (req: Request, res: Response): Promise<R
     try {
         const subquery1 = '( SELECT i.descripcion FROM peri_vacaciones i WHERE i.id = v.id_peri_vacacion) AS nperivacacion '
         const subquery2 = '( SELECT t.cargo FROM empl_cargos i, tipo_cargo t WHERE i.id = v.id_empl_cargo AND i.cargo = t.id) AS ncargo '
-        const subquery3 = '( SELECT (nombre || \' \' || apellido) FROM empleados i WHERE i.codigo = CAST(v.codigo AS VARCHAR) ) AS nempleado '
-        const subquery4 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo::int = v.codigo) AS id_contrato '
-        const subquery5 = '( SELECT da.id_departamento FROM datos_actuales_empleado AS da WHERE da.codigo::int = v.codigo ) AS id_departamento '
+        const subquery3 = '( SELECT (nombre || \' \' || apellido) FROM empleados i WHERE i.codigo = v.codigo) AS nempleado '
+        const subquery4 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo = v.codigo) AS id_contrato '
+        const subquery5 = '( SELECT da.id_departamento FROM datos_actuales_empleado AS da WHERE da.codigo = v.codigo ) AS id_departamento '
 
         const query = `SELECT v.*, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4}, ${subquery5} FROM vacaciones v ORDER BY v.fec_inicio DESC LIMIT 100`
         const response: QueryResult = await pool.query(query);
@@ -58,9 +58,9 @@ export const getlistaVacacionesByFechas = async (req: Request, res: Response): P
         const { fec_inicio, fec_final } = req.query;
         const subquery1 = '( SELECT i.descripcion FROM peri_vacaciones i WHERE i.id = v.id_peri_vacacion) AS nperivacacion '
         const subquery2 = '( SELECT t.cargo FROM empl_cargos i, tipo_cargo t WHERE i.id = v.id_empl_cargo AND i.cargo = t.id) AS ncargo '
-        const subquery3 = '( SELECT (nombre || \' \' || apellido) FROM empleados i WHERE i.codigo = CAST(v.codigo AS VARCHAR) ) AS nempleado '
-        const subquery4 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo::int = v.codigo) AS id_contrato '
-        const subquery5 = '( SELECT da.id_departamento FROM datos_actuales_empleado AS da WHERE da.codigo::int = v.codigo ) AS id_departamento '
+        const subquery3 = '( SELECT (nombre || \' \' || apellido) FROM empleados i WHERE i.codigo = v.codigo) AS nempleado '
+        const subquery4 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo = v.codigo) AS id_contrato '
+        const subquery5 = '( SELECT da.id_departamento FROM datos_actuales_empleado AS da WHERE da.codigo = v.codigo ) AS id_departamento '
 
         const query = `SELECT v.*, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4}, ${subquery5} 
         FROM vacaciones v WHERE v.fec_inicio BETWEEN \'${fec_inicio}\' AND \'${fec_final}\' 
@@ -83,7 +83,7 @@ export const getlistaVacacionesByFechas = async (req: Request, res: Response): P
     try {
         const { fec_inicio, fec_final, codigo } = req.query;
 
-        const query = `SELECT v.* FROM vacaciones v WHERE v.codigo = \'${codigo}'\ AND (
+        const query = `SELECT v.* FROM vacaciones v WHERE v.codigo = ${codigo} AND (
             ((\'${fec_inicio}\' BETWEEN v.fec_inicio AND v.fec_final ) OR 
              (\'${fec_final}\' BETWEEN v.fec_inicio AND v.fec_final)) 
             OR
