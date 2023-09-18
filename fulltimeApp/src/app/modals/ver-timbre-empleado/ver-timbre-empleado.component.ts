@@ -43,7 +43,7 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
   fechaIn: string = "";
   fechaFi: string = "";
 
-  idEmpleado: number;
+  codigo: number | string;
 
   constructor(
     private dataUserService: DataUserLoggedService,
@@ -231,10 +231,10 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
   }
 
   filtrarFechas(codigo) {
-    this.idEmpleado = codigo
+    this.codigo = codigo
     this.timbres_filtro = [];
     if (this.fechaInicio < this.fechaFinal) {
-      var datos = { fecInicio: this.fechaInicio, fecFinal: this.fechaFinal, id_empleado: this.idEmpleado }
+      var datos = { fecInicio: this.fechaInicio, fecFinal: this.fechaFinal, codigo: this.codigo }
       this.filtimbre.PostFiltrotimbres(datos).subscribe(
         ress => {
           let fechasObjeto_f = {}

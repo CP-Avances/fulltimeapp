@@ -21,7 +21,7 @@ export class ReportesService {
     private http: HttpClient
   ) { }
 
-  getInfoReporteTimbres(codigo: number, fec_inicio: any, fec_final: any): Observable<Timbre[]> {
+  getInfoReporteTimbres(codigo: number | string, fec_inicio: any, fec_final: any): Observable<Timbre[]> {
     const params = new HttpParams()
       .set('codigo', codigo)
       .set('fec_inicio', fec_inicio)
@@ -33,7 +33,7 @@ export class ReportesService {
       )
   }
 
-  getInfoReporteTimbresNovedad(codigo: number, fec_inicio: any, fec_final: any, conexion: boolean): Observable<Timbre[]> {
+  getInfoReporteTimbresNovedad(codigo: number | string, fec_inicio: any, fec_final: any, conexion: boolean): Observable<Timbre[]> {
     const params = new HttpParams()
       .set('codigo', codigo)
       .set('fec_inicio', fec_inicio)

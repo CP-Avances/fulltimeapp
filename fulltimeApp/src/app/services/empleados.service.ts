@@ -24,7 +24,7 @@ export class EmpleadosService {
   }
 
 
-  ObtenerHorariosEmpleado(codigo: number) {
+  ObtenerHorariosEmpleado(codigo: number | string) {
     const params = new HttpParams()
       .set('codigo', codigo);
     return this.http.get<HorarioE[]>(`${this.apiUrl}/empleado/horarios`, { params })
@@ -63,7 +63,7 @@ export class EmpleadosService {
       )
   }
 
-  ObtenerUnHorarioEmpleado(codigo: number, fecha_hoy: any) {
+  ObtenerUnHorarioEmpleado(codigo: number | string, fecha_hoy: any) {
     const params = new HttpParams()
       .set('codigo', codigo)
       .set('fecha_hoy', fecha_hoy.split(' ')[0]);

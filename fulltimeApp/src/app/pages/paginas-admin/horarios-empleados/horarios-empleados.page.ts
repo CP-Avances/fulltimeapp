@@ -21,7 +21,7 @@ export class HorariosEmpleadosPage implements OnInit {
   ngOnInit() {
   }
 
-  async presentModal(codigo: number) {
+  async presentModal(codigo: number | string) {
     console.log('entro a modal...');
     
     const modal = await this.modalController.create({

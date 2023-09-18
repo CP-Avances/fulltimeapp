@@ -21,7 +21,7 @@ export const getTimbreById = async (req: Request, res: Response): Promise<Respon
     try {
 
         const id = parseInt(req.params.idUsuario);
-        const response: QueryResult = await pool.query('SELECT * FROM timbres WHERE id_empleado = $1 ORDER BY fec_hora_timbre DESC LIMIT 100', [id]);
+        const response: QueryResult = await pool.query('SELECT * FROM timbres WHERE codigo = $1 ORDER BY fec_hora_timbre DESC LIMIT 100', [id]);
         const timbres: Timbre[] = response.rows;
         return res.jsonp(timbres);
     } catch (error) {
@@ -52,11 +52,11 @@ export const crearTimbre = async (req: Request, res: Response) => {
             timbre.hora_timbre_diferente = false;
         }
         const response = await pool.query('INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, ' +
-            'observacion, latitud, longitud, id_empleado, id_reloj, tipo_autenticacion, ' +
+            'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
             'dispositivo_timbre, fec_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion) ' +
             'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16);',
             [timbre.fec_hora_timbre, timbre.accion, timbre.tecl_funcion, timbre.observacion,
-            timbre.latitud, timbre.longitud, timbre.id_empleado, timbre.id_reloj,
+            timbre.latitud, timbre.longitud, timbre.codigo, timbre.id_reloj,
             timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fec_hora_timbre_servidor,
             timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion]);
         res.jsonp({
@@ -92,11 +92,11 @@ export const crearTimbreDesconectado = async (req: Request, res: Response) => {
         }
 
         const response = await pool.query('INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, ' +
-            'observacion, latitud, longitud, id_empleado, id_reloj, tipo_autenticacion, ' +
+            'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
             'dispositivo_timbre, fec_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion) ' +
             'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16);',
             [timbre.fec_hora_timbre, timbre.accion, timbre.tecl_funcion, timbre.observacion,
-            timbre.latitud, timbre.longitud, timbre.id_empleado, timbre.id_reloj,
+            timbre.latitud, timbre.longitud, timbre.codigo, timbre.id_reloj,
             timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fec_hora_timbre_servidor,
             timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion]);
         res.jsonp({
@@ -113,10 +113,10 @@ export const crearTimbreDesconectado = async (req: Request, res: Response) => {
 
 export const crearTimbreJustificadoAdmin = async (req: Request, res: Response) => {
     try {
-        const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_empleado,id_reloj } = req.body
+        const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,id_reloj } = req.body
         console.log(req.body);
 
-        const [timbre] = await pool.query('INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_empleado, id_reloj) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id', [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_empleado, id_reloj])
+        const [timbre] = await pool.query('INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id', [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj])
             .then(result => {
                 return result.rows;
             });

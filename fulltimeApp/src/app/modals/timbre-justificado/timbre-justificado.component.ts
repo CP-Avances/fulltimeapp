@@ -65,7 +65,7 @@ export class TimbreJustificadoComponent  implements OnInit {
       observacion: 'Timbre creado por Administrador ' + this.fullnameAdmin,
       latitud: null,
       longitud: null,
-      id_empleado: this.data.codigo,
+      codigo: this.data.codigo,
       id_reloj: 97,
     }
 

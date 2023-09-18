@@ -13,7 +13,7 @@ export class TimbresService {
     private http: HttpClient
   ) { }
 
-  getTimbresEmpleadoByCodigo(codigo: number) {
+  getTimbresEmpleadoByCodigo(codigo: number | string) {
     return this.http.get<any>(`${this.api_url}/ring/timbreEmpleado/${codigo}`)
   }
 
