@@ -50,7 +50,7 @@ export class PermisosListaComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.codigo = localStorage.getItem('codigo')
+    this.codigo = String(localStorage.getItem('codigo'));
     this.BuscarFormatos();
     this.cambioPaginaActual();
   }

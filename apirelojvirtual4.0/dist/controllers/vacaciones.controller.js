@@ -22,7 +22,7 @@ const getlistaVacacionesByCodigo = (req, res) => __awaiter(void 0, void 0, void 
         const subquery1 = '( SELECT i.descripcion FROM peri_vacaciones i WHERE i.id = v.id_peri_vacacion) AS nperivacacion ';
         const subquery2 = '( SELECT t.cargo FROM empl_cargos i, tipo_cargo t WHERE i.id = v.id_empl_cargo AND i.cargo = t.id) AS ncargo ';
         const subquery3 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo = v.codigo) AS id_contrato ';
-        const query = `SELECT v.*, ${subquery1}, ${subquery2}, ${subquery3} FROM vacaciones v WHERE v.codigo = ${codigo} ORDER BY v.fec_inicio DESC LIMIT 100`;
+        const query = `SELECT v.*, ${subquery1}, ${subquery2}, ${subquery3} FROM vacaciones v WHERE v.codigo = '${codigo}' ORDER BY v.fec_inicio DESC LIMIT 100`;
         const response = yield database_1.pool.query(query);
         const vacaciones = response.rows;
         return res.status(200).jsonp(vacaciones);
@@ -87,7 +87,7 @@ exports.getlistaVacacionesByFechas = getlistaVacacionesByFechas;
 const getlistaVacacionesByFechasyCodigo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { fec_inicio, fec_final, codigo } = req.query;
-        const query = `SELECT v.* FROM vacaciones v WHERE v.codigo = ${codigo} AND (
+        const query = `SELECT v.* FROM vacaciones v WHERE v.codigo = '${codigo}' AND (
             ((\'${fec_inicio}\' BETWEEN v.fec_inicio AND v.fec_final ) OR 
              (\'${fec_final}\' BETWEEN v.fec_inicio AND v.fec_final)) 
             OR
@@ -216,7 +216,7 @@ const listarPeriVacaciones = (req, res) => __awaiter(void 0, void 0, void 0, fun
     try {
         const { codigo } = req.query;
         const query = `
-            SELECT periv.* FROM peri_vacaciones AS periv WHERE periv.codigo = ${codigo} 
+            SELECT periv.* FROM peri_vacaciones AS periv WHERE periv.codigo = '${codigo}' 
             `;
         const response = yield database_1.pool.query(query);
         const vacaciones = response.rows;

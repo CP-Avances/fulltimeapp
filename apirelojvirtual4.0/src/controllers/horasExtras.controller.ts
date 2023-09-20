@@ -59,7 +59,7 @@ export const getlistaHorasExtrasByCodigo = async (req: Request, res: Response): 
         const subquery2 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo = h.codigo ) AS id_contrato '
 
         const query = `SELECT h.*, ${subquery1}, ${subquery2} 
-        FROM hora_extr_pedidos h WHERE h.codigo = ${codigo} 
+        FROM hora_extr_pedidos h WHERE h.codigo = '${codigo}' 
         ORDER BY h.fec_inicio DESC LIMIT 100`
         const response: QueryResult = await pool.query(query);
         const horas_extras: HoraExtra[] = response.rows;
@@ -80,7 +80,7 @@ export const getlistaHorasExtrasByCodigo = async (req: Request, res: Response): 
     try {
         const { fec_inicio, fec_final, codigo } = req.query;
 
-        const query = `SELECT h.* FROM hora_extr_pedidos h WHERE h.codigo = ${codigo} AND (
+        const query = `SELECT h.* FROM hora_extr_pedidos h WHERE h.codigo = '${codigo}' AND (
             ((\'${fec_inicio}\' BETWEEN h.fec_inicio AND h.fec_final ) OR 
              (\'${fec_final}\' BETWEEN h.fec_inicio AND h.fec_final)) 
             OR

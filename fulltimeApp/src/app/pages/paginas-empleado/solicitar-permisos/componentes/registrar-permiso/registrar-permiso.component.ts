@@ -129,7 +129,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.reg.fec_creacion = this.tiempo.format('YYYY-MM-DD');
     this.reg.num_permiso = this.num_permiso;
     this.reg.estado = 1;
-    this.reg.codigo = parseInt(localStorage.getItem('codigo'));
+    this.reg.codigo = localStorage.getItem('codigo');
     this.reg.id_peri_vacacion = parseInt(localStorage.getItem('cperi_vacacion'));
     this.reg.id_empl_cargo = parseInt(localStorage.getItem('ccargo')!)
     this.reg.id_empl_contrato = parseInt(localStorage.getItem('ccontr')!)
@@ -157,6 +157,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     )
   }
 
+  //TODO obtenerInformacionEmpleado
   solInfo: any;
   obtenerInformacionEmpleado() {
     this.autorizaciones.getInfoEmpleadoByCodigo(this.reg.codigo).subscribe(

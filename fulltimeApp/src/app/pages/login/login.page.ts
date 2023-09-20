@@ -104,10 +104,10 @@ export class LoginPage implements OnInit {
         res => {
           this.iniciandoSesion = false;
           this.usuarioObtenido = res.body.usuario;
-          const id_empleado = parseInt((this.usuarioObtenido.codigo));
+          const codigo = this.usuarioObtenido.codigo;
           let existeId_Dispositivo: boolean;
 
-          this.relojService.obtenerIdDispositivosUsuario(id_empleado).subscribe(
+          this.relojService.obtenerIdDispositivosUsuario(codigo).subscribe(
                 dispositivos => {
                 
                   //Buscar el id_dispositivo y el id_empleado si son el mismo

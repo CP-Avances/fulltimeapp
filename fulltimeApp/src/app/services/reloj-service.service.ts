@@ -48,7 +48,7 @@ export class RelojServiceService {
     return this.http.post<any>(this.URL + '/user/ingresarIDdispositivo', { id_empleado, id_celular, modelo_dispositivo });
   }
 
-  obtenerIdDispositivosUsuario(id_empleado: number) {
+  obtenerIdDispositivosUsuario(id_empleado: number | string) {
     return this.http.get<any>(this.URL + '/user/IDdispositivos/' + id_empleado);
   }
 

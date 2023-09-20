@@ -68,7 +68,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.tiempo = moment();
     this.reg.estado = 1;
-    this.reg.codigo = parseInt(localStorage.getItem('codigo'));
+    this.reg.codigo = localStorage.getItem('codigo');
     this.reg.fec_solicita = this.tiempo.format('YYYY-MM-DD');
     this.reg.id_empl_cargo = parseInt(localStorage.getItem('ccargo'));
     this.reg.id_usua_solicita = parseInt(localStorage.getItem('empleadoID'));
@@ -205,7 +205,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     const minutosfinal = moment(this.reg.hora_ingreso).format('HH:mm');
     const fec_inicio = (moment(this.reg.fec_inicio).format('YYYY-MM-DD')) + ' ' + minutosinicio;
     const fec_final = (moment(this.reg.fec_final).format('YYYY-MM-DD')) + ' ' + minutosfinal;
-    const codigo = parseInt(localStorage.getItem('codigo'));
+    const codigo = localStorage.getItem('codigo');
 
     this.horasExtrasService.getlistaHorasExtrasByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
       if(solicitados.length != 0){

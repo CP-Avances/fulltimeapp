@@ -156,7 +156,7 @@ const getInfoEmpleadoByCodigo = (req, res) => __awaiter(void 0, void 0, void 0, 
             (SELECT cd.nombre FROM cg_departamentos AS cd WHERE cd.id = da.id_departamento) AS ndepartamento,
             (SELECT s.nombre FROM sucursales AS s WHERE s.id = da.id_sucursal) AS nsucursal
             FROM datos_actuales_empleado AS da, config_noti AS cn            
-            WHERE da.codigo = ${codigo} AND cn.id_empleado = da.id
+            WHERE da.codigo = '${codigo}' AND cn.id_empleado = da.id
             `;
         const response = yield database_1.pool.query(query);
         const [infoEmpleado] = response.rows;

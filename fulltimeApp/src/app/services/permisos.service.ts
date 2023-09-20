@@ -74,7 +74,7 @@ export class PermisosService {
       )
   }
 
-  getListaPermisosByCodigo(codigo: number | string): Observable<Permiso[]> {
+  getListaPermisosByCodigo(codigo: string): Observable<Permiso[]> {
     const url = `${this.apiUrl}/permisos/lista-permisos`;
     const params = new HttpParams().set('codigo', codigo)
     return this.http.get<Permiso[]>(url, { params })
