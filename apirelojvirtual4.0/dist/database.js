@@ -6,7 +6,7 @@ exports.pool = new pg_1.Pool({
     user: 'fulltime',
     host: '192.168.0.156',
     password: 'fulltime',
-    database: 'fulltime4_prueba',
+    database: 'fulltime4_juan',
     port: 5432
     /*user: 'postgres',
     host: 'localhost',

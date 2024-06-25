@@ -17,7 +17,7 @@ const VerDetalleParametro = (req, res) => __awaiter(void 0, void 0, void 0, func
         const id = parseInt(req.params.id);
         const response = yield database_1.pool.query('SELECT tp.id AS id_tipo, tp.descripcion AS tipo, ' +
             'dtp.id AS id_detalle, dtp.descripcion ' +
-            'FROM tipo_parametro AS tp, detalle_tipo_parametro AS dtp ' +
+            'FROM ep_parametro AS tp, ep_detalle_parametro AS dtp ' +
             'WHERE tp.id = dtp.id_tipo_parametro AND tp.id = $1', [id]);
         const detalle = response.rows;
         console.log(detalle);
@@ -50,9 +50,9 @@ exports.CompararCoordenadas = CompararCoordenadas;
 const BuscarCoordenadasUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { codigo } = req.params;
-        const response = yield database_1.pool.query('SELECT eu.id AS id_emplu, eu.codigo, eu.id_ubicacion, eu.id_empl, ' +
+        const response = yield database_1.pool.query('SELECT eu.id AS id_emplu, eu.codigo, eu.id_ubicacion, eu.id_empleado, ' +
             'cu.latitud, cu.longitud, cu.descripcion ' +
-            'FROM empl_ubicacion AS eu, cg_ubicaciones AS cu ' +
+            'FROM mg_empleado_ubicacion AS eu, mg_cat_ubicaciones AS cu ' +
             'WHERE eu.id_ubicacion = cu.id AND eu.codigo = $1', [codigo]);
         console.log(response.rows);
         return res.jsonp(response.rows);
@@ -81,7 +81,7 @@ const BuscarFechasHoras = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.BuscarFechasHoras = BuscarFechasHoras;
 const BuscarFunciones = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const response = yield database_1.pool.query('SELECT * FROM funciones');
+        const response = yield database_1.pool.query('SELECT * FROM e_funciones');
         console.log(response.rows);
         return res.jsonp(response.rows);
     }

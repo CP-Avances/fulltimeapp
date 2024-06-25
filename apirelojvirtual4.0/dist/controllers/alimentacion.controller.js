@@ -18,16 +18,16 @@ const database_1 = require("../database");
 const getlistaAlimentacionByIdEmpleado = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { idEmpleado } = req.query;
-        const subquery = '( SELECT (nombre || \' \' || apellido) from empleados i where i.id = a.id_empleado) as nempleado ';
-        const subquery1 = '( SELECT i.nombre from detalle_menu i where i.id = a.id_comida ) as ncomida ';
-        const subquery2 = '( SELECT i.valor from detalle_menu i where i.id = a.id_comida )  as nvalor ';
-        const subquery3 = '( SELECT i.observacion from detalle_menu i where i.id = a.id_comida )  as ndetallecomida ';
-        const subquery4 = '( SELECT t.nombre from tipo_comida t, cg_tipo_comidas ct, detalle_menu i where i.id = a.id_comida AND i.id_menu = ct.id AND ct.tipo_comida = t.id )  as nservicio ';
-        const subquery5 = '( SELECT t.id from tipo_comida t, cg_tipo_comidas ct, detalle_menu i where i.id = a.id_comida AND i.id_menu = ct.id AND ct.tipo_comida = t.id )  as id_servicio ';
-        const subquery6 = '( SELECT i.id_menu from detalle_menu i where i.id = a.id_comida )  as id_plato ';
-        const subquery7 = `(SELECT e.codigo FROM empleados AS e WHERE e.id = a.id_empleado) AS codigo`;
+        const subquery = '( SELECT (nombre || \' \' || apellido) from eu_empleados i where i.id = a.id_empleado) as nempleado ';
+        const subquery1 = '( SELECT i.nombre from ma_detalle_comida i where i.id = a.id_detalle_comida ) as ncomida ';
+        const subquery2 = '( SELECT i.valor from ma_detalle_comida i where i.id = a.id_detalle_comida )  as nvalor ';
+        const subquery3 = '( SELECT i.observacion from ma_detalle_comida i where i.id = a.id_detalle_comida )  as ndetallecomida ';
+        const subquery4 = '( SELECT t.nombre from ma_cat_comidas t, ma_horario_comidas ct, ma_detalle_comida i where i.id = a.id_detalle_comida AND i.id_horario_comida = ct.id AND ct.id_comida = t.id )  as nservicio ';
+        const subquery5 = '( SELECT t.id from ma_cat_comidas t, ma_horario_comidas ct, ma_detalle_comida i where i.id = a.id_detalle_comida AND i.id_horario_comida = ct.id AND ct.id_comida = t.id )  as id_servicio ';
+        const subquery6 = '( SELECT i.id_horario_comida,  from ma_detalle_comida i where i.id = a.id_comida )  as id_plato ';
+        const subquery7 = `(SELECT e.codigo FROM eu_empleados AS e WHERE e.id = a.id_empleado) AS codigo`;
         const query = `SELECT a.*, ${subquery}, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4}, 
-        ${subquery5}, ${subquery6}, ${subquery7} FROM solicita_comidas a WHERE a.id_empleado = ${idEmpleado} 
+        ${subquery5}, ${subquery6}, ${subquery7} FROM ma_solicitud_comida a WHERE a.id_empleado = ${idEmpleado} 
         ORDER BY a.fecha DESC LIMIT 100`;
         const response = yield database_1.pool.query(query);
         const alimentacion = response.rows;
@@ -46,13 +46,13 @@ exports.getlistaAlimentacionByIdEmpleado = getlistaAlimentacionByIdEmpleado;
  */
 const getlistaAlimentacion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const subquery = '( SELECT (i.nombre || \' \' || i.apellido) from empleados i where i.id = a.id_empleado) as nempleado ';
-        const subquery1 = '( SELECT i.nombre from detalle_menu i where i.id = a.id_comida ) as ncomida ';
-        const subquery2 = '( SELECT i.valor from detalle_menu i where i.id = a.id_comida )  as nvalor ';
-        const subquery3 = '( SELECT i.observacion from detalle_menu i where i.id = a.id_comida )  as ndetallecomida ';
-        const subquery4 = '( SELECT t.nombre from tipo_comida t, cg_tipo_comidas ct, detalle_menu i where i.id = a.id_comida AND i.id_menu = ct.id AND ct.tipo_comida = t.id )  as nservicio ';
-        const subquery5 = `(SELECT e.codigo FROM empleados AS e WHERE e.id = a.id_empleado) AS codigo`;
-        const query = `SELECT a.*, ${subquery}, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4}, ${subquery5} FROM solicita_comidas a ORDER BY a.fecha DESC LIMIT 100`;
+        const subquery = '( SELECT (i.nombre || \' \' || i.apellido) from eu_empleados i where i.id = a.id_empleado) as nempleado ';
+        const subquery1 = '( SELECT i.nombre from ma_detalle_comida i where i.id = a.id_detalle_comida ) as ncomida ';
+        const subquery2 = '( SELECT i.valor from ma_detalle_comida i where i.id = a.id_detalle_comida )  as nvalor ';
+        const subquery3 = '( SELECT i.observacion from ma_detalle_comida i where i.id = a.id_detalle_comida )  as ndetallecomida ';
+        const subquery4 = '( SELECT t.nombre from ma_cat_comidas t, ma_horario_comidas ct, ma_detalle_comida i where i.id = a.id_detalle_comida AND i.id_horario_comida = ct.id AND ct.id_comida = t.id )  as nservicio ';
+        const subquery5 = `(SELECT e.codigo FROM eu_empleados AS e WHERE e.id = a.id_empleado) AS codigo`;
+        const query = `SELECT a.*, ${subquery}, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4}, ${subquery5} FROM ma_solicitud_comida a ORDER BY a.fecha DESC LIMIT 100`;
         const response = yield database_1.pool.query(query);
         const alimentacion = response.rows;
         return res.status(200).jsonp(alimentacion);
@@ -70,15 +70,15 @@ exports.getlistaAlimentacion = getlistaAlimentacion;
 const getlistaAlimentacionByFechas = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { fec_inicio, fec_final } = req.query;
-        const subquery = '( SELECT (i.nombre || \' \' || i.apellido) from empleados i where i.id = a.id_empleado) as nempleado ';
-        const subquery1 = '( SELECT i.nombre from detalle_menu i where i.id = a.id_comida ) as ncomida ';
-        const subquery2 = '( SELECT i.valor from detalle_menu i where i.id = a.id_comida )  as nvalor ';
-        const subquery3 = '( SELECT i.observacion from detalle_menu i where i.id = a.id_comida )  as ndetallecomida ';
-        const subquery4 = '( SELECT t.nombre from tipo_comida t, cg_tipo_comidas ct, detalle_menu i where i.id = a.id_comida AND i.id_menu = ct.id AND ct.tipo_comida = t.id )  as nservicio ';
-        const subquery5 = `(SELECT e.codigo FROM empleados AS e WHERE e.id = a.id_empleado) AS codigo`;
+        const subquery = '( SELECT (i.nombre || \' \' || i.apellido) from eu_empleados i where i.id = a.id_empleado) as nempleado ';
+        const subquery1 = '( SELECT i.nombre from ma_detalle_comida i where i.id = a.id_detalle_comida ) as ncomida ';
+        const subquery2 = '( SELECT i.valor from ma_detalle_comida i where i.id = a.id_detalle_comida )  as nvalor ';
+        const subquery3 = '( SELECT i.observacion from ma_detalle_comida i where i.id = a.id_detalle_comida )  as ndetallecomida ';
+        const subquery4 = '( SELECT t.nombre from ma_cat_comidas t, ma_horario_comidas ct, ma_detalle_comida i where i.id = a.id_detalle_comida AND i.id_horario_comida = ct.id AND ct.id_comida = t.id )  as nservicio ';
+        const subquery5 = `(SELECT e.codigo FROM eu_empleados AS e WHERE e.id = a.id_empleado) AS codigo`;
         const query = `SELECT a.*, ${subquery}, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4}, ${subquery5} 
-        FROM solicita_comidas a WHERE a.fec_comida BETWEEN \'${fec_inicio}\' AND \'${fec_final}\' 
-        ORDER BY a.fec_comida DESC LIMIT 100`;
+        FROM ma_solicitud_comida a WHERE a.fecha_comida BETWEEN \'${fec_inicio}\' AND \'${fec_final}\' 
+        ORDER BY a.fecha_comida DESC LIMIT 100`;
         const response = yield database_1.pool.query(query);
         const alimentacion = response.rows;
         return res.status(200).jsonp(alimentacion);
@@ -96,9 +96,9 @@ exports.getlistaAlimentacionByFechas = getlistaAlimentacionByFechas;
 const getlistaAlimentacionByFechasyCodigo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { fec_comida, id_empleado } = req.query;
-        const query = `SELECT a.* FROM solicita_comidas a 
+        const query = `SELECT a.* FROM ma_solicitud_comida a 
                         WHERE a.id_empleado = \'${id_empleado}'\ 
-                        AND ((\'${fec_comida}\' =  a.fec_comida))`;
+                        AND ((\'${fec_comida}\' =  a.fecha_comida))`;
         const response = yield database_1.pool.query(query);
         const vacaciones = response.rows;
         return res.status(200).jsonp(vacaciones);
@@ -117,7 +117,7 @@ const postNuevoAlimentacion = (req, res) => __awaiter(void 0, void 0, void 0, fu
     try {
         const { extra, fec_comida, fecha, hora_fin, hora_inicio, id_comida, id_empleado, observacion, verificar } = req.body;
         console.log(req.body);
-        const response = yield database_1.pool.query('INSERT INTO solicita_comidas (extra, fec_comida, fecha, hora_fin, hora_inicio, id_comida, ' +
+        const response = yield database_1.pool.query('INSERT INTO solicita_comidas (extra, fecha_comida, fecha, hora_fin, hora_inicio, id_detalle_comida, ' +
             'id_empleado, observacion, verificar) ' +
             'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *', [extra, fec_comida, fecha, hora_fin, hora_inicio, id_comida, id_empleado, observacion, verificar]);
         const [objetoAlimento] = response.rows;

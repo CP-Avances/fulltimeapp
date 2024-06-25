@@ -9,7 +9,7 @@ export const VerDetalleParametro = async (req: Request, res: Response): Promise<
         const id = parseInt(req.params.id);
         const response: QueryResult = await pool.query('SELECT tp.id AS id_tipo, tp.descripcion AS tipo, ' +
             'dtp.id AS id_detalle, dtp.descripcion ' +
-            'FROM tipo_parametro AS tp, detalle_tipo_parametro AS dtp ' +
+            'FROM ep_parametro AS tp, ep_detalle_parametro AS dtp ' +
             'WHERE tp.id = dtp.id_tipo_parametro AND tp.id = $1', [id]);
         const detalle: DetalleParametro[] = response.rows;
         console.log(detalle);
@@ -43,9 +43,9 @@ export const BuscarCoordenadasUsuario = async (req: Request, res: Response): Pro
     try {
         const { codigo } = req.params;
 
-        const response: QueryResult = await pool.query('SELECT eu.id AS id_emplu, eu.codigo, eu.id_ubicacion, eu.id_empl, ' +
+        const response: QueryResult = await pool.query('SELECT eu.id AS id_emplu, eu.codigo, eu.id_ubicacion, eu.id_empleado, ' +
             'cu.latitud, cu.longitud, cu.descripcion ' +
-            'FROM empl_ubicacion AS eu, cg_ubicaciones AS cu ' +
+            'FROM mg_empleado_ubicacion AS eu, mg_cat_ubicaciones AS cu ' +
             'WHERE eu.id_ubicacion = cu.id AND eu.codigo = $1',
             [codigo]);
 
@@ -75,7 +75,7 @@ export const BuscarFechasHoras = async (req: Request, res: Response): Promise<Re
 
 export const BuscarFunciones = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const response: QueryResult = await pool.query('SELECT * FROM funciones');
+        const response: QueryResult = await pool.query('SELECT * FROM e_funciones');
 
         console.log(response.rows);
         return res.jsonp(response.rows);
