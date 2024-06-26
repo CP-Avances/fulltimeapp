@@ -11,7 +11,7 @@ import { Cg_TipoPermiso } from '../interfaces/Catalogos';
 export const getCgFeriados = async (req: Request, res: Response): Promise<Response> => {
     try {
         const fecha = new Date();
-        const response: QueryResult = await pool.query('SELECT id, descripcion, CAST(fecha AS VARCHAR),CAST(fec_recuperacion AS VARCHAR) FROM cg_feriados WHERE CAST(fecha AS VARCHAR) LIKE $1 || \'%\' ORDER BY descripcion ASC', [fecha.toJSON().split("-")[0]]);
+        const response: QueryResult = await pool.query('SELECT id, descripcion, CAST(fecha AS VARCHAR),CAST(fecha_recuperacion AS VARCHAR) FROM ef_cat_feriados WHERE CAST(fecha AS VARCHAR) LIKE $1 || \'%\' ORDER BY descripcion ASC', [fecha.toJSON().split("-")[0]]);
         const cg_feriados: Cg_Feriados[] = response.rows;
         console.log('cg_feriados: ',cg_feriados);
         return res.status(200).jsonp(cg_feriados);
@@ -28,7 +28,7 @@ export const getCgFeriados = async (req: Request, res: Response): Promise<Respon
  */
 export const getCgTipoPermisos = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const response: QueryResult = await pool.query('SELECT cg.* FROM cg_tipo_permisos cg ORDER BY cg.descripcion ASC');
+        const response: QueryResult = await pool.query('SELECT cg.* FROM mp_cat_tipo_permisos cg ORDER BY cg.descripcion ASC');
         const cg_permisos: Cg_TipoPermiso[] = response.rows;
         return res.status(200).jsonp(cg_permisos);
     } catch (error) {
@@ -44,7 +44,7 @@ export const getCgTipoPermisos = async (req: Request, res: Response): Promise<Re
 
 export const getServiciosComida = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const response: QueryResult = await pool.query('SELECT * FROM tipo_comida');
+        const response: QueryResult = await pool.query('SELECT * FROM ma_cat_comidas');
         const servicios_comida: Servicios_Comida[] = response.rows;
         return res.status(200).jsonp(servicios_comida);
     } catch (error) {
@@ -59,7 +59,7 @@ export const getServiciosComida = async (req: Request, res: Response): Promise<R
 
 export const getServiciosMenu = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const response: QueryResult = await pool.query('SELECT * FROM cg_tipo_comidas');
+        const response: QueryResult = await pool.query('SELECT * FROM ma_horario_comidas');
         const menu: Menu_Servicios[] = response.rows;
         return res.status(200).jsonp(menu);
     } catch (error) {
@@ -74,7 +74,7 @@ export const getServiciosMenu = async (req: Request, res: Response): Promise<Res
 
 export const getDetalleMenu = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const response: QueryResult = await pool.query('SELECT cg.* FROM detalle_menu cg ORDER BY cg.valor ASC');
+        const response: QueryResult = await pool.query('SELECT cg.* FROM ma_detalle_comida cg ORDER BY cg.valor ASC');
         const cg_detalle_menu: Cg_DetalleMenu[] = response.rows;
         return res.status(200).jsonp(cg_detalle_menu);
     } catch (error) {

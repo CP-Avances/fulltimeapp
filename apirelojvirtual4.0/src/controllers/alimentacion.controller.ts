@@ -118,24 +118,29 @@ export const postNuevoAlimentacion = async (req: Request, res: Response): Promis
         console.log(req.body);
 
         const response: QueryResult = await pool.query(
-            'INSERT INTO solicita_comidas (extra, fecha_comida, fecha, hora_fin, hora_inicio, id_detalle_comida, ' +
+            'INSERT INTO ma_solicitud_comida (extra, fecha_comida, fecha, hora_fin, hora_inicio, id_detalle_comida, ' +
             'id_empleado, observacion, verificar) ' +
             'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
             [extra, fec_comida, fecha, hora_fin, hora_inicio, id_comida, id_empleado, observacion, verificar]);
         const [objetoAlimento] = response.rows;
 
-        if (!objetoAlimento) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
+        if (!objetoAlimento) {
+            return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
 
-        const alimento: Alimentacion = objetoAlimento
+        }else{
+            return res.status(200).jsonp(objetoAlimento);
+        }
 
-        const { id_departamento } = req.query;
 
+        //const { id_departamento } = req.query;
+
+        /*
         const JefesDepartamentos = await pool.query(
             'SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc, ' +
             'cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato, ' +
             'e.id AS empleado, (e.nombre || \' \' || e.apellido) as fullname , e.cedula, e.correo, c.comida_mail, c.comida_noti ' +
-            'FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, ' +
-            'sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c ' +
+            'FROM ed_autoriza_departamento AS da, eu_empleado_cargos AS ecr, ed_departamentos AS cg, ' +
+            'e_sucursales AS s, eu_empleado_contratos AS ecn, eu_empleados AS e, eu_configurar_alertas AS c ' +
             'WHERE da.id_departamento = $1 AND ' +
             'da.id_empl_cargo = ecr.id AND ' +
             'da.id_departamento = cg.id AND ' +
@@ -144,15 +149,17 @@ export const postNuevoAlimentacion = async (req: Request, res: Response): Promis
             'ecr.id_empl_contrato = ecn.id AND ' +
             'ecn.id_empleado = e.id AND ' +
             'e.id = c.id_empleado', [id_departamento]).then(result => { return result.rows });
-        console.log(JefesDepartamentos);
+        */    
+        //console.log(JefesDepartamentos);
 
-        if (JefesDepartamentos.length === 0) return res.status(400)
-            .jsonp({ message: 'Ups !!! algo salio mal. Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.' });
+       // if (JefesDepartamentos.length === 0) return res.status(400)
+         //   .jsonp({ message: 'Ups !!! algo salio mal. Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.' });
 
-        const [obj] = JefesDepartamentos;
-        let depa_padre = obj.depa_padre;
-        let JefeDepaPadre;
+        //const [obj] = JefesDepartamentos;
+        //let depa_padre = obj.depa_padre;
+        //let JefeDepaPadre;
 
+        /*
         if (depa_padre !== null) {
             do {
                 JefeDepaPadre = await pool.query('SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, ' +
@@ -172,6 +179,7 @@ export const postNuevoAlimentacion = async (req: Request, res: Response): Promis
             alimento.EmpleadosSendNotiEmail = JefesDepartamentos
             return res.status(200).jsonp(alimento);
         }
+            */
 
     } catch (error) {
         console.log(error);
@@ -189,8 +197,8 @@ export const putAlimentacion = async (req: Request, res: Response): Promise<Resp
 
         const response: QueryResult = await pool.query(
             `
-            UPDATE solicita_comidas SET id_empleado = $2 , fecha = $3, id_comida = $4, observacion = $5, 
-            fec_comida = $6, extra = $7, aprobada = $8, verificar = $9 
+            UPDATE ma_solicitud_comida SET id_empleado = $2 , fecha = $3, id_detalle_comida = $4, observacion = $5, 
+            fecha_comida = $6, extra = $7, aprobada = $8, verificar = $9 
             WHERE id = $1  RETURNING *
             `
             , [id, id_empleado, fecha, id_comida, observacion, fec_comida, extra, aprobada, verificar]);
@@ -222,7 +230,7 @@ export const putEstadoAlimentacion = async (req: Request, res: Response): Promis
         const { id, id_empleado, aprobada } = req.body;
 
         const response: QueryResult = await pool.query(`
-            UPDATE solicita_comidas SET aprobada = $2 WHERE id = $1 RETURNING id`,
+            UPDATE ma_solicitud_comida SET aprobada = $2 WHERE id = $1 RETURNING id`,
             [id, aprobada]);
         const [objetoAlimentacion] = response.rows;
 

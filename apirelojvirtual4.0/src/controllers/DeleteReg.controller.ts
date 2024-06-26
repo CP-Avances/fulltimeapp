@@ -15,16 +15,16 @@ export const deleteMetodoGeneral = async (req: Request, res: Response): Promise<
 
         switch (nametable) {
             case 'vacaciones':
-                await pool.query('DELETE FROM autorizaciones WHERE id_vacacion = $1', [idreg]);
-                await pool.query('DELETE FROM realtime_noti WHERE id_vacaciones = $1', [idreg]);
+                await pool.query('DELETE FROM ecm_autorizaciones WHERE id_vacacion = $1', [idreg]);
+                await pool.query('DELETE FROM ecm_realtime_notificacion WHERE id_vacaciones = $1', [idreg]);
                 break;
             case 'hora_extr_pedidos':
-                await pool.query('DELETE FROM autorizaciones WHERE id_hora_extra = $1', [idreg]);
-                await pool.query('DELETE FROM realtime_noti WHERE id_hora_extra = $1', [idreg]);
+                await pool.query('DELETE FROM ecm_autorizaciones WHERE id_hora_extra = $1', [idreg]);
+                await pool.query('DELETE FROM ecm_realtime_notificacion WHERE id_hora_extra = $1', [idreg]);
                 break;
             case 'permisos':
-                await pool.query('DELETE FROM autorizaciones WHERE id_permiso = $1', [idreg]);
-                await pool.query('DELETE FROM realtime_noti where id_permiso = $1', [idreg]);
+                await pool.query('DELETE FROM ecm_autorizaciones WHERE id_permiso = $1', [idreg]);
+                await pool.query('DELETE FROM ecm_realtime_notificacion where id_permiso = $1', [idreg]);
                 break;
 
             default:
