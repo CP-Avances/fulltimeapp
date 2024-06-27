@@ -12,9 +12,9 @@ export const getNotificacion = async (req: Request, res: Response): Promise<Resp
     try {
 
         const { id_empleado } = req.query;
-        const subquery1 = `( select (i.nombre || ' ' || i.apellido) from empleados i where i.id = r.id_send_empl ) as nempleadosend`
-        const subquery2 = `( select (i.nombre || ' ' || i.apellido) from empleados i where i.id = r.id_receives_empl ) as nempleadoreceives`
-        const query = `SELECT r.*, ${subquery1}, ${subquery2} FROM realtime_noti r WHERE r.id_receives_empl = ${id_empleado} ORDER BY r.create_at DESC LIMIT 40`
+        const subquery1 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_envia ) as nempleadosend`
+        const subquery2 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_recibe ) as nempleadoreceives`
+        const query = `SELECT r.*, ${subquery1}, ${subquery2} FROM ecm_realtime_notificacion r WHERE r.id_empleado_recibe = ${id_empleado} ORDER BY r.fecha_hora DESC LIMIT 40`
 
         const response: QueryResult = await pool.query(query);
         const notificacion: Notificacion[] = response.rows;
@@ -36,7 +36,7 @@ export const postNotificacion = async (req: Request, res: Response): Promise<Res
                 id_vacaciones, id_hora_extra, mensaje, tipo } = req.body;
 
         const response: QueryResult = await pool.query(`
-        INSERT INTO realtime_noti( id_send_empl, id_receives_empl, id_receives_depa, estado, create_at, 
+        INSERT INTO ecm_realtime_notificacion( id_empleado_envia, id_empleado_recibe, id_departamento_recibe, estado, fecha_hora, 
             id_permiso, id_vacaciones, id_hora_extra, mensaje, tipo ) 
         VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ) RETURNING * 
 
@@ -49,7 +49,7 @@ export const postNotificacion = async (req: Request, res: Response): Promise<Res
         const USUARIO = await pool.query(
             `
             SELECT (nombre || ' ' || apellido) AS usuario
-            FROM empleados WHERE id = $1
+            FROM eu_empleados WHERE id = $1
             `,
             [id_send_empl]);
       
@@ -71,9 +71,9 @@ export const getNotificacionTimbres = async (req: Request, res: Response): Promi
     try {
 
         const { id_empleado } = req.query;
-        const subquery1 = `( select (i.nombre || ' ' || i.apellido) from empleados i where i.id = r.id_send_empl ) as nempleadosend`
-        const subquery2 = `( select (i.nombre || ' ' || i.apellido) from empleados i where i.id = r.id_receives_empl ) as nempleadoreceives`
-        const query = `SELECT r.id, r.create_at, r.id_send_empl, r.id_receives_empl,r.visto, r.descripcion as mensaje, r.id_timbre, r.tipo, ${subquery1}, ${subquery2} FROM realtime_timbres r WHERE r.id_receives_empl = ${id_empleado} ORDER BY r.create_at DESC LIMIT 60`
+        const subquery1 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_envia ) as nempleadosend`
+        const subquery2 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_recibe ) as nempleadoreceives`
+        const query = `SELECT r.id, r.fecha_hora, r.id_empleado_envia, r.id_empleado_recibe,r.visto, r.descripcion as mensaje, r.id_timbre, r.tipo, ${subquery1}, ${subquery2} FROM ecm_realtime_timbres r WHERE r.id_empleado_recibe = ${id_empleado} ORDER BY r.fecha_hora DESC LIMIT 60`
 
         const response: QueryResult = await pool.query(query);
         const notificacion: NotificacionTimbre[] = response.rows;
@@ -95,7 +95,7 @@ export const postAvisosGenerales = async (req: Request, res: Response): Promise<
 
         const response: QueryResult = await pool.query(
             `
-            INSERT INTO realtime_timbres (create_at, id_send_empl, id_receives_empl, descripcion, tipo) 
+            INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo) 
             VALUES($1, $2, $3, $4, $5) RETURNING * 
             `,
             [create_at, id_send_empl, id_receives_empl, descripcion, tipo]);
@@ -107,7 +107,7 @@ export const postAvisosGenerales = async (req: Request, res: Response): Promise<
         const USUARIO = await pool.query(
             `
             SELECT (nombre || ' ' || apellido) AS usuario
-            FROM empleados WHERE id = $1
+            FROM eu_empleados WHERE id = $1
             `,
             [id_send_empl]);
       
@@ -135,8 +135,8 @@ export const EnviarNotificacionComidas = async (req: Request, res: Response): Pr
         `
         SELECT tc.nombre AS servicio, ctc.nombre AS menu, ctc.hora_inicio, ctc.hora_fin, 
           dm.nombre AS comida, dm.valor, dm.observacion 
-        FROM tipo_comida AS tc, cg_tipo_comidas AS ctc, detalle_menu AS dm 
-        WHERE tc.id = ctc.tipo_comida AND ctc.id = dm.id_menu AND dm.id = $1
+        FROM ma_cat_comidas AS tc, ma_horario_comidas AS ctc, ma_detalle_comida AS dm 
+        WHERE tc.id = ctc.id_comida AND ctc.id = dm.id_menu AND dm.id = $1
       `,
         [id_comida]);
 
@@ -144,7 +144,7 @@ export const EnviarNotificacionComidas = async (req: Request, res: Response): Pr
 
     const response: QueryResult = await pool.query(
         `
-        INSERT INTO realtime_timbres(create_at, id_send_empl, id_receives_empl, descripcion, tipo) 
+        INSERT INTO ecm_realtime_timbres(fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo) 
         VALUES($1, $2, $3, $4, $5) RETURNING *
         `,
         [create_at, id_empl_envia, id_empl_recive, notifica, tipo]);
@@ -156,7 +156,7 @@ export const EnviarNotificacionComidas = async (req: Request, res: Response): Pr
       const USUARIO = await pool.query(
         `
         SELECT (nombre || ' ' || apellido) AS usuario
-        FROM empleados WHERE id = $1
+        FROM eu_empleados WHERE id = $1
         `,
         [id_empl_envia]);
   
@@ -179,9 +179,9 @@ export const getInfoEmpleadoByCodigo = async (req: Request, res: Response): Prom
             `
             SELECT da.id_departamento,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, da.cedula,
             da.correo, da.codigo, da.estado, da.id_sucursal, da.id_contrato,
-            (SELECT cd.nombre FROM cg_departamentos AS cd WHERE cd.id = da.id_departamento) AS ndepartamento,
-            (SELECT s.nombre FROM sucursales AS s WHERE s.id = da.id_sucursal) AS nsucursal
-            FROM datos_actuales_empleado AS da, config_noti AS cn            
+            (SELECT cd.nombre FROM ed_departamentos AS cd WHERE cd.id = da.id_departamento) AS ndepartamento,
+            (SELECT s.nombre FROM e_sucursales AS s WHERE s.id = da.id_sucursal) AS nsucursal
+            FROM datos_actuales_empleado AS da, eu_configurar_alertas AS cn            
             WHERE da.codigo = '${codigo}' AND cn.id_empleado = da.id
             `
         const response: QueryResult = await pool.query(query);
@@ -208,9 +208,9 @@ export const getInfoEmpleadoById = async (req: Request, res: Response): Promise<
             `
             SELECT da.id_departamento,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, da.cedula,
             da.correo, da.codigo, da.estado, da.id_sucursal,
-            (SELECT cd.nombre FROM cg_departamentos AS cd WHERE cd.id = da.id_departamento) AS ndepartamento,
-            (SELECT s.nombre FROM sucursales AS s WHERE s.id = da.id_sucursal) AS nsucursal
-            FROM datos_actuales_empleado AS da, config_noti AS cn 
+            (SELECT cd.nombre FROM ed_departamentos AS cd WHERE cd.id = da.id_departamento) AS ndepartamento,
+            (SELECT s.nombre FROM e_sucursales AS s WHERE s.id = da.id_sucursal) AS nsucursal
+            FROM datos_actuales_empleado AS da, eu_configurar_alertas AS cn 
             WHERE da.id = '${id_empleado}' AND cn.id_empleado = da.id
             `
         const response: QueryResult = await pool.query(query);
@@ -274,7 +274,7 @@ export const DatosGenerales = async (req: Request, res: Response): Promise<Respo
 
         let suc = await pool.query(
             `
-            SELECT s.id AS id_suc, s.nombre AS name_suc, c.descripcion AS ciudad FROM sucursales AS s, 
+            SELECT s.id AS id_suc, s.nombre AS name_suc, c.descripcion AS ciuadd FROM e_sucursales AS s, 
             ciudades AS c WHERE s.id_ciudad = c.id ORDER BY s.id
             `
         ).then(result => { return result.rows });
@@ -284,7 +284,7 @@ export const DatosGenerales = async (req: Request, res: Response): Promise<Respo
         let departamentos = await Promise.all(suc.map(async (ele: any) => {
             ele.departamentos = await pool.query(
                 `
-                SELECT d.id as id_depa, d.nombre as name_dep FROM cg_departamentos AS d
+                SELECT d.id as id_depa, d.nombre as name_dep FROM ed_departamentos AS d
                 WHERE d.id_sucursal = $1
                 `
                 , [ele.id_suc])
@@ -309,9 +309,9 @@ export const DatosGenerales = async (req: Request, res: Response): Promise<Respo
                         `
                         SELECT DISTINCT e.id, CONCAT(nombre, ' ' , apellido) 
                         name_empleado, e.codigo, e.cedula, e.genero, e.correo, cn.comunicado_mail, 
-                        cn.comunicado_noti 
-                        FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e, 
-                        config_noti AS cn 
+                        cn.comunicado_notificacion 
+                        FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e, 
+                        eu_configurar_alertas AS cn 
                         WHERE ca.id = (SELECT MAX(cargo_id) AS cargo_id FROM datos_empleado_cargo WHERE 
                         codigo = e.codigo) 
                         AND ca.id_departamento = $1 
@@ -327,9 +327,9 @@ export const DatosGenerales = async (req: Request, res: Response): Promise<Respo
                         `
                         SELECT DISTINCT e.id, CONCAT(nombre, \' \', apellido) 
                         name_empleado, e.codigo, e.cedula, e.genero, e.correo, cn.comunicado_mail, 
-                        cn.comunicado_noti, ca.fec_final 
-                        FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e, 
-                        config_noti AS cn 
+                        cn.comunicado_notificacion, ca.fecha_final 
+                        FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e, 
+                        eu_configurar_alertas AS cn 
                         WHERE ca.id = (SELECT MAX(cargo_id) AS cargo_id FROM datos_empleado_cargo WHERE 
                         codigo = e.codigo) AND ca.id_departamento = $1 
                         AND co.id = (SELECT MAX(id_contrato) AS contrato_id FROM datos_contrato_actual WHERE 
@@ -370,7 +370,7 @@ export const NotificaVisto = async (req: Request, res: Response) => {
     try {
         const { id_notificacion, visible } = req.body
 
-        const response: QueryResult = await pool.query('UPDATE realtime_noti SET visto = $1 WHERE id = $2', [visible, id_notificacion])
+        const response: QueryResult = await pool.query('UPDATE ecm_realtime_notificacion SET visto = $1 WHERE id = $2', [visible, id_notificacion])
         const notificacion: Notificacion[] = response.rows;
         return res.status(200).jsonp(notificacion);
 
@@ -385,7 +385,7 @@ export const NotifiTimbreVisto = async (req: Request, res: Response) => {
 
         const { id_notificacion, visible } = req.body
         console.log(req.body);
-        const response: QueryResult = await pool.query('UPDATE realtime_timbres SET visto = $1 WHERE id = $2', [visible, id_notificacion])
+        const response: QueryResult = await pool.query('UPDATE ecm_realtime_timbres SET visto = $1 WHERE id = $2', [visible, id_notificacion])
         const notificacionTimbre: NotificacionTimbre[] = response.rows;
 
         return res.status(200).jsonp(notificacionTimbre);
@@ -402,7 +402,7 @@ export const EnviarNotificacionGeneral = async (req: Request, res: Response): Pr
 
     const response: QueryResult = await pool.query(
       `
-        INSERT INTO realtime_timbres(create_at, id_send_empl, id_receives_empl, descripcion, tipo) 
+        INSERT INTO ecm_realtime_timbres(fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo) 
         VALUES($1, $2, $3, $4, $5) RETURNING *
       `,
       [create_at, id_empl_envia, id_empl_recive, mensaje, tipo]);
@@ -414,7 +414,7 @@ export const EnviarNotificacionGeneral = async (req: Request, res: Response): Pr
     const USUARIO = await pool.query(
         `
         SELECT (nombre || ' ' || apellido) AS usuario
-        FROM empleados WHERE id = $1
+        FROM eu_empleados WHERE id = $1
         `,
         [id_empl_envia]);
   
@@ -430,7 +430,7 @@ export const ObtenerConfigEmpleado = async (req: Request, res: Response): Promis
     if (id_empleado != 'NaN') {
       const CONFIG_NOTI = await pool.query(
         `
-        SELECT * FROM config_noti WHERE id_empleado = $1
+        SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1
         `
         , [id_empleado]);
       if (CONFIG_NOTI.rowCount > 0) {

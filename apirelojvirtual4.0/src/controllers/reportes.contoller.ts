@@ -9,7 +9,7 @@ import { CalcularHoraExtra } from '../libs/CalcularHorasExtras';
 export const getInfoReporteTimbres = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { codigo, fec_inicio, fec_final } = req.query;
-        const response: QueryResult = await pool.query('SELECT t.*, CAST(t.fec_hora_timbre AS VARCHAR) AS stimbre, CAST(t.fec_hora_timbre_servidor AS VARCHAR) AS stimbre_servidor FROM timbres as t WHERE codigo = $3 AND fec_hora_timbre BETWEEN $1 AND $2 ORDER BY fec_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo]);
+        const response: QueryResult = await pool.query('SELECT t.*, CAST(t.fec_hora_timbre AS VARCHAR) AS stimbre, CAST(t.fec_hora_timbre_servidor AS VARCHAR) AS stimbre_servidor FROM eu_timbres as t WHERE codigo = $3 AND fec_hora_timbre BETWEEN $1 AND $2 ORDER BY fec_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo]);
         const timbres: Timbre[] = response.rows;
         // console.log(timbres);
         if (timbres.length === 0) return res.status(400).jsonp({ message: 'No hay timbres resgistrados' })
@@ -24,7 +24,7 @@ export const getInfoReporteTimbres = async (req: Request, res: Response): Promis
 export const getInfoReporteTimbresNovedad = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { codigo, fec_inicio, fec_final, conexion} = req.query;
-        const response: QueryResult = await pool.query('SELECT t.*, CAST(t.fec_hora_timbre AS VARCHAR) AS stimbre, CAST(t.fecha_subida_servidor AS VARCHAR) AS stimbre_servidor FROM timbres as t WHERE codigo = $3 AND fec_hora_timbre BETWEEN $1 AND $2 AND conexion = $4 ORDER BY fec_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo, conexion]);
+        const response: QueryResult = await pool.query('SELECT t.*, CAST(t.fec_hora_timbre AS VARCHAR) AS stimbre, CAST(t.fecha_subida_servidor AS VARCHAR) AS stimbre_servidor FROM eu_timbres as t WHERE codigo = $3 AND fec_hora_timbre BETWEEN $1 AND $2 AND conexion = $4 ORDER BY fec_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo, conexion]);
         const timbres: Timbre[] = response.rows;
         // console.log(timbres);
         if (timbres.length === 0) return res.status(400).jsonp({ message: 'No hay timbres resgistrados' })

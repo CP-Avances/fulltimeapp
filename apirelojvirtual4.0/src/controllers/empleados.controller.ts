@@ -40,7 +40,7 @@ export const getOneHorarioEmpleadoByCodigo = async (req: Request, res: Response)
         const response: QueryResult = await pool.query(
             `
                 SELECT de.hora, de.id, de.id_horario, de.tolerancia, de.tipo_accion, cg.codigo
-                FROM eh_detalle_horarios AS de, cg_horarios AS cg
+                FROM eh_detalle_horarios AS de, eh_cat_horarios AS cg
                 WHERE cg.codigo = $1 AND de.id_horario = cg.id 
                 ORDER BY id ASC  
             `, [codigo]
@@ -72,9 +72,9 @@ export const getInformarEmpleadoAutoriza = async (req: Request, res: Response): 
             `
             SELECT (da.nombre ||' '|| da.apellido) AS fullname, da.cedula, tc.cargo, 
                 cd.nombre AS departamento
-            FROM datos_actuales_empleado AS da, empl_cargos AS ec, tipo_cargo AS tc,
-                cg_departamentos AS cd
-            WHERE da.id_cargo = ec.id AND ec.cargo = tc.id AND cd.id = da.id_departamento AND 
+            FROM datos_actuales_empleado AS da, eu_empleado_cargos AS ec, e_cat_tipo_cargo AS tc,
+                ed_departamentos AS cd
+            WHERE da.id_cargo = ec.id AND ec.id_tipo_cargo = tc.id AND cd.id = da.id_departamento AND 
             da.id = $1
             `
             , [id_empleado]);
@@ -96,12 +96,12 @@ export const getHorariosEmpleadoByCodigo = async (req: Request, res: Response): 
         const { codigo, fecha_inicio} = req.query;
         const response: QueryResult = await pool.query(
             `
-            SELECT id, codigo AS empl_codigo, id_empl_cargo, id_horario,
-                fec_horario AS fecha, fec_hora_horario::time AS horario,
-                tipo_dia, tipo_entr_salida AS tipo_hora, id_det_horario
-            FROM plan_general
+            SELECT id, codigo AS empl_codigo, id_empleado_cargo, id_horario,
+                fecha_horario AS fecha, fecha_hora_horario::time AS horario,
+                tipo_dia, tipo_accion AS tipo_hora, id_detalle_horario
+            FROM eu_asistencia_general
             WHERE codigo = $1
-                AND fec_horario BETWEEN $2 AND $2 
+                AND fecha_horario BETWEEN $2 AND $2 
             ORDER BY horario ASC`
             , [codigo, fecha_inicio]
         );
@@ -163,12 +163,12 @@ export const BuscarPlanificacionHorarioEmple = async (req: Request, res: Respons
                 "CASE WHEN STRING_AGG(CASE WHEN dia = 30 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 30 THEN codigo_dia end,', ') ELSE '-' END AS dia30, " +
                 "CASE WHEN STRING_AGG(CASE WHEN dia = 31 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 31 THEN codigo_dia end,', ') ELSE '-' END AS dia31 " +
                 "FROM ( " +
-                "SELECT p_g.codigo AS codigo_e, CONCAT(empleado.apellido, ' ', empleado.nombre) AS nombre_e, EXTRACT('year' FROM fec_horario) AS anio, EXTRACT('month' FROM fec_horario) AS mes, " +
-                "EXTRACT('day' FROM fec_horario) AS dia, CASE WHEN tipo_dia = 'L' THEN tipo_dia ELSE horario.codigo END AS codigo_dia " +
-                "FROM plan_general p_g " +
-                "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN ("+codigo+") " +
-                "INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario " +
-                "WHERE fec_horario BETWEEN $1 AND $2 " +
+                "SELECT p_g.codigo AS codigo_e, CONCAT(empleado.apellido, ' ', empleado.nombre) AS nombre_e, EXTRACT('year' FROM fecha_horario) AS anio, EXTRACT('month' FROM fecha_horario) AS mes, " +
+                "EXTRACT('day' FROM fecha_horario) AS dia, CASE WHEN tipo_dia = 'L' THEN tipo_dia ELSE horario.codigo END AS codigo_dia " +
+                "FROM eu_asistencia_general p_g " +
+                "INNER JOIN eu_empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN ("+codigo+") " +
+                "INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario " +
+                "WHERE fecha_horario BETWEEN $1 AND $2 " +
                 "GROUP BY codigo_e, nombre_e, anio, mes, dia, codigo_dia, p_g.id_horario " +
                 "ORDER BY p_g.codigo,anio, mes , dia, p_g.id_horario " +
                 ") AS datos " +
@@ -226,11 +226,11 @@ export const getPlanificacionMesesCodigoEmple = async (req: Request, res: Respon
                 "CASE WHEN STRING_AGG(CASE WHEN dia = 30 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 30 THEN codigo_dia end,', ') ELSE '-' END AS dia30, " +
                 "CASE WHEN STRING_AGG(CASE WHEN dia = 31 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 31 THEN codigo_dia end,', ') ELSE '-' END AS dia31 " +
                 "FROM ( " +
-                "SELECT p_g.codigo AS codigo_e, CONCAT(empleado.apellido, ' ', empleado.nombre) AS nombre_e, EXTRACT('year' FROM fec_horario) AS anio, EXTRACT('month' FROM fec_horario) AS mes, " +
-                "EXTRACT('day' FROM fec_horario) AS dia, CASE WHEN tipo_dia = 'L' THEN tipo_dia ELSE horario.codigo END AS codigo_dia " +
-                "FROM plan_general p_g " +
-                "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN ($1) " +
-                "INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario " +
+                "SELECT p_g.codigo AS codigo_e, CONCAT(empleado.apellido, ' ', empleado.nombre) AS nombre_e, EXTRACT('year' FROM fecha_horario) AS anio, EXTRACT('month' FROM fecha_horario) AS mes, " +
+                "EXTRACT('day' FROM fecha_horario) AS dia, CASE WHEN tipo_dia = 'L' THEN tipo_dia ELSE horario.codigo END AS codigo_dia " +
+                "FROM eu_asistencia_general p_g " +
+                "INNER JOIN eu_empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN ($1) " +
+                "INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario " +
                 "GROUP BY codigo_e, nombre_e, anio, mes, dia, codigo_dia, p_g.id_horario " +
                 "ORDER BY p_g.codigo,anio, mes , dia, p_g.id_horario " +
                 ") AS datos " +
