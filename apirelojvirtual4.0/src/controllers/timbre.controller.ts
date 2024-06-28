@@ -4,7 +4,9 @@ import { QueryResult } from 'pg';
 import { Timbre } from '../interfaces/Timbre';
 
 
-export const getTimbreByIdEmpresa = async (req: Request, res: Response): Promise<Response> => {
+
+/*
+export const getTimbreByIEmdpresa = async (req: Request, res: Response): Promise<Response> => {
     try {
         const id = req.params.idEmpresa;
         const response: QueryResult = await pool.query('select timbre.id_usuario,tipo_timbre.descrip_tipo_timbre,tipo_timbre.id_tipo,nombre,usuario.apellido,fecha_timbre,hora_timbre,hora_timbre_app,observacion,latitud,longitud,timbre.tipo_identificacion,timbre.dispositivo_timbre,usuario.id_celular,timbre.tipo_autenticacion,timbre.dispositivo_timbre,timbre.fec_hora_timbre_servidor from timbre inner join usuario on timbre.id_usuario=usuario.id_usuario inner join tipo_timbre on timbre.id_tipo=tipo_timbre.id_tipo where id_empresa=$1 ORDER BY fecha_timbre DESC', [id]);
@@ -16,12 +18,14 @@ export const getTimbreByIdEmpresa = async (req: Request, res: Response): Promise
     }
 };
 
+*/
+
 
 export const getTimbreById = async (req: Request, res: Response): Promise<Response> => {
     try {
 
         const id = parseInt(req.params.idUsuario);
-        const response: QueryResult = await pool.query('SELECT * FROM timbres WHERE codigo = $1 ORDER BY fec_hora_timbre DESC LIMIT 100', [id]);
+        const response: QueryResult = await pool.query('SELECT * FROM eu_timbres WHERE codigo = $1 ORDER BY fecha_hora_timbre DESC LIMIT 100', [id]);
         const timbres: Timbre[] = response.rows;
         return res.jsonp(timbres);
     } catch (error) {
@@ -51,9 +55,9 @@ export const crearTimbre = async (req: Request, res: Response) => {
         } else {
             timbre.hora_timbre_diferente = false;
         }
-        const response = await pool.query('INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, ' +
+        const response = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
             'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
-            'dispositivo_timbre, fec_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion) ' +
+            'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion) ' +
             'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16);',
             [timbre.fec_hora_timbre, timbre.accion, timbre.tecl_funcion, timbre.observacion,
             timbre.latitud, timbre.longitud, timbre.codigo, timbre.id_reloj,
@@ -91,9 +95,9 @@ export const crearTimbreDesconectado = async (req: Request, res: Response) => {
             timbre.hora_timbre_diferente = false;
         }
 
-        const response = await pool.query('INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, ' +
+        const response = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
             'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
-            'dispositivo_timbre, fec_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion) ' +
+            'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion) ' +
             'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16);',
             [timbre.fec_hora_timbre, timbre.accion, timbre.tecl_funcion, timbre.observacion,
             timbre.latitud, timbre.longitud, timbre.codigo, timbre.id_reloj,
@@ -116,7 +120,7 @@ export const crearTimbreJustificadoAdmin = async (req: Request, res: Response) =
         const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,id_reloj } = req.body
         console.log(req.body);
 
-        const [timbre] = await pool.query('INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id', [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj])
+        const [timbre] = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id', [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj])
             .then(result => {
                 return result.rows;
             });
@@ -133,7 +137,7 @@ export const FiltrarTimbre = async (req: Request, res: Response) => {
     try {
         const { fecInicio, fecFinal, codigo} = req.body
         console.log(req.body);
-        const response: QueryResult = await pool.query('SELECT * FROM timbres WHERE codigo = $3 AND fec_hora_timbre BETWEEN $1 AND $2 ORDER BY fec_hora_timbre DESC ',
+        const response: QueryResult = await pool.query('SELECT * FROM eu_timbres WHERE codigo = $3 AND fecha_hora_timbre BETWEEN $1 AND $2 ORDER BY fecha_hora_timbre DESC ',
             [fecInicio, fecFinal, codigo])
             const timbres: Timbre[] = response.rows;
             return res.jsonp(timbres);
@@ -146,7 +150,7 @@ export const justificarAtraso = async (req: Request, res: Response) => {
     try {
         const { descripcion, fec_justifica , codigo, create_time, codigo_create_user } = req.body;
         const [atraso] = await pool.query(
-            'INSERT INTO atrasos(descripcion, fec_justifica, codigo, create_time, codigo_create_user) ' +
+            'INSERT INTO eu_empleado_justificacion_atraso(descripcion, fecha_justifica, codigo, fecha_hora, codigo_empleado_justifica) ' +
             'VALUES($1, $2, $3, $4, $5) RETURNING id',
             [descripcion, fec_justifica, codigo, create_time, codigo_create_user])
             .then(res => {

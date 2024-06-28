@@ -3,13 +3,12 @@ import { pool } from '../database';
 import { QueryResult } from 'pg';
 import { Timbre } from '../interfaces/Timbre';
 import { ImagenBase64LogosEmpresas } from '../libs/metodos';
-import { AtrasosTimbres } from '../libs/calculosReportes';
 import { CalcularHoraExtra } from '../libs/CalcularHorasExtras';
 
 export const getInfoReporteTimbres = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { codigo, fec_inicio, fec_final } = req.query;
-        const response: QueryResult = await pool.query('SELECT t.*, CAST(t.fec_hora_timbre AS VARCHAR) AS stimbre, CAST(t.fec_hora_timbre_servidor AS VARCHAR) AS stimbre_servidor FROM eu_timbres as t WHERE codigo = $3 AND fec_hora_timbre BETWEEN $1 AND $2 ORDER BY fec_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo]);
+        const response: QueryResult = await pool.query('SELECT t.*, CAST(t.fecha_hora_timbre AS VARCHAR) AS stimbre, CAST(t.fecha_hora_timbre_servidor AS VARCHAR) AS stimbre_servidor FROM eu_timbres as t WHERE codigo = $3 AND fecha_hora_timbre BETWEEN $1 AND $2 ORDER BY fecha_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo]);
         const timbres: Timbre[] = response.rows;
         // console.log(timbres);
         if (timbres.length === 0) return res.status(400).jsonp({ message: 'No hay timbres resgistrados' })
@@ -24,7 +23,7 @@ export const getInfoReporteTimbres = async (req: Request, res: Response): Promis
 export const getInfoReporteTimbresNovedad = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { codigo, fec_inicio, fec_final, conexion} = req.query;
-        const response: QueryResult = await pool.query('SELECT t.*, CAST(t.fec_hora_timbre AS VARCHAR) AS stimbre, CAST(t.fecha_subida_servidor AS VARCHAR) AS stimbre_servidor FROM eu_timbres as t WHERE codigo = $3 AND fec_hora_timbre BETWEEN $1 AND $2 AND conexion = $4 ORDER BY fec_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo, conexion]);
+        const response: QueryResult = await pool.query('SELECT t.*, CAST(t.fecha_hora_timbre AS VARCHAR) AS stimbre, CAST(t.fecha_subida_servidor AS VARCHAR) AS stimbre_servidor FROM eu_timbres as t WHERE codigo = $3 AND fecha_hora_timbre BETWEEN $1 AND $2 AND conexion = $4 ORDER BY fecha_hora_timbre DESC LIMIT 100', [fec_inicio, fec_final, codigo, conexion]);
         const timbres: Timbre[] = response.rows;
         // console.log(timbres);
         if (timbres.length === 0) return res.status(400).jsonp({ message: 'No hay timbres resgistrados' })
@@ -45,25 +44,6 @@ export const getInfoReporteInasistencia = async (req: Request, res: Response): P
         if (inasistencia.length === 0) return res.status(400).jsonp({ message: 'No hay inasistencias resgistradas' })
 
         return res.status(200).jsonp(inasistencia);
-    } catch (error) {
-        console.log(error);
-        return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
-    }
-};
-
-export const getInfoReporteAtrasos = async (req: Request, res: Response): Promise<Response> => {
-    try {
-        const qReport: any = req.query;
-        const { codigo, fec_inicio, fec_final } = qReport;
-        let atrasos = await AtrasosTimbres(fec_inicio, fec_final, codigo);
-
-        // const response: QueryResult = await pool.query('SELECT t.* ', [fec_inicio, fec_final, codigo]);
-        // const atrasos: any[] = response.rows;
-        if (atrasos.error) return res.status(500).jsonp({ message: atrasos.error });
-
-        if (atrasos.length === 0) return res.status(400).jsonp({ message: 'No hay atrasos resgistrados' });
-
-        return res.status(200).jsonp(atrasos);
     } catch (error) {
         console.log(error);
         return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
@@ -146,19 +126,19 @@ export const getInfoPlantilla = async (req: Request, res: Response): Promise<Res
     try {
         const { id_empresa } = req.query;
 
-        const [file_name] = await pool.query('select nombre, logo, color_p, color_s from cg_empresa where id = $1', [id_empresa])
+        const [file_name] = await pool.query('select nombre, logo, color_principal, color_secundario from e_empresa where id = $1', [id_empresa])
             .then(result => {
                 return result.rows;
             });
         if (!file_name) return res.status(400).jsonp({ message: 'No hay información de la empresa' })
 
-        const { nombre: nom_empresa, logo, color_p, color_s } = file_name;
+        const { nombre: nom_empresa, logo, color_principal, color_secundario } = file_name;
 
         const codificado = await ImagenBase64LogosEmpresas(logo);
         if (codificado === 0) {
-            return res.status(200).jsonp({ imagen: '', nom_empresa, color_p, color_s })
+            return res.status(200).jsonp({ imagen: '', nom_empresa, color_principal, color_secundario })
         } else {
-            return res.status(200).jsonp({ imagen: codificado, nom_empresa, color_p, color_s })
+            return res.status(200).jsonp({ imagen: codificado, nom_empresa, color_principal, color_secundario })
         }
     } catch (error) {
         console.log(error);

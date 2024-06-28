@@ -4,43 +4,7 @@ import { ObtenerRangoSemanal, ObtenerRangoMensual } from './MetodosFechas'
 
 const FECHA_FERIADOS: any = [];
 
-export const VerificarHorario = async function (id_cargo: number) {
 
-    let horario = await pool.query('SELECT * FROM empl_horarios WHERE id_empl_cargo = $1 AND estado = 1 ORDER BY fec_inicio DESC LIMIT 1', [id_cargo]).then(result => { return result.rows[0] }); // devuelve el ultimo horario del cargo
-
-    if (!horario) return { message: 'Horario no encontrado' }
-    // console.log(horario);
-
-    let respuesta = tipoHorario(horario.fec_inicio, horario.fec_final)
-    var f = new Date();
-
-    f.setUTCMonth(f.getMonth());
-    f.setUTCDate(f.getDate());
-    f.setUTCHours(f.getHours());
-
-    // FECHA_FERIADOS = feriados
-    let feriados;
-
-    let fechasRango;
-    let objeto;
-    if (respuesta === 'semanal') {
-        fechasRango = ObtenerRangoSemanal(f);
-        feriados = await pool.query('SELECT f.fecha FROM empl_cargos AS ca, sucursales AS s, ciudades AS c, ciud_feriados AS cf, cg_feriados AS f WHERE ca.id_sucursal = s.id AND c.id = s.id_ciudad AND c.id = cf.id_ciudad AND f.id = cf.id_feriado AND ca.id = $1 AND CAST(f.fecha AS VARCHAR) between $2 || \'%\' AND $3 || \'%\'', [id_cargo, fechasRango.inicio.toJSON().split('T')[0], fechasRango.final.toJSON().split('T')[0]]).then(result => { return result.rows });
-        feriados.forEach(obj => {
-            FECHA_FERIADOS.push(obj);
-        })
-        objeto = DiasByEstado(horario, fechasRango);
-    } else if (respuesta === 'mensual') {
-        fechasRango = ObtenerRangoMensual(f);
-        objeto = DiasByEstado(horario, fechasRango);
-    } else if (respuesta === 'anual') {
-        fechasRango = ObtenerRangoMensual(f)
-        objeto = DiasByEstado(horario, fechasRango);
-    }
-    // console.log('Fechas rango: ', fechasRango);
-    // console.log('Objeto JSON: ', objeto);
-    return objeto
-}
 
 /**
  * Metodo devuelve el tipo de horario que tiene el empleado.
@@ -111,23 +75,13 @@ function fechaIterada(fechaIterada: Date, horario: any) {
 export const EstadoHorarioPeriVacacion = async function (id_empleado: number) {
     console.log(id_empleado);
 
-    let ids = await pool.query('SELECT co.id AS id_contrato, ca.id AS id_cargo FROM empl_contratos AS co, empl_cargos AS ca WHERE co.id_empleado = $1 AND co.id = ca.id_empl_contrato', [id_empleado])
+    let ids = await pool.query('SELECT co.id AS id_contrato, ca.id AS id_cargo FROM eu_empleado_contratos AS co, eu_empleado_cargos AS ca WHERE co.id_empleado = $1 AND co.id = ca.id_contrato', [id_empleado])
         .then(result => { return result.rows });
 
     if (ids.length === 0) {
         return 0;
     }
     console.log(ids);
-
-    let cargos = [... new Set(
-        ids.map(obj => {
-            return obj.id_cargo;
-        })
-    )]
-
-    cargos.forEach(async (id_cargo) => {
-        await pool.query('UPDATE empl_horarios SET estado = 2 WHERE id_empl_cargo = $1', [id_cargo]) //Estado 2 es para q esten desactivados esos horarios
-    })
 
     let contratos = [... new Set(
         ids.map(obj => {
@@ -136,7 +90,7 @@ export const EstadoHorarioPeriVacacion = async function (id_empleado: number) {
     )]
 
     contratos.forEach(async (id_contrato) => {
-        await pool.query('UPDATE peri_vacaciones SET estado = 2 WHERE id_empl_contrato = $1', [id_contrato]) //Estado 2 es para q esten desactivados esos periodos de vacacion
+        await pool.query('UPDATE mv_periodo_vacacion SET estado = 2 WHERE id_empleado_contrato = $1', [id_contrato]) //Estado 2 es para q esten desactivados esos periodos de vacacion
     })
 
     return 0
