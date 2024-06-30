@@ -18,7 +18,7 @@ const VerDetalleParametro = (req, res) => __awaiter(void 0, void 0, void 0, func
         const response = yield database_1.pool.query('SELECT tp.id AS id_tipo, tp.descripcion AS tipo, ' +
             'dtp.id AS id_detalle, dtp.descripcion ' +
             'FROM ep_parametro AS tp, ep_detalle_parametro AS dtp ' +
-            'WHERE tp.id = dtp.id_tipo_parametro AND tp.id = $1', [id]);
+            'WHERE tp.id = dtp.id_parametro AND tp.id = $1', [id]);
         const detalle = response.rows;
         console.log(detalle);
         return res.jsonp(detalle);

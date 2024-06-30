@@ -14,7 +14,7 @@ const database_1 = require("../database");
 const getEmpresaPorId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = parseInt(req.params.id);
-        const response = yield database_1.pool.query('SELECT id, nombre, ruc, direccion, telefono, correo, representante, tipo_empresa, establecimiento, logo, color_p, color_s, dias_cambio, cambios, password_correo, seg_contrasena, seg_frase, seg_ninguna, acciones_timbres, num_partida, public_key FROM cg_empresa WHERE id = $1', [id]);
+        const response = yield database_1.pool.query('SELECT id, nombre, ruc, direccion, telefono, correo, representante, tipo_empresa, establecimiento, logo, color_principal, color_secundario, dias_cambio, cambios, password_correo, seguridad_contrasena, seguridad_frase, seguridad_ninguna, acciones_timbres, numero_partida, public_key FROM e_empresa WHERE id = $1', [id]);
         const empresa = response.rows;
         console.log(empresa);
         return res.jsonp(empresa[0]);

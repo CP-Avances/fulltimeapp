@@ -14,13 +14,7 @@ class GraficasRutas {
     configuracion() {
         // ADMINISTRADOR
         this.router.get('/hora-extra', verificarToken_1.verificarToken, graficas_controller_1.default.AdminHorasExtras);
-        this.router.get('/asistencia', verificarToken_1.verificarToken, graficas_controller_1.default.AdminAsistencia);
-        this.router.get('/inasistencia', verificarToken_1.verificarToken, graficas_controller_1.default.AdminInasistencia);
-        this.router.get('/retrasos', verificarToken_1.verificarToken, graficas_controller_1.default.AdminAtrasos);
-        this.router.get('/jornada-vs-hora-extra', verificarToken_1.verificarToken, graficas_controller_1.default.AdminJornadaHorasExtras);
-        this.router.get('/tiempo-jornada-vs-hora-ext', verificarToken_1.verificarToken, graficas_controller_1.default.AdminTiempoJornadaHorasExtras);
         this.router.get('/marcaciones-emp', verificarToken_1.verificarToken, graficas_controller_1.default.AdminMarcacionesEmpleado);
-        this.router.get('/salidas-anticipadas', verificarToken_1.verificarToken, graficas_controller_1.default.AdminSalidasAnticipadas);
     }
 }
 const GRAFICAS_RUTAS = new GraficasRutas();

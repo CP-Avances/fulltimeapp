@@ -160,7 +160,7 @@ exports.FormatearHora = FormatearHora;
 const BuscarFecha = function () {
     return __awaiter(this, void 0, void 0, function* () {
         return {
-            fecha: yield database_1.pool.query(`SELECT descripcion FROM detalle_tipo_parametro WHERE id_tipo_parametro = 25`).then(result => {
+            fecha: yield database_1.pool.query(`SELECT descripcion FROM ep_detalle_parametro WHERE id_parametro = 25`).then(result => {
                 if (result.rowCount != 0) {
                     return result.rows[0].descripcion;
                 }
@@ -175,7 +175,7 @@ exports.BuscarFecha = BuscarFecha;
 const BuscarHora = function () {
     return __awaiter(this, void 0, void 0, function* () {
         return {
-            hora: yield database_1.pool.query(`SELECT descripcion FROM detalle_tipo_parametro WHERE id_tipo_parametro = 26`).then(result => {
+            hora: yield database_1.pool.query(`SELECT descripcion FROM ep_detalle_parametro WHERE id_parametro = 26`).then(result => {
                 if (result.rowCount != 0) {
                     return result.rows[0].descripcion;
                 }

@@ -37,7 +37,6 @@ class ReportesRoutes {
         this.router.get('/timbres', [verificarToken_1.verificarToken], REPORTES.getInfoReporteTimbres);
         this.router.get('/timbresConNovedad', [verificarToken_1.verificarToken], REPORTES.getInfoReporteTimbresNovedad);
         this.router.get('/inasistencia', [verificarToken_1.verificarToken], REPORTES.getInfoReporteInasistencia);
-        this.router.get('/atrasos', [verificarToken_1.verificarToken], REPORTES.getInfoReporteAtrasos);
         this.router.get('/horas-extras', [verificarToken_1.verificarToken], REPORTES.getInfoReporteHorasExtras);
         this.router.get('/solicitudes', [verificarToken_1.verificarToken], REPORTES.getInfoReporteSolicitudes);
         this.router.get('/vacaciones', [verificarToken_1.verificarToken], REPORTES.getInfoReporteVacaciones);

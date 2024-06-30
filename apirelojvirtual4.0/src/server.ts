@@ -6,9 +6,7 @@ import morgan from 'morgan';
 import EMPLEADOS_Routes from './routes/empleados.routes';
 import EMPRESA_Routes from './routes/empresa.routes';
 import REPORTES_Routes from './routes/reportes.routes';
-import ROL_Routes from './routes/rol.routes';
 import TIMBRES_Routes from './routes/timbre.routes';
-import TIPO_TIMBRE_Routes from './routes/tipoTimbre.routes';
 import USUARIO_Routes from './routes/usuario.routes';
 import PERMISOS_Routes from './routes/permisos.routes';
 import HORAS_EXTRAS_Routes from './routes/horasExtras.routes';
@@ -71,8 +69,6 @@ class Servidor {
         this.app.use('/api/enterprise', EMPRESA_Routes);
         this.app.use('/api/ring', TIMBRES_Routes);
         this.app.use('/api/reportes', REPORTES_Routes);
-        this.app.use('/api/roles', ROL_Routes);
-        this.app.use('/api/tipoTimbre', TIPO_TIMBRE_Routes);
         this.app.use('/api/permisos', PERMISOS_Routes);
         this.app.use('/api/horasextras', HORAS_EXTRAS_Routes);
         this.app.use('/api/vacaciones', VACACIONES_Routes);

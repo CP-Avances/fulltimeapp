@@ -18,7 +18,7 @@ const database_1 = require("../database");
 const getCgFeriados = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const fecha = new Date();
-        const response = yield database_1.pool.query('SELECT id, descripcion, CAST(fecha AS VARCHAR),CAST(fec_recuperacion AS VARCHAR) FROM cg_feriados WHERE CAST(fecha AS VARCHAR) LIKE $1 || \'%\' ORDER BY descripcion ASC', [fecha.toJSON().split("-")[0]]);
+        const response = yield database_1.pool.query('SELECT id, descripcion, CAST(fecha AS VARCHAR),CAST(fecha_recuperacion AS VARCHAR) FROM ef_cat_feriados WHERE CAST(fecha AS VARCHAR) LIKE $1 || \'%\' ORDER BY descripcion ASC', [fecha.toJSON().split("-")[0]]);
         const cg_feriados = response.rows;
         console.log('cg_feriados: ', cg_feriados);
         return res.status(200).jsonp(cg_feriados);
@@ -35,7 +35,7 @@ exports.getCgFeriados = getCgFeriados;
  */
 const getCgTipoPermisos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const response = yield database_1.pool.query('SELECT cg.* FROM cg_tipo_permisos cg ORDER BY cg.descripcion ASC');
+        const response = yield database_1.pool.query('SELECT cg.* FROM mp_cat_tipo_permisos cg ORDER BY cg.descripcion ASC');
         const cg_permisos = response.rows;
         return res.status(200).jsonp(cg_permisos);
     }
@@ -51,7 +51,7 @@ exports.getCgTipoPermisos = getCgTipoPermisos;
  */
 const getServiciosComida = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const response = yield database_1.pool.query('SELECT * FROM tipo_comida');
+        const response = yield database_1.pool.query('SELECT * FROM ma_cat_comidas');
         const servicios_comida = response.rows;
         return res.status(200).jsonp(servicios_comida);
     }
@@ -67,7 +67,7 @@ const getServiciosComida = (req, res) => __awaiter(void 0, void 0, void 0, funct
 exports.getServiciosComida = getServiciosComida;
 const getServiciosMenu = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const response = yield database_1.pool.query('SELECT * FROM cg_tipo_comidas');
+        const response = yield database_1.pool.query('SELECT * FROM ma_horario_comidas');
         const menu = response.rows;
         return res.status(200).jsonp(menu);
     }
@@ -83,7 +83,7 @@ const getServiciosMenu = (req, res) => __awaiter(void 0, void 0, void 0, functio
 exports.getServiciosMenu = getServiciosMenu;
 const getDetalleMenu = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const response = yield database_1.pool.query('SELECT cg.* FROM detalle_menu cg ORDER BY cg.valor ASC');
+        const response = yield database_1.pool.query('SELECT cg.* FROM ma_detalle_comida cg ORDER BY cg.valor ASC');
         const cg_detalle_menu = response.rows;
         return res.status(200).jsonp(cg_detalle_menu);
     }

@@ -61,8 +61,8 @@ const CalcularHoraExtra = function (id_empleado, codigo, fec_desde, fec_hasta) {
 exports.CalcularHoraExtra = CalcularHoraExtra;
 function FeriadosPorIdCargo(id_cargo, fec_desde, fec_hasta) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield database_1.pool.query('SELECT f.fecha, f.fec_recuperacion, f.descripcion FROM empl_cargos AS ec, sucursales AS s, ciudades AS c, ' +
-            'ciud_feriados AS cf, cg_feriados AS f WHERE ec.id = $1 AND ec.id_sucursal = s.id AND s.id_ciudad = c.id AND ' +
+        return yield database_1.pool.query('SELECT f.fecha, f.fecha_recuperacion, f.descripcion FROM eu_empleado_cargos AS ec, e_sucursales AS s, e_ciudades AS c, ' +
+            'ef_ciudad_feriado AS cf, ef_cat_feriados AS f WHERE ec.id = $1 AND ec.id_sucursal = s.id AND s.id_ciudad = c.id AND ' +
             'cf.id_ciudad = s.id AND f.id = cf.id_feriado AND f.fecha between $2 and $3', [id_cargo, fec_desde, fec_hasta])
             .then(result => { return result.rows; });
     });
@@ -145,13 +145,13 @@ function HorasSuplementarias(valor_dia, valor_hora, num_hora, porcentaje) {
 }
 function HorasExtrasSolicitadas(codigo, id_cargo, fec_desde, fec_hasta) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield database_1.pool.query('SELECT h.fec_inicio, h.fec_final, h.descripcion, h.num_hora, h.tiempo_autorizado ' +
-            'FROM hora_extr_pedidos AS h WHERE h.id_empl_cargo = $1 AND h.fec_inicio between $2 and $3 ' +
-            'AND h.fec_final between $2 and $3 ORDER BY h.fec_inicio', [id_cargo, fec_desde, fec_hasta])
+        return yield database_1.pool.query('SELECT h.fecha_inicio, h.fecha_final, h.descripcion, h.horas_solicitud, h.tiempo_autorizado ' +
+            'FROM mhe_solicitud_hora_extra AS h WHERE h.id_empleado_cargo = $1 AND h.fecha_inicio between $2 and $3 ' +
+            'AND h.fecha_final between $2 and $3 ORDER BY h.fecha_inicio', [id_cargo, fec_desde, fec_hasta])
             .then(result => {
             return Promise.all(result.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
-                var f1 = new Date(obj.fec_inicio);
-                var f2 = new Date(obj.fec_final);
+                var f1 = new Date(obj.fecha_inicio);
+                var f2 = new Date(obj.fecha_final);
                 f1.setUTCHours(f1.getUTCHours() - 5);
                 f2.setUTCHours(f2.getUTCHours() - 5);
                 const hora_inicio = (0, metodos_1.HHMMtoSegundos)(f1.toJSON().split('T')[1].split('.')[0]);
@@ -180,7 +180,7 @@ function HorasExtrasSolicitadas(codigo, id_cargo, fec_desde, fec_hasta) {
 function PlanificacionHorasExtrasSolicitadas(codigo, id_cargo, fec_desde, fec_hasta) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.pool.query('SELECT h.fecha_desde, h.hora_inicio, h.fecha_hasta, h.hora_fin, h.descripcion, h.horas_totales, ph.tiempo_autorizado ' +
-            'FROM plan_hora_extra_empleado AS ph, plan_hora_extra AS h WHERE ph.id_empl_cargo = $1 AND ph.id_plan_hora = h.id ' +
+            'FROM mhe_empleado_plan_hora_extra AS ph, mhe_detalle_plan_hora_extra AS h WHERE ph.id_empleado_cargo = $1 AND ph.id_detalle_plan = h.id ' +
             'AND h.fecha_desde between $2 and $3 AND h.fecha_hasta between $2 and $3 ORDER BY h.fecha_desde', [id_cargo, fec_desde, fec_hasta])
             .then(result => {
             return Promise.all(result.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
@@ -214,12 +214,12 @@ function PlanificacionHorasExtrasSolicitadas(codigo, id_cargo, fec_desde, fec_ha
 function ObtenerTimbres(codigo, fec_desde, fec_hasta) {
     return __awaiter(this, void 0, void 0, function* () {
         // console.log('$$$$$$$$$$$$', fec_desde, fec_hasta);
-        return yield database_1.pool.query('SELECT fec_hora_timbre, accion FROM timbres WHERE codigo = $1 AND accion  in (\'EoS\', \'E\', \'S\') AND fec_hora_timbre BETWEEN $2 AND $3 ORDER BY fec_hora_timbre', [codigo, fec_desde, fec_hasta])
+        return yield database_1.pool.query('SELECT fecha_hora_timbre, accion FROM eu_timbres WHERE codigo = $1 AND accion  in (\'EoS\', \'E\', \'S\') AND fecha_hora_timbre BETWEEN $2 AND $3 ORDER BY fecha_hora_timbre', [codigo, fec_desde, fec_hasta])
             .then(result => {
             return result.rows.map(obj => {
-                var f1 = new Date(obj.fec_hora_timbre.toJSON().split('.')[0]);
+                var f1 = new Date(obj.fecha_hora_timbre.toJSON().split('.')[0]);
                 f1.setUTCHours(f1.getUTCHours() - 15);
-                obj.fec_hora_timbre = new Date(f1.toJSON().split('.')[0]);
+                obj.fecha_hora_timbre = new Date(f1.toJSON().split('.')[0]);
                 console.log(obj);
                 return obj;
             });
@@ -229,8 +229,8 @@ function ObtenerTimbres(codigo, fec_desde, fec_hasta) {
 function CargoContratoByFecha(id_empleado, fec_desde, fec_hasta) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const cargo_contrato = yield database_1.pool.query('SELECT (e.nombre || \' \' || e.apellido) as nombre, e.codigo, e.cedula, ca.id AS id_cargo, ca.fec_inicio, ca.fec_final, co.id AS id_contrato, ca.sueldo, ca.hora_trabaja FROM empleados AS e, empl_contratos AS co, empl_cargos AS ca ' +
-                'WHERE e.id = co.id_empleado AND co.id_empleado = $1 AND ca.id_empl_contrato = co.id OR ca.fec_inicio BETWEEN $2 AND $3 OR ca.fec_final BETWEEN $2 AND $3 ', [id_empleado, fec_desde, fec_hasta])
+            const cargo_contrato = yield database_1.pool.query('SELECT (e.nombre || \' \' || e.apellido) as nombre, e.codigo, e.cedula, ca.id AS id_cargo, ca.fecha_inicio, ca.fecha_final, co.id AS id_contrato, ca.sueldo, ca.hora_trabaja FROM eu_empleados AS e, eu_empleado_contratos AS co, eu_empleado_cargos AS ca ' +
+                'WHERE e.id = co.id_empleado AND co.id_empleado = $1 AND ca.id_contrato = co.id OR ca.fecha_inicio BETWEEN $2 AND $3 OR ca.fecha_final BETWEEN $2 AND $3 ', [id_empleado, fec_desde, fec_hasta])
                 .then(result => {
                 return result.rows;
             });
@@ -267,12 +267,12 @@ function CargoContratoByFecha(id_empleado, fec_desde, fec_hasta) {
  */
 function CatalogoHorasExtras() {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield database_1.pool.query('SELECT id, descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, tipo_funcion FROM cg_hora_extras').then(result => {
+        return yield database_1.pool.query('SELECT id, descripcion, tipo_descuento, recargo_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, tipo_funcion FROM mhe_configurar_hora_extra').then(result => {
             return result.rows.map(obj => {
                 obj.hora_inicio = (0, metodos_1.HHMMtoSegundos)(obj.hora_inicio);
                 obj.hora_final = (0, metodos_1.HHMMtoSegundos)(obj.hora_final);
                 (obj.tipo_descuento === 1) ? obj.tipo_descuento = 'HE' : obj.tipo_descuento = 'RN';
-                obj.reca_porcentaje = parseInt(obj.reca_porcentaje) / 100;
+                obj.recargo_porcentaje = parseInt(obj.recargo_porcentaje) / 100;
                 (obj.hora_jornada === 1) ? obj.hora_jornada = 'Diurna' : obj.hora_jornada = 'Nocturna';
                 (obj.tipo_dia === 1 || obj.tipo_dia === 2) ? obj.tipo_dia = 'LoF' : obj.tipo_dia = 'N';
                 return obj;

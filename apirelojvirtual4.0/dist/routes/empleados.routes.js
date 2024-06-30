@@ -34,7 +34,6 @@ class EmpleadoRoutes {
     configuracion() {
         // RUTAS DE EMPLEADOS CONTROLADOR
         this.router.get('/lista', verificarToken_1.verificarToken, EMPLEADO.getListaEmpleados);
-        this.router.get('/horarios', EMPLEADO.getListaHorariosEmpleadoByCodigo);
         this.router.get('/horariosEmpleado', EMPLEADO.getHorariosEmpleadoByCodigo);
         this.router.get('/horarioEmplefecha', EMPLEADO.BuscarPlanificacionHorarioEmple);
         this.router.get('/un-horario', EMPLEADO.getOneHorarioEmpleadoByCodigo);

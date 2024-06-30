@@ -10,9 +10,7 @@ const morgan_1 = __importDefault(require("morgan"));
 const empleados_routes_1 = __importDefault(require("./routes/empleados.routes"));
 const empresa_routes_1 = __importDefault(require("./routes/empresa.routes"));
 const reportes_routes_1 = __importDefault(require("./routes/reportes.routes"));
-const rol_routes_1 = __importDefault(require("./routes/rol.routes"));
 const timbre_routes_1 = __importDefault(require("./routes/timbre.routes"));
-const tipoTimbre_routes_1 = __importDefault(require("./routes/tipoTimbre.routes"));
 const usuario_routes_1 = __importDefault(require("./routes/usuario.routes"));
 const permisos_routes_1 = __importDefault(require("./routes/permisos.routes"));
 const horasExtras_routes_1 = __importDefault(require("./routes/horasExtras.routes"));
@@ -60,8 +58,6 @@ class Servidor {
         this.app.use('/api/enterprise', empresa_routes_1.default);
         this.app.use('/api/ring', timbre_routes_1.default);
         this.app.use('/api/reportes', reportes_routes_1.default);
-        this.app.use('/api/roles', rol_routes_1.default);
-        this.app.use('/api/tipoTimbre', tipoTimbre_routes_1.default);
         this.app.use('/api/permisos', permisos_routes_1.default);
         this.app.use('/api/horasextras', horasExtras_routes_1.default);
         this.app.use('/api/vacaciones', vacaciones_routes_1.default);

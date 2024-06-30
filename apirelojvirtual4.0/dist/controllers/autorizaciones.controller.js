@@ -18,8 +18,8 @@ const database_1 = require("../database");
 const getAutorizacion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id_auto, campo } = req.query;
-        const subquery1 = `( select i.nombre from cg_departamentos i where i.id = a.id_departamento ) AS ndepartamento `;
-        const query = `SELECT a.*, ${subquery1} FROM autorizaciones a WHERE a.${campo} = ${id_auto}`;
+        const subquery1 = `( select i.nombre from ed_departamentos i where i.id = a.id_departamento ) AS ndepartamento `;
+        const query = `SELECT a.*, ${subquery1} FROM ecm_autorizaciones a WHERE a.${campo} = ${id_auto}`;
         const response = yield database_1.pool.query(query);
         const [autorizacion] = response.rows;
         if (!autorizacion)
@@ -41,16 +41,16 @@ const EncontrarAutorizacionUsuario = (req, res) => __awaiter(void 0, void 0, voi
     console.log('id_empleado: ', id_empleado);
     const AUTORIZA = yield database_1.pool.query(`
         SELECT cd.id AS id_depa_confi, n.id_departamento, n.departamento AS depa_autoriza, n.nivel, da.estado, da.autorizar, da.preautorizar, 
-            da.id_empl_cargo, e.id_contrato, da.id_empleado, e.id_departamento AS depa_pertenece, cd.nombre, 
+            da.id_empleado_cargo, e.id_contrato, da.id_empleado, e.id_departamento AS depa_pertenece, cd.nombre, 
             ce.id AS id_empresa, ce.nombre AS nom_empresa, s.id AS id_sucursal, s.nombre AS nom_sucursal 
-            FROM depa_autorizaciones AS da, cg_departamentos AS cd, cg_empresa AS ce, 
-            sucursales AS s, datos_actuales_empleado AS e, nivel_jerarquicodep AS n 
+            FROM ed_autoriza_departamento AS da, ed_departamentos AS cd, e_empresa AS ce, 
+            e_sucursales AS s, datos_actuales_empleado AS e, ed_niveles_departamento AS n 
         WHERE da.id_departamento = cd.id 
             AND cd.id_sucursal = s.id 
             AND ce.id = s.id_empresa 
             AND da.id_empleado = $1 
-            AND e.id_cargo = da.id_empl_cargo
-            AND n.id_dep_nivel = cd.id
+            AND e.id_cargo = da.id_empleado_cargo
+            AND n.id_departamento_nivel = cd.id
         `, [id_empleado]);
     if ((AUTORIZA.rowCount > 0)) {
         return res.jsonp(AUTORIZA.rows);
@@ -68,19 +68,19 @@ const ObtenerListaAutorizaDepa = (req, res) => __awaiter(void 0, void 0, void 0,
     try {
         const { id_depar } = req.params;
         const EMPLEADOS = yield database_1.pool.query(`
-            SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel,
-                n.id_establecimiento AS id_suc, s.nombre AS sucursal,
-                da.estado, dae.id_contrato, da.id_empl_cargo, c.id_empleado, (dae.nombre || ' ' || dae.apellido) as fullname, 
-                dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail, 
-                c.hora_extra_noti  
-            FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae, 
-                config_noti AS c, cg_departamentos AS cg, sucursales AS s 
+            SELECT n.id_departamento, cg.nombre, n.id_departamento_nivel, n.departamento_nombre_nivel, n.nivel,
+                n.id_sucursal AS id_suc, s.nombre AS sucursal,
+                da.estado, dae.id_contrato, da.id_empleado_cargo, c.id_empleado, (dae.nombre || ' ' || dae.apellido) as fullname, 
+                dae.cedula, dae.correo, c.permiso_mail, c.permiso_notificacion, c.vacacion_mail, c.vacacion_notificacion, c.hora_extra_mail, 
+                c.hora_extra_notificacion  
+            FROM ed_niveles_departamento AS n, ed_autoriza_departamento AS da, datos_actuales_empleado AS dae, 
+                eu_configurar_alertas AS c, ed_departamentos AS cg, e_sucursales AS s 
             WHERE n.id_departamento = $1 
-                AND da.id_departamento = n.id_dep_nivel 
-                AND dae.id_cargo = da.id_empl_cargo 
+                AND da.id_departamento = n.id_departamento_nivel 
+                AND dae.id_cargo = da.id_empleado_cargo 
                 AND dae.id = c.id_empleado 
                 AND cg.id = $1
-                AND s.id = n.id_establecimiento 
+                AND s.id = n.id_sucursal 
             ORDER BY nivel ASC
             `, [id_depar]);
         if (EMPLEADOS.rowCount > 0) {
@@ -103,7 +103,7 @@ exports.ObtenerListaAutorizaDepa = ObtenerListaAutorizaDepa;
 const postAutorizacion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_documento, id_plan_hora_extra } = req.body;
-        const response = yield database_1.pool.query('INSERT INTO autorizaciones( orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_documento, id_plan_hora_extra ) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING * ', [orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_documento, id_plan_hora_extra]);
+        const response = yield database_1.pool.query('INSERT INTO ecm_autorizaciones( orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_autoriza_estado, id_plan_hora_extra ) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING * ', [orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_documento, id_plan_hora_extra]);
         const [autorizacion] = response.rows;
         if (!autorizacion)
             return res.status(400).jsonp({ message: 'No se creo autorización' });
@@ -126,8 +126,8 @@ const updateAutorizacion = (req, res) => __awaiter(void 0, void 0, void 0, funct
         console.log('id_auto: ', id_auto);
         console.log('campo: ', campo);
         console.log('id_auto: ', estado);
-        console.log('id_documento: ', id_documento);
-        const query = `UPDATE autorizaciones SET estado = ${estado} , id_documento = \'${id_documento}\' WHERE ${campo} = ${id_auto} RETURNING *`;
+        console.log('id_autoriza_estado: ', id_documento);
+        const query = `UPDATE ecm_autorizaciones SET estado = ${estado} , id_autoriza_estado = \'${id_documento}\' WHERE ${campo} = ${id_auto} RETURNING *`;
         const response = yield database_1.pool.query(query);
         const [autorizacion] = response.rows;
         if (!autorizacion)
@@ -171,26 +171,26 @@ const BuscarJefes = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     const permiso = objeto;
     console.log(permiso);
     const JefesDepartamentos = yield database_1.pool.query(`
-        SELECT da.id, da.estado, n.id_departamento as id_dep, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel, 
-            n.id_establecimiento AS id_suc, n.departamento, s.nombre AS sucursal, da.id_empl_cargo as cargo, 
+        SELECT da.id, da.estado, n.id_departamento as id_dep, n.id_departamento_nivel, n.departamento_nombre_nivel, n.nivel, 
+            n.id_sucursal AS id_suc, n.departamento, s.nombre AS sucursal, da.id_empleado_cargo as cargo, 
             dae.id_contrato as contrato, da.id_empleado AS empleado, (dae.nombre || ' ' || dae.apellido) as fullname,
-            dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail, 
-            c.hora_extra_noti, c.comida_mail, c.comida_noti 
-        FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae,
-            config_noti AS c, cg_departamentos AS cg, sucursales AS s
+            dae.cedula, dae.correo, c.permiso_mail, c.permiso_notificacion, c.vacacion_mail, c.vacacion_notificacion, c.hora_extra_mail, 
+            c.hora_extra_notificacion, c.comida_mail, c.comida_notificacion
+        FROM ed_niveles_departamento AS n, ed_autoriza_departamento AS da, datos_actuales_empleado AS dae,
+            eu_configurar_alertas AS c, ed_departamentos AS cg, e_sucursales AS s
         WHERE n.id_departamento = $1
-            AND da.id_departamento = n.id_dep_nivel
-            AND dae.id_cargo = da.id_empl_cargo
+            AND da.id_departamento = n.id_departamento_nivel
+            AND dae.id_cargo = da.id_empleado_cargo
             AND dae.id_contrato = c.id_empleado
             AND cg.id = $1
-            AND s.id = n.id_establecimiento
+            AND s.id = n.id_sucursal
         ORDER BY nivel ASC
         `, [depa_user_loggin]).then(result => { return result.rows; });
     if (JefesDepartamentos.length === 0)
         return res.status(400)
             .jsonp({ message: 'Ups !!! algo salio mal. Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.' });
     const obj = JefesDepartamentos[JefesDepartamentos.length - 1];
-    let depa_padre = obj.id_dep_nivel;
+    let depa_padre = obj.id_departamento_nivel;
     let JefeDepaPadre;
     if (depa_padre !== null) {
         /*
@@ -201,8 +201,8 @@ const BuscarJefes = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                             cg.nivel, s.id AS id_suc, cg.nombre AS departamento, s.nombre AS sucursal,
                             ecr.id AS cargo, ecn.id AS contrato, e.id AS empleado,
                             (e.nombre || ' ' || e.apellido) as fullname, e.cedula, e.correo, c.permiso_mail,
-                            c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail,
-                            c.hora_extra_noti, c.comida_mail, c.comida_noti
+                            c.permiso_notificacion, c.vacacion_mail, c.vacacion_notificacion, c.hora_extra_mail,
+                            c.hora_extra_notificacion, c.comida_mail, c.comida_noti
                             FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg,
                             sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c
                             WHERE da.id_departamento = $1 AND da.id_empl_cargo = ecr.id AND
