@@ -73,7 +73,7 @@ export class EmpleadosService {
       )
   }
 
-  ObtenerUbicacion(codigo: number) {
+  ObtenerUbicacion(codigo: any) {
     return this.http.get<any>(this.apiUrl + '/empleado/ubicacion/' + codigo);
   }
 

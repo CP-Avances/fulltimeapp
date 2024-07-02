@@ -156,14 +156,14 @@ export class VertimbrePage implements OnInit {
         let fechasObjeto = {}
         
         res.forEach(data => {
-          data.fecha = this.validar.FormatearFecha(data.fec_hora_timbre, this.formato_fecha, this.validar.dia_completo);
-          data.hora = this.validar.FormatearHora(moment(data.fec_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+          data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
+          data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
           data.sfecha = '';
           data.shora = '';
 
-          if (data.fec_hora_timbre_servidor != null) {
-            data.sfecha = this.validar.FormatearFecha(data.fec_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo);
-            data.shora = this.validar.FormatearHora(moment(data.fec_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
+          if (data.fecha_hora_timbre_servidor != null) {
+            data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo);
+            data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
           }else if(data.fecha_subida_servidor != null){
             data.sfecha = this.validar.FormatearFecha(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo);
             data.shora = this.validar.FormatearHora(moment(data.fecha_subida_servidor).format('HH:mm:ss'), this.formato_hora);
@@ -204,15 +204,15 @@ export class VertimbrePage implements OnInit {
           var fechasObjeto_f = {};
 
           ress.forEach(data => {
-            data.fecha = this.validar.FormatearFecha(data.fec_hora_timbre, this.formato_fecha, this.validar.dia_completo);
-            data.hora = this.validar.FormatearHora(moment(data.fec_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+            data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
+            data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
 
             data.sfecha = '';
             data.shora = '';
 
-            if (data.fec_hora_timbre_servidor != null) {
-              data.sfecha = this.validar.FormatearFecha(data.fec_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo);
-              data.shora = this.validar.FormatearHora(moment(data.fec_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
+            if (data.fecha_hora_timbre_servidor != null) {
+              data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo);
+              data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
             }else if(data.fecha_subida_servidor != null){
               data.sfecha = this.validar.FormatearFecha(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo);
               data.shora = this.validar.FormatearHora(moment(data.fecha_subida_servidor).format('HH:mm:ss'), this.formato_hora);

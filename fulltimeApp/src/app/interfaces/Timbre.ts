@@ -6,7 +6,7 @@ export interface Timbre {
     observacion?: string,
     latitud?: string,
     longitud?: string
-    id_empleado?: number,
+    codigo?: string,
     id_reloj?: number,
     tipo_autenticacion?: string,
     dispositivo_timbre?: any,

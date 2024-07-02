@@ -244,7 +244,7 @@ exports.ingresarIDdispositivo = ingresarIDdispositivo;
 const getidDispositivo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id_empleado = req.params.id_empleado;
-        const response = yield database_1.pool.query(`SELECT * FROM mrv_dispositivos WHERE codigo_empleado = '35' ORDER BY id ASC `);
+        const response = yield database_1.pool.query(`SELECT * FROM mrv_dispositivos WHERE codigo_empleado = '${id_empleado}' ORDER BY id ASC `);
         const IdDispositivos = response.rows;
         return res.jsonp(IdDispositivos);
     }

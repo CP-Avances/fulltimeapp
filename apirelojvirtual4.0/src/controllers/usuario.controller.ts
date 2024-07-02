@@ -256,7 +256,7 @@ export const ingresarIDdispositivo = async (req: Request, res: Response) => {
 export const getidDispositivo = async (req: Request, res: Response): Promise<Response> => {
     try {
         const id_empleado = req.params.id_empleado;
-        const response: QueryResult = await pool.query(`SELECT * FROM mrv_dispositivos WHERE codigo_empleado = '35' ORDER BY id ASC `);
+        const response: QueryResult = await pool.query(`SELECT * FROM mrv_dispositivos WHERE codigo_empleado = '${id_empleado}' ORDER BY id ASC `);
         const IdDispositivos: IdDispositivos[] = response.rows;
         return res.jsonp(IdDispositivos);
     } catch (error) {

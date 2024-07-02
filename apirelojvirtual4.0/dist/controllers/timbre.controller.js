@@ -42,6 +42,8 @@ const crearTimbre = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     try {
         const hoy = new Date();
         const timbre = req.body;
+        // Verificar el contenido de req.body
+        console.log('Contenido de req.body:', timbre);
         timbre.fec_hora_timbre_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
         const timbreRV = new Date(timbre.fec_hora_timbre || '');
         const restaTimbresHoras = timbreRV.getHours() - hoy.getHours();
@@ -61,6 +63,8 @@ const crearTimbre = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         else {
             timbre.hora_timbre_diferente = false;
         }
+        // Verificar el valor de timbre.accion antes de la consulta
+        console.log('Valor de timbre.accion:', timbre.accion);
         const response = yield database_1.pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
             'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
             'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion) ' +
@@ -105,7 +109,7 @@ const crearTimbreDesconectado = (req, res) => __awaiter(void 0, void 0, void 0, 
         const response = yield database_1.pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
             'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
             'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion) ' +
-            'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16);', [timbre.fec_hora_timbre, timbre.accion, timbre.tecl_funcion, timbre.observacion,
+            'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16);', [timbre.fec_hora_timbre, 'dd', timbre.tecl_funcion, timbre.observacion,
             timbre.latitud, timbre.longitud, timbre.codigo, timbre.id_reloj,
             timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fec_hora_timbre_servidor,
             timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion]);
