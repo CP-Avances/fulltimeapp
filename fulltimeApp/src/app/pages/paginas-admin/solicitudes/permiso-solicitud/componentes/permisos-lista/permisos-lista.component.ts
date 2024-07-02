@@ -111,16 +111,16 @@ export class PermisosListaComponent implements OnInit, OnDestroy {
 
           this.permisos.forEach(p => {
             // TRATAMIENTO DE FECHAS Y HORAS EN FORMATO DD/MM/YYYYY
-            p.fec_creacion_ = this.validar.FormatearFecha(String(p.fec_creacion), this.formato_fecha, this.validar.dia_completo);
-            p.fec_inicio_ = this.validar.FormatearFecha(String(p.fec_inicio), this.formato_fecha, this.validar.dia_completo);
-            p.fec_final_ = this.validar.FormatearFecha(String(p.fec_final), this.formato_fecha, this.validar.dia_completo);
+            p.fec_creacion_ = this.validar.FormatearFecha(String(p.fecha_creacion), this.formato_fecha, this.validar.dia_completo);
+            p.fec_inicio_ = this.validar.FormatearFecha(String(p.fecha_inicio), this.formato_fecha, this.validar.dia_completo);
+            p.fec_final_ = this.validar.FormatearFecha(String(p.fecha_final), this.formato_fecha, this.validar.dia_completo);
 
             p.hora_ingreso_ = this.validar.FormatearHora(p.hora_ingreso!, this.formato_hora);
             p.hora_salida_ = this.validar.FormatearHora(p.hora_salida!, this.formato_hora);
 
           })
           const [ultimoNumeroPermiso] = permisos;
-          this.num_permiso = (ultimoNumeroPermiso) ? ultimoNumeroPermiso.num_permiso! + 1 : 1;
+          this.num_permiso = (ultimoNumeroPermiso) ? ultimoNumeroPermiso.numero_permiso! + 1 : 1;
 
           this.conteoSolicitudes = this.permisos.length;
 

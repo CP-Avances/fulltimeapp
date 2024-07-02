@@ -3,7 +3,7 @@ import { Cg_TipoPermiso } from './Catalogos';
 
 export interface Permiso {
     isChecked?: boolean;
-    num_permiso: number;
+    numero_permiso: number;
     id?: number | any;
     id_empl_cargo: number;
     id_empl_contrato: number;
@@ -11,13 +11,13 @@ export interface Permiso {
     id_tipo_permiso: number;
     codigo: number | any;
     descripcion: string;
-    fec_creacion: any;
-    fec_inicio: string;
-    fec_final: string;
+    fecha_creacion: any;
+    fecha_inicio: string;
+    fecha_final: string;
     hora_salida: string;
     hora_ingreso: string;
-    hora_numero: string;
-    dia: number | null;
+    horas_permiso: string;
+    dias_permiso: number | null;
     dia_libre: number;
     estado: number;
     legalizado: boolean;
@@ -42,20 +42,20 @@ export interface Permiso {
 
 export const permisoValueDefault: Permiso = {
     isChecked: false,
-    num_permiso: 0,
+    numero_permiso: 0,
     id_empl_cargo: 0,
     id_empl_contrato: 0,
     id_peri_vacacion: 0,
     id_tipo_permiso: 0,
     codigo: 0,
     descripcion: '',
-    fec_creacion: '',
-    fec_inicio: '',
-    fec_final: '',
+    fecha_creacion: '',
+    fecha_inicio: '',
+    fecha_final: '',
     hora_salida: '',
     hora_ingreso: '',
-    hora_numero: '',
-    dia: 0,
+    horas_permiso: '',
+    dias_permiso: 0,
     dia_libre: 0,
     estado: 0,
     legalizado: false,
@@ -78,18 +78,18 @@ export const cg_permisoValueDefault: Cg_TipoPermiso = {
     fecha_inicio: new Date(),
     fecha_fin: new Date(),
     tipo_descuento: '',
-    num_dia_maximo: 0,
-    num_dia_anticipo: 0,
-    num_dia_anterior: 0,
+    dias_maximo_permiso: 0,
+    dias_anticipar_permiso: 0,
+    crear_dias_anteriores: 0,
     vaca_afecta: false,
     anio_acumula: false,
-    num_dia_justifica: 0,
-    num_hora_maximo: '',
-    almu_incluir: false,
-    fec_validar: false,
-    gene_justificacion: false,
+    dias_justificar: 0,
+    horas_maximo_permiso: '',
+    incluir_minutos_comida: false,
+    fecha_restriccion: false,
+    justificar: false,
     legalizar: false,
-    acce_empleado: 0,
+    solicita_empleado: 0,
     documento: false,
     correo_crear: false,
     correo_editar: false,

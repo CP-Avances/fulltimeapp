@@ -203,23 +203,23 @@ export class ListaPermisosAdminComponent implements OnInit {
 
                     this.permisos_pendientes.sort(
                       (firstObject: Permiso, secondObject: Permiso) =>  
-                        (firstObject.num_permiso >  secondObject.num_permiso)? -1 : 1
+                        (firstObject.numero_permiso >  secondObject.numero_permiso)? -1 : 1
                     );
                   }
                   
                   this.permisos_pre_autorizados.sort(
                     (firstObject: Permiso, secondObject: Permiso) =>  
-                      (firstObject.num_permiso >  secondObject.num_permiso)? -1 : 1
+                      (firstObject.numero_permiso >  secondObject.numero_permiso)? -1 : 1
                   );
 
                   this.permisos_autorizado.sort(
                     (firstObject: Permiso, secondObject: Permiso) =>  
-                      (firstObject.num_permiso >  secondObject.num_permiso)? -1 : 1
+                      (firstObject.numero_permiso >  secondObject.numero_permiso)? -1 : 1
                   );
 
                   this.permisos_negado.sort(
                     (firstObject: Permiso, secondObject: Permiso) =>  
-                      (firstObject.num_permiso >  secondObject.num_permiso)? -1 : 1
+                      (firstObject.numero_permiso >  secondObject.numero_permiso)? -1 : 1
                   );
 
                   if(this.permisos_pendientes.length == 0){
@@ -419,23 +419,23 @@ export class ListaPermisosAdminComponent implements OnInit {
 
                     this.permisos_pendientes.sort(
                       (firstObject: Permiso, secondObject: Permiso) =>  
-                        (firstObject.num_permiso >  secondObject.num_permiso)? -1 : 1
+                        (firstObject.numero_permiso >  secondObject.numero_permiso)? -1 : 1
                     );
                   }
 
                   this.permisos_pre_autorizados.sort(
                     (firstObject: Permiso, secondObject: Permiso) =>  
-                      (firstObject.num_permiso >  secondObject.num_permiso)? -1 : 1
+                      (firstObject.numero_permiso >  secondObject.numero_permiso)? -1 : 1
                   );
 
                   this.permisos_autorizado.sort(
                     (firstObject: Permiso, secondObject: Permiso) =>  
-                      (firstObject.num_permiso >  secondObject.num_permiso)? -1 : 1
+                      (firstObject.numero_permiso >  secondObject.numero_permiso)? -1 : 1
                   );
 
                   this.permisos_negado.sort(
                     (firstObject: Permiso, secondObject: Permiso) =>  
-                      (firstObject.num_permiso >  secondObject.num_permiso)? -1 : 1
+                      (firstObject.numero_permiso >  secondObject.numero_permiso)? -1 : 1
                   );
 
                   if(this.permisos_pendientes.length == 0){

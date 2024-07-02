@@ -120,8 +120,8 @@ export class EditarPermisoComponent implements OnInit {
     this.tiempo = moment();
     this.catalogos.getCgPermisos()
     this.reg = this.permiso;
-    this.fecha_inicio = this.permiso.fec_inicio;
-    this.fecha_final = this.permiso.fec_final;
+    this.fecha_inicio = this.permiso.fecha_inicio;
+    this.fecha_final = this.permiso.fecha_final;
     this.aux_descripcion = this.reg.descripcion;
     this.diaPermiso_refe = 0;
     this.dialibre_refe = 0;
@@ -223,7 +223,7 @@ export class EditarPermisoComponent implements OnInit {
 
   //METODO VALIDAR TIEMPO MAXIMO DE SUBIR DOCUMENTO
   TiempoDocumentJustifi(){
-    if(this.cg_permiso.gene_justificacion == true){
+    if(this.cg_permiso.justificar == true){
       //conteo de días para validar el num de dias para justificar y subir el documento
       var diahoy: any = new Date();
       var diaCreacion = new Date(this.reg.fec_creacion).getTime();
@@ -234,8 +234,8 @@ export class EditarPermisoComponent implements OnInit {
       //Obtenemos el valor de los dias trasncuridos con la siguiente formula donde el 24 es la hora, 60 son minutos, 60 son segundos y 1000 son milisegun
       let dias: number = Math.floor(diasDiferencia / (24 * 60 * 60 * 1000));
      
-      if( dias > this.cg_permiso.num_dia_justifica && (this.reg.documento == ''|| this.reg.documento == null)){
-        this.mensajedocumentBloqueado = 'Lo sentimos, el plazo para subir el documento es de '+this.cg_permiso.num_dia_justifica+' días y usted esta fuera el plazo'
+      if( dias > this.cg_permiso.dias_justificar && (this.reg.documento == ''|| this.reg.documento == null)){
+        this.mensajedocumentBloqueado = 'Lo sentimos, el plazo para subir el documento es de '+this.cg_permiso.dias_justificar+' días y usted esta fuera el plazo'
         this.blockDocument = true;
       }else{
         this.blockDocument = false;
@@ -323,8 +323,8 @@ export class EditarPermisoComponent implements OnInit {
       this.cg_permiso = cg_permiso;
       
       if(this.cg_permiso.id == this.reg.id_tipo_permiso ){
-        const num_maxPermiso = this.cg_permiso.num_dia_maximo;
-        console.log('Dias maximo ',this.cg_permiso.num_dia_maximo);
+        const num_maxPermiso = this.cg_permiso.dias_maximo_permiso;
+        console.log('Dias maximo ',this.cg_permiso.dias_maximo_permiso);
 
         const permilegalizado = this.cg_permiso.legalizar;
   
@@ -344,12 +344,12 @@ export class EditarPermisoComponent implements OnInit {
           this.required = false;
         }
 
-        if(this.cg_permiso.almu_incluir === true){
+        if(this.cg_permiso.incluir_minutos_comida === true){
           this.informacion_comida = `Aplica descuento de minutos de alimentación si el permiso es solicitado por horas y se encuentra dentro del horario de alimentación.`;
         }
 
         this.validaciones.abrirToas(' Dias maximos de Permiso - '+num_maxPermiso, 3000, 'tertiary', 'top');
-        return console.log('Se requiere documento ',this.required), this.cg_permiso.num_dia_maximo;
+        return console.log('Se requiere documento ',this.required), this.cg_permiso.dias_maximo_permiso;
       }
     }
   }
@@ -439,7 +439,7 @@ export class EditarPermisoComponent implements OnInit {
           return this.readonly = true;
         }else{
           console.log('dia laboral')
-          if(this.cg_permiso.fec_validar == true){
+          if(this.cg_permiso.fecha_restriccion == true){
             if((this.dia_inicio >= moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD')) && (this.dia_inicio <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'))){
               this.validaciones.showToast('Lo Sentimos la fecha '+this.dia_inicio+' esta dentro del rango de los días reservados', 3500, 'warning');
               this.valoresDefectoValidacionHoras();
@@ -505,7 +505,7 @@ export class EditarPermisoComponent implements OnInit {
           return this.btnOculto = true;
         }else{
           console.log('dia laboral');
-          if(this.cg_permiso.fec_validar == true){
+          if(this.cg_permiso.fecha_restriccion == true){
             if((this.dia_fianl >= moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD')) && (this.dia_fianl <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'))){
               this.validaciones.showToast('Lo Sentimos la fecha '+this.dia_fianl+' esta dentro del rango de los días reservados', 3500, 'warning');
               this.valoresDefectoValidacionHoras();
@@ -679,13 +679,13 @@ export class EditarPermisoComponent implements OnInit {
       this.mes1 = moment(this.dia_inicio).format('MM');
       this.mes2 = moment(this.reg.fec_creacion).format('MM');
 
-      if(this.cg_permiso.num_dia_anticipo != null){
+      if(this.cg_permiso.dias_maximo_permiso != null){
         if(this.mes1 == this.mes2){
           this.conteo_dia_antisipo = parseInt(this.dia1) - parseInt(this.dia2);
-          if(this.conteo_dia_antisipo >= this.cg_permiso.num_dia_anticipo ){
+          if(this.conteo_dia_antisipo >= this.cg_permiso.dias_maximo_permiso ){
             this.DiaIniciolLibre();
           }else{
-            this.validaciones.showToast('Lo sentimos, el tipo de solicitud seleccionada debe ser solicitada con '+this.cg_permiso.num_dia_anticipo+' días de anticipación', 4500, 'warning'); 
+            this.validaciones.showToast('Lo sentimos, el tipo de solicitud seleccionada debe ser solicitada con '+this.cg_permiso.dias_anticipar_permiso+' días de anticipación', 4500, 'warning'); 
           }
         }else{
           this.DiaIniciolLibre();
@@ -739,7 +739,7 @@ export class EditarPermisoComponent implements OnInit {
   }
 
   AlmuerzoIncluidoCalculo(){
-    if(this.cg_permiso.almu_incluir == true){
+    if(this.cg_permiso.incluir_minutos_comida == true){
       if(this.selectItemDiasHoras == 'Horas'){
         if(this.dia_inicio == this.dia_fianl){
           this.VerificarFechasIgualesComida(this.dia_inicio);
@@ -1002,7 +1002,7 @@ export class EditarPermisoComponent implements OnInit {
       }
 
       //Esta condición calcula el tiempo total con el descuento de minutos de alimentación.
-      if(this.dato_comida != 0 && this.cg_permiso.almu_incluir == true){
+      if(this.dato_comida != 0 && this.cg_permiso.incluir_minutos_comida == true){
         total = total -  this.valor_comida;
       }
 
@@ -1026,8 +1026,8 @@ export class EditarPermisoComponent implements OnInit {
     const [cg_permiso] = this.cg_tipo_permisos.filter(o => {return o.id === this.reg.id_tipo_permiso})
     this.cg_permiso = cg_permiso;
 
-    if((this.cg_permiso.num_dia_maximo < this.reg.dia!) &&  (this.cg_permiso.num_dia_maximo != 0)){
-      this.validaciones.showToast('Lo Sentimos el maximo de dias de permiso es '+this.cg_permiso.num_dia_maximo, 3500, 'warning');
+    if((this.cg_permiso.dias_maximo_permiso < this.reg.dia!) &&  (this.cg_permiso.dias_maximo_permiso != 0)){
+      this.validaciones.showToast('Lo Sentimos el maximo de dias de permiso es '+this.cg_permiso.dias_maximo_permiso, 3500, 'warning');
       this.reg.fec_final = null;
       return false;
     }

@@ -7,7 +7,7 @@ import { Permiso } from 'src/app/interfaces/Permisos';
   <div style="margin: 2% 0% 2% 5%; text-align: left;">
     <p style="font-size: 14px; margin-right:6%;">
       <ion-label> 
-        <strong>No. Solicitud: {{ permiso.num_permiso }}</strong>
+        <strong>No. Solicitud: {{ permiso.numero_permiso }}</strong>
         <strong style="float:right">
           <p *ngIf="permiso.estado == 1" style="color: #81F0FB">Pendiente</p>
           <p *ngIf="permiso.estado == 2" class="pre_autorizado">{{ permiso.estado | estadoSolicitudes }}</p>
@@ -36,8 +36,8 @@ import { Permiso } from 'src/app/interfaces/Permisos';
 
     <p align=left style="font-size: 12px; margin-top:-2%;">
       <strong> Calculo </strong><br>
-      <strong>Días: </strong> {{ permiso.dia }} - 
-      <strong>Horas permiso: </strong> {{ permiso.hora_numero }}
+      <strong>Días: </strong> {{ permiso.dias_permiso }} - 
+      <strong>Horas permiso: </strong> {{ permiso.horas_permiso }}
     </p>
 
     <p align=left style="font-size: 13px; margin-top:-2%;">

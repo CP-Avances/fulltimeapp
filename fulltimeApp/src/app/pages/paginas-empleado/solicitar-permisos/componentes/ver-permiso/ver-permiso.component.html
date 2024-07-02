@@ -7,7 +7,7 @@
       <ion-col size="6">
         <ion-item mode="md">
           <ion-label>
-            <b> Solicitud: </b> {{ permiso.num_permiso }}
+            <b> Solicitud: </b> {{ permiso.numero_permiso }}
           </ion-label>
         </ion-item>
       </ion-col>
@@ -141,7 +141,7 @@
           <ion-item class="item_fondo" mode="md">
             <ion-label>
               <b style="font-size: 85%;"> Dias Permiso  </b> <br>
-              <p style="margin-top: 3%; margin-left: 4%;"> {{ permiso.dia }} dias</p>
+              <p style="margin-top: 3%; margin-left: 4%;"> {{ permiso.dias_permiso }} dias</p>
             </ion-label>
           </ion-item>
         </div>
@@ -150,17 +150,17 @@
       <ion-col size="6">
         <div class="formdiv_tiempo">
           <ion-item class="item_fondo" mode="md">
-            <ion-label *ngIf="permiso.dia === 0 && permiso.hora_numero !== '00:00:00' ">
+            <ion-label *ngIf="permiso.dias_permiso === 0 && permiso.horas_permiso !== '00:00:00' ">
               <b style="font-size: 85%;"> Horas Permiso </b><br>
-              <p style="margin-top: 3%; margin-left: 4%;"> {{ permiso.hora_numero }} horas</p>
+              <p style="margin-top: 3%; margin-left: 4%;"> {{ permiso.horas_permiso }} horas</p>
             </ion-label>
 
-            <ion-label *ngIf="permiso.dia !== 0 && permiso.hora_numero === '00:00:00' ">
+            <ion-label *ngIf="permiso.dias_permiso !== 0 && permiso.horas_permiso === '00:00:00' ">
               <b style="font-size: 85%;"> Dias Libres </b><br>
               <p style="margin-top: 3%; margin-left: 4%;"> {{ permiso.dia_libre }} dias</p>
             </ion-label>
 
-            <ion-label *ngIf="permiso.dia !== 0 && permiso.hora_numero !== '00:00:00' ">
+            <ion-label *ngIf="permiso.dias_permiso !== 0 && permiso.horas_permiso !== '00:00:00' ">
               <b style="font-size: 85%;"> Dias Libres </b><br>
               <p style="margin-top: 3%; margin-left: 4%;"> {{ permiso.dia_libre }} dias</p>
             </ion-label>
@@ -170,11 +170,11 @@
     </ion-row>
   </ion-grid>
 
-  <div *ngIf="permiso.dia !== 0 && permiso.hora_numero !== '00:00:00' " class="formdiv" style="margin-top: -1%; margin-bottom: 3%;">
+  <div *ngIf="permiso.dias_permiso !== 0 && permiso.horas_permiso !== '00:00:00' " class="formdiv" style="margin-top: -1%; margin-bottom: 3%;">
     <ion-item class="item_fondo" mode="md">
       <ion-label>
         <b style="font-size: 85%;"> Horas Permiso </b><br>
-        <p style="margin-top: 1%; margin-left: 4%;"> {{ permiso.hora_numero }} horas</p>
+        <p style="margin-top: 1%; margin-left: 4%;"> {{ permiso.horas_permiso }} horas</p>
       </ion-label>
     </ion-item>
   </div>

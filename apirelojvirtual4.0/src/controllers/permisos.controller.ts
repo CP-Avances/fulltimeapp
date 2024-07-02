@@ -179,8 +179,8 @@ export const getlistaPermisosByHorasyCodigoEdit = async (req: Request, res: Resp
 export const postNuevoPermiso = async (req: Request, res: Response): Promise<Response> => {
     try {
 
-        const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
-            id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
+        const { fecha_creacion, descripcion, fecha_inicio, fecha_final, dia, legalizado, dia_libre,
+            id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, numero_permiso,
             documento, estado, id_empl_cargo, hora_salida, hora_ingreso, codigo } = req.body;
 
         const response: QueryResult = await pool.query(
@@ -189,8 +189,8 @@ export const postNuevoPermiso = async (req: Request, res: Response): Promise<Res
             'documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, codigo) ' +
             'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) ' +
             'RETURNING * ',
-            [fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
-                id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
+            [fecha_creacion, descripcion, fecha_inicio, fecha_final, dia, legalizado, dia_libre,
+                id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, numero_permiso,
                 documento, estado, id_empl_cargo, hora_salida, hora_ingreso, codigo]);
         const [objetoPermiso] = response.rows;
 
