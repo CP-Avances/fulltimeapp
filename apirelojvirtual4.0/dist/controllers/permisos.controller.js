@@ -184,14 +184,14 @@ exports.getlistaPermisosByHorasyCodigoEdit = getlistaPermisosByHorasyCodigoEdit;
  */
 const postNuevoPermiso = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { fecha_creacion, descripcion, fecha_inicio, fecha_final, dia, legalizado, dia_libre, id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, numero_permiso, documento, estado, id_empl_cargo, hora_salida, hora_ingreso, codigo } = req.body;
+        const { fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre, id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, numero_permiso, documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, codigo } = req.body;
         const response = yield database_1.pool.query('INSERT INTO mp_solicitud_permiso (fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, ' +
             'dia_libre, id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, numero_permiso, ' +
             'documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, codigo) ' +
             'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) ' +
-            'RETURNING * ', [fecha_creacion, descripcion, fecha_inicio, fecha_final, dia, legalizado, dia_libre,
-            id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, numero_permiso,
-            documento, estado, id_empl_cargo, hora_salida, hora_ingreso, codigo]);
+            'RETURNING * ', [fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre,
+            id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, numero_permiso,
+            documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, codigo]);
         const [objetoPermiso] = response.rows;
         if (!objetoPermiso)
             return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
@@ -228,7 +228,7 @@ exports.postNuevoPermiso = postNuevoPermiso;
  */
 const putPermiso = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id, fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre, id_tipo_permiso, hora_numero, documento, estado, hora_salida, hora_ingreso } = req.body;
+        const { id, fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre, id_tipo_permiso, horas_permiso, documento, estado, hora_salida, hora_ingreso } = req.body;
         console.log(req.body);
         if (estado === 1) {
             const response = yield database_1.pool.query(`
@@ -236,8 +236,8 @@ const putPermiso = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 dias_permiso = $6, legalizado = $7, dia_libre = $8, id_tipo_permiso = $9, horas_permiso = $10, documento = $11, 
                 estado = $12, hora_salida = $13, hora_ingreso = $14
                 WHERE id = $1  RETURNING *
-                `, [id, fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre, id_tipo_permiso,
-                hora_numero,
+                `, [id, fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre, id_tipo_permiso,
+                horas_permiso,
                 documento, estado, hora_salida, hora_ingreso]);
             const [objetoPermiso] = response.rows;
             if (objetoPermiso) {

@@ -130,9 +130,9 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.reg.numero_permiso = this.num_permiso;
     this.reg.estado = 1;
     this.reg.codigo = localStorage.getItem('codigo');
-    this.reg.id_peri_vacacion = parseInt(localStorage.getItem('cperi_vacacion'));
-    this.reg.id_empl_cargo = parseInt(localStorage.getItem('ccargo')!)
-    this.reg.id_empl_contrato = parseInt(localStorage.getItem('ccontr')!)
+    this.reg.id_periodo_vacacion = parseInt(localStorage.getItem('cperi_vacacion'));
+    this.reg.id_empleado_cargo = parseInt(localStorage.getItem('ccargo')!)
+    this.reg.id_empleado_contrato = parseInt(localStorage.getItem('ccontr')!)
     this.horas_trabaja_seg = this.validaciones.HorasTrabajaToSegundos(localStorage.getItem('horas_trabaja')!);
 
     if(this.reg.fecha_inicio == null || this.reg.fecha_inicio == undefined) {
@@ -168,7 +168,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         this.solInfo = [];
         this.solInfo = {
           permiso_mail: res.permiso_mail,
-          permiso_noti: res.permiso_noti,
+          permiso_noti: res.permiso_notificacion,
           id_empleado: res.id_empleado,
           id_dep: res.id_departamento,
           id_suc: res.id_sucursal,
@@ -270,7 +270,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
         //Cambiar esta validacion del dato id_peri_vacacion se debe leer por la consulta no por el valor almacenado
         if(this.cg_permiso.tipo_descuento == 1){
-          if(!(Number.isNaN(this.reg.id_peri_vacacion))){
+          if(!(Number.isNaN(this.reg.id_periodo_vacacion))){
             this.vacacionService.getlistarPeriVacacionesByCodigo(this.reg.codigo).subscribe(vacaciones => {
               if(vacaciones.length == 0){
                 this.ocultar = true;
@@ -278,7 +278,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
               }else{
                 this.validaciones.showToast('Sin descuento a vacaciones.', 4000, 'tertiary');
                 localStorage.setItem('cperi_vacacion',vacaciones[0].id.toString());
-                this.reg.id_peri_vacacion = parseInt(localStorage.getItem('cperi_vacacion'));
+                this.reg.id_periodo_vacacion = parseInt(localStorage.getItem('cperi_vacacion'));
                 this.ocultar = false;
                 this.mensaje = true;
               }
@@ -297,7 +297,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
           this.mensaje = false;
           this.validaciones.showToast('No tiene registrado periodo de vacaciones.', 3000, 'warning');
         }else{
-          this.reg.id_peri_vacacion = 0;
+          this.reg.id_periodo_vacacion = 0;
           this.ocultar = false;
           this.mensaje = true;
         }
@@ -969,6 +969,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
       this.subscripted = this.permisoService.postNuevoPermiso(this.reg).subscribe(
         permiso => {
+          permiso.EmpleadosSendNotiEmail = []
           permiso.EmpleadosSendNotiEmail.push(this.solInfo);
           if(this.archivoSubido != null){this.subirRespaldo(permiso)};
           this.CrearNuevaAutorizacion(permiso);
@@ -1198,7 +1199,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
           hasta: hasta,
           h_inicio: this.validar.FormatearHora(permiso.hora_salida!, this.formato_hora),
           h_fin: this.validar.FormatearHora(permiso.hora_ingreso!, this.formato_hora),
-          id_empl_contrato: permiso.id_empl_contrato,
+          id_empl_contrato: permiso.id_empleado_contrato,
           horas_permiso: permiso.horas_permiso,
           observacion: permiso.descripcion,
           tipo_permiso: tipo_permiso,

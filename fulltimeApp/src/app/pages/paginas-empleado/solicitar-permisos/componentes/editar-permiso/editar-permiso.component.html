@@ -93,7 +93,7 @@
                         mode="md" 
                         min="2000-01-01" max="2050-12-31" 
                         (ionChange)="ChangeDiaInicio($event)" 
-                        [value]="reg.fec_inicio" 
+                        [value]="reg.fecha_inicio" 
                         required></ion-datetime>
                         <div style="width: 95%;">
                             <ion-label style="float:right; margin: 2%; font-size: medium;" color="success" (click)="datetimeInicio.cancel(true)">Cancelar</ion-label>
@@ -121,7 +121,7 @@
                         mode="md" 
                         [min]="dia_inicio" [max]="dia_siguiente"
                         (ionChange)="ChangeDiaFinal($event)" 
-                        [value]="reg.fec_final" 
+                        [value]="reg.fecha_final" 
                         required></ion-datetime>
                         <div style="width: 95%;">
                           <ion-label style="float:right; margin: 2%; font-size: medium;" color="primary" (click)="datetimeFinal.cancel(true)">Cancelar</ion-label>
@@ -154,7 +154,7 @@
                   </ion-item>
                   <ion-popover trigger="open-editPermisoHoraInicio">
                     <ng-template>
-                      <p style="margin: auto; padding: 4%;" *ngIf="(dia_fianl == '') && (reg.fec_final == null)">Ingrese las fechas</p>
+                      <p style="margin: auto; padding: 4%;" *ngIf="(dia_fianl == '') && (reg.fecha_final == null)">Ingrese las fechas</p>
                       <ion-datetime *ngIf="dia_fianl != ''"
                       presentation="time" 
                       mode="md" 
@@ -201,14 +201,14 @@
 
          <!-- CALCULO DE TIEMPOS -->
          <div *ngIf="selectItemDiasHoras === 'Días'">
-          <ion-button [disabled] = "(btnOculto == true) || validar.vacio(reg.fec_final)"
+          <ion-button [disabled] = "(btnOculto == true) || validar.vacio(reg.fecha_final)"
             shape="round" expand="block" color="tertiary" (click)=" mostrarCalculos()" style="margin: 0% 3% 2% 3%;">
             <ion-icon slot="start" name="calculator-outline"></ion-icon>
             Calcular tiempo real
           </ion-button>
         </div>  
         <div *ngIf="selectItemDiasHoras === 'Horas' ||  selectItemDiasHoras === 'Días y Horas'">
-          <ion-button [disabled] = "(btnOculto == true) || (validar.vacio(reg.fec_inicio) || validar.vacio(reg.hora_salida) ||  validar.vacio(reg.fec_final) || validar.vacio(reg.hora_ingreso))"
+          <ion-button [disabled] = "(btnOculto == true) || (validar.vacio(reg.fecha_inicio) || validar.vacio(reg.hora_salida) ||  validar.vacio(reg.fecha_final) || validar.vacio(reg.hora_ingreso))"
             shape="round" expand="block" color="tertiary" (click)=" mostrarCalculos()" style="margin: 0% 3% 2% 3%;" >
             <ion-icon slot="start" name="calculator-outline"></ion-icon>
             Calcular tiempo real
@@ -224,7 +224,7 @@
                 <div class="formdiv_tiempo">
                   <ion-item class="item_fondo" mode="md">
                     <ion-label class="is-required" position="floating">Días Permiso</ion-label>
-                    <ion-input name="dia" [ngModel]="reg.dia" mode="md" maxlengt="10" disabled="true" required></ion-input>
+                    <ion-input name="dia" [ngModel]="reg.dias_permiso" mode="md" maxlengt="10" disabled="true" required></ion-input>
                   </ion-item>
                 </div>
               </ion-col>
@@ -246,7 +246,7 @@
                 <div class="formdiv_tiempo">
                   <ion-item class="item_fondo" mode="md">
                     <ion-label class="is-required" position="floating">Horas y minutos de permiso</ion-label>
-                    <ion-input name="hora_numero" displayFormat="HH:mm:ss" [ngModel]="reg.hora_numero"  disabled="true"  required></ion-input>
+                    <ion-input name="horas_permiso" displayFormat="HH:mm:ss" [ngModel]="reg.horas_permiso"  disabled="true"  required></ion-input>
                   </ion-item>
                 </div>
               </ion-col>
@@ -259,7 +259,7 @@
                 <div class="formdiv_tiempo">
                   <ion-item class="item_fondo" mode="md">
                     <ion-label class="is-required" position="floating">Días de permiso</ion-label>
-                    <ion-input name="dia" [ngModel]="reg.dia" mode="md" disabled="true" maxlengt="10" required></ion-input>
+                    <ion-input name="dia" [ngModel]="reg.dias_permiso" mode="md" disabled="true" maxlengt="10" required></ion-input>
                   </ion-item>
                 </div>
               </ion-col>
@@ -280,7 +280,7 @@
                 <div class="formdiv_tiempo">
                   <ion-item class="item_fondo" mode="md">
                     <ion-label class="is-required" position="floating">Horas y minutos de permiso</ion-label>
-                    <ion-input name="hora_numero" displayFormat="HH:mm:ss" disabled="true" [ngModel]="reg.hora_numero" required></ion-input>
+                    <ion-input name="horas_permiso" displayFormat="HH:mm:ss" disabled="true" [ngModel]="reg.horas_permiso" required></ion-input>
                   </ion-item>
                 </div>
               </ion-col>

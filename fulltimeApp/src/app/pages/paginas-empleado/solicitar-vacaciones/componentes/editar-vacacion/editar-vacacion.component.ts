@@ -118,8 +118,8 @@ export class EditarVacacionComponent implements OnInit {
         }
         this.solInfo = [];
         this.solInfo = {
-          vaca_mail: res.vaca_mail,
-          vaca_noti: res.vaca_noti,
+          vaca_mail: res.vacacion_mail,
+          vaca_noti: res.vacacion_notificacion,
           empleado: res.id_empleado,
           id_suc: res.id_sucursal,
           id_dep: res.id_departamento,

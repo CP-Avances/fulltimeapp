@@ -29,14 +29,14 @@ export const getlistaHorasExtras = async (req: Request, res: Response): Promise<
  */
 export const getlistaByFechas = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const { fec_inicio, fec_final } = req.query;
+        const { fecha_inicio, fecha_final } = req.query;
         const subquery1 = '( SELECT (nombre || \' \' || apellido) FROM eu_empleados i WHERE i.id = h.id_empleado_solicita) as nempleado '
         const subquery2 = '( SELECT t.cargo FROM eu_empleado_cargos i, e_cat_tipo_cargo t WHERE i.id = h.id_empleado_cargo and i.id_tipo_cargo = t.id) as ncargo '
         const subquery3 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo = h.codigo ) AS id_contrato '
         const subquery4 = '( SELECT da.id_departamento FROM datos_actuales_empleado AS da WHERE da.codigo = h.codigo ) AS id_departamento '
 
         const query = `SELECT h.*, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4} 
-        FROM mhe_solicitud_hora_extra h WHERE h.fecha_inicio BETWEEN \'${fec_inicio}\' AND \'${fec_final}\' 
+        FROM mhe_solicitud_hora_extra h WHERE h.fecha_inicio BETWEEN \'${fecha_inicio}\' AND \'${fecha_final}\' 
         ORDER BY h.fecha_inicio DESC`
         const response: QueryResult = await pool.query(query);
         const horas_extras: HoraExtra[] = response.rows;
@@ -78,14 +78,14 @@ export const getlistaHorasExtrasByCodigo = async (req: Request, res: Response): 
 
  export const getlistaHorasExtrasByFechasyCodigo = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const { fec_inicio, fec_final, codigo } = req.query;
+        const { fecha_inicio, fecha_final, codigo } = req.query;
 
         const query = `SELECT h.* FROM mhe_solicitud_hora_extra h WHERE h.codigo = '${codigo}' AND (
-            ((\'${fec_inicio}\' BETWEEN h.fecha_inicio AND h.fecha_final ) OR 
-             (\'${fec_final}\' BETWEEN h.fecha_inicio AND h.fecha_final)) 
+            ((\'${fecha_inicio}\' BETWEEN h.fecha_inicio AND h.fecha_final ) OR 
+             (\'${fecha_final}\' BETWEEN h.fecha_inicio AND h.fecha_final)) 
             OR
-            ((h.fecha_inicio BETWEEN \'${fec_inicio}\' AND \'${fec_final}\') OR 
-             (h.fecha_final BETWEEN \'${fec_inicio}\' AND \'${fec_final}\'))
+            ((h.fecha_inicio BETWEEN \'${fecha_inicio}\' AND \'${fecha_final}\') OR 
+             (h.fecha_final BETWEEN \'${fecha_inicio}\' AND \'${fecha_final}\'))
             )`
 
         const response: QueryResult = await pool.query(query);
@@ -104,10 +104,10 @@ export const getlistaHorasExtrasByCodigo = async (req: Request, res: Response): 
  */
 export const getlistaHorasExtrasByFechasyCodigoEdit = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const { fec_inicio, fec_final, codigo, id } = req.query;
+        const { fecha_inicio, fecha_final, codigo, id } = req.query;
 
-        console.log('fec_inicio: ',fec_inicio)
-        console.log('fec_final: ',fec_final)
+        console.log('fecha_inicio: ',fecha_inicio)
+        console.log('fecha_final: ',fecha_final)
         console.log('codigo: ',codigo)
         console.log('id: ',id)
 
@@ -115,7 +115,7 @@ export const getlistaHorasExtrasByFechasyCodigoEdit = async (req: Request, res: 
         WHERE h.codigo::varchar = $1 
         AND ((($2 BETWEEN h.fecha_inicio AND h.fecha_final ) OR ($3 BETWEEN h.fecha_inicio AND h.fecha_final)) OR ((h.fecha_inicio BETWEEN $2 AND $3) OR (h.fecha_final BETWEEN $2 AND $3))) 
         AND NOT h.id = $4 `
-            , [codigo, fec_inicio, fec_final, id]);
+            , [codigo, fecha_inicio, fecha_final, id]);
 
         console.log('lista solicitudes: ',HorasExtras.rows)
 
@@ -133,8 +133,8 @@ export const getlistaHorasExtrasByFechasyCodigoEdit = async (req: Request, res: 
 export const postNuevaHoraExtra = async (req: Request, res: Response): Promise<Response> => {
     try {
 
-        const { codigo, descripcion, estado, fec_final, fec_inicio, fec_solicita, hora_ingreso, hora_salida,
-            id_empl_cargo, id_usua_solicita, num_hora, observacion, tiempo_autorizado } = req.body;
+        const { codigo, descripcion, estado, fecha_final, fecha_inicio, fecha_solicita, hora_ingreso, hora_salida,
+            id_empleado_cargo, id_empleado_solicita, horas_solicitud, observacion, tiempo_autorizado } = req.body;
 
         console.log(req.body);
 
@@ -142,8 +142,8 @@ export const postNuevaHoraExtra = async (req: Request, res: Response): Promise<R
             INSERT INTO mhe_solicitud_hora_extra (codigo, descripcion, estado, fecha_final, fecha_inicio, fecha_solicita,
             id_empleado_cargo, id_empleado_solicita, horas_solicitud, observacion, tiempo_autorizado)
             VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11 ) RETURNING * 
-            `, [codigo, descripcion, estado, fec_final, fec_inicio, fec_solicita,
-            id_empl_cargo, id_usua_solicita, num_hora, observacion, tiempo_autorizado]);
+            `, [codigo, descripcion, estado, fecha_final, fecha_inicio, fecha_solicita,
+            id_empleado_cargo, id_empleado_solicita, horas_solicitud, observacion, tiempo_autorizado]);
         const [objetoHoraExtra] = response.rows;
 
         if (!objetoHoraExtra) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
@@ -164,7 +164,7 @@ export const postNuevaHoraExtra = async (req: Request, res: Response): Promise<R
  */
 export const putHoraExtra = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const { id, descripcion, fec_final, fec_inicio, num_hora, observacion,
+        const { id, descripcion, fecha_final, fecha_inicio, horas_solicitud, observacion,
             tiempo_autorizado, documento, docu_nombre, estado } = req.body;
 
         console.log(req.body);
@@ -176,7 +176,7 @@ export const putHoraExtra = async (req: Request, res: Response): Promise<Respons
                 horas_solicitud = $5, observacion = $6, tiempo_autorizado = $7, documento = $8, docu_nombre = $9
                 WHERE id = $1  RETURNING *
                 `
-                , [id, descripcion, fec_final, fec_inicio, num_hora, observacion, tiempo_autorizado, documento, docu_nombre]);
+                , [id, descripcion, fecha_final, fecha_inicio, horas_solicitud, observacion, tiempo_autorizado, documento, docu_nombre]);
 
             const [objetoHora_extra] = response.rows;
 

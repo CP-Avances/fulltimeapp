@@ -10,7 +10,7 @@ export interface Permiso {
     id_tipo_permiso: number;
     id_empl_contrato: number;
     id_peri_vacacion: number;
-    hora_numero: string;
+    horas_permiso: string;
     numero_permiso: number;
     documento: string;
     docu_nombre: string;

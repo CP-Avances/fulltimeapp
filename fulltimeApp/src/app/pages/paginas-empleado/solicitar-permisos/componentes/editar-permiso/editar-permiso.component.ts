@@ -139,8 +139,8 @@ export class EditarPermisoComponent implements OnInit {
       this. TiempoDocumentJustifi()
     }
 
-    this.dia_inicio = moment(this.reg.fec_inicio).format('YYYY-MM-DD');
-    this.dia_fianl = moment(this.reg.fec_final).format('YYYY-MM-DD');
+    this.dia_inicio = moment(this.reg.fecha_inicio).format('YYYY-MM-DD');
+    this.dia_fianl = moment(this.reg.fecha_final).format('YYYY-MM-DD');
     
     /*Esta tranformacion se realizada debido a que el formato de las variables this.permiso.hora_salida y this.permiso.hora_ingreso no es correcto y se 
       realiza la configuracion para adaptar ese dato y transforma a una dato de tipo Date que permita visualizar en el input con el formato correcto.*/ 
@@ -154,24 +154,24 @@ export class EditarPermisoComponent implements OnInit {
     this.reg.hora_ingreso = moment(HoraFinal).format();
     this.hora_final = moment(HoraFinal).format('hh:mm a');
 
-    if(this.reg.dia != 0 && this.reg.hora_numero == '00:00:00'){
+    if(this.reg.dias_permiso != 0 && this.reg.horas_permiso == '00:00:00'){
       this.selectItemDiasHoras = 'Días';
-      this.diaPermiso_refe = this.reg.dia;
+      this.diaPermiso_refe = this.reg.dias_permiso;
       this.dialibre_refe = this.reg.dia_libre;
-    }else if(this.reg.dia == 0 && this.reg.hora_numero != '00:00:00'){
+    }else if(this.reg.dias_permiso == 0 && this.reg.horas_permiso != '00:00:00'){
       this.selectItemDiasHoras = 'Horas';
-      this.horas_refe = this.reg.hora_numero;
+      this.horas_refe = this.reg.horas_permiso;
       this.readonly = false;
     }
 
     this.horas_trabaja_seg = this.validaciones.HorasTrabajaToSegundos(String(localStorage.getItem('horas_trabaja')))
     this.horas_trabaja_string = this.validaciones.SegundosToHHMM(this.horas_trabaja_seg)
 
-    const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
+    const hoy = moment(this.reg.fecha_inicio).format("DD/MM/YYYY, HH:mm:ss")
     this.horario_ingreso = '00:00:00';
 
     var busqueda = {
-      fecha: moment(this.reg.fec_inicio).format('YYYY-MM-D'), 
+      fecha: moment(this.reg.fecha_inicio).format('YYYY-MM-D'), 
       codigo: this.reg.codigo
     }
 
@@ -179,7 +179,7 @@ export class EditarPermisoComponent implements OnInit {
       this.plan_horario = this.validaciones.ObtenerDetallesPlanificacion(datos);
 
       const hora_salida = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_salida);
-      const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fec_inicio!, hora_salida );
+      const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_inicio!, hora_salida );
 
       this.plan_horario.filter(item => {
         const HorarioInicio = this.validaciones.Unir_Fecha_Hora(String(this.dia_inicio),item.entrada);      
@@ -198,7 +198,7 @@ export class EditarPermisoComponent implements OnInit {
 
     if(this.selectItemDiasHoras == 'Horas'){
       //Esta variable permite contar el dia siguiente ingresado en el campo de dia inicial y que sea este dato el valor a leer en la fecha maxima
-      var fechasiguiente = new Date(this.reg.fec_inicio);
+      var fechasiguiente = new Date(this.reg.fecha_inicio);
       fechasiguiente.setDate(fechasiguiente.getDate() + 1);
       this.dia_siguiente = moment(fechasiguiente).format('YYYY-MM-DD');
     }else{
@@ -226,7 +226,7 @@ export class EditarPermisoComponent implements OnInit {
     if(this.cg_permiso.justificar == true){
       //conteo de días para validar el num de dias para justificar y subir el documento
       var diahoy: any = new Date();
-      var diaCreacion = new Date(this.reg.fec_creacion).getTime();
+      var diaCreacion = new Date(this.reg.fecha_creacion).getTime();
       var diasDiferencia: number =  diahoy - diaCreacion;
       //Ponemos la hora en 00:00:00 para tomar el dia completo
       diahoy.setHours(0, 0, 0, 0);
@@ -256,7 +256,7 @@ export class EditarPermisoComponent implements OnInit {
         this.solInfo = [];
         this.solInfo = {
           permiso_mail: res.permiso_mail,
-          permiso_noti: res.permiso_noti,
+          permiso_noti: res.permiso_notificacion,
           empleado: res.id_empleado,
           id_dep: res.id_departamento,
           id_suc: res.id_sucursal,
@@ -282,8 +282,8 @@ export class EditarPermisoComponent implements OnInit {
   ** ******************************************************************************************* **/
   // METODO ENCERAR LAS INPUTS DE FECHA
   valoresDefectoValidacionFechas() {
-    this.reg.fec_inicio = null;
-    this.reg.fec_final = null;
+    this.reg.fecha_inicio = null;
+    this.reg.fecha_final = null;
     this.loadingBtn = false;
     return false
   }
@@ -300,9 +300,9 @@ export class EditarPermisoComponent implements OnInit {
 
    //METODO ENCERRAR LOS INPUTS DE LOS RESULTADOS DE LOS CALCULOS
    valoresDefectoValidacionResultados(){
-    this.reg.dia = null;
+    this.reg.dias_permiso = null;
     this.reg.dia_libre = null;
-    this.reg.hora_numero = null;
+    this.reg.horas_permiso = null;
     this.btnOculto = false; 
     this.btnOcultoguardar = true;
   }
@@ -359,7 +359,7 @@ export class EditarPermisoComponent implements OnInit {
     this.valoresDefectoValidacionFechas();
     this.valoresDefectoValidacionHoras();
     this.btnOcultoguardar = true;
-    this.reg.hora_numero = null;
+    this.reg.horas_permiso = null;
     this.readonly = false;
     if(!$event.target.value){
       return console.log('Salio ', $event.target.value);
@@ -367,17 +367,17 @@ export class EditarPermisoComponent implements OnInit {
      const [diasHora] = this.diasHoras.filter(o => { return o.value === this.selectItemDiasHoras })
      if( diasHora != undefined || diasHora != null ){
        this.validaciones.showToast(diasHora.message, 3500, 'primary')
-       this.reg.dia = null;
+       this.reg.dias_permiso = null;
         this.reg.dia_libre = null; // POR DEFECTO HASTA HACER LA VALIDACION CORRESPONDIENTES A DIAS LIBRES EN EL RANGO DE TIEMPO DEL PERMISO
         switch (diasHora.value) {
           case 'Días':
-            this.reg.hora_numero = null ; // POR DEFECTO YA QUE ES PERMISO POR DIAS
+            this.reg.horas_permiso = null ; // POR DEFECTO YA QUE ES PERMISO POR DIAS
           break;
           case 'Horas':
             this.readonly = true;
-            this.reg.fec_final = this.reg.fec_inicio;
+            this.reg.fecha_final = this.reg.fecha_inicio;
             this.dia_fianl = this.dia_inicio;
-            this.reg.dia = 0; // POR DEFECTO YA Q ES PERMISO POR SOLO HORAS.
+            this.reg.dias_permiso = 0; // POR DEFECTO YA Q ES PERMISO POR SOLO HORAS.
           break;
           case 'Días y Horas': break;
           default: break;
@@ -412,9 +412,9 @@ export class EditarPermisoComponent implements OnInit {
   DiaIniciolLibre(){
     //let dia_retur;
     this.cont_tipo_dia_libre = 0; 
-    if(this.reg.fec_inicio != null){
+    if(this.reg.fecha_inicio != null){
       var busqueda = {
-        fecha: moment(this.reg.fec_inicio).format('YYYY-MM-D'), 
+        fecha: moment(this.reg.fecha_inicio).format('YYYY-MM-D'), 
         codigo: this.reg.codigo
       }
       
@@ -449,14 +449,14 @@ export class EditarPermisoComponent implements OnInit {
           }
 
             //Esta variable permite contar el dia siguiente ingresado en el campo de dia inicial y que sea este dato el valor a leer en la fecha maxima
-            var fechasiguiente = new Date(this.reg.fec_inicio);
+            var fechasiguiente = new Date(this.reg.fecha_inicio);
             fechasiguiente.setDate(fechasiguiente.getDate() + 1);
 
             console.log('fechasiguiente: ',fechasiguiente);
 
             if(this.selectItemDiasHoras == 'Horas'){
               this.dia_siguiente = moment(fechasiguiente).format('YYYY-MM-DD');
-              this.reg.hora_numero = null; 
+              this.reg.horas_permiso = null; 
               this.readonly = false;
               this.btnOcultoguardar = true;
               this.datetimeInicio.confirm(true);
@@ -479,10 +479,10 @@ export class EditarPermisoComponent implements OnInit {
   //METODO VALIDADOR DE DIAS LIBRES
   DiaFinalLibre(){
     this.cont_tipo_dia_libre = 0; 
-    if(this.reg.fec_final != null){
+    if(this.reg.fecha_final != null){
 
       var busqueda = {
-        fecha: moment(this.reg.fec_final).format('YYYY-MM-D'), 
+        fecha: moment(this.reg.fecha_final).format('YYYY-MM-D'), 
         codigo: this.reg.codigo
       }
 
@@ -554,10 +554,11 @@ export class EditarPermisoComponent implements OnInit {
       this.reg.hora_salida = e.target.value;
 
       const hora_salida = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_salida);
-      const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fec_inicio, hora_salida );
+      const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_inicio, hora_salida );
 
       var HorarioInicio: any 
       var HorarioFinal: any
+
 
       this.plan_horario.filter(item => {
         HorarioInicio = this.validaciones.Unir_Fecha_Hora(String(this.dia_inicio),item.entrada);      
@@ -606,10 +607,10 @@ export class EditarPermisoComponent implements OnInit {
       this.reg.hora_ingreso = e.target.value;
 
       const hora_salida = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_salida);
-      const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fec_inicio, hora_salida );
+      const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_inicio, hora_salida );
 
       const hora_ingreso = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_ingreso);
-      const fec_comp_final = this.validaciones.Unir_Fecha_Hora(this.reg.fec_final, hora_ingreso );
+      const fec_comp_final = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_final, hora_ingreso );
 
       this.plan_horario.filter(item => {
         const HorarioInicio = this.validaciones.Unir_Fecha_Hora(String(this.dia_inicio),item.entrada);        
@@ -657,27 +658,27 @@ export class EditarPermisoComponent implements OnInit {
     this.conteo_dia_antisipo = 0;
     this.valoresDefectoValidacionHoras();
     if(!e.target.value){
-      this.reg.fec_inicio = moment(new Date()).format('YYYY-MM-DD');
-      this.fecha_inicio = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
+      this.reg.fecha_inicio = moment(new Date()).format('YYYY-MM-DD');
+      this.fecha_inicio = moment(this.reg.fecha_inicio).format("DD/MM/YYYY, HH:mm:ss")
     }else{
       this.horario_salida = '00:00:00'
       if(!(moment(e.target.value).format('YYYY-MM-DD') == moment(this.dia_inicio).format('YYYY-MM-DD'))){
-        this.reg.fec_final = null;
+        this.reg.fecha_final = null;
         this.dia_fianl = '';
         this.readonly = true;
         this.valoresDefectoValidacionResultados();
         this.btnOcultoguardar = true;
       }
       
-      this.reg.fec_inicio = e.target.value;
+      this.reg.fecha_inicio = e.target.value;
       this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
-      this.fecha_inicio = this.reg.fec_inicio
+      this.fecha_inicio = this.reg.fecha_inicio
 
       //conteo de días para validar el num de dias de anticipacion para pedir el permiso
       this.dia1 = moment(this.dia_inicio).format('D');
-      this.dia2 = moment(this.reg.fec_creacion).format('D');
+      this.dia2 = moment(this.reg.fecha_creacion).format('D');
       this.mes1 = moment(this.dia_inicio).format('MM');
-      this.mes2 = moment(this.reg.fec_creacion).format('MM');
+      this.mes2 = moment(this.reg.fecha_creacion).format('MM');
 
       if(this.cg_permiso.dias_maximo_permiso != null){
         if(this.mes1 == this.mes2){
@@ -700,19 +701,19 @@ export class EditarPermisoComponent implements OnInit {
     this.valoresDefectoValidacionResultados();
     this.valoresDefectoValidacionHoras();
     if(!e.target.value){
-      if(moment(this.reg.fec_inicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
-        this.reg.fec_final = this.reg.fec_inicio;
+      if(moment(this.reg.fecha_inicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
+        this.reg.fecha_final = this.reg.fecha_inicio;
         this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
       }else{
-        this.reg.fec_final = null;
+        this.reg.fecha_final = null;
         this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
         this.dia_fianl = null;
       }
     }else{
       this.horario_ingreso = '23:59:59'
-      this.reg.fec_final = e.target.value;
+      this.reg.fecha_final = e.target.value;
       this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');
-      this.fecha_final= this.reg.fec_final;
+      this.fecha_final= this.reg.fecha_final;
       this.DiaFinalLibre();
     }
   }
@@ -724,11 +725,11 @@ export class EditarPermisoComponent implements OnInit {
       if(e.target.value != this.aux_descripcion){
         this.reg.descripcion = e.target.value;
         if(this.selectItemDiasHoras == 'Horas'){
-          if(this.reg.hora_numero != null){
+          if(this.reg.horas_permiso != null){
             this.btnOcultoguardar = false;
           }
         }else{
-          if(this.reg.dia != null && this.reg.dia_libre != null){
+          if(this.reg.dias_permiso != null && this.reg.dia_libre != null){
             this.btnOcultoguardar = false;
           }
         }
@@ -825,7 +826,7 @@ export class EditarPermisoComponent implements OnInit {
         return false;
       }
     }else if(this.selectItemDiasHoras == 'Días'){
-      if (this.validar.vacio(this.reg.fec_inicio) || this.validar.vacio(this.reg.fec_final)) {
+      if (this.validar.vacio(this.reg.fecha_inicio) || this.validar.vacio(this.reg.fecha_final)) {
         this.loadingBtn = false;
         this.validar.showToast('Llenar todos los campos solicitados.', 3000, 'warning')
         return false;
@@ -839,8 +840,8 @@ export class EditarPermisoComponent implements OnInit {
     let minutosfinal = this.horario_ingreso;
 
     var data = {
-      fecha_inicio: moment(this.reg.fec_inicio).format('YYYY-MM-D'), 
-      fecha_final: moment(this.reg.fec_final).format('YYYY-MM-D'), 
+      fecha_inicio: moment(this.reg.fecha_inicio).format('YYYY-MM-D'), 
+      fecha_final: moment(this.reg.fecha_final).format('YYYY-MM-D'), 
       codigo: '\''+this.reg.codigo+'\''
     }
 
@@ -853,8 +854,8 @@ export class EditarPermisoComponent implements OnInit {
         minutosfinal = moment(this.reg.hora_ingreso).format('HH:mm:ss');
       }
   
-      const fec_inicio = (moment(this.reg.fec_inicio).format('YYYY-MM-DD'))+' '+ minutosinicio;
-      const fec_final = (moment(this.reg.fec_final).format('YYYY-MM-DD')) +' '+ minutosfinal;
+      const fec_inicio = (moment(this.reg.fecha_inicio).format('YYYY-MM-DD'))+' '+ minutosinicio;
+      const fec_final = (moment(this.reg.fecha_final).format('YYYY-MM-DD')) +' '+ minutosfinal;
       const codigo = parseInt((localStorage.getItem('codigo')));
       const id_solicitud = this.reg.id;
 
@@ -868,18 +869,18 @@ export class EditarPermisoComponent implements OnInit {
           else{
             this.horasExtrasService.getlistaHorasExtrasByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
               if(solicitados.length != 0){
-                this.reg.dia = null;
+                this.reg.dias_permiso = null;
                 this.reg.dia_libre = null;
-                this.reg.hora_numero = null;
+                this.reg.horas_permiso = null;
                 this.validaciones.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
                 return false
               }
               else{
                 this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
                   if(solicitados.length != 0){
-                    this.reg.dia = null;
+                    this.reg.dias_permiso = null;
                     this.reg.dia_libre = null;
-                    this.reg.hora_numero = null;
+                    this.reg.horas_permiso = null;
                     this.validaciones.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
                     return false
                   }
@@ -908,18 +909,18 @@ export class EditarPermisoComponent implements OnInit {
           else{
             this.horasExtrasService.getlistaHorasExtrasByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
               if(solicitados.length != 0){
-                this.reg.dia = null;
+                this.reg.dias_permiso = null;
                 this.reg.dia_libre = null;
-                this.reg.hora_numero = null;
+                this.reg.horas_permiso = null;
                 this.validaciones.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
                 return false
               }
               else{
                 this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
                   if(solicitados.length != 0){
-                    this.reg.dia = null;
+                    this.reg.dias_permiso = null;
                     this.reg.dia_libre = null;
-                    this.reg.hora_numero = null;
+                    this.reg.horas_permiso = null;
                     this.validaciones.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
                     return false
                   }
@@ -947,14 +948,14 @@ export class EditarPermisoComponent implements OnInit {
    * ********************************************************************************** */
   calcularhoras() {
     if(this.selectItemDiasHoras == 'Días'){
-      const fechasValidas = this.validaciones.validarRangoFechasIngresa(this.reg.fec_inicio!, this.reg.fec_final!, true);
+      const fechasValidas = this.validaciones.validarRangoFechasIngresa(this.reg.fecha_inicio!, this.reg.fecha_final!, true);
       console.log('fechasValidas: ',fechasValidas)
       if (!fechasValidas) {return this.valoresDefectoValidacionFechas()}
 
       //Se optiene la hora por defecto del dia de salida que es la hora en la que se crea el permiso 
       //Esto se lee hasta mientras por defecto ya que el tipo de permiso es por dias, se debe validar con el horario laboral del usuario
-      const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fec_inicio!, this.horario_salida);
-      const fec_comp_final = this.validaciones.Unir_Fecha_Hora(this.reg.fec_final!, this.horario_salida);
+      const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_inicio!, this.horario_salida);
+      const fec_comp_final = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_final!, this.horario_salida);
       const total = this.validaciones.MilisegToSegundos( fec_comp_final.valueOf() - fec_comp_inicio.valueOf() );
 
       // 86400 seg ==> es un dia de 24 horas
@@ -968,19 +969,19 @@ export class EditarPermisoComponent implements OnInit {
       this.fecha_final = moment(fec_comp_final).format();
       this.reg.hora_ingreso = this.horario_salida;
       this.reg.hora_salida =  this.horario_ingreso;
-      this.reg.dia = dia;
+      this.reg.dias_permiso = dia;
       this.reg.dia_libre = dia_libre;
-      this.reg.hora_numero = '00:00:00'; //Por defecto ya que es permiso por dias
+      this.reg.horas_permiso = '00:00:00'; //Por defecto ya que es permiso por dias
       this.btnOcultoguardar = false;
 
     }else{      
-      const fechasValidas = this.validaciones.validarRangoFechasIngresa(this.reg.fec_inicio!, this.reg.fec_final!, true)
+      const fechasValidas = this.validaciones.validarRangoFechasIngresa(this.reg.fecha_inicio!, this.reg.fecha_final!, true)
       if (!fechasValidas){return this.valoresDefectoValidacionFechas()}
   
       const hora_salida = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_salida!);
       const hora_ingreso = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_ingreso!);
-      const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fec_inicio!, hora_salida);
-      const fec_comp_final = this.validaciones.Unir_Fecha_Hora(this.reg.fec_final!,  hora_ingreso);
+      const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_inicio!, hora_salida);
+      const fec_comp_final = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_final!,  hora_ingreso);
 
       this.fecha_inicio = moment(fec_comp_inicio).format();
       this.fecha_final = moment(fec_comp_final).format();
@@ -994,7 +995,7 @@ export class EditarPermisoComponent implements OnInit {
       if(this.selectItemDiasHoras === 'Horas'){
         if(total > this.horas_trabaja_seg){
           this.validaciones.showToast('Ups!, lo sentimos el rango de horas excede su jornada laboral', 3500, 'warning');
-          this.reg.hora_numero = null;
+          this.reg.horas_permiso = null;
           this.btnOcultoguardar = true;
           return false;
         }
@@ -1008,15 +1009,15 @@ export class EditarPermisoComponent implements OnInit {
 
       // 86400 seg ==> es un dia de 24 horas
       const { dia, tiempo_transcurrido, dia_libre } =
-      this.validaciones.SegundosTransformDiaLaboral(this.reg.fec_inicio!.toString(), this.reg.fec_final!.toString(), total, this.totalhoras, this.horarioEmpleado, this.horas_trabaja_seg, this.cg_feriados)
+      this.validaciones.SegundosTransformDiaLaboral(this.reg.fecha_inicio!.toString(), this.reg.fecha_final!.toString(), total, this.totalhoras, this.horarioEmpleado, this.horas_trabaja_seg, this.cg_feriados)
 
-      this.reg.dia = dia
-      this.reg.hora_numero = tiempo_transcurrido
+      this.reg.dias_permiso = dia
+      this.reg.horas_permiso = tiempo_transcurrido
       this.reg.dia_libre = dia_libre;
   
       switch (this.selectItemDiasHoras) {
         case 'Horas':
-          this.reg.dia = 0; // por defecto ya q es permiso por solo horas.
+          this.reg.dias_permiso = 0; // por defecto ya q es permiso por solo horas.
           break;
         default: break;
       }
@@ -1026,9 +1027,9 @@ export class EditarPermisoComponent implements OnInit {
     const [cg_permiso] = this.cg_tipo_permisos.filter(o => {return o.id === this.reg.id_tipo_permiso})
     this.cg_permiso = cg_permiso;
 
-    if((this.cg_permiso.dias_maximo_permiso < this.reg.dia!) &&  (this.cg_permiso.dias_maximo_permiso != 0)){
+    if((this.cg_permiso.dias_maximo_permiso < this.reg.dias_permiso!) &&  (this.cg_permiso.dias_maximo_permiso != 0)){
       this.validaciones.showToast('Lo Sentimos el maximo de dias de permiso es '+this.cg_permiso.dias_maximo_permiso, 3500, 'warning');
-      this.reg.fec_final = null;
+      this.reg.fecha_final = null;
       return false;
     }
 
@@ -1045,9 +1046,9 @@ export class EditarPermisoComponent implements OnInit {
     let validadionesFechasHoras: boolean;
     this.loadingBtn = true;
 
-    if(this.reg.dia != this.diaPermiso_refe){
+    if(this.reg.dias_permiso != this.diaPermiso_refe){
       validadionesFechasHoras= this.calcularhoras();
-    }else if(this.reg.hora_numero != this.horas_refe){
+    }else if(this.reg.horas_permiso != this.horas_refe){
       validadionesFechasHoras = this.calcularhoras();
     }else{
       validadionesFechasHoras = true;
@@ -1057,8 +1058,8 @@ export class EditarPermisoComponent implements OnInit {
 
     console.log('PASO VALIDACIONES DE FECHAS Y HORAS: ');
 
-    this.reg.fec_inicio = moment(this.fecha_inicio).format('YYYY-MM-DD');
-    this.reg.fec_final = moment(this.fecha_final).format('YYYY-MM-DD');
+    this.reg.fecha_inicio = moment(this.fecha_inicio).format('YYYY-MM-DD');
+    this.reg.fecha_final = moment(this.fecha_final).format('YYYY-MM-DD');
 
     this.reg.hora_salida = moment(this.reg.hora_salida).format('HH:mm:ss');
     this.reg.hora_ingreso = moment(this.reg.hora_ingreso).format('HH:mm:ss');
@@ -1074,7 +1075,7 @@ export class EditarPermisoComponent implements OnInit {
       }
     }
 
-    this.reg.fec_edision = moment(new Date()).format('YYYY-MM-DD');
+    this.reg.fecha_edicion = moment(new Date()).format('YYYY-MM-DD');
 
     this.subscripted = this.permisoService.putPermiso(this.reg).subscribe(
       permiso => {
@@ -1256,7 +1257,7 @@ export class EditarPermisoComponent implements OnInit {
             h_fin: this.validar.FormatearHora(permiso.hora_ingreso, this.formato_hora),
             id_empl_contrato: permiso.id_empl_contrato,
             tipo_solicitud: 'Permiso actualizado por',
-            horas_permiso: permiso.hora_numero,
+            horas_permiso: permiso.horas_permiso,
             observacion: permiso.descripcion,
             tipo_permiso: tipo_permiso,
             dias_permiso: permiso.dia,
@@ -1275,7 +1276,7 @@ export class EditarPermisoComponent implements OnInit {
             ahasta: ahasta,
             ah_inicio: this.permisoAntiguo.hora_salida,
             ah_fin: this.permisoAntiguo.hora_ingreso,
-            ahoras_permiso: this.permisoAntiguo.hora_numero,
+            ahoras_permiso: this.permisoAntiguo.horas_permiso,
             aobservacion: this.permisoAntiguo.descripcion,
             atipo_permiso: this.tipo_permiso_anterior,
             adias_permiso: this.permisoAntiguo.dia,

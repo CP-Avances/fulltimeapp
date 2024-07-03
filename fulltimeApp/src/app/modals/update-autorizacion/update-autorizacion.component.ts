@@ -172,7 +172,7 @@ export class UpdateAutorizacionComponent implements OnInit {
           this.solInfo = {
             cedula: res.cedula,
             permiso_mail: res.permiso_mail,
-            permiso_noti: res.permiso_noti,
+            permiso_noti: res.permiso_notificacion,
             id_empleado: res.id_empleado,
             id_departamento: res.id_departamento,
             id_suc: res.id_sucursal,
@@ -219,8 +219,8 @@ export class UpdateAutorizacionComponent implements OnInit {
           }
           this.solInfo = [];
           this.solInfo = {
-            vaca_mail: res.vaca_mail,
-            vaca_noti: res.vaca_noti,
+            vaca_mail: res.vacacion_mail,
+            vaca_noti: res.vacacion_notificacion,
             id_empleado: res.id_empleado,
             id_suc: res.id_sucursal,
             id_departamento: res.id_departamento,
@@ -259,7 +259,7 @@ export class UpdateAutorizacionComponent implements OnInit {
           this.solInfo = [];
           this.solInfo = {
             hora_extra_mail: res.hora_extra_mail,
-            hora_extra_noti: res.hora_extra_noti,
+            hora_extra_noti: res.hora_extra_notificacion,
             id_empleado: res.id_empleado,
             id_suc: res.id_sucursal,
             id_departamento: res.id_departamento,
@@ -714,7 +714,7 @@ export class UpdateAutorizacionComponent implements OnInit {
           h_fin: this.validar.FormatearHora(permiso.hora_ingreso, this.formato_hora),
           id_empl_contrato: permiso.id_empl_contrato,
           tipo_solicitud: 'Permiso ' + estado_p.toLowerCase() + ' por',
-          horas_permiso: permiso.hora_numero,
+          horas_permiso: permiso.horas_permiso,
           observacion: permiso.descripcion,
           tipo_permiso: permiso.ntipopermiso,
           dias_permiso: permiso.dia,

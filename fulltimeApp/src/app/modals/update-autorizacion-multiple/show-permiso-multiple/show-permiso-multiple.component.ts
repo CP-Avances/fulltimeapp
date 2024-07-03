@@ -32,7 +32,7 @@ import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
             <strong> Hasta: </strong> {{ PermisoDato.fec_final_ }}<br>
             <strong> Hora inicia: </strong> {{ PermisoDato.hora_salida_ }} - 
             <strong> Hora finaliza:</strong> {{ PermisoDato.hora_ingreso_ }} <br>
-            <strong> Permiso - Horas: </strong> {{ PermisoDato.hora_numero }} /&nbsp;
+            <strong> Permiso - Horas: </strong> {{ PermisoDato.horas_permiso }} /&nbsp;
             <strong> Dias: </strong> {{ PermisoDato.dia }} <br>
             <br>
             <ion-card-title style="margin-top:-2%; margin-bottom:-3%; font-size: 100%; float: right;"> <b> Fecha solicitada:</b> {{ PermisoDato.fec_creacion_ }}</ion-card-title> 

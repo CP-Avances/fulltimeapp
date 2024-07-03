@@ -219,7 +219,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
                     this.solInfo = [];
                     this.solInfo = {
                       permiso_mail: res.permiso_mail,
-                      permiso_noti: res.permiso_noti,
+                      permiso_noti: res.permiso_notificacion,
                       empleado: res.id_empleado,
                       id_dep: res.id_departamento,
                       id_suc: res.id_sucursal,
@@ -284,8 +284,8 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
                   }
                   this.solInfo = [];
                   this.solInfo = {
-                    vaca_mail: res.vaca_mail,
-                    vaca_noti: res.vaca_noti,
+                    vaca_mail: res.vacacion_mail,
+                    vaca_noti: res.vacacion_notificacion,
                     empleado: res.id_empleado,
                     id_suc: res.id_sucursal,
                     id_dep: res.id_departamento,
@@ -344,7 +344,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
                 this.solInfo = [];
                 this.solInfo = {
                   hora_extra_mail: res.hora_extra_mail,
-                  hora_extra_noti: res.hora_extra_noti,
+                  hora_extra_noti: res.hora_extra_notificacion,
                   empleado: res.id_empleado,
                   id_suc: res.id_sucursal,
                   id_dep: res.id_departamento,
@@ -662,7 +662,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
 
     this.dataAprobacion.push({ dataSolicitud, autorizacion, solicitud });
 
-    const { permiso_mail, permiso_noti, vaca_mail, vaca_noti, hora_extra_mail, hora_extra_noti } = infoEmpleadoRecibe;
+    const { permiso_mail, permiso_notificacion, vacacion_mail, vacacion_notificacion, hora_extra_mail, hora_extra_notificacion } = infoEmpleadoRecibe;
 
     switch (solicitud) {
       case 'permiso':
@@ -1532,7 +1532,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
               { style: 'itemsTable', text: this.validar.FormatearFecha(moment(dat.fec_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_abreviado) },
               { style: 'itemsTable', text: this.validar.FormatearFecha(moment(dat.fec_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_abreviado) },
               { style: 'itemsTable', text: dat.dia },
-              { style: 'itemsTable', text: dat.hora_numero },
+              { style: 'itemsTable', text: dat.horas_permiso },
               { style: 'itemsTable', text: this.estadoChange.nombre },
               { style: 'itemsTable', text: localStorage.getItem('ap') + ' ' + localStorage.getItem('nom') },
               { style: 'itemsTable', text: this.validar.FormatearFecha(moment(fecha).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_abreviado) },

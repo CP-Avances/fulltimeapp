@@ -19,15 +19,15 @@ const deleteMetodoGeneral = (req, res) => __awaiter(void 0, void 0, void 0, func
             `);
         console.log(response.rows);
         switch (nametable) {
-            case 'vacaciones':
+            case 'mv_solicitud_vacacion':
                 yield database_1.pool.query('DELETE FROM ecm_autorizaciones WHERE id_vacacion = $1', [idreg]);
                 yield database_1.pool.query('DELETE FROM ecm_realtime_notificacion WHERE id_vacaciones = $1', [idreg]);
                 break;
-            case 'hora_extr_pedidos':
+            case 'mhe_solicitud_hora_extra':
                 yield database_1.pool.query('DELETE FROM ecm_autorizaciones WHERE id_hora_extra = $1', [idreg]);
                 yield database_1.pool.query('DELETE FROM ecm_realtime_notificacion WHERE id_hora_extra = $1', [idreg]);
                 break;
-            case 'permisos':
+            case 'mp_solicitud_permiso':
                 yield database_1.pool.query('DELETE FROM ecm_autorizaciones WHERE id_permiso = $1', [idreg]);
                 yield database_1.pool.query('DELETE FROM ecm_realtime_notificacion where id_permiso = $1', [idreg]);
                 break;

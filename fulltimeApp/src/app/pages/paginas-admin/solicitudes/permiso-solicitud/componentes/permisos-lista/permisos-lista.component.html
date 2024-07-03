@@ -73,7 +73,7 @@
               Desde: {{ permiso.fec_inicio_ }}<br>
               Hasta: {{ permiso.fec_final_ }}<br>
             </ion-text>
-            <ion-text *ngIf="permiso.hora_numero != '00:00:00'">
+            <ion-text *ngIf="permiso.horas_permiso != '00:00:00'">
               Dia: {{ permiso.fec_inicio_ }}<br>
               Hora salida: {{ permiso.hora_salida_}}<br>
               Hora Ingreso: {{ permiso.hora_ingreso_}}<br>
@@ -96,7 +96,7 @@
         <ion-icon color="success" *ngIf="permiso.estado === 1" slot="end" name="create-outline"
           (click)="presentModalEditarRegistro( permiso )" style="margin-bottom:15%;"></ion-icon><br>
         <!-- Eliminar registro -->
-        <btn-delete (onDelete)="ngOnInit()" [isButtom]="false" nameTable="permisos" [idreg]="permiso.id"
+        <btn-delete (onDelete)="ngOnInit()" [isButtom]="false" nameTable="mp_solicitud_permiso" [idreg]="permiso.id"
           [userCodigo]="permiso.codigo"></btn-delete>
       </div>
 

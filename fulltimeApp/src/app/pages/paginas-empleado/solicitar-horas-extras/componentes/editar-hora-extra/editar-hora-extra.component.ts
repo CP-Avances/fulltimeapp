@@ -107,7 +107,7 @@ export class EditarHoraExtraComponent implements OnInit {
         this.solInfo = [];
         this.solInfo = {
           hora_extra_mail: res.hora_extra_mail,
-          hora_extra_noti: res.hora_extra_noti,
+          hora_extra_noti: res.hora_extra_notificacion,
           empleado: res.id_empleado,
           id_suc: res.id_sucursal,
           id_dep: res.id_departamento,

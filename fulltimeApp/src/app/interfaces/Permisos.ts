@@ -5,9 +5,9 @@ export interface Permiso {
     isChecked?: boolean;
     numero_permiso: number;
     id?: number | any;
-    id_empl_cargo: number;
-    id_empl_contrato: number;
-    id_peri_vacacion: number;
+    id_empleado_cargo: number;
+    id_empleado_contrato: number;
+    id_periodo_vacacion: number;
     id_tipo_permiso: number;
     codigo: number | any;
     descripcion: string;
@@ -28,7 +28,7 @@ export interface Permiso {
     id_departamento?: number;
     aprobacion?: string;
     observacion?: string;
-    fec_edision?: any;
+    fecha_edicion?: any;
     
     // FORMATEAR FECHAS Y HORAS
     fec_creacion_: string;
@@ -43,9 +43,9 @@ export interface Permiso {
 export const permisoValueDefault: Permiso = {
     isChecked: false,
     numero_permiso: 0,
-    id_empl_cargo: 0,
-    id_empl_contrato: 0,
-    id_peri_vacacion: 0,
+    id_empleado_cargo: 0,
+    id_empleado_contrato: 0,
+    id_periodo_vacacion: 0,
     id_tipo_permiso: 0,
     codigo: 0,
     descripcion: '',
