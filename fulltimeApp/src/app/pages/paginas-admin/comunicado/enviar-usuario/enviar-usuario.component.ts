@@ -83,7 +83,7 @@ export class EnviarUsuarioComponent implements OnInit {
                 cedula: r.cedula,
                 correo: r.correo,
                 comunicado_mail: r.comunicado_mail,
-                comunicado_noti: r.comunicado_noti,
+                comunicado_noti: r.comunicado_notificacion,
               }
               this.empleados.push(elemento)
             }
@@ -286,8 +286,10 @@ export class EnviarUsuarioComponent implements OnInit {
     })
 
     console.log('ver usuario---------------------------', respuesta);
-    this.EnviarNotificaciones(respuesta);
     this.closeModal();
+    this.EnviarNotificaciones(respuesta);
+    console.log(' ver donde falla', respuesta)
+
   }
 
 
@@ -298,13 +300,21 @@ export class EnviarUsuarioComponent implements OnInit {
 
     if (data.length > 0) {
 
+
+
       this.ContarCorreos(data);
+      console.log("cont_correo", this.cont_correo)
+      console.log("this.correo", this.correos)
+
       if (this.cont_correo <= this.correos) {
         this.cont = 0;
         this.boton_enviar = true;
 
         data.forEach((obj: any) => {
+
+          console.log("obj.comunicado_noti ", obj.comunicado_noti);
           if (obj.comunicado_noti === true) {
+
             this.NotificarSistema(this.idEmpleado, obj.id);
           }
 
@@ -377,7 +387,7 @@ export class EnviarUsuarioComponent implements OnInit {
 
   NotificarSistema(empleado_envia: any, empleado_recive: any) {
     let mensaje = {
-      create_at: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
+      fecha_hora: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
       id_empl_envia: empleado_envia,
       id_empl_recive: empleado_recive,
       mensaje: this.data.asunto + '; ' + this.data.mensaje, 

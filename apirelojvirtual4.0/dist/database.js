@@ -4,10 +4,10 @@ exports.pool = void 0;
 const pg_1 = require("pg");
 exports.pool = new pg_1.Pool({
     user: 'fulltime',
-    host: '186.4.226.49',
+    host: 'localhost',
     password: 'fulltime',
     database: 'fulltime4_juan',
-    port: 9192
+    port: 5432
     /*user: 'postgres',
     host: 'localhost',
     password: '123456',

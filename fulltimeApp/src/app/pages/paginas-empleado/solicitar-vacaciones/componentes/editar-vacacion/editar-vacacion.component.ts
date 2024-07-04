@@ -536,9 +536,9 @@ export class EditarVacacionComponent implements OnInit {
 
     const noti: Notificacion = notificacionValueDefault;
     noti.id_vacaciones = vacaciones.id;
-    noti.id_send_empl = parseInt(localStorage.getItem('empleadoID'));
+    noti.id_empleado_envia = parseInt(localStorage.getItem('empleadoID'));
     noti.id_permiso = noti.id_hora_extra = null;
-    noti.create_at = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
+    noti.fecha_hora = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
     noti.estado = 'Pendiente'
     noti.tipo = 1;
     noti.mensaje = 'Ha actualizado su solicitud de vacaciones desde ' +
@@ -558,8 +558,8 @@ export class EditarVacacionComponent implements OnInit {
     });
 
     allNotificaciones.forEach(e => {
-      noti.id_receives_depa = e.id_dep;
-      noti.id_receives_empl = e.empleado;
+      noti.id_departamento_recibe = e.id_dep;
+      noti.id_empleado_recibe = e.empleado;
       if (e.vaca_noti) {
         this.autoriza.postNotificacion(noti).subscribe(
           resp => {

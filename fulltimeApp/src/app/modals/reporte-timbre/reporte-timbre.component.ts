@@ -63,11 +63,11 @@ export class ReporteTimbreComponent implements OnInit {
     this.reporteService.getInfoReporteTimbres(this.data.codigo, this.fechaInicio, this.fechaFinal).subscribe(res => {
       this.timbres = res;
       this.timbres.forEach(data => {
-        data.fecha = this.validar.FormatearFecha(data.fec_hora_timbre, this.formato_fecha, this.validar.dia_abreviado);
-        data.hora = this.validar.FormatearHora(moment(data.fec_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+        data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_abreviado);
+        data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
 
-        data.sfecha = this.validar.FormatearFecha(data.fec_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
-        data.shora = this.validar.FormatearHora(moment(data.fec_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
+        data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
+        data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
 
         if(data.latitud == null || data.latitud == undefined){
           data.latitud = '0';
@@ -221,8 +221,8 @@ export class ReporteTimbreComponent implements OnInit {
               { style: 'itemsTableCentrado', text: c },
               { style: 'itemsTable', text: obj.fecha },
               { style: 'itemsTable', text: obj.hora },
-              { style: 'itemsTable', text: (obj.fec_hora_timbre_servidor === null) ? '' : obj.sfecha },
-              { style: 'itemsTable', text: (obj.fec_hora_timbre_servidor === null) ? '' : obj.shora },
+              { style: 'itemsTable', text: (obj.fecha_hora_timbre_servidor === null) ? '' : obj.sfecha },
+              { style: 'itemsTable', text: (obj.fecha_hora_timbre_servidor === null) ? '' : obj.shora },
               { style: 'itemsTable', text: obj.id_reloj },
               { style: 'itemsTable', text: accionT },
               { style: 'itemsTable', text: obj.observacion },

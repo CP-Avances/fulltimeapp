@@ -320,9 +320,9 @@ export class DeleteRegisterComponent{
 
     const noti: Notificacion = notificacionValueDefault;
     noti.id_vacaciones = noti.id_hora_extra = null;
-    noti.id_send_empl = parseInt(String(localStorage.getItem('empleadoID')));
+    noti.id_empleado_envia = parseInt(String(localStorage.getItem('empleadoID')));
     noti.id_permiso = permiso.id;
-    noti.create_at = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
+    noti.fecha_hora = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
     noti.estado = estado_p!;
     noti.tipo = 3;
     noti.mensaje = 'Ha eliminado ' + nota + ' de permiso ' + user + ' desde ' +
@@ -344,8 +344,8 @@ export class DeleteRegisterComponent{
     console.log("Usuarios que reciben la notificacion Permiso: ",NotificacionesPermisoFiltrados);
 
     NotificacionesPermisoFiltrados.forEach((e: any) => {
-      noti.id_receives_depa = e.id_dep;
-      noti.id_receives_empl = e.empleado;
+      noti.id_departamento_recibe = e.id_dep;
+      noti.id_empleado_recibe = e.empleado;
       
       if (e.permiso_noti) {
         this.autoriza.postNotificacion(noti).subscribe(
@@ -469,9 +469,9 @@ export class DeleteRegisterComponent{
 
     const noti: Notificacion = notificacionValueDefault;
     noti.id_vacaciones = vacaciones.id;
-    noti.id_send_empl = parseInt(String(localStorage.getItem('empleadoID')));
+    noti.id_empleado_envia = parseInt(String(localStorage.getItem('empleadoID')));
     noti.id_permiso = noti.id_hora_extra = null;
-    noti.create_at = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
+    noti.fecha_hora = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
     noti.estado = estado_v!
     noti.tipo = 3;
     noti.mensaje = 'Ha eliminado ' + nota + ' de vacaciones ' + user + ' desde ' +
@@ -493,8 +493,8 @@ export class DeleteRegisterComponent{
 
 
     NotificacionesVacacionesFiltrados.forEach((e: any) => {
-      noti.id_receives_depa = e.id_dep;
-      noti.id_receives_empl = e.empleado;
+      noti.id_departamento_recibe = e.id_dep;
+      noti.id_empleado_recibe = e.empleado;
       if (e.vaca_noti) {
         this.autoriza.postNotificacion(noti).subscribe(
           resp => {
@@ -519,9 +519,9 @@ export class DeleteRegisterComponent{
     var correo_usuarios = '';
 
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let solicitud = this.validar.FormatearFecha(horaExtra.fec_solicita, this.formato_fecha, this.validar.dia_completo);
-    let desde = this.validar.FormatearFecha(moment(horaExtra.fec_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(moment(horaExtra.fec_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
+    let solicitud = this.validar.FormatearFecha(horaExtra.fecha_solicita, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(moment(horaExtra.fecha_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
+    let hasta = this.validar.FormatearFecha(moment(horaExtra.fecha_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
 
     // CAPTURANDO ESTADO DE LA SOLICITUD DE HORA EXTRA
     if (horaExtra.estado === 1) {
@@ -559,13 +559,13 @@ export class DeleteRegisterComponent{
           id_empl_contrato: infoUsuario.id_contrato,
           tipo_solicitud: 'Realización de Horas Extras eliminada por',
           observacion: horaExtra.descripcion,
-          num_horas: moment(horaExtra.num_hora, 'HH:mm').format('HH:mm'),
+          num_horas: moment(horaExtra.horas_solicitud, 'HH:mm').format('HH:mm'),
           estado_h: estado_h,
           solicitud: solicitud,
           desde: desde,
           hasta: hasta,
-          h_inicio: this.validar.FormatearHora(moment(horaExtra.fec_inicio).format('HH:mm:ss'), this.formato_hora),
-          h_final: this.validar.FormatearHora(moment(horaExtra.fec_final).format('HH:mm:ss'), this.formato_hora),
+          h_inicio: this.validar.FormatearHora(moment(horaExtra.fecha_inicio).format('HH:mm:ss'), this.formato_hora),
+          h_final: this.validar.FormatearHora(moment(horaExtra.fecha_final).format('HH:mm:ss'), this.formato_hora),
           proceso: 'eliminado',
           asunto: 'ELIMINACION DE SOLICITUD DE REALIZACION DE HORAS EXTRAS',
           correo: correo_usuarios,
@@ -597,11 +597,11 @@ export class DeleteRegisterComponent{
   EnviarNotificacionHE(horaExtra: any, nota: string, user: string) {
 
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let desde = this.validar.FormatearFecha(moment(horaExtra.fec_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(moment(horaExtra.fec_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(moment(horaExtra.fecha_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
+    let hasta = this.validar.FormatearFecha(moment(horaExtra.fecha_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
 
-    let h_inicio = this.validar.FormatearHora(moment(horaExtra.fec_inicio).format('HH:mm:ss'), this.formato_hora)
-    let h_final = this.validar.FormatearHora(moment(horaExtra.fec_final).format('HH:mm:ss'), this.formato_hora);
+    let h_inicio = this.validar.FormatearHora(moment(horaExtra.fecha_inicio).format('HH:mm:ss'), this.formato_hora)
+    let h_final = this.validar.FormatearHora(moment(horaExtra.fecha_final).format('HH:mm:ss'), this.formato_hora);
 
     // CAPTURANDO ESTADO DE LA SOLICITUD DE HORA EXTRA
     if (horaExtra.estado === 1) {
@@ -619,9 +619,9 @@ export class DeleteRegisterComponent{
 
     const noti: Notificacion = notificacionValueDefault;
     noti.id_hora_extra = horaExtra.id;
-    noti.id_send_empl = parseInt(String(localStorage.getItem('empleadoID')));
+    noti.id_empleado_envia = parseInt(String(localStorage.getItem('empleadoID')));
     noti.id_permiso = noti.id_vacaciones = null;
-    noti.create_at = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
+    noti.fecha_hora = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
     noti.estado = estado_h!;
     noti.tipo = 3;
     noti.mensaje = 'Ha eliminado ' + nota + ' de horas extras ' + user + ' desde ' +
@@ -643,7 +643,7 @@ export class DeleteRegisterComponent{
     console.log("Usuarios que reciben la notificacion Horas: ",NotificacionesHorasExtrasFiltrados);
 
     NotificacionesHorasExtrasFiltrados.forEach((e: any) => {
-      noti.id_receives_empl = e.empleado;
+      noti.id_empleado_recibe = e.empleado;
       if (e.hora_extra_noti) {
         this.autoriza.postNotificacion(noti).subscribe(
           resp => {

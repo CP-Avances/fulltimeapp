@@ -50,13 +50,13 @@
         <tbody class="detail-table">
           <tr *ngFor="let timbre of timbres">
 
-            <td>{{timbre.fec_hora_timbre | date: 'dd/MM/yyyy HH:mm'}}</td>
-            <td>{{timbre.fec_hora_timbre_servidor | date: 'dd/MM/yyyy HH:mm'}}</td>
+            <td>{{timbre.fecha_hora_timbre | date: 'dd/MM/yyyy HH:mm'}}</td>
+            <td>{{timbre.fecha_hora_timbre_servidor | date: 'dd/MM/yyyy HH:mm'}}</td>
            <!--
             <td *ngIf="horaServidor">{{timbre.fec_hora_timbre | date: 'HH:mm'}}</td>
             <td *ngIf="!horaServidor">{{timbre.fec_hora_timbre | date: 'HH:mm'}}</td>
             -->
-            <td [ngSwitch]="timbre.tecl_funcion">
+            <td [ngSwitch]="timbre.tecla_funcion">
               <p *ngSwitchCase="1">Inicio de la jornada</p>
               <p *ngSwitchCase="2">Fin de la jornada</p>
               <p *ngSwitchCase="3">Inicio almuerzo</p>

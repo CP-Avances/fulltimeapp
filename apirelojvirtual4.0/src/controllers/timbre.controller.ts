@@ -43,8 +43,8 @@ export const crearTimbre = async (req: Request, res: Response) => {
         // Verificar el contenido de req.body
         console.log('Contenido de req.body:', timbre);
 
-        timbre.fec_hora_timbre_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
-        const timbreRV: Date = new Date(timbre.fec_hora_timbre || '');
+        timbre.fecha_hora_timbre_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
+        const timbreRV: Date = new Date(timbre.fecha_hora_timbre || '');
         const restaTimbresHoras = timbreRV.getHours() - hoy.getHours();
         const restaTimbresMinutos = timbreRV.getMinutes() - hoy.getMinutes();
         const restaTimbresDias = timbreRV.getDate() - hoy.getDate();
@@ -67,9 +67,9 @@ export const crearTimbre = async (req: Request, res: Response) => {
             'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
             'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion) ' +
             'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16);',
-            [timbre.fec_hora_timbre, timbre.accion, timbre.tecl_funcion, timbre.observacion,
+            [timbre.fecha_hora_timbre, timbre.accion, timbre.tecla_funcion, timbre.observacion,
             timbre.latitud, timbre.longitud, timbre.codigo, timbre.id_reloj,
-            timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fec_hora_timbre_servidor,
+            timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fecha_hora_timbre_servidor,
             timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion]);
 
         res.jsonp({
@@ -87,7 +87,7 @@ export const crearTimbreDesconectado = async (req: Request, res: Response) => {
         const hoy: Date = new Date();
         const timbre: Timbre = req.body;
         timbre.fecha_subida_servidor = hoy.getFullYear() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getDate() + " " + hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
-        const timbreRV: Date = new Date(timbre.fec_hora_timbre || '');
+        const timbreRV: Date = new Date(timbre.fecha_hora_timbre || '');
         const restaTimbresHoras = timbreRV.getHours() - hoy.getHours();
         const restaTimbresMinutos = timbreRV.getMinutes() - hoy.getMinutes();
         const restaTimbresDias = timbreRV.getDate() - hoy.getDate();
@@ -107,9 +107,9 @@ export const crearTimbreDesconectado = async (req: Request, res: Response) => {
             'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
             'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion) ' +
             'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16);',
-            [timbre.fec_hora_timbre, 'dd', timbre.tecl_funcion, timbre.observacion,
+            [timbre.fecha_hora_timbre, 'dd', timbre.tecla_funcion, timbre.observacion,
             timbre.latitud, timbre.longitud, timbre.codigo, timbre.id_reloj,
-            timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fec_hora_timbre_servidor,
+            timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fecha_hora_timbre_servidor,
             timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion]);
         res.jsonp({
             message: 'Timbre creado con éxito',

@@ -34,10 +34,10 @@ import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
           <ion-card-title style="margin-top:-2%; margin-bottom:-3%; font-size: 100%;"><b> Horario </b></ion-card-title><br>
             <strong> Inicia: </strong>{{ horaExtraDato.hora_inicio_ }} - 
             <strong> Finaliza: </strong> {{ horaExtraDato.hora_fin_ }}<br>
-            <strong> Tiempo: </strong> {{ horaExtraDato.num_hora }} &nbsp;
+            <strong> Tiempo: </strong> {{ horaExtraDato.horas_solicitud }} &nbsp;
             <strong> Tiempo autorizado: </strong> {{ horaExtraDato.tiempo_autorizado }} <br>          
             <br>
-          <ion-card-title style="margin-top:-2%; margin-bottom:-3%; font-size: 100%; float: right;"> <b> Fecha solicitada:</b> {{ horaExtraDato.fec_solicita_ }}</ion-card-title> 
+          <ion-card-title style="margin-top:-2%; margin-bottom:-3%; font-size: 100%; float: right;"> <b> Fecha solicitada:</b> {{ horaExtraDato.fecha_solicita_ }}</ion-card-title> 
           </p>
         </h6>
         

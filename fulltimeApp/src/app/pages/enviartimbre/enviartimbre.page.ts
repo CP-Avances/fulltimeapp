@@ -66,7 +66,7 @@ export class EnviartimbrePage implements OnInit {
 
   cargandoPosicion = false;
   public nuevoTimbre: Timbre = {
-    tecl_funcion: "",
+    tecla_funcion: "",
     codigo: "",
     observacion: "",
     latitud: "",
@@ -392,10 +392,10 @@ export class EnviartimbrePage implements OnInit {
   //Metodo que guarda el timbre en la base de datos en la tabla timbres.
   guardarEnBDD() {
     this.nuevoTimbre.codigo = this.id_usuario;
-    this.nuevoTimbre.tecl_funcion = this.obtenerIdTipo();
-    this.nuevoTimbre.fec_hora_timbre = this.fechaTransformada + " " + this.horaTransformada;
+    this.nuevoTimbre.tecla_funcion = this.obtenerIdTipo();
+    this.nuevoTimbre.fecha_hora_timbre = this.fechaTransformada + " " + this.horaTransformada;
 
-    this.nuevoTimbre.tecl_funcion = this.obtenerIdTipo();
+    this.nuevoTimbre.tecla_funcion = this.obtenerIdTipo();
 
     if (this.nuevoTimbre.accion === "HA" && this.nuevoTimbre.observacion === null) return this.abrirToas('Lo siento! Debes ingresar una observación antes de enviar un timbre abierto 😅', "danger", 5000, "bottom");
     if (this.nuevoTimbre.accion === "HA" && this.nuevoTimbre.observacion === "") return this.abrirToas('Lo siento! Debes ingresar una observación antes de enviar un timbre abierto 😅', "danger", 5000, "bottom");

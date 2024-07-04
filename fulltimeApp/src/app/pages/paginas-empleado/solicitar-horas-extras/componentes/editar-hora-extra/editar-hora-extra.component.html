@@ -79,7 +79,7 @@
                   [showDefaultButtons]="false"
                   name="fec_final" 
                   mode="md" 
-                  [min]="reg.fec_inicio"  max="2050-12-31" 
+                  [min]="reg.fecha_inicio"  max="2050-12-31" 
                   (ionChange)="ChangeDiaFinal($event)" 
                   [value]="dia_fianl" 
                   required></ion-datetime>
@@ -165,7 +165,7 @@
                 <div class="formdiv_tiempo">
                   <ion-item  class="item_fondo" >
                     <ion-label position="floating"><b>Tiempo</b></ion-label>
-                    <ion-input disabled="true" name="num_hora" [ngModel]="reg.num_hora" mode="md" maxlengt="10" required></ion-input>
+                    <ion-input disabled="true" name="num_hora" [ngModel]="reg.horas_solicitud" mode="md" maxlengt="10" required></ion-input>
                   </ion-item>
                 </div>
               </ion-col>

@@ -981,9 +981,9 @@ export class UpdateAutorizacionComponent implements OnInit {
 
     const noti: Notificacion = notificacionValueDefault;
     noti.id_vacaciones = vacaciones.id;
-    noti.id_send_empl = parseInt(localStorage.getItem('empleadoID'));
+    noti.id_empleado_envia = parseInt(localStorage.getItem('empleadoID'));
     noti.id_permiso = noti.id_hora_extra = null;
-    noti.create_at = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
+    noti.fecha_hora = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
     noti.estado = estado_v;
     noti.tipo = 2;
     noti.mensaje = 'Ha ' + estado_v.toLowerCase() + ' la solicitud de vacaciones para ' +
@@ -1006,8 +1006,8 @@ export class UpdateAutorizacionComponent implements OnInit {
 
     allNotificacionesVacaciones.forEach(e => {
 
-      noti.id_receives_depa = e.id_dep;
-      noti.id_receives_empl = e.empleado;
+      noti.id_departamento_recibe = e.id_dep;
+      noti.id_empleado_recibe = e.empleado;
 
       if (e.vaca_noti) {
         this.autoService.postNotificacion(noti).subscribe(
@@ -1055,7 +1055,7 @@ export class UpdateAutorizacionComponent implements OnInit {
       horaExtra.EmpleadosSendNotiEmail.push(this.solInfo);
       console.log(horaExtra);
       //this.configuracionCorreoHE(horaExtra, estado_h, estado_c, horaExtra.num_hora, estado_n);
-      this.EnviarNotificacionHE(horaExtra, estado_h, horaExtra.num_hora, estado_n, infoUsuario);
+      this.EnviarNotificacionHE(horaExtra, estado_h, horaExtra.horas_solicitud, estado_n, infoUsuario);
       this.validaciones.showToast('Proceso realizado exitosamente.', 5000, 'success');
     });
   }
@@ -1153,9 +1153,9 @@ export class UpdateAutorizacionComponent implements OnInit {
     console.log('nueva lista HE: ',horaExtra.EmpleadosSendNotiEmail);
 
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let solicitud = this.validar.FormatearFecha(horaExtra.fec_solicita, this.formato_fecha, this.validar.dia_completo);
-    let desde = this.validar.FormatearFecha(moment(horaExtra.fec_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(moment(horaExtra.fec_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
+    let solicitud = this.validar.FormatearFecha(horaExtra.fecha_solicita, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(moment(horaExtra.fecha_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
+    let hasta = this.validar.FormatearFecha(moment(horaExtra.fecha_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
 
     horaExtra.EmpleadosSendNotiEmail.forEach(e => {
 
@@ -1180,9 +1180,9 @@ export class UpdateAutorizacionComponent implements OnInit {
           solicitud: solicitud,
           desde: desde,
           hasta: hasta,
-          h_inicio: this.validar.FormatearHora(moment(horaExtra.fec_inicio).format('HH:mm:ss'), this.formato_hora),
-          h_final: this.validar.FormatearHora(moment(horaExtra.fec_final).format('HH:mm:ss'), this.formato_hora),
-          num_horas: moment(horaExtra.num_hora, 'HH:mm').format('HH:mm') +
+          h_inicio: this.validar.FormatearHora(moment(horaExtra.fecha_inicio).format('HH:mm:ss'), this.formato_hora),
+          h_final: this.validar.FormatearHora(moment(horaExtra.fecha_final).format('HH:mm:ss'), this.formato_hora),
+          num_horas: moment(horaExtra.horas_solicitud, 'HH:mm').format('HH:mm') +
             '<br> <b>Num. horas ' + estado_n + ':</b> ' + moment(valor, 'HH:mm').format('HH:mm') + ' <br>',
           observacion: horaExtra.descripcion,
           estado_h: estado_h,
@@ -1219,11 +1219,11 @@ export class UpdateAutorizacionComponent implements OnInit {
   EnviarNotificacionHE(horaExtra: any, estado_h: string, valor: any, estado_n: string, infoUsuario: any) {
 
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let desde = this.validar.FormatearFecha(moment(horaExtra.fec_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(moment(horaExtra.fec_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(moment(horaExtra.fecha_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
+    let hasta = this.validar.FormatearFecha(moment(horaExtra.fecha_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
 
-    let h_inicio = this.validar.FormatearHora(moment(horaExtra.fec_inicio).format('HH:mm:ss'), this.formato_hora)
-    let h_final = this.validar.FormatearHora(moment(horaExtra.fec_final).format('HH:mm:ss'), this.formato_hora);
+    let h_inicio = this.validar.FormatearHora(moment(horaExtra.fecha_inicio).format('HH:mm:ss'), this.formato_hora)
+    let h_final = this.validar.FormatearHora(moment(horaExtra.fecha_final).format('HH:mm:ss'), this.formato_hora);
 
     const noti: NotificacionTimbre = notificacionTimbreValueDefault;
     noti.tipo = 12;

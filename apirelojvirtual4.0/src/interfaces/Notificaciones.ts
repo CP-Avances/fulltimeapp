@@ -1,10 +1,10 @@
 export interface Notificacion {
     id: number;
-    id_send_empl: number;
-    id_receives_empl: number;
-    id_receives_depa: number;
+    id_empleado_envia: number;
+    id_empleado_recibe: number;
+    id_departamento_recibe: number;
     estado: string;
-    create_at: Date;
+    fecha_hora: Date;
     visto: boolean;
     id_permiso: number;
     id_vacaciones: null;

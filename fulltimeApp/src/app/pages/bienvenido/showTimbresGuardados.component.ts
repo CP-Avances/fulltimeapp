@@ -29,7 +29,7 @@ import { EmpleadosService } from 'src/app/services/empleados.service';
     <ion-list style="background-color: transparent;">
       <ion-item style="margin: 2.5%; padding: -2%; border-radius: 3%;" *ngFor="let t of timbres">
         <ion-label>
-          <h2> <ion-icon color="dark" name="calendar-outline"></ion-icon> &nbsp;{{ t.fec_hora_timbre }} </h2>
+          <h2> <ion-icon color="dark" name="calendar-outline"></ion-icon> &nbsp;{{ t.fecha_hora_timbre }} </h2>
           <h4 *ngIf="t.latitud !== null && t.latitud !== '0' && t.latitud !== undefined"> 
             <ion-icon color="dark" name="location-outline"></ion-icon> 
             &nbsp;{{ t.latitud }} / {{ t.longitud }} 
@@ -330,7 +330,7 @@ export class TimbresPerdidosComponent implements OnInit {
 
   //Metodo para enviar timbre perdido
   EnviarTimbres(latitud: any, longitud: any, timbre:any): void {
-    timbre.fec_hora_timbre_servidor = null;
+    timbre.fecha_hora_timbre_servidor = null;
     timbre.latitud = latitud+"";
     timbre.longitud = longitud+"";
     timbre.novedades_conexion = "Fallo conexion al servidor";

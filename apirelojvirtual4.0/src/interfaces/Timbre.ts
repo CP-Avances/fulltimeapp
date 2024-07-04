@@ -1,9 +1,9 @@
 
 export interface Timbre {
     id?: number,
-    fec_hora_timbre?: Date,
+    fecha_hora_timbre?: Date,
     accion?: string,
-    tecl_funcion?: string,
+    tecla_funcion?: string,
     observacion?: string,
     latitud?: string,
     longitud?: string
@@ -11,7 +11,7 @@ export interface Timbre {
     id_reloj?: number,
     tipo_autenticacion?: string,
     dispositivo_timbre?: string,
-    fec_hora_timbre_servidor?: string,
+    fecha_hora_timbre_servidor?: string,
     hora_timbre_diferente: boolean
     stimbre?: string,
     stimbre_servidor?: string,

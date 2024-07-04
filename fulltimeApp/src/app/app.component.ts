@@ -61,7 +61,7 @@ export class AppComponent {
     const timbres = [...this.dataLocalService.timbresStorage]
     if (timbres.length > 0) {
       timbres.forEach(t => {
-        t.fec_hora_timbre_servidor = null;
+        t.fecha_hora_timbre_servidor = null;
         this.relojService.enviarTimbreSinConexion(t).subscribe(
           res => { 
             setTimeout(() => {

@@ -54,7 +54,7 @@ export class DataLocalService {
   }
 
   guardarTimbre(timbre: Timbre) {
-    const existe = this.timbres.find(tim => tim.fec_hora_timbre === timbre.fec_hora_timbre)
+    const existe = this.timbres.find(tim => tim.fecha_hora_timbre === timbre.fecha_hora_timbre)
     if (!existe) {
       this.mensaje =  `<div class="card-alert">
                             <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
@@ -75,7 +75,7 @@ export class DataLocalService {
   }
 
   guardarTimbresPerdidos(timbre: Timbre) {
-    const existe = this.timbresPerdidos.find(tim => tim.fec_hora_timbre === timbre.fec_hora_timbre)
+    const existe = this.timbresPerdidos.find(tim => tim.fecha_hora_timbre === timbre.fecha_hora_timbre)
     if (!existe) {
       this.mensaje =  `<div class="card-alert">
                             <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">

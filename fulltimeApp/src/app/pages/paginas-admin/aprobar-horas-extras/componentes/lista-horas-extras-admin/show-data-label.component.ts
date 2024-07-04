@@ -33,7 +33,7 @@ import { HoraExtra } from 'src/app/interfaces/HoraExtra';
       <strong>Horario </strong><br>
       <strong>Inicia: </strong> {{ horasExtras.hora_inicio_ }} - 
       <strong>Finaliza: </strong> {{ horasExtras.hora_fin_ }}<br>
-      <strong>Tiempo: </strong> {{ horasExtras.num_hora }}
+      <strong>Tiempo: </strong> {{ horasExtras.horas_solicitud }}
     </p>
 
   </div>

@@ -52,7 +52,7 @@ export class NotificacionPopoverComponent implements OnInit {
           (firstObject: Notificacion, secondObject: Notificacion) =>  
               (firstObject.visto === true)? 1 : 
                 (firstObject.visto === secondObject.visto) ?
-                  ((firstObject.create_at < secondObject.create_at)? 1 : -1)
+                  ((firstObject.fecha_hora < secondObject.fecha_hora)? 1 : -1)
               
             :-1
         );

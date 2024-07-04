@@ -191,8 +191,8 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
       let fechasObjeto = {}
 
       res.forEach(data => {
-        data.fecha = this.validar.FormatearFecha(data.fec_hora_timbre, this.formato_fecha, this.validar.dia_completo);
-        data.hora = this.validar.FormatearHora(moment(data.fec_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+        data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
+        data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
       })
 
       res.forEach(x => {
@@ -240,8 +240,8 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
           let fechasObjeto_f = {}
 
           ress.forEach(data => {
-            data.fecha = this.validar.FormatearFecha(data.fec_hora_timbre, this.formato_fecha, this.validar.dia_completo);
-            data.hora = this.validar.FormatearHora(moment(data.fec_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+            data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
+            data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
           })
 
           ress.forEach(i => {

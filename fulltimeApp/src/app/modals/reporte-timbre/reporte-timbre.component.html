@@ -81,11 +81,11 @@
           <td>{{timbre.num}}</td>
           <td>{{timbre.fecha}}</td>
           <td>{{timbre.hora}}</td>
-          <td *ngIf="timbre.fec_hora_timbre_servidor != null">{{timbre.sfecha}}</td>
-          <td *ngIf="timbre.fec_hora_timbre_servidor === null"></td>
-          <td *ngIf="timbre.fec_hora_timbre_servidor != null">{{timbre.shora}}</td>
-          <td *ngIf="timbre.fec_hora_timbre_servidor === null"></td>
-          <td [ngSwitch]="timbre.tecl_funcion">
+          <td *ngIf="timbre.fecha_hora_timbre_servidor != null">{{timbre.sfecha}}</td>
+          <td *ngIf="timbre.fecha_hora_timbre_servidor === null"></td>
+          <td *ngIf="timbre.fecha_hora_timbre_servidor != null">{{timbre.shora}}</td>
+          <td *ngIf="timbre.fecha_hora_timbre_servidor === null"></td>
+          <td [ngSwitch]="timbre.tecla_funcion">
             <p *ngSwitchCase="1">Inicio de la jornada</p>
             <p *ngSwitchCase="2">Fin de la jornada</p>
             <p *ngSwitchCase="3">Inicio almuerzo</p>

@@ -100,13 +100,13 @@ export class HoraExtraListaComponent implements OnInit, OnDestroy {
 
           this.horas_extras.forEach(h => {
             // TRATAMIENTO DE FECHAS Y HORAS
-            h.fecha_inicio_ = this.validar.FormatearFecha(moment(h.fec_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-            h.hora_inicio_ = this.validar.FormatearHora(moment(h.fec_inicio).format('HH:mm:ss'), this.formato_hora);
+            h.fecha_inicio_ = this.validar.FormatearFecha(moment(h.fecha_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
+            h.hora_inicio_ = this.validar.FormatearHora(moment(h.fecha_inicio).format('HH:mm:ss'), this.formato_hora);
 
-            h.fecha_fin_ = this.validar.FormatearFecha(moment(h.fec_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);;
-            h.hora_fin_ = this.validar.FormatearHora(moment(h.fec_final).format('HH:mm:ss'), this.formato_hora);
+            h.fecha_fin_ = this.validar.FormatearFecha(moment(h.fecha_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);;
+            h.hora_fin_ = this.validar.FormatearHora(moment(h.fecha_final).format('HH:mm:ss'), this.formato_hora);
 
-            h.fec_solicita_ = this.validar.FormatearFecha(String(h.fec_solicita), this.formato_fecha, this.validar.dia_completo);
+            h.fecha_solicita_ = this.validar.FormatearFecha(String(h.fecha_solicita), this.formato_fecha, this.validar.dia_completo);
           })
 
           if (horas_extras.length < 6) {

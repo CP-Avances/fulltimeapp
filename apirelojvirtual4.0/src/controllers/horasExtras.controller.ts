@@ -76,7 +76,7 @@ export const getlistaHorasExtrasByCodigo = async (req: Request, res: Response): 
  * @returns Retorna un array de HORAS EXTRAS
  */
 
- export const getlistaHorasExtrasByFechasyCodigo = async (req: Request, res: Response): Promise<Response> => {
+export const getlistaHorasExtrasByFechasyCodigo = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { fecha_inicio, fecha_final, codigo } = req.query;
 
@@ -106,10 +106,10 @@ export const getlistaHorasExtrasByFechasyCodigoEdit = async (req: Request, res: 
     try {
         const { fecha_inicio, fecha_final, codigo, id } = req.query;
 
-        console.log('fecha_inicio: ',fecha_inicio)
-        console.log('fecha_final: ',fecha_final)
-        console.log('codigo: ',codigo)
-        console.log('id: ',id)
+        console.log('fecha_inicio: ', fecha_inicio)
+        console.log('fecha_final: ', fecha_final)
+        console.log('codigo: ', codigo)
+        console.log('id: ', id)
 
         const HorasExtras = await pool.query(`SELECT h.* FROM mhe_solicitud_hora_extra h 
         WHERE h.codigo::varchar = $1 
@@ -117,7 +117,7 @@ export const getlistaHorasExtrasByFechasyCodigoEdit = async (req: Request, res: 
         AND NOT h.id = $4 `
             , [codigo, fecha_inicio, fecha_final, id]);
 
-        console.log('lista solicitudes: ',HorasExtras.rows)
+        console.log('lista solicitudes: ', HorasExtras.rows)
 
         return res.status(200).jsonp(HorasExtras.rows);
     } catch (error) {

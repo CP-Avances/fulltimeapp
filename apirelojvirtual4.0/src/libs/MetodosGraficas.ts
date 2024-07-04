@@ -124,7 +124,7 @@ export const GraficaMarcaciones = async function (id_empresa: number, fec_inicio
     } as IModelarAnio;
 
     timbres.forEach(obj => {
-        let fecha = obj.fec_hora_timbre;
+        let fecha = obj.fecha_hora_timbre;
         // console.log(fecha.getMonth());
         switch (fecha.getMonth()) {
             case 0:

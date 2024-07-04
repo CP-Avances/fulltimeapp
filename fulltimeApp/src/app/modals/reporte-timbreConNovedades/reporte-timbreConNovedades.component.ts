@@ -63,8 +63,8 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
     this.reporteService.getInfoReporteTimbresNovedad(this.data.codigo, this.fechaInicio, this.fechaFinal, this.conexion).subscribe(res => {
       this.timbres = res;
       this.timbres.forEach(data => {
-        data.fecha = this.validar.FormatearFecha(data.fec_hora_timbre, this.formato_fecha, this.validar.dia_abreviado);
-        data.hora = this.validar.FormatearHora(moment(data.fec_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+        data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_abreviado);
+        data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
 
         data.sfecha = this.validar.FormatearFecha(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_abreviado);
         data.shora = this.validar.FormatearHora(moment(data.fecha_subida_servidor).format('HH:mm:ss'), this.formato_hora);

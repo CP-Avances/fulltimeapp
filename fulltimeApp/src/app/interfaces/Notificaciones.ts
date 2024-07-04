@@ -1,10 +1,10 @@
 export interface Notificacion {
     id?: number;
-    id_send_empl: number;
-    id_receives_empl: any;
-    id_receives_depa: any;
+    id_empleado_envia: number;
+    id_empleado_recibe: any;
+    id_departamento_recibe: any;
     estado: string;
-    create_at: string;
+    fecha_hora: string;
     visto: boolean;
     id_permiso: number | null;
     id_vacaciones: number | null;
@@ -18,11 +18,11 @@ export interface Notificacion {
 
 export const notificacionValueDefault = {
     id: undefined,
-    id_send_empl: undefined,
-    id_receives_empl: null,
-    id_receives_depa: null,
+    id_empleado_envia: undefined,
+    id_empleado_recibe: null,
+    id_departamento_recibe: null,
     estado: '',
-    create_at: '',
+    fecha_hora: '',
     visto: false,
     id_permiso: null,
     id_vacaciones: null,

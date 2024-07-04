@@ -53,8 +53,8 @@ export class HorasExtrasService {
   getAllHorasExtrasByFechas(fec_inicio: string, fec_final: string): Observable<HoraExtra[]> {
     const url = `${this.apiUrl}/horasextras/rangofechas`;
     const params = new HttpParams()
-      .set('fec_inicio', fec_inicio)
-      .set('fec_final', fec_final)
+      .set('fecha_inicio', fec_inicio)
+      .set('fecha_final', fec_final)
     return this.http.get<HoraExtra[]>(url, { params })
       .pipe(
         tap(console.log),
@@ -75,8 +75,8 @@ export class HorasExtrasService {
   getlistaHorasExtrasByFechasyCodigo(fec_inicio: string, fec_final: string, codigo: number | string): Observable <HoraExtra[]>{
     const url = `${this.apiUrl}/horasextras/lista-horas-extrasfechas`;
     const params = new HttpParams()
-      .set('fec_inicio', fec_inicio)
-      .set('fec_final', fec_final)
+      .set('fecha_inicio', fec_inicio)
+      .set('fecha_final', fec_final)
       .set('codigo', codigo)
     return this.http.get<HoraExtra[]>(url, { params })
       .pipe(
@@ -88,8 +88,8 @@ export class HorasExtrasService {
   getlistaHorasExtrasByFechasyCodigoEdit(fec_inicio: string, fec_final: string, codigo: number | string, id:number): Observable <HoraExtra[]>{
     const url = `${this.apiUrl}/horasextras/lista-horas-extrasfechasedit`;
     const params = new HttpParams()
-      .set('fec_inicio', fec_inicio)
-      .set('fec_final', fec_final)
+      .set('fecha_inicio', fec_inicio)
+      .set('fecha_final', fec_final)
       .set('codigo', codigo)
       .set('id', id)
     return this.http.get<HoraExtra[]>(url, { params })
