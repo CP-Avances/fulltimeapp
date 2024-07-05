@@ -2,15 +2,15 @@ import { EmpleadosSendNotiEmail } from './Notificaciones';
 
 export interface Vacacion {
     isChecked?: boolean;
-    fec_inicio: string;
-    fec_final: string;
-    fec_ingreso: string;
+    fecha_inicio: string;
+    fecha_final: string;
+    fecha_ingreso: string;
     dia_libre: number;
     dia_laborable: number;
     legalizado: boolean;
     id?: number;
-    id_peri_vacacion: number | null;
-    id_empl_cargo: number;
+    id_periodo_vacacion: number | null;
+    id_empleado_cargo: number;
     estado: number;
     codigo: number | string;
     nperivacacion?: string;
@@ -24,14 +24,14 @@ export interface Vacacion {
 }
 export const vacacionValueDefault = {
     isChecked: false,
-    fec_inicio: null,
-    fec_final: null,
-    fec_ingreso: null,
+    fecha_inicio: null,
+    fecha_final: null,
+    fecha_ingreso: null,
     dia_libre: null,
     dia_laborable: null,
     legalizado: null,
-    id_peri_vacacion: null,
-    id_empl_cargo: null,
+    id_periodo_vacacion: null,
+    id_empleado_cargo: null,
     estado: null,
     codigo: null,
     fec_inicio_: null,

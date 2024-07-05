@@ -59,9 +59,9 @@ export interface EmpleadosSendNotiEmail {
 
 export interface NotificacionTimbre {
     id: number | undefined;
-    create_at: string | null;
-    id_send_empl: number | null;
-    id_receives_empl: number | null;
+    fecha_hora: string | null;
+    id_empleado_envia: number | null;
+    id_empleado_recibe: number | null;
     visto: boolean | null;
     descripcion: string | null;
     id_timbre: number | null;
@@ -73,9 +73,9 @@ export interface NotificacionTimbre {
 
 export const notificacionTimbreValueDefault = {
     id: undefined,
-    create_at: null,
-    id_send_empl: null,
-    id_receives_empl: null,
+    fecha_hora: null,
+    id_empleado_envia: null,
+    id_empleado_recibe: null,
     visto: null,
     descripcion: null,
     id_timbre: null,

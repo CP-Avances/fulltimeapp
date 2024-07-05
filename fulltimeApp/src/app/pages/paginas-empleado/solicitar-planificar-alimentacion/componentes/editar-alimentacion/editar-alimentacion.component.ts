@@ -90,7 +90,7 @@ export class EditarAlimentacionComponent implements OnInit {
     this.catalogos.getServicioComida();
     this.catalogos.getMenuServicios();
     this.reg = this.alimentacion;
-    this.fecha_comida = this.alimentacion.fec_comida;
+    this.fecha_comida = this.alimentacion.fecha_comida;
     this.fecha_consumo = moment(this.fecha_comida).format('YYYY-MM-DD');
 
     this.LecturaDatos();
@@ -135,7 +135,7 @@ export class EditarAlimentacionComponent implements OnInit {
 
   calcularhoras() {
     if (
-      this.reg.fec_comida === undefined ||
+      this.reg.fecha_comida === undefined ||
       this.reg.fecha === undefined) {
 
       this.loadingBtn = false;
@@ -143,20 +143,20 @@ export class EditarAlimentacionComponent implements OnInit {
       return false
     }
 
-    const fechasValidas = this.validar.validarRangoFechasIngresa(this.reg.fecha, this.reg.fec_comida, true)
+    const fechasValidas = this.validar.validarRangoFechasIngresa(this.reg.fecha, this.reg.fecha_comida, true)
     if (!fechasValidas) return this.valoresDefectoValidacionFecha()
 
     const hora_inicio = this.validar.TiempoFormatoHHMMSS(this.reg.hora_inicio)
     const hora_fin = this.validar.TiempoFormatoHHMMSS(this.reg.hora_fin)
 
-    const fec_comp_inicio = this.validar.Unir_Fecha_Hora(this.reg.fec_comida, hora_inicio);
-    const fec_comp_final = this.validar.Unir_Fecha_Hora(this.reg.fec_comida, hora_fin);
+    const fec_comp_inicio = this.validar.Unir_Fecha_Hora(this.reg.fecha_comida, hora_inicio);
+    const fec_comp_final = this.validar.Unir_Fecha_Hora(this.reg.fecha_comida, hora_fin);
 
     return true
   }
 
   valoresDefectoValidacionFecha() {
-    this.reg.fec_comida = undefined;
+    this.reg.fecha_comida = undefined;
     this.loadingBtn = false;
     return false
   }
@@ -174,7 +174,7 @@ export class EditarAlimentacionComponent implements OnInit {
   ChangePlatoMenu() {
     this.LimpiarFormularioPlato();
     this.plato = this.cg_detalle_menu.filter(o => {
-      return o.id_menu === this.reg.id_plato
+      return o.id_horario_comida === this.reg.id_plato
     })
     this.plato_selected = this.plato;
     if (this.plato_selected.length != 0) {
@@ -189,7 +189,7 @@ export class EditarAlimentacionComponent implements OnInit {
   ChangeDetalleComida() {
     this.detalle_menu_selected = {};
     const [cg_det_comida] = this.cg_detalle_menu.filter(o => {
-      return o.id === this.reg.id_comida
+      return o.id === this.reg.id_detalle_comida
     })
     if (cg_det_comida != undefined) {
       this.detalle_menu_selected = cg_det_comida;
@@ -201,7 +201,7 @@ export class EditarAlimentacionComponent implements OnInit {
     this.LimpiarFormularioMenu();
     this.LimpiarFormularioPlato();
     this.menu = this.menus.filter(o => {
-      return o.tipo_comida === this.reg.id_servicio
+      return o.id_comida === this.reg.id_servicio
     })
     this.menu_selected = this.menu;
     if (this.menu_selected.length != 0) {
@@ -228,11 +228,11 @@ export class EditarAlimentacionComponent implements OnInit {
    * ********************************************************************************** */
      mostrarCalculos(e){
       if(!e.target.value){
-        this.reg.fec_comida = moment(new Date()).format('YYYY-MM-DD');
-        return this.fecha_comida = moment(this.reg.fec_comida).format('YYYY-MM-DD');
+        this.reg.fecha_comida = moment(new Date()).format('YYYY-MM-DD');
+        return this.fecha_comida = moment(this.reg.fecha_comida).format('YYYY-MM-DD');
       }else{
-        this.reg.fec_comida = e.target.value;
-        const fec_comida = (moment(this.reg.fec_comida).format('YYYY-MM-DD'));
+        this.reg.fecha_comida = e.target.value;
+        const fec_comida = (moment(this.reg.fecha_comida).format('YYYY-MM-DD'));
         this.fecha_consumo = fec_comida;
         const codigo = parseInt(localStorage.getItem('empleadoID'));
         this.datetimeInicio.confirm(true);
@@ -425,12 +425,12 @@ export class EditarAlimentacionComponent implements OnInit {
   }
 
   LimpiarFormularioPlato() {
-    this.reg.id_comida = undefined;
+    this.reg.id_detalle_comida = undefined;
   }
 
   LecturaDatos() {
     this.menu = this.menus.filter(o => {
-      return o.tipo_comida === this.reg.id_servicio
+      return o.id_comida === this.reg.id_servicio
     })
     this.menu_selected = this.menu;
     if (this.menu_selected.length != 0) {
@@ -441,7 +441,7 @@ export class EditarAlimentacionComponent implements OnInit {
     }
 
     this.plato = this.cg_detalle_menu.filter(o => {
-      return o.id_menu === this.reg.id_plato
+      return o.id_horario_comida === this.reg.id_plato
     })
     this.plato_selected = this.plato;
     if (this.plato_selected.length != 0) {
@@ -455,7 +455,7 @@ export class EditarAlimentacionComponent implements OnInit {
 
     this.detalle_menu_selected = {};
     const [cg_det_comida] = this.cg_detalle_menu.filter(o => {
-      return o.id === this.reg.id_comida
+      return o.id === this.reg.id_detalle_comida
     })
     if (cg_det_comida != undefined) {
       this.detalle_menu_selected = cg_det_comida;

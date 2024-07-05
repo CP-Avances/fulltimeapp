@@ -80,7 +80,7 @@
         <ion-icon color="success" *ngIf="a.aprobada === null" name="create-outline" (click)="presentModalEditarRegistro( a )"
           style="margin-bottom:15%;"></ion-icon><br>
         <!-- Eliminar registro -->
-        <btn-delete (onDelete)="ngOnInit()" [isButtom]="false" nameTable="solicita_comidas" [idreg]="a.id"
+        <btn-delete (onDelete)="ngOnInit()" [isButtom]="false" nameTable="ma_solicitud_comida" [idreg]="a.id"
           [userCodigo]="a.codigo"></btn-delete>
       </div>
     </ion-item>

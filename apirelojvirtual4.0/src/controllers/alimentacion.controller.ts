@@ -17,7 +17,7 @@ export const getlistaAlimentacionByIdEmpleado = async (req: Request, res: Respon
         const subquery3 = '( SELECT i.observacion from ma_detalle_comida i where i.id = a.id_detalle_comida )  as ndetallecomida '
         const subquery4 = '( SELECT t.nombre from ma_cat_comidas t, ma_horario_comidas ct, ma_detalle_comida i where i.id = a.id_detalle_comida AND i.id_horario_comida = ct.id AND ct.id_comida = t.id )  as nservicio '
         const subquery5 = '( SELECT t.id from ma_cat_comidas t, ma_horario_comidas ct, ma_detalle_comida i where i.id = a.id_detalle_comida AND i.id_horario_comida = ct.id AND ct.id_comida = t.id )  as id_servicio '
-        const subquery6 = '( SELECT i.id_horario_comida,  from ma_detalle_comida i where i.id = a.id_comida )  as id_plato '
+        const subquery6 = '( SELECT i.id_horario_comida  from ma_detalle_comida i where i.id = a.id_detalle_comida )  as id_plato '
         const subquery7 = `(SELECT e.codigo FROM eu_empleados AS e WHERE e.id = a.id_empleado) AS codigo`
 
         const query = `SELECT a.*, ${subquery}, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4}, 
@@ -112,7 +112,7 @@ export const getlistaAlimentacionByFechas = async (req: Request, res: Response):
 export const postNuevoAlimentacion = async (req: Request, res: Response): Promise<Response> => {
     try {
 
-        const { extra, fec_comida, fecha, hora_fin, hora_inicio, id_comida, id_empleado,
+        const { extra, fecha_comida, fecha, hora_fin, hora_inicio, id_detalle_comida, id_empleado,
             observacion, verificar } = req.body;
 
         console.log(req.body);
@@ -121,7 +121,7 @@ export const postNuevoAlimentacion = async (req: Request, res: Response): Promis
             'INSERT INTO ma_solicitud_comida (extra, fecha_comida, fecha, hora_fin, hora_inicio, id_detalle_comida, ' +
             'id_empleado, observacion, verificar) ' +
             'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
-            [extra, fec_comida, fecha, hora_fin, hora_inicio, id_comida, id_empleado, observacion, verificar]);
+            [extra, fecha_comida, fecha, hora_fin, hora_inicio, id_detalle_comida, id_empleado, observacion, verificar]);
         const [objetoAlimento] = response.rows;
 
         if (!objetoAlimento) {
@@ -145,7 +145,7 @@ export const postNuevoAlimentacion = async (req: Request, res: Response): Promis
  */
 export const putAlimentacion = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const { id, id_empleado, fecha, id_comida, observacion, fec_comida, extra, aprobada, verificar } = req.body;
+        const { id, id_empleado, fecha, id_detalle_comida, observacion, fecha_comida, extra, aprobada, verificar } = req.body;
 
         const response: QueryResult = await pool.query(
             `
@@ -153,7 +153,7 @@ export const putAlimentacion = async (req: Request, res: Response): Promise<Resp
             fecha_comida = $6, extra = $7, aprobada = $8, verificar = $9 
             WHERE id = $1  RETURNING *
             `
-            , [id, id_empleado, fecha, id_comida, observacion, fec_comida, extra, aprobada, verificar]);
+            , [id, id_empleado, fecha, id_detalle_comida, observacion, fecha_comida, extra, aprobada, verificar]);
 
         const [objetoAlimentacion] = response.rows;
 

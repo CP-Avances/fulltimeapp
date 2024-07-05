@@ -83,12 +83,12 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     this.catalogoService.getFeriadosAnual()
     this.reg.estado = 1;
     this.reg.codigo = parseInt(localStorage.getItem('codigo'));
-    this.reg.id_peri_vacacion = parseInt(localStorage.getItem('cperi_vacacion'));
-    this.reg.id_empl_cargo = parseInt(localStorage.getItem('ccargo'));
+    this.reg.id_periodo_vacacion = parseInt(localStorage.getItem('cperi_vacacion'));
+    this.reg.id_empleado_cargo = parseInt(localStorage.getItem('ccargo'));
     this.reg.dia_laborable = undefined;
     this.reg.dia_libre = undefined;
 
-    console.log('peri_vacaciones: ',this.reg.id_peri_vacacion);
+    console.log('peri_vacaciones: ',this.reg.id_periodo_vacacion);
     
     this.obtenerInformacionEmpleado();
     this.BuscarFormatos();
@@ -124,7 +124,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
           correo: res.correo,
         }
 
-        if(!(Number.isNaN(this.reg.id_peri_vacacion))){
+        if(!(Number.isNaN(this.reg.id_periodo_vacacion))){
           this.ocultar = false;
           this.mensaje = true;
         }else{
@@ -136,9 +136,9 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
   }
 
   valoresDefectoValidacionFechas() {
-    this.reg.fec_inicio = null;
-    this.reg.fec_final = null;
-    this.reg.fec_ingreso = null;
+    this.reg.fecha_inicio = null;
+    this.reg.fecha_final = null;
+    this.reg.fecha_ingreso = null;
     this.loadingBtn = false;
     return false
   }
@@ -180,8 +180,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
 
   // METODO VALIDAR EL INPUT DE DIA INICIAL, FINAL y INGRESO
   ChangeDiaInicio(e){
-    this.reg.fec_final = null;
-    this.reg.fec_ingreso = null;
+    this.reg.fecha_final = null;
+    this.reg.fecha_ingreso = null;
     this.loadingBtn = false;
     this.dia_fianl = '';
     this.dia_ingreso = '';
@@ -189,15 +189,15 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     this.reg.dia_libre = null;
 
     if(!e.target.value){
-      this.reg.fec_inicio = moment(new Date()).format('YYYY-MM-DD'); 
-      const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
-      this.dia_fianl = moment(this.reg.fec_inicio).format('YYYY-MM-DD');
+      this.reg.fecha_inicio = moment(new Date()).format('YYYY-MM-DD'); 
+      const hoy = moment(this.reg.fecha_inicio).format("DD/MM/YYYY, HH:mm:ss")
+      this.dia_fianl = moment(this.reg.fecha_inicio).format('YYYY-MM-DD');
 
       this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
         horario => { 
           this.horarioEmpleado = horario;
 
-          if(this.DiaIniciolLibre(this.reg.fec_inicio) == 0){
+          if(this.DiaIniciolLibre(this.reg.fecha_inicio) == 0){
             this.disabled_dia_fianl = true, this.disabled_dia_ingreso = true;
           }else{
             this.disabled_dia_fianl = false, this.disabled_dia_ingreso = false;
@@ -205,23 +205,23 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
           return this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
         },
         err => { this.validar.showToast(err.error.message, 3000, 'danger');
-          this.reg.fec_inicio = undefined;
+          this.reg.fecha_inicio = undefined;
           return this.dia_inicio = '';
         }
       )
 
     }else{
-      this.reg.fec_inicio = e.target.value;
+      this.reg.fecha_inicio = e.target.value;
       this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
       this.datetimeInicio.confirm(true);
-      if(this.reg.fec_inicio != '' || this.reg.fec_inicio != null){
+      if(this.reg.fecha_inicio != '' || this.reg.fecha_inicio != null){
       
-        const hoy = moment(this.reg.fec_inicio).format("DD/MM/YYYY, HH:mm:ss")
+        const hoy = moment(this.reg.fecha_inicio).format("DD/MM/YYYY, HH:mm:ss")
         this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
           horario => { 
             this.horarioEmpleado = horario;
 
-            if(this.DiaIniciolLibre(this.reg.fec_inicio) == 0){
+            if(this.DiaIniciolLibre(this.reg.fecha_inicio) == 0){
               return this.disabled_dia_fianl = true, this.disabled_dia_ingreso = true;
             }else{
               return this.disabled_dia_fianl = false, this.disabled_dia_ingreso = false;
@@ -239,32 +239,32 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
 
   ChangeDiaFinal(e){
     if(!e.target.value){
-      this.reg.fec_ingreso = null;
+      this.reg.fecha_ingreso = null;
       this.loadingBtn = false;
       this.dia_ingreso = '';
       this.reg.dia_laborable = null;
       this.reg.dia_libre = null;
 
-      if(moment(this.reg.fec_inicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
-        this.reg.fec_final = this.reg.fec_inicio;
+      if(moment(this.reg.fecha_inicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
+        this.reg.fecha_final = this.reg.fecha_inicio;
         return this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
       }else{
-        this.reg.fec_final = null;
+        this.reg.fecha_final = null;
         this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
         return this.dia_fianl = null
       }
     }else{
-      this.reg.fec_ingreso = null;
+      this.reg.fecha_ingreso = null;
       this.dia_ingreso = '';
       this.loadingBtn = false;
       this.reg.dia_laborable = null;
       this.reg.dia_libre = null;
-      this.reg.fec_final = e.target.value;
+      this.reg.fecha_final = e.target.value;
       this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD'); 
       this.datetimeFinal.confirm(true);
     }
 
-    if(moment(this.reg.fec_final).format('YYYY-MM-DD') == moment(this.reg.fec_inicio).format('YYYY-MM-DD')){
+    if(moment(this.reg.fecha_final).format('YYYY-MM-DD') == moment(this.reg.fecha_inicio).format('YYYY-MM-DD')){
       this.validar.showToast('Las fechas no pueden ser iguales', 3000, "warning");
       return this.disabled_dia_ingreso = true;
     }
@@ -275,12 +275,12 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     if(!e.target.value){
       this.reg.dia_laborable = null;
       this.reg.dia_libre = null;
-      if(moment(this.reg.fec_final).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
-        this.reg.fec_ingreso = this.reg.fec_final;
+      if(moment(this.reg.fecha_final).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
+        this.reg.fecha_ingreso = this.reg.fecha_final;
         this.btnOculto = false;
         return this.dia_ingreso = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
       }else{
-        this.reg.fec_ingreso = null;
+        this.reg.fecha_ingreso = null;
         this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
         return this.dia_ingreso = null
       }
@@ -288,7 +288,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
       this.reg.dia_laborable = null;
       this.reg.dia_libre = null;
       this.btnOculto = false;
-      this.reg.fec_ingreso = e.target.value;
+      this.reg.fecha_ingreso = e.target.value;
       this.dia_ingreso = moment(e.target.value).format('YYYY-MM-DD');
       this.datetimeIngreso.confirm(true);
     }
@@ -303,8 +303,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
      let minutosinicio = '00:00:00';
      let minutosfinal = '23:00:00';
 
-     const fec_inicio = (moment(this.reg.fec_inicio).format('YYYY-MM-DD'))+' '+ minutosinicio;
-     const fec_final = (moment(this.reg.fec_final).format('YYYY-MM-DD')) +' '+ minutosfinal;
+     const fec_inicio = (moment(this.reg.fecha_inicio).format('YYYY-MM-DD'))+' '+ minutosinicio;
+     const fec_final = (moment(this.reg.fecha_final).format('YYYY-MM-DD')) +' '+ minutosfinal;
      const codigo = parseInt(localStorage.getItem('codigo'))
 
     this.permisoService.getlistaPermisosByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
@@ -350,22 +350,22 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
 
   calcularDiasVacaciones() {
     if (
-      this.reg.fec_inicio === undefined ||
-      this.reg.fec_final === undefined ||
-      this.reg.fec_ingreso === undefined) {
+      this.reg.fecha_inicio === undefined ||
+      this.reg.fecha_final === undefined ||
+      this.reg.fecha_ingreso === undefined) {
 
       this.loadingBtn = false;
       this.validar.showToast('Llenar todos los campos de fechas de vacación', 3000, 'warning')
       return false
     }
 
-    const fechasValidas = this.validar.validarRangoFechasIngresa(this.reg.fec_inicio, this.reg.fec_final)
+    const fechasValidas = this.validar.validarRangoFechasIngresa(this.reg.fecha_inicio, this.reg.fecha_final)
     if (!fechasValidas) return this.valoresDefectoValidacionFechas()
 
-    const fechasValidasReingresa = this.validar.validarRangoFechasIngresa(this.reg.fec_final, this.reg.fec_ingreso, true)
+    const fechasValidasReingresa = this.validar.validarRangoFechasIngresa(this.reg.fecha_final, this.reg.fecha_ingreso, true)
     if (!fechasValidasReingresa) return this.valoresDefectoValidacionFechas()
 
-    const { dia_laborable, dia_libre } = this.validar.vacacionesByFeriadoAndHorarioE(this.reg.fec_inicio.toString(), this.reg.fec_final.toString(), this.horarioEmpleado, this.cg_feriados)
+    const { dia_laborable, dia_libre } = this.validar.vacacionesByFeriadoAndHorarioE(this.reg.fecha_inicio.toString(), this.reg.fecha_final.toString(), this.horarioEmpleado, this.cg_feriados)
 
     this.reg.dia_laborable = dia_laborable;
     this.reg.dia_libre = dia_libre;
@@ -416,8 +416,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
   CrearNuevaNotificacion(vacacion: Vacacion) {
     var f = moment();
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
-    let desde = this.validar.FormatearFecha(String(vacacion.fec_inicio), this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(String(vacacion.fec_final), this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(String(vacacion.fecha_inicio), this.formato_fecha, this.validar.dia_completo);
+    let hasta = this.validar.FormatearFecha(String(vacacion.fecha_final), this.formato_fecha, this.validar.dia_completo);
 
     const noti: Notificacion = notificacionValueDefault;
     noti.id_vacaciones = vacacion.id;
@@ -468,8 +468,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
       cont = cont + 1;
 
       // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
-      let desde = this.validar.FormatearFecha(String(vacacion.fec_inicio), this.formato_fecha, this.validar.dia_completo);
-      let hasta = this.validar.FormatearFecha(String(vacacion.fec_final), this.formato_fecha, this.validar.dia_completo);
+      let desde = this.validar.FormatearFecha(String(vacacion.fecha_inicio), this.formato_fecha, this.validar.dia_completo);
+      let hasta = this.validar.FormatearFecha(String(vacacion.fecha_final), this.formato_fecha, this.validar.dia_completo);
 
       // CAPTURANDO ESTADO DE LA SOLICITUD DE VACACIÓN
       if (vacacion.estado === 1) {
@@ -533,9 +533,9 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
 
   ionViewWillLeave(){
     console.log('Sali de Vacaciones');
-    this.reg.fec_inicio = null;
-    this.reg.fec_final = null;
-    this.reg.fec_ingreso = null;
+    this.reg.fecha_inicio = null;
+    this.reg.fecha_final = null;
+    this.reg.fecha_ingreso = null;
   }
 
 }

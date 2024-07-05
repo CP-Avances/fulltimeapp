@@ -17,9 +17,9 @@ export interface Notificacion {
 
 export interface NotificacionTimbre {
     id: number;
-    create_at: Date;
-    id_send_empl: number;
-    id_receives_empl: number;
+    fecha_hora: Date;
+    id_empleado_envia: number;
+    id_empleado_recibe: number;
     visto: boolean;
     descripcion: string;
     id_timbre: number | null;
@@ -32,14 +32,14 @@ export interface NotificacionTimbre {
 export interface SettingsInfoEmpleado {
     id_departamento: number;
     id_empleado: number;
-    vaca_mail: boolean;
-    vaca_noti: boolean;
+    vacacion_mail: boolean;
+    vacacion_notificacion: boolean;
     permiso_mail: boolean;
-    permiso_noti: boolean;
+    permiso_notificacion: boolean;
     hora_extra_mail: boolean;
-    hora_extra_noti: boolean;
+    hora_extra_notificacion: boolean;
     comida_mail: boolean;
-    comida_noti: boolean;
+    comida_notificacion: boolean;
     fullname: string;
     cedula: string;
     correo: string;

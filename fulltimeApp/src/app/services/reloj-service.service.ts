@@ -52,8 +52,8 @@ export class RelojServiceService {
     return this.http.get<any>(this.URL + '/user/IDdispositivos/' + id_empleado);
   }
 
-  ObtenerDepartamentoUsuarios(id: number){
-    return this.http.get(this.URL + '/user/dato/'+ id);
+  ObtenerDepartamentoUsuarios(id_empleado: number){
+    return this.http.get(this.URL + '/user/dato/'+ id_empleado);
   }
 
   //FIN USUARIO

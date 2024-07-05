@@ -1,26 +1,27 @@
 export interface Permiso {
-    fec_creacion: Date;
+    fecha_creacion: Date;
     descripcion: string;
-    fec_inicio: Date;
-    fec_final: Date;
-    dia: number;
+    fecha_inicio: Date;
+    fecha_final: Date;
+    dias_permiso: number;
     legalizado: boolean;
     dia_libre: number;
     id: number;
     id_tipo_permiso: number;
-    id_empl_contrato: number;
-    id_peri_vacacion: number;
+    id_empleado_contrato: number;
+    id_periodo_vacacion: number;
     horas_permiso: string;
     numero_permiso: number;
     documento: string;
     docu_nombre: string;
     estado: number;
-    id_empl_cargo: number;
+    id_empleado_cargo: number;
     hora_salida: string;
     hora_ingreso: string;
     codigo: number | string;
     ntipopermiso?: string;
     EmpleadosSendNotiEmail?: EmpleadosSendNotiEmail[];
+    id_empleado: number;
 }
 
 export interface EmpleadosSendNotiEmail {

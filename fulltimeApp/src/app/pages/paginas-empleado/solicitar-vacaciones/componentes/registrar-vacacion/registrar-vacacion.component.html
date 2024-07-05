@@ -56,7 +56,7 @@
                   mode="md" 
                   min="1990-01-01" max="2050-12-31" 
                   (ionChange)="ChangeDiaInicio($event)" 
-                  [value]="reg.fec_inicio" 
+                  [value]="reg.fecha_inicio" 
                   required></ion-datetime>
                   <div style="width: 95%;">
                     <ion-label style="float:right; margin: 2%; font-size: medium;" color="success" (click)="datetimeInicio.cancel(true)">Cancelar</ion-label>
@@ -142,7 +142,7 @@
     </div>
        
      <!-- CALCULO DE DIAS DE VACACION -->
-     <ion-button [disabled]="(btnOculto == true) || (validar.vacio(reg.fec_inicio) ||  validar.vacio(reg.fec_final) || validar.vacio(reg.fec_ingreso))"  
+     <ion-button [disabled]="(btnOculto == true) || (validar.vacio(reg.fecha_inicio) ||  validar.vacio(reg.fecha_final) || validar.vacio(reg.fecha_ingreso))"  
       shape="round" expand="block" color="tertiary" (click)="mostrarCalculos()" style="margin: 4% 3% 2% 3%;">
       <ion-icon slot="start" name="calculator-outline"></ion-icon>
       Calcular días.

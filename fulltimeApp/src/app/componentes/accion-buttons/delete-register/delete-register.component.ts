@@ -164,21 +164,21 @@ export class DeleteRegisterComponent{
 
     this.autoriza.BuscarJefes(datos).subscribe(data => {
       data.EmpleadosSendNotiEmail.push(infoUsuario);
-      if (tabla === 'permisos') {
+      if (tabla === 'mp_solicitud_permiso') {
         this.EliminarDocumentoPermiso(data);
         this.EnviarCorreoPermiso(data); 
         this.EnviarNotificacionPermiso(data, nota, user);
       }
-      else if (tabla === 'vacaciones') {
+      else if (tabla === 'mv_solicitud_vacacion') {
         this.EnviarCorreoVacacion(data, infoUsuario);
         this.EnviarNotificacionVacacion(data, nota, user);
       }
-      else if (tabla === 'hora_extr_pedidos') {
+      else if (tabla === 'mhe_solicitud_hora_extra') {
         this.EliminarDocumentoHoraE(data);
         this.EnviarCorreoHE(data, infoUsuario);
         this.EnviarNotificacionHE(data, nota, user);
       }
-      else if (tabla === 'solicita_comidas') {
+      else if (tabla === 'ma_solicitud_comida') {
         this.EnviarCorreoComida(data);
         this.NotificarEventoComida(data, nota, user);
       }

@@ -699,7 +699,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
         this.NotificarAprobacionVacacion(dataSolicitud, infoEmpleadoRecibe, this.estadoChange.id);
         break;
       case 'hora_extra':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: dataSolicitud.id }, 'hora_extr_pedidos').subscribe(
+        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: dataSolicitud.id }, 'mhe_solicitud_hora_extra').subscribe(
           resp => { this.validar.showToast(resp.message, 3000, 'success') },
           err => { this.validar.showToast(err.error.message, 3000, 'danger') },
         )
@@ -1394,8 +1394,8 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
 
     const noti: NotificacionTimbre = notificacionTimbreValueDefault;
     noti.tipo = 12; // APROBACIONES DE SOLICITUD DE HORAS EXTRAS
-    noti.id_send_empl = parseInt(localStorage.getItem('empleadoID'));
-    noti.create_at = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
+    noti.id_empleado_envia = parseInt(localStorage.getItem('empleadoID'));
+    noti.fecha_hora = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
 
     noti.descripcion = 'Ha ' + estado_h.toLowerCase() + ' la solicitud de horas extras para ' +
       infoUsuario.fullname + ' desde ' +
@@ -1419,7 +1419,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
 
     allNotificacionesHorasExtras.forEach(e => {
 
-      noti.id_receives_empl = e.empleado;
+      noti.id_empleado_recibe = e.empleado;
 
       if (e.hora_extra_noti) {
         this.autoService.postAvisosGenerales(noti).subscribe(

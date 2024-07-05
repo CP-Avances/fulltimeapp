@@ -92,7 +92,7 @@ export class ListaAlimentacionComponent implements OnInit, OnDestroy {
           alimentacion.forEach(c => {
             // TRATAMIENTO DE FECHAS Y HORAS
             c.fecha_ = this.validar.FormatearFecha(String(c.fecha), this.formato_fecha, this.validar.dia_completo);
-            c.fec_comida_ = this.validar.FormatearFecha(String(c.fec_comida), this.formato_fecha, this.validar.dia_completo);
+            c.fec_comida_ = this.validar.FormatearFecha(String(c.fecha_comida), this.formato_fecha, this.validar.dia_completo);
             c.hora_inicio_ = this.validar.FormatearHora(c.hora_inicio, this.formato_hora);
             c.hora_fin_ = this.validar.FormatearHora(c.hora_fin, this.formato_hora);
 

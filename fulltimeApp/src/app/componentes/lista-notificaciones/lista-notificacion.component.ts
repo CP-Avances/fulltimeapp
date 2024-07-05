@@ -67,7 +67,7 @@ export class ListaNotificacionComponent implements OnInit {
             (firstObject: NotificacionTimbre, secondObject: NotificacionTimbre) =>  
                 (firstObject.visto === true)? 1 : 
                   (firstObject.visto === secondObject.visto) ?
-                    ((firstObject.create_at! < secondObject.create_at!)? 1 : -1)
+                    ((firstObject.fecha_hora! < secondObject.fecha_hora!)? 1 : -1)
                 
               :-1
           );
@@ -93,7 +93,7 @@ export class ListaNotificacionComponent implements OnInit {
             (firstObject: NotificacionTimbre, secondObject: NotificacionTimbre) =>  
                 (firstObject.visto === true)? 1 : 
                   (firstObject.visto === secondObject.visto) ?
-                    ((firstObject.create_at! < secondObject.create_at!)? 1 : -1)
+                    ((firstObject.fecha_hora! < secondObject.fecha_hora!)? 1 : -1)
                 
               :-1
           );

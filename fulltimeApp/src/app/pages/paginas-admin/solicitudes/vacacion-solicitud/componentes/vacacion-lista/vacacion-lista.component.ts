@@ -92,9 +92,9 @@ export class VacacionListaComponent implements OnInit, OnDestroy {
 
           this.vacaciones.forEach(v => {
             // TRATAMIENTO DE FECHAS Y HORAS 
-            v.fec_ingreso_ = this.validar.FormatearFecha(String(v.fec_ingreso), this.formato_fecha, this.validar.dia_completo);
-            v.fec_inicio_ = this.validar.FormatearFecha(String(v.fec_inicio), this.formato_fecha, this.validar.dia_completo);
-            v.fec_final_ = this.validar.FormatearFecha(String(v.fec_final), this.formato_fecha, this.validar.dia_completo);
+            v.fec_ingreso_ = this.validar.FormatearFecha(String(v.fecha_ingreso), this.formato_fecha, this.validar.dia_completo);
+            v.fec_inicio_ = this.validar.FormatearFecha(String(v.fecha_inicio), this.formato_fecha, this.validar.dia_completo);
+            v.fec_final_ = this.validar.FormatearFecha(String(v.fecha_final), this.formato_fecha, this.validar.dia_completo);
           })
 
           if (vacaciones.length < 6) {

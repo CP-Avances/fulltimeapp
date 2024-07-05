@@ -124,7 +124,7 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
 
   calcularhoras() {
     if (
-      this.reg.fec_comida === undefined ||
+      this.reg.fecha_comida === undefined ||
       this.reg.fecha === undefined) {
 
       this.loadingBtn = false;
@@ -132,20 +132,20 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
       return false
     }
 
-    const fechasValidas = this.validar.validarRangoFechasIngresa(this.reg.fecha, this.reg.fec_comida, true)
+    const fechasValidas = this.validar.validarRangoFechasIngresa(this.reg.fecha, this.reg.fecha_comida, true)
     if (!fechasValidas) return this.valoresDefectoValidacionFecha()
 
     const hora_inicio = this.validar.TiempoFormatoHHMMSS(this.reg.hora_inicio)
     const hora_fin = this.validar.TiempoFormatoHHMMSS(this.reg.hora_fin)
 
-    const fec_comp_inicio = this.validar.Unir_Fecha_Hora(this.reg.fec_comida, hora_inicio);
-    const fec_comp_final = this.validar.Unir_Fecha_Hora(this.reg.fec_comida, hora_fin);
+    const fec_comp_inicio = this.validar.Unir_Fecha_Hora(this.reg.fecha_comida, hora_inicio);
+    const fec_comp_final = this.validar.Unir_Fecha_Hora(this.reg.fecha_comida, hora_fin);
 
     return true
   }
 
   valoresDefectoValidacionFecha() {
-    this.reg.fec_comida = undefined;
+    this.reg.fecha_comida = undefined;
     this.loadingBtn = false;
     return false
   }
@@ -163,7 +163,7 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
   ChangePlatoMenu() {
     this.LimpiarFormularioPlato();
     this.plato = this.cg_detalle_menu.filter(o => {
-      return o.id_menu === this.reg.id_plato
+      return o.id_horario_comida === this.reg.id_plato
     })
     this.plato_selected = this.plato;
     if (this.plato_selected.length != 0) {
@@ -181,7 +181,7 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
   ChangeDetalleComida() {
     this.detalle_menu_selected = {};
     const [cg_det_comida] = this.cg_detalle_menu.filter(o => {
-      return o.id === this.reg.id_comida
+      return o.id === this.reg.id_detalle_comida
     })
     if (cg_det_comida != undefined) {
       this.detalle_menu_selected = cg_det_comida;
@@ -194,7 +194,7 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
     this.LimpiarFormularioMenu();
     this.LimpiarFormularioPlato();
     this.menu = this.menus.filter(o => {
-      return o.tipo_comida === this.reg.id_servicio
+      return o.id_comida === this.reg.id_servicio
     })
     this.menu_selected = this.menu;
     if (this.menu_selected.length != 0) {
@@ -221,15 +221,15 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
    * ********************************************************************************** */
    mostrarCalculos(e){
     if(!e.target.value){
-      this.reg.fec_comida = moment(new Date()).format('YYYY-MM-DD');
-      return this.fecha_comida = moment(this.reg.fec_comida).format('YYYY-MM-DD');
+      this.reg.fecha_comida = moment(new Date()).format('YYYY-MM-DD');
+      return this.fecha_comida = moment(this.reg.fecha_comida).format('YYYY-MM-DD');
     }else{
-      this.reg.fec_comida = e.target.value;
+      this.reg.fecha_comida = e.target.value;
       this.fecha_comida = moment(e.target.value).format('YYYY-MM-DD');
-      const fec_comida = (moment(this.reg.fec_comida).format('YYYY-MM-DD'));
+      const fec_comida = (moment(this.reg.fecha_comida).format('YYYY-MM-DD'));
       const codigo = parseInt(localStorage.getItem('empleadoID'))
       this.datetimeInicio.confirm(true);
-      if(this.reg.fec_comida != null || this.reg.fec_comida != undefined){
+      if(this.reg.fecha_comida != null || this.reg.fecha_comida != undefined){
         this.alimentacionService.getlistaAlimentacionByFechasyCodigo(fec_comida, codigo).subscribe(solicitados => {
           if(solicitados.length != 0){
             this.validar.showToast('Ups! tiene una solicitud de Alimentacion en esa fecha', 3500, 'warning');
@@ -258,6 +258,7 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
     console.log('ver registro', this.reg)
     this.subscripted = this.alimentacionService.postNuevoAlimentacion(this.reg).subscribe(
       alimentacion => {
+        alimentacion.EmpleadosSendNotiEmail = [];
         alimentacion.EmpleadosSendNotiEmail.push(this.solInfo);
         this.CrearNuevaNotificacion(alimentacion);
         this.SendEmailsEmpleados(alimentacion);
@@ -274,7 +275,7 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
   CrearNuevaNotificacion(alimentacion: Alimentacion) {
 
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE ALIMENTACIÓN
-    let desde = this.validar.FormatearFecha(String(alimentacion.fec_comida), this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(String(alimentacion.fecha_comida), this.formato_fecha, this.validar.dia_completo);
 
     let inicio = this.validar.FormatearHora(alimentacion.hora_inicio, this.formato_hora);
     let final = this.validar.FormatearHora(alimentacion.hora_fin, this.formato_hora);
@@ -287,7 +288,7 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
       mensaje: 'Ha solicitado un servicio de alimentación desde ' +
         desde +
         ' horario de ' + inicio + ' a ' + final + ' servicio ',
-      id_comida: alimentacion.id_comida
+      id_comida: alimentacion.id_detalle_comida
     }
 
     //Listado para eliminar el usuario duplicado
@@ -326,7 +327,7 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
     var cont = 0;
     var correo_usuarios = '';
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE ALIMENTACIÓN
-    let solicitud = this.validar.FormatearFecha(String(alimentacion.fec_comida), this.formato_fecha, this.validar.dia_completo);
+    let solicitud = this.validar.FormatearFecha(String(alimentacion.fecha_comida), this.formato_fecha, this.validar.dia_completo);
     alimentacion.EmpleadosSendNotiEmail.forEach(e => {
 
       // LECTURA DE DATOS LEIDOS
@@ -350,7 +351,7 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
           tipo_solicitud: 'Servicio de alimentación solicitado por',
           fec_solicitud: solicitud,
           observacion: alimentacion.observacion,
-          id_comida: alimentacion.id_comida,
+          id_comida: alimentacion.id_detalle_comida,
           proceso: 'creado',
           correo: correo_usuarios,
           estadoc: 'Pendiente de autorización',
@@ -393,8 +394,8 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
   }
 
   LimpiarFormularioPlato() {
-    this.reg.id_comida = null;
-    this.reg.fec_comida = null;
+    this.reg.id_detalle_comida = null;
+    this.reg.fecha_comida = null;
   }
 
 }

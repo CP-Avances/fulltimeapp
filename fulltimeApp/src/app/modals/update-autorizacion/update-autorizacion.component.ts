@@ -564,7 +564,7 @@ export class UpdateAutorizacionComponent implements OnInit {
 
     switch (solicitud) {
       case 'permiso':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.permiso.id }, 'permisos').subscribe(
+        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.permiso.id }, 'mp_solicitud_permiso').subscribe(
           resp => { 
             this.validaciones.showToast(resp.message, 3000, 'success');
             console.log('ver autoriza permiso.... ', this.permiso, 'INFO.. ', this.infoEmpleadoRecibe);
@@ -576,7 +576,7 @@ export class UpdateAutorizacionComponent implements OnInit {
         break;
 
       case 'vacacion':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.vacacion.id }, 'vacaciones').subscribe(
+        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.vacacion.id }, 'mv_solicitud_vacacion').subscribe(
           resp => { this.validaciones.showToast(resp.message, 3000, 'success') },
           err => { this.validaciones.showToast(err.error.message, 3000, 'danger') },
         )
@@ -587,7 +587,7 @@ export class UpdateAutorizacionComponent implements OnInit {
         break;
       
       case 'hora_extra':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.hora_extra.id }, 'hora_extr_pedidos').subscribe(
+        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.hora_extra.id }, 'mhe_solicitud_hora_extra').subscribe(
           resp => { this.validaciones.showToast(resp.message, 3000, 'success') },
           err => { this.validaciones.showToast(err.error.message, 3000, 'danger') },
         )
@@ -1227,8 +1227,8 @@ export class UpdateAutorizacionComponent implements OnInit {
 
     const noti: NotificacionTimbre = notificacionTimbreValueDefault;
     noti.tipo = 12;
-    noti.id_send_empl = parseInt(localStorage.getItem('empleadoID'));
-    noti.create_at = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
+    noti.id_empleado_envia = parseInt(localStorage.getItem('empleadoID'));
+    noti.fecha_hora = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
 
     noti.descripcion = 'Ha ' + estado_h.toLowerCase() + ' la solicitud de horas extras para ' +
       infoUsuario.fullname + ' desde ' +
@@ -1251,7 +1251,7 @@ export class UpdateAutorizacionComponent implements OnInit {
         console.log("Usuarios que reciben la notificacion: ",allNotificacionesHorasExtras);
 
       allNotificacionesHorasExtras.forEach(e => {
-      noti.id_receives_empl = e.empleado;
+      noti.id_empleado_recibe = e.empleado;
 
       if (e.hora_extra_noti) {
         this.autoService.postAvisosGenerales(noti).subscribe(

@@ -5,9 +5,9 @@ export interface Alimentacion {
     id?: number;
     id_empleado: number | string;
     fecha: Date;
-    id_comida: number;
+    id_detalle_comida: number;
     observacion: string;
-    fec_comida: string;
+    fecha_comida: string;
     hora_inicio: string;
     hora_fin: string;
     extra: boolean;
@@ -33,9 +33,9 @@ export const alimentacionValueDefault = {
     id: null,
     id_empleado: null,
     fecha: null,
-    id_comida: null,
+    id_detalle_comida: null,
     observacion: null,
-    fec_comida: null,
+    fecha_comida: null,
     hora_inicio: null,
     hora_fin: null,
     extra: null,

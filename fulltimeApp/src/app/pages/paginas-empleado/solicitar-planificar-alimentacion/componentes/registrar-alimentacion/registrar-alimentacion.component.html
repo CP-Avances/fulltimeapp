@@ -52,14 +52,14 @@
       <div class="formdiv">
         <ion-item class="item_fondo">
           <ion-label class="is-required" position="floating"><b> Plato </b></ion-label>
-          <ion-select name="id_comida" interface="popover" mode="ios" [(ngModel)]="reg.id_comida" okText="Guardar" cancelText="Cancelar" (ionChange)="ChangeDetalleComida()" required [disabled]="activar_plato">
+          <ion-select name="id_comida" interface="popover" mode="ios" [(ngModel)]="reg.id_detalle_comida" okText="Guardar" cancelText="Cancelar" (ionChange)="ChangeDetalleComida()" required [disabled]="activar_plato">
             <ion-select-option *ngFor="let plato of plato_selected" [value]="plato.id"> {{ plato.nombre }} </ion-select-option>
           </ion-select>
         </ion-item>    
       </div>
     </ng-container>
 
-    <ng-container *ngIf="reg.id_comida != null">
+    <ng-container *ngIf="reg.id_detalle_comida != null">
       <ion-text class="text_info"> Ingrese los datos </ion-text>
         <ion-grid style="margin-top: -2%;">
           <ion-row>
@@ -92,7 +92,7 @@
                       [min]="fec_actual_formato" 
                       max="2050-12-31" 
                       (ionChange)="mostrarCalculos($event)" 
-                      [value]="reg.fec_comida" required></ion-datetime>
+                      [value]="reg.fecha_comida" required></ion-datetime>
                       <div style="width: 95%;">
                         <ion-label style="float:right; margin: 2%; font-size: medium;" color="success" (click)="datetimeInicio.cancel(true)">Cancelar</ion-label>
                       </div>
@@ -127,7 +127,7 @@
           </ion-grid>
     </ng-container>
 
-    <ng-container *ngIf="reg.fec_comida != null ">
+    <ng-container *ngIf="reg.fecha_comida != null ">
       <ion-text class="text_info">Escriba la razon de la solicitud</ion-text>
       <div class="formdiv">
         <ion-item class="item_fondo">

@@ -118,23 +118,33 @@ export class ListaPermisosAdminComponent implements OnInit {
     this.listaPermisosFiltradas = [];
     this.listaPermisosDeparta = [];
     this.permilista = [];
+    console.log("ver 1")
     this.subscripted = this.permisosService.getAllPermisos()
       .subscribe(
         permisos => {
           this.permisos = permisos;
 
+          console.log("ver 2", permisos)
+          console.log("ver 3", this.idEmpleado)
+
+
           //Filtra la lista de Permisos para descartar las solicitudes del mismo usuario y almacena en una nueva lista
           this.listaPermisosFiltradas = this.permisos.filter((o) => {
-            if (this.idEmpleado !== o.id_empleado) {
+            if (this.idEmpleado == o.id_empleado) {//FIXME
               return this.listaPermisosFiltradas.push(o);
             }
+
           });
+
+          console.log("ver 4", this.listaPermisosFiltradas)
+
+
 
           this.listaPermisosFiltradas.forEach(p => {
             // TRATAMIENTO DE FECHAS Y HORAS
-            p.fec_creacion_ = this.validar.FormatearFecha(p.fec_creacion, this.formato_fecha, this.validar.dia_completo);
-            p.fec_inicio_ = this.validar.FormatearFecha(String(p.fec_inicio), this.formato_fecha, this.validar.dia_completo);
-            p.fec_final_ = this.validar.FormatearFecha(String(p.fec_final), this.formato_fecha, this.validar.dia_completo);
+            p.fec_creacion_ = this.validar.FormatearFecha(p.fecha_creacion, this.formato_fecha, this.validar.dia_completo);
+            p.fec_inicio_ = this.validar.FormatearFecha(String(p.fecha_inicio), this.formato_fecha, this.validar.dia_completo);
+            p.fec_final_ = this.validar.FormatearFecha(String(p.fecha_final), this.formato_fecha, this.validar.dia_completo);
 
             p.hora_ingreso_ = this.validar.FormatearHora(p.hora_ingreso, this.formato_hora);
             p.hora_salida_ = this.validar.FormatearHora(p.hora_salida, this.formato_hora);
@@ -142,7 +152,7 @@ export class ListaPermisosAdminComponent implements OnInit {
 
           let i = 0;
           this.listaPermisosFiltradas.filter(item => {   
-            this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_empl_contrato).subscribe(
+            this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_empleado_contrato).subscribe(
               (usuaDep) => {
                 i = i+1;
 
@@ -256,6 +266,8 @@ export class ListaPermisosAdminComponent implements OnInit {
             });
             
           });
+
+          
           
         },
         err => {
@@ -348,9 +360,9 @@ export class ListaPermisosAdminComponent implements OnInit {
 
           this.listaPermisosFiltradas.forEach(p => {
             // TRATAMIENTO DE FECHAS Y HORAS
-            p.fec_creacion_ = this.validar.FormatearFecha(p.fec_creacion, this.formato_fecha, this.validar.dia_completo);
-            p.fec_inicio_ = this.validar.FormatearFecha(String(p.fec_inicio), this.formato_fecha, this.validar.dia_completo);
-            p.fec_final_ = this.validar.FormatearFecha(String(p.fec_final), this.formato_fecha, this.validar.dia_completo);
+            p.fec_creacion_ = this.validar.FormatearFecha(p.fecha_creacion, this.formato_fecha, this.validar.dia_completo);
+            p.fec_inicio_ = this.validar.FormatearFecha(String(p.fecha_inicio), this.formato_fecha, this.validar.dia_completo);
+            p.fec_final_ = this.validar.FormatearFecha(String(p.fecha_final), this.formato_fecha, this.validar.dia_completo);
 
             p.hora_ingreso_ = this.validar.FormatearHora(p.hora_ingreso, this.formato_hora);
             p.hora_salida_ = this.validar.FormatearHora(p.hora_salida, this.formato_hora);

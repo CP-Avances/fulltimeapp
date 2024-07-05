@@ -3,17 +3,17 @@ export interface Cg_TipoPermiso {
     descripcion: string;
     fecha: Date;
     tipo_descuento: string;
-    num_dia_maximo: number;
-    num_dia_ingreso: number;
+    dias_maximo_permiso: number;
+    dias_anticipar_permiso: number;
     vaca_afecta: boolean;
     anio_acumula: boolean;
-    num_dia_justifica: number;
-    num_hora_maximo: string;
-    almu_incluir: boolean;
-    fec_validar: boolean;
-    gene_justificacion: boolean;
+    dias_justificar: number;
+    horas_maximo_permiso: string;
+    incluir_minutos_comida: boolean;
+    fecha_restriccion: boolean;
+    justificar: boolean;
     legalizar: boolean;
-    acce_empleado: number;
+    solicita_empleado: number;
     documento: boolean;
 }
 
@@ -21,7 +21,7 @@ export interface Cg_Feriados {
     id: number;
     descripcion: string;
     fecha: Date | string;
-    fec_recuperacion: Date | string;
+    fecha_recuperacion: Date | string;
 }
 
 export interface Cg_DetalleMenu {
@@ -29,7 +29,7 @@ export interface Cg_DetalleMenu {
     nombre: string;
     valor: number;
     observacion: string;
-    id_menu: number;
+    id_horario_comida: number;
 }
 
 export interface Servicios_Comida{
@@ -40,7 +40,7 @@ export interface Servicios_Comida{
 export interface Menu_Servicios{
     id: number;
     nombre: string;
-    tipo_comida: number;
+    id_comida: number;
     hora_inicio: string;
     hora_fin: string;
 }
