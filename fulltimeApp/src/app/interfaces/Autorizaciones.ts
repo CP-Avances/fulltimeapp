@@ -6,9 +6,11 @@ export interface Autorizacion {
     id_permiso: number | null;
     id_vacacion: number | null;
     id_hora_extra: number | null;
-    id_documento: string | null;
+    id_autoriza_estado: string | null;
     id_plan_hora_extra: number | null;
     ndepartamento?: string;
+
+    id_depa_confi?: number;
 }
 
 export const autorizacionValueDefault = {
@@ -20,5 +22,5 @@ export const autorizacionValueDefault = {
     id_vacacion: null,
     id_hora_extra: null,
     id_plan_hora_extra: null,
-    id_documento: null,
+    id_autoriza_estado: null,
 }

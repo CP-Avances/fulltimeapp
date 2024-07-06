@@ -118,6 +118,9 @@ export class ListaPermisosAdminComponent implements OnInit {
     this.listaPermisosFiltradas = [];
     this.listaPermisosDeparta = [];
     this.permilista = [];
+
+    console.log("ver username",this.username)
+
     console.log("ver 1")
     this.subscripted = this.permisosService.getAllPermisos()
       .subscribe(
@@ -130,7 +133,7 @@ export class ListaPermisosAdminComponent implements OnInit {
 
           //Filtra la lista de Permisos para descartar las solicitudes del mismo usuario y almacena en una nueva lista
           this.listaPermisosFiltradas = this.permisos.filter((o) => {
-            if (this.idEmpleado == o.id_empleado) {//FIXME
+            if (this.idEmpleado != o.id_empleado) {//FIXME
               return this.listaPermisosFiltradas.push(o);
             }
 

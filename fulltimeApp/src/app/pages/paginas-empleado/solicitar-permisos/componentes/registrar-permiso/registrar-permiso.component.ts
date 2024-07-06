@@ -1059,7 +1059,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     autorizacion.id_departamento = parseInt(localStorage.getItem('cdepar')!);
     autorizacion.id_vacacion = autorizacion.id_hora_extra = autorizacion.id_plan_hora_extra = null;
     autorizacion.id_permiso = permiso.id;
-    autorizacion.id_documento = ''
+    autorizacion.id_autoriza_estado = ''
 
     this.autorizaciones.postNuevaAutorizacion(autorizacion).subscribe(
       resp => { 

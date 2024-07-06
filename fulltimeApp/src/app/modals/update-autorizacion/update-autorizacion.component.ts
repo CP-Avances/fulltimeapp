@@ -188,6 +188,11 @@ export class UpdateAutorizacionComponent implements OnInit {
           return this.autoService.getAutorizacionPermiso(this.permiso.id).subscribe(
             autorizacion => { 
               this.autorizacion = autorizacion;
+
+              console.log("autorizacion ver",this.autorizacion );
+              console.log("solInfo ver",this.solInfo );
+              console.log("permiso ver",this.permiso );
+
               setTimeout(() => {
                 this.ConfiguracionAutorizacion(this.autorizacion, this.permiso, this.solInfo);
               }, 2000);
@@ -300,7 +305,7 @@ export class UpdateAutorizacionComponent implements OnInit {
     this.listaEnvioCorreo = [];
     this.UsuaAprueba = [];
     this.id_departamento = solInfo.id_departamento;
-    var autorizaciones = autorizacion.id_documento.split(',');
+    var autorizaciones = autorizacion.id_autoriza_estado.split(',');
     autorizaciones.map((obj: string) => {
       this.lectura = this.lectura + 1;
       if (obj != '') {
@@ -351,7 +356,7 @@ export class UpdateAutorizacionComponent implements OnInit {
               console.log('this.listaEnvioCorreo PRE: ',this.listaEnvioCorreo);
 
               if(this.UsuaAprueba.length > 0){
-                this.obtenerPlanificacionHoraria(solicitud.fec_inicio, solicitud.fec_final, solicitud.codigo, solicitud, autorizaciones);
+                this.obtenerPlanificacionHoraria(solicitud.fecha_inicio, solicitud.fecha_final, solicitud.codigo, solicitud, autorizaciones);
               }else{
                 this.ocultar = true;
                 return this.mensaje = 'Falta la Aprobacion del nivel '+ this.FilDepartamentosAprueban[autorizaciones.length - 1].nivel +
@@ -388,7 +393,7 @@ export class UpdateAutorizacionComponent implements OnInit {
             this.empleado_estado = this.empleado_estado.concat(',');
 
             if(this.UsuaAprueba.length > 0){
-              this.obtenerPlanificacionHoraria(solicitud.fec_inicio, solicitud.fec_final, solicitud.codigo, solicitud, autorizaciones);
+              this.obtenerPlanificacionHoraria(solicitud.fecha_inicio, solicitud.fecha_final, solicitud.codigo, solicitud, autorizaciones);
             }else{
               this.ocultar = true;
               return this.mensaje = 'Falta la Aprobacion del nivel '+ this.FilDepartamentosAprueban[autorizaciones.length - 1].nivel +
@@ -476,7 +481,7 @@ export class UpdateAutorizacionComponent implements OnInit {
       id_permiso: this.permiso.id,
       id_vacacion: null,
       id_hora_extra: null,
-      id_documento: data.id_documento,
+      id_autoriza_estado: data.id_autoriza_estado,
       id_plan_hora_extra: null,
     }
 
@@ -504,8 +509,8 @@ export class UpdateAutorizacionComponent implements OnInit {
     ** **                        METODO PARA ACTUALIZAR PERMISO                               ** **
    ** ******************************************************************************************* **/
   UpdateRegister() {
-    if(this.autorizacion.id_documento == null && this.autorizacion.id_documento == undefined){
-      this.autorizacion.id_documento = '';
+    if(this.autorizacion.id_autoriza_estado == null && this.autorizacion.id_autoriza_estado == undefined){
+      this.autorizacion.id_autoriza_estado = '';
     }
 
     if (this.autorizacion.estado == 1) {
@@ -515,7 +520,7 @@ export class UpdateAutorizacionComponent implements OnInit {
       this.loadingBtn = true;
       const data = {
         estado: this.estadoChange.id,
-        id_documento: this.autorizacion.id_documento + `${localStorage.getItem("empleadoID")}_${this.estadoChange.id},`
+        id_autoriza_estado: this.autorizacion.id_autoriza_estado + `${localStorage.getItem("empleadoID")}_${this.estadoChange.id},`
       }
 
       if (this.permiso){
@@ -840,7 +845,7 @@ export class UpdateAutorizacionComponent implements OnInit {
     this.autoService.getAutorizacionVacacion(this.vacacion.id).subscribe(res2 => { 
       this.autorizacion = res2;
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
-      var autorizaciones = this.autorizacion.id_documento.split(',');
+      var autorizaciones = this.autorizacion.id_autoriza_estado.split(',');
       autorizaciones.map((obj: string) => {
         this.lectura = this.lectura + 1;
         if (obj != '') {
@@ -1070,7 +1075,7 @@ export class UpdateAutorizacionComponent implements OnInit {
     this.autoService.getAutorizacionHoraExtra(this.hora_extra.id).subscribe(res3 => { 
       this.autorizacion = res3;
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
-      var autorizaciones = this.autorizacion.id_documento.split(',');
+      var autorizaciones = this.autorizacion.id_autoriza_estado.split(',');
       autorizaciones.map((obj: string) => {
         this.lectura = this.lectura + 1;
         if (obj != '') {

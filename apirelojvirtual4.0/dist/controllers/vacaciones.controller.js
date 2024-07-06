@@ -129,12 +129,12 @@ exports.getlistaVacacionesByFechasyCodigoEdit = getlistaVacacionesByFechasyCodig
  */
 const postNuevaVacacion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, legalizado, id_peri_vacacion, id_empl_cargo, estado, codigo } = req.body;
+        const { fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado, id_periodo_vacacion, id_empleado_cargo, estado, codigo } = req.body;
         console.log(req.body);
         const response = yield database_1.pool.query('INSERT INTO mv_solicitud_vacacion (fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, ' +
             'legalizado, id_periodo_vacacion, id_empleado_cargo, estado, codigo) ' +
-            'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ) RETURNING *', [fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, legalizado, id_peri_vacacion,
-            id_empl_cargo, estado, codigo]);
+            'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ) RETURNING *', [fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado, id_periodo_vacacion,
+            id_empleado_cargo, estado, codigo]);
         const [objetoVacacion] = response.rows;
         if (!objetoVacacion)
             return res.status(400)

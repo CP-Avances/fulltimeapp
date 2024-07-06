@@ -388,7 +388,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     autorizacion.id_departamento = parseInt(localStorage.getItem('cdepar'));
     autorizacion.id_vacacion = autorizacion.id_permiso = autorizacion.id_plan_hora_extra = null;
     autorizacion.id_hora_extra = horaExtra.id;
-    autorizacion.id_documento = ''
+    autorizacion.id_autoriza_estado = ''
 
     this.autorizaciones.postNuevaAutorizacion(autorizacion).subscribe(
       resp => { //this.validar.showToast(resp.message, 3000, 'success') 

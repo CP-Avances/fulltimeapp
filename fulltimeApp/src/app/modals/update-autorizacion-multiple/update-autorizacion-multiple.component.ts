@@ -424,7 +424,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
   ConfiguracionAutorizacion(autorizacion: any, solicitud: any, solicitud_length: any){
     this.listafiltrada = [];
     this.noaprobar = 0;
-    var autorizaciones = autorizacion.id_documento.split(','); 
+    var autorizaciones = autorizacion.id_autoriza_estado.split(','); 
     autorizaciones.map((obj: string) => {
       this.lectura = this.lectura + 1;
       if (obj != '') {
@@ -587,7 +587,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
             a.estado = this.estadoChange.id
             const data = {
               estado: a.estado,
-              id_documento: a.id_documento + `${localStorage.getItem("empleadoID")}_${this.estadoChange.id},`
+              id_autoriza_estados: a.id_autoriza_estado + `${localStorage.getItem("empleadoID")}_${this.estadoChange.id},`
             }
     
             if (this.ListaPermisos) {
@@ -1008,7 +1008,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
     this.autoService.getAutorizacionVacacion(vacacion.id).subscribe(res2 => { 
       this.autorizacionVA = res2;
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
-      var autorizaciones = this.autorizacionVA.id_documento.split(',');
+      var autorizaciones = this.autorizacionVA.id_autoriza_estado.split(',');
       autorizaciones.map((obj: string) => {
         this.lectura = this.lectura + 1;
         if (obj != '') {
@@ -1237,7 +1237,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
     this.autoService.getAutorizacionHoraExtra(horaExtra.id).subscribe(res3 => { 
       this.autorizacionHE = res3;
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
-      var autorizaciones = this.autorizacionHE.id_documento.split(',');
+      var autorizaciones = this.autorizacionHE.id_autoriza_estado.split(',');
       autorizaciones.map((obj: string) => {
         this.lectura = this.lectura + 1;
         if (obj != '') {

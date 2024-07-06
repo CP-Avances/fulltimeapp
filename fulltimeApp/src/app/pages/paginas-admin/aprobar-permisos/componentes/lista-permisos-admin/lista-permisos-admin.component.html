@@ -102,6 +102,8 @@
     </app-aprobacion-multiple>
 
     <ion-card *ngFor="let permiso of permisos_pendientes | paginate: { itemsPerPage: 5, currentPage: pageActual }" class="item-pendientes-color" >
+        <!--*ngIf="permiso.nempleado == username -->
+
       <ng-container *ngIf="permiso.nempleado == username else showpendiente"></ng-container>
       <ng-template #showpendiente>
         <div style="width:100%; margin-bottom: 7%;" >

@@ -89,7 +89,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     this.reg.dia_libre = undefined;
 
     console.log('peri_vacaciones: ',this.reg.id_periodo_vacacion);
-    
+    console.log('id_empleado_cargo: ',this.reg.id_empleado_cargo);
+
     this.obtenerInformacionEmpleado();
     this.BuscarFormatos();
   }
@@ -217,6 +218,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
       if(this.reg.fecha_inicio != '' || this.reg.fecha_inicio != null){
       
         const hoy = moment(this.reg.fecha_inicio).format("DD/MM/YYYY, HH:mm:ss")
+
+        console.log("ver el codigo para ho",this.reg.codigo)
         this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
           horario => { 
             this.horarioEmpleado = horario;
@@ -383,6 +386,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
 
     this.subscripted = this.vacacionService.postNuevoVacacion(this.reg).subscribe(
       vacacion => {
+
+        vacacion.EmpleadosSendNotiEmail=[];
         vacacion.EmpleadosSendNotiEmail.push(this.solInfo);
         this.CrearNuevaAutorizacion(vacacion);
         this.CrearNuevaNotificacion(vacacion);
@@ -403,7 +408,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     autorizacion.id_departamento = parseInt(localStorage.getItem('cdepar'));
     autorizacion.id_permiso = autorizacion.id_hora_extra = autorizacion.id_plan_hora_extra = null;
     autorizacion.id_vacacion = vacacion.id;
-    autorizacion.id_documento = ''
+    autorizacion.id_autoriza_estado = ''
 
     this.autorizaciones.postNuevaAutorizacion(autorizacion).subscribe(
       resp => { //this.validar.showToast(resp.message, 3000, 'success') 

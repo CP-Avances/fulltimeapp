@@ -127,8 +127,8 @@ export const getlistaVacacionesByFechasyCodigoEdit = async (req: Request, res: R
  */
 export const postNuevaVacacion = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const { fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, legalizado, id_peri_vacacion,
-            id_empl_cargo, estado, codigo } = req.body;
+        const { fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado, id_periodo_vacacion,
+            id_empleado_cargo, estado, codigo } = req.body;
 
         console.log(req.body);
 
@@ -136,8 +136,8 @@ export const postNuevaVacacion = async (req: Request, res: Response): Promise<Re
             'INSERT INTO mv_solicitud_vacacion (fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, ' +
             'legalizado, id_periodo_vacacion, id_empleado_cargo, estado, codigo) ' +
             'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ) RETURNING *',
-            [fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, legalizado, id_peri_vacacion,
-                id_empl_cargo, estado, codigo]);
+            [fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado, id_periodo_vacacion,
+                id_empleado_cargo, estado, codigo]);
         const [objetoVacacion] = response.rows;
 
         if (!objetoVacacion) return res.status(400)
