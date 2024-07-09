@@ -157,7 +157,7 @@ export const postNuevaVacacion = async (req: Request, res: Response): Promise<Re
  */
 export const putVacacion = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const { id, fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, legalizado, estado } = req.body;
+        const { id, fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado, estado } = req.body;
 
         console.log(req.body);
 
@@ -168,7 +168,7 @@ export const putVacacion = async (req: Request, res: Response): Promise<Response
                 dia_laborable = $6, legalizado = $7
                 WHERE id = $1 RETURNING *
                 `
-                , [id, fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, legalizado]);
+                , [id, fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado]);
 
             const [objetoVacacion] = response.rows;
 

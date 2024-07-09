@@ -153,13 +153,22 @@ export class ListaPermisosAdminComponent implements OnInit {
             p.hora_salida_ = this.validar.FormatearHora(p.hora_salida, this.formato_hora);
           })
 
+          console.log("ver 5", this.listaPermisosFiltradas)
+
+
           let i = 0;
           this.listaPermisosFiltradas.filter(item => {   
             this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_empleado_contrato).subscribe(
               (usuaDep) => {
                 i = i+1;
 
+                console.log("ver usuaDep", usuaDep)
+                console.log("item.estado", item.estado)
+
                 this.ArrayAutorizacionTipos.filter(x => {
+
+                  console.log("ArrayAutorizacionTipos", x)
+
                   if((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)){
                     this.gerencia = true;
                     if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
@@ -183,10 +192,13 @@ export class ListaPermisosAdminComponent implements OnInit {
                 //Filtra la lista de autorizacion para almacenar en un array
                 if(this.listaPermisosFiltradas.length === i){
                   this.listaPermisosDeparta = this.permilista
+                  console.log("ver listaPermisosDeparta", this.listaPermisosDeparta);
 
                   this.permisos_pendientes = this.listaPermisosDeparta.filter(o => {
                     return o.estado === 1;
                   });
+
+                  console.log("ver permiso final", this.permisos_pendientes);
         
                   this.permisos_pre_autorizados = this.listaPermisosDeparta.filter(o => {
                       return o.estado === 2;

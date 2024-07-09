@@ -163,8 +163,10 @@ export class UpdateAutorizacionComponent implements OnInit {
   listadoDepaAutoriza: any = [];
   obtenerAutorizacion() {
     if (this.permiso) {
+      console.log("ver vermiso", this.permiso )
       this.autoService.getInfoEmpleadoByCodigo(this.permiso.codigo).subscribe(
         res => {
+          console.log("ver getInfoEmpleadoByCodigo", res)
           if (res.estado === 1) {
             var estado = true;
           }
@@ -305,6 +307,7 @@ export class UpdateAutorizacionComponent implements OnInit {
     this.listaEnvioCorreo = [];
     this.UsuaAprueba = [];
     this.id_departamento = solInfo.id_departamento;
+    console.log("ver autorizacion", autorizacion)
     var autorizaciones = autorizacion.id_autoriza_estado.split(',');
     autorizaciones.map((obj: string) => {
       this.lectura = this.lectura + 1;

@@ -124,7 +124,7 @@ const EnviarNotificacionComidas = (req, res) => __awaiter(void 0, void 0, void 0
         SELECT tc.nombre AS servicio, ctc.nombre AS menu, ctc.hora_inicio, ctc.hora_fin, 
           dm.nombre AS comida, dm.valor, dm.observacion 
         FROM ma_cat_comidas AS tc, ma_horario_comidas AS ctc, ma_detalle_comida AS dm 
-        WHERE tc.id = ctc.id_comida AND ctc.id = dm.id_menu AND dm.id = $1
+        WHERE tc.id = ctc.id_comida AND ctc.id = dm.id_horario_comida AND dm.id = $1
       `, [id_comida]);
     let notifica = mensaje + SERVICIO_SOLICITADO.rows[0].servicio;
     const response = yield database_1.pool.query(`
@@ -160,6 +160,7 @@ const getInfoEmpleadoByCodigo = (req, res) => __awaiter(void 0, void 0, void 0, 
             `;
         const response = yield database_1.pool.query(query);
         const [infoEmpleado] = response.rows;
+        console.log("ver", response.rows);
         console.log(infoEmpleado);
         return res.status(200).jsonp(infoEmpleado);
     }

@@ -154,14 +154,14 @@ exports.postNuevaVacacion = postNuevaVacacion;
  */
 const putVacacion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id, fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, legalizado, estado } = req.body;
+        const { id, fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado, estado } = req.body;
         console.log(req.body);
         if (estado === 1) {
             const response = yield database_1.pool.query(`
                 UPDATE mv_solicitud_vacacion SET fecha_inicio = $2, fecha_final = $3, fecha_ingreso = $4, dia_libre = $5, 
                 dia_laborable = $6, legalizado = $7
                 WHERE id = $1 RETURNING *
-                `, [id, fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, legalizado]);
+                `, [id, fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado]);
             const [objetoVacacion] = response.rows;
             if (objetoVacacion) {
                 return res.status(200).jsonp(objetoVacacion);

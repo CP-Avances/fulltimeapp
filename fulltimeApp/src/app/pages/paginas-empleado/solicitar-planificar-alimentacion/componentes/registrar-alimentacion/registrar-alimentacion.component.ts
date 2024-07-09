@@ -281,7 +281,7 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
     let final = this.validar.FormatearHora(alimentacion.hora_fin, this.formato_hora);
 
     let mensaje = {
-      create_at: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
+      fecha_hora: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
       id_empl_envia: parseInt(localStorage.getItem('empleadoID')),
       id_empl_recive: 0,
       tipo: 1, // SOLICITUD SERVICIO DE ALIMENTACIÓN

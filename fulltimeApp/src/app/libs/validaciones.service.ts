@@ -184,9 +184,10 @@ export class ValidacionesService {
     vacacionesByFeriadoAndHorarioE(inicio: string, final: string, horario: HorarioE, feriado: Cg_Feriados[]): any {
         this.lista_plan = horario;
         this.filtro = [];
-
         console.log('horario: ',horario);
-
+        console.log('inicio: ',inicio);
+        console.log('final: ',final);
+        console.log('feriado: ',feriado);
         const fec_aux = new Date(inicio.split('T')[0])//variable auxiliar de la fecha de inicio, me toma un dia anterior.90p-[=]
         const fecha1 = moment(inicio);
         const fecha2 = moment(final);
@@ -208,11 +209,16 @@ export class ValidacionesService {
             console.log('dia: ',dia);
             console.log('mes: ',mes);
 
+            console.log('ver this.lista_plan: ',this.lista_plan);
+
+
             this.lista_plan.filter(item =>{
                 if(item.mes == mes){
                     this.filtro = item;
                 }
             })
+
+            console.log("ver filtro", this.filtro);
 
             let horario_laboral = {
                 fecha: fec_string,

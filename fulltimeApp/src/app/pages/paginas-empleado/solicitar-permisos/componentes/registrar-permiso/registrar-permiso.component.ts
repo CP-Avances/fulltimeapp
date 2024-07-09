@@ -1105,10 +1105,10 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
     allNotificaciones.forEach(item => {
       let notificacion: any = {
-        id_send_empl: parseInt(localStorage.getItem('empleadoID')),
-        id_receives_empl: item.id_empleado,
-        id_receives_depa: item.id_dep,
-        create_at: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
+        id_empleado_envia: parseInt(localStorage.getItem('empleadoID')),
+        id_empleado_recibe: item.id_empleado,
+        id_departamento_recibe: item.id_dep,
+        fecha_hora: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
         estado: 'Pendiente',
         id_permiso: permiso.id,
         id_vacaciones: null,

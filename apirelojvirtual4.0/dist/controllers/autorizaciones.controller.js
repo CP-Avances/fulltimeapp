@@ -102,8 +102,8 @@ exports.ObtenerListaAutorizaDepa = ObtenerListaAutorizaDepa;
  */
 const postAutorizacion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_documento, id_plan_hora_extra } = req.body;
-        const response = yield database_1.pool.query('INSERT INTO ecm_autorizaciones( orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_autoriza_estado, id_plan_hora_extra ) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING * ', [orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_documento, id_plan_hora_extra]);
+        const { orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_autoriza_estado, id_plan_hora_extra } = req.body;
+        const response = yield database_1.pool.query('INSERT INTO ecm_autorizaciones( orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_autoriza_estado, id_plan_hora_extra ) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING * ', [orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_autoriza_estado, id_plan_hora_extra]);
         const [autorizacion] = response.rows;
         if (!autorizacion)
             return res.status(400).jsonp({ message: 'No se creo autorización' });
@@ -122,12 +122,12 @@ exports.postAutorizacion = postAutorizacion;
 const updateAutorizacion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id_auto, campo } = req.query;
-        const { estado, id_documento } = req.body;
+        const { estado, id_autoriza_estado } = req.body;
         console.log('id_auto: ', id_auto);
         console.log('campo: ', campo);
         console.log('id_auto: ', estado);
-        console.log('id_autoriza_estado: ', id_documento);
-        const query = `UPDATE ecm_autorizaciones SET estado = ${estado} , id_autoriza_estado = \'${id_documento}\' WHERE ${campo} = ${id_auto} RETURNING *`;
+        console.log('id_autoriza_estado: ', id_autoriza_estado);
+        const query = `UPDATE ecm_autorizaciones SET estado = ${estado} , id_autoriza_estado = \'${id_autoriza_estado}\' WHERE ${campo} = ${id_auto} RETURNING *`;
         const response = yield database_1.pool.query(query);
         const [autorizacion] = response.rows;
         if (!autorizacion)

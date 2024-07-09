@@ -83,7 +83,7 @@
           <td *ngIf="timbre.fecha_subida_servidor === null"></td>
           <td *ngIf="timbre.fecha_subida_servidor != null">{{timbre.shora}}</td>
           <td *ngIf="timbre.fecha_subida_servidor === null"></td>
-          <td [ngSwitch]="timbre.tecl_funcion">
+          <td [ngSwitch]="timbre.tecla_funcion">
             <p *ngSwitchCase="1">Inicio de la jornada</p>
             <p *ngSwitchCase="2">Fin de la jornada</p>
             <p *ngSwitchCase="3">Inicio almuerzo</p>

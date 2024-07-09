@@ -85,14 +85,14 @@ export interface ConfigNotificacion {
 
 export interface IdDispositivos {
     id: number;
-    id_empleado?: number;
+    codigo_empleado?: string;
     id_dispositivo?: string;
     modelo_dispositivo?: string;
 }
 
 export const IdDispositivosValueDefault = {
     id: undefined,
-    id_empleado: null,
+    codigo_empleado: null,
     id_dispositivo: null,
     modelo_dispositivo: null,
 }

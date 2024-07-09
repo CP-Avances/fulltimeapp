@@ -99,9 +99,9 @@ export const ObtenerListaAutorizaDepa = async (req: Request, res: Response): Pro
  */
 export const postAutorizacion = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const { orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_documento, id_plan_hora_extra } = req.body;
+        const { orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_autoriza_estado, id_plan_hora_extra } = req.body;
 
-        const response: QueryResult = await pool.query('INSERT INTO ecm_autorizaciones( orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_autoriza_estado, id_plan_hora_extra ) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING * ', [orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_documento, id_plan_hora_extra]);
+        const response: QueryResult = await pool.query('INSERT INTO ecm_autorizaciones( orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_autoriza_estado, id_plan_hora_extra ) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING * ', [orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_autoriza_estado, id_plan_hora_extra]);
         const [autorizacion]: Autorizacion[] = response.rows;
         if (!autorizacion) return res.status(400).jsonp({ message: 'No se creo autorización' });
         return res.status(200).jsonp({ message: 'Autorización creada', autorizacion: autorizacion});
@@ -118,14 +118,14 @@ export const postAutorizacion = async (req: Request, res: Response): Promise<Res
 export const updateAutorizacion = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { id_auto, campo } = req.query;
-        const { estado, id_documento } = req.body;
+        const { estado, id_autoriza_estado } = req.body;
 
         console.log('id_auto: ',id_auto);
         console.log('campo: ',campo);
         console.log('id_auto: ',estado);
-        console.log('id_autoriza_estado: ',id_documento);
+        console.log('id_autoriza_estado: ',id_autoriza_estado);
 
-        const query = `UPDATE ecm_autorizaciones SET estado = ${estado} , id_autoriza_estado = \'${id_documento}\' WHERE ${campo} = ${id_auto} RETURNING *`;
+        const query = `UPDATE ecm_autorizaciones SET estado = ${estado} , id_autoriza_estado = \'${id_autoriza_estado}\' WHERE ${campo} = ${id_auto} RETURNING *`;
 
         const response: QueryResult = await pool.query(query);
         const [autorizacion]: Autorizacion[] = response.rows;

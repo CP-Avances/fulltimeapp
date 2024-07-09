@@ -452,7 +452,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
             this.listadoDepaAutoriza.filter(item => {
               this.nivel_padre = item.nivel_padre;
               if((this.idEmpleado == item.id_empleado) && (autorizaciones.length ==  item.nivel)){
-                this.obtenerPlanificacionHoraria(solicitud.fec_inicio, solicitud.fec_final, solicitud.codigo, solicitud);
+                this.obtenerPlanificacionHoraria(solicitud.fecha_inicio, solicitud.fecha_final, solicitud.codigo, solicitud);
                 this.configuracionCorreo(solicitud);
                 return this.ocultar = false;
               }
@@ -468,7 +468,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
             this.listadoDepaAutoriza = res;
             this.listadoDepaAutoriza.forEach(item => {
               if((this.idEmpleado == item.id_empleado) && (autorizaciones.length ==  item.nivel)){
-                this.obtenerPlanificacionHoraria(solicitud.fec_inicio, solicitud.fec_final, solicitud.codigo, solicitud);
+                this.obtenerPlanificacionHoraria(solicitud.fecha_inicio, solicitud.fecha_final, solicitud.codigo, solicitud);
                 this.configuracionCorreo(solicitud);
                 return this.ocultar = false;
               }
@@ -666,7 +666,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
 
     switch (solicitud) {
       case 'permiso':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: dataSolicitud.id }, 'permisos').subscribe(
+        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: dataSolicitud.id }, 'mp_solicitud_permiso').subscribe(
             resp => { 
               this.validar.showToast(resp.message+' - '+this.listaSolicitudesValidadas.length, 3000, 'success');
               console.log('ver datos de permisos multiples...', dataSolicitud,
@@ -684,7 +684,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
        
         break;
       case 'vacacion':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: dataSolicitud.id }, 'vacaciones').subscribe(
+        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: dataSolicitud.id }, 'mv_solicitud_vacacion').subscribe(
           resp => { this.validar.showToast(resp.message, 3000, 'success') },
           err => { this.validar.showToast(err.error.message, 3000, 'danger') },
         )
@@ -758,7 +758,8 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
 
   listaCorreosEnviar: any = []
   configuracionCorreo(solicitud: any){
-    this.configNoti.ObtenerConfiguracionEmpleado(solicitud.id_empl_contrato).subscribe(res_config => {
+    console.log("solictud", solicitud)
+    this.configNoti.ObtenerConfiguracionEmpleado(solicitud.id_empleado_contrato).subscribe(res_config => {
       if(res_config[0].permiso_mail == true){
         this.listaCorreosEnviar.push(solicitud);
       }
@@ -894,8 +895,8 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
 
   EnviarNotificacionPermiso(dataSolicitud: any, estado_p: string, infoUsuario: any) {
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE PERMISO
-    let desde = this.validar.FormatearFecha(dataSolicitud.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(dataSolicitud.fec_final, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(dataSolicitud.fecha_inicio, this.formato_fecha, this.validar.dia_completo);
+    let hasta = this.validar.FormatearFecha(dataSolicitud.fecha_final, this.formato_fecha, this.validar.dia_completo);
 
     let h_inicio = this.validar.FormatearHora(dataSolicitud.hora_salida, this.formato_hora);
     let h_fin = this.validar.FormatearHora(dataSolicitud.hora_ingreso, this.formato_hora);
@@ -1093,8 +1094,8 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
       cont = cont + 1;
 
       // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
-      let desde = this.validar.FormatearFecha(vacacion.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-      let hasta = this.validar.FormatearFecha(vacacion.fec_final, this.formato_fecha, this.validar.dia_completo);
+      let desde = this.validar.FormatearFecha(vacacion.fecha_inicio, this.formato_fecha, this.validar.dia_completo);
+      let hasta = this.validar.FormatearFecha(vacacion.fecha_final, this.formato_fecha, this.validar.dia_completo);
 
       // SI EL USUARIO SE ENCUENTRA ACTIVO Y TIENEN CONFIGURACIÓN RECIBIRA CORREO DE SOLICITUD DE VACACIÓN
       if (e.vaca_mail) {
@@ -1147,8 +1148,8 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
   EnviarNotificacionVacacion(vacaciones: any, estado_v: string, infoUsuario: any) {
 
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
-    let desde = this.validar.FormatearFecha(vacaciones.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(vacaciones.fec_final, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(vacaciones.fecha_inicio, this.formato_fecha, this.validar.dia_completo);
+    let hasta = this.validar.FormatearFecha(vacaciones.fecha_final, this.formato_fecha, this.validar.dia_completo);
 
     const noti: Notificacion = notificacionValueDefault;
     noti.id_vacaciones = vacaciones.id;
@@ -1529,8 +1530,8 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
               { style: 'itemsTable', text: solicitud },
               { style: 'itemsTable', text: dat.nempleado },
               { style: 'itemsTable', text: this.CampoDescripcion(dat, solicitud) },
-              { style: 'itemsTable', text: this.validar.FormatearFecha(moment(dat.fec_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_abreviado) },
-              { style: 'itemsTable', text: this.validar.FormatearFecha(moment(dat.fec_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_abreviado) },
+              { style: 'itemsTable', text: this.validar.FormatearFecha(moment(dat.fecha_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_abreviado) },
+              { style: 'itemsTable', text: this.validar.FormatearFecha(moment(dat.fecha_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_abreviado) },
               { style: 'itemsTable', text: dat.dia },
               { style: 'itemsTable', text: dat.horas_permiso },
               { style: 'itemsTable', text: this.estadoChange.nombre },

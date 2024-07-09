@@ -161,6 +161,7 @@ export class DeleteRegisterComponent{
       depa_user_loggin: infoUsuario.id_dep,
       objeto: info,
     }
+    console.log("ver", datos);
 
     this.autoriza.BuscarJefes(datos).subscribe(data => {
       data.EmpleadosSendNotiEmail.push(infoUsuario);
@@ -194,9 +195,9 @@ export class DeleteRegisterComponent{
     var correo_usuarios = '';
 
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE PERMISO
-    let solicitud = this.validar.FormatearFecha(permiso.fec_creacion, this.formato_fecha, this.validar.dia_completo);
-    let desde = this.validar.FormatearFecha(permiso.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(permiso.fec_final, this.formato_fecha, this.validar.dia_completo);
+    let solicitud = this.validar.FormatearFecha(permiso.fecha_creacion, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(permiso.fecha_inicio, this.formato_fecha, this.validar.dia_completo);
+    let hasta = this.validar.FormatearFecha(permiso.fecha_final, this.formato_fecha, this.validar.dia_completo);
 
     // CAPTURANDO ESTADO DE LA SOLICITUD DE PERMISO
     if (permiso.estado === 1) {
@@ -290,8 +291,8 @@ export class DeleteRegisterComponent{
   EnviarNotificacionPermiso(permiso: any, nota: string, user: string) {
 
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE PERMISO
-    let desde = this.validar.FormatearFecha(permiso.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(permiso.fec_final, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(permiso.fecha_inicio, this.formato_fecha, this.validar.dia_completo);
+    let hasta = this.validar.FormatearFecha(permiso.fecha_final, this.formato_fecha, this.validar.dia_completo);
 
     let h_inicio = this.validar.FormatearHora(permiso.hora_salida, this.formato_hora);
     let h_fin = this.validar.FormatearHora(permiso.hora_ingreso, this.formato_hora);
@@ -382,8 +383,8 @@ export class DeleteRegisterComponent{
       cont = cont + 1;
 
       // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
-      let desde = this.validar.FormatearFecha(vacacion.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-      let hasta = this.validar.FormatearFecha(vacacion.fec_final, this.formato_fecha, this.validar.dia_completo);
+      let desde = this.validar.FormatearFecha(vacacion.fecha_inicio, this.formato_fecha, this.validar.dia_completo);
+      let hasta = this.validar.FormatearFecha(vacacion.fecha_final, this.formato_fecha, this.validar.dia_completo);
 
       // CAPTURANDO ESTADO DE LA SOLICITUD DE VACACIÓN
       if (vacacion.estado === 1) {
@@ -450,8 +451,8 @@ export class DeleteRegisterComponent{
   EnviarNotificacionVacacion(vacaciones: any, nota: string, user: string) {
 
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
-    let desde = this.validar.FormatearFecha(vacaciones.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(vacaciones.fec_final, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(vacaciones.fecha_inicio, this.formato_fecha, this.validar.dia_completo);
+    let hasta = this.validar.FormatearFecha(vacaciones.fecha_final, this.formato_fecha, this.validar.dia_completo);
 
     // CAPTURANDO ESTADO DE LA SOLICITUD DE VACACIÓN
     if (vacaciones.estado === 1) {
@@ -673,7 +674,7 @@ export class DeleteRegisterComponent{
     var correo_usuarios = '';
 
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE ALIMENTACIÓN
-    let solicitud = this.validar.FormatearFecha(alimentacion.fec_comida, this.formato_fecha, this.validar.dia_completo);
+    let solicitud = this.validar.FormatearFecha(alimentacion.fecha_comida, this.formato_fecha, this.validar.dia_completo);
 
     // CAPTURANDO ESTADO DE LA SOLICITUD 
     if (alimentacion.aprobada === null) {
@@ -745,7 +746,7 @@ export class DeleteRegisterComponent{
   NotificarEventoComida(alimentacion: any, nota: string, user: string) {
 
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE ALIMENTACIÓN
-    let desde = this.validar.FormatearFecha(alimentacion.fec_comida, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(alimentacion.fecha_comida, this.formato_fecha, this.validar.dia_completo);
 
     let inicio = this.validar.FormatearHora(alimentacion.hora_inicio, this.formato_hora);
     let final = this.validar.FormatearHora(alimentacion.hora_fin, this.formato_hora);

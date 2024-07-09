@@ -146,6 +146,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
 
   //METODO VALIDADOR DE DIAS LIBRES
   DiaIniciolLibre(fecha_ingresada){
+
+    console.log("ver fecha_ingresada",fecha_ingresada);
     let dia_retur; 
     if(fecha_ingresada != null && fecha_ingresada != ""){
       dia_retur = this.validar.validarDiaLaboral_Libre(fecha_ingresada.toString(),this.horarioEmpleado, this.cg_feriados);
@@ -193,9 +195,13 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
       this.reg.fecha_inicio = moment(new Date()).format('YYYY-MM-DD'); 
       const hoy = moment(this.reg.fecha_inicio).format("DD/MM/YYYY, HH:mm:ss")
       this.dia_fianl = moment(this.reg.fecha_inicio).format('YYYY-MM-DD');
+      console.log("ver codigo", this.reg.codigo)
+
 
       this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
         horario => { 
+
+          console.log("ver horario", horario)
           this.horarioEmpleado = horario;
 
           if(this.DiaIniciolLibre(this.reg.fecha_inicio) == 0){
@@ -223,6 +229,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
         this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
           horario => { 
             this.horarioEmpleado = horario;
+            console.log("ver horario", this.horarioEmpleado)
 
             if(this.DiaIniciolLibre(this.reg.fecha_inicio) == 0){
               return this.disabled_dia_fianl = true, this.disabled_dia_ingreso = true;
