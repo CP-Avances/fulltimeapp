@@ -13,7 +13,7 @@ exports.pool = new pg_1.Pool({
     user: 'fulltime',
     host: 'localhost',
     password: 'fulltime',
-    database: 'fulltime4_juan',
+    database: 'fulltime_pablo',
     port: 5432
     /*user: 'postgres',
     host: 'localhost',
