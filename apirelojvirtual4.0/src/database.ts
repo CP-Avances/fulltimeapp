@@ -12,9 +12,9 @@ export const pool = new Pool({
 
     
     user: 'fulltime',
-    host: 'localhost',
+    host: '192.168.0.156',
     password: 'fulltime',
-    database: 'fulltime_pablo',
+    database: 'fulltime4_empresa1',
     port: 5432
 
     

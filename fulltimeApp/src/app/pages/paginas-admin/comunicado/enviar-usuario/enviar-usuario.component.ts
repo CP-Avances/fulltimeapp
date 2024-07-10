@@ -402,9 +402,9 @@ export class EnviarUsuarioComponent implements OnInit {
 
   correos: number;
   BuscarParametro() {
-    // id_tipo_parametro PARA RANGO DE UBICACIÓN = 24
+    // id_tipo_parametro PARA LIMITE DE CORREOS = 13
     let datos = [];
-    this.restP.ObtenerDetallesParametros(24).subscribe(
+    this.restP.ObtenerDetallesParametros(13).subscribe(
       res => {
         datos = res;
         console.log('datos correo -----------')

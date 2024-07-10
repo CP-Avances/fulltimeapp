@@ -54,7 +54,7 @@ const loginUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const { usuario, contrasena } = req.body;
         const response = yield database_1.pool.query('SELECT e.id AS id_registro_empleado, e.codigo as idEmpleado, ' +
             'e.cedula, e.apellido, e.nombre, e.estado_civil, e.genero, e.correo, e.fecha_nacimiento, ' +
-            'e.estado as eestado, e.mail_alternativo, e.domicilio, e.telefono, e.id_nacionalidad, ' +
+            'e.estado as eestado, e.domicilio, e.telefono, e.id_nacionalidad, ' +
             'e.imagen, e.codigo, e.latitud, e.longitud, u.id as id, u.usuario, u.contrasena, ' +
             'u.estado as estado, u.id_rol, u.id_empleado, u.app_habilita, frase ' +
             'FROM eu_usuarios as u inner join eu_empleados as e on u.id_empleado = e.id WHERE usuario = $1;', [usuario]);
@@ -222,7 +222,7 @@ const compararContraseña = function (contrasena_ingresada, contrasena_bdd) {
 const ingresarIDdispositivo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id_empleado, id_celular, modelo_dispositivo } = req.body;
-        const [Response] = yield database_1.pool.query('INSERT INTO mrv_dispositivos(codigo_empleado, id_dispositivo, modelo_dispositivo)' +
+        const [Response] = yield database_1.pool.query('INSERT INTO mrv_dispositivos(id_empleado, id_dispositivo, modelo_dispositivo)' +
             'VALUES ($1, $2, $3) RETURNING *', [id_empleado, id_celular, modelo_dispositivo]).then(res => {
             return res.rows;
         });
@@ -244,7 +244,7 @@ exports.ingresarIDdispositivo = ingresarIDdispositivo;
 const getidDispositivo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id_empleado = req.params.id_empleado;
-        const response = yield database_1.pool.query(`SELECT * FROM mrv_dispositivos WHERE codigo_empleado = '${id_empleado}' ORDER BY id ASC `);
+        const response = yield database_1.pool.query(`SELECT * FROM mrv_dispositivos WHERE id_empleado = ${id_empleado} ORDER BY id ASC `);
         const IdDispositivos = response.rows;
         return res.jsonp(IdDispositivos);
     }

@@ -1,6 +1,6 @@
 export interface HorarioE {
     id: number,
-    codigo: number | string,
+    id_empleado: number | string,
     fecha_inicio: Date | string,
     fecha_final: Date | string,
     lunes: Boolean,

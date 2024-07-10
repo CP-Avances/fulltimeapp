@@ -43,7 +43,7 @@ export class LoginPage implements OnInit {
 
   ngOnInit() {
 
-    this.BuscarParametro();
+    //this.BuscarParametro();
     if (!this.relojService.esPrimeraVez()) {
       this.navCtroller.navigateForward(['inicio']);
     } else if (this.relojService.estaLogueado() && this.relojService.existeRol()) {
@@ -62,11 +62,15 @@ export class LoginPage implements OnInit {
   }
 
   rango_dispositivos: any;
+
+  /*
   BuscarParametro() {
-    // id_tipo_parametro PARA RANGO DE UBICACIÓN = 22
+    // id_tipo_parametro PARA NUMERO DE DISPOSITIVOS = 6
     let datos = [];
-    this.parametros.ObtenerDetallesParametros(32).subscribe(
+    this.parametros.ObtenerDetallesParametros(6).subscribe(
       res => {
+
+        console.log("ver parametro:", res)
         datos = res;
         if (datos.length != 0) {
           return this.rango_dispositivos = (parseInt(datos[0].descripcion));
@@ -75,6 +79,7 @@ export class LoginPage implements OnInit {
         }
     });
   }
+    */
 
   infoDispositivo(){
     Device.getId().then((id) => {
@@ -91,6 +96,23 @@ export class LoginPage implements OnInit {
   }
 
   iniciarSesion1() {
+
+
+    let datos = [];
+    this.parametros.ObtenerDetallesParametros(6).subscribe(
+      res => {
+
+        console.log("ver parametro:", res)
+        datos = res;
+        if (datos.length != 0) {
+          return this.rango_dispositivos = (parseInt(datos[0].descripcion));
+        }else{
+          return this.rango_dispositivos = 1;
+        }
+    });
+
+
+
     this.infoDispositivo();
     this.user.usuario = this.user.usuario.trim();
     this.user.contrasena = this.user.contrasena.trim();
@@ -104,11 +126,12 @@ export class LoginPage implements OnInit {
         res => {
           this.iniciandoSesion = false;
           this.usuarioObtenido = res.body.usuario;
-          const codigo = this.usuarioObtenido.codigo;
+          const codigo = this.usuarioObtenido.id;
           let existeId_Dispositivo: boolean;
 
           this.relojService.obtenerIdDispositivosUsuario(codigo).subscribe(
                 dispositivos => {
+                  console.log("ver dispositivos", dispositivos )
                 
                   //Buscar el id_dispositivo y el id_empleado si son el mismo
                   dispositivos.forEach((item: any) => {
@@ -215,7 +238,6 @@ export class LoginPage implements OnInit {
         }
       );
     }
-
   }
 
   cambiodepantallas(rol: number){

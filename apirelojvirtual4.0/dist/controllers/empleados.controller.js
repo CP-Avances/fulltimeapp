@@ -94,11 +94,11 @@ const getHorariosEmpleadoByCodigo = (req, res) => __awaiter(void 0, void 0, void
     try {
         const { codigo, fecha_inicio } = req.query;
         const response = yield database_1.pool.query(`
-            SELECT id, codigo AS empl_codigo, id_empleado_cargo, id_horario,
+            SELECT id, id_empleado AS empl_codigo, id_empleado_cargo, id_horario,
                 fecha_horario AS fecha, fecha_hora_horario::time AS horario,
                 tipo_dia, tipo_accion AS tipo_hora, id_detalle_horario
             FROM eu_asistencia_general
-            WHERE codigo = $1
+            WHERE id_empleado = $1
                 AND fecha_horario BETWEEN $2 AND $2 
             ORDER BY horario ASC`, [codigo, fecha_inicio]);
         const horarios = response.rows;
@@ -155,14 +155,14 @@ const BuscarPlanificacionHorarioEmple = (req, res) => __awaiter(void 0, void 0, 
             "CASE WHEN STRING_AGG(CASE WHEN dia = 30 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 30 THEN codigo_dia end,', ') ELSE '-' END AS dia30, " +
             "CASE WHEN STRING_AGG(CASE WHEN dia = 31 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 31 THEN codigo_dia end,', ') ELSE '-' END AS dia31 " +
             "FROM ( " +
-            "SELECT p_g.codigo AS codigo_e, CONCAT(empleado.apellido, ' ', empleado.nombre) AS nombre_e, EXTRACT('year' FROM fecha_horario) AS anio, EXTRACT('month' FROM fecha_horario) AS mes, " +
+            "SELECT p_g.id_empleado AS codigo_e, CONCAT(empleado.apellido, ' ', empleado.nombre) AS nombre_e, EXTRACT('year' FROM fecha_horario) AS anio, EXTRACT('month' FROM fecha_horario) AS mes, " +
             "EXTRACT('day' FROM fecha_horario) AS dia, CASE WHEN tipo_dia = 'L' THEN tipo_dia ELSE horario.codigo END AS codigo_dia " +
             "FROM eu_asistencia_general p_g " +
-            "INNER JOIN eu_empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
+            "INNER JOIN eu_empleados empleado ON empleado.id = p_g.id_empleado AND p_g.id_empleado IN (" + codigo + ") " +
             "INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario " +
             "WHERE fecha_horario BETWEEN $1 AND $2 " +
             "GROUP BY codigo_e, nombre_e, anio, mes, dia, codigo_dia, p_g.id_horario " +
-            "ORDER BY p_g.codigo,anio, mes , dia, p_g.id_horario " +
+            "ORDER BY p_g.id_empleado,anio, mes , dia, p_g.id_horario " +
             ") AS datos " +
             "GROUP BY codigo_e, nombre_e, anio, mes " +
             "ORDER BY 1,3,4", [fecha_inicio, fecha_final]);
@@ -215,13 +215,13 @@ const getPlanificacionMesesCodigoEmple = (req, res) => __awaiter(void 0, void 0,
             "CASE WHEN STRING_AGG(CASE WHEN dia = 30 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 30 THEN codigo_dia end,', ') ELSE '-' END AS dia30, " +
             "CASE WHEN STRING_AGG(CASE WHEN dia = 31 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 31 THEN codigo_dia end,', ') ELSE '-' END AS dia31 " +
             "FROM ( " +
-            "SELECT p_g.codigo AS codigo_e, CONCAT(empleado.apellido, ' ', empleado.nombre) AS nombre_e, EXTRACT('year' FROM fecha_horario) AS anio, EXTRACT('month' FROM fecha_horario) AS mes, " +
+            "SELECT p_g.id_empleado AS codigo_e, CONCAT(empleado.apellido, ' ', empleado.nombre) AS nombre_e, EXTRACT('year' FROM fecha_horario) AS anio, EXTRACT('month' FROM fecha_horario) AS mes, " +
             "EXTRACT('day' FROM fecha_horario) AS dia, CASE WHEN tipo_dia = 'L' THEN tipo_dia ELSE horario.codigo END AS codigo_dia " +
             "FROM eu_asistencia_general p_g " +
-            "INNER JOIN eu_empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN ($1) " +
+            "INNER JOIN eu_empleados empleado ON empleado.id = p_g.id_empleado AND p_g.id_empleado IN ($1) " +
             "INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario " +
             "GROUP BY codigo_e, nombre_e, anio, mes, dia, codigo_dia, p_g.id_horario " +
-            "ORDER BY p_g.codigo,anio, mes , dia, p_g.id_horario " +
+            "ORDER BY p_g.id_empleado,anio, mes , dia, p_g.id_horario " +
             ") AS datos " +
             "GROUP BY codigo_e, nombre_e, anio, mes " +
             "ORDER BY 1,3,4", [codigo]);

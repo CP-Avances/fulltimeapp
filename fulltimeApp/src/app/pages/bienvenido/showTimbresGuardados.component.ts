@@ -178,9 +178,9 @@ export class TimbresPerdidosComponent implements OnInit {
 
   rango: any;
   BuscarParametro() {
-    // id_tipo_parametro PARA RANGO DE UBICACIÓN = 22
+    // id_tipo_parametro PARA RANGO DE UBICACION = 4
     let datos = [];
-    this.restP.ObtenerDetallesParametros(22).subscribe(
+    this.restP.ObtenerDetallesParametros(4).subscribe(
       res => {
         datos = res;
         if (datos.length != 0) {

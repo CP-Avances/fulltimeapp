@@ -44,6 +44,8 @@ export class EnviartimbrePage implements OnInit {
     private networkService: NetworkService,
     private restP: ParametrosService,
     private restE: EmpleadosService,
+    public parametros: ParametrosService,
+
   ) { }
 
   ngOnInit() {
@@ -165,6 +167,8 @@ export class EnviartimbrePage implements OnInit {
   VerificarFunciones() {
     this.restP.ObtenerFunciones().subscribe(res => {
       this.funciones = res;
+
+      console.log("Ver funciones", res)
     });
   }
 
@@ -318,7 +322,7 @@ export class EnviartimbrePage implements OnInit {
   }
 
 
-  
+
 
   obtenerIdTipoTresBotones(): string {
     switch (this.nombreInfo_timbre) {
@@ -441,9 +445,9 @@ export class EnviartimbrePage implements OnInit {
   //Metodo que valida la tolerancia de la ubicacion, de la tabla tipo de parametro,
   rango: any;
   BuscarParametro() {
-    // id_tipo_parametro PARA RANGO DE UBICACIÓN = 22
+    // id_tipo_parametro PARA RANGO DE UBICACION = 4
     let datos = [];
-    this.restP.ObtenerDetallesParametros(22).subscribe(
+    this.restP.ObtenerDetallesParametros(4).subscribe(
       res => {
         datos = res;
         console.log('Parametro Detalle: ', datos)
@@ -480,8 +484,15 @@ export class EnviartimbrePage implements OnInit {
           }
         }
       }, err => {
-        this.storageUbica = "DESCONOCIDO";
-        this.EnviarDatos(timbre);
+
+
+        if (this.timbrarDesconocido == 'Si') {
+          timbre.ubicacion = 'DESCONOCIDO';
+          this.storageUbica = timbre.ubicacion;
+          this.EnviarDatos(timbre);
+        } else {
+          this.abrirToas('No se puede marcar un Timbre con ubicación Desconocida', "danger", 5000, "bottom");
+        }
       }
     );
   }
@@ -516,12 +527,18 @@ export class EnviartimbrePage implements OnInit {
           this.ValidarDomicilio(informacion, timbre);
         }
       }, () => {
-        timbre.ubicacion = 'DESCONOCIDO';
-        this.storageUbica = timbre.ubicacion;
-        this.EnviarDatos(timbre);
+        if (this.timbrarDesconocido == 'Si') {
+          timbre.ubicacion = 'DESCONOCIDO';
+          this.storageUbica = timbre.ubicacion;
+          this.EnviarDatos(timbre);
+        } else {
+          this.abrirToas('No se puede marcar un Timbre con ubicación Desconocida', "danger", 5000, "bottom");
+        }
       });
   }
 
+
+  timbrarDesconocido: string;
 
   ValidarModulo(latitud: any, longitud: any, rango: any, timbre: any) {
     console.log('--------- Validacion Modulo----------')
@@ -534,6 +551,22 @@ export class EnviartimbrePage implements OnInit {
       this.EnviarDatos(timbre);
       //this.navCtroller.navigateForward(['confirmaciontimbre'])
     } else {
+
+      let datos = [];
+      this.parametros.ObtenerDetallesParametros(5).subscribe(
+        res => {
+
+          console.log("ver parametro:", res)
+          datos = res[0];
+          if (datos[0].descripcion == "Si") {
+            return this.timbrarDesconocido = 'Si';
+          } else {
+            return this.timbrarDesconocido = 'No';
+          }
+        });
+
+
+
       //Sin fallos en el serividor y red
       if (this.funciones[0].geolocalizacion === true) {
         console.log('BuscarUbicacion validar Modulo------')
@@ -565,16 +598,29 @@ export class EnviartimbrePage implements OnInit {
             this.EnviarDatos(timbre);
           }
           else {
-            timbre.ubicacion = 'DESCONOCIDO';
-            this.storageUbica = timbre.ubicacion;
-            this.abrirToas('Marcación realizada dentro de un perímetro DESCONOCIDO.', "primary", 3000, "top");
-            this.EnviarDatos(timbre);
+
+
+            if (this.timbrarDesconocido == 'Si') {
+              timbre.ubicacion = 'DESCONOCIDO';
+              this.storageUbica = timbre.ubicacion;
+              this.abrirToas('Marcación realizada dentro de un perímetro DESCONOCIDO.', "primary", 3000, "top");
+              this.EnviarDatos(timbre);
+            } else {
+              this.abrirToas('No se puede marcar un Timbre con ubicación Desconocida', "danger", 5000, "bottom");
+            }
           }
 
         }, err => {
-          timbre.ubicacion = 'DESCONOCIDO';
-          this.storageUbica = timbre.ubicacion;
-          this.EnviarDatos(timbre);
+
+          if (this.timbrarDesconocido == 'Si') {
+
+            timbre.ubicacion = 'DESCONOCIDO';
+            this.storageUbica = timbre.ubicacion;
+            this.EnviarDatos(timbre);
+
+          } else {
+            this.abrirToas('No se puede marcar un Timbre con ubicación Desconocida', "danger", 5000, "bottom");
+          }
         });
       }
       else {
@@ -585,9 +631,14 @@ export class EnviartimbrePage implements OnInit {
       }
 
     }, err => {
-      timbre.ubicacion = 'DESCONOCIDO';
-      this.storageUbica = timbre.ubicacion;
-      this.GuardartimbresinServidor(timbre);
+
+      if (this.timbrarDesconocido == 'Si') {
+        timbre.ubicacion = 'DESCONOCIDO';
+        this.storageUbica = timbre.ubicacion;
+        this.GuardartimbresinServidor(timbre);
+      } else {
+        this.abrirToas('No se puede marcar un Timbre con ubicación Desconocida', "danger", 5000, "bottom");
+      }
     })
 
   }

@@ -78,7 +78,7 @@ const crearTimbre = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         });
     }
     catch (error) {
-        console.log(error);
+        console.log("ver el error", error);
         return res.status(500).jsonp({ message: 'Error al crear Timbre' });
     }
 });

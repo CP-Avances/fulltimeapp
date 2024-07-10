@@ -77,7 +77,7 @@ export const crearTimbre = async (req: Request, res: Response) => {
             respuestaBDD: response
         });
     } catch (error) {
-        console.log(error);
+        console.log("ver el error",error);
         return res.status(500).jsonp({ message: 'Error al crear Timbre' });
     }
 };
