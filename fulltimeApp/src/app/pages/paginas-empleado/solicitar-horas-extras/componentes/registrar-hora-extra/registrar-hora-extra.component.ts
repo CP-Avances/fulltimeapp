@@ -68,7 +68,6 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.tiempo = moment();
     this.reg.estado = 1;
-    this.reg.codigo = localStorage.getItem('codigo');
     this.reg.fecha_solicita = this.tiempo.format('YYYY-MM-DD');
     this.reg.id_empleado_cargo = parseInt(localStorage.getItem('ccargo'));
     this.reg.id_empleado_solicita = parseInt(localStorage.getItem('empleadoID'));
@@ -94,7 +93,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
 
   solInfo: any;
   obtenerInformacionEmpleado() {
-    this.autorizaciones.getInfoEmpleadoByCodigo(this.reg.codigo).subscribe(
+    this.autorizaciones.getInfoEmpleadoByCodigo(this.reg.id_empleado_solicita).subscribe(
       res => {
         if (res.estado === 1) {
           var estado = true;

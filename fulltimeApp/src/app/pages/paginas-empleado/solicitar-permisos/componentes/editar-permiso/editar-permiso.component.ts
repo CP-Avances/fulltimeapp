@@ -1125,7 +1125,7 @@ export class EditarPermisoComponent implements OnInit {
   //Metodo para actualizar un archivo
   updataArchivo(permiso: any){
     if(this.archivoSubido[0].name != this.reg.documento){
-      this.permisoService.EliminarArchivo(this.reg.documento!,this.permiso.codigo).subscribe(res => {
+      this.permisoService.EliminarArchivo(this.reg.documento!,this.permiso.id_empleado).subscribe(res => {
         this.subirRespaldo(permiso);
       })
     }else{
@@ -1147,7 +1147,7 @@ export class EditarPermisoComponent implements OnInit {
       formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
     }
 
-    this.permisoService.SubirArchivoRespaldo(formData, id, this.permiso.codigo, null).subscribe(res => {
+    this.permisoService.SubirArchivoRespaldo(formData, id, this.permiso.id_empleado, null).subscribe(res => {
       this.validaciones.showToast('El archivo se actualizo Correctamente', 3000, 'success');
       this.reg.documento = '';
 

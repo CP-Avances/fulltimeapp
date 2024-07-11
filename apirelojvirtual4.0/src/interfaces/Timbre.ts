@@ -19,6 +19,7 @@ export interface Timbre {
     conexion: boolean,
     fecha_subida_servidor?: string,
     novedades_conexion?: string,
+    id_empleado?: string
 }
 
 

@@ -9,7 +9,7 @@ export interface Permiso {
     id_empleado_contrato: number;
     id_periodo_vacacion: number;
     id_tipo_permiso: number;
-    codigo: number | any;
+    id_empleado: number | any;
     descripcion: string;
     fecha_creacion: any;
     fecha_inicio: string;
@@ -47,7 +47,7 @@ export const permisoValueDefault: Permiso = {
     id_empleado_contrato: 0,
     id_periodo_vacacion: 0,
     id_tipo_permiso: 0,
-    codigo: 0,
+    id_empleado: 0,
     descripcion: '',
     fecha_creacion: '',
     fecha_inicio: '',

@@ -50,10 +50,10 @@ exports.CompararCoordenadas = CompararCoordenadas;
 const BuscarCoordenadasUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { codigo } = req.params;
-        const response = yield database_1.pool.query('SELECT eu.id AS id_emplu, eu.codigo, eu.id_ubicacion, eu.id_empleado, ' +
+        const response = yield database_1.pool.query('SELECT eu.id AS id_emplu, eu.id_ubicacion, eu.id_empleado, ' +
             'cu.latitud, cu.longitud, cu.descripcion ' +
             'FROM mg_empleado_ubicacion AS eu, mg_cat_ubicaciones AS cu ' +
-            'WHERE eu.id_ubicacion = cu.id AND eu.codigo = $1', [codigo]);
+            'WHERE eu.id_ubicacion = cu.id AND eu.id_empleado = $1', [codigo]);
         console.log(response.rows);
         return res.jsonp(response.rows);
     }

@@ -129,7 +129,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.reg.fecha_creacion = this.tiempo.format('YYYY-MM-DD');
     this.reg.numero_permiso = this.num_permiso;
     this.reg.estado = 1;
-    this.reg.codigo = localStorage.getItem('codigo');
+    this.reg.id_empleado = localStorage.getItem('empleadoID');
     this.reg.id_periodo_vacacion = parseInt(localStorage.getItem('cperi_vacacion'));
     this.reg.id_empleado_cargo = parseInt(localStorage.getItem('ccargo')!)
     this.reg.id_empleado_contrato = parseInt(localStorage.getItem('ccontr')!)
@@ -160,7 +160,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   //TODO obtenerInformacionEmpleado
   solInfo: any;
   obtenerInformacionEmpleado() {
-    this.autorizaciones.getInfoEmpleadoByCodigo(this.reg.codigo).subscribe(
+    this.autorizaciones.getInfoEmpleadoByCodigo(this.reg.id_empleado).subscribe(
       res => {
         if (res.estado === 1) {
           var estado = true;
@@ -271,7 +271,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         //Cambiar esta validacion del dato id_peri_vacacion se debe leer por la consulta no por el valor almacenado
         if(this.cg_permiso.tipo_descuento == 1){
           if(!(Number.isNaN(this.reg.id_periodo_vacacion))){
-            this.vacacionService.getlistarPeriVacacionesByCodigo(this.reg.codigo).subscribe(vacaciones => {
+            this.vacacionService.getlistarPeriVacacionesByCodigo(this.reg.id_empleado).subscribe(vacaciones => {
               if(vacaciones.length == 0){
                 this.ocultar = true;
                 this.mensaje = false;
@@ -326,7 +326,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     if(this.reg.fecha_inicio != null){
       var busqueda = {
         fecha: moment(this.reg.fecha_inicio).format('YYYY-MM-D'), 
-        codigo: this.reg.codigo
+        codigo: this.reg.id_empleado
       }
 
       this.empleadoService.getHorariosEmpleadobyCodigo(busqueda).subscribe(datos => { 
@@ -396,7 +396,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     if(this.reg.fecha_final != null){
       var busqueda = {
         fecha: moment(this.reg.fecha_final).format('YYYY-MM-DD'), 
-        codigo: this.reg.codigo
+        codigo: this.reg.id_empleado
       }
 
       this.empleadoService.getHorariosEmpleadobyCodigo(busqueda).subscribe(datos => { 
@@ -659,7 +659,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.dato_comida = 0;
     this.valor_comida = 0;
     let horario = {
-      codigo: this.reg.codigo,
+      codigo: this.reg.id_empleado,
       fecha_inicio: fecha_inicio,
       hora_inicio: moment(this.reg.hora_salida).format('HH:mm:ss'),
       hora_final: moment(this.reg.hora_ingreso).format('HH:mm:ss'),
@@ -695,7 +695,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       fecha_final: fecha_final,
       hora_inicio: moment(this.reg.hora_salida).format('HH:mm:ss'),
       hora_final: moment(this.reg.hora_ingreso).format('HH:mm:ss'),
-      codigo: this.reg.codigo
+      codigo: this.reg.id_empleado
     }
 
     this.empleadoService.BuscarComidaHorarioHorasDD(horario).subscribe(informacion => {
@@ -733,7 +733,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     var data = {
       fecha_inicio: moment(this.reg.fecha_inicio).format('YYYY-MM-D'), 
       fecha_final: moment(this.reg.fecha_final).format('YYYY-MM-D'), 
-      codigo: '\''+this.reg.codigo+'\''
+      codigo: '\''+this.reg.id_empleado+'\''
     }
 
     this.empleadoService.BuscarPlanificacionHorarioEmple(data).subscribe(horario => {
@@ -1031,7 +1031,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     }
 
     console.log('formData: ',formData);
-    this.permisoService.SubirArchivoRespaldo(formData, id, this.reg.codigo, this.archivoSubido[0].name).subscribe(res => {
+    this.permisoService.SubirArchivoRespaldo(formData, id, this.reg.id_empleado, this.archivoSubido[0].name).subscribe(res => {
       this.validaciones.showToast('El archivo se Cargo Correctamente', 3500, 'success');
     }, err => {
         console.log(err)

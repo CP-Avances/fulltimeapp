@@ -45,7 +45,7 @@
           <ion-item class="item_fondo" mode="md">
             <ion-label>
               <b style="font-size: 85%;"> Código Personal</b><br>
-              <p style="margin-top: 6%; margin-left: 4%;">{{ permiso.codigo }}</p>
+              <p style="margin-top: 6%; margin-left: 4%;">{{ permiso.id_empleado }}</p>
             </ion-label>
           </ion-item>
         </div>
@@ -198,7 +198,7 @@
       <ion-label>
         <b> Ver Certificado de la Solicitud </b><br>
         <a *ngIf="permiso.documento != null"
-          href="{{hipervinculo}}/empleadoPermiso/documentos/{{permiso.documento}}/visualizar/{{permiso.codigo}}" target="_black"
+          href="{{hipervinculo}}/empleadoPermiso/documentos/{{permiso.documento}}/visualizar/{{permiso.id_empleado}}" target="_black"
           style="text-decoration:none;">
           <ion-label color="theme" style="font-size: 90%; margin-top: 3%; margin-left: 2%;">
             {{permiso.documento}}</ion-label>

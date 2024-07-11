@@ -1,19 +1,18 @@
 import { EmpleadosSendNotiEmail } from './Permisos';
 
 export interface HoraExtra {
-    id_empl_cargo: number;
-    id_usua_solicita: number;
-    fec_inicio: Date;
-    fec_final: Date;
-    fec_solicita: Date;
+    id_empleado_cargo: number;
+    id_empleado_solicita: number;
+    fecha_inicio: Date;
+    fecha_final: Date;
+    fecha_solicita: Date;
     descripcion: string;
     estado: number;
     tipo_funcion: number;
     id: number;
-    num_hora: string;
+    horas_solicitud: string;
     tiempo_autorizado: string;
     observacion: boolean;
-    codigo: number | string;
     nempleado?: string;
     ncargo?: string;
     EmpleadosSendNotiEmail?: EmpleadosSendNotiEmail[];

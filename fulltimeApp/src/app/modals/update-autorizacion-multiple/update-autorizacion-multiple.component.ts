@@ -210,7 +210,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
           this.ListaPermisos.forEach(o => {
             this.cont = this.cont + 1;
             if (o.nempleado != this.username) {
-              this.autoService.getInfoEmpleadoByCodigo(o.codigo).subscribe(
+              this.autoService.getInfoEmpleadoByCodigo(o.id_empleado).subscribe(
                 res => {
                   if (o.nempleado != this.username) {
                     if (res.estado === 1) {
@@ -336,7 +336,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
         if(this.ListaHoras_extras.length != 0){
           this.ListaHoras_extras.forEach(o => {
             this.cont = this.cont + 1;
-            this.autoService.getInfoEmpleadoByCodigo(o.codigo).subscribe(
+            this.autoService.getInfoEmpleadoByCodigo(o.id_empleado_solicita).subscribe(
               res => {
                 if (res.estado === 1) {
                   var estado = true;

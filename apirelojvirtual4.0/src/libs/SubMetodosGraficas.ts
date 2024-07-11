@@ -27,7 +27,7 @@ export const BuscarTimbresByCodigo_Fecha = async function (codigo: number, horar
 }
 
 export const BuscarPermisosJustificados = async function (codigo: number, fecha: string) {
-    return await pool.query('SELECT fecha_inicio, descripcion FROM mp_solicitud_permiso WHERE codigo = $1 AND fecha_inicio::TIMESTAMP::DATE <= $2 AND fecha_final::TIMESTAMP::DATE >= $2 AND estado = 3 ',
+    return await pool.query('SELECT fecha_inicio, descripcion FROM mp_solicitud_permiso WHERE id_empleado = $1 AND fecha_inicio::TIMESTAMP::DATE <= $2 AND fecha_final::TIMESTAMP::DATE >= $2 AND estado = 3 ',
         [codigo, fecha + ''])
         .then(result => {
             return result.rowCount
@@ -105,7 +105,7 @@ async function ListaHorasExtrasGrafica(fec_desde: Date, fec_hasta: Date) {
 }
 
 async function HorasExtrasSolicitadasGrafica(fec_desde: Date, fec_hasta: Date) {
-    return await pool.query('SELECT CAST(h.fecha_inicio AS VARCHAR), CAST(h.fecha_final AS VARCHAR), h.descripcion, h.horas_solicitud, h.tiempo_autorizado, h.codigo, h.id_empleado_cargo ' +
+    return await pool.query('SELECT CAST(h.fecha_inicio AS VARCHAR), CAST(h.fecha_final AS VARCHAR), h.descripcion, h.horas_solicitud, h.tiempo_autorizado, h.id_empleado_solicita, h.id_empleado_cargo ' +
         'FROM mhe_solicitud_hora_extra AS h WHERE h.fecha_inicio between $1 and $2 AND h.estado = 3 ' +  // estado = 3 significa q las horas extras fueron autorizadas
         'AND h.fecha_final between $1 and $2 ORDER BY h.fecha_inicio', [fec_desde, fec_hasta])
         .then(result => {
@@ -121,14 +121,14 @@ async function HorasExtrasSolicitadasGrafica(fec_desde: Date, fec_hasta: Date) {
                     descripcion: obj.descripcion,
                     num_hora: HHMMtoSegundos(obj.horas_solicitud) / 3600,
                     tiempo_autorizado: HHMMtoSegundos(obj.tiempo_autorizado) / 3600,
-                    codigo: obj.codigo
+                    id_empleado_solicita: obj.id_empleado_solicita
                 }
             }))
         });
 }
 
 async function PlanificacionHorasExtrasSolicitadasGrafica(fec_desde: Date, fec_hasta: Date) {
-    return await pool.query('SELECT CAST(h.fecha_desde AS VARCHAR), CAST(h.hora_inicio AS VARCHAR), h.fecha_hasta, h.hora_fin, h.descripcion, h.horas_totales, ph.tiempo_autorizado, ph.codigo, ph.id_empleado_cargo ' +
+    return await pool.query('SELECT CAST(h.fecha_desde AS VARCHAR), CAST(h.hora_inicio AS VARCHAR), h.fecha_hasta, h.hora_fin, h.descripcion, h.horas_totales, ph.tiempo_autorizado, ph.id_empleado_realiza ,ph.id_empleado_cargo ' +
         'FROM mhe_empleado_plan_hora_extra AS ph, mhe_detalle_plan_hora_extra AS h WHERE ph.id_detalle_plan = h.id AND ph.estado = 3 ' + //estado = 3 para horas extras autorizadas
         'AND h.fecha_desde between $1 and $2 AND h.fecha_hasta between $1 and $2 ORDER BY h.fecha_desde', [fec_desde, fec_hasta])
         .then(result => {
@@ -144,7 +144,7 @@ async function PlanificacionHorasExtrasSolicitadasGrafica(fec_desde: Date, fec_h
                     descripcion: obj.descripcion,
                     num_hora: HHMMtoSegundos(obj.horas_totales) / 3600,
                     tiempo_autorizado: HHMMtoSegundos(obj.tiempo_autorizado) / 3600,
-                    codigo: obj.codigo
+                    id_empleado_solicita: obj.id_empleado_realiza
                 }
             }))
         })
@@ -224,9 +224,9 @@ async function EmpleadoHorasExtrasGrafica(codigo: string | number, fec_desde: Da
 }
 
 async function EmpleadoHorasExtrasSolicitadasGrafica(codigo: string | number, fec_desde: Date, fec_hasta: Date) {
-    return await pool.query('SELECT h.fecha_inicio, h.fecha_final, h.descripcion, h.horas_solicitud, h.tiempo_autorizado, h.codigo, h.id_empleado_cargo ' +
+    return await pool.query('SELECT h.fecha_inicio, h.fecha_final, h.descripcion, h.horas_solicitud, h.tiempo_autorizado, h.id_empleado_solicita, h.id_empleado_cargo ' +
         'FROM mhe_solicitud_hora_extra AS h WHERE h.fecha_inicio between $1 and $2 AND h.estado = 3 ' +  // estado = 3 significa q las horas extras fueron autorizadas
-        'AND h.fecha_final between $1 and $2 AND h.codigo = $3 ORDER BY h.fecha_inicio', [fec_desde, fec_hasta, codigo])
+        'AND h.fecha_final between $1 and $2 AND h.id_empleado_solicita = $3 ORDER BY h.fecha_inicio', [fec_desde, fec_hasta, codigo])
         .then(result => {
             return Promise.all(result.rows.map(async (obj) => {
                 var f1 = new Date(obj.fecha_inicio)
@@ -246,16 +246,16 @@ async function EmpleadoHorasExtrasSolicitadasGrafica(codigo: string | number, fe
                     descripcion: obj.descripcion,
                     num_hora: HHMMtoSegundos(obj.horas_solicitud) / 3600,
                     tiempo_autorizado: HHMMtoSegundos(obj.tiempo_autorizado) / 3600,
-                    codigo: obj.codigo
+                    id_empleado_solicita : obj.id_empleado_solicita
                 }
             }))
         });
 }
 
 async function EmpleadoPlanificacionHorasExtrasSolicitadasGrafica(codigo: string | number, fec_desde: Date, fec_hasta: Date) {
-    return await pool.query('SELECT h.fecha_desde, h.hora_inicio, h.fecha_hasta, h.hora_fin, h.descripcion, h.horas_totales, ph.tiempo_autorizado, ph.codigo, ph.id_empleado_contrato ' +
+    return await pool.query('SELECT h.fecha_desde, h.hora_inicio, h.fecha_hasta, h.hora_fin, h.descripcion, h.horas_totales, ph.tiempo_autorizado, ph.id_empleado_realiza, ph.id_empleado_contrato ' +
         'FROM mhe_empleado_plan_hora_extra AS ph, mhe_detalle_plan_hora_extra AS h WHERE ph.id_detalle_plan = h.id AND ph.estado = 3 ' + //estado = 3 para horas extras autorizadas
-        'AND h.fecha_desde between $1 and $2 AND h.fecha_hasta between $1 and $2 AND ph.codigo = $3 ORDER BY h.fecha_desde', [fec_desde, fec_hasta, codigo])
+        'AND h.fecha_desde between $1 and $2 AND h.fecha_hasta between $1 and $2 AND ph.id_empleado_realiza = $3 ORDER BY h.fecha_desde', [fec_desde, fec_hasta, codigo])
         .then(result => {
             return Promise.all(result.rows.map(async (obj) => {
                 var f1 = new Date(obj.fecha_desde.toJSON().split('T')[0] + 'T' + obj.hora_inicio);
@@ -275,7 +275,7 @@ async function EmpleadoPlanificacionHorasExtrasSolicitadasGrafica(codigo: string
                     descripcion: obj.descripcion,
                     num_hora: HHMMtoSegundos(obj.horas_totales) / 3600,
                     tiempo_autorizado: HHMMtoSegundos(obj.tiempo_autorizado) / 3600,
-                    codigo: obj.codigo
+                    id_empleado_solicita: obj.id_empleado_realiza
                 }
             }))
         })
@@ -305,7 +305,7 @@ export const Empleado_Vacaciones_ModelarDatos = async function (codigo: string |
 }
 
 export const Empleado_Permisos_ModelarDatos = async function (codigo: string | number, fec_desde: Date, fec_hasta: Date) {
-    let permisos = await pool.query('SELECT CAST(fecha_inicio AS VARCHAR), CAST(fecha_final AS VARCHAR), horas_permiso, dias_permiso FROM mp_solicitud_permiso WHERE codigo = $1 AND fecha_inicio between $2 and $3 AND estado = 3 ', [codigo, fec_desde, fec_hasta]).then(result => { return result.rows })
+    let permisos = await pool.query('SELECT CAST(fecha_inicio AS VARCHAR), CAST(fecha_final AS VARCHAR), horas_permiso, dias_permiso FROM mp_solicitud_permiso WHERE id_empleado = $1 AND fecha_inicio between $2 and $3 AND estado = 3 ', [codigo, fec_desde, fec_hasta]).then(result => { return result.rows })
     // console.log('Lista de permisos ===', permisos);
     let aux_array: any = [];
     permisos.forEach(obj => {

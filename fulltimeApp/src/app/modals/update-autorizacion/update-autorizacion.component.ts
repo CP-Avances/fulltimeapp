@@ -164,7 +164,7 @@ export class UpdateAutorizacionComponent implements OnInit {
   obtenerAutorizacion() {
     if (this.permiso) {
       console.log("ver vermiso", this.permiso )
-      this.autoService.getInfoEmpleadoByCodigo(this.permiso.codigo).subscribe(
+      this.autoService.getInfoEmpleadoByCodigo(this.permiso.id_empleado).subscribe(
         res => {
           console.log("ver getInfoEmpleadoByCodigo", res)
           if (res.estado === 1) {
@@ -258,7 +258,7 @@ export class UpdateAutorizacionComponent implements OnInit {
     }
 
     if (this.hora_extra) {
-      this.autoService.getInfoEmpleadoByCodigo(this.hora_extra.codigo).subscribe(
+      this.autoService.getInfoEmpleadoByCodigo(this.hora_extra.id_empleado_solicita).subscribe(
         res => {
           if (res.estado === 1) {
             var estado = true;

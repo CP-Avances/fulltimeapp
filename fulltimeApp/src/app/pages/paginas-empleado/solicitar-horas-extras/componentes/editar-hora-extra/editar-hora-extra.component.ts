@@ -99,7 +99,7 @@ export class EditarHoraExtraComponent implements OnInit {
 
   solInfo: any;
   obtenerInformacionEmpleado() {
-    this.autoriza.getInfoEmpleadoByCodigo(this.reg.codigo).subscribe(
+    this.autoriza.getInfoEmpleadoByCodigo(this.reg.id_empleado_solicita).subscribe(
       res => {
         if (res.estado === 1) {
           var estado = true;

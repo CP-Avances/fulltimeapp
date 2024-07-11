@@ -14,7 +14,6 @@ export interface HoraExtra {
     horas_solicitud: string;
     tiempo_autorizado: string;
     observacion: boolean;
-    codigo: number | string;
     nempleado?: string;
     ncargo?: string;
     hora_salida?: string;

@@ -18,7 +18,7 @@ const database_1 = require("../database");
 const getPermisoByIdyCodigo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { codigo, id } = req.query;
-        const query = `SELECT p.* FROM mp_solicitud_permiso p WHERE p.codigo = '${codigo}' AND p.id = ${id}`;
+        const query = `SELECT p.* FROM mp_solicitud_permiso p WHERE p.id_empleado = '${codigo}' AND p.id = ${id}`;
         const response = yield database_1.pool.query(query);
         const permisos = response.rows;
         return res.status(200).jsonp(permisos);
@@ -37,8 +37,8 @@ const getlistaPermisosByCodigo = (req, res) => __awaiter(void 0, void 0, void 0,
     try {
         const { codigo } = req.query;
         const subquery = '( select i.descripcion from mp_cat_tipo_permisos i where i.id = p.id_tipo_permiso) as tipo_permiso ';
-        const subquery1 = '( select (nombre || \' \' || apellido) from eu_empleados i where i.codigo = p.codigo) as nempleado ';
-        const query = `SELECT p.*, ${subquery}, ${subquery1} FROM mp_solicitud_permiso p WHERE p.codigo = '${codigo}' ORDER BY p.numero_permiso DESC LIMIT 100`;
+        const subquery1 = '( select (nombre || \' \' || apellido) from eu_empleados i where i.id = p.id_empleado) as nempleado ';
+        const query = `SELECT p.*, ${subquery}, ${subquery1} FROM mp_solicitud_permiso p WHERE p.id_empleado = '${codigo}' ORDER BY p.numero_permiso DESC LIMIT 100`;
         const response = yield database_1.pool.query(query);
         const permisos = response.rows;
         return res.status(200).jsonp(permisos);
@@ -60,8 +60,8 @@ const getlistaPermisos = (req, res) => __awaiter(void 0, void 0, void 0, functio
 		    da.correo AS correo, depa.nombre AS nombre_depa
         FROM mp_solicitud_permiso AS p, eu_empleados AS e, mp_cat_tipo_permisos AS i, datos_actuales_empleado AS da,
 	        ed_departamentos AS depa
-        WHERE e.codigo = p.codigo 
-	        AND da.codigo = p.codigo
+        WHERE e.id = p.id_empleado 
+	        AND da.id = p.id_empleado
 	        AND i.id = p.id_tipo_permiso
 	        AND depa.id = da.id_departamento
         ORDER BY p.fecha_inicio DESC
@@ -83,9 +83,9 @@ exports.getlistaPermisos = getlistaPermisos;
 const getlistaPermisosByFechas = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { fec_inicio, fec_final } = req.query;
-        const subquery = '( select (nombre || \' \' || apellido) from eu_empleados i where i.codigo = p.codigo ) as nempleado ';
+        const subquery = '( select (nombre || \' \' || apellido) from eu_empleados i where i.id = p.id_empleado ) as nempleado ';
         const subquery1 = '( select i.descripcion from mp_cat_tipo_permisos i where i.id = p.id_tipo_permiso) as tipo_permiso ';
-        const subquery2 = '( select da.id_departamento FROM datos_actuales_empleado AS da WHERE da.codigo = p.codigo ) AS id_departamento ';
+        const subquery2 = '( select da.id_departamento FROM datos_actuales_empleado AS da WHERE da.id = p.id_empleado ) AS id_departamento ';
         const query = `SELECT p.*, ${subquery}, ${subquery1}, ${subquery2} FROM mp_solicitud_permiso p WHERE p.fecha_inicio BETWEEN \'${fec_inicio}\' AND \'${fec_final}\' ORDER BY p.fecha_inicio DESC`;
         const response = yield database_1.pool.query(query);
         const permisos = response.rows;
@@ -105,7 +105,7 @@ const getlistaPermisosByFechasyCodigo = (req, res) => __awaiter(void 0, void 0, 
     try {
         const { fec_inicio, fec_final, codigo } = req.query;
         const PERMISO = yield database_1.pool.query(`SELECT * FROM mp_solicitud_permiso p 
-        WHERE p.codigo::varchar = $1 
+        WHERE p.id_empleado::varchar = $1 
         AND ((($2 BETWEEN p.fecha_inicio::date AND p.fecha_final::date ) OR ($3 BETWEEN p.fecha_inicio::date AND p.fecha_final::date)) OR ((p.fecha_inicio::date BETWEEN $2 AND $3) OR (p.fecha_final::date BETWEEN $2 AND $3)))
          `, [codigo, fec_inicio, fec_final]);
         return res.status(200).jsonp(PERMISO.rows);
@@ -124,7 +124,7 @@ const getlistaPermisosByFechasyCodigoEdit = (req, res) => __awaiter(void 0, void
     try {
         const { fec_inicio, fec_final, codigo, id } = req.query;
         const PERMISO = yield database_1.pool.query(`SELECT * FROM mp_solicitud_permiso p 
-        WHERE p.codigo::varchar = $1 
+        WHERE p.id_empleado::varchar = $1 
         AND ((($2 BETWEEN p.fecha_inicio::date AND p.fecha_final::date ) OR ($3 BETWEEN p.fecha_inicio::date AND p.fecha_final::date)) OR ((p.fecha_inicio::date BETWEEN $2 AND $3) OR (p.fecha_final::date BETWEEN $2 AND $3))) 
         AND NOT p.id = $4 `, [codigo, fec_inicio, fec_final, id]);
         return res.status(200).jsonp(PERMISO.rows);
@@ -147,7 +147,7 @@ const getlistaPermisosByHorasyCodigo = (req, res) => __awaiter(void 0, void 0, v
         console.log('hora inicio: ', hora_inicio);
         console.log('hora final: ', hora_final);
         const PERMISO = yield database_1.pool.query(`SELECT id FROM mp_solicitud_permiso p 
-        WHERE p.codigo::varchar = $1 
+        WHERE p.id_empleado::varchar = $1 
         AND ((($2 BETWEEN p.fecha_inicio::date AND p.fecha_final::date ) OR ($3 BETWEEN p.fecha_inicio::date AND p.fecha_final::date)) OR ((p.fecha_inicio::date BETWEEN $2 AND $3) OR (p.fecha_final::date BETWEEN $2 AND $3))) 
         AND ((($4 BETWEEN p.hora_salida AND p.hora_ingreso) OR ($5 BETWEEN p.hora_salida AND p.hora_ingreso)) OR ((p.hora_salida BETWEEN $4 AND $5) OR (p.hora_ingreso BETWEEN $4 AND $5))) `, [codigo, fec_inicio, fec_final, hora_inicio, hora_final]);
         return res.status(200).jsonp(PERMISO.rows);
@@ -166,7 +166,7 @@ const getlistaPermisosByHorasyCodigoEdit = (req, res) => __awaiter(void 0, void 
     try {
         const { fec_inicio, fec_final, hora_inicio, hora_final, codigo, id } = req.query;
         const PERMISO = yield database_1.pool.query(`SELECT id FROM mp_solicitud_permiso p 
-        WHERE p.codigo::varchar = $1 
+        WHERE p.id_empleado::varchar = $1 
         AND ((($2 BETWEEN p.fecha_inicio::date AND p.fecha_final::date ) OR ($3 BETWEEN p.fecha_inicio::date AND p.fecha_final::date)) OR ((p.fecha_inicio::date BETWEEN $2 AND $3) OR (p.fecha_final::date BETWEEN $2 AND $3))) 
         AND ((($4 BETWEEN p.hora_salida AND p.hora_ingreso) OR ($5 BETWEEN p.hora_salida AND p.hora_ingreso)) OR ((p.hora_salida BETWEEN $4 AND $5) OR (p.hora_ingreso BETWEEN $4 AND $5)))
         AND NOT p.id = $6 `, [codigo, fec_inicio, fec_final, hora_inicio, hora_final, id]);
@@ -187,7 +187,7 @@ const postNuevoPermiso = (req, res) => __awaiter(void 0, void 0, void 0, functio
         const { fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre, id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, numero_permiso, documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, codigo } = req.body;
         const response = yield database_1.pool.query('INSERT INTO mp_solicitud_permiso (fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, ' +
             'dia_libre, id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, numero_permiso, ' +
-            'documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, codigo) ' +
+            'documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado) ' +
             'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) ' +
             'RETURNING * ', [fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre,
             id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, numero_permiso,

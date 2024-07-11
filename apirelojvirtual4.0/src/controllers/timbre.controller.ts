@@ -65,12 +65,12 @@ export const crearTimbre = async (req: Request, res: Response) => {
 
         const response = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
             'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
-            'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion) ' +
-            'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16);',
+            'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion, id_empleado) ' +
+            'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17);',
             [timbre.fecha_hora_timbre, timbre.accion, timbre.tecla_funcion, timbre.observacion,
             timbre.latitud, timbre.longitud, timbre.codigo, timbre.id_reloj,
             timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fecha_hora_timbre_servidor,
-            timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion]);
+            timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion, timbre.id_empleado]);
 
         res.jsonp({
             message: 'Timbre creado con éxito',
