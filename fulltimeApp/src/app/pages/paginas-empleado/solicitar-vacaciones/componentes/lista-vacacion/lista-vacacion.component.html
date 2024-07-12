@@ -84,7 +84,7 @@
           (click)="presentModalEditarRegistro( vacacion )" style="margin-bottom:15%;"></ion-icon><br>
           <!-- eliminar registro -->
           <btn-delete *ngIf="vacacion.estado === 1" (onDelete)="ngOnInit()" [isButtom]="false" nameTable="mv_solicitud_vacacion"
-          [idreg]="vacacion.id" [userCodigo]="vacacion.codigo"></btn-delete>
+          [idreg]="vacacion.id" [userCodigo]="vacacion.id_empleado"></btn-delete>
         </div>
 
        </ion-item>

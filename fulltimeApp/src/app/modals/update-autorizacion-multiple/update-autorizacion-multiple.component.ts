@@ -277,7 +277,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
           this.ListaVacaciones.forEach(o => {
             this.cont = this.cont + 1;
             if (o.nempleado != this.username) {
-              this.autoService.getInfoEmpleadoByCodigo(o.codigo).subscribe(
+              this.autoService.getInfoEmpleadoByCodigo(o.id_empleado).subscribe(
                 res => {
                   if (res.estado === 1) {
                     var estado = true;

@@ -282,7 +282,7 @@ async function EmpleadoPlanificacionHorasExtrasSolicitadasGrafica(codigo: string
 }
 
 export const Empleado_Vacaciones_ModelarDatos = async function (codigo: string | number, fec_desde: Date, fec_hasta: Date) {
-    let vacaciones = await pool.query('SELECT CAST(fecha_inicio AS VARCHAR), CAST(fecha_final AS VARCHAR) FROM mv_solicitud_vacacion WHERE codigo = $1 AND fecha_inicio between $2 and $3 AND estado = 3 ', [codigo, fec_desde, fec_hasta]).then(result => { return result.rows })
+    let vacaciones = await pool.query('SELECT CAST(fecha_inicio AS VARCHAR), CAST(fecha_final AS VARCHAR) FROM mv_solicitud_vacacion WHERE id_empleado = $1 AND fecha_inicio between $2 and $3 AND estado = 3 ', [codigo, fec_desde, fec_hasta]).then(result => { return result.rows })
     // console.log('Lista de vacaciones ===', vacaciones);
     let aux_array: any = [];
     vacaciones.forEach(obj => {

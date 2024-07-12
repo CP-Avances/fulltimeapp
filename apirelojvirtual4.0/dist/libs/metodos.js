@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BuscarHora = exports.BuscarFecha = exports.FormatearHora = exports.FormatearFecha = exports.dia_completo = exports.dia_abreviado = exports.DiaSemana = exports.SegundosToHHMM = exports.HHMMtoSegundos = exports.ModelarFechas = exports.ImagenBase64LogosEmpresas = void 0;
+exports.BuscarHora = exports.BuscarFecha = exports.FormatearHora = exports.FormatearFecha2 = exports.FormatearFecha = exports.dia_completo = exports.dia_abreviado = exports.DiaSemana = exports.SegundosToHHMM = exports.HHMMtoSegundos = exports.ModelarFechas = exports.ImagenBase64LogosEmpresas = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const moment_1 = __importDefault(require("moment"));
@@ -149,6 +149,20 @@ const FormatearFecha = function (fecha, dia) {
     });
 };
 exports.FormatearFecha = FormatearFecha;
+const FormatearFecha2 = function (fecha, dia) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let formato = yield (0, exports.BuscarFecha)();
+        let diaFormateado = (0, moment_1.default)(fecha).format(dia);
+        // Limpia el día formateado de puntos no deseados
+        diaFormateado = diaFormateado.replace('.', '');
+        // Asegúrate de que la primera letra esté en mayúscula
+        diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+        let fechaFormateada = (0, moment_1.default)(fecha).format(formato.fecha);
+        let valor = `${diaFormateado}, ${fechaFormateada}`;
+        return valor;
+    });
+};
+exports.FormatearFecha2 = FormatearFecha2;
 const FormatearHora = function (hora) {
     return __awaiter(this, void 0, void 0, function* () {
         let formato = yield (0, exports.BuscarHora)();

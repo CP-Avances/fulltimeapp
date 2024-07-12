@@ -298,7 +298,7 @@ function EmpleadoPlanificacionHorasExtrasSolicitadasGrafica(codigo, fec_desde, f
 }
 const Empleado_Vacaciones_ModelarDatos = function (codigo, fec_desde, fec_hasta) {
     return __awaiter(this, void 0, void 0, function* () {
-        let vacaciones = yield database_1.pool.query('SELECT CAST(fecha_inicio AS VARCHAR), CAST(fecha_final AS VARCHAR) FROM mv_solicitud_vacacion WHERE codigo = $1 AND fecha_inicio between $2 and $3 AND estado = 3 ', [codigo, fec_desde, fec_hasta]).then(result => { return result.rows; });
+        let vacaciones = yield database_1.pool.query('SELECT CAST(fecha_inicio AS VARCHAR), CAST(fecha_final AS VARCHAR) FROM mv_solicitud_vacacion WHERE id_empleado = $1 AND fecha_inicio between $2 and $3 AND estado = 3 ', [codigo, fec_desde, fec_hasta]).then(result => { return result.rows; });
         // console.log('Lista de vacaciones ===', vacaciones);
         let aux_array = [];
         vacaciones.forEach(obj => {

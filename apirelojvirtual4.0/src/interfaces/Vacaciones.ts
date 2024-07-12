@@ -11,7 +11,7 @@ export interface Vacacion {
     id_peri_vid_periodo_vacacionacacion: number;
     id_empleado_cargo: number;
     estado: number;
-    codigo: number | string;
+    id_empleado: number | string;
     nperivacacion?: string;
     ncargo?: string;
     nempleado?: string;

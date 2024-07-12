@@ -12,7 +12,7 @@ export interface Vacacion {
     id_periodo_vacacion: number | null;
     id_empleado_cargo: number;
     estado: number;
-    codigo: number | string;
+    id_empleado: number | string;
     nperivacacion?: string;
     ncargo?: string;
     nempleado?: string;
@@ -33,7 +33,7 @@ export const vacacionValueDefault = {
     id_periodo_vacacion: null,
     id_empleado_cargo: null,
     estado: null,
-    codigo: null,
+    id_empleado: null,
     fec_inicio_: null,
     fec_final_: null,
     fec_ingreso_: null,

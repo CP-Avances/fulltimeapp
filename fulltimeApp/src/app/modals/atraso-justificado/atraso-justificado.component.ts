@@ -59,9 +59,9 @@ export class AtrasoJustificadoComponent  implements OnInit {
     let datos = {
       descripcion: this.descripcion,
       fec_justifica: this.fec_justifica,
-      codigo: this.data.codigo,
+      codigo: this.data.id,
       create_time: this.time,
-      codigo_create_user: localStorage.getItem('codigo')
+      codigo_create_user: localStorage.getItem('empleadoID')
     }
 
     console.log("Descripción: ",this.descripcion);

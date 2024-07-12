@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -11,6 +34,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.putEstadoAlimentacion = exports.putAlimentacion = exports.postNuevoAlimentacion = exports.getlistaAlimentacionByFechasyCodigo = exports.getlistaAlimentacionByFechas = exports.getlistaAlimentacion = exports.getlistaAlimentacionByIdEmpleado = void 0;
 const database_1 = require("../database");
+const AUDITORIA_CONTROLADOR = __importStar(require("../controllers/auditotia.controller"));
+const metodos_1 = require("../libs/metodos");
 /**
  * Metodo para obtener listado de solicitudes de alimentacion por id_empleado
  * @returns Retorna un array de solicitudes de alimentacion.
@@ -115,12 +140,30 @@ exports.getlistaAlimentacionByFechasyCodigo = getlistaAlimentacionByFechasyCodig
  */
 const postNuevoAlimentacion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { extra, fecha_comida, fecha, hora_fin, hora_inicio, id_detalle_comida, id_empleado, observacion, verificar } = req.body;
+        const { extra, fecha_comida, fecha, hora_fin, hora_inicio, id_detalle_comida, id_empleado, observacion, verificar, user_name, ip } = req.body;
         console.log(req.body);
+        // INICIAR TRANSACCION
+        yield database_1.pool.query('BEGIN');
         const response = yield database_1.pool.query('INSERT INTO ma_solicitud_comida (extra, fecha_comida, fecha, hora_fin, hora_inicio, id_detalle_comida, ' +
             'id_empleado, observacion, verificar) ' +
             'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *', [extra, fecha_comida, fecha, hora_fin, hora_inicio, id_detalle_comida, id_empleado, observacion, verificar]);
         const [objetoAlimento] = response.rows;
+        var fechaN = yield (0, metodos_1.FormatearFecha2)(fecha, 'ddd');
+        var fechaComidaN = yield (0, metodos_1.FormatearFecha2)(fecha_comida, 'ddd');
+        var horaInicioN = yield (0, metodos_1.FormatearHora)(hora_inicio);
+        var horaFinN = yield (0, metodos_1.FormatearHora)(hora_fin);
+        // AUDITORIA
+        yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ma_solicitud_comida',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: `{id_empleado: ${id_empleado}, id_detalle_comida: ${id_detalle_comida}, fecha: ${fechaN}, fecha_comida: ${fechaComidaN}, hora_inicio: ${horaInicioN}, hora_fin: ${horaFinN}, observacion: ${observacion}, extra: ${extra}, verificar: ${verificar}} `,
+            ip,
+            observacion: null
+        });
+        // FINALIZAR TRANSACCION
+        yield database_1.pool.query('COMMIT');
         if (!objetoAlimento) {
             return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
         }
@@ -140,13 +183,50 @@ exports.postNuevoAlimentacion = postNuevoAlimentacion;
  */
 const putAlimentacion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id, id_empleado, fecha, id_detalle_comida, observacion, fecha_comida, extra, aprobada, verificar } = req.body;
+        const { id, id_empleado, fecha, id_detalle_comida, observacion, fecha_comida, extra, aprobada, verificar, user_name, ip } = req.body;
+        // INICIAR TRANSACCION
+        yield database_1.pool.query('BEGIN');
+        // CONSULTAR DATOSORIGINALES
+        const planComida = yield database_1.pool.query('SELECT * FROM ma_solicitud_comida WHERE id = $1', [id]);
+        const [datosOriginales] = planComida.rows;
+        if (!datosOriginales) {
+            yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'ma_solicitud_comida',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: '',
+                datosNuevos: '',
+                ip,
+                observacion: `Error al actualizar solicitud de comidas con id: ${id}. Registro no encontrado`
+            });
+            // FINALIZAR TRANSACCION
+            yield database_1.pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado' });
+        }
         const response = yield database_1.pool.query(`
             UPDATE ma_solicitud_comida SET id_empleado = $2 , fecha = $3, id_detalle_comida = $4, observacion = $5, 
             fecha_comida = $6, extra = $7, aprobada = $8, verificar = $9 
             WHERE id = $1  RETURNING *
             `, [id, id_empleado, fecha, id_detalle_comida, observacion, fecha_comida, extra, aprobada, verificar]);
         const [objetoAlimentacion] = response.rows;
+        var fechaN = yield (0, metodos_1.FormatearFecha2)(fecha, 'ddd');
+        var fechaComidaN = yield (0, metodos_1.FormatearFecha2)(fecha_comida, 'ddd');
+        var fechaO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha, 'ddd');
+        var fechaComidaO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_comida, 'ddd');
+        var horaInicioO = yield (0, metodos_1.FormatearHora)(datosOriginales.hora_inicio);
+        var horaFinO = yield (0, metodos_1.FormatearHora)(datosOriginales.hora_fin);
+        // AUDITORIA
+        yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ma_solicitud_comida',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_detalle_comida: ${datosOriginales.id_detalle_comida}, fecha: ${fechaO}, fecha_comida: ${fechaComidaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${datosOriginales.observacion}, extra: ${datosOriginales.extra}, verificar: ${datosOriginales.verificar}} `,
+            datosNuevos: `{id_empleado: ${id_empleado}, id_detalle_comida: ${id_detalle_comida}, fecha: ${fechaN}, fecha_comida: ${fechaComidaN}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${observacion}, extra: ${extra}}} `,
+            ip,
+            observacion: null
+        });
+        // FINALIZAR TRANSACCION
+        yield database_1.pool.query('COMMIT');
         if (objetoAlimentacion) {
             return res.status(200).jsonp(objetoAlimentacion);
         }

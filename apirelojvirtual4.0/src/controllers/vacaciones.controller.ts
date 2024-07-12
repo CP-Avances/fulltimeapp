@@ -11,13 +11,13 @@ export const getlistaVacacionesByCodigo = async (req: Request, res: Response): P
     try {
         const { codigo } = req.query;
 
-        console.log('codigo: ',codigo);
+        console.log('id_empleado: ',codigo);
 
         const subquery1 = '( SELECT i.descripcion FROM mv_periodo_vacacion i WHERE i.id = v.id_periodo_vacacion) AS nperivacacion '
         const subquery2 = '( SELECT t.cargo FROM eu_empleado_cargos i, e_cat_tipo_cargo t WHERE i.id = v.id_empleado_cargo AND i.id_tipo_cargo = t.id) AS ncargo '
-        const subquery3 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo = v.codigo) AS id_contrato '
+        const subquery3 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.id = v.id_empleado) AS id_contrato '
 
-        const query = `SELECT v.*, ${subquery1}, ${subquery2}, ${subquery3} FROM mv_solicitud_vacacion v WHERE v.codigo = '${codigo}' ORDER BY v.fecha_inicio DESC LIMIT 100`
+        const query = `SELECT v.*, ${subquery1}, ${subquery2}, ${subquery3} FROM mv_solicitud_vacacion v WHERE v.id_empleado = '${codigo}' ORDER BY v.fecha_inicio DESC LIMIT 100`
         const response: QueryResult = await pool.query(query);
         const vacaciones: Vacacion[] = response.rows;
         return res.status(200).jsonp(vacaciones);
@@ -35,9 +35,9 @@ export const getlistaVacaciones = async (req: Request, res: Response): Promise<R
     try {
         const subquery1 = '( SELECT i.descripcion FROM mv_periodo_vacacion i WHERE i.id = v.id_periodo_vacacion) AS nperivacacion '
         const subquery2 = '( SELECT t.cargo FROM eu_empleado_cargos i, e_cat_tipo_cargo t WHERE i.id = v.id_empleado_cargo AND i.id_tipo_cargo = t.id) AS ncargo '
-        const subquery3 = '( SELECT (nombre || \' \' || apellido) FROM eu_empleados i WHERE i.codigo = v.codigo) AS nempleado '
-        const subquery4 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo = v.codigo) AS id_contrato '
-        const subquery5 = '( SELECT da.id_departamento FROM datos_actuales_empleado AS da WHERE da.codigo = v.codigo ) AS id_departamento '
+        const subquery3 = '( SELECT (nombre || \' \' || apellido) FROM eu_empleados i WHERE i.id = v.id_empleado) AS nempleado '
+        const subquery4 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.id = v.id_empleado) AS id_contrato '
+        const subquery5 = '( SELECT da.id_departamento FROM datos_actuales_empleado AS da WHERE da.id = v.id_empleado ) AS id_departamento '
 
         const query = `SELECT v.*, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4}, ${subquery5} FROM mv_solicitud_vacacion v ORDER BY v.fecha_inicio DESC LIMIT 100`
         const response: QueryResult = await pool.query(query);
@@ -58,9 +58,9 @@ export const getlistaVacacionesByFechas = async (req: Request, res: Response): P
         const { fec_inicio, fec_final } = req.query;
         const subquery1 = '( SELECT i.descripcion FROM mv_periodo_vacacion i WHERE i.id = v.id_periodo_vacacion) AS nperivacacion '
         const subquery2 = '( SELECT t.cargo FROM eu_empleado_cargos i, e_cat_tipo_cargo t WHERE i.id = v.id_empleado_cargo AND i.id_tipo_cargo = t.id) AS ncargo '
-        const subquery3 = '( SELECT (nombre || \' \' || apellido) FROM eu_empleados i WHERE i.codigo = v.codigo) AS nempleado '
-        const subquery4 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.codigo = v.codigo) AS id_contrato '
-        const subquery5 = '( SELECT da.id_departamento FROM datos_actuales_empleado AS da WHERE da.codigo = v.codigo ) AS id_departamento '
+        const subquery3 = '( SELECT (nombre || \' \' || apellido) FROM eu_empleados i WHERE i.id = v.id_empleado) AS nempleado '
+        const subquery4 = '( SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.id = v.id_empleado) AS id_contrato '
+        const subquery5 = '( SELECT da.id_departamento FROM datos_actuales_empleado AS da WHERE da.id = v.id_empleado ) AS id_departamento '
 
         const query = `SELECT v.*, ${subquery1}, ${subquery2}, ${subquery3}, ${subquery4}, ${subquery5} 
         FROM mv_solicitud_vacacion v WHERE v.fecha_inicio BETWEEN \'${fec_inicio}\' AND \'${fec_final}\' 
@@ -83,7 +83,7 @@ export const getlistaVacacionesByFechas = async (req: Request, res: Response): P
     try {
         const { fec_inicio, fec_final, codigo } = req.query;
 
-        const query = `SELECT v.* FROM mv_solicitud_vacacion v WHERE v.codigo = '${codigo}' AND (
+        const query = `SELECT v.* FROM mv_solicitud_vacacion v WHERE v.id_empleado = '${codigo}' AND (
             ((\'${fec_inicio}\' BETWEEN v.fecha_inicio AND v.fecha_final ) OR 
              (\'${fec_final}\' BETWEEN v.fecha_inicio AND v.fecha_final)) 
             OR
@@ -109,7 +109,7 @@ export const getlistaVacacionesByFechasyCodigoEdit = async (req: Request, res: R
         const { fec_inicio, fec_final, codigo, id } = req.query;
 
         const VACACIONES = await pool.query(`SELECT v.* FROM mv_solicitud_vacacion v 
-        WHERE v.codigo::varchar = $1 
+        WHERE v.id_empleado::varchar = $1 
         AND ((($2 BETWEEN v.fecha_inicio::date AND v.fecha_final::date ) OR ($3 BETWEEN v.fecha_inicio::date AND v.fecha_final::date)) OR ((v.fecha_inicio::date BETWEEN $2 AND $3) OR (v.fecha_final::date BETWEEN $2 AND $3))) 
         AND NOT v.id = $4 `
             , [codigo, fec_inicio, fec_final, id]);
@@ -134,7 +134,7 @@ export const postNuevaVacacion = async (req: Request, res: Response): Promise<Re
 
         const response: QueryResult = await pool.query(
             'INSERT INTO mv_solicitud_vacacion (fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, ' +
-            'legalizado, id_periodo_vacacion, id_empleado_cargo, estado, codigo) ' +
+            'legalizado, id_periodo_vacacion, id_empleado_cargo, estado, id_empleado) ' +
             'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ) RETURNING *',
             [fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado, id_periodo_vacacion,
                 id_empleado_cargo, estado, codigo]);
@@ -200,7 +200,7 @@ export const listarPeriVacaciones = async (req: Request, res: Response): Promise
         const { codigo } = req.query;
 
         const query = `
-            SELECT periv.* FROM mv_periodo_vacacion AS periv WHERE periv.codigo = '${codigo}' 
+            SELECT periv.* FROM mv_periodo_vacacion AS periv WHERE periv.id_empleado = '${codigo}' 
             `
         const response: QueryResult = await pool.query(query);
         const vacaciones: Vacacion[] = response.rows;

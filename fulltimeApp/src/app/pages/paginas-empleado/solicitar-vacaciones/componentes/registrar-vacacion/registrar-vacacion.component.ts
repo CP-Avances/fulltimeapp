@@ -82,7 +82,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.catalogoService.getFeriadosAnual()
     this.reg.estado = 1;
-    this.reg.codigo = parseInt(localStorage.getItem('codigo'));
+    this.reg.id_empleado = parseInt(localStorage.getItem('empleadoID'));
     this.reg.id_periodo_vacacion = parseInt(localStorage.getItem('cperi_vacacion'));
     this.reg.id_empleado_cargo = parseInt(localStorage.getItem('ccargo'));
     this.reg.dia_laborable = undefined;
@@ -109,7 +109,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
 
   solInfo: any;
   obtenerInformacionEmpleado() {
-    this.autorizaciones.getInfoEmpleadoByCodigo(this.reg.codigo).subscribe(
+    this.autorizaciones.getInfoEmpleadoByCodigo(this.reg.id_empleado).subscribe(
       res => {
         if (res.estado === 1) {
           var estado = true;
@@ -195,10 +195,10 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
       this.reg.fecha_inicio = moment(new Date()).format('YYYY-MM-DD'); 
       const hoy = moment(this.reg.fecha_inicio).format("DD/MM/YYYY, HH:mm:ss")
       this.dia_fianl = moment(this.reg.fecha_inicio).format('YYYY-MM-DD');
-      console.log("ver codigo", this.reg.codigo)
+      console.log("ver id empleado", this.reg.id_empleado)
 
 
-      this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+      this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
         horario => { 
 
           console.log("ver horario", horario)
@@ -225,8 +225,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
       
         const hoy = moment(this.reg.fecha_inicio).format("DD/MM/YYYY, HH:mm:ss")
 
-        console.log("ver el codigo para ho",this.reg.codigo)
-        this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+        console.log("ver el codigo para ho",this.reg.id_empleado)
+        this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
           horario => { 
             this.horarioEmpleado = horario;
             console.log("ver horario", this.horarioEmpleado)
@@ -315,7 +315,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
 
      const fec_inicio = (moment(this.reg.fecha_inicio).format('YYYY-MM-DD'))+' '+ minutosinicio;
      const fec_final = (moment(this.reg.fecha_final).format('YYYY-MM-DD')) +' '+ minutosfinal;
-     const codigo = parseInt(localStorage.getItem('codigo'))
+     const codigo = parseInt(localStorage.getItem('empleadoID'))
 
     this.permisoService.getlistaPermisosByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
       if(solicitados.length != 0){

@@ -111,7 +111,7 @@ export class EditarVacacionComponent implements OnInit {
 
   solInfo: any;
   obtenerInformacionEmpleado() {
-    this.autoriza.getInfoEmpleadoByCodigo(this.reg.codigo).subscribe(
+    this.autoriza.getInfoEmpleadoByCodigo(this.reg.id_empleado).subscribe(
       res => {
         if (res.estado === 1) {
           var estado = true;
@@ -177,7 +177,7 @@ export class EditarVacacionComponent implements OnInit {
       this.reg.fecha_inicio = moment(new Date()).format('YYYY-MM-DD');
       const hoy = moment(this.reg.fecha_inicio).format("DD/MM/YYYY, HH:mm:ss")
       this.datetimeInicio.confirm(true);
-      this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+      this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
         horario => { 
           this.horarioEmpleado = horario;
           
@@ -212,7 +212,7 @@ export class EditarVacacionComponent implements OnInit {
       if(this.reg.fecha_inicio != '' || this.reg.fecha_inicio != null){
         
         const hoy = moment(this.reg.fecha_inicio).format("DD/MM/YYYY, HH:mm:ss")
-        this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+        this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
           horario => { 
             this.horarioEmpleado = horario 
             if(this.DiaIniciolLibre(this.reg.fecha_inicio) == 0){
@@ -239,7 +239,7 @@ export class EditarVacacionComponent implements OnInit {
         const hoy = moment(this.reg.fecha_final).format("DD/MM/YYYY, HH:mm:ss")
         this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
 
-        this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+        this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
           horario => { 
             this.horarioEmpleado = horario;
           
@@ -273,7 +273,7 @@ export class EditarVacacionComponent implements OnInit {
 
       this.disabled_dia_ingreso = false;
 
-      this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+      this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
         horario => { 
           this.horarioEmpleado = horario;
 
@@ -302,7 +302,7 @@ export class EditarVacacionComponent implements OnInit {
       this.dia_ingreso = moment(e.target.value).format('YYYY-MM-DD');
       this.datetimeIngreso.confirm(true);
       const hoy = moment(this.reg.fecha_ingreso).format("DD/MM/YYYY, HH:mm:ss")
-      this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.codigo, hoy).subscribe(
+      this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
         horario => { 
           this.horarioEmpleado = horario;
           return this.btnOculto = false;
@@ -326,7 +326,7 @@ export class EditarVacacionComponent implements OnInit {
     const minutosfinal = '23:00:00';
     const fec_inicio = (moment(this.reg.fecha_inicio).format('YYYY-MM-DD'))+' '+ minutosinicio;
     const fec_final = (moment(this.reg.fecha_final).format('YYYY-MM-DD')) +' '+ minutosfinal;
-    const codigo = parseInt(localStorage.getItem('codigo'));
+    const codigo = parseInt(localStorage.getItem('empleadoID'));
     const id_solicitud = this.reg.id;
 
 

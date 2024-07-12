@@ -158,7 +158,7 @@ export const justificarAtraso = async (req: Request, res: Response) => {
     try {
         const { descripcion, fec_justifica , codigo, create_time, codigo_create_user } = req.body;
         const [atraso] = await pool.query(
-            'INSERT INTO eu_empleado_justificacion_atraso(descripcion, fecha_justifica, codigo, fecha_hora, codigo_empleado_justifica) ' +
+            'INSERT INTO eu_empleado_justificacion_atraso(descripcion, fecha_justifica, id_empleado, fecha_hora, id_empleado_justifica) ' +
             'VALUES($1, $2, $3, $4, $5) RETURNING id',
             [descripcion, fec_justifica, codigo, create_time, codigo_create_user])
             .then(res => {

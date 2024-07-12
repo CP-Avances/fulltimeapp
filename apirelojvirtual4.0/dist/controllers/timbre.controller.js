@@ -157,7 +157,7 @@ exports.FiltrarTimbre = FiltrarTimbre;
 const justificarAtraso = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { descripcion, fec_justifica, codigo, create_time, codigo_create_user } = req.body;
-        const [atraso] = yield database_1.pool.query('INSERT INTO eu_empleado_justificacion_atraso(descripcion, fecha_justifica, codigo, fecha_hora, codigo_empleado_justifica) ' +
+        const [atraso] = yield database_1.pool.query('INSERT INTO eu_empleado_justificacion_atraso(descripcion, fecha_justifica, id_empleado, fecha_hora, id_empleado_justifica) ' +
             'VALUES($1, $2, $3, $4, $5) RETURNING id', [descripcion, fec_justifica, codigo, create_time, codigo_create_user])
             .then(res => {
             return res.rows;

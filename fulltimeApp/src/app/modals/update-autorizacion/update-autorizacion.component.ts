@@ -219,7 +219,7 @@ export class UpdateAutorizacionComponent implements OnInit {
     }
 
     if (this.vacacion) {
-      this.autoService.getInfoEmpleadoByCodigo(this.vacacion.codigo).subscribe(
+      this.autoService.getInfoEmpleadoByCodigo(this.vacacion.id_empleado).subscribe(
         res => {
           if (res.estado === 1) {
             var estado = true;
@@ -359,7 +359,7 @@ export class UpdateAutorizacionComponent implements OnInit {
               console.log('this.listaEnvioCorreo PRE: ',this.listaEnvioCorreo);
 
               if(this.UsuaAprueba.length > 0){
-                this.obtenerPlanificacionHoraria(solicitud.fecha_inicio, solicitud.fecha_final, solicitud.codigo, solicitud, autorizaciones);
+                this.obtenerPlanificacionHoraria(solicitud.fecha_inicio, solicitud.fecha_final, solicitud.id_empleado_solicita, solicitud, autorizaciones);
               }else{
                 this.ocultar = true;
                 return this.mensaje = 'Falta la Aprobacion del nivel '+ this.FilDepartamentosAprueban[autorizaciones.length - 1].nivel +
@@ -396,7 +396,7 @@ export class UpdateAutorizacionComponent implements OnInit {
             this.empleado_estado = this.empleado_estado.concat(',');
 
             if(this.UsuaAprueba.length > 0){
-              this.obtenerPlanificacionHoraria(solicitud.fecha_inicio, solicitud.fecha_final, solicitud.codigo, solicitud, autorizaciones);
+              this.obtenerPlanificacionHoraria(solicitud.fecha_inicio, solicitud.fecha_final, solicitud.id_empleado_solicita, solicitud, autorizaciones);
             }else{
               this.ocultar = true;
               return this.mensaje = 'Falta la Aprobacion del nivel '+ this.FilDepartamentosAprueban[autorizaciones.length - 1].nivel +

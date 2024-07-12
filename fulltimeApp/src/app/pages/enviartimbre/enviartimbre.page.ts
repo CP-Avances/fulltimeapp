@@ -3,6 +3,7 @@ import { NavController, ToastController, AlertController } from '@ionic/angular'
 import { Platform, PopoverController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 
 import { FingerprintAIO } from '@ionic-native/fingerprint-aio';
 import { Geolocation } from '@capacitor/geolocation';
@@ -45,7 +46,7 @@ export class EnviartimbrePage implements OnInit {
     private restP: ParametrosService,
     private restE: EmpleadosService,
     public parametros: ParametrosService,
-
+    private router: Router,
   ) { }
 
   ngOnInit() {
@@ -468,6 +469,8 @@ export class EnviartimbrePage implements OnInit {
 
       } else {
         this.abrirToas('Timbre sin conexión a Internet. No Permitido', "danger", 5000, "bottom");
+        return this.router.navigate(['/login']);
+
       }
 
     }
@@ -575,6 +578,9 @@ export class EnviartimbrePage implements OnInit {
           this.EnviarDatos(timbre);
         } else {
           this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "bottom");
+
+          return this.router.navigate(['/login']);
+
         }
       }
     );
@@ -620,6 +626,10 @@ export class EnviartimbrePage implements OnInit {
           console.log("entra aqui??? no")
 
           this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "bottom");
+
+          return this.router.navigate(['/login']);
+
+
         }
       });
   }
@@ -692,6 +702,8 @@ export class EnviartimbrePage implements OnInit {
               this.EnviarDatos(timbre);
             } else {
               this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "bottom");
+              return this.router.navigate(['/login']);
+
             }
           }
 
@@ -707,6 +719,8 @@ export class EnviartimbrePage implements OnInit {
 
           } else {
             this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "bottom");
+            return this.router.navigate(['/login']);
+
           }
         });
       }
@@ -720,6 +734,7 @@ export class EnviartimbrePage implements OnInit {
           this.EnviarDatos(timbre);
         } else {
           this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "bottom");
+          return this.router.navigate(['/login']);
 
         }
 
@@ -733,6 +748,9 @@ export class EnviartimbrePage implements OnInit {
         this.GuardartimbresinServidor(timbre);
       } else {
         this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "bottom");
+
+        return this.router.navigate(['/login']);
+
       }
     })
 
