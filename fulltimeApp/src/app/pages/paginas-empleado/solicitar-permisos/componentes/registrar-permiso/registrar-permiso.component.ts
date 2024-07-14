@@ -24,7 +24,7 @@ import { ParametrosService } from 'src/app/services/parametros.service';
 import { CloseModalComponent } from 'src/app/componentes/close-modal/close-modal.component';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { AlertController, IonDatetime, ModalController } from '@ionic/angular';
-
+import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 
 @Component({
   selector: 'app-registrar-permiso',
@@ -115,6 +115,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     public validar: ValidacionesService,
     public modalController: ModalController,
     public alertCrtl: AlertController,
+    private userService: DataUserLoggedService,
+
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('id_empresa')!);
   }
@@ -1060,6 +1062,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     autorizacion.id_vacacion = autorizacion.id_hora_extra = autorizacion.id_plan_hora_extra = null;
     autorizacion.id_permiso = permiso.id;
     autorizacion.id_autoriza_estado = ''
+    autorizacion.user_name = this.userService.username;
+    autorizacion.ip = localStorage.getItem('ip');
 
     this.autorizaciones.postNuevaAutorizacion(autorizacion).subscribe(
       resp => { 

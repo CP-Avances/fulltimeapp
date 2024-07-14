@@ -53,6 +53,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
     public loadingController: LoadingController,
     public modalController: ModalController,
     public parametro: ParametrosService,
+
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('id_empresa'));
   }
@@ -120,14 +121,16 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
       return this.validar.showToast("Seleccione el tipo de Autorización", 2000, 'warning');
     } else {
       this.loadingBtn = true;
-      await this.alimentacion.forEach(a => {
-        a.aprobada = this.estadoChange.id
+      this.alimentacion.forEach(a => {
+        a.aprobada = this.estadoChange.id;
+        a.user_name = this.dataUserServices.username;
+        a.ip = localStorage.getItem('ip');
 
-        var [info] = this.infoEmpleadoRecibe.filter(o => { return o.id_empleado === a.id_empleado });
+        var [info] = this.infoEmpleadoRecibe.filter(o => { return o.id_empleado === a.id_empleado; });
         this.alimentacionService.putEstadoAlimentacion(a).subscribe(
-          alimento => { this.successResponse(a, info) },
-          err => { this.errorResponse(err.error.message) },
-        )
+          alimento => { this.successResponse(a, info); },
+          err => { this.errorResponse(err.error.message); }
+        );
 
       })
 
@@ -294,16 +297,15 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
     //Listado para eliminar el usuario duplicado
     var allNotificacionesAlimentacion = [];
     //Ciclo por cada elemento del listado
-    alimentacion.EmpleadosSendNotiEmail.forEach(function(elemento, indice, array) {
+    alimentacion.EmpleadosSendNotiEmail.forEach(function (elemento, indice, array) {
       // Discriminación de elementos iguales
-      if(allNotificacionesAlimentacion.find(p=>p.empleado == elemento.empleado) == undefined)
-      {
+      if (allNotificacionesAlimentacion.find(p => p.empleado == elemento.empleado) == undefined) {
         // Nueva lista de empleados que reciben la notificacion
         allNotificacionesAlimentacion.push(elemento);
       }
     });
 
-    console.log("Usuarios que reciben la notificacion: ",allNotificacionesAlimentacion);
+    console.log("Usuarios que reciben la notificacion: ", allNotificacionesAlimentacion);
 
     allNotificacionesAlimentacion.forEach(e => {
       mensaje.id_empl_recive = e.empleado;

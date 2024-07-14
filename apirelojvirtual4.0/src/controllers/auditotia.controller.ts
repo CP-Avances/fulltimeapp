@@ -8,7 +8,7 @@ import { Auditoria } from '../interfaces/Auditoria'
 export const InsertarAuditoria = async (data: Auditoria) => {
     try {
         const { tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion } = data;
-        let plataforma = "APLICACION WEB"
+        let plataforma = "APLICACION MOVIL"
         await pool.query(
             `
             INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,

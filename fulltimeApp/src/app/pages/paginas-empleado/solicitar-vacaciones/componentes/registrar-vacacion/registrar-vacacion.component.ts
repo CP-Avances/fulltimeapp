@@ -1,4 +1,4 @@
-import { Component, Input,OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import moment from 'moment';
@@ -19,7 +19,7 @@ import { ParametrosService } from 'src/app/services/parametros.service';
 import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { PermisosService } from 'src/app/services/permisos.service';
 import { AlertController, IonDatetime } from '@ionic/angular';
-
+import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 @Component({
   selector: 'app-registrar-vacacion',
   templateUrl: './registrar-vacacion.component.html',
@@ -35,7 +35,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
   @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
   @ViewChild(IonDatetime) datetimeFinal: IonDatetime;
   @ViewChild(IonDatetime) datetimeIngreso: IonDatetime;
-  
+
   reg: Vacacion = vacacionValueDefault;
   radioButton = estadoBoolean;
   loadingBtn: boolean = false;
@@ -75,6 +75,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     private autorizaciones: AutorizacionesService,
     public parametro: ParametrosService,
     public alertCrtl: AlertController,
+    private userService: DataUserLoggedService,
+
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('id_empresa'));
   }
@@ -88,8 +90,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     this.reg.dia_laborable = undefined;
     this.reg.dia_libre = undefined;
 
-    console.log('peri_vacaciones: ',this.reg.id_periodo_vacacion);
-    console.log('id_empleado_cargo: ',this.reg.id_empleado_cargo);
+    console.log('peri_vacaciones: ', this.reg.id_periodo_vacacion);
+    console.log('id_empleado_cargo: ', this.reg.id_empleado_cargo);
 
     this.obtenerInformacionEmpleado();
     this.BuscarFormatos();
@@ -125,10 +127,10 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
           correo: res.correo,
         }
 
-        if(!(Number.isNaN(this.reg.id_periodo_vacacion))){
+        if (!(Number.isNaN(this.reg.id_periodo_vacacion))) {
           this.ocultar = false;
           this.mensaje = true;
-        }else{
+        } else {
           this.mensaje = false;
         }
 
@@ -145,16 +147,16 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
   }
 
   //METODO VALIDADOR DE DIAS LIBRES
-  DiaIniciolLibre(fecha_ingresada){
+  DiaIniciolLibre(fecha_ingresada) {
 
-    console.log("ver fecha_ingresada",fecha_ingresada);
-    let dia_retur; 
-    if(fecha_ingresada != null && fecha_ingresada != ""){
-      dia_retur = this.validar.validarDiaLaboral_Libre(fecha_ingresada.toString(),this.horarioEmpleado, this.cg_feriados);
-      if(dia_retur == undefined){
+    console.log("ver fecha_ingresada", fecha_ingresada);
+    let dia_retur;
+    if (fecha_ingresada != null && fecha_ingresada != "") {
+      dia_retur = this.validar.validarDiaLaboral_Libre(fecha_ingresada.toString(), this.horarioEmpleado, this.cg_feriados);
+      if (dia_retur == undefined) {
         this.validar.showToast('Ups! No tiene horario para realizar solicitudes', 3500, 'warning');
       }
-      if(dia_retur == 0){
+      if (dia_retur == 0) {
         this.showAlert();
         return dia_retur;
       }
@@ -163,7 +165,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
   }
 
   // Diseno de Mensaje de notificacion con logo 
-  async showAlert(){
+  async showAlert() {
     let alert = await this.alertCrtl.create({
       message: `<div class="card-alert">
                   <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
@@ -178,11 +180,11 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
         }],
       mode: "ios",
       backdropDismiss: false,
-    });await alert.present();
+    }); await alert.present();
   }
 
   // METODO VALIDAR EL INPUT DE DIA INICIAL, FINAL y INGRESO
-  ChangeDiaInicio(e){
+  ChangeDiaInicio(e) {
     this.reg.fecha_final = null;
     this.reg.fecha_ingreso = null;
     this.loadingBtn = false;
@@ -191,55 +193,57 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     this.reg.dia_laborable = null;
     this.reg.dia_libre = null;
 
-    if(!e.target.value){
-      this.reg.fecha_inicio = moment(new Date()).format('YYYY-MM-DD'); 
+    if (!e.target.value) {
+      this.reg.fecha_inicio = moment(new Date()).format('YYYY-MM-DD');
       const hoy = moment(this.reg.fecha_inicio).format("DD/MM/YYYY, HH:mm:ss")
       this.dia_fianl = moment(this.reg.fecha_inicio).format('YYYY-MM-DD');
       console.log("ver id empleado", this.reg.id_empleado)
 
 
       this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
-        horario => { 
+        horario => {
 
           console.log("ver horario", horario)
           this.horarioEmpleado = horario;
 
-          if(this.DiaIniciolLibre(this.reg.fecha_inicio) == 0){
+          if (this.DiaIniciolLibre(this.reg.fecha_inicio) == 0) {
             this.disabled_dia_fianl = true, this.disabled_dia_ingreso = true;
-          }else{
+          } else {
             this.disabled_dia_fianl = false, this.disabled_dia_ingreso = false;
           }
           return this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
         },
-        err => { this.validar.showToast(err.error.message, 3000, 'danger');
+        err => {
+          this.validar.showToast(err.error.message, 3000, 'danger');
           this.reg.fecha_inicio = undefined;
           return this.dia_inicio = '';
         }
       )
 
-    }else{
+    } else {
       this.reg.fecha_inicio = e.target.value;
       this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
       this.datetimeInicio.confirm(true);
-      if(this.reg.fecha_inicio != '' || this.reg.fecha_inicio != null){
-      
+      if (this.reg.fecha_inicio != '' || this.reg.fecha_inicio != null) {
+
         const hoy = moment(this.reg.fecha_inicio).format("DD/MM/YYYY, HH:mm:ss")
 
-        console.log("ver el codigo para ho",this.reg.id_empleado)
+        console.log("ver el codigo para ho", this.reg.id_empleado)
         this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
-          horario => { 
+          horario => {
             this.horarioEmpleado = horario;
             console.log("ver horario", this.horarioEmpleado)
 
-            if(this.DiaIniciolLibre(this.reg.fecha_inicio) == 0){
+            if (this.DiaIniciolLibre(this.reg.fecha_inicio) == 0) {
               return this.disabled_dia_fianl = true, this.disabled_dia_ingreso = true;
-            }else{
+            } else {
               return this.disabled_dia_fianl = false, this.disabled_dia_ingreso = false;
             }
 
           },
-          err => { this.validar.showToast(err.error.message, 3000, 'danger') 
-          return this.dia_inicio = '';  
+          err => {
+            this.validar.showToast(err.error.message, 3000, 'danger')
+            return this.dia_inicio = '';
           }
         )
       }
@@ -247,54 +251,54 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     }
   }
 
-  ChangeDiaFinal(e){
-    if(!e.target.value){
+  ChangeDiaFinal(e) {
+    if (!e.target.value) {
       this.reg.fecha_ingreso = null;
       this.loadingBtn = false;
       this.dia_ingreso = '';
       this.reg.dia_laborable = null;
       this.reg.dia_libre = null;
 
-      if(moment(this.reg.fecha_inicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
+      if (moment(this.reg.fecha_inicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')) {
         this.reg.fecha_final = this.reg.fecha_inicio;
         return this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
-      }else{
+      } else {
         this.reg.fecha_final = null;
         this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
         return this.dia_fianl = null
       }
-    }else{
+    } else {
       this.reg.fecha_ingreso = null;
       this.dia_ingreso = '';
       this.loadingBtn = false;
       this.reg.dia_laborable = null;
       this.reg.dia_libre = null;
       this.reg.fecha_final = e.target.value;
-      this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD'); 
+      this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');
       this.datetimeFinal.confirm(true);
     }
 
-    if(moment(this.reg.fecha_final).format('YYYY-MM-DD') == moment(this.reg.fecha_inicio).format('YYYY-MM-DD')){
+    if (moment(this.reg.fecha_final).format('YYYY-MM-DD') == moment(this.reg.fecha_inicio).format('YYYY-MM-DD')) {
       this.validar.showToast('Las fechas no pueden ser iguales', 3000, "warning");
       return this.disabled_dia_ingreso = true;
     }
     return this.disabled_dia_ingreso = false;
   }
 
-  ChangeDiaIngreso(e){
-    if(!e.target.value){
+  ChangeDiaIngreso(e) {
+    if (!e.target.value) {
       this.reg.dia_laborable = null;
       this.reg.dia_libre = null;
-      if(moment(this.reg.fecha_final).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
+      if (moment(this.reg.fecha_final).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')) {
         this.reg.fecha_ingreso = this.reg.fecha_final;
         this.btnOculto = false;
         return this.dia_ingreso = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
-      }else{
+      } else {
         this.reg.fecha_ingreso = null;
         this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
         return this.dia_ingreso = null
       }
-    }else{
+    } else {
       this.reg.dia_laborable = null;
       this.reg.dia_libre = null;
       this.btnOculto = false;
@@ -305,53 +309,53 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
   }
 
 
-   /* ********************************************************************************** *
-     *                 METODO PARA MOSTRAR EL CALCULO EN LOS INPUTS                   *
-   * ********************************************************************************** */
-   mostrarCalculos(){
+  /* ********************************************************************************** *
+    *                 METODO PARA MOSTRAR EL CALCULO EN LOS INPUTS                   *
+  * ********************************************************************************** */
+  mostrarCalculos() {
     //variables para validar el dia de inicio completo y el dia final completo y buscar duplicidad.
-     let minutosinicio = '00:00:00';
-     let minutosfinal = '23:00:00';
+    let minutosinicio = '00:00:00';
+    let minutosfinal = '23:00:00';
 
-     const fec_inicio = (moment(this.reg.fecha_inicio).format('YYYY-MM-DD'))+' '+ minutosinicio;
-     const fec_final = (moment(this.reg.fecha_final).format('YYYY-MM-DD')) +' '+ minutosfinal;
-     const codigo = parseInt(localStorage.getItem('empleadoID'))
+    const fec_inicio = (moment(this.reg.fecha_inicio).format('YYYY-MM-DD')) + ' ' + minutosinicio;
+    const fec_final = (moment(this.reg.fecha_final).format('YYYY-MM-DD')) + ' ' + minutosfinal;
+    const codigo = parseInt(localStorage.getItem('empleadoID'))
 
     this.permisoService.getlistaPermisosByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
-      if(solicitados.length != 0){
+      if (solicitados.length != 0) {
         this.reg.dia_laborable = null;
         this.reg.dia_libre = null;
         this.validar.showToast('Ups! Ya existe permisos en esas fechas ', 3500, 'warning');
         return this.btnOcultoguardar = true;
       }
-      else{
+      else {
         this.horasExtrasService.getlistaHorasExtrasByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
-          if(solicitados.length != 0){
+          if (solicitados.length != 0) {
             this.reg.dia_laborable = null;
             this.reg.dia_libre = null;
             this.validar.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
             return this.btnOcultoguardar = true;
           }
-          else{
+          else {
             this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
-              if(solicitados.length != 0){
+              if (solicitados.length != 0) {
                 this.reg.dia_laborable = null;
                 this.reg.dia_libre = null;
                 this.validar.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
                 return this.btnOcultoguardar = true;
               }
-              else{
+              else {
                 this.calcularDiasVacaciones();
                 return this.btnOcultoguardar = false;
               }
             }, err => {
               this.validar.showToast('Lo sentimos tenemos inconvenientes con el servidor', 3500, 'warning');
-            }); 
+            });
 
           }
         }, err => {
           this.validar.showToast('Lo sentimos tenemos inconvenientes con el servidor', 3500, 'warning');
-        }); 
+        });
       }
     }, err => {
       this.validar.showToast('Lo sentimos tenemos inconvenientes con el servidor', 3500, 'warning');
@@ -394,7 +398,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     this.subscripted = this.vacacionService.postNuevoVacacion(this.reg).subscribe(
       vacacion => {
 
-        vacacion.EmpleadosSendNotiEmail=[];
+        vacacion.EmpleadosSendNotiEmail = [];
         vacacion.EmpleadosSendNotiEmail.push(this.solInfo);
         this.CrearNuevaAutorizacion(vacacion);
         this.CrearNuevaNotificacion(vacacion);
@@ -416,7 +420,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     autorizacion.id_permiso = autorizacion.id_hora_extra = autorizacion.id_plan_hora_extra = null;
     autorizacion.id_vacacion = vacacion.id;
     autorizacion.id_autoriza_estado = ''
-
+    autorizacion.user_name = this.userService.username;
+    autorizacion.ip = localStorage.getItem('ip');
     this.autorizaciones.postNuevaAutorizacion(autorizacion).subscribe(
       resp => { //this.validar.showToast(resp.message, 3000, 'success') 
       },
@@ -440,14 +445,13 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     noti.tipo = 1;
     noti.mensaje = 'Ha realizado una solicitud de vacaciones desde ' +
       desde + ' hasta ' + hasta;
-    
+
     //Listado para eliminar el usuario duplicado
     var allNotificaciones = [];
     //Ciclo por cada elemento del listado
-    vacacion.EmpleadosSendNotiEmail.forEach(function(elemento, indice, array) {
+    vacacion.EmpleadosSendNotiEmail.forEach(function (elemento, indice, array) {
       // Discriminación de elementos iguales
-      if(allNotificaciones.find(p=>p.empleado == elemento.empleado) == undefined)
-      {
+      if (allNotificaciones.find(p => p.empleado == elemento.empleado) == undefined) {
         // Nueva lista de empleados que reciben la notificacion
         allNotificaciones.push(elemento);
       }
@@ -543,7 +547,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     }
   }
 
-  ionViewWillLeave(){
+  ionViewWillLeave() {
     console.log('Sali de Vacaciones');
     this.reg.fecha_inicio = null;
     this.reg.fecha_final = null;

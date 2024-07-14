@@ -15,6 +15,7 @@ import { PermisosService } from 'src/app/services/permisos.service';
 
 import { CloseModalComponent } from 'src/app/componentes/close-modal/close-modal.component';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
+import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 
 @Component({
   selector: 'app-registrar-hora-extra',
@@ -60,6 +61,8 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     private autorizaciones: AutorizacionesService,
     public parametro: ParametrosService,
     private permisoService: PermisosService,
+    private userService: DataUserLoggedService,
+
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('id_empresa'));
   }
@@ -387,7 +390,10 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     autorizacion.id_departamento = parseInt(localStorage.getItem('cdepar'));
     autorizacion.id_vacacion = autorizacion.id_permiso = autorizacion.id_plan_hora_extra = null;
     autorizacion.id_hora_extra = horaExtra.id;
-    autorizacion.id_autoriza_estado = ''
+    autorizacion.id_autoriza_estado = '';
+    autorizacion.user_name = this.userService.username;
+    autorizacion.ip = localStorage.getItem('ip');
+    
 
     this.autorizaciones.postNuevaAutorizacion(autorizacion).subscribe(
       resp => { //this.validar.showToast(resp.message, 3000, 'success') 

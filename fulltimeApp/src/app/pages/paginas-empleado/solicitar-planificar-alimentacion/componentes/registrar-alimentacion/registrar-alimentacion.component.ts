@@ -11,6 +11,7 @@ import { Alimentacion, alimentacionValueDefault } from 'src/app/interfaces/Alime
 import { CloseModalComponent } from 'src/app/componentes/close-modal/close-modal.component';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { IonDatetime } from '@ionic/angular'
+import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 
 import moment from 'moment';
 import { ParametrosService } from 'src/app/services/parametros.service';
@@ -73,6 +74,8 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
     private catalogos: CatalogosService,
     private notifica: NotificacionesService,
     public parametro: ParametrosService,
+    private userService: DataUserLoggedService,
+
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('id_empresa'));
   }
@@ -84,6 +87,8 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
     this.catalogos.getMenuServicios();
     this.reg.fecha = this.tiempo.format('YYYY-MM-DD');
     this.reg.id_empleado = localStorage.getItem('empleadoID');
+    this.reg.user_name = this.userService.username;
+    this.reg.ip = localStorage.getItem('ip');
     this.fec_actual = new Date();
     this.fec_actual_formato = moment(this.fec_actual).format('YYYY-MM-DD');
     this.obtenerInformacionEmpleado();

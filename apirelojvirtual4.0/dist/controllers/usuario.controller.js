@@ -49,6 +49,11 @@ const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.getUserById = getUserById;
 const loginUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var requestIp = require('request-ip');
+    var clientIp = requestIp.getClientIp(req);
+    if (clientIp != null && clientIp != '' && clientIp != undefined) {
+        var ip_cliente = clientIp.split(':')[3];
+    }
     try {
         let caducidad_licencia = new Date();
         const { usuario, contrasena } = req.body;
@@ -59,6 +64,7 @@ const loginUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             'u.estado as estado, u.id_rol, u.id_empleado, u.app_habilita, frase ' +
             'FROM eu_usuarios as u inner join eu_empleados as e on u.id_empleado = e.id WHERE usuario = $1;', [usuario]);
         const usuarios = response.rows;
+        usuarios[0].ip = ip_cliente;
         if (usuarios.length === 0)
             return res.status(401).jsonp({
                 message: 'No existe el usuario ingresado'

@@ -9,4 +9,6 @@ export interface Autorizacion {
     id_autoriza_estado: string;
     id_plan_hora_extra: number | null;
     ndepartamento?: string;
+    ip:string
+    user_name: string
 }

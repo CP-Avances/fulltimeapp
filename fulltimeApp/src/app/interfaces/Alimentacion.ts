@@ -26,6 +26,8 @@ export interface Alimentacion {
     fec_comida_: string;
     hora_inicio_: string;
     hora_fin_: string;
+    user_name: string;
+    ip: string;
 }
 
 export const alimentacionValueDefault = {
@@ -53,4 +55,6 @@ export const alimentacionValueDefault = {
     fec_comida_: null,
     hora_inicio_: null,
     hora_fin_: null,
+    user_name: null,
+    ip: null
 }

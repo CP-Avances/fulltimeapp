@@ -150,6 +150,8 @@ export class LoginPage implements OnInit {
                     localStorage.setItem('rol', String(this.usuarioObtenido.id_rol));
                     localStorage.setItem('UCedula', this.usuarioObtenido.cedula);
                     localStorage.setItem('username', this.usuarioObtenido.usuario);
+                    localStorage.setItem('ip', this.usuarioObtenido.ip);
+
                     localStorage.setItem('codigo', this.usuarioObtenido.codigo);
                     localStorage.setItem('empleadoID', res.body.usuario.id_registro_empleado);
                     localStorage.setItem('id_empresa', res.body.empresa.id_empresa);
@@ -200,6 +202,8 @@ export class LoginPage implements OnInit {
                       localStorage.setItem('config_noti', JSON.stringify(res.body.config_noti));
                       localStorage.setItem('app_info', JSON.stringify(res.body.app));
                       localStorage.setItem('vacuna_info', JSON.stringify(res.body.vacuna));
+                      localStorage.setItem('ip', this.usuarioObtenido.ip);
+  
                       //console.log(res.body.usuario);
                       //console.log(res.body.vacuna);
                       //console.log(res.body.empresa);

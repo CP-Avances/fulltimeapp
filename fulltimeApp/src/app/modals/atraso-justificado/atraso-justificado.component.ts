@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { ModalController, IonDatetime } from '@ionic/angular';
 import { TimbresService } from '../../services/timbres.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
+import { DataUserLoggedService } from 'src/app/services/data-user-logged.service'; 
 import moment from 'moment';
 
 @Component({
@@ -24,7 +25,9 @@ export class AtrasoJustificadoComponent  implements OnInit {
   constructor(
     public modalController: ModalController,
     public timbreservice: TimbresService,
-    private validacion: ValidacionesService
+    private validacion: ValidacionesService,
+    private dataUserServices: DataUserLoggedService,
+
   ) { }
 
   ngOnInit(){
@@ -61,7 +64,9 @@ export class AtrasoJustificadoComponent  implements OnInit {
       fec_justifica: this.fec_justifica,
       codigo: this.data.id,
       create_time: this.time,
-      codigo_create_user: localStorage.getItem('empleadoID')
+      codigo_create_user: localStorage.getItem('empleadoID'),
+      user_name : this.dataUserServices.username,
+      ip : localStorage.getItem('ip')
     }
 
     console.log("Descripción: ",this.descripcion);

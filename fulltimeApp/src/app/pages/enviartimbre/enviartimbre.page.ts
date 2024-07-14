@@ -4,6 +4,8 @@ import { Platform, PopoverController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
+import { DataUserLoggedService } from '../../services/data-user-logged.service';
+
 
 import { FingerprintAIO } from '@ionic-native/fingerprint-aio';
 import { Geolocation } from '@capacitor/geolocation';
@@ -47,6 +49,8 @@ export class EnviartimbrePage implements OnInit {
     private restE: EmpleadosService,
     public parametros: ParametrosService,
     private router: Router,
+    private userService: DataUserLoggedService,
+
   ) { }
 
   ngOnInit() {
@@ -80,7 +84,9 @@ export class EnviartimbrePage implements OnInit {
     longitud: "",
     id_reloj: 97,
     ubicacion: "",
-    id_empleado: ""
+    id_empleado: "",
+    ip:"",
+    user_name: ""
   };
 
   pipe = new DatePipe('en-US');
@@ -410,6 +416,10 @@ export class EnviartimbrePage implements OnInit {
     this.nuevoTimbre.fecha_hora_timbre = this.fechaTransformada + " " + this.horaTransformada;
 
     this.nuevoTimbre.tecla_funcion = this.obtenerIdTipo();
+    this.nuevoTimbre.user_name= this.userService.username;
+    this.nuevoTimbre.ip = localStorage.getItem('ip');
+
+    console.log("ver usuario e IP",  this.nuevoTimbre.user_name,  this.nuevoTimbre.ip )
 
     if (this.nuevoTimbre.accion === "HA" && this.nuevoTimbre.observacion === null) return this.abrirToas('Lo siento! Debes ingresar una observación antes de enviar un timbre abierto 😅', "danger", 5000, "bottom");
     if (this.nuevoTimbre.accion === "HA" && this.nuevoTimbre.observacion === "") return this.abrirToas('Lo siento! Debes ingresar una observación antes de enviar un timbre abierto 😅', "danger", 5000, "bottom");

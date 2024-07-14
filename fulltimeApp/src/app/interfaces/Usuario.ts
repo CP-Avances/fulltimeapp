@@ -29,6 +29,7 @@ export interface Usuario {
     latitud?: string
     id_celular?: boolean
     id_celulardb?: boolean
+    ip?: string
 }
 
 export const UsuarioValueDefault = {
@@ -61,7 +62,8 @@ export const UsuarioValueDefault = {
     longitud: '',
     latitud: '',
     id_celular: false,
-    id_celulardb: false
+    id_celulardb: false,
+    ip:''
 }
 
 export interface Empleado {

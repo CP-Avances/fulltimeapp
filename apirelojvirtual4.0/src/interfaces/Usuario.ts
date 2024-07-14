@@ -29,6 +29,7 @@ export interface Usuario {
     longitud:string,
     latitud:string,
     id_celulardb: boolean
+    ip:string
 }
 
 

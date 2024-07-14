@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -11,6 +34,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BuscarJefes = exports.updateEstadoSolicitudes = exports.updateAutorizacion = exports.postAutorizacion = exports.ObtenerListaAutorizaDepa = exports.EncontrarAutorizacionUsuario = exports.getAutorizacion = void 0;
 const database_1 = require("../database");
+const AUDITORIA_CONTROLADOR = __importStar(require("../controllers/auditotia.controller"));
 /**
  * Obtener registro de la tabla de Autorizaciones
  * @returns
@@ -102,8 +126,22 @@ exports.ObtenerListaAutorizaDepa = ObtenerListaAutorizaDepa;
  */
 const postAutorizacion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_autoriza_estado, id_plan_hora_extra } = req.body;
+        const { orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_autoriza_estado, id_plan_hora_extra, user_name, ip } = req.body;
+        // INICIAR TRANSACCION
+        yield database_1.pool.query('BEGIN');
         const response = yield database_1.pool.query('INSERT INTO ecm_autorizaciones( orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_autoriza_estado, id_plan_hora_extra ) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING * ', [orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_autoriza_estado, id_plan_hora_extra]);
+        // AUDITORIA
+        yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ecm_autorizaciones',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: `{id: , orden: ${orden}, estado: ${estado}, id_departamento : ${id_departamento} , id_permiso: ${id_permiso}, id_vacacion: ${id_vacacion}, id_hora_extra: ${id_hora_extra}, id_autoriza_estado: ${id_autoriza_estado}, id_plan_hora_extra: ${id_plan_hora_extra}} `,
+            ip: ip,
+            observacion: null
+        });
+        // FINALIZAR TRANSACCION
+        yield database_1.pool.query('COMMIT');
         const [autorizacion] = response.rows;
         if (!autorizacion)
             return res.status(400).jsonp({ message: 'No se creo autorización' });
@@ -122,14 +160,43 @@ exports.postAutorizacion = postAutorizacion;
 const updateAutorizacion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id_auto, campo } = req.query;
-        const { estado, id_autoriza_estado } = req.body;
+        const { estado, id_autoriza_estado, id_permiso, user_name, ip } = req.body;
         console.log('id_auto: ', id_auto);
         console.log('campo: ', campo);
         console.log('id_auto: ', estado);
         console.log('id_autoriza_estado: ', id_autoriza_estado);
+        // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REGISTRAR AUDITORIA
+        const responseSelect = yield database_1.pool.query('SELECT * FROM ecm_autorizaciones WHERE id_permiso = $1', [id_permiso]);
+        const [datos] = responseSelect.rows;
+        if (!datos) {
+            yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'ecm_autorizaciones',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: '',
+                datosNuevos: `estado: ${estado}, id_autoriza_estado: ${id_autoriza_estado}`,
+                ip: ip,
+                observacion: `Error al actualizar el registro de autorizaciones con id_permiso: ${id_permiso}`
+            });
+            // FINALIZAR TRANSACCION
+            yield database_1.pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado' });
+        }
         const query = `UPDATE ecm_autorizaciones SET estado = ${estado} , id_autoriza_estado = \'${id_autoriza_estado}\' WHERE ${campo} = ${id_auto} RETURNING *`;
         const response = yield database_1.pool.query(query);
         const [autorizacion] = response.rows;
+        // REGISTRAR AUDITORIA
+        yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ecm_autorizaciones',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: `estado: ${datos.estado}, id_autoriza_estado: ${datos.id_autoriza_estado}`,
+            datosNuevos: `estado: ${estado}, id_autoriza_estado: ${id_autoriza_estado}`,
+            ip: ip,
+            observacion: null
+        });
+        // FINALIZAR TRANSACCION
+        yield database_1.pool.query('COMMIT');
         if (!autorizacion)
             return res.status(400).jsonp({ message: 'No hay autorización' });
         return res.status(200).jsonp(autorizacion);
@@ -147,10 +214,40 @@ exports.updateAutorizacion = updateAutorizacion;
 const updateEstadoSolicitudes = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { nameTable } = req.query;
-        const { estado, id_solicitud } = req.body;
+        const { estado, id_solicitud, user_name, ip } = req.body;
+        yield database_1.pool.query('BEGIN');
+        // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REGISTRAR AUDITORIA
+        const responseSelect = yield database_1.pool.query(`SELECT * FROM ${nameTable} WHERE id = $1`, [id_solicitud]);
+        const [datos] = responseSelect.rows;
+        if (!datos) {
+            yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: `nameTable`,
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: '',
+                datosNuevos: '',
+                ip: ip,
+                observacion: `Error al actualizar el registro de ${nameTable} con id: ${id_solicitud}`
+            });
+            // FINALIZAR TRANSACCION
+            yield database_1.pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado' });
+        }
         const query = `UPDATE ${nameTable} SET estado = ${estado} WHERE id = ${id_solicitud} RETURNING * `;
         const response = yield database_1.pool.query(query);
         const [solicitud] = response.rows;
+        // AUDITORIA
+        yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'nameTable',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: JSON.stringify(datos),
+            datosNuevos: JSON.stringify(solicitud),
+            ip: ip,
+            observacion: null
+        });
+        // FINALIZAR TRANSACCION
+        yield database_1.pool.query('COMMIT');
         if (!solicitud)
             return res.status(400).jsonp({ message: 'No se actualizo la solicitud' });
         return res.status(200).jsonp({ message: 'Solicitud actualizada' });

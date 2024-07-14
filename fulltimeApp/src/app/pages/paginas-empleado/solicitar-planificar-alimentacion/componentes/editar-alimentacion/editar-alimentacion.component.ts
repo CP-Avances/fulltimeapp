@@ -15,6 +15,8 @@ import { Alimentacion } from 'src/app/interfaces/Alimentacion';
 import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
+import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
+
 
 @Component({
   selector: 'app-editar-alimentacion',
@@ -78,6 +80,8 @@ export class EditarAlimentacionComponent implements OnInit {
     private notifica: NotificacionesService,
     public modalController: ModalController,
     public parametro: ParametrosService,
+    private userService: DataUserLoggedService,
+
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('id_empresa'));
   }
@@ -264,7 +268,8 @@ export class EditarAlimentacionComponent implements OnInit {
     console.log('PASO VALIDACIONES DE FECHAS Y HORAS');
     this.reg.hora_inicio = this.validar.TiempoFormatoHHMMSS(this.reg.hora_inicio);
     this.reg.hora_fin = this.validar.TiempoFormatoHHMMSS(this.reg.hora_fin);
-
+    this.reg.user_name = this.userService.username;
+    this.reg.ip = localStorage.getItem('ip');
     this.subscripted = this.alimentacionService.putAlimentacion(this.reg).subscribe(
       resp => {
         this.NotificarEdicionComida(resp);

@@ -67,6 +67,9 @@ export class TimbreJustificadoComponent  implements OnInit {
       longitud: null,
       codigo: this.data.codigo,
       id_reloj: 97,
+      id: this.data.id,
+      user_name : this.dataUserService.username,
+      ip : localStorage.getItem('ip')
     }
 
     this.timbresService.PostTimbreWebAdmin(dataTimbre).subscribe(res => {

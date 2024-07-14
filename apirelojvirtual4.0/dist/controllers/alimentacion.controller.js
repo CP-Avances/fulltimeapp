@@ -248,10 +248,43 @@ exports.putAlimentacion = putAlimentacion;
  */
 const putEstadoAlimentacion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id, id_empleado, aprobada } = req.body;
+        const { id, id_empleado, aprobada, user_name, ip } = req.body;
+        // INICIAR TRANSACCION
+        yield database_1.pool.query('BEGIN');
+        // CONSULTAR DATOSORIGINALES
+        const planComida = yield database_1.pool.query('SELECT * FROM ma_solicitud_comida WHERE id = $1', [id]);
+        const [datosOriginales] = planComida.rows;
+        if (!datosOriginales) {
+            yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'ma_solicitud_comida',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: '',
+                datosNuevos: '',
+                ip,
+                observacion: `Error al actualizar solicitud de comidas con id: ${id}. Registro no encontrado`
+            });
+            // FINALIZAR TRANSACCION
+            yield database_1.pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado' });
+        }
         const response = yield database_1.pool.query(`
             UPDATE ma_solicitud_comida SET aprobada = $2 WHERE id = $1 RETURNING id`, [id, aprobada]);
         const [objetoAlimentacion] = response.rows;
+        var fechaO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha, 'ddd');
+        var fechaComidaO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_comida, 'ddd');
+        var horaInicioO = yield (0, metodos_1.FormatearHora)(datosOriginales.hora_inicio);
+        var horaFinO = yield (0, metodos_1.FormatearHora)(datosOriginales.hora_fin);
+        // AUDITORIA
+        yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ma_solicitud_comida',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_detalle_comida: ${datosOriginales.id_detalle_comida}, fecha: ${fechaO}, fecha_comida: ${fechaComidaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${datosOriginales.observacion}, extra: ${datosOriginales.extra}, verificar: ${datosOriginales.verificar}, aprobada: ${datosOriginales.aprobada}} `,
+            datosNuevos: `{id_empleado: ${id_empleado}, id_detalle_comida: ${datosOriginales.id_detalle_comida}, fecha: ${fechaO}, fecha_comida: ${fechaComidaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${datosOriginales.observacion}, extra: ${datosOriginales.extra}, verificar: ${datosOriginales.verificar}, aprobada: ${aprobada}}} `,
+            ip,
+            observacion: null
+        });
         if (objetoAlimentacion) {
             return res.status(200).jsonp(objetoAlimentacion);
         }

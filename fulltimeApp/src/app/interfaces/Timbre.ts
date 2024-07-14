@@ -23,6 +23,10 @@ export interface Timbre {
     id_empleado?: string
 
     num?: number,
+
+    ip?:string
+    user_name?: string
+    
 }
 
 

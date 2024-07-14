@@ -8,6 +8,7 @@ import { DatePipe } from '@angular/common';
 import { debounceTime, filter } from 'rxjs/operators';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
+import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 
 @Component({
   template: `
@@ -133,6 +134,8 @@ export class TimbresPerdidosComponent implements OnInit {
     private toastController: ToastController,
     private restP: ParametrosService,
     private restE: EmpleadosService,
+    private dataUserServices: DataUserLoggedService,
+
   ) { }
 
   ngOnInit() {
@@ -334,6 +337,9 @@ export class TimbresPerdidosComponent implements OnInit {
     timbre.latitud = latitud+"";
     timbre.longitud = longitud+"";
     timbre.novedades_conexion = "Fallo conexion al servidor";
+    timbre.user_name = this.dataUserServices.username,
+    timbre.ip = localStorage.getItem('ip')
+    
     this.relojService.enviarTimbreSinConexion(timbre).subscribe(
       res => {},
       err => { 

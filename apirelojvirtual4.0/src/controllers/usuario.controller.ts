@@ -42,9 +42,15 @@ export const getUserById = async (req: Request, res: Response): Promise<Response
 };
 
 export const loginUsuario = async (req: Request, res: Response) => {
+    var requestIp = require('request-ip');
+    var clientIp = requestIp.getClientIp(req);
+    if (clientIp != null && clientIp != '' && clientIp != undefined) {
+        var ip_cliente = clientIp.split(':')[3];
+    }
+
     try {
         let caducidad_licencia: Date = new Date();
-        const { usuario, contrasena} = req.body;
+        const { usuario, contrasena } = req.body;
 
         const response = await pool.query('SELECT e.id AS id_registro_empleado, e.codigo as idEmpleado, ' +
             'e.cedula, e.apellido, e.nombre, e.estado_civil, e.genero, e.correo, e.fecha_nacimiento, ' +
@@ -55,6 +61,8 @@ export const loginUsuario = async (req: Request, res: Response) => {
             [usuario]);
 
         const usuarios: Usuario[] = response.rows;
+
+        usuarios[0].ip= ip_cliente;
 
         if (usuarios.length === 0) return res.status(401).jsonp({ // NO EXISTE USUARIO CON ESE NOMBRE.
             message: 'No existe el usuario ingresado'
@@ -102,7 +110,7 @@ export const loginUsuario = async (req: Request, res: Response) => {
                 return o
             })
             console.log(ok_licencias);
-            if (ok_licencias.length === 0) return res.status(404).jsonp({ 
+            if (ok_licencias.length === 0) return res.status(404).jsonp({
                 message: 'La licencia no existe, consulte a soporte técnico'
             });
 
@@ -130,36 +138,36 @@ export const loginUsuario = async (req: Request, res: Response) => {
                         _id: usuarios[0].usuario, _idEmpresa: id_empresa,
                         _licencia: public_key, _acciones_timbres: acciones_timbres
                     },
-                    process.env.TOKEN_SECRETO || "masSeguridad")
+                        process.env.TOKEN_SECRETO || "masSeguridad")
                     usuarios[0].contrasena = '';
                     const [config_noti] = await pool.query('SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1',
-                    [id_registro_empleado]).then(result => { return result.rows })
-        
+                        [id_registro_empleado]).then(result => { return result.rows })
+
                     // CONSULTA DE VACUNA
                     const [vacuna] = await pool.query(
-                    `
+                        `
                     SELECT ev.id, ev.id_usuario, ev.id_vacuna, ev.carnet, ev.descripcion, ev.fecha, 
                     tv.nombre, ev.descripcion
                     FROM eu_empleado_vacunas AS ev, e_cat_vacuna AS tv 
                     WHERE ev.id_vacuna = tv.id AND ev.id_usuario = $1
                     ORDER BY ev.id DESC LIMIT 1
                     `,
-                    [id_registro_empleado]).then(result => { return result.rows })
+                        [id_registro_empleado]).then(result => { return result.rows })
                     //const vacuna = 'undefined'
                     return res.status(200).jsonp({
                         message: 'Ingreso exitoso',
                         body: {
-                                autorizacion: token,
-                                usuario: usuarios[0],
-                                empresa: data_empresa,
-                                config_noti,
-                                app: {
-                                    caducidad_licencia,
-                                    version: '4.0.0'
-                                },
-                                vacuna: vacuna
-                            }
-                        })
+                            autorizacion: token,
+                            usuario: usuarios[0],
+                            empresa: data_empresa,
+                            config_noti,
+                            app: {
+                                caducidad_licencia,
+                                version: '4.0.0'
+                            },
+                            vacuna: vacuna
+                        }
+                    })
 
                 } else {
                     delete usuarios[0]
@@ -232,14 +240,14 @@ export const ingresarIDdispositivo = async (req: Request, res: Response) => {
     try {
         const { id_empleado, id_celular, modelo_dispositivo } = req.body;
         const [Response] = await pool.query(
-            'INSERT INTO mrv_dispositivos(id_empleado, id_dispositivo, modelo_dispositivo)' + 
+            'INSERT INTO mrv_dispositivos(id_empleado, id_dispositivo, modelo_dispositivo)' +
             'VALUES ($1, $2, $3) RETURNING *',
             [id_empleado, id_celular, modelo_dispositivo]
         ).then(res => {
             return res.rows;
         });
 
-        if(!Response) return res.status(400).jsonp({message: "El dispositivo no se Registro"});
+        if (!Response) return res.status(400).jsonp({ message: "El dispositivo no se Registro" });
 
         return res.status(200).jsonp({
             body: {
@@ -282,13 +290,13 @@ export const ObtenerDepartamentoUsuarios = async (req: Request, res: Response): 
             INNER JOIN ed_departamentos ON e.id_departamento = ed_departamentos.id 
             WHERE id_contrato = $1
             `
-            ,[id_empleado]);
+            , [id_empleado]);
 
-        if (EMPLEADO.rowCount > 0){
+        if (EMPLEADO.rowCount > 0) {
             return res.status(200).jsonp(EMPLEADO.rows);
-        }else{
+        } else {
             return res.status(404).jsonp({ text: 'Registros no encontrados' });
-        } 
+        }
     } catch (error) {
         console.log(error);
         return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });

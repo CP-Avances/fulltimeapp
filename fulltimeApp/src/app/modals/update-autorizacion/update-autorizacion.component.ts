@@ -21,7 +21,7 @@ import { PermisosService } from 'src/app/services/permisos.service';
 import { VacacionesService } from 'src/app/services/vacaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
-
+import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 
 
 @Component({
@@ -74,6 +74,8 @@ export class UpdateAutorizacionComponent implements OnInit {
     public restGeneral: EmpleadosService,
     public horario: EmpleadosService,
     public alertCrtl: AlertController,
+    private userService: DataUserLoggedService,
+
 
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('id_empresa'));
@@ -486,6 +488,8 @@ export class UpdateAutorizacionComponent implements OnInit {
       id_hora_extra: null,
       id_autoriza_estado: data.id_autoriza_estado,
       id_plan_hora_extra: null,
+      user_name: null,
+      ip:null
     }
 
     if(solicitud === 'permiso'){
@@ -501,6 +505,9 @@ export class UpdateAutorizacionComponent implements OnInit {
       newAutorizaciones.id_vacacion = null,
       newAutorizaciones.id_hora_extra = this.hora_extra.id;
     }
+    newAutorizaciones.user_name = this.userService.username;
+    newAutorizaciones.ip = localStorage.getItem('ip');
+    
 
     this.autoService.postNuevaAutorizacion(newAutorizaciones).subscribe(autorizacion => {
       this.successResponse(autorizacion, solicitud, this.autorizacion.estado);

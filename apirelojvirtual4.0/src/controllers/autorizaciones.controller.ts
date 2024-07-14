@@ -3,6 +3,7 @@ import { pool } from '../database';
 import { QueryResult } from 'pg';
 import { Autorizacion } from '../interfaces/Autorizaciones';
 import { Permiso } from '../interfaces/Permisos';
+import * as AUDITORIA_CONTROLADOR from '../controllers/auditotia.controller';
 
 /**
  * Obtener registro de la tabla de Autorizaciones
@@ -29,9 +30,9 @@ export const getAutorizacion = async (req: Request, res: Response): Promise<Resp
  * Buscar registro si el usuario esta configurado en uno o varios departamentos para preautorizar o autorizar
  * @returns 
  */
-export const EncontrarAutorizacionUsuario = async (req: Request, res:Response): Promise<Response> => {
-    const {id_empleado} = req.params;
-    console.log('id_empleado: ',id_empleado);
+export const EncontrarAutorizacionUsuario = async (req: Request, res: Response): Promise<Response> => {
+    const { id_empleado } = req.params;
+    console.log('id_empleado: ', id_empleado);
     const AUTORIZA = await pool.query(
         `
         SELECT cd.id AS id_depa_confi, n.id_departamento, n.departamento AS depa_autoriza, n.nivel, da.estado, da.autorizar, da.preautorizar, 
@@ -46,11 +47,11 @@ export const EncontrarAutorizacionUsuario = async (req: Request, res:Response): 
             AND e.id_cargo = da.id_empleado_cargo
             AND n.id_departamento_nivel = cd.id
         `
-        ,[id_empleado]);
-    if((AUTORIZA.rowCount > 0)){
+        , [id_empleado]);
+    if ((AUTORIZA.rowCount > 0)) {
         return res.jsonp(AUTORIZA.rows);
-    }else{
-        return res.status(404).jsonp({text: 'No se encuentra registros'});
+    } else {
+        return res.status(404).jsonp({ text: 'No se encuentra registros' });
     }
 };
 
@@ -59,7 +60,7 @@ export const EncontrarAutorizacionUsuario = async (req: Request, res:Response): 
  * @returns 
  */
 export const ObtenerListaAutorizaDepa = async (req: Request, res: Response): Promise<Response> => {
-    try{
+    try {
         const { id_depar } = req.params;
         const EMPLEADOS = await pool.query(
             `
@@ -78,15 +79,15 @@ export const ObtenerListaAutorizaDepa = async (req: Request, res: Response): Pro
                 AND s.id = n.id_sucursal 
             ORDER BY nivel ASC
             `
-            ,[id_depar]);
-        
-        if(EMPLEADOS.rowCount > 0){
+            , [id_depar]);
+
+        if (EMPLEADOS.rowCount > 0) {
             return res.jsonp(EMPLEADOS.rows);
-        }else{
-            return res.status(404).jsonp({message: 'Registros no encontrados'})
+        } else {
+            return res.status(404).jsonp({ message: 'Registros no encontrados' })
         }
 
-    }catch (error){
+    } catch (error) {
         console.log(error);
         return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
@@ -99,12 +100,26 @@ export const ObtenerListaAutorizaDepa = async (req: Request, res: Response): Pro
  */
 export const postAutorizacion = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const { orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_autoriza_estado, id_plan_hora_extra } = req.body;
-
+        const { orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_autoriza_estado, id_plan_hora_extra, user_name, ip } = req.body;
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
         const response: QueryResult = await pool.query('INSERT INTO ecm_autorizaciones( orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_autoriza_estado, id_plan_hora_extra ) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING * ', [orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra, id_autoriza_estado, id_plan_hora_extra]);
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ecm_autorizaciones',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: `{id: , orden: ${orden}, estado: ${estado}, id_departamento : ${id_departamento} , id_permiso: ${id_permiso}, id_vacacion: ${id_vacacion}, id_hora_extra: ${id_hora_extra}, id_autoriza_estado: ${id_autoriza_estado}, id_plan_hora_extra: ${id_plan_hora_extra}} `,
+            ip: ip,
+            observacion: null
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
         const [autorizacion]: Autorizacion[] = response.rows;
         if (!autorizacion) return res.status(400).jsonp({ message: 'No se creo autorización' });
-        return res.status(200).jsonp({ message: 'Autorización creada', autorizacion: autorizacion});
+        return res.status(200).jsonp({ message: 'Autorización creada', autorizacion: autorizacion });
     } catch (error) {
         console.log(error);
         return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
@@ -118,17 +133,49 @@ export const postAutorizacion = async (req: Request, res: Response): Promise<Res
 export const updateAutorizacion = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { id_auto, campo } = req.query;
-        const { estado, id_autoriza_estado } = req.body;
+        const { estado, id_autoriza_estado, id_permiso, user_name, ip } = req.body;
 
-        console.log('id_auto: ',id_auto);
-        console.log('campo: ',campo);
-        console.log('id_auto: ',estado);
-        console.log('id_autoriza_estado: ',id_autoriza_estado);
+        console.log('id_auto: ', id_auto);
+        console.log('campo: ', campo);
+        console.log('id_auto: ', estado);
+        console.log('id_autoriza_estado: ', id_autoriza_estado);
 
+
+        // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REGISTRAR AUDITORIA
+        const responseSelect = await pool.query('SELECT * FROM ecm_autorizaciones WHERE id_permiso = $1', [id_permiso]);
+        const [datos] = responseSelect.rows;
+        if (!datos) {
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'ecm_autorizaciones',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: '',
+                datosNuevos: `estado: ${estado}, id_autoriza_estado: ${id_autoriza_estado}`,
+                ip: ip,
+                observacion: `Error al actualizar el registro de autorizaciones con id_permiso: ${id_permiso}`
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado' });
+        }
         const query = `UPDATE ecm_autorizaciones SET estado = ${estado} , id_autoriza_estado = \'${id_autoriza_estado}\' WHERE ${campo} = ${id_auto} RETURNING *`;
 
         const response: QueryResult = await pool.query(query);
         const [autorizacion]: Autorizacion[] = response.rows;
+
+        // REGISTRAR AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ecm_autorizaciones',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: `estado: ${datos.estado}, id_autoriza_estado: ${datos.id_autoriza_estado}`,
+            datosNuevos: `estado: ${estado}, id_autoriza_estado: ${id_autoriza_estado}`,
+            ip: ip,
+            observacion: null
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
         if (!autorizacion) return res.status(400).jsonp({ message: 'No hay autorización' });
 
         return res.status(200).jsonp(autorizacion);
@@ -146,12 +193,46 @@ export const updateAutorizacion = async (req: Request, res: Response): Promise<R
 export const updateEstadoSolicitudes = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { nameTable } = req.query;
-        const { estado, id_solicitud } = req.body;
+        const { estado, id_solicitud, user_name, ip } = req.body;
+        await pool.query('BEGIN');
+        // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REGISTRAR AUDITORIA
+        const responseSelect = await pool.query(`SELECT * FROM ${nameTable} WHERE id = $1`, [id_solicitud]);
+        const [datos] = responseSelect.rows;
+
+        if (!datos) {
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: `nameTable`,
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: '',
+                datosNuevos: '',
+                ip: ip,
+                observacion: `Error al actualizar el registro de ${nameTable} con id: ${id_solicitud}`
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado' });
+        }
+
+
 
         const query = `UPDATE ${nameTable} SET estado = ${estado} WHERE id = ${id_solicitud} RETURNING * `;
 
         const response: QueryResult = await pool.query(query);
         const [solicitud]: any[] = response.rows;
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'nameTable',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: JSON.stringify(datos),
+            datosNuevos: JSON.stringify(solicitud),
+            ip: ip,
+            observacion: null
+        });
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
         if (!solicitud) return res.status(400).jsonp({ message: 'No se actualizo la solicitud' });
 
         return res.status(200).jsonp({ message: 'Solicitud actualizada' });

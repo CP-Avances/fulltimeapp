@@ -15,7 +15,7 @@ const database_1 = require("../database");
 const InsertarAuditoria = (data) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion } = data;
-        let plataforma = "APLICACION WEB";
+        let plataforma = "APLICACION MOVIL";
         yield database_1.pool.query(`
             INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
                 action, original_data, new_data, ip_address, observacion) 
