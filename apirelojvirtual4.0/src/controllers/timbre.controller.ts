@@ -76,9 +76,9 @@ export const crearTimbre = async (req: Request, res: Response) => {
             timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion, timbre.id_empleado]);
 
 
-        const fechaHora = await FormatearHora(timbre.fecha_hora_timbre.toLocaleString().split('T')[1]);
+        const fechaHora = await FormatearHora(timbre.fecha_hora_timbre.toLocaleString().split(' ')[1]);
         const fechaTimbre = await FormatearFecha2(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
-        const fechaHoraServidor = await FormatearHora(timbre.fecha_hora_timbre_servidor.toLocaleString().split('T')[1]);
+        const fechaHoraServidor = await FormatearHora(timbre.fecha_hora_timbre_servidor.toLocaleString().split(' ')[1]);
         const fechaTimbreServidor = await FormatearFecha2(timbre.fecha_hora_timbre_servidor.toLocaleString(), 'ddd');
 
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({

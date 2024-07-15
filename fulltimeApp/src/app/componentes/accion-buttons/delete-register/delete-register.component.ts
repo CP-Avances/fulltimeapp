@@ -18,7 +18,7 @@ import { PermisosService } from 'src/app/services/permisos.service';
 import { VacacionesService } from 'src/app/services/vacaciones.service';
 import { AlimentacionService } from 'src/app/services/alimentacion.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
-
+import { DataUserLoggedService } from 'src/app/services/data-user-logged.service'; 
 @Component({
   selector: 'btn-delete',
   templateUrl: './delete-register.component.html',
@@ -65,6 +65,8 @@ export class DeleteRegisterComponent{
     public alertController: AlertController,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
+    private dataUserServices: DataUserLoggedService,
+
   ) {
     this.idEmpresa = parseInt(String(localStorage.getItem('id_empresa')));
     this.catalogos.getCgPermisos();
@@ -98,7 +100,7 @@ export class DeleteRegisterComponent{
         }, {
           text: 'Confirmar',
           handler: () => {
-            this.deleteSevice.EliminarRegistro(this.idreg, this.nameTable).subscribe(
+            this.deleteSevice.EliminarRegistro(this.idreg, this.nameTable,this.dataUserServices.username, localStorage.getItem('ip') ).subscribe(
               data => {
                 console.log('Datos a eliminar -> ', this.nameTable, ' id: ', this.idreg, ' codigo: ', this.userCodigo)
                 this.obtenerInformacionEmpleado(data, this.nameTable, parseInt(this.userCodigo));

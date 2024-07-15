@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -11,6 +34,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.putHoraExtra = exports.postNuevaHoraExtra = exports.getlistaHorasExtrasByFechasyCodigoEdit = exports.getlistaHorasExtrasByFechasyCodigo = exports.getlistaHorasExtrasByCodigo = exports.getlistaByFechas = exports.getlistaHorasExtras = void 0;
 const database_1 = require("../database");
+const metodos_1 = require("../libs/metodos");
+const AUDITORIA_CONTROLADOR = __importStar(require("../controllers/auditotia.controller"));
 /**
  * Metodo para obtener listado de las primeras 100 horas extras de empleados
  * @returns Retorna un array de horas extras
@@ -133,7 +158,7 @@ exports.getlistaHorasExtrasByFechasyCodigoEdit = getlistaHorasExtrasByFechasyCod
  */
 const postNuevaHoraExtra = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { descripcion, estado, fecha_final, fecha_inicio, fecha_solicita, hora_ingreso, hora_salida, id_empleado_cargo, id_empleado_solicita, horas_solicitud, observacion, tiempo_autorizado } = req.body;
+        const { descripcion, estado, fecha_final, fecha_inicio, fecha_solicita, hora_ingreso, hora_salida, id_empleado_cargo, id_empleado_solicita, horas_solicitud, observacion, tiempo_autorizado, user_name, ip } = req.body;
         console.log(req.body);
         const response = yield database_1.pool.query(`
             INSERT INTO mhe_solicitud_hora_extra ( descripcion, estado, fecha_final, fecha_inicio, fecha_solicita,
@@ -142,6 +167,22 @@ const postNuevaHoraExtra = (req, res) => __awaiter(void 0, void 0, void 0, funct
             `, [descripcion, estado, fecha_final, fecha_inicio, fecha_solicita,
             id_empleado_cargo, id_empleado_solicita, horas_solicitud, observacion, tiempo_autorizado]);
         const [objetoHoraExtra] = response.rows;
+        const fechaHoraInicio = yield (0, metodos_1.FormatearHora)(fecha_inicio.toLocaleString().split(' ')[1]);
+        const fechaTimbreInicio = yield (0, metodos_1.FormatearFecha2)(fecha_inicio.toLocaleString(), 'ddd');
+        const fechaHoraFin = yield (0, metodos_1.FormatearHora)(fecha_final.toLocaleString().split(' ')[1]);
+        const fechaTimbreFin = yield (0, metodos_1.FormatearFecha2)(fecha_final.toLocaleString(), 'ddd');
+        const fechaSolicita = yield (0, metodos_1.FormatearFecha2)(fecha_solicita.toLocaleString(), 'ddd');
+        yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'eu_timbres',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: `{id_empleado_solicita: ${id_empleado_solicita}, id_empleado_cargo: ${id_empleado_cargo}, fecha_solicita: ${fechaSolicita}, fecha_inicio: ${fechaTimbreInicio + ' ' + fechaHoraInicio}, fecha_final: ${fechaTimbreFin + ' ' + fechaHoraFin}, descripcion: ${descripcion}, estado: ${estado}, horas_solicitud: ${horas_solicitud}, tiempo_autorizado: ${tiempo_autorizado}, observacion: ${observacion}}`,
+            ip: ip,
+            observacion: null
+        });
+        // FINALIZAR TRANSACCION
+        yield database_1.pool.query('COMMIT');
         if (!objetoHoraExtra)
             return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
         const hora_extra = objetoHoraExtra;
@@ -161,8 +202,24 @@ exports.postNuevaHoraExtra = postNuevaHoraExtra;
  */
 const putHoraExtra = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id, descripcion, fecha_final, fecha_inicio, horas_solicitud, observacion, tiempo_autorizado, documento, docu_nombre, estado } = req.body;
+        const { id, descripcion, fecha_final, fecha_inicio, horas_solicitud, observacion, tiempo_autorizado, documento, docu_nombre, estado, user_name, ip } = req.body;
         console.log(req.body);
+        const solicitudHoraExtra = yield database_1.pool.query('SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1', [id]);
+        const [datosOriginales] = solicitudHoraExtra.rows;
+        if (!datosOriginales) {
+            yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'ma_solicitud_comida',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: '',
+                datosNuevos: '',
+                ip,
+                observacion: `Error al actualizar solicitud de comidas con id: ${id}. Registro no encontrado`
+            });
+            // FINALIZAR TRANSACCION
+            yield database_1.pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado' });
+        }
         if (estado === 1) {
             const response = yield database_1.pool.query(`
                 UPDATE mhe_solicitud_hora_extra SET descripcion = $2 , fecha_final = $3, fecha_inicio = $4,
@@ -170,6 +227,25 @@ const putHoraExtra = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 WHERE id = $1  RETURNING *
                 `, [id, descripcion, fecha_final, fecha_inicio, horas_solicitud, observacion, tiempo_autorizado, documento, docu_nombre]);
             const [objetoHora_extra] = response.rows;
+            const fechaHoraInicioO = yield (0, metodos_1.FormatearHora)(datosOriginales.fecha_inicio.toLocaleString().split(' ')[1]);
+            const fechaTimbreInicioO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_inicio.toLocaleString(), 'ddd');
+            const fechaHoraFinO = yield (0, metodos_1.FormatearHora)(datosOriginales.fecha_final.toLocaleString().split(' ')[1]);
+            const fechaTimbreFinO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_final.toLocaleString(), 'ddd');
+            const fechaHoraInicioN = yield (0, metodos_1.FormatearHora)(fecha_inicio.toLocaleString().split(' ')[1]);
+            const fechaTimbreInicioN = yield (0, metodos_1.FormatearFecha2)(fecha_inicio.toLocaleString(), 'ddd');
+            const fechaHoraFinN = yield (0, metodos_1.FormatearHora)(fecha_final.toLocaleString().split(' ')[1]);
+            const fechaTimbreFinN = yield (0, metodos_1.FormatearFecha2)(fecha_final.toLocaleString(), 'ddd');
+            yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'eu_timbres',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: `{id_empleado_solicita: ${datosOriginales.id_empleado_solicita}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, fecha_solicita: ${datosOriginales.fechaSolicita}, fecha_inicio: ${fechaTimbreInicioO + ' ' + fechaHoraInicioO}, fecha_final: ${fechaTimbreFinO + ' ' + fechaHoraFinO}, descripcion: ${datosOriginales.descripcion}, estado: ${datosOriginales.estado}, horas_solicitud: ${datosOriginales.horas_solicitud}, tiempo_autorizado: ${datosOriginales.tiempo_autorizado}, observacion: ${datosOriginales.observacion}, documento: ${datosOriginales.documento}, docu_nombre: ${datosOriginales.docu_nombre}}`,
+                datosNuevos: `{id_empleado_solicita: ${datosOriginales.id_empleado_solicita}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, fecha_solicita: ${datosOriginales.fechaSolicita}, fecha_inicio: ${fechaTimbreInicioN + ' ' + fechaHoraInicioN}, fecha_final: ${fechaTimbreFinN + ' ' + fechaHoraFinN}, descripcion: ${descripcion}, estado: ${estado}, horas_solicitud: ${horas_solicitud}, tiempo_autorizado: ${tiempo_autorizado}, observacion: ${observacion}, documento: ${documento}, docu_nombre: ${docu_nombre}}`,
+                ip: ip,
+                observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            yield database_1.pool.query('COMMIT');
             if (objetoHora_extra) {
                 return res.status(200).jsonp(objetoHora_extra);
             }

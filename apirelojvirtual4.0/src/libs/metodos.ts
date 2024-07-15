@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import moment from 'moment';
+import 'moment/locale/es'; // Importa el idioma español
+
 import { pool } from '../database';
 
 export const ImagenBase64LogosEmpresas = async function (path_file: string) {
@@ -116,6 +118,8 @@ export const dia_abreviado: string = 'ddd';
 export const dia_completo: string = 'dddd';
 
 export const FormatearFecha = async function (fecha: string, dia: string) {
+    moment.locale('es');
+
     let formato = await BuscarFecha();
     let valor = moment(fecha).format(dia).charAt(0).toUpperCase() +
         moment(fecha).format(dia).slice(1) +

@@ -90,6 +90,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
     public horario: EmpleadosService,
     public alertCrtl: AlertController,
     public configNoti: NotificacionesService,
+
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('id_empresa'));
     this.idEmpleado = parseInt(localStorage.getItem('empleadoID'));
@@ -587,7 +588,9 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
             a.estado = this.estadoChange.id
             const data = {
               estado: a.estado,
-              id_autoriza_estados: a.id_autoriza_estado + `${localStorage.getItem("empleadoID")}_${this.estadoChange.id},`
+              id_autoriza_estados: a.id_autoriza_estado + `${localStorage.getItem("empleadoID")}_${this.estadoChange.id},`,
+              user_name : this.dataUserServices.username,
+              ip : localStorage.getItem('ip')
             }
     
             if (this.ListaPermisos) {
@@ -666,7 +669,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
 
     switch (solicitud) {
       case 'permiso':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: dataSolicitud.id }, 'mp_solicitud_permiso').subscribe(
+        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: dataSolicitud.id,  user_name : this.dataUserServices.username, ip : localStorage.getItem('ip') }, 'mp_solicitud_permiso').subscribe(
             resp => { 
               this.validar.showToast(resp.message+' - '+this.listaSolicitudesValidadas.length, 3000, 'success');
               console.log('ver datos de permisos multiples...', dataSolicitud,
@@ -684,7 +687,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
        
         break;
       case 'vacacion':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: dataSolicitud.id }, 'mv_solicitud_vacacion').subscribe(
+        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: dataSolicitud.id, user_name : this.dataUserServices.username, ip : localStorage.getItem('ip') }, 'mv_solicitud_vacacion').subscribe(
           resp => { this.validar.showToast(resp.message, 3000, 'success') },
           err => { this.validar.showToast(err.error.message, 3000, 'danger') },
         )
@@ -699,7 +702,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
         this.NotificarAprobacionVacacion(dataSolicitud, infoEmpleadoRecibe, this.estadoChange.id);
         break;
       case 'hora_extra':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: dataSolicitud.id }, 'mhe_solicitud_hora_extra').subscribe(
+        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: dataSolicitud.id, user_name : this.dataUserServices.username, ip : localStorage.getItem('ip')}, 'mhe_solicitud_hora_extra').subscribe(
           resp => { this.validar.showToast(resp.message, 3000, 'success') },
           err => { this.validar.showToast(err.error.message, 3000, 'danger') },
         )

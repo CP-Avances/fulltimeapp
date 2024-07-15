@@ -22,7 +22,7 @@ export class DeleteService {
         private toastController: ToastController,
     ) { }
 
-    EliminarRegistro(idreg: string, nametable: string) {
+    EliminarRegistro(idreg: string, nametable: string,user_name:  string, ip:  string) {
         const params = new HttpParams()
             .set('nametable', nametable)
             .set('idreg', idreg)

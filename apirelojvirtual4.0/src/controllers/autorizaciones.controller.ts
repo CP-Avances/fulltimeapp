@@ -150,7 +150,7 @@ export const updateAutorizacion = async (req: Request, res: Response): Promise<R
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: '',
-                datosNuevos: `estado: ${estado}, id_autoriza_estado: ${id_autoriza_estado}`,
+                datosNuevos:  '',
                 ip: ip,
                 observacion: `Error al actualizar el registro de autorizaciones con id_permiso: ${id_permiso}`
             });
@@ -201,7 +201,7 @@ export const updateEstadoSolicitudes = async (req: Request, res: Response): Prom
 
         if (!datos) {
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: `nameTable`,
+                tabla: `${nameTable}`,
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: '',

@@ -98,9 +98,9 @@ const crearTimbre = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             timbre.latitud, timbre.longitud, timbre.codigo, timbre.id_reloj,
             timbre.tipo_autenticacion, timbre.dispositivo_timbre, timbre.fecha_hora_timbre_servidor,
             timbre.hora_timbre_diferente, timbre.ubicacion, timbre.conexion, timbre.fecha_subida_servidor, timbre.novedades_conexion, timbre.id_empleado]);
-        const fechaHora = yield (0, metodos_1.FormatearHora)(timbre.fecha_hora_timbre.toLocaleString().split('T')[1]);
+        const fechaHora = yield (0, metodos_1.FormatearHora)(timbre.fecha_hora_timbre.toLocaleString().split(' ')[1]);
         const fechaTimbre = yield (0, metodos_1.FormatearFecha2)(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
-        const fechaHoraServidor = yield (0, metodos_1.FormatearHora)(timbre.fecha_hora_timbre_servidor.toLocaleString().split('T')[1]);
+        const fechaHoraServidor = yield (0, metodos_1.FormatearHora)(timbre.fecha_hora_timbre_servidor.toLocaleString().split(' ')[1]);
         const fechaTimbreServidor = yield (0, metodos_1.FormatearFecha2)(timbre.fecha_hora_timbre_servidor.toLocaleString(), 'ddd');
         yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
             tabla: 'eu_timbres',

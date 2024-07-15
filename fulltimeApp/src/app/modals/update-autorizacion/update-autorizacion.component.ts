@@ -75,6 +75,7 @@ export class UpdateAutorizacionComponent implements OnInit {
     public horario: EmpleadosService,
     public alertCrtl: AlertController,
     private userService: DataUserLoggedService,
+    
 
 
   ) {
@@ -530,7 +531,9 @@ export class UpdateAutorizacionComponent implements OnInit {
       this.loadingBtn = true;
       const data = {
         estado: this.estadoChange.id,
-        id_autoriza_estado: this.autorizacion.id_autoriza_estado + `${localStorage.getItem("empleadoID")}_${this.estadoChange.id},`
+        id_autoriza_estado: this.autorizacion.id_autoriza_estado + `${localStorage.getItem("empleadoID")}_${this.estadoChange.id},`,
+        user_name : this.userService.username,
+        ip : localStorage.getItem('ip')
       }
 
       if (this.permiso){
@@ -579,7 +582,7 @@ export class UpdateAutorizacionComponent implements OnInit {
 
     switch (solicitud) {
       case 'permiso':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.permiso.id }, 'mp_solicitud_permiso').subscribe(
+        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.permiso.id,  user_name : this.userService.username, ip : localStorage.getItem('ip') }, 'mp_solicitud_permiso').subscribe(
           resp => { 
             this.validaciones.showToast(resp.message, 3000, 'success');
             console.log('ver autoriza permiso.... ', this.permiso, 'INFO.. ', this.infoEmpleadoRecibe);
@@ -591,7 +594,7 @@ export class UpdateAutorizacionComponent implements OnInit {
         break;
 
       case 'vacacion':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.vacacion.id }, 'mv_solicitud_vacacion').subscribe(
+        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.vacacion.id, user_name : this.userService.username, ip : localStorage.getItem('ip') }, 'mv_solicitud_vacacion').subscribe(
           resp => { this.validaciones.showToast(resp.message, 3000, 'success') },
           err => { this.validaciones.showToast(err.error.message, 3000, 'danger') },
         )
@@ -602,7 +605,7 @@ export class UpdateAutorizacionComponent implements OnInit {
         break;
       
       case 'hora_extra':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.hora_extra.id }, 'mhe_solicitud_hora_extra').subscribe(
+        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.hora_extra.id, user_name : this.userService.username, ip : localStorage.getItem('ip') }, 'mhe_solicitud_hora_extra').subscribe(
           resp => { this.validaciones.showToast(resp.message, 3000, 'success') },
           err => { this.validaciones.showToast(err.error.message, 3000, 'danger') },
         )

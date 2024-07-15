@@ -16,6 +16,7 @@ exports.BuscarHora = exports.BuscarFecha = exports.FormatearHora = exports.Forma
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const moment_1 = __importDefault(require("moment"));
+require("moment/locale/es"); // Importa el idioma español
 const database_1 = require("../database");
 const ImagenBase64LogosEmpresas = function (path_file) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -141,6 +142,7 @@ exports.dia_abreviado = 'ddd';
 exports.dia_completo = 'dddd';
 const FormatearFecha = function (fecha, dia) {
     return __awaiter(this, void 0, void 0, function* () {
+        moment_1.default.locale('es');
         let formato = yield (0, exports.BuscarFecha)();
         let valor = (0, moment_1.default)(fecha).format(dia).charAt(0).toUpperCase() +
             (0, moment_1.default)(fecha).format(dia).slice(1) +
