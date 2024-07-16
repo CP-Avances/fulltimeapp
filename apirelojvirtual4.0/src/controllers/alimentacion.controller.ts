@@ -176,7 +176,6 @@ export const putAlimentacion = async (req: Request, res: Response): Promise<Resp
         const planComida = await pool.query('SELECT * FROM ma_solicitud_comida WHERE id = $1', [id]);
         const [datosOriginales] = planComida.rows;
 
-
         if (!datosOriginales) {
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'ma_solicitud_comida',
@@ -187,13 +186,10 @@ export const putAlimentacion = async (req: Request, res: Response): Promise<Resp
                 ip,
                 observacion: `Error al actualizar solicitud de comidas con id: ${id}. Registro no encontrado`
             });
-
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             return res.status(404).jsonp({ message: 'Registro no encontrado' });
         }
-
-
 
         const response: QueryResult = await pool.query(
             `
@@ -221,7 +217,7 @@ export const putAlimentacion = async (req: Request, res: Response): Promise<Resp
             usuario: user_name,
             accion: 'U',
             datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_detalle_comida: ${datosOriginales.id_detalle_comida}, fecha: ${fechaO}, fecha_comida: ${fechaComidaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${datosOriginales.observacion}, extra: ${datosOriginales.extra}, verificar: ${datosOriginales.verificar}} `,
-            datosNuevos: `{id_empleado: ${id_empleado}, id_detalle_comida: ${id_detalle_comida}, fecha: ${fechaN}, fecha_comida: ${fechaComidaN}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${observacion}, extra: ${extra}}} `,
+            datosNuevos: `{id_empleado: ${id_empleado}, id_detalle_comida: ${id_detalle_comida}, fecha: ${fechaN}, fecha_comida: ${fechaComidaN}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${observacion}, extra: ${extra}} `,
             ip,
             observacion: null
         });

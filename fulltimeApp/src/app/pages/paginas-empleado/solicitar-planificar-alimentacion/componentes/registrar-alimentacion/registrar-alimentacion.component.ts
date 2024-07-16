@@ -287,13 +287,15 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
 
     let mensaje = {
       fecha_hora: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
-      id_empl_envia: parseInt(localStorage.getItem('empleadoID')),
-      id_empl_recive: 0,
+      id_empleado_envia: parseInt(localStorage.getItem('empleadoID')),
+      id_empleado_recibe: 0,
       tipo: 1, // SOLICITUD SERVICIO DE ALIMENTACIÓN
-      mensaje: 'Ha solicitado un servicio de alimentación desde ' +
+      descripcion: 'Ha solicitado un servicio de alimentación desde ' +
         desde +
         ' horario de ' + inicio + ' a ' + final + ' servicio ',
-      id_comida: alimentacion.id_detalle_comida
+      id_comida: alimentacion.id_detalle_comida,
+      user_name : this.userService.username,
+      ip: localStorage.getItem('ip')
     }
 
     //Listado para eliminar el usuario duplicado
@@ -311,7 +313,7 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
     console.log("Usuarios que reciben la notificacion: ",allNotificaciones);
 
     allNotificaciones.forEach(e => {
-      mensaje.id_empl_recive = e.empleado;
+      mensaje.id_empleado_recibe = e.empleado;
       if (e.comida_noti) {
         this.notifica.EnviarMensajePlanComida(mensaje).subscribe(
           resp => { //this.validar.showToast(resp.message, 3000, 'success') 

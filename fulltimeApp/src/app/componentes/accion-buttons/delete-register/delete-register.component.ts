@@ -349,6 +349,10 @@ export class DeleteRegisterComponent{
     NotificacionesPermisoFiltrados.forEach((e: any) => {
       noti.id_departamento_recibe = e.id_dep;
       noti.id_empleado_recibe = e.empleado;
+      noti.user_name =this.dataUserServices.username;
+      noti.ip =localStorage.getItem('ip');
+
+
       
       if (e.permiso_noti) {
         this.autoriza.postNotificacion(noti).subscribe(
@@ -498,6 +502,8 @@ export class DeleteRegisterComponent{
     NotificacionesVacacionesFiltrados.forEach((e: any) => {
       noti.id_departamento_recibe = e.id_dep;
       noti.id_empleado_recibe = e.empleado;
+      noti.user_name =this.dataUserServices.username;
+      noti.ip =localStorage.getItem('ip');
       if (e.vaca_noti) {
         this.autoriza.postNotificacion(noti).subscribe(
           resp => {
@@ -647,6 +653,9 @@ export class DeleteRegisterComponent{
 
     NotificacionesHorasExtrasFiltrados.forEach((e: any) => {
       noti.id_empleado_recibe = e.empleado;
+
+      noti.user_name =this.dataUserServices.username;
+      noti.ip =localStorage.getItem('ip');
       if (e.hora_extra_noti) {
         this.autoriza.postNotificacion(noti).subscribe(
           resp => {
@@ -754,14 +763,17 @@ export class DeleteRegisterComponent{
     let final = this.validar.FormatearHora(alimentacion.hora_fin, this.formato_hora);
 
     let mensaje = {
-      create_at: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
-      id_empl_envia: parseInt(String(localStorage.getItem('empleadoID'))),
-      id_empl_recive: '',
+      fecha_hora: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
+      id_empleado_envia: parseInt(String(localStorage.getItem('empleadoID'))),
+      id_empleado_recibe: '',
       tipo: 1, // SOLICITUD SERVICIO DE ALIMENTACIÓN 
-      mensaje: 'Ha eliminado ' + nota + ' de alimentación ' + user + ' desde ' +
+      descripcion: 'Ha eliminado ' + nota + ' de alimentación ' + user + ' desde ' +
         desde +
         ' horario de ' + inicio + ' a ' + final + ' servicio ',
-      id_comida: alimentacion.id_comida
+      id_comida: alimentacion.id_comida,
+      user_name : this.dataUserServices.username,
+      ip: localStorage.getItem('ip')
+
     }
 
         //Listado para eliminar el usuario duplicado
@@ -779,7 +791,7 @@ export class DeleteRegisterComponent{
         console.log("Usuarios que reciben la notificacion Alimen: ",NotificacionesAlimentacionFiltrados);
 
       NotificacionesAlimentacionFiltrados.forEach((e: any) => {
-      mensaje.id_empl_recive = e.empleado;
+      mensaje.id_empleado_recibe = e.empleado;
       if (e.comida_noti) {
         this.notifica.EnviarMensajePlanComida(mensaje).subscribe(res => {
           console.log(res.message);

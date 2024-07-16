@@ -14,6 +14,8 @@ export interface Notificacion {
     ndepartamento?: string;
     mensaje: string;
     tipo?: number | undefined;
+    user_name?: string;
+    ip?: string
 }
 
 export const notificacionValueDefault = {
@@ -28,7 +30,10 @@ export const notificacionValueDefault = {
     id_vacaciones: null,
     id_hora_extra: null,
     mensaje: '',
-    tipo: undefined
+    tipo: undefined, 
+    user_name:null,
+    ip: null
+
 }
 
 export interface EmpleadosSendNotiEmail {
@@ -69,6 +74,9 @@ export interface NotificacionTimbre {
     nempleadosend?: string | null;
     nempleadoreceives?: string | null;
     id_comida: number | null;
+
+    user_name?: string;
+    ip?: string
 }
 
 export const notificacionTimbreValueDefault = {
@@ -81,6 +89,8 @@ export const notificacionTimbreValueDefault = {
     id_timbre: null,
     tipo: null,
     id_comida: null,
+    user_name: null,
+    ip: null
 }
 
 export interface SettingsInfoEmpleado {

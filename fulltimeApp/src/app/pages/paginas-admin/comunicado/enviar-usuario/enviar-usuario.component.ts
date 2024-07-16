@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
+import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import moment from 'moment';
 
 interface checkOptions {
@@ -43,6 +44,8 @@ export class EnviarUsuarioComponent implements OnInit {
     public restN: NotificacionesService,
     public toastController: ToastController,
     public restP: ParametrosService,
+    private dataUserServices: DataUserLoggedService,
+
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleadoID'));
     this.idEmpresa = parseInt(localStorage.getItem('id_empresa'));
@@ -388,10 +391,12 @@ export class EnviarUsuarioComponent implements OnInit {
   NotificarSistema(empleado_envia: any, empleado_recive: any) {
     let mensaje = {
       fecha_hora: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
-      id_empl_envia: empleado_envia,
-      id_empl_recive: empleado_recive,
-      mensaje: this.data.asunto + '; ' + this.data.mensaje, 
-      tipo: 6
+      id_empleado_envia: empleado_envia,
+      id_empleado_recibe: empleado_recive,
+      descripcion: this.data.asunto + '; ' + this.data.mensaje, 
+      tipo: 6,
+      user_name: this.dataUserServices.username,
+      ip:localStorage.getItem('ip')
     }
     console.log(mensaje);
     this.restN.EnviarMensajeComunicado(mensaje).subscribe(res => {

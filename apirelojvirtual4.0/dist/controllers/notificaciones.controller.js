@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -15,6 +38,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ObtenerConfigEmpleado = exports.EnviarNotificacionGeneral = exports.NotifiTimbreVisto = exports.NotificaVisto = exports.DatosGenerales = exports.sendCorreoEmpleados = exports.getInfoEmpleadoById = exports.getInfoEmpleadoByCodigo = exports.EnviarNotificacionComidas = exports.postAvisosGenerales = exports.getNotificacionTimbres = exports.postNotificacion = exports.getNotificacion = void 0;
 const database_1 = require("../database");
 const nodemailer_1 = __importDefault(require("nodemailer"));
+const AUDITORIA_CONTROLADOR = __importStar(require("../controllers/auditotia.controller"));
+const metodos_1 = require("../libs/metodos");
 /**
  * obtener registro de la tabla de realtime_noti
  * @returns
@@ -41,7 +66,8 @@ exports.getNotificacion = getNotificacion;
  */
 const postNotificacion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id_empleado_envia, id_empleado_recibe, id_departamento_recibe, estado, fecha_hora, id_permiso, id_vacaciones, id_hora_extra, mensaje, tipo } = req.body;
+        const { id_empleado_envia, id_empleado_recibe, id_departamento_recibe, estado, fecha_hora, id_permiso, id_vacaciones, id_hora_extra, mensaje, tipo, user_name, ip } = req.body;
+        yield database_1.pool.query('BEGIN');
         const response = yield database_1.pool.query(`
         INSERT INTO ecm_realtime_notificacion( id_empleado_envia, id_empleado_recibe, id_departamento_recibe, estado, fecha_hora, 
             id_permiso, id_vacaciones, id_hora_extra, mensaje, tipo ) 
@@ -49,6 +75,18 @@ const postNotificacion = (req, res) => __awaiter(void 0, void 0, void 0, functio
 
         `, [id_empleado_envia, id_empleado_recibe, id_departamento_recibe, estado, fecha_hora, id_permiso, id_vacaciones,
             id_hora_extra, mensaje, tipo]);
+        const horaN = yield (0, metodos_1.FormatearHora)(fecha_hora.toLocaleString().split(' ')[1]);
+        const fechaN = yield (0, metodos_1.FormatearFecha2)(fecha_hora.toLocaleString(), 'ddd');
+        yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ecm_realtime_notificacion',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: `{id_empleado_envia: ${id_empleado_envia}, id_empleado_recibe: ${id_empleado_recibe}, id_departamento_recibe: ${id_departamento_recibe}, fecha_hora: ${fechaN + ' ' + horaN}, mensaje: ${mensaje}, id_permiso: ${id_permiso}, id_vacaciones: ${id_vacaciones}, id_hora_extra: ${id_hora_extra}, estado: ${estado}, visto: null, tipo: ${tipo}}`,
+            ip: ip,
+            observacion: null
+        });
+        yield database_1.pool.query('COMMIT');
         const [notificiacion] = response.rows;
         if (!notificiacion)
             return res.status(400).jsonp({ message: 'No se registro notificación.' });
@@ -91,11 +129,24 @@ exports.getNotificacionTimbres = getNotificacionTimbres;
  */
 const postAvisosGenerales = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo } = req.body;
+        const { fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo, user_name, ip } = req.body;
+        yield database_1.pool.query('BEGIN');
         const response = yield database_1.pool.query(`
             INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo) 
             VALUES($1, $2, $3, $4, $5) RETURNING * 
             `, [fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo]);
+        const horaN = yield (0, metodos_1.FormatearHora)(fecha_hora.toLocaleString().split(' ')[1]);
+        const fechaN = yield (0, metodos_1.FormatearFecha2)(fecha_hora.toLocaleString(), 'ddd');
+        yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ecm_realtime_timbres',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: `{id_empleado_envia: ${id_empleado_envia}, id_empleado_recibe: ${id_empleado_recibe}, fecha_hora: ${fechaN + ' ' + horaN}, descripcion: ${descripcion}, mensaje: null, id_timbre: null, visto: null, tipo: ${tipo}}`,
+            ip: ip,
+            observacion: null
+        });
+        yield database_1.pool.query('COMMIT');
         const [notificiacion] = response.rows;
         if (!notificiacion)
             return res.status(400).jsonp({ message: 'No se inserto notificación' });
@@ -119,25 +170,38 @@ exports.postAvisosGenerales = postAvisosGenerales;
  ** **************************************************************************/
 // NOTIFICACIONES DE SOLICITUDES Y PLANIFICACIÓN DE SERVICIO DE ALIMENTACIÓN
 const EnviarNotificacionComidas = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let { id_empl_envia, id_empl_recive, mensaje, tipo, id_comida, fecha_hora } = req.body;
+    let { id_empleado_envia, id_empleado_recibe, descripcion, tipo, id_comida, fecha_hora, user_name, ip } = req.body;
     const SERVICIO_SOLICITADO = yield database_1.pool.query(`
         SELECT tc.nombre AS servicio, ctc.nombre AS menu, ctc.hora_inicio, ctc.hora_fin, 
           dm.nombre AS comida, dm.valor, dm.observacion 
         FROM ma_cat_comidas AS tc, ma_horario_comidas AS ctc, ma_detalle_comida AS dm 
         WHERE tc.id = ctc.id_comida AND ctc.id = dm.id_horario_comida AND dm.id = $1
       `, [id_comida]);
-    let notifica = mensaje + SERVICIO_SOLICITADO.rows[0].servicio;
+    let notifica = descripcion + SERVICIO_SOLICITADO.rows[0].servicio;
+    yield database_1.pool.query('BEGIN');
     const response = yield database_1.pool.query(`
         INSERT INTO ecm_realtime_timbres(fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo) 
         VALUES($1, $2, $3, $4, $5) RETURNING *
-        `, [fecha_hora, id_empl_envia, id_empl_recive, notifica, tipo]);
+        `, [fecha_hora, id_empleado_envia, id_empleado_recibe, notifica, tipo]);
+    const horaN = yield (0, metodos_1.FormatearHora)(fecha_hora.toLocaleString().split(' ')[1]);
+    const fechaN = yield (0, metodos_1.FormatearFecha2)(fecha_hora.toLocaleString(), 'ddd');
+    yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ecm_realtime_timbres',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{id_empleado_envia: ${id_empleado_envia}, id_empleado_recibe: ${id_empleado_recibe}, fecha_hora: ${fechaN + ' ' + horaN}, descripcion: ${notifica}, mensaje: null, id_timbre: null, visto: null, tipo: ${tipo}}`,
+        ip: ip,
+        observacion: null
+    });
+    yield database_1.pool.query('COMMIT');
     const [notificiacion] = response.rows;
     if (!notificiacion)
         return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
     const USUARIO = yield database_1.pool.query(`
         SELECT (nombre || ' ' || apellido) AS usuario
         FROM eu_empleados WHERE id = $1
-        `, [id_empl_envia]);
+        `, [id_empleado_envia]);
     notificiacion.usuario = USUARIO.rows[0].usuario;
     return res.status(200)
         .jsonp({ message: 'Se ha enviado la respectiva notificación.', respuesta: notificiacion });
@@ -322,8 +386,38 @@ const DatosGenerales = (req, res) => __awaiter(void 0, void 0, void 0, function*
 exports.DatosGenerales = DatosGenerales;
 const NotificaVisto = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id_notificacion, visible } = req.body;
+        const { id_notificacion, visible, user_name, ip } = req.body;
+        yield database_1.pool.query('BEGIN');
+        const notificacionBuscada = yield database_1.pool.query('SELECT * FROM ecm_realtime_notificacion WHERE id = $1', [id_notificacion]);
+        const [datosOriginales] = notificacionBuscada.rows;
+        if (!datosOriginales) {
+            yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'ecm_realtime_notificacion',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: '',
+                datosNuevos: '',
+                ip: ip,
+                observacion: `Error al actualizar solicitud de comidas con id: ${id_notificacion}. Registro no encontrado`
+            });
+            // FINALIZAR TRANSACCION
+            yield database_1.pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado' });
+        }
         const response = yield database_1.pool.query('UPDATE ecm_realtime_notificacion SET visto = $1 WHERE id = $2', [visible, id_notificacion]);
+        const horaN = yield (0, metodos_1.FormatearHora)(datosOriginales.fecha_hora.toLocaleString().split(' ')[1]);
+        const fechaN = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_hora.toLocaleString(), 'ddd');
+        // AUDITORIA
+        yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ecm_realtime_notificacion',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: `{id_empleado_envia: ${datosOriginales.id_empleado_envia}, id_empleado_recibe: ${datosOriginales.id_empleado_recibe}, id_departamento_recibe: ${datosOriginales.id_departamento_recibe}, fecha_hora: ${fechaN + ' ' + horaN}, mensaje: ${datosOriginales.mensaje}, id_permiso: ${datosOriginales.id_permiso}, id_vacaciones: ${datosOriginales.id_vacaciones}, id_hora_extra: ${datosOriginales.id_hora_extra}, estado: ${datosOriginales.estado}, visto: ${datosOriginales.visto}, tipo: ${datosOriginales.tipo}} `,
+            datosNuevos: `{id_empleado_envia: ${datosOriginales.id_empleado_envia}, id_empleado_recibe: ${datosOriginales.id_empleado_recibe}, id_departamento_recibe: ${datosOriginales.id_departamento_recibe}, fecha_hora: ${fechaN + ' ' + horaN}, mensaje: ${datosOriginales.mensaje}, id_permiso: ${datosOriginales.id_permiso}, id_vacaciones: ${datosOriginales.id_vacaciones}, id_hora_extra: ${datosOriginales.id_hora_extra}, estado: ${datosOriginales.estado}, visto: ${visible}, tipo: ${datosOriginales.tipo}} `,
+            ip,
+            observacion: null
+        });
+        yield database_1.pool.query('COMMIT');
         const notificacion = response.rows;
         return res.status(200).jsonp(notificacion);
     }
@@ -335,9 +429,39 @@ const NotificaVisto = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 exports.NotificaVisto = NotificaVisto;
 const NotifiTimbreVisto = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id_notificacion, visible } = req.body;
+        const { id_notificacion, visible, user_name, ip } = req.body;
+        yield database_1.pool.query('BEGIN');
+        const notificacionTimbreBuscada = yield database_1.pool.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1', [id_notificacion]);
+        const [datosOriginales] = notificacionTimbreBuscada.rows;
+        if (!datosOriginales) {
+            yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'ecm_realtime_timbres',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: '',
+                datosNuevos: '',
+                ip: ip,
+                observacion: `Error al actualizar solicitud de comidas con id: ${id_notificacion}. Registro no encontrado`
+            });
+            // FINALIZAR TRANSACCION
+            yield database_1.pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado' });
+        }
         console.log(req.body);
         const response = yield database_1.pool.query('UPDATE ecm_realtime_timbres SET visto = $1 WHERE id = $2', [visible, id_notificacion]);
+        const horaN = yield (0, metodos_1.FormatearHora)(datosOriginales.fecha_hora.toLocaleString().split(' ')[1]);
+        const fechaN = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_hora.toLocaleString(), 'ddd');
+        // AUDITORIA
+        yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ecm_realtime_timbres',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: `{id_empleado_envia: ${datosOriginales.id_empleado_envia}, id_empleado_recibe: ${datosOriginales.id_empleado_recibe}, fecha_hora: ${fechaN + ' ' + horaN}, descripcion: ${datosOriginales.descripcion}, mensaje: ${datosOriginales.mensaje}, id_timbre: ${datosOriginales.id_timbre}, visto: ${datosOriginales.visto}, tipo: ${datosOriginales.tipo}} `,
+            datosNuevos: `{id_empleado_envia: ${datosOriginales.id_empleado_envia}, id_empleado_recibe: ${datosOriginales.id_empleado_recibe}, fecha_hora: ${fechaN + ' ' + horaN}, descripcion: ${datosOriginales.descripcion}, mensaje: ${datosOriginales.mensaje}, id_timbre: ${datosOriginales.id_timbre}, visto: ${visible}, tipo: ${datosOriginales.tipo}} `,
+            ip,
+            observacion: null
+        });
+        yield database_1.pool.query('COMMIT');
         const notificacionTimbre = response.rows;
         return res.status(200).jsonp(notificacionTimbre);
     }
@@ -349,18 +473,31 @@ const NotifiTimbreVisto = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.NotifiTimbreVisto = NotifiTimbreVisto;
 // NOTIFICACIÓNES GENERALES
 const EnviarNotificacionGeneral = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let { fecha_hora, id_empl_envia, id_empl_recive, mensaje, tipo } = req.body;
+    let { fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo, user_name, ip } = req.body;
+    yield database_1.pool.query('BEGIN');
     const response = yield database_1.pool.query(`
         INSERT INTO ecm_realtime_timbres(fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo) 
         VALUES($1, $2, $3, $4, $5) RETURNING *
-      `, [fecha_hora, id_empl_envia, id_empl_recive, mensaje, tipo]);
+      `, [fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo]);
+    const horaN = yield (0, metodos_1.FormatearHora)(fecha_hora.toLocaleString().split(' ')[1]);
+    const fechaN = yield (0, metodos_1.FormatearFecha2)(fecha_hora.toLocaleString(), 'ddd');
+    yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ecm_realtime_timbres',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{id_empleado_envia: ${id_empleado_envia}, id_empleado_recibe: ${id_empleado_recibe}, fecha_hora: ${fechaN + ' ' + horaN}, descripcion: ${descripcion}, mensaje: null, id_timbre: null, visto: null, tipo: ${tipo}}`,
+        ip: ip,
+        observacion: null
+    });
+    yield database_1.pool.query('COMMIT');
     const [notificiacion] = response.rows;
     if (!notificiacion)
         return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
     const USUARIO = yield database_1.pool.query(`
         SELECT (nombre || ' ' || apellido) AS usuario
         FROM eu_empleados WHERE id = $1
-        `, [id_empl_envia]);
+        `, [id_empleado_envia]);
     notificiacion.usuario = USUARIO.rows[0].usuario;
     return res.status(200)
         .jsonp({ message: 'Comunicado enviado exitosamente.', respuesta: notificiacion });

@@ -159,6 +159,7 @@ exports.getlistaHorasExtrasByFechasyCodigoEdit = getlistaHorasExtrasByFechasyCod
 const postNuevaHoraExtra = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { descripcion, estado, fecha_final, fecha_inicio, fecha_solicita, hora_ingreso, hora_salida, id_empleado_cargo, id_empleado_solicita, horas_solicitud, observacion, tiempo_autorizado, user_name, ip } = req.body;
+        yield database_1.pool.query('BEGIN');
         console.log(req.body);
         const response = yield database_1.pool.query(`
             INSERT INTO mhe_solicitud_hora_extra ( descripcion, estado, fecha_final, fecha_inicio, fecha_solicita,
@@ -173,7 +174,7 @@ const postNuevaHoraExtra = (req, res) => __awaiter(void 0, void 0, void 0, funct
         const fechaTimbreFin = yield (0, metodos_1.FormatearFecha2)(fecha_final.toLocaleString(), 'ddd');
         const fechaSolicita = yield (0, metodos_1.FormatearFecha2)(fecha_solicita.toLocaleString(), 'ddd');
         yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            tabla: 'eu_timbres',
+            tabla: 'mhe_solicitud_hora_extra',
             usuario: user_name,
             accion: 'I',
             datosOriginales: '',
@@ -203,17 +204,18 @@ exports.postNuevaHoraExtra = postNuevaHoraExtra;
 const putHoraExtra = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id, descripcion, fecha_final, fecha_inicio, horas_solicitud, observacion, tiempo_autorizado, documento, docu_nombre, estado, user_name, ip } = req.body;
+        yield database_1.pool.query('BEGIN');
         console.log(req.body);
         const solicitudHoraExtra = yield database_1.pool.query('SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1', [id]);
         const [datosOriginales] = solicitudHoraExtra.rows;
         if (!datosOriginales) {
             yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'ma_solicitud_comida',
+                tabla: 'mhe_solicitud_hora_extra',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: '',
                 datosNuevos: '',
-                ip,
+                ip: ip,
                 observacion: `Error al actualizar solicitud de comidas con id: ${id}. Registro no encontrado`
             });
             // FINALIZAR TRANSACCION
@@ -236,9 +238,9 @@ const putHoraExtra = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             const fechaHoraFinN = yield (0, metodos_1.FormatearHora)(fecha_final.toLocaleString().split(' ')[1]);
             const fechaTimbreFinN = yield (0, metodos_1.FormatearFecha2)(fecha_final.toLocaleString(), 'ddd');
             yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'eu_timbres',
+                tabla: 'mhe_solicitud_hora_extra',
                 usuario: user_name,
-                accion: 'I',
+                accion: 'U',
                 datosOriginales: `{id_empleado_solicita: ${datosOriginales.id_empleado_solicita}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, fecha_solicita: ${datosOriginales.fechaSolicita}, fecha_inicio: ${fechaTimbreInicioO + ' ' + fechaHoraInicioO}, fecha_final: ${fechaTimbreFinO + ' ' + fechaHoraFinO}, descripcion: ${datosOriginales.descripcion}, estado: ${datosOriginales.estado}, horas_solicitud: ${datosOriginales.horas_solicitud}, tiempo_autorizado: ${datosOriginales.tiempo_autorizado}, observacion: ${datosOriginales.observacion}, documento: ${datosOriginales.documento}, docu_nombre: ${datosOriginales.docu_nombre}}`,
                 datosNuevos: `{id_empleado_solicita: ${datosOriginales.id_empleado_solicita}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, fecha_solicita: ${datosOriginales.fechaSolicita}, fecha_inicio: ${fechaTimbreInicioN + ' ' + fechaHoraInicioN}, fecha_final: ${fechaTimbreFinN + ' ' + fechaHoraFinN}, descripcion: ${descripcion}, estado: ${estado}, horas_solicitud: ${horas_solicitud}, tiempo_autorizado: ${tiempo_autorizado}, observacion: ${observacion}, documento: ${documento}, docu_nombre: ${docu_nombre}}`,
                 ip: ip,

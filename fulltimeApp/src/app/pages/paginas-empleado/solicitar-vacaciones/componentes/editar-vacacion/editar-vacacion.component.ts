@@ -19,6 +19,7 @@ import { HorarioE } from 'src/app/interfaces/Horarios';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { PermisosService } from 'src/app/services/permisos.service';
+import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 
 @Component({
   selector: 'app-editar-vacacion',
@@ -76,6 +77,8 @@ export class EditarVacacionComponent implements OnInit {
     public modalController: ModalController,
     public parametro: ParametrosService,
     public alertCrtl: AlertController,
+    private userService: DataUserLoggedService,
+
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('id_empresa'));
   }
@@ -129,22 +132,22 @@ export class EditarVacacionComponent implements OnInit {
       })
   }
 
-  valoresPorDefectoResultado(){
+  valoresPorDefectoResultado() {
     this.reg.dia_laborable = undefined;
     this.reg.dia_libre = undefined;
     this.btnOcultoguardar = true;
   }
 
   //METODO VALIDADOR DE DIAS LIBRES
-  DiaIniciolLibre(fecha_ingresada){
-    let dia_retur; 
-    if(fecha_ingresada != null && fecha_ingresada != ""){
-      dia_retur = this.validar.validarDiaLaboral_Libre(fecha_ingresada.toString(),this.horarioEmpleado, this.cg_feriados);
-      if(dia_retur == undefined){
+  DiaIniciolLibre(fecha_ingresada) {
+    let dia_retur;
+    if (fecha_ingresada != null && fecha_ingresada != "") {
+      dia_retur = this.validar.validarDiaLaboral_Libre(fecha_ingresada.toString(), this.horarioEmpleado, this.cg_feriados);
+      if (dia_retur == undefined) {
         this.validar.showToast('Ups! No tiene horario para realizar solicitudes', 3500, 'warning');
       }
-      
-      if(dia_retur == 0){
+
+      if (dia_retur == 0) {
         this.showAlert();
         return dia_retur;
       }
@@ -153,7 +156,7 @@ export class EditarVacacionComponent implements OnInit {
   }
 
   // Diseno de Mensaje de notificacion con logo 
-  async showAlert(){
+  async showAlert() {
     let alert = await this.alertCrtl.create({
       message: `<div class="card-alert">
                   <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
@@ -168,35 +171,36 @@ export class EditarVacacionComponent implements OnInit {
         }],
       mode: "ios",
       backdropDismiss: false,
-    });await alert.present();
+    }); await alert.present();
   }
 
   // METODO VALIDAR EL INPUT DE DIA INICIAL, FINAL y INGRESO
-  ChangeDiaInicio(e){
-    if(!e.target.value){
+  ChangeDiaInicio(e) {
+    if (!e.target.value) {
       this.reg.fecha_inicio = moment(new Date()).format('YYYY-MM-DD');
       const hoy = moment(this.reg.fecha_inicio).format("DD/MM/YYYY, HH:mm:ss")
       this.datetimeInicio.confirm(true);
       this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
-        horario => { 
+        horario => {
           this.horarioEmpleado = horario;
-          
-          if(this.DiaIniciolLibre(this.reg.fecha_inicio) == 0){
+
+          if (this.DiaIniciolLibre(this.reg.fecha_inicio) == 0) {
             this.disabled_dia_fianl = true, this.disabled_dia_ingreso = true;
-          }else{
+          } else {
             this.disabled_dia_fianl = false, this.disabled_dia_ingreso = false;
           }
           return this.dia_inicio = moment(this.reg.fecha_inicio).format('YYYY-MM-DD');
         },
-        err => { this.validar.showToast(err.error.message, 3000, 'danger') 
-        this.reg.fecha_inicio = undefined;
-        return this.dia_inicio = '';
+        err => {
+          this.validar.showToast(err.error.message, 3000, 'danger')
+          this.reg.fecha_inicio = undefined;
+          return this.dia_inicio = '';
         }
       )
 
-    }else{
+    } else {
 
-      if(!(moment(e.target.value).format('YYYY-MM-DD') == moment(this.dia_inicio).format('YYYY-MM-DD'))){
+      if (!(moment(e.target.value).format('YYYY-MM-DD') == moment(this.dia_inicio).format('YYYY-MM-DD'))) {
         this.reg.fecha_final = null;
         this.reg.fecha_ingreso = null;
         this.reg.dia_laborable = null;
@@ -209,21 +213,21 @@ export class EditarVacacionComponent implements OnInit {
       this.reg.fecha_inicio = e.target.value;
       this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
       this.datetimeInicio.confirm(true);
-      if(this.reg.fecha_inicio != '' || this.reg.fecha_inicio != null){
-        
+      if (this.reg.fecha_inicio != '' || this.reg.fecha_inicio != null) {
+
         const hoy = moment(this.reg.fecha_inicio).format("DD/MM/YYYY, HH:mm:ss")
         this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
-          horario => { 
-            this.horarioEmpleado = horario 
-            if(this.DiaIniciolLibre(this.reg.fecha_inicio) == 0){
+          horario => {
+            this.horarioEmpleado = horario
+            if (this.DiaIniciolLibre(this.reg.fecha_inicio) == 0) {
               return this.disabled_dia_fianl = true, this.disabled_dia_ingreso = true;
-            }else{
+            } else {
               return this.disabled_dia_fianl = false, this.disabled_dia_ingreso = false;
             }
           },
-          err => { 
-            this.validar.showToast(err.error.message, 3000, 'danger') 
-            return this.dia_inicio = '';  
+          err => {
+            this.validar.showToast(err.error.message, 3000, 'danger')
+            return this.dia_inicio = '';
           }
         )
       }
@@ -231,42 +235,43 @@ export class EditarVacacionComponent implements OnInit {
     }
   }
 
-  ChangeDiaFinal(e){
+  ChangeDiaFinal(e) {
     this.valoresPorDefectoResultado();
-    if(!e.target.value){
-      if(moment(this.reg.fecha_inicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
+    if (!e.target.value) {
+      if (moment(this.reg.fecha_inicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')) {
         this.reg.fecha_final = this.reg.fecha_inicio;
         const hoy = moment(this.reg.fecha_final).format("DD/MM/YYYY, HH:mm:ss")
         this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
 
         this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
-          horario => { 
+          horario => {
             this.horarioEmpleado = horario;
-          
-            if(this.DiaIniciolLibre(this.reg.fecha_final) == 0){
+
+            if (this.DiaIniciolLibre(this.reg.fecha_final) == 0) {
               return this.disabled_dia_ingreso = true;
-            }else{
+            } else {
               return this.disabled_dia_ingreso = false;
             }
           },
-          err => { this.validar.showToast(err.error.message, 3000, 'danger') 
-          this.reg.fecha_final = null;
-          return this.dia_fianl = '';
+          err => {
+            this.validar.showToast(err.error.message, 3000, 'danger')
+            this.reg.fecha_final = null;
+            return this.dia_fianl = '';
           }
         )
-        
-      }else{
+
+      } else {
         this.reg.fecha_final = null;
         this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
         return this.dia_fianl = null
       }
-    }else{
+    } else {
       this.dia_ingreso = "";
       this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');
       this.reg.fecha_final = e.target.value;
       const hoy = moment(this.reg.fecha_final).format("DD/MM/YYYY, HH:mm:ss")
       this.datetimeFinal.confirm(true);
-      if(moment(this.reg.fecha_final).format('YYYY-MM-DD') == moment(this.reg.fecha_inicio).format('YYYY-MM-DD')){
+      if (moment(this.reg.fecha_final).format('YYYY-MM-DD') == moment(this.reg.fecha_inicio).format('YYYY-MM-DD')) {
         this.validar.showToast('Las fechas no pueden ser iguales', 3000, "warning");
         return this.disabled_dia_ingreso = true;
       }
@@ -274,40 +279,42 @@ export class EditarVacacionComponent implements OnInit {
       this.disabled_dia_ingreso = false;
 
       this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
-        horario => { 
+        horario => {
           this.horarioEmpleado = horario;
 
-          if(this.DiaIniciolLibre(this.reg.fecha_final) == 0){
+          if (this.DiaIniciolLibre(this.reg.fecha_final) == 0) {
             return this.disabled_dia_ingreso = true;
-          }else{
+          } else {
             return this.disabled_dia_ingreso = false;
           }
         },
-        err => { this.validar.showToast(err.error.message, 3000, 'danger');
+        err => {
+          this.validar.showToast(err.error.message, 3000, 'danger');
           return this.dia_fianl = '';
         }
       )
     }
   }
 
-  ChangeDiaIngreso(e){
+  ChangeDiaIngreso(e) {
     this.valoresPorDefectoResultado();
-    if(!e.target.value){
+    if (!e.target.value) {
       this.reg.fecha_ingreso = null;
       this.validar.showToast('Seleccione una Fecha Ingreso', 3000, "warning");
       return this.dia_ingreso = null
-    }else{
+    } else {
       this.validar.showToast('Calcule el tiempo para actualizar.', 3000, 'warning')
       this.reg.fecha_ingreso = e.target.value;
       this.dia_ingreso = moment(e.target.value).format('YYYY-MM-DD');
       this.datetimeIngreso.confirm(true);
       const hoy = moment(this.reg.fecha_ingreso).format("DD/MM/YYYY, HH:mm:ss")
       this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
-        horario => { 
+        horario => {
           this.horarioEmpleado = horario;
           return this.btnOculto = false;
         },
-        err => { this.validar.showToast(err.error.message, 3000, 'danger') 
+        err => {
+          this.validar.showToast(err.error.message, 3000, 'danger')
           this.reg.fecha_ingreso = null;
           this.btnOculto = true;
           return this.dia_ingreso = '';
@@ -317,52 +324,52 @@ export class EditarVacacionComponent implements OnInit {
 
   }
 
-  mostrarCalculos(){
+  mostrarCalculos() {
 
-    console.log("this.horariempleado: ",this.horarioEmpleado);
+    console.log("this.horariempleado: ", this.horarioEmpleado);
 
     //variables para validar el dia de inicio completo y el dia final completo y buscar duplicidad.
     const minutosinicio = '00:00:00';
     const minutosfinal = '23:00:00';
-    const fec_inicio = (moment(this.reg.fecha_inicio).format('YYYY-MM-DD'))+' '+ minutosinicio;
-    const fec_final = (moment(this.reg.fecha_final).format('YYYY-MM-DD')) +' '+ minutosfinal;
+    const fec_inicio = (moment(this.reg.fecha_inicio).format('YYYY-MM-DD')) + ' ' + minutosinicio;
+    const fec_final = (moment(this.reg.fecha_final).format('YYYY-MM-DD')) + ' ' + minutosfinal;
     const codigo = parseInt(localStorage.getItem('empleadoID'));
     const id_solicitud = this.reg.id;
 
 
-    if(moment(fec_inicio).format('YYYY-MM-DD') != moment(this.fecha_inicio).format('YYYY-MM-DD') || 
-       moment(fec_final).format('YYYY-MM-DD') != moment(this.fecha_final).format('YYYY-MM-DD')){
-      
+    if (moment(fec_inicio).format('YYYY-MM-DD') != moment(this.fecha_inicio).format('YYYY-MM-DD') ||
+      moment(fec_final).format('YYYY-MM-DD') != moment(this.fecha_final).format('YYYY-MM-DD')) {
+
       this.permisoService.getlistaPermisosByFechasyCodigoEdit(fec_inicio, fec_final, codigo, id_solicitud).subscribe(solicitados => {
-        if(solicitados.length != 0){
+        if (solicitados.length != 0) {
           this.reg.dia_laborable = null;
           this.reg.dia_libre = null;
           this.validar.showToast('Ups! Ya existe permisos en esas fechas ', 3500, 'warning');
           return this.btnOcultoguardar = true;
         }
-        else{
+        else {
           this.horasExtrasService.getlistaHorasExtrasByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
-            if(solicitados.length != 0){
+            if (solicitados.length != 0) {
               this.reg.dia_laborable = null;
               this.reg.dia_libre = null;
               this.validar.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
               return this.btnOcultoguardar = true;
             }
-            else{
+            else {
               this.vacacionService.getlistaVacacionesByFechasyCodigoEdit(fec_inicio, fec_final, codigo, id_solicitud).subscribe(solicitados => {
-                if(solicitados.length != 0){
+                if (solicitados.length != 0) {
                   this.reg.dia_laborable = null;
                   this.reg.dia_libre = null;
                   this.validar.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
                   return this.btnOcultoguardar = true;
                 }
-                else{
+                else {
                   this.calcularDiasVacaciones();
                   return this.btnOcultoguardar = false;
                 }
               }, error => {
                 this.validar.showToast('Lo sentimos tenemos problemas para verificar si existen vacaciones', 3500, 'warning');
-              }); 
+              });
             }
           }, error => {
             this.validar.showToast('Lo sentimos tenemos problemas para verificar su existen horas', 3500, 'warning');
@@ -371,7 +378,7 @@ export class EditarVacacionComponent implements OnInit {
       }, error => {
         this.validar.showToast('Lo sentimos tenemos problemas para verificar su existen permisos', 3500, 'warning');
       });
-    }else{
+    } else {
       this.calcularDiasVacaciones();
     }
   }
@@ -544,14 +551,15 @@ export class EditarVacacionComponent implements OnInit {
     noti.mensaje = 'Ha actualizado su solicitud de vacaciones desde ' +
       desde + ' hasta ' + hasta;
 
-    
+      noti.ip = localStorage.getItem("ip");
+      noti.user_name = this.userService.username;
+
     //Listado para eliminar el usuario duplicado
     var allNotificaciones = [];
     //Ciclo por cada elemento del listado
-    vacaciones.EmpleadosSendNotiEmail.forEach(function(elemento, indice, array) {
+    vacaciones.EmpleadosSendNotiEmail.forEach(function (elemento, indice, array) {
       // Discriminación de elementos iguales
-      if(allNotificaciones.find(p=>p.empleado == elemento.empleado) == undefined)
-      {
+      if (allNotificaciones.find(p => p.empleado == elemento.empleado) == undefined) {
         // Nueva lista de empleados que reciben la notificacion
         allNotificaciones.push(elemento);
       }

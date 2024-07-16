@@ -3,6 +3,9 @@ import { pool } from '../database';
 import { QueryResult } from 'pg';
 import { Notificacion, NotificacionTimbre, SettingsInfoEmpleado } from '../interfaces/Notificaciones';
 import nodemailer from 'nodemailer';
+import * as AUDITORIA_CONTROLADOR from '../controllers/auditotia.controller';
+import { FormatearFecha2, FormatearHora } from '../libs/metodos';
+
 
 /**
  * obtener registro de la tabla de realtime_noti
@@ -33,7 +36,8 @@ export const getNotificacion = async (req: Request, res: Response): Promise<Resp
 export const postNotificacion = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { id_empleado_envia, id_empleado_recibe, id_departamento_recibe, estado, fecha_hora, id_permiso,
-                id_vacaciones, id_hora_extra, mensaje, tipo } = req.body;
+            id_vacaciones, id_hora_extra, mensaje, tipo, user_name, ip } = req.body;
+        await pool.query('BEGIN');
 
         const response: QueryResult = await pool.query(`
         INSERT INTO ecm_realtime_notificacion( id_empleado_envia, id_empleado_recibe, id_departamento_recibe, estado, fecha_hora, 
@@ -43,6 +47,23 @@ export const postNotificacion = async (req: Request, res: Response): Promise<Res
         `,
             [id_empleado_envia, id_empleado_recibe, id_departamento_recibe, estado, fecha_hora, id_permiso, id_vacaciones,
                 id_hora_extra, mensaje, tipo]);
+
+
+        const horaN = await FormatearHora(fecha_hora.toLocaleString().split(' ')[1]);
+        const fechaN = await FormatearFecha2(fecha_hora.toLocaleString(), 'ddd');
+
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ecm_realtime_notificacion',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: `{id_empleado_envia: ${id_empleado_envia}, id_empleado_recibe: ${id_empleado_recibe}, id_departamento_recibe: ${id_departamento_recibe}, fecha_hora: ${fechaN + ' ' + horaN}, mensaje: ${mensaje}, id_permiso: ${id_permiso}, id_vacaciones: ${id_vacaciones}, id_hora_extra: ${id_hora_extra}, estado: ${estado}, visto: null, tipo: ${tipo}}`,
+            ip: ip,
+            observacion: null
+        });
+
+        await pool.query('COMMIT');
+
         const [notificiacion]: Notificacion[] = response.rows;
         if (!notificiacion) return res.status(400).jsonp({ message: 'No se registro notificación.' });
 
@@ -52,8 +73,8 @@ export const postNotificacion = async (req: Request, res: Response): Promise<Res
             FROM eu_empleados WHERE id = $1
             `,
             [id_empleado_envia]);
-      
-          notificiacion.usuario = USUARIO.rows[0].usuario;
+
+        notificiacion.usuario = USUARIO.rows[0].usuario;
 
         return res.status(200).jsonp({ message: 'Se ha enviado la respectiva notificación.', respuesta: notificiacion });
 
@@ -91,7 +112,8 @@ export const getNotificacionTimbres = async (req: Request, res: Response): Promi
  */
 export const postAvisosGenerales = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const { fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo } = req.body;
+        const { fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo, user_name, ip } = req.body;
+        await pool.query('BEGIN');
 
         const response: QueryResult = await pool.query(
             `
@@ -100,8 +122,21 @@ export const postAvisosGenerales = async (req: Request, res: Response): Promise<
             `,
             [fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo]);
 
-        const [notificiacion]: NotificacionTimbre[] = response.rows;
+        const horaN = await FormatearHora(fecha_hora.toLocaleString().split(' ')[1]);
+        const fechaN = await FormatearFecha2(fecha_hora.toLocaleString(), 'ddd');
 
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ecm_realtime_timbres',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: `{id_empleado_envia: ${id_empleado_envia}, id_empleado_recibe: ${id_empleado_recibe}, fecha_hora: ${fechaN + ' ' + horaN}, descripcion: ${descripcion}, mensaje: null, id_timbre: null, visto: null, tipo: ${tipo}}`,
+            ip: ip,
+            observacion: null
+        });
+        await pool.query('COMMIT');
+
+        const [notificiacion]: NotificacionTimbre[] = response.rows;
         if (!notificiacion) return res.status(400).jsonp({ message: 'No se inserto notificación' });
 
         const USUARIO = await pool.query(
@@ -110,8 +145,8 @@ export const postAvisosGenerales = async (req: Request, res: Response): Promise<
             FROM eu_empleados WHERE id = $1
             `,
             [id_empleado_envia]);
-      
-          notificiacion.usuario = USUARIO.rows[0].usuario;
+
+        notificiacion.usuario = USUARIO.rows[0].usuario;
 
         return res.status(200).jsonp({ message: 'Notificación creada', respuesta: notificiacion });
 
@@ -129,7 +164,7 @@ export const postAvisosGenerales = async (req: Request, res: Response): Promise<
 
 // NOTIFICACIONES DE SOLICITUDES Y PLANIFICACIÓN DE SERVICIO DE ALIMENTACIÓN
 export const EnviarNotificacionComidas = async (req: Request, res: Response): Promise<Response> => {
-    let { id_empl_envia, id_empl_recive, mensaje, tipo, id_comida, fecha_hora } = req.body;
+    let { id_empleado_envia, id_empleado_recibe, descripcion, tipo, id_comida, fecha_hora, user_name, ip } = req.body;
 
     const SERVICIO_SOLICITADO = await pool.query(
         `
@@ -140,29 +175,43 @@ export const EnviarNotificacionComidas = async (req: Request, res: Response): Pr
       `,
         [id_comida]);
 
-    let notifica = mensaje + SERVICIO_SOLICITADO.rows[0].servicio;
-
+    let notifica = descripcion + SERVICIO_SOLICITADO.rows[0].servicio;
+    await pool.query('BEGIN');
     const response: QueryResult = await pool.query(
         `
         INSERT INTO ecm_realtime_timbres(fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo) 
         VALUES($1, $2, $3, $4, $5) RETURNING *
         `,
-        [fecha_hora, id_empl_envia, id_empl_recive, notifica, tipo]);
-  
-      const [notificiacion] = response.rows;
-  
-      if (!notificiacion) return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
+        [fecha_hora, id_empleado_envia, id_empleado_recibe, notifica, tipo]);
 
-      const USUARIO = await pool.query(
+
+    const horaN = await FormatearHora(fecha_hora.toLocaleString().split(' ')[1]);
+    const fechaN = await FormatearFecha2(fecha_hora.toLocaleString(), 'ddd');
+
+    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ecm_realtime_timbres',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{id_empleado_envia: ${id_empleado_envia}, id_empleado_recibe: ${id_empleado_recibe}, fecha_hora: ${fechaN + ' ' + horaN}, descripcion: ${notifica}, mensaje: null, id_timbre: null, visto: null, tipo: ${tipo}}`,
+        ip: ip,
+        observacion: null
+    });
+    await pool.query('COMMIT');
+    const [notificiacion] = response.rows;
+
+    if (!notificiacion) return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
+
+    const USUARIO = await pool.query(
         `
         SELECT (nombre || ' ' || apellido) AS usuario
         FROM eu_empleados WHERE id = $1
         `,
-        [id_empl_envia]);
-  
-      notificiacion.usuario = USUARIO.rows[0].usuario;
-  
-      return res.status(200)
+        [id_empleado_envia]);
+
+    notificiacion.usuario = USUARIO.rows[0].usuario;
+
+    return res.status(200)
         .jsonp({ message: 'Se ha enviado la respectiva notificación.', respuesta: notificiacion });
 }
 
@@ -186,7 +235,7 @@ export const getInfoEmpleadoByCodigo = async (req: Request, res: Response): Prom
             `
         const response: QueryResult = await pool.query(query);
         const [infoEmpleado]: SettingsInfoEmpleado[] = response.rows;
-        console.log("ver",response.rows);
+        console.log("ver", response.rows);
 
         console.log(infoEmpleado);
 
@@ -370,9 +419,43 @@ export const DatosGenerales = async (req: Request, res: Response): Promise<Respo
 
 export const NotificaVisto = async (req: Request, res: Response) => {
     try {
-        const { id_notificacion, visible } = req.body
+        const { id_notificacion, visible, user_name, ip } = req.body
+        await pool.query('BEGIN');
+
+        const notificacionBuscada = await pool.query('SELECT * FROM ecm_realtime_notificacion WHERE id = $1', [id_notificacion]);
+        const [datosOriginales] = notificacionBuscada.rows;
+        if (!datosOriginales) {
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'ecm_realtime_notificacion',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: '',
+                datosNuevos: '',
+                ip: ip,
+                observacion: `Error al actualizar solicitud de comidas con id: ${id_notificacion}. Registro no encontrado`
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado' });
+        }
 
         const response: QueryResult = await pool.query('UPDATE ecm_realtime_notificacion SET visto = $1 WHERE id = $2', [visible, id_notificacion])
+
+        const horaN = await FormatearHora(datosOriginales.fecha_hora.toLocaleString().split(' ')[1]);
+        const fechaN = await FormatearFecha2(datosOriginales.fecha_hora.toLocaleString(), 'ddd');
+
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ecm_realtime_notificacion',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: `{id_empleado_envia: ${datosOriginales.id_empleado_envia}, id_empleado_recibe: ${datosOriginales.id_empleado_recibe}, id_departamento_recibe: ${datosOriginales.id_departamento_recibe}, fecha_hora: ${fechaN + ' ' + horaN}, mensaje: ${datosOriginales.mensaje}, id_permiso: ${datosOriginales.id_permiso}, id_vacaciones: ${datosOriginales.id_vacaciones}, id_hora_extra: ${datosOriginales.id_hora_extra}, estado: ${datosOriginales.estado}, visto: ${datosOriginales.visto}, tipo: ${datosOriginales.tipo}} `,
+            datosNuevos: `{id_empleado_envia: ${datosOriginales.id_empleado_envia}, id_empleado_recibe: ${datosOriginales.id_empleado_recibe}, id_departamento_recibe: ${datosOriginales.id_departamento_recibe}, fecha_hora: ${fechaN + ' ' + horaN}, mensaje: ${datosOriginales.mensaje}, id_permiso: ${datosOriginales.id_permiso}, id_vacaciones: ${datosOriginales.id_vacaciones}, id_hora_extra: ${datosOriginales.id_hora_extra}, estado: ${datosOriginales.estado}, visto: ${visible}, tipo: ${datosOriginales.tipo}} `,
+            ip,
+            observacion: null
+        });
+        await pool.query('COMMIT');
+
         const notificacion: Notificacion[] = response.rows;
         return res.status(200).jsonp(notificacion);
 
@@ -385,9 +468,42 @@ export const NotificaVisto = async (req: Request, res: Response) => {
 export const NotifiTimbreVisto = async (req: Request, res: Response) => {
     try {
 
-        const { id_notificacion, visible } = req.body
+        const { id_notificacion, visible, user_name, ip } = req.body
+        await pool.query('BEGIN');
+        const notificacionTimbreBuscada = await pool.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1', [id_notificacion]);
+        const [datosOriginales] = notificacionTimbreBuscada.rows;
+
+        if (!datosOriginales) {
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'ecm_realtime_timbres',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: '',
+                datosNuevos: '',
+                ip: ip,
+                observacion: `Error al actualizar solicitud de comidas con id: ${id_notificacion}. Registro no encontrado`
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado' });
+        }
+
         console.log(req.body);
         const response: QueryResult = await pool.query('UPDATE ecm_realtime_timbres SET visto = $1 WHERE id = $2', [visible, id_notificacion])
+        const horaN = await FormatearHora(datosOriginales.fecha_hora.toLocaleString().split(' ')[1]);
+        const fechaN = await FormatearFecha2(datosOriginales.fecha_hora.toLocaleString(), 'ddd');
+    // AUDITORIA
+    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ecm_realtime_timbres',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: `{id_empleado_envia: ${datosOriginales.id_empleado_envia}, id_empleado_recibe: ${datosOriginales.id_empleado_recibe}, fecha_hora: ${fechaN + ' ' + horaN}, descripcion: ${datosOriginales.descripcion}, mensaje: ${datosOriginales.mensaje}, id_timbre: ${datosOriginales.id_timbre}, visto: ${datosOriginales.visto}, tipo: ${datosOriginales.tipo}} `,
+        datosNuevos: `{id_empleado_envia: ${datosOriginales.id_empleado_envia}, id_empleado_recibe: ${datosOriginales.id_empleado_recibe}, fecha_hora: ${fechaN + ' ' + horaN}, descripcion: ${datosOriginales.descripcion}, mensaje: ${datosOriginales.mensaje}, id_timbre: ${datosOriginales.id_timbre}, visto: ${visible}, tipo: ${datosOriginales.tipo}} `,
+        ip,
+        observacion: null
+    });
+    await pool.query('COMMIT');
+
         const notificacionTimbre: NotificacionTimbre[] = response.rows;
 
         return res.status(200).jsonp(notificacionTimbre);
@@ -400,15 +516,28 @@ export const NotifiTimbreVisto = async (req: Request, res: Response) => {
 
 // NOTIFICACIÓNES GENERALES
 export const EnviarNotificacionGeneral = async (req: Request, res: Response): Promise<Response> => {
-    let { fecha_hora, id_empl_envia, id_empl_recive, mensaje, tipo } = req.body;
+    let { fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo, user_name, ip } = req.body;
+    await pool.query('BEGIN');
 
     const response: QueryResult = await pool.query(
-      `
+        `
         INSERT INTO ecm_realtime_timbres(fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo) 
         VALUES($1, $2, $3, $4, $5) RETURNING *
       `,
-      [fecha_hora, id_empl_envia, id_empl_recive, mensaje, tipo]);
+        [fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo]);
 
+    const horaN = await FormatearHora(fecha_hora.toLocaleString().split(' ')[1]);
+    const fechaN = await FormatearFecha2(fecha_hora.toLocaleString(), 'ddd');
+    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ecm_realtime_timbres',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{id_empleado_envia: ${id_empleado_envia}, id_empleado_recibe: ${id_empleado_recibe}, fecha_hora: ${fechaN + ' ' + horaN}, descripcion: ${descripcion}, mensaje: null, id_timbre: null, visto: null, tipo: ${tipo}}`,
+        ip: ip,
+        observacion: null
+    });
+    await pool.query('COMMIT');
     const [notificiacion] = response.rows;
 
     if (!notificiacion) return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
@@ -418,31 +547,31 @@ export const EnviarNotificacionGeneral = async (req: Request, res: Response): Pr
         SELECT (nombre || ' ' || apellido) AS usuario
         FROM eu_empleados WHERE id = $1
         `,
-        [id_empl_envia]);
-  
-      notificiacion.usuario = USUARIO.rows[0].usuario;
+        [id_empleado_envia]);
+
+    notificiacion.usuario = USUARIO.rows[0].usuario;
 
     return res.status(200)
-      .jsonp({ message: 'Comunicado enviado exitosamente.', respuesta: notificiacion });
+        .jsonp({ message: 'Comunicado enviado exitosamente.', respuesta: notificiacion });
 }
 
 // METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES
 export const ObtenerConfigEmpleado = async (req: Request, res: Response): Promise<Response> => {
     const id_empleado = req.params.id;
     if (id_empleado != 'NaN') {
-      const CONFIG_NOTI = await pool.query(
-        `
+        const CONFIG_NOTI = await pool.query(
+            `
         SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1
         `
-        , [id_empleado]);
-      if (CONFIG_NOTI.rowCount > 0) {
-        return res.status(200).jsonp(CONFIG_NOTI.rows);
-      }
-      else {
-        return res.status(404).jsonp({ text: 'Registro no encontrados.' });
-      }
+            , [id_empleado]);
+        if (CONFIG_NOTI.rowCount > 0) {
+            return res.status(200).jsonp(CONFIG_NOTI.rows);
+        }
+        else {
+            return res.status(404).jsonp({ text: 'Registro no encontrados.' });
+        }
     } else {
-      return res.status(500).jsonp({ text: 'Sin registros encontrados.' });
+        return res.status(500).jsonp({ text: 'Sin registros encontrados.' });
     }
 }
 

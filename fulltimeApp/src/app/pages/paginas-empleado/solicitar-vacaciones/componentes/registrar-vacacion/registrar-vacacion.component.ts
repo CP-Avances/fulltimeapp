@@ -446,6 +446,9 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     noti.mensaje = 'Ha realizado una solicitud de vacaciones desde ' +
       desde + ' hasta ' + hasta;
 
+    noti.user_name = this.userService.username;
+    noti.ip = localStorage.getItem('ip')  
+
     //Listado para eliminar el usuario duplicado
     var allNotificaciones = [];
     //Ciclo por cada elemento del listado

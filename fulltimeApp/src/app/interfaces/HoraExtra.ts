@@ -28,6 +28,8 @@ export interface HoraExtra {
     hora_inicio_?: string;
     hora_fin_?: string;
     id_departamento?: number;
+    ip?: string;
+    user_name?: string;
 }
 
 export const horaExtraDefaultValue = {

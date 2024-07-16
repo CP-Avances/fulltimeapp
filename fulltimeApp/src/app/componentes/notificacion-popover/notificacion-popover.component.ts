@@ -279,7 +279,7 @@ export class NotificacionPopoverComponent implements OnInit {
   
   cambiovistanoti(noti:{id: number}) {
     const vista = true;
-    const datos = {id_notificacion: noti.id, visible: vista}
+    const datos = {id_notificacion: noti.id, visible: vista, user_name:this.userService.username, ip: localStorage.getItem('ip')}
 
     this.vistonotificacion.PutNotificaVisto(datos).subscribe(
       res => {
@@ -292,7 +292,7 @@ export class NotificacionPopoverComponent implements OnInit {
 
   cambiovistanotitimbre(noti:{id: number}) {
     const vista = true;
-    const datos = {id_notificacion: noti.id, visible: vista}
+    const datos = {id_notificacion: noti.id, visible: vista, user_name: this.userService.username, ip: localStorage.getItem('ip')}
     
     this.vistonotificacion.PutNotifiTimbreVisto(datos).subscribe(
       res => {

@@ -221,7 +221,7 @@ const putAlimentacion = (req, res) => __awaiter(void 0, void 0, void 0, function
             usuario: user_name,
             accion: 'U',
             datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_detalle_comida: ${datosOriginales.id_detalle_comida}, fecha: ${fechaO}, fecha_comida: ${fechaComidaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${datosOriginales.observacion}, extra: ${datosOriginales.extra}, verificar: ${datosOriginales.verificar}} `,
-            datosNuevos: `{id_empleado: ${id_empleado}, id_detalle_comida: ${id_detalle_comida}, fecha: ${fechaN}, fecha_comida: ${fechaComidaN}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${observacion}, extra: ${extra}}} `,
+            datosNuevos: `{id_empleado: ${id_empleado}, id_detalle_comida: ${id_detalle_comida}, fecha: ${fechaN}, fecha_comida: ${fechaComidaN}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${observacion}, extra: ${extra}} `,
             ip,
             observacion: null
         });

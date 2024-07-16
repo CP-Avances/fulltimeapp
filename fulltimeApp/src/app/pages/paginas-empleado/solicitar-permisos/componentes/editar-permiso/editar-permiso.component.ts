@@ -20,6 +20,7 @@ import { HorarioE } from 'src/app/interfaces/Horarios';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { VacacionesService } from 'src/app/services/vacaciones.service';
+import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 
 @Component({
   selector: 'app-editar-permiso',
@@ -41,7 +42,7 @@ export class EditarPermisoComponent implements OnInit {
   horarioEmpleado: HorarioE;
   loadingBtn: boolean = false;
   mensajeFile: string;
-  archivoSubido: Array <File> | null;
+  archivoSubido: Array<File> | null;
   required: boolean = false;
   legalizado: string;
   readonly: boolean = false;
@@ -102,6 +103,8 @@ export class EditarPermisoComponent implements OnInit {
     public parametro: ParametrosService,
     public validar: ValidacionesService,
     public alertCrtl: AlertController,
+    private userService: DataUserLoggedService,
+
   ) {
     this.idEmpresa = parseInt(String(localStorage.getItem('id_empresa')));
   }
@@ -126,24 +129,24 @@ export class EditarPermisoComponent implements OnInit {
     this.diaPermiso_refe = 0;
     this.dialibre_refe = 0;
     this.horas_refe = '00:00:00';
-    
+
     this.datosAntiguos(this.permiso);
 
-    var [cg_permiso] = this.cg_tipo_permisos.filter(o => {return o.id === this.reg.id_tipo_permiso})
+    var [cg_permiso] = this.cg_tipo_permisos.filter(o => { return o.id === this.reg.id_tipo_permiso })
     this.cg_permiso = cg_permiso;
 
-    if(this.reg.documento == null || this.reg.documento == ''){
+    if (this.reg.documento == null || this.reg.documento == '') {
       this.mensajeFile = "No hay archivo subido";
       this.TiempoDocumentJustifi();
-    }else{
-      this. TiempoDocumentJustifi()
+    } else {
+      this.TiempoDocumentJustifi()
     }
 
     this.dia_inicio = moment(this.reg.fecha_inicio).format('YYYY-MM-DD');
     this.dia_fianl = moment(this.reg.fecha_final).format('YYYY-MM-DD');
-    
+
     /*Esta tranformacion se realizada debido a que el formato de las variables this.permiso.hora_salida y this.permiso.hora_ingreso no es correcto y se 
-      realiza la configuracion para adaptar ese dato y transforma a una dato de tipo Date que permita visualizar en el input con el formato correcto.*/ 
+      realiza la configuracion para adaptar ese dato y transforma a una dato de tipo Date que permita visualizar en el input con el formato correcto.*/
     let hora_ini = this.permiso.hora_salida;
     const Horainicio = this.validaciones.Unir_Fecha_Hora(String(this.dia_inicio), hora_ini);
     this.reg.hora_salida = moment(Horainicio).format();
@@ -154,11 +157,11 @@ export class EditarPermisoComponent implements OnInit {
     this.reg.hora_ingreso = moment(HoraFinal).format();
     this.hora_final = moment(HoraFinal).format('hh:mm a');
 
-    if(this.reg.dias_permiso != 0 && this.reg.horas_permiso == '00:00:00'){
+    if (this.reg.dias_permiso != 0 && this.reg.horas_permiso == '00:00:00') {
       this.selectItemDiasHoras = 'Días';
       this.diaPermiso_refe = this.reg.dias_permiso;
       this.dialibre_refe = this.reg.dia_libre;
-    }else if(this.reg.dias_permiso == 0 && this.reg.horas_permiso != '00:00:00'){
+    } else if (this.reg.dias_permiso == 0 && this.reg.horas_permiso != '00:00:00') {
       this.selectItemDiasHoras = 'Horas';
       this.horas_refe = this.reg.horas_permiso;
       this.readonly = false;
@@ -171,37 +174,37 @@ export class EditarPermisoComponent implements OnInit {
     this.horario_ingreso = '00:00:00';
 
     var busqueda = {
-      fecha: moment(this.reg.fecha_inicio).format('YYYY-MM-D'), 
+      fecha: moment(this.reg.fecha_inicio).format('YYYY-MM-D'),
       codigo: this.reg.codigo
     }
 
-    this.empleadoService.getHorariosEmpleadobyCodigo(busqueda).subscribe(datos => { 
+    this.empleadoService.getHorariosEmpleadobyCodigo(busqueda).subscribe(datos => {
       this.plan_horario = this.validaciones.ObtenerDetallesPlanificacion(datos);
 
       const hora_salida = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_salida);
-      const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_inicio!, hora_salida );
+      const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_inicio!, hora_salida);
 
       this.plan_horario.filter(item => {
-        const HorarioInicio = this.validaciones.Unir_Fecha_Hora(String(this.dia_inicio),item.entrada);      
-        const HorarioFinal = this.validaciones.Unir_Fecha_Hora(String(this.dia_inicio),item.salida);
+        const HorarioInicio = this.validaciones.Unir_Fecha_Hora(String(this.dia_inicio), item.entrada);
+        const HorarioFinal = this.validaciones.Unir_Fecha_Hora(String(this.dia_inicio), item.salida);
 
-        if((fec_comp_inicio.toTimeString() >= HorarioInicio.toTimeString()) && (fec_comp_inicio.toTimeString() <= HorarioFinal.toTimeString())){
+        if ((fec_comp_inicio.toTimeString() >= HorarioInicio.toTimeString()) && (fec_comp_inicio.toTimeString() <= HorarioFinal.toTimeString())) {
           this.horario_salida = item.entrada;
           this.horario = item.horario
           this.fech_bloquf = false;
         }
       });
-      
-    },err => { 
+
+    }, err => {
       this.validar.showToast(err.error.message, 3000, 'danger')
     });
 
-    if(this.selectItemDiasHoras == 'Horas'){
+    if (this.selectItemDiasHoras == 'Horas') {
       //Esta variable permite contar el dia siguiente ingresado en el campo de dia inicial y que sea este dato el valor a leer en la fecha maxima
       var fechasiguiente = new Date(this.reg.fecha_inicio);
       fechasiguiente.setDate(fechasiguiente.getDate() + 1);
       this.dia_siguiente = moment(fechasiguiente).format('YYYY-MM-DD');
-    }else{
+    } else {
       this.dia_siguiente = '2050-12-31';
     }
 
@@ -222,26 +225,26 @@ export class EditarPermisoComponent implements OnInit {
   }
 
   //METODO VALIDAR TIEMPO MAXIMO DE SUBIR DOCUMENTO
-  TiempoDocumentJustifi(){
-    if(this.cg_permiso.justificar == true){
+  TiempoDocumentJustifi() {
+    if (this.cg_permiso.justificar == true) {
       //conteo de días para validar el num de dias para justificar y subir el documento
       var diahoy: any = new Date();
       var diaCreacion = new Date(this.reg.fecha_creacion).getTime();
-      var diasDiferencia: number =  diahoy - diaCreacion;
+      var diasDiferencia: number = diahoy - diaCreacion;
       //Ponemos la hora en 00:00:00 para tomar el dia completo
       diahoy.setHours(0, 0, 0, 0);
       diahoy = diahoy.getTime();
       //Obtenemos el valor de los dias trasncuridos con la siguiente formula donde el 24 es la hora, 60 son minutos, 60 son segundos y 1000 son milisegun
       let dias: number = Math.floor(diasDiferencia / (24 * 60 * 60 * 1000));
-     
-      if( dias > this.cg_permiso.dias_justificar && (this.reg.documento == ''|| this.reg.documento == null)){
-        this.mensajedocumentBloqueado = 'Lo sentimos, el plazo para subir el documento es de '+this.cg_permiso.dias_justificar+' días y usted esta fuera el plazo'
+
+      if (dias > this.cg_permiso.dias_justificar && (this.reg.documento == '' || this.reg.documento == null)) {
+        this.mensajedocumentBloqueado = 'Lo sentimos, el plazo para subir el documento es de ' + this.cg_permiso.dias_justificar + ' días y usted esta fuera el plazo'
         this.blockDocument = true;
-      }else{
+      } else {
         this.blockDocument = false;
         this.mensajedocumentBloqueado = '';
       }
-    }else{
+    } else {
       this.blockDocument = false;
     }
   }
@@ -269,10 +272,10 @@ export class EditarPermisoComponent implements OnInit {
   }
 
   permisoAntiguo: any;
-  datosAntiguos(permiso: any){
+  datosAntiguos(permiso: any) {
     this.permisoService.getPermisoIdyCodigo(permiso.codigo, permiso.id).subscribe(dato => {
       this.permisoAntiguo = dato[0];
-      var [cg_permiso] = this.cg_tipo_permisos.filter(o => {return o.id === this.reg.id_tipo_permiso})
+      var [cg_permiso] = this.cg_tipo_permisos.filter(o => { return o.id === this.reg.id_tipo_permiso })
       this.tipo_permiso_anterior = cg_permiso.descripcion
     })
   }
@@ -298,12 +301,12 @@ export class EditarPermisoComponent implements OnInit {
     return false
   }
 
-   //METODO ENCERRAR LOS INPUTS DE LOS RESULTADOS DE LOS CALCULOS
-   valoresDefectoValidacionResultados(){
+  //METODO ENCERRAR LOS INPUTS DE LOS RESULTADOS DE LOS CALCULOS
+  valoresDefectoValidacionResultados() {
     this.reg.dias_permiso = null;
     this.reg.dia_libre = null;
     this.reg.horas_permiso = null;
-    this.btnOculto = false; 
+    this.btnOculto = false;
     this.btnOcultoguardar = true;
   }
 
@@ -316,40 +319,40 @@ export class EditarPermisoComponent implements OnInit {
     this.cg_permiso = cg_permisoValueDefault;
     this.valoresDefectoValidacionResultados();
     //Metodo para mostrar el mensaje al seleccionar
-    if(!$event.target.value){
+    if (!$event.target.value) {
       return console.log('Salio ', $event.target.value);
-    }else{
-      const [cg_permiso] = this.cg_tipo_permisos.filter(o => {return o.id === this.reg.id_tipo_permiso})
+    } else {
+      const [cg_permiso] = this.cg_tipo_permisos.filter(o => { return o.id === this.reg.id_tipo_permiso })
       this.cg_permiso = cg_permiso;
-      
-      if(this.cg_permiso.id == this.reg.id_tipo_permiso ){
+
+      if (this.cg_permiso.id == this.reg.id_tipo_permiso) {
         const num_maxPermiso = this.cg_permiso.dias_maximo_permiso;
-        console.log('Dias maximo ',this.cg_permiso.dias_maximo_permiso);
+        console.log('Dias maximo ', this.cg_permiso.dias_maximo_permiso);
 
         const permilegalizado = this.cg_permiso.legalizar;
-  
-        if(permilegalizado == true){
+
+        if (permilegalizado == true) {
           this.legalizado = 'SI';
           this.reg.legalizado = permilegalizado;
-          console.log('Legalizado ',this.reg.legalizado)
-        }else{
+          console.log('Legalizado ', this.reg.legalizado)
+        } else {
           this.legalizado = 'NO';
           this.reg.legalizado = permilegalizado;
-          console.log('Legalizado ',this.reg.legalizado)
+          console.log('Legalizado ', this.reg.legalizado)
         }
-  
-        if(this.cg_permiso.documento == true){
+
+        if (this.cg_permiso.documento == true) {
           this.required = true;
-        }else{
+        } else {
           this.required = false;
         }
 
-        if(this.cg_permiso.incluir_minutos_comida === true){
+        if (this.cg_permiso.incluir_minutos_comida === true) {
           this.informacion_comida = `Aplica descuento de minutos de alimentación si el permiso es solicitado por horas y se encuentra dentro del horario de alimentación.`;
         }
 
-        this.validaciones.abrirToas(' Dias maximos de Permiso - '+num_maxPermiso, 3000, 'tertiary', 'top');
-        return console.log('Se requiere documento ',this.required), this.cg_permiso.dias_maximo_permiso;
+        this.validaciones.abrirToas(' Dias maximos de Permiso - ' + num_maxPermiso, 3000, 'tertiary', 'top');
+        return console.log('Se requiere documento ', this.required), this.cg_permiso.dias_maximo_permiso;
       }
     }
   }
@@ -361,24 +364,24 @@ export class EditarPermisoComponent implements OnInit {
     this.btnOcultoguardar = true;
     this.reg.horas_permiso = null;
     this.readonly = false;
-    if(!$event.target.value){
+    if (!$event.target.value) {
       return console.log('Salio ', $event.target.value);
-    }else{
-     const [diasHora] = this.diasHoras.filter(o => { return o.value === this.selectItemDiasHoras })
-     if( diasHora != undefined || diasHora != null ){
-       this.validaciones.showToast(diasHora.message, 3500, 'primary')
-       this.reg.dias_permiso = null;
+    } else {
+      const [diasHora] = this.diasHoras.filter(o => { return o.value === this.selectItemDiasHoras })
+      if (diasHora != undefined || diasHora != null) {
+        this.validaciones.showToast(diasHora.message, 3500, 'primary')
+        this.reg.dias_permiso = null;
         this.reg.dia_libre = null; // POR DEFECTO HASTA HACER LA VALIDACION CORRESPONDIENTES A DIAS LIBRES EN EL RANGO DE TIEMPO DEL PERMISO
         switch (diasHora.value) {
           case 'Días':
-            this.reg.horas_permiso = null ; // POR DEFECTO YA QUE ES PERMISO POR DIAS
-          break;
+            this.reg.horas_permiso = null; // POR DEFECTO YA QUE ES PERMISO POR DIAS
+            break;
           case 'Horas':
             this.readonly = true;
             this.reg.fecha_final = this.reg.fecha_inicio;
             this.dia_fianl = this.dia_inicio;
             this.reg.dias_permiso = 0; // POR DEFECTO YA Q ES PERMISO POR SOLO HORAS.
-          break;
+            break;
           case 'Días y Horas': break;
           default: break;
         }
@@ -387,8 +390,8 @@ export class EditarPermisoComponent implements OnInit {
 
   }
 
-   // Diseno de Mensaje de notificacion con logo 
-   async showAlert(){
+  // Diseno de Mensaje de notificacion con logo 
+  async showAlert() {
     let alert = await this.alertCrtl.create({
       message: `<div class="card-alert">
                   <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
@@ -403,73 +406,73 @@ export class EditarPermisoComponent implements OnInit {
         }],
       mode: "ios",
       backdropDismiss: false,
-    });await alert.present();
+    }); await alert.present();
   }
 
 
   cont_tipo_dia_libre: number = 0;
   //METODO VALIDADOR DE DIAS LIBRES
-  DiaIniciolLibre(){
+  DiaIniciolLibre() {
     //let dia_retur;
-    this.cont_tipo_dia_libre = 0; 
-    if(this.reg.fecha_inicio != null){
+    this.cont_tipo_dia_libre = 0;
+    if (this.reg.fecha_inicio != null) {
       var busqueda = {
-        fecha: moment(this.reg.fecha_inicio).format('YYYY-MM-D'), 
+        fecha: moment(this.reg.fecha_inicio).format('YYYY-MM-D'),
         codigo: this.reg.codigo
       }
-      
-      this.empleadoService.getHorariosEmpleadobyCodigo(busqueda).subscribe(datos => { 
+
+      this.empleadoService.getHorariosEmpleadobyCodigo(busqueda).subscribe(datos => {
         this.plan_horario = this.validaciones.ObtenerDetallesPlanificacion(datos);
 
-        if(this.plan_horario == undefined){
+        if (this.plan_horario == undefined) {
           return this.btnOculto = true;
         }
 
         this.plan_horario.filter(item => {
-          if(item.tipo_dia == 'L' ||  item.tipo_dia == 'FD'){
+          if (item.tipo_dia == 'L' || item.tipo_dia == 'FD') {
             this.cont_tipo_dia_libre += 1;
           }
         });
 
-        if(this.cont_tipo_dia_libre == this.plan_horario.length){
+        if (this.cont_tipo_dia_libre == this.plan_horario.length) {
           console.log('dia libre')
           this.showAlert();
           this.valoresDefectoValidacionHoras();
           this.btnOculto = true;
           return this.readonly = true;
-        }else{
+        } else {
           console.log('dia laboral')
-          if(this.cg_permiso.fecha_restriccion == true){
-            if((this.dia_inicio >= moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD')) && (this.dia_inicio <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'))){
-              this.validaciones.showToast('Lo Sentimos la fecha '+this.dia_inicio+' esta dentro del rango de los días reservados', 3500, 'warning');
+          if (this.cg_permiso.fecha_restriccion == true) {
+            if ((this.dia_inicio >= moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD')) && (this.dia_inicio <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'))) {
+              this.validaciones.showToast('Lo Sentimos la fecha ' + this.dia_inicio + ' esta dentro del rango de los días reservados', 3500, 'warning');
               this.valoresDefectoValidacionHoras();
               this.readonly = true
               return this.btnOculto = true;
             }
           }
 
-            //Esta variable permite contar el dia siguiente ingresado en el campo de dia inicial y que sea este dato el valor a leer en la fecha maxima
-            var fechasiguiente = new Date(this.reg.fecha_inicio);
-            fechasiguiente.setDate(fechasiguiente.getDate() + 1);
+          //Esta variable permite contar el dia siguiente ingresado en el campo de dia inicial y que sea este dato el valor a leer en la fecha maxima
+          var fechasiguiente = new Date(this.reg.fecha_inicio);
+          fechasiguiente.setDate(fechasiguiente.getDate() + 1);
 
-            console.log('fechasiguiente: ',fechasiguiente);
+          console.log('fechasiguiente: ', fechasiguiente);
 
-            if(this.selectItemDiasHoras == 'Horas'){
-              this.dia_siguiente = moment(fechasiguiente).format('YYYY-MM-DD');
-              this.reg.horas_permiso = null; 
-              this.readonly = false;
-              this.btnOcultoguardar = true;
-              this.datetimeInicio.confirm(true);
-              return this.btnOculto = false;
-            }else{
-              this.dia_siguiente = '2050-12-31';
-              this.readonly = false;
-              this.fech_bloqu = false;
-              return this.datetimeInicio.confirm(true);;
-            }
-          
+          if (this.selectItemDiasHoras == 'Horas') {
+            this.dia_siguiente = moment(fechasiguiente).format('YYYY-MM-DD');
+            this.reg.horas_permiso = null;
+            this.readonly = false;
+            this.btnOcultoguardar = true;
+            this.datetimeInicio.confirm(true);
+            return this.btnOculto = false;
+          } else {
+            this.dia_siguiente = '2050-12-31';
+            this.readonly = false;
+            this.fech_bloqu = false;
+            return this.datetimeInicio.confirm(true);;
+          }
+
         }
-      },err => { 
+      }, err => {
         this.btnOculto = true;
         this.validar.showToast(err.error.message, 3000, 'danger')
       });
@@ -477,61 +480,61 @@ export class EditarPermisoComponent implements OnInit {
   }
 
   //METODO VALIDADOR DE DIAS LIBRES
-  DiaFinalLibre(){
-    this.cont_tipo_dia_libre = 0; 
-    if(this.reg.fecha_final != null){
+  DiaFinalLibre() {
+    this.cont_tipo_dia_libre = 0;
+    if (this.reg.fecha_final != null) {
 
       var busqueda = {
-        fecha: moment(this.reg.fecha_final).format('YYYY-MM-D'), 
+        fecha: moment(this.reg.fecha_final).format('YYYY-MM-D'),
         codigo: this.reg.codigo
       }
 
-      this.empleadoService.getHorariosEmpleadobyCodigo(busqueda).subscribe(datos => { 
+      this.empleadoService.getHorariosEmpleadobyCodigo(busqueda).subscribe(datos => {
         this.plan_horario = this.validaciones.ObtenerDetallesPlanificacion(datos);
 
-        if(this.plan_horario == undefined){
+        if (this.plan_horario == undefined) {
           return this.btnOculto = true;
         }
 
         this.plan_horario.filter(item => {
-          if(item.tipo_dia == 'L' ||  item.tipo_dia == 'FD'){
+          if (item.tipo_dia == 'L' || item.tipo_dia == 'FD') {
             this.cont_tipo_dia_libre += 1;
           }
         });
 
-        if(this.cont_tipo_dia_libre == this.plan_horario.length){
+        if (this.cont_tipo_dia_libre == this.plan_horario.length) {
           console.log('dia libre')
           this.showAlert();
           return this.btnOculto = true;
-        }else{
+        } else {
           console.log('dia laboral');
-          if(this.cg_permiso.fecha_restriccion == true){
-            if((this.dia_fianl >= moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD')) && (this.dia_fianl <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'))){
-              this.validaciones.showToast('Lo Sentimos la fecha '+this.dia_fianl+' esta dentro del rango de los días reservados', 3500, 'warning');
+          if (this.cg_permiso.fecha_restriccion == true) {
+            if ((this.dia_fianl >= moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD')) && (this.dia_fianl <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'))) {
+              this.validaciones.showToast('Lo Sentimos la fecha ' + this.dia_fianl + ' esta dentro del rango de los días reservados', 3500, 'warning');
               this.valoresDefectoValidacionHoras();
               this.btnOculto = true;
               return this.readonly = false;
-            }else if((this.dia_inicio <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD') && (this.dia_fianl >= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD')))){
-              this.validaciones.showToast('El rango de dias de permiso estan reservados, no puede pedir en el rango de '+moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD')+' - '+moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'), 4000, 'warning');
+            } else if ((this.dia_inicio <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD') && (this.dia_fianl >= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD')))) {
+              this.validaciones.showToast('El rango de dias de permiso estan reservados, no puede pedir en el rango de ' + moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD') + ' - ' + moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'), 4000, 'warning');
               this.valoresDefectoValidacionHoras();
               this.btnOculto = true;
               return this.readonly = false;
             }
           }
 
-          if(this.selectItemDiasHoras == 'Horas'){
+          if (this.selectItemDiasHoras == 'Horas') {
             this.datetimeFinal.confirm(true);
             this.fech_bloqu = false;
             return this.btnOculto = false;
-          }else{
+          } else {
             this.datetimeFinal.confirm(true);
             this.btnOculto = false;
             this.fech_bloqu = false;
           }
         }
-      },error => {
+      }, error => {
         this.validaciones.showToast('Ups! No tiene registrado un horario en ese día para solicitar un permiso', 3500, 'warning');
-        this.dia_fianl = ''; 
+        this.dia_fianl = '';
         return this.btnOculto = true;
       });
     }
@@ -539,54 +542,54 @@ export class EditarPermisoComponent implements OnInit {
 
   horario: number;
   // METODO ALIDAR Y CAMBIAR EL INPUT DE HORA INICAL Y FINAL
-  ChangeHoraInicio(e: any){
+  ChangeHoraInicio(e: any) {
     this.fech_bloquf = true;
     this.horario = 0;
     this.btnOculto = false;
     this.valoresDefectoValidacionResultados();
-    if(!e.target.value){
+    if (!e.target.value) {
       this.reg.hora_salida = moment(new Date()).format();
       return this.hora_inicio = moment(this.reg.hora_salida).format('h:mm a');
-    }else{
+    } else {
       this.reg.hora_salida = e.target.value;
-      this.hora_final = ''; 
+      this.hora_final = '';
       this.reg.hora_ingreso = null;
       this.reg.hora_salida = e.target.value;
 
       const hora_salida = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_salida);
-      const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_inicio, hora_salida );
+      const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_inicio, hora_salida);
 
-      var HorarioInicio: any 
+      var HorarioInicio: any
       var HorarioFinal: any
 
 
       this.plan_horario.filter(item => {
-        HorarioInicio = this.validaciones.Unir_Fecha_Hora(String(this.dia_inicio),item.entrada);      
-        HorarioFinal = this.validaciones.Unir_Fecha_Hora(String(this.dia_fianl),item.salida);
-        const HorarioFinalDiaIgual = this.validaciones.Unir_Fecha_Hora(String(this.dia_fianl),"23:59:59");
+        HorarioInicio = this.validaciones.Unir_Fecha_Hora(String(this.dia_inicio), item.entrada);
+        HorarioFinal = this.validaciones.Unir_Fecha_Hora(String(this.dia_fianl), item.salida);
+        const HorarioFinalDiaIgual = this.validaciones.Unir_Fecha_Hora(String(this.dia_fianl), "23:59:59");
 
-        if(item.entrada > item.salida){
-          if(this.dia_inicio  == this.dia_fianl){
-            if((fec_comp_inicio >= HorarioInicio) && (fec_comp_inicio <= HorarioFinalDiaIgual)){
+        if (item.entrada > item.salida) {
+          if (this.dia_inicio == this.dia_fianl) {
+            if ((fec_comp_inicio >= HorarioInicio) && (fec_comp_inicio <= HorarioFinalDiaIgual)) {
               this.horario_salida = item.entrada;
               this.horario = item.horario
               this.fech_bloquf = false;
             }
           }
-        }else if(item.entrada < item.salida){
-          if(this.dia_inicio  != this.dia_fianl){
+        } else if (item.entrada < item.salida) {
+          if (this.dia_inicio != this.dia_fianl) {
             this.validaciones.showToast('Ups! De acuerdo a su plan horario el dia final debe ser el mismo al dia inicial, ya que es horario normal', 4500, 'warning');
             return this.fech_bloquf = true
           }
         }
 
-        if((fec_comp_inicio >= HorarioInicio) && (fec_comp_inicio <= HorarioFinal)){
+        if ((fec_comp_inicio >= HorarioInicio) && (fec_comp_inicio <= HorarioFinal)) {
           this.horario_salida = item.entrada;
           this.horario = item.horario
           this.fech_bloquf = false;
         }
 
-        if(this.fech_bloquf == true){
+        if (this.fech_bloquf == true) {
           return this.validaciones.showToast('Ups! La hora de Inicio esta fuera de su horario de ingreso', 3500, 'warning');
         }
 
@@ -597,47 +600,47 @@ export class EditarPermisoComponent implements OnInit {
     }
   }
 
-  ChangeHoraFinal(e: any){
+  ChangeHoraFinal(e: any) {
     this.valoresDefectoValidacionResultados();
     this.btnOculto = true;
-    if(!e.target.value){
+    if (!e.target.value) {
       this.reg.hora_ingreso = moment(new Date()).format();
       return this.hora_final = moment(this.reg.hora_ingreso).format('h:mm a');
-    }else{
+    } else {
       this.reg.hora_ingreso = e.target.value;
 
       const hora_salida = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_salida);
-      const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_inicio, hora_salida );
+      const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_inicio, hora_salida);
 
       const hora_ingreso = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_ingreso);
-      const fec_comp_final = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_final, hora_ingreso );
+      const fec_comp_final = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_final, hora_ingreso);
 
       this.plan_horario.filter(item => {
-        const HorarioInicio = this.validaciones.Unir_Fecha_Hora(String(this.dia_inicio),item.entrada);        
-        const HorarioFinal = this.validaciones.Unir_Fecha_Hora(String(this.dia_fianl),item.salida);
-        const HorarioFinalDiaIgual = this.validaciones.Unir_Fecha_Hora(String(this.dia_fianl),"23:59:59");
+        const HorarioInicio = this.validaciones.Unir_Fecha_Hora(String(this.dia_inicio), item.entrada);
+        const HorarioFinal = this.validaciones.Unir_Fecha_Hora(String(this.dia_fianl), item.salida);
+        const HorarioFinalDiaIgual = this.validaciones.Unir_Fecha_Hora(String(this.dia_fianl), "23:59:59");
 
-        if(this.validaciones.validarHorasIngresadas(fec_comp_inicio, fec_comp_final)){
-          if(item.entrada > item.salida){
-            if(this.dia_inicio  == this.dia_fianl){
-              if((fec_comp_final >= HorarioInicio) && (fec_comp_final <= HorarioFinalDiaIgual)
-              && (this.horario == item.horario)){
+        if (this.validaciones.validarHorasIngresadas(fec_comp_inicio, fec_comp_final)) {
+          if (item.entrada > item.salida) {
+            if (this.dia_inicio == this.dia_fianl) {
+              if ((fec_comp_final >= HorarioInicio) && (fec_comp_final <= HorarioFinalDiaIgual)
+                && (this.horario == item.horario)) {
                 this.horario_ingreso = item.salida;
                 this.btnOculto = false;
-              }else{
+              } else {
                 this.validaciones.showToast('Ups! La hora Final esta fuera de su horario de Salida, ya que es horario nocturno', 4500, 'warning');
                 return this.btnOculto = true
               }
             }
           }
-          
-          if((fec_comp_final >= HorarioInicio) && (fec_comp_final <= HorarioFinal)
-          && (this.horario == item.horario)){
+
+          if ((fec_comp_final >= HorarioInicio) && (fec_comp_final <= HorarioFinal)
+            && (this.horario == item.horario)) {
             this.horario_ingreso = item.salida;
             this.btnOculto = false;
           }
-  
-          if(this.btnOculto == true){
+
+          if (this.btnOculto == true) {
             return this.validaciones.showToast('Ups! La hora Final esta fuera de su horario de Salida', 3500, 'warning');
           }
         }
@@ -652,24 +655,24 @@ export class EditarPermisoComponent implements OnInit {
   conteo_dia_antisipo: any;
   dia1: any; dia2: any;
   mes1: any; mes2: any;
-  ChangeDiaInicio(e: any){
+  ChangeDiaInicio(e: any) {
     this.dia1 = ''; this.dia2 = '';
     this.mes1 = ''; this.mes2 = '';
     this.conteo_dia_antisipo = 0;
     this.valoresDefectoValidacionHoras();
-    if(!e.target.value){
+    if (!e.target.value) {
       this.reg.fecha_inicio = moment(new Date()).format('YYYY-MM-DD');
       this.fecha_inicio = moment(this.reg.fecha_inicio).format("DD/MM/YYYY, HH:mm:ss")
-    }else{
+    } else {
       this.horario_salida = '00:00:00'
-      if(!(moment(e.target.value).format('YYYY-MM-DD') == moment(this.dia_inicio).format('YYYY-MM-DD'))){
+      if (!(moment(e.target.value).format('YYYY-MM-DD') == moment(this.dia_inicio).format('YYYY-MM-DD'))) {
         this.reg.fecha_final = null;
         this.dia_fianl = '';
         this.readonly = true;
         this.valoresDefectoValidacionResultados();
         this.btnOcultoguardar = true;
       }
-      
+
       this.reg.fecha_inicio = e.target.value;
       this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
       this.fecha_inicio = this.reg.fecha_inicio
@@ -680,71 +683,71 @@ export class EditarPermisoComponent implements OnInit {
       this.mes1 = moment(this.dia_inicio).format('MM');
       this.mes2 = moment(this.reg.fecha_creacion).format('MM');
 
-      if(this.cg_permiso.dias_maximo_permiso != null){
-        if(this.mes1 == this.mes2){
+      if (this.cg_permiso.dias_maximo_permiso != null) {
+        if (this.mes1 == this.mes2) {
           this.conteo_dia_antisipo = parseInt(this.dia1) - parseInt(this.dia2);
-          if(this.conteo_dia_antisipo >= this.cg_permiso.dias_maximo_permiso ){
+          if (this.conteo_dia_antisipo >= this.cg_permiso.dias_maximo_permiso) {
             this.DiaIniciolLibre();
-          }else{
-            this.validaciones.showToast('Lo sentimos, el tipo de solicitud seleccionada debe ser solicitada con '+this.cg_permiso.dias_anticipar_permiso+' días de anticipación', 4500, 'warning'); 
+          } else {
+            this.validaciones.showToast('Lo sentimos, el tipo de solicitud seleccionada debe ser solicitada con ' + this.cg_permiso.dias_anticipar_permiso + ' días de anticipación', 4500, 'warning');
           }
-        }else{
+        } else {
           this.DiaIniciolLibre();
         }
-      }else{
+      } else {
         this.DiaIniciolLibre();
       }
     }
   }
 
-  ChangeDiaFinal(e: any){
+  ChangeDiaFinal(e: any) {
     this.valoresDefectoValidacionResultados();
     this.valoresDefectoValidacionHoras();
-    if(!e.target.value){
-      if(moment(this.reg.fecha_inicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
+    if (!e.target.value) {
+      if (moment(this.reg.fecha_inicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')) {
         this.reg.fecha_final = this.reg.fecha_inicio;
         this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
-      }else{
+      } else {
         this.reg.fecha_final = null;
         this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
         this.dia_fianl = null;
       }
-    }else{
+    } else {
       this.horario_ingreso = '23:59:59'
       this.reg.fecha_final = e.target.value;
       this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');
-      this.fecha_final= this.reg.fecha_final;
+      this.fecha_final = this.reg.fecha_final;
       this.DiaFinalLibre();
     }
   }
 
-  ChangeObservacion(e: any){
-    if(!e.target.value){
+  ChangeObservacion(e: any) {
+    if (!e.target.value) {
       return this.btnOcultoguardar = true;
-    }else{
-      if(e.target.value != this.aux_descripcion){
+    } else {
+      if (e.target.value != this.aux_descripcion) {
         this.reg.descripcion = e.target.value;
-        if(this.selectItemDiasHoras == 'Horas'){
-          if(this.reg.horas_permiso != null){
+        if (this.selectItemDiasHoras == 'Horas') {
+          if (this.reg.horas_permiso != null) {
             this.btnOcultoguardar = false;
           }
-        }else{
-          if(this.reg.dias_permiso != null && this.reg.dia_libre != null){
+        } else {
+          if (this.reg.dias_permiso != null && this.reg.dia_libre != null) {
             this.btnOcultoguardar = false;
           }
         }
-      }else{
+      } else {
         return this.btnOcultoguardar = true;
       }
     }
   }
 
-  AlmuerzoIncluidoCalculo(){
-    if(this.cg_permiso.incluir_minutos_comida == true){
-      if(this.selectItemDiasHoras == 'Horas'){
-        if(this.dia_inicio == this.dia_fianl){
+  AlmuerzoIncluidoCalculo() {
+    if (this.cg_permiso.incluir_minutos_comida == true) {
+      if (this.selectItemDiasHoras == 'Horas') {
+        if (this.dia_inicio == this.dia_fianl) {
           this.VerificarFechasIgualesComida(this.dia_inicio);
-        }else{
+        } else {
           this.VerificarFechasDiferentesComida(this.dia_inicio, this.dia_fianl);
         }
       }
@@ -753,7 +756,7 @@ export class EditarPermisoComponent implements OnInit {
 
   dato_comida: any;
   valor_comida: any;
-  VerificarFechasIgualesComida(fecha_inicio: any){
+  VerificarFechasIgualesComida(fecha_inicio: any) {
     let datos: any = [];
     this.dato_comida = 0;
     this.valor_comida = 0;
@@ -767,25 +770,25 @@ export class EditarPermisoComponent implements OnInit {
     this.empleadoService.BuscarComidaHorarioHorasMD(horario).subscribe(informacion => {
       datos = informacion.respuesta;
       //Horarios con finalizacion de jornada en el mismo día
-      if(informacion.message === 'CASO_1'){
+      if (informacion.message === 'CASO_1') {
         console.log('calculo caso 1');
-        console.log('datos: ',datos);
+        console.log('datos: ', datos);
         this.dato_comida = datos[0].min_almuerzo;
         this.valor_comida = this.validar.MinutosToSegundos(this.dato_comida);
-      }else if(informacion.message === 'CASO_2'){
+      } else if (informacion.message === 'CASO_2') {
         console.log('calculo caso 2');
-        console.log('datos: ',datos);
+        console.log('datos: ', datos);
         this.dato_comida = datos[0].min_almuerzo;
         this.valor_comida = this.validar.MinutosToSegundos(this.dato_comida);
       }
       this.validaciones.showToast('Se descontaron los minutos de la alimentacion', 3500, 'warning');
 
-    },error => {
+    }, error => {
       this.validaciones.showToast('No se descontara la alimentacion', 3500, 'warning');
     });
   }
 
-  VerificarFechasDiferentesComida(fecha_inicio: any, fecha_final: any){
+  VerificarFechasDiferentesComida(fecha_inicio: any, fecha_final: any) {
     let datos: any = [];
     this.dato_comida = 0;
     this.valor_comida = 0;
@@ -798,18 +801,18 @@ export class EditarPermisoComponent implements OnInit {
     }
 
     this.empleadoService.BuscarComidaHorarioHorasDD(horario).subscribe(informacion => {
-      console.log('informacion dias diferentes: ',informacion);
+      console.log('informacion dias diferentes: ', informacion);
       datos = informacion.respuesta;
       //Horarios con finalizacion de jornada en el mismo día
       if (informacion.message === 'CASO_4') {
         console.log('calculo caso 1');
-        console.log('datos: ',datos);
+        console.log('datos: ', datos);
         this.dato_comida = datos[0].min_almuerzo;
         this.valor_comida = this.validar.MinutosToSegundos(this.dato_comida);
       }
 
 
-    },error => {
+    }, error => {
       this.validaciones.showToast('No se ha encontrado registro minutos de alimentacion', 3500, 'warning');
     });
 
@@ -818,19 +821,19 @@ export class EditarPermisoComponent implements OnInit {
   /* ********************************************************************************** *
      *                 METODO PARA MOSTRAR EL CALCULO EN LOS INPUTS                   *
    * ********************************************************************************** */
-  mostrarCalculos(){
-    if(this.selectItemDiasHoras == 'Horas'){
+  mostrarCalculos() {
+    if (this.selectItemDiasHoras == 'Horas') {
       if (this.validar.vacio(this.reg.hora_ingreso) || this.validar.vacio(this.reg.hora_salida)) {
         this.loadingBtn = false;
         this.validar.showToast('Llenar todos los campos solicitados.', 3000, 'warning')
         return false;
       }
-    }else if(this.selectItemDiasHoras == 'Días'){
+    } else if (this.selectItemDiasHoras == 'Días') {
       if (this.validar.vacio(this.reg.fecha_inicio) || this.validar.vacio(this.reg.fecha_final)) {
         this.loadingBtn = false;
         this.validar.showToast('Llenar todos los campos solicitados.', 3000, 'warning')
         return false;
-      }else{
+      } else {
         this.horario_salida = '00:00:00';
       }
     }
@@ -840,56 +843,56 @@ export class EditarPermisoComponent implements OnInit {
     let minutosfinal = this.horario_ingreso;
 
     var data = {
-      fecha_inicio: moment(this.reg.fecha_inicio).format('YYYY-MM-D'), 
-      fecha_final: moment(this.reg.fecha_final).format('YYYY-MM-D'), 
-      codigo: '\''+this.reg.codigo+'\''
+      fecha_inicio: moment(this.reg.fecha_inicio).format('YYYY-MM-D'),
+      fecha_final: moment(this.reg.fecha_final).format('YYYY-MM-D'),
+      codigo: '\'' + this.reg.codigo + '\''
     }
 
     this.empleadoService.BuscarPlanificacionHorarioEmple(data).subscribe(horario => {
       this.horarioEmpleado = horario;
 
-      if(this.selectItemDiasHoras === 'Horas'){
+      if (this.selectItemDiasHoras === 'Horas') {
         this.AlmuerzoIncluidoCalculo();
         minutosinicio = moment(this.reg.hora_salida).format('HH:mm:ss');
         minutosfinal = moment(this.reg.hora_ingreso).format('HH:mm:ss');
       }
-  
-      const fec_inicio = (moment(this.reg.fecha_inicio).format('YYYY-MM-DD'))+' '+ minutosinicio;
-      const fec_final = (moment(this.reg.fecha_final).format('YYYY-MM-DD')) +' '+ minutosfinal;
+
+      const fec_inicio = (moment(this.reg.fecha_inicio).format('YYYY-MM-DD')) + ' ' + minutosinicio;
+      const fec_final = (moment(this.reg.fecha_final).format('YYYY-MM-DD')) + ' ' + minutosfinal;
       const codigo = parseInt((localStorage.getItem('codigo')));
       const id_solicitud = this.reg.id;
 
-      if(this.selectItemDiasHoras === 'Días'){
+      if (this.selectItemDiasHoras === 'Días') {
         this.permisoService.getlistaPermisosByFechasyCodigoEdit(fec_inicio, fec_final, codigo, id_solicitud).subscribe(solicitados => {
-          if(solicitados.length != 0){
+          if (solicitados.length != 0) {
             this.valoresDefectoValidacionResultados();
             this.validaciones.showToast('Ups! Ya existe permisos en esas fechas ', 3500, 'warning');
             return false
           }
-          else{
+          else {
             this.horasExtrasService.getlistaHorasExtrasByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
-              if(solicitados.length != 0){
+              if (solicitados.length != 0) {
                 this.reg.dias_permiso = null;
                 this.reg.dia_libre = null;
                 this.reg.horas_permiso = null;
                 this.validaciones.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
                 return false
               }
-              else{
+              else {
                 this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
-                  if(solicitados.length != 0){
+                  if (solicitados.length != 0) {
                     this.reg.dias_permiso = null;
                     this.reg.dia_libre = null;
                     this.reg.horas_permiso = null;
                     this.validaciones.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
                     return false
                   }
-                  else{
+                  else {
                     this.calcularhoras();
                   }
                 }, error => {
                   this.validaciones.showToast('!Ups Lo sentimos tenemos problemas para verificar su permiso ', 3500, 'warning');
-                }); 
+                });
               }
             }, error => {
               this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
@@ -899,37 +902,37 @@ export class EditarPermisoComponent implements OnInit {
           this.validaciones.showToast('Tenemos problemas para verificar su permiso', 3500, 'warning');
         });
 
-      }else{
+      } else {
         this.permisoService.getlistaPermisosByHorasyCodigoEdit(fec_inicio, fec_final, minutosinicio, minutosfinal, codigo, id_solicitud).subscribe(solicitados => {
-          if(solicitados.length != 0){
+          if (solicitados.length != 0) {
             this.valoresDefectoValidacionResultados();
             this.validaciones.showToast('Ups! Ya existe permisos en esa fecha y hora ', 3500, 'warning');
             return false
           }
-          else{
+          else {
             this.horasExtrasService.getlistaHorasExtrasByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
-              if(solicitados.length != 0){
+              if (solicitados.length != 0) {
                 this.reg.dias_permiso = null;
                 this.reg.dia_libre = null;
                 this.reg.horas_permiso = null;
                 this.validaciones.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
                 return false
               }
-              else{
+              else {
                 this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
-                  if(solicitados.length != 0){
+                  if (solicitados.length != 0) {
                     this.reg.dias_permiso = null;
                     this.reg.dia_libre = null;
                     this.reg.horas_permiso = null;
                     this.validaciones.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
                     return false
                   }
-                  else{
+                  else {
                     this.calcularhoras();
                   }
                 }, error => {
                   this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
-                }); 
+                });
               }
             }, error => {
               this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
@@ -939,7 +942,7 @@ export class EditarPermisoComponent implements OnInit {
           this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
         });
       }
-    
+
     });
   }
 
@@ -947,53 +950,53 @@ export class EditarPermisoComponent implements OnInit {
      *              METODO PARA CALCULAR Y VALIDAR EL RESULTADO MOSTRADO              *
    * ********************************************************************************** */
   calcularhoras() {
-    if(this.selectItemDiasHoras == 'Días'){
+    if (this.selectItemDiasHoras == 'Días') {
       const fechasValidas = this.validaciones.validarRangoFechasIngresa(this.reg.fecha_inicio!, this.reg.fecha_final!, true);
-      console.log('fechasValidas: ',fechasValidas)
-      if (!fechasValidas) {return this.valoresDefectoValidacionFechas()}
+      console.log('fechasValidas: ', fechasValidas)
+      if (!fechasValidas) { return this.valoresDefectoValidacionFechas() }
 
       //Se optiene la hora por defecto del dia de salida que es la hora en la que se crea el permiso 
       //Esto se lee hasta mientras por defecto ya que el tipo de permiso es por dias, se debe validar con el horario laboral del usuario
       const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_inicio!, this.horario_salida);
       const fec_comp_final = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_final!, this.horario_salida);
-      const total = this.validaciones.MilisegToSegundos( fec_comp_final.valueOf() - fec_comp_inicio.valueOf() );
+      const total = this.validaciones.MilisegToSegundos(fec_comp_final.valueOf() - fec_comp_inicio.valueOf());
 
       // 86400 seg ==> es un dia de 24 horas
       let { dia, tiempo_transcurrido, dia_libre } =
-      this.validaciones.SegundosTransformDiaLaboral(this.fecha_inicio!.toString(), this.fecha_final!.toString(), total, this.totalhoras, this.horarioEmpleado, this.horas_trabaja_seg, this.cg_feriados)
-      if(dia == 0){
+        this.validaciones.SegundosTransformDiaLaboral(this.fecha_inicio!.toString(), this.fecha_final!.toString(), total, this.totalhoras, this.horarioEmpleado, this.horas_trabaja_seg, this.cg_feriados)
+      if (dia == 0) {
         dia = 1;
       }
 
       this.fecha_inicio = moment(fec_comp_inicio).format();
       this.fecha_final = moment(fec_comp_final).format();
       this.reg.hora_ingreso = this.horario_salida;
-      this.reg.hora_salida =  this.horario_ingreso;
+      this.reg.hora_salida = this.horario_ingreso;
       this.reg.dias_permiso = dia;
       this.reg.dia_libre = dia_libre;
       this.reg.horas_permiso = '00:00:00'; //Por defecto ya que es permiso por dias
       this.btnOcultoguardar = false;
 
-    }else{      
+    } else {
       const fechasValidas = this.validaciones.validarRangoFechasIngresa(this.reg.fecha_inicio!, this.reg.fecha_final!, true)
-      if (!fechasValidas){return this.valoresDefectoValidacionFechas()}
-  
+      if (!fechasValidas) { return this.valoresDefectoValidacionFechas() }
+
       const hora_salida = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_salida!);
       const hora_ingreso = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_ingreso!);
       const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_inicio!, hora_salida);
-      const fec_comp_final = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_final!,  hora_ingreso);
+      const fec_comp_final = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_final!, hora_ingreso);
 
       this.fecha_inicio = moment(fec_comp_inicio).format();
       this.fecha_final = moment(fec_comp_final).format();
-  
+
       const horasValidas = this.validaciones.validarHorasIngresadas(fec_comp_inicio, fec_comp_final) // evaluacion de fechas completas 
       if (!horasValidas) return false;
-  
-      var total = this.validaciones.MilisegToSegundos( fec_comp_final.valueOf() - fec_comp_inicio.valueOf());
+
+      var total = this.validaciones.MilisegToSegundos(fec_comp_final.valueOf() - fec_comp_inicio.valueOf());
 
       //Condicion que valida el tiempo calculado de horas con la jornada laboral la cual es el numero de horas en segundos que trabaja el empleado
-      if(this.selectItemDiasHoras === 'Horas'){
-        if(total > this.horas_trabaja_seg){
+      if (this.selectItemDiasHoras === 'Horas') {
+        if (total > this.horas_trabaja_seg) {
           this.validaciones.showToast('Ups!, lo sentimos el rango de horas excede su jornada laboral', 3500, 'warning');
           this.reg.horas_permiso = null;
           this.btnOcultoguardar = true;
@@ -1003,18 +1006,18 @@ export class EditarPermisoComponent implements OnInit {
       }
 
       //Esta condición calcula el tiempo total con el descuento de minutos de alimentación.
-      if(this.dato_comida != 0 && this.cg_permiso.incluir_minutos_comida == true){
-        total = total -  this.valor_comida;
+      if (this.dato_comida != 0 && this.cg_permiso.incluir_minutos_comida == true) {
+        total = total - this.valor_comida;
       }
 
       // 86400 seg ==> es un dia de 24 horas
       const { dia, tiempo_transcurrido, dia_libre } =
-      this.validaciones.SegundosTransformDiaLaboral(this.reg.fecha_inicio!.toString(), this.reg.fecha_final!.toString(), total, this.totalhoras, this.horarioEmpleado, this.horas_trabaja_seg, this.cg_feriados)
+        this.validaciones.SegundosTransformDiaLaboral(this.reg.fecha_inicio!.toString(), this.reg.fecha_final!.toString(), total, this.totalhoras, this.horarioEmpleado, this.horas_trabaja_seg, this.cg_feriados)
 
       this.reg.dias_permiso = dia
       this.reg.horas_permiso = tiempo_transcurrido
       this.reg.dia_libre = dia_libre;
-  
+
       switch (this.selectItemDiasHoras) {
         case 'Horas':
           this.reg.dias_permiso = 0; // por defecto ya q es permiso por solo horas.
@@ -1024,11 +1027,11 @@ export class EditarPermisoComponent implements OnInit {
 
     }
 
-    const [cg_permiso] = this.cg_tipo_permisos.filter(o => {return o.id === this.reg.id_tipo_permiso})
+    const [cg_permiso] = this.cg_tipo_permisos.filter(o => { return o.id === this.reg.id_tipo_permiso })
     this.cg_permiso = cg_permiso;
 
-    if((this.cg_permiso.dias_maximo_permiso < this.reg.dias_permiso!) &&  (this.cg_permiso.dias_maximo_permiso != 0)){
-      this.validaciones.showToast('Lo Sentimos el maximo de dias de permiso es '+this.cg_permiso.dias_maximo_permiso, 3500, 'warning');
+    if ((this.cg_permiso.dias_maximo_permiso < this.reg.dias_permiso!) && (this.cg_permiso.dias_maximo_permiso != 0)) {
+      this.validaciones.showToast('Lo Sentimos el maximo de dias de permiso es ' + this.cg_permiso.dias_maximo_permiso, 3500, 'warning');
       this.reg.fecha_final = null;
       return false;
     }
@@ -1036,9 +1039,9 @@ export class EditarPermisoComponent implements OnInit {
     return true;
   }
 
-   /* ********************************************************************************** *
-     *                          ACTUALIZA LA SOLICITUD CREADA                            *
-   * ********************************************************************************** */
+  /* ********************************************************************************** *
+    *                          ACTUALIZA LA SOLICITUD CREADA                            *
+  * ********************************************************************************** */
   //Metodo para actualizar la solicitud
   permisoEdit: any = [];
   UpdateRegister() {
@@ -1046,14 +1049,14 @@ export class EditarPermisoComponent implements OnInit {
     let validadionesFechasHoras: boolean;
     this.loadingBtn = true;
 
-    if(this.reg.dias_permiso != this.diaPermiso_refe){
-      validadionesFechasHoras= this.calcularhoras();
-    }else if(this.reg.horas_permiso != this.horas_refe){
+    if (this.reg.dias_permiso != this.diaPermiso_refe) {
       validadionesFechasHoras = this.calcularhoras();
-    }else{
+    } else if (this.reg.horas_permiso != this.horas_refe) {
+      validadionesFechasHoras = this.calcularhoras();
+    } else {
       validadionesFechasHoras = true;
     }
-    
+
     if (!validadionesFechasHoras) return
 
     console.log('PASO VALIDACIONES DE FECHAS Y HORAS: ');
@@ -1064,13 +1067,13 @@ export class EditarPermisoComponent implements OnInit {
     this.reg.hora_salida = moment(this.reg.hora_salida).format('HH:mm:ss');
     this.reg.hora_ingreso = moment(this.reg.hora_ingreso).format('HH:mm:ss');
 
-    if(this.selectItemDiasHoras === 'Días'){
+    if (this.selectItemDiasHoras === 'Días') {
       this.reg.hora_salida = '00:00:00';
       this.reg.hora_ingreso = '00:00:00';
     }
 
-    if(this.reg.documento == null || this.reg.documento == ''){
-      if(this.archivoSubido != null){
+    if (this.reg.documento == null || this.reg.documento == '') {
+      if (this.archivoSubido != null) {
         this.reg.documento = this.archivoSubido[0].name; // Inserta el nombre del archivo al subir
       }
     }
@@ -1080,40 +1083,40 @@ export class EditarPermisoComponent implements OnInit {
     this.subscripted = this.permisoService.putPermiso(this.reg).subscribe(
       permiso => {
         this.reg.id_tipo_permiso = this.cg_permiso.id;
-        if(this.archivoSubido != null){this.updataArchivo(permiso)}
+        if (this.archivoSubido != null) { this.updataArchivo(permiso) }
         this.NotificarEdicionPermiso(permiso);
         this.closeModal(true);
         this.validaciones.abrirToas('Solicitud actualizada correctamente.', 4000, 'success', 'top');
       },
       err => { this.validaciones.showToast(err.error.message, 3000, 'danger') },
-      () => { this.loadingBtn = false; this.ngForm.resetForm(); this.subs_bool = true; this.mensajeFile = '';}
+      () => { this.loadingBtn = false; this.ngForm.resetForm(); this.subs_bool = true; this.mensajeFile = ''; }
     )
     this.closeModal(true);
   }
 
-   /* ********************************************************************************** *
-     *                       SUBIR ARCHIVO DE SOLICITUD DE PERMISO                    *
-   * ********************************************************************************** */
+  /* ********************************************************************************** *
+    *                       SUBIR ARCHIVO DE SOLICITUD DE PERMISO                    *
+  * ********************************************************************************** */
   //Metodo para ingresar el archivo
-  fileChange(element: any){
+  fileChange(element: any) {
     this.archivoSubido = element.target.files;
     console.log(this.archivoSubido);
     const name = this.archivoSubido[0].name;
     this.btnOcultoguardar = true;
-    if(this.archivoSubido.length != 0){
-      if(this.archivoSubido![0].size >= 2e+6){
+    if (this.archivoSubido.length != 0) {
+      if (this.archivoSubido![0].size >= 2e+6) {
         this.archivoSubido = null;
         this.reg.documento = '';
         this.mensajeFile = "Ingrese un archivo maximo de 2Mb";
-        this.validaciones.showToast('Ups el archivo pesa mas de 2Mb',3500, 'danger');
+        this.validaciones.showToast('Ups el archivo pesa mas de 2Mb', 3500, 'danger');
 
-      }else if(this.archivoSubido![0].name.length > 50){
+      } else if (this.archivoSubido![0].name.length > 50) {
         this.archivoSubido = null;
         this.reg.documento = ''
         this.mensajeFile = "El nombre debe tener 50 caracteres como maximo";
         this.validaciones.showToast('Ups el nombre del archivo es muy largo', 3500, 'warning');
 
-      }else{
+      } else {
         console.log(this.archivoSubido![0].name);
         this.reg.documento = name;
         this.btnOcultoguardar = false;
@@ -1123,27 +1126,27 @@ export class EditarPermisoComponent implements OnInit {
   }
 
   //Metodo para actualizar un archivo
-  updataArchivo(permiso: any){
-    if(this.archivoSubido[0].name != this.reg.documento){
-      this.permisoService.EliminarArchivo(this.reg.documento!,this.permiso.id_empleado).subscribe(res => {
+  updataArchivo(permiso: any) {
+    if (this.archivoSubido[0].name != this.reg.documento) {
+      this.permisoService.EliminarArchivo(this.reg.documento!, this.permiso.id_empleado).subscribe(res => {
         this.subirRespaldo(permiso);
       })
-    }else{
+    } else {
       this.subirRespaldo(permiso);
     }
   }
 
   //Metodo para subir (cargar) el archivo al servidor
-  subirRespaldo(permiso: any){
+  subirRespaldo(permiso: any) {
     var id = permiso.id;
     let formData = new FormData();
     console.log("tamaño: ", this.archivoSubido[0].size);
 
-    if(this.archivoSubido == undefined){
+    if (this.archivoSubido == undefined) {
       return this.archivoSubido = null;
     }
-    
-    for(var i = 0; i < this.archivoSubido.length; i++){
+
+    for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
     }
 
@@ -1152,14 +1155,14 @@ export class EditarPermisoComponent implements OnInit {
       this.reg.documento = '';
 
     }, err => {
-        console.log(err)
-        return this.validaciones.showToast('El archivo no se pudo Cargar al Servidor', 3500, 'danger');
-        
+      console.log(err)
+      return this.validaciones.showToast('El archivo no se pudo Cargar al Servidor', 3500, 'danger');
+
     });
   }
 
   //Metodo para eliminar el archivo de permiso
-  deleteDocumentoPermiso(){
+  deleteDocumentoPermiso() {
     console.log('El archivo ', this.reg.documento, ' Se quito Correctamente');
     this.validaciones.showToast('El archivo se quito correctamente', 3500, 'acua');
     this.reg.documento = '';
@@ -1219,10 +1222,10 @@ export class EditarPermisoComponent implements OnInit {
       return tipo_permiso;
     })
 
-    console.log("Envio de correo: ",correo_editar);
+    console.log("Envio de correo: ", correo_editar);
 
-    if(correo_editar === true){
-       // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
+    if (correo_editar === true) {
+      // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
       permiso.EmpleadosSendNotiEmail.forEach((e: any) => {
         // LECTURA DE DATOS LEIDOS
         cont = cont + 1;
@@ -1283,8 +1286,8 @@ export class EditarPermisoComponent implements OnInit {
             aestado_p: estado_p,
           }
 
-          console.log('datos de correo que se envia: ',datosPermisoCreado)
-          
+          console.log('datos de correo que se envia: ', datosPermisoCreado)
+
           if (correo_usuarios != '') {
             this.autorizacion.EnviarCorreoPermiso(this.idEmpresa, datosPermisoCreado).subscribe(
               resp => {
@@ -1301,7 +1304,7 @@ export class EditarPermisoComponent implements OnInit {
               () => { },
             )
           }
-          
+
         }
       })
     }
@@ -1335,19 +1338,21 @@ export class EditarPermisoComponent implements OnInit {
       desde + ' ' + h_inicio + ' hasta ' +
       hasta + ' ' + h_fin;
 
+    this.reg.ip = localStorage.getItem("ip");
+    this.reg.user_name = this.userService.username;
+
     //Listado para eliminar el usuario duplicado
     var allNotificaciones: any = [];
     //Ciclo por cada elemento del listado
-    permiso.EmpleadosSendNotiEmail.forEach(function(elemento: any, indice: any , array: any) {
+    permiso.EmpleadosSendNotiEmail.forEach(function (elemento: any, indice: any, array: any) {
       // Discriminación de elementos iguales
-      if(allNotificaciones.find((p: any) =>p.empleado == elemento.empleado) == undefined)
-      {
+      if (allNotificaciones.find((p: any) => p.empleado == elemento.empleado) == undefined) {
         // Nueva lista de empleados que reciben la notificacion
         allNotificaciones.push(elemento);
       }
     });
 
-    console.log("Usuarios que reciben la notificacion: ",allNotificaciones);
+    console.log("Usuarios que reciben la notificacion: ", allNotificaciones);
 
     allNotificaciones.forEach((e: any) => {
       noti.id_departamento_recibe = e.id_dep;

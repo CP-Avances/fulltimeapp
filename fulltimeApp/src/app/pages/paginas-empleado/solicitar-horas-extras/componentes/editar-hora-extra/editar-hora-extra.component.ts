@@ -13,6 +13,7 @@ import { Notificacion, notificacionValueDefault } from 'src/app/interfaces/Notif
 import { HoraExtra } from 'src/app/interfaces/HoraExtra';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { PermisosService } from 'src/app/services/permisos.service';
+import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 
 @Component({
   selector: 'app-editar-hora-extra',
@@ -53,6 +54,8 @@ export class EditarHoraExtraComponent implements OnInit {
     public modalController: ModalController,
     public parametro: ParametrosService,
     private permisoService: PermisosService,
+    private userService: DataUserLoggedService,
+
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('id_empresa'));
   }
@@ -322,6 +325,10 @@ export class EditarHoraExtraComponent implements OnInit {
       }
     }
 
+    this.reg.user_name = this.userService.username;
+    this.reg.ip = localStorage.getItem('ip');
+    
+
     this.subscripted = this.horasExtrasService.putHoraExtra(this.reg).subscribe(
       resp => {
         if(this.archivoSubido != null){this.updataArchivo(resp)}
@@ -523,6 +530,8 @@ export class EditarHoraExtraComponent implements OnInit {
     noti.mensaje = 'Ha actualizado su solicitud de horas extras desde ' +
       desde + ' hasta ' + hasta +
       ' horario de ' + h_inicio + ' a ' + h_final;
+    noti.user_name = this.userService.username;
+    noti.ip = localStorage.getItem('ip')
 
     //Listado para eliminar el usuario duplicado
     var allNotificaciones = [];

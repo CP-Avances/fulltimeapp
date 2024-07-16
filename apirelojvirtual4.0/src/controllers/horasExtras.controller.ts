@@ -137,6 +137,7 @@ export const postNuevaHoraExtra = async (req: Request, res: Response): Promise<R
 
         const { descripcion, estado, fecha_final, fecha_inicio, fecha_solicita, hora_ingreso, hora_salida,
             id_empleado_cargo, id_empleado_solicita, horas_solicitud, observacion, tiempo_autorizado, user_name, ip } = req.body;
+        await pool.query('BEGIN');
 
         console.log(req.body);
 
@@ -157,7 +158,7 @@ export const postNuevaHoraExtra = async (req: Request, res: Response): Promise<R
         const fechaSolicita = await FormatearFecha2(fecha_solicita.toLocaleString(), 'ddd');
 
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            tabla: 'eu_timbres',
+            tabla: 'mhe_solicitud_hora_extra',
             usuario: user_name,
             accion: 'I',
             datosOriginales: '',
@@ -188,6 +189,7 @@ export const putHoraExtra = async (req: Request, res: Response): Promise<Respons
     try {
         const { id, descripcion, fecha_final, fecha_inicio, horas_solicitud, observacion,
             tiempo_autorizado, documento, docu_nombre, estado, user_name, ip } = req.body;
+        await pool.query('BEGIN');
 
         console.log(req.body);
 
@@ -197,12 +199,12 @@ export const putHoraExtra = async (req: Request, res: Response): Promise<Respons
 
         if (!datosOriginales) {
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'ma_solicitud_comida',
+                tabla: 'mhe_solicitud_hora_extra',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: '',
                 datosNuevos: '',
-                ip,
+                ip: ip,
                 observacion: `Error al actualizar solicitud de comidas con id: ${id}. Registro no encontrado`
             });
 
@@ -236,11 +238,13 @@ export const putHoraExtra = async (req: Request, res: Response): Promise<Respons
             const fechaTimbreFinN = await FormatearFecha2(fecha_final.toLocaleString(), 'ddd');
 
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'eu_timbres',
+                tabla: 'mhe_solicitud_hora_extra',
                 usuario: user_name,
-                accion: 'I',
+                accion: 'U',
                 datosOriginales: `{id_empleado_solicita: ${datosOriginales.id_empleado_solicita}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, fecha_solicita: ${datosOriginales.fechaSolicita}, fecha_inicio: ${fechaTimbreInicioO + ' ' + fechaHoraInicioO}, fecha_final: ${fechaTimbreFinO + ' ' + fechaHoraFinO}, descripcion: ${datosOriginales.descripcion}, estado: ${datosOriginales.estado}, horas_solicitud: ${datosOriginales.horas_solicitud}, tiempo_autorizado: ${datosOriginales.tiempo_autorizado}, observacion: ${datosOriginales.observacion}, documento: ${datosOriginales.documento}, docu_nombre: ${datosOriginales.docu_nombre}}`,
                 datosNuevos: `{id_empleado_solicita: ${datosOriginales.id_empleado_solicita}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, fecha_solicita: ${datosOriginales.fechaSolicita}, fecha_inicio: ${fechaTimbreInicioN + ' ' + fechaHoraInicioN}, fecha_final: ${fechaTimbreFinN + ' ' + fechaHoraFinN}, descripcion: ${descripcion}, estado: ${estado}, horas_solicitud: ${horas_solicitud}, tiempo_autorizado: ${tiempo_autorizado}, observacion: ${observacion}, documento: ${documento}, docu_nombre: ${docu_nombre}}`,
+                
+                
                 ip: ip,
                 observacion: null
             });

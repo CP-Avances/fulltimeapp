@@ -62,6 +62,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     public parametro: ParametrosService,
     private permisoService: PermisosService,
     private userService: DataUserLoggedService,
+    
 
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('id_empresa'));
@@ -279,6 +280,9 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     this.reg.hora_salida = this.validar.TiempoFormatoHHMMSS(this.reg.hora_salida);
     this.reg.hora_ingreso = this.validar.TiempoFormatoHHMMSS(this.reg.hora_ingreso);
 
+    this.reg.ip = localStorage.getItem("ip");
+    this.reg.user_name =this.userService.username ;
+
     if(this.archivoSubido != null){
       this.reg.docu_nombre = this.archivoSubido[0].name; // Inserta el nombre del archivo al subir
     }else{
@@ -422,6 +426,9 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     noti.mensaje = 'Ha realizado una solicitud de horas extras desde ' +
       desde + ' hasta ' + hasta +
       ' horario de ' + h_inicio + ' a ' + h_final;
+
+    noti.user_name = this.userService.username
+    noti.ip = localStorage.getItem('ip')
 
     //Listado para eliminar el usuario duplicado
     var allNotificaciones = [];

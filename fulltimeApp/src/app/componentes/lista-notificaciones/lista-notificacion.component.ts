@@ -6,6 +6,7 @@ import { NotificacionTimbre } from '../../interfaces/Notificaciones';
 import { SkeletonListNotificacionesArray } from '../../interfaces/Skeleton';
 import { Router } from '@angular/router';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
+import { DataUserLoggedService } from 'src/app/services/data-user-logged.service'; 
 
 
 @Component({
@@ -39,6 +40,8 @@ export class ListaNotificacionComponent implements OnInit {
     public pooverCtrl: PopoverController,
     private vistonotificacion: NotificacionesService,
     public modalController: ModalController,
+    private userService: DataUserLoggedService,
+
   ) { }
 
   ngOnInit() {
@@ -263,7 +266,7 @@ export class ListaNotificacionComponent implements OnInit {
   //cambia el estado de la columna visto de la tabla realtime_noti de true a false.
   cambiovistanoti(noti:{id: number}) {
     const vista = true;
-    const datos = {id_notificacion: noti.id, visible: vista}
+    const datos = {id_notificacion: noti.id, visible: vista, user_name:this.userService.username, ip: localStorage.getItem('ip')}
 
     this.vistonotificacion.PutNotificaVisto(datos).subscribe(
       res => {
@@ -277,7 +280,7 @@ export class ListaNotificacionComponent implements OnInit {
   //cambia el estado de la columna visto de la tabla realtime_notitimbre de true a false.
   cambiovistanotitimbre(noti:{id: number}) {
     const vista = true;
-    const datos = {id_notificacion: noti.id, visible: vista}
+    const datos = {id_notificacion: noti.id, visible: vista, user_name: this.userService.username, ip: localStorage.getItem('ip')}
     
     this.vistonotificacion.PutNotifiTimbreVisto(datos).subscribe(
       res => {
@@ -291,7 +294,7 @@ export class ListaNotificacionComponent implements OnInit {
   //Poner todas las notificaciones como vistas
   notificacionesvistanoti(noti: any){
     const vista = true;
-    var datos = {id_notificacion: 0, visible: vista}
+    var datos = {id_notificacion: 0, visible: vista, user_name:this.userService.username, ip: localStorage.getItem('ip')}
     var allNotificaciones = [];
     allNotificaciones = noti;
     

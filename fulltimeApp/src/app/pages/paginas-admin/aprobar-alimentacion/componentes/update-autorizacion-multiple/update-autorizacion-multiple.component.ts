@@ -282,16 +282,18 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
     let final = this.validar.FormatearHora(alimentacion.hora_fin, this.formato_hora);
 
     let mensaje = {
-      create_at: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
-      id_empl_envia: parseInt(localStorage.getItem('empleadoID')),
-      id_empl_recive: '',
+      fecha_hora: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
+      id_empleado_envia: parseInt(localStorage.getItem('empleadoID')),
+      id_empleado_recibe: '',
       tipo: 2, // SOLICITUD SERVICIO DE ALIMENTACIÓN APROBADA
 
-      mensaje: 'Ha ' + estado_a.toLowerCase() + ' la solicitud de alimentación para ' +
+      descripcion: 'Ha ' + estado_a.toLowerCase() + ' la solicitud de alimentación para ' +
         infoUsuario.fullname + ' desde ' +
         desde +
         ' horario de ' + inicio + ' a ' + final + ' servicio ',
-      id_comida: alimentacion.id_comida
+      id_comida: alimentacion.id_comida,
+      user_name : this.dataUserServices.username,
+      ip: localStorage.getItem('ip')
     }
 
     //Listado para eliminar el usuario duplicado
@@ -308,7 +310,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
     console.log("Usuarios que reciben la notificacion: ", allNotificacionesAlimentacion);
 
     allNotificacionesAlimentacion.forEach(e => {
-      mensaje.id_empl_recive = e.empleado;
+      mensaje.id_empleado_recibe = e.empleado;
       if (e.comida_noti) {
         this.notifica.EnviarMensajePlanComida(mensaje).subscribe(
           res => {

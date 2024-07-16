@@ -1119,6 +1119,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         id_hora_extra: null,
         mensaje: 'Ha realizado una solicitud de permiso desde ' + desde + ' ' + h_inicio + ' hasta ' + hasta + ' ' + h_fin,
         tipo: 1,
+        user_name: this.userService.username,
+        ip : localStorage.getItem('ip')
       }
 
       if (item.permiso_noti) {
