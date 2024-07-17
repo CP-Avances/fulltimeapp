@@ -137,6 +137,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.reg.id_empleado_contrato = parseInt(localStorage.getItem('ccontr')!)
     this.horas_trabaja_seg = this.validaciones.HorasTrabajaToSegundos(localStorage.getItem('horas_trabaja')!);
 
+    console.log("ID EMPLEADO",localStorage.getItem('empleadoID') );
+
     if (this.reg.fecha_inicio == null || this.reg.fecha_inicio == undefined) {
       this.readonly = true;
     } else {
@@ -162,8 +164,13 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   //TODO obtenerInformacionEmpleado
   solInfo: any;
   obtenerInformacionEmpleado() {
+
+    console.log("ve id empleado",this.reg.id_empleado);
+
     this.autorizaciones.getInfoEmpleadoByCodigo(this.reg.id_empleado).subscribe(
       res => {
+
+        console.log("ver info empleado", res)
         if (res.estado === 1) {
           var estado = true;
         }
