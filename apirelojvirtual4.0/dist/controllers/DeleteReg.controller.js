@@ -152,7 +152,7 @@ const deleteMetodoGeneral = (req, res) => __awaiter(void 0, void 0, void 0, func
                         user_name = '';
                         ip = '';
                         yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                            tabla: `mv_solicitud_vacacion`,
+                            tabla: `mhe_solicitud_hora_extra`,
                             usuario: user_name,
                             accion: 'D',
                             datosOriginales: '',
@@ -219,7 +219,7 @@ const deleteMetodoGeneral = (req, res) => __awaiter(void 0, void 0, void 0, func
                         user_name = '';
                         ip = '';
                         yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                            tabla: `mv_solicitud_vacacion`,
+                            tabla: `mp_solicitud_permiso`,
                             usuario: user_name,
                             accion: 'D',
                             datosOriginales: '',

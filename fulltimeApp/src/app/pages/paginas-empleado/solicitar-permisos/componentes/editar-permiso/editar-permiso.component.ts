@@ -1079,6 +1079,8 @@ export class EditarPermisoComponent implements OnInit {
     }
 
     this.reg.fecha_edicion = moment(new Date()).format('YYYY-MM-DD');
+    this.reg.user_name = this.userService.username;
+    this.reg.ip = localStorage.getItem('ip')
 
     this.subscripted = this.permisoService.putPermiso(this.reg).subscribe(
       permiso => {

@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -11,6 +34,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.listarPeriVacaciones = exports.putVacacion = exports.postNuevaVacacion = exports.getlistaVacacionesByFechasyCodigoEdit = exports.getlistaVacacionesByFechasyCodigo = exports.getlistaVacacionesByFechas = exports.getlistaVacaciones = exports.getlistaVacacionesByCodigo = void 0;
 const database_1 = require("../database");
+const AUDITORIA_CONTROLADOR = __importStar(require("../controllers/auditotia.controller"));
+const metodos_1 = require("../libs/metodos");
 /**
  * Metodo para obtener listado de vacaciones por codigo del empleado
  * @returns Retorna un array de vacaciones
@@ -129,13 +154,27 @@ exports.getlistaVacacionesByFechasyCodigoEdit = getlistaVacacionesByFechasyCodig
  */
 const postNuevaVacacion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado, id_periodo_vacacion, id_empleado_cargo, estado, codigo } = req.body;
+        const { fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado, id_periodo_vacacion, id_empleado_cargo, estado, id_empleado, user_name, ip } = req.body;
+        yield database_1.pool.query('BEGIN');
         console.log(req.body);
         const response = yield database_1.pool.query('INSERT INTO mv_solicitud_vacacion (fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, ' +
             'legalizado, id_periodo_vacacion, id_empleado_cargo, estado, id_empleado) ' +
             'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ) RETURNING *', [fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado, id_periodo_vacacion,
-            id_empleado_cargo, estado, codigo]);
+            id_empleado_cargo, estado, id_empleado]);
         const [objetoVacacion] = response.rows;
+        const fechaIngresoN = yield (0, metodos_1.FormatearFecha2)(fecha_ingreso.toLocaleString(), 'ddd');
+        const fechaInicioN = yield (0, metodos_1.FormatearFecha2)(fecha_inicio.toLocaleString(), 'ddd');
+        const fechaFinN = yield (0, metodos_1.FormatearFecha2)(fecha_final.toLocaleString(), 'ddd');
+        yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'mv_solicitud_vacacion',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: `{id_empleado_cargo: ${id_empleado_cargo}, id_periodo_vacacion: ${id_periodo_vacacion}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinN}, fecha_ingreso: ${fechaIngresoN}, dia_libre: ${dia_libre}, dia_laborable: ${dia_laborable}, legalizado: ${legalizado}, estado: ${estado}, id_empleado: ${id_empleado}}`,
+            ip: ip,
+            observacion: null
+        });
+        yield database_1.pool.query('COMMIT');
         if (!objetoVacacion)
             return res.status(400)
                 .jsonp({ message: 'Upps !!! algo salio mal. Solicitud de vacación no ingresada' });
@@ -154,7 +193,23 @@ exports.postNuevaVacacion = postNuevaVacacion;
  */
 const putVacacion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id, fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado, estado } = req.body;
+        const { id, fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado, estado, user_name, ip } = req.body;
+        const solicitudVacacionesBuscada = yield database_1.pool.query('SELECT * FROM mv_solicitud_vacacion WHERE id = $1', [id]);
+        const [datosOriginales] = solicitudVacacionesBuscada.rows;
+        if (!datosOriginales) {
+            yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'mv_solicitud_vacacion',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: '',
+                datosNuevos: '',
+                ip: ip,
+                observacion: `Error al actualizar solicitud de vacaciones con id: ${id}. Registro no encontrado`
+            });
+            // FINALIZAR TRANSACCION
+            yield database_1.pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado' });
+        }
         console.log(req.body);
         if (estado === 1) {
             const response = yield database_1.pool.query(`
@@ -163,6 +218,22 @@ const putVacacion = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 WHERE id = $1 RETURNING *
                 `, [id, fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado]);
             const [objetoVacacion] = response.rows;
+            const fechaIngresoO = yield (0, metodos_1.FormatearFecha2)(fecha_ingreso.toLocaleString(), 'ddd');
+            const fechaInicioO = yield (0, metodos_1.FormatearFecha2)(fecha_inicio.toLocaleString(), 'ddd');
+            const fechaFinO = yield (0, metodos_1.FormatearFecha2)(fecha_final.toLocaleString(), 'ddd');
+            const fechaIngresoN = yield (0, metodos_1.FormatearFecha2)(fecha_ingreso.toLocaleString(), 'ddd');
+            const fechaInicioN = yield (0, metodos_1.FormatearFecha2)(fecha_inicio.toLocaleString(), 'ddd');
+            const fechaFinN = yield (0, metodos_1.FormatearFecha2)(fecha_final.toLocaleString(), 'ddd');
+            yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'mv_solicitud_vacacion',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: `{id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinO}, fecha_ingreso: ${fechaIngresoO}, dia_libre: ${datosOriginales.dia_libre}, dia_laborable: ${datosOriginales.dia_laborable}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}, id_empleado: ${datosOriginales.id_empleado}}`,
+                datosNuevos: `{id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinN}, fecha_ingreso: ${fechaIngresoN}, dia_libre: ${dia_libre}, dia_laborable: ${dia_laborable}, legalizado: ${legalizado}, estado: ${estado}, id_empleado: ${datosOriginales.id_empleado}}`,
+                ip: ip,
+                observacion: null
+            });
+            yield database_1.pool.query('COMMIT');
             if (objetoVacacion) {
                 return res.status(200).jsonp(objetoVacacion);
             }

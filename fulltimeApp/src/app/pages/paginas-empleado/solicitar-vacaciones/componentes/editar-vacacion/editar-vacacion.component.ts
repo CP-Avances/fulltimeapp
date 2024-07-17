@@ -424,6 +424,8 @@ export class EditarVacacionComponent implements OnInit {
     if (!validadionesFechas) return
 
     console.log('PASO VALIDACIONES DE FECHAS Y HORAS');
+    this.reg.user_name = this.userService.username;
+    this.reg.ip = localStorage.getItem('ip');
 
     this.subscripted = this.vacacionService.putVacacion(this.reg).subscribe(
       resp => {

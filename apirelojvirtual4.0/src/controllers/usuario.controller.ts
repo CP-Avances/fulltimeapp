@@ -8,6 +8,8 @@ import { pool } from '../database';
 import { QueryResult } from 'pg';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
+import * as AUDITORIA_CONTROLADOR from '../controllers/auditotia.controller';
+
 
 
 export const getUsers = async (req: Request, res: Response): Promise<Response> => {
@@ -62,7 +64,7 @@ export const loginUsuario = async (req: Request, res: Response) => {
 
         const usuarios: Usuario[] = response.rows;
 
-        usuarios[0].ip= ip_cliente;
+        usuarios[0].ip = ip_cliente;
 
         if (usuarios.length === 0) return res.status(401).jsonp({ // NO EXISTE USUARIO CON ESE NOMBRE.
             message: 'No existe el usuario ingresado'
@@ -238,21 +240,34 @@ const compararContraseña = async function (contrasena_ingresada: string, contra
 
 export const ingresarIDdispositivo = async (req: Request, res: Response) => {
     try {
-        const { id_empleado, id_celular, modelo_dispositivo } = req.body;
-        const [Response] = await pool.query(
+        const { id_empleado, id_celular, modelo_dispositivo, user_name, ip } = req.body;
+        await pool.query('BEGIN');
+
+        const response: QueryResult = await pool.query(
             'INSERT INTO mrv_dispositivos(id_empleado, id_dispositivo, modelo_dispositivo)' +
             'VALUES ($1, $2, $3) RETURNING *',
             [id_empleado, id_celular, modelo_dispositivo]
-        ).then(res => {
-            return res.rows;
+        )
+        const [objetoDispositivos] = response.rows;
+
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: "mrv_dispositivos",
+            usuario: user_name,
+            accion: "I",
+            datosOriginales: "",
+            datosNuevos: JSON.stringify(objetoDispositivos),
+            ip: ip,
+            observacion: null,
         });
 
+        await pool.query('COMMIT');
         if (!Response) return res.status(400).jsonp({ message: "El dispositivo no se Registro" });
 
         return res.status(200).jsonp({
             body: {
                 mensaje: "Celular Registrado ",
-                response: Response.rowCount
+                response: response.rowCount
             }
         })
     } catch (error) {

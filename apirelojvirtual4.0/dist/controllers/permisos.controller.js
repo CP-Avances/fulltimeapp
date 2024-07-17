@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -11,6 +34,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.pruebaConsulta = exports.putPermiso = exports.postNuevoPermiso = exports.getlistaPermisosByHorasyCodigoEdit = exports.getlistaPermisosByHorasyCodigo = exports.getlistaPermisosByFechasyCodigoEdit = exports.getlistaPermisosByFechasyCodigo = exports.getlistaPermisosByFechas = exports.getlistaPermisos = exports.getlistaPermisosByCodigo = exports.getPermisoByIdyCodigo = void 0;
 const database_1 = require("../database");
+const metodos_1 = require("../libs/metodos");
+const AUDITORIA_CONTROLADOR = __importStar(require("../controllers/auditotia.controller"));
 /**
  * Metodo para obtener listado de permisos por codigo del empleado
  * @returns Retorna un array de Permisos
@@ -184,14 +209,31 @@ exports.getlistaPermisosByHorasyCodigoEdit = getlistaPermisosByHorasyCodigoEdit;
  */
 const postNuevoPermiso = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre, id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, numero_permiso, documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, codigo } = req.body;
+        const { fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre, id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, numero_permiso, documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado, user_name, ip } = req.body;
+        yield database_1.pool.query('BEGIN');
         const response = yield database_1.pool.query('INSERT INTO mp_solicitud_permiso (fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, ' +
             'dia_libre, id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, numero_permiso, ' +
             'documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado) ' +
             'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) ' +
             'RETURNING * ', [fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre,
             id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, numero_permiso,
-            documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, codigo]);
+            documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado]);
+        const fechaCreacionN = yield (0, metodos_1.FormatearFecha2)(fecha_creacion.toLocaleString(), 'ddd');
+        const fechaInicioN = yield (0, metodos_1.FormatearFecha2)(fecha_inicio.toLocaleString(), 'ddd');
+        const fechaFinN = yield (0, metodos_1.FormatearFecha2)(fecha_final.toLocaleString(), 'ddd');
+        const horaIngresoN = yield (0, metodos_1.FormatearHora)(hora_ingreso);
+        const horaSalidaN = yield (0, metodos_1.FormatearHora)(hora_salida);
+        const horasPermisoN = yield (0, metodos_1.FormatearHora)(horas_permiso);
+        yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'mp_solicitud_permiso',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: `{id_empleado_contrato: ${id_empleado_contrato}, id_empleado_cargo: ${id_empleado_cargo}, id_periodo_vacacion: ${id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: null, numero_permiso: ${numero_permiso}, descripcion: ${descripcion}, id_tipo_permiso: ${id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dias_permiso}, dia_libre: ${dia_libre}, horas_permiso: ${horasPermisoN}, documento: ${documento}, legalizado: ${legalizado}, estado: ${estado}, id_empleado: ${id_empleado}}`,
+            ip: ip,
+            observacion: null
+        });
+        yield database_1.pool.query('COMMIT');
         const [objetoPermiso] = response.rows;
         if (!objetoPermiso)
             return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
@@ -228,8 +270,25 @@ exports.postNuevoPermiso = postNuevoPermiso;
  */
 const putPermiso = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id, fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre, id_tipo_permiso, horas_permiso, documento, estado, hora_salida, hora_ingreso } = req.body;
+        const { id, fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre, id_tipo_permiso, horas_permiso, documento, estado, hora_salida, hora_ingreso, user_name, ip } = req.body;
         console.log(req.body);
+        yield database_1.pool.query('BEGIN');
+        const solicitudPermisoBuscada = yield database_1.pool.query('SELECT * FROM mp_solicitud_permiso WHERE id = $1', [id]);
+        const [datosOriginales] = solicitudPermisoBuscada.rows;
+        if (!datosOriginales) {
+            yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'mp_solicitud_permiso',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: '',
+                datosNuevos: '',
+                ip: ip,
+                observacion: `Error al actualizar el permiso con id: ${id}. Registro no encontrado`
+            });
+            // FINALIZAR TRANSACCION
+            yield database_1.pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado' });
+        }
         if (estado === 1) {
             const response = yield database_1.pool.query(`
                 UPDATE mp_solicitud_permiso SET fecha_creacion = $2 , descripcion = $3, fecha_inicio = $4, fecha_final = $5, 
@@ -239,6 +298,28 @@ const putPermiso = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 `, [id, fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre, id_tipo_permiso,
                 horas_permiso,
                 documento, estado, hora_salida, hora_ingreso]);
+            const fechaCreacionO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_creacion.toLocaleString(), 'ddd');
+            const fechaInicioO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_inicio.toLocaleString(), 'ddd');
+            const fechaFinO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_final.toLocaleString(), 'ddd');
+            const horaIngresoO = yield (0, metodos_1.FormatearHora)(datosOriginales.hora_ingreso);
+            const horaSalidaO = yield (0, metodos_1.FormatearHora)(datosOriginales.hora_salida);
+            const horasPermisoO = yield (0, metodos_1.FormatearHora)(datosOriginales.horas_permiso);
+            const fechaCreacionN = yield (0, metodos_1.FormatearFecha2)(fecha_creacion.toLocaleString(), 'ddd');
+            const fechaInicioN = yield (0, metodos_1.FormatearFecha2)(fecha_inicio.toLocaleString(), 'ddd');
+            const fechaFinN = yield (0, metodos_1.FormatearFecha2)(fecha_final.toLocaleString(), 'ddd');
+            const horaIngresoN = yield (0, metodos_1.FormatearHora)(hora_ingreso);
+            const horaSalidaN = yield (0, metodos_1.FormatearHora)(hora_salida);
+            const horasPermisoN = yield (0, metodos_1.FormatearHora)(horas_permiso);
+            yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'mp_solicitud_permiso',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: `{id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionO}, fecha_edicion: null, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horasPermisoN}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}, id_empleado: ${datosOriginales.id_empleado}}`,
+                datosNuevos: `{id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: null, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dias_permiso}, dia_libre: ${dia_libre}, horas_permiso: ${horasPermisoN}, documento: ${documento}, legalizado: ${legalizado}, estado: ${estado}, id_empleado: ${datosOriginales.id_empleado}}`,
+                ip: ip,
+                observacion: null
+            });
+            yield database_1.pool.query('COMMIT');
             const [objetoPermiso] = response.rows;
             if (objetoPermiso) {
                 return res.status(200).jsonp(objetoPermiso);

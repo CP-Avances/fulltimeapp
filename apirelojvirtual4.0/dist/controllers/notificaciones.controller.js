@@ -398,7 +398,7 @@ const NotificaVisto = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 datosOriginales: '',
                 datosNuevos: '',
                 ip: ip,
-                observacion: `Error al actualizar solicitud de comidas con id: ${id_notificacion}. Registro no encontrado`
+                observacion: `Error al actualizar notificaciones con id: ${id_notificacion}. Registro no encontrado`
             });
             // FINALIZAR TRANSACCION
             yield database_1.pool.query('COMMIT');
@@ -441,7 +441,7 @@ const NotifiTimbreVisto = (req, res) => __awaiter(void 0, void 0, void 0, functi
                 datosOriginales: '',
                 datosNuevos: '',
                 ip: ip,
-                observacion: `Error al actualizar solicitud de comidas con id: ${id_notificacion}. Registro no encontrado`
+                observacion: `Error al actualizar notificacion timbre con id: ${id_notificacion}. Registro no encontrado`
             });
             // FINALIZAR TRANSACCION
             yield database_1.pool.query('COMMIT');

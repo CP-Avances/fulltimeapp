@@ -38,6 +38,9 @@ export interface Permiso {
     hora_ingreso_: string;
 
     EmpleadosSendNotiEmail?: EmpleadosSendNotiEmail[];
+
+    user_name: string;
+    ip: string;
 }
 
 export const permisoValueDefault: Permiso = {
@@ -70,6 +73,8 @@ export const permisoValueDefault: Permiso = {
     fec_final_: '',
     hora_salida_: '',
     hora_ingreso_: '',
+    user_name: ' ',
+    ip: ' '
 }
 
 export const cg_permisoValueDefault: Cg_TipoPermiso = {

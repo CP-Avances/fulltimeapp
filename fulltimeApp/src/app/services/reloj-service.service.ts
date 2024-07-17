@@ -44,7 +44,7 @@ export class RelojServiceService {
     return this.http.put<any>(this.URL + '/user/actualizarIDcelular/' + id_usuario, { id_celular });
   }
 
-  registrarCelularUsuario(id_empleado: any, id_celular: any, modelo_dispositivo: any) {
+  registrarCelularUsuario(id_empleado: any, id_celular: any, modelo_dispositivo: any, user_name : any, ip: any) {
     return this.http.post<any>(this.URL + '/user/ingresarIDdispositivo', { id_empleado, id_celular, modelo_dispositivo });
   }
 

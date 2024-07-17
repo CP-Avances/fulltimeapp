@@ -21,6 +21,10 @@ export interface Vacacion {
     fec_final_: string;
     fec_ingreso_: string;
     id_departamento?: number;
+    user_name?: string;
+    ip?: string;
+
+
 }
 export const vacacionValueDefault = {
     isChecked: false,
@@ -38,4 +42,7 @@ export const vacacionValueDefault = {
     fec_final_: null,
     fec_ingreso_: null,
     id_departamento: null,
+    user_name: null,
+    ip: null
+
 }

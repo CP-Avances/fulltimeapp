@@ -238,7 +238,7 @@ const updateEstadoSolicitudes = (req, res) => __awaiter(void 0, void 0, void 0, 
         const [solicitud] = response.rows;
         // AUDITORIA
         yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            tabla: 'nameTable',
+            tabla: `${nameTable}`,
             usuario: user_name,
             accion: 'U',
             datosOriginales: JSON.stringify(datos),

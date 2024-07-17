@@ -432,7 +432,7 @@ export const NotificaVisto = async (req: Request, res: Response) => {
                 datosOriginales: '',
                 datosNuevos: '',
                 ip: ip,
-                observacion: `Error al actualizar solicitud de comidas con id: ${id_notificacion}. Registro no encontrado`
+                observacion: `Error al actualizar notificaciones con id: ${id_notificacion}. Registro no encontrado`
             });
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
@@ -481,7 +481,7 @@ export const NotifiTimbreVisto = async (req: Request, res: Response) => {
                 datosOriginales: '',
                 datosNuevos: '',
                 ip: ip,
-                observacion: `Error al actualizar solicitud de comidas con id: ${id_notificacion}. Registro no encontrado`
+                observacion: `Error al actualizar notificacion timbre con id: ${id_notificacion}. Registro no encontrado`
             });
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');

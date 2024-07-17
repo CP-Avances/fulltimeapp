@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { pool } from '../database';
 import { QueryResult } from 'pg';
 import { Permiso } from '../interfaces/Permisos'
+import { FormatearFecha2, FormatearHora } from '../libs/metodos';
+import * as AUDITORIA_CONTROLADOR from '../controllers/auditotia.controller';
 
 /**
  * Metodo para obtener listado de permisos por codigo del empleado
@@ -181,7 +183,11 @@ export const postNuevoPermiso = async (req: Request, res: Response): Promise<Res
 
         const { fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre,
             id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, numero_permiso,
-            documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, codigo } = req.body;
+            documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado, user_name, ip } = req.body;
+
+        await pool.query('BEGIN');
+
+
 
         const response: QueryResult = await pool.query(
             'INSERT INTO mp_solicitud_permiso (fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, ' +
@@ -191,14 +197,35 @@ export const postNuevoPermiso = async (req: Request, res: Response): Promise<Res
             'RETURNING * ',
             [fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre,
                 id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, numero_permiso,
-                documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, codigo]);
+                documento, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado]);
+        const fechaCreacionN = await FormatearFecha2(fecha_creacion.toLocaleString(), 'ddd');
+        const fechaInicioN = await FormatearFecha2(fecha_inicio.toLocaleString(), 'ddd');
+        const fechaFinN = await FormatearFecha2(fecha_final.toLocaleString(), 'ddd');
+        const horaIngresoN = await FormatearHora(hora_ingreso);
+        const horaSalidaN = await FormatearHora(hora_salida);
+        const horasPermisoN = await FormatearHora(horas_permiso);
+
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'mp_solicitud_permiso',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: `{id_empleado_contrato: ${id_empleado_contrato}, id_empleado_cargo: ${id_empleado_cargo}, id_periodo_vacacion: ${id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: null, numero_permiso: ${numero_permiso}, descripcion: ${descripcion}, id_tipo_permiso: ${id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dias_permiso}, dia_libre: ${dia_libre}, horas_permiso: ${horasPermisoN}, documento: ${documento}, legalizado: ${legalizado}, estado: ${estado}, id_empleado: ${id_empleado}}`,
+            ip: ip,
+            observacion: null
+        });
+
+
+        await pool.query('COMMIT');
+
+
         const [objetoPermiso] = response.rows;
 
         if (!objetoPermiso) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
 
         const permiso: Permiso = objetoPermiso
         return res.status(200).jsonp(permiso);
-        
+
     } catch (error) {
         console.log(error);
         return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
@@ -232,8 +259,29 @@ export const putPermiso = async (req: Request, res: Response): Promise<Response>
     try {
         const { id, fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre, id_tipo_permiso,
             horas_permiso,
-            documento, estado, hora_salida, hora_ingreso } = req.body;
+            documento, estado, hora_salida, hora_ingreso, user_name, ip } = req.body;
         console.log(req.body);
+
+        await pool.query('BEGIN');
+
+        const solicitudPermisoBuscada = await pool.query('SELECT * FROM mp_solicitud_permiso WHERE id = $1', [id]);
+        const [datosOriginales] = solicitudPermisoBuscada.rows;
+
+        if (!datosOriginales) {
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'mp_solicitud_permiso',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: '',
+                datosNuevos: '',
+                ip: ip,
+                observacion: `Error al actualizar el permiso con id: ${id}. Registro no encontrado`
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado' });
+        }
+
 
         if (estado === 1) {
             const response: QueryResult = await pool.query(
@@ -247,6 +295,32 @@ export const putPermiso = async (req: Request, res: Response): Promise<Response>
                     horas_permiso,
                     documento, estado, hora_salida, hora_ingreso]);
 
+
+            const fechaCreacionO = await FormatearFecha2(datosOriginales.fecha_creacion.toLocaleString(), 'ddd');
+            const fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio.toLocaleString(), 'ddd');
+            const fechaFinO = await FormatearFecha2(datosOriginales.fecha_final.toLocaleString(), 'ddd');
+            const horaIngresoO = await FormatearHora(datosOriginales.hora_ingreso);
+            const horaSalidaO = await FormatearHora(datosOriginales.hora_salida);
+            const horasPermisoO = await FormatearHora(datosOriginales.horas_permiso);
+
+            const fechaCreacionN = await FormatearFecha2(fecha_creacion.toLocaleString(), 'ddd');
+            const fechaInicioN = await FormatearFecha2(fecha_inicio.toLocaleString(), 'ddd');
+            const fechaFinN = await FormatearFecha2(fecha_final.toLocaleString(), 'ddd');
+            const horaIngresoN = await FormatearHora(hora_ingreso);
+            const horaSalidaN = await FormatearHora(hora_salida);
+            const horasPermisoN = await FormatearHora(horas_permiso);
+
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'mp_solicitud_permiso',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: `{id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionO}, fecha_edicion: null, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horasPermisoN}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}, id_empleado: ${datosOriginales.id_empleado}}`,
+                datosNuevos: `{id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: null, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dias_permiso}, dia_libre: ${dia_libre}, horas_permiso: ${horasPermisoN}, documento: ${documento}, legalizado: ${legalizado}, estado: ${estado}, id_empleado: ${datosOriginales.id_empleado}}`,
+                ip: ip,
+                observacion: null
+            });
+
+            await pool.query('COMMIT');
             const [objetoPermiso] = response.rows;
 
             if (objetoPermiso) {

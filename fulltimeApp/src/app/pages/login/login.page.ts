@@ -5,7 +5,7 @@ import { Usuario, UsuarioValueDefault } from 'src/app/interfaces/Usuario';
 import { IdDispositivos } from 'src/app/interfaces/Usuario';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { Device } from '@capacitor/device';
-
+import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 
 @Component({
   selector: 'app-login',
@@ -30,14 +30,16 @@ export class LoginPage implements OnInit {
 
   constructor(
     private relojService: RelojServiceService,
-    private navCtroller: NavController, 
+    private navCtroller: NavController,
     public toastController: ToastController,
     public alertController: AlertController,
     public parametros: ParametrosService,
     public platform: Platform,
+    private userService: DataUserLoggedService,
+
   ) { }
 
-  ionViewWillEnter(){
+  ionViewWillEnter() {
     this.infoDispositivo();
   }
 
@@ -47,14 +49,12 @@ export class LoginPage implements OnInit {
     if (!this.relojService.esPrimeraVez()) {
       this.navCtroller.navigateForward(['inicio']);
     } else if (this.relojService.estaLogueado() && this.relojService.existeRol()) {
-      if (localStorage.getItem('rol') == "1") 
-      { 
+      if (localStorage.getItem('rol') == "1") {
         this.navCtroller.pop();
         this.navCtroller.navigateRoot(['adminpage']);
       }
 
-      else 
-      { 
+      else {
         this.navCtroller.pop();
         this.navCtroller.navigateRoot(['empleado']);
       }
@@ -81,7 +81,7 @@ export class LoginPage implements OnInit {
   }
     */
 
-  infoDispositivo(){
+  infoDispositivo() {
     Device.getId().then((id) => {
       this.id_celular = id.uuid;
     });
@@ -91,8 +91,8 @@ export class LoginPage implements OnInit {
     });
   }
 
-  mostrarPassword(): void{
-    this.verPassword = !this.verPassword;   
+  mostrarPassword(): void {
+    this.verPassword = !this.verPassword;
   }
 
   iniciarSesion1() {
@@ -106,10 +106,10 @@ export class LoginPage implements OnInit {
         datos = res;
         if (datos.length != 0) {
           return this.rango_dispositivos = (parseInt(datos[0].descripcion));
-        }else{
+        } else {
           return this.rango_dispositivos = 1;
         }
-    });
+      });
 
 
 
@@ -117,7 +117,7 @@ export class LoginPage implements OnInit {
     this.user.usuario = this.user.usuario.trim();
     this.user.contrasena = this.user.contrasena.trim();
     this.iniciandoSesion = true;
-    
+
     if (this.user.usuario == "" && this.user.contrasena == "") {
       this.iniciandoSesion = false;
       this.usuarioIncorrectoToas("Ups! Ingrese sus datos.", 2000);
@@ -130,103 +130,103 @@ export class LoginPage implements OnInit {
           let existeId_Dispositivo: boolean;
 
           this.relojService.obtenerIdDispositivosUsuario(codigo).subscribe(
-                dispositivos => {
-                  console.log("ver dispositivos", dispositivos )
-                
-                  //Buscar el id_dispositivo y el id_empleado si son el mismo
-                  dispositivos.forEach((item: any) => {
-                    if(item.id_dispositivo == this.id_celular){
-                      this.iddispositivos = dispositivos
-                      existeId_Dispositivo = true;
-                    }
-                  });
+            dispositivos => {
+              console.log("ver dispositivos", dispositivos)
 
-                  if(existeId_Dispositivo == true){
-                    localStorage.setItem('token', res.body.autorizacion);
-                    localStorage.setItem('Uid', String(this.usuarioObtenido.id));
-                    localStorage.setItem('nom', String(this.usuarioObtenido.nombre));
-                    localStorage.setItem('ap', String(this.usuarioObtenido.apellido));
-                    localStorage.setItem('correo', String(this.usuarioObtenido.correo));
-                    localStorage.setItem('rol', String(this.usuarioObtenido.id_rol));
-                    localStorage.setItem('UCedula', this.usuarioObtenido.cedula);
-                    localStorage.setItem('username', this.usuarioObtenido.usuario);
-                    localStorage.setItem('ip', this.usuarioObtenido.ip);
-
-                    localStorage.setItem('codigo', this.usuarioObtenido.codigo);
-                    localStorage.setItem('empleadoID', res.body.usuario.id_registro_empleado);
-                    localStorage.setItem('id_empresa', res.body.empresa.id_empresa);
-                    localStorage.setItem('cperi_vacacion', res.body.empresa.id_peri_vacacion);
-                    localStorage.setItem('ccontr', res.body.empresa.id_contrato);
-                    localStorage.setItem('cdepar', res.body.empresa.id_departamento);
-                    localStorage.setItem('ccargo', res.body.empresa.id_cargo);
-                    localStorage.setItem('csucur', res.body.empresa.id_sucursal);
-                    localStorage.setItem('horas_trabaja', res.body.empresa.hora_trabaja);
-                    localStorage.setItem('ndepartamento', res.body.empresa.ndepartamento);
-                    localStorage.setItem('config_noti', JSON.stringify(res.body.config_noti));
-                    localStorage.setItem('app_info', JSON.stringify(res.body.app));
-                    localStorage.setItem('vacuna_info', JSON.stringify(res.body.vacuna));
-                    //console.log(res.body.usuario);
-                    //console.log(res.body.vacuna);
-                    //console.log(res.body.empresa);
-                    //console.log(res.body.config_noti);
-                    this.usuarioSuccessToas(res.message, 2000);
-                    this.cambiodepantallas(this.usuarioObtenido.id_rol);  
-
-                  }else{
-
-                    if(dispositivos.length >= this.rango_dispositivos){
-                      this.usuarioIncorrectoToas("Ups! El usuario llego al limite de dispositivos permitidos", 3000);
-                      var FormId = 'formulariologin';
-                      var resetForm = <HTMLFormElement>document.getElementById(FormId);
-                      resetForm.reset();
-                    }else{
-                      this.registrarCelular();
-                      localStorage.setItem('token', res.body.autorizacion);
-                      localStorage.setItem('Uid', String(this.usuarioObtenido.id));
-                      localStorage.setItem('nom', String(this.usuarioObtenido.nombre));
-                      localStorage.setItem('ap', String(this.usuarioObtenido.apellido));
-                      localStorage.setItem('correo', String(this.usuarioObtenido.correo));
-                      localStorage.setItem('rol', String(this.usuarioObtenido.id_rol));
-                      localStorage.setItem('UCedula', this.usuarioObtenido.cedula);
-                      localStorage.setItem('username', this.usuarioObtenido.usuario);
-                      localStorage.setItem('codigo', this.usuarioObtenido.codigo);
-                      localStorage.setItem('empleadoID', res.body.usuario.id_registro_empleado);
-                      localStorage.setItem('id_empresa', res.body.empresa.id_empresa);
-                      localStorage.setItem('cperi_vacacion', res.body.empresa.id_peri_vacacion);
-                      localStorage.setItem('ccontr', res.body.empresa.id_contrato);
-                      localStorage.setItem('cdepar', res.body.empresa.id_departamento);
-                      localStorage.setItem('ccargo', res.body.empresa.id_cargo);
-                      localStorage.setItem('csucur', res.body.empresa.id_sucursal);
-                      localStorage.setItem('horas_trabaja', res.body.empresa.hora_trabaja);
-                      localStorage.setItem('ndepartamento', res.body.empresa.ndepartamento);
-                      localStorage.setItem('config_noti', JSON.stringify(res.body.config_noti));
-                      localStorage.setItem('app_info', JSON.stringify(res.body.app));
-                      localStorage.setItem('vacuna_info', JSON.stringify(res.body.vacuna));
-                      localStorage.setItem('ip', this.usuarioObtenido.ip);
-  
-                      //console.log(res.body.usuario);
-                      //console.log(res.body.vacuna);
-                      //console.log(res.body.empresa);
-                      //console.log(res.body.config_noti);
-                      this.usuarioSuccessToas(res.message, 2000);
-                      this.cambiodepantallas(this.usuarioObtenido.id_rol);  
-                    }
-                    
-                  }
-                },
-                err => {
-                  this.iniciandoSesion = false;
-                  if (err.status == 0) {
-                    console.log(err.url + "|" + err.message + "|" + err.statusText + "|" + err.name);
-                    this.usuarioIncorrectoToas("Halgo ha salido mal. COMPRUEBA TU CONEXION A INTERNET o PONGASE EN CONTACTO CON EL ADMINISTRADOR", 3000);
-                  } else {
-                    console.log(err.url + "|" + err.message + "|" + err.statusText + "|" + err.name);
-                    this.usuarioIncorrectoToas(err.error.message, 3000),
-                      console.log(err)
-        
-                  }
+              //Buscar el id_dispositivo y el id_empleado si son el mismo
+              dispositivos.forEach((item: any) => {
+                if (item.id_dispositivo == this.id_celular) {
+                  this.iddispositivos = dispositivos
+                  existeId_Dispositivo = true;
                 }
-              );
+              });
+
+              if (existeId_Dispositivo == true) {
+                localStorage.setItem('token', res.body.autorizacion);
+                localStorage.setItem('Uid', String(this.usuarioObtenido.id));
+                localStorage.setItem('nom', String(this.usuarioObtenido.nombre));
+                localStorage.setItem('ap', String(this.usuarioObtenido.apellido));
+                localStorage.setItem('correo', String(this.usuarioObtenido.correo));
+                localStorage.setItem('rol', String(this.usuarioObtenido.id_rol));
+                localStorage.setItem('UCedula', this.usuarioObtenido.cedula);
+                localStorage.setItem('username', this.usuarioObtenido.usuario);
+                localStorage.setItem('ip', this.usuarioObtenido.ip);
+
+                localStorage.setItem('codigo', this.usuarioObtenido.codigo);
+                localStorage.setItem('empleadoID', res.body.usuario.id_registro_empleado);
+                localStorage.setItem('id_empresa', res.body.empresa.id_empresa);
+                localStorage.setItem('cperi_vacacion', res.body.empresa.id_peri_vacacion);
+                localStorage.setItem('ccontr', res.body.empresa.id_contrato);
+                localStorage.setItem('cdepar', res.body.empresa.id_departamento);
+                localStorage.setItem('ccargo', res.body.empresa.id_cargo);
+                localStorage.setItem('csucur', res.body.empresa.id_sucursal);
+                localStorage.setItem('horas_trabaja', res.body.empresa.hora_trabaja);
+                localStorage.setItem('ndepartamento', res.body.empresa.ndepartamento);
+                localStorage.setItem('config_noti', JSON.stringify(res.body.config_noti));
+                localStorage.setItem('app_info', JSON.stringify(res.body.app));
+                localStorage.setItem('vacuna_info', JSON.stringify(res.body.vacuna));
+                //console.log(res.body.usuario);
+                //console.log(res.body.vacuna);
+                //console.log(res.body.empresa);
+                //console.log(res.body.config_noti);
+                this.usuarioSuccessToas(res.message, 2000);
+                this.cambiodepantallas(this.usuarioObtenido.id_rol);
+
+              } else {
+
+                if (dispositivos.length >= this.rango_dispositivos) {
+                  this.usuarioIncorrectoToas("Ups! El usuario llego al limite de dispositivos permitidos", 3000);
+                  var FormId = 'formulariologin';
+                  var resetForm = <HTMLFormElement>document.getElementById(FormId);
+                  resetForm.reset();
+                } else {
+                  this.registrarCelular();
+                  localStorage.setItem('token', res.body.autorizacion);
+                  localStorage.setItem('Uid', String(this.usuarioObtenido.id));
+                  localStorage.setItem('nom', String(this.usuarioObtenido.nombre));
+                  localStorage.setItem('ap', String(this.usuarioObtenido.apellido));
+                  localStorage.setItem('correo', String(this.usuarioObtenido.correo));
+                  localStorage.setItem('rol', String(this.usuarioObtenido.id_rol));
+                  localStorage.setItem('UCedula', this.usuarioObtenido.cedula);
+                  localStorage.setItem('username', this.usuarioObtenido.usuario);
+                  localStorage.setItem('codigo', this.usuarioObtenido.codigo);
+                  localStorage.setItem('empleadoID', res.body.usuario.id_registro_empleado);
+                  localStorage.setItem('id_empresa', res.body.empresa.id_empresa);
+                  localStorage.setItem('cperi_vacacion', res.body.empresa.id_peri_vacacion);
+                  localStorage.setItem('ccontr', res.body.empresa.id_contrato);
+                  localStorage.setItem('cdepar', res.body.empresa.id_departamento);
+                  localStorage.setItem('ccargo', res.body.empresa.id_cargo);
+                  localStorage.setItem('csucur', res.body.empresa.id_sucursal);
+                  localStorage.setItem('horas_trabaja', res.body.empresa.hora_trabaja);
+                  localStorage.setItem('ndepartamento', res.body.empresa.ndepartamento);
+                  localStorage.setItem('config_noti', JSON.stringify(res.body.config_noti));
+                  localStorage.setItem('app_info', JSON.stringify(res.body.app));
+                  localStorage.setItem('vacuna_info', JSON.stringify(res.body.vacuna));
+                  localStorage.setItem('ip', this.usuarioObtenido.ip);
+
+                  //console.log(res.body.usuario);
+                  //console.log(res.body.vacuna);
+                  //console.log(res.body.empresa);
+                  //console.log(res.body.config_noti);
+                  this.usuarioSuccessToas(res.message, 2000);
+                  this.cambiodepantallas(this.usuarioObtenido.id_rol);
+                }
+
+              }
+            },
+            err => {
+              this.iniciandoSesion = false;
+              if (err.status == 0) {
+                console.log(err.url + "|" + err.message + "|" + err.statusText + "|" + err.name);
+                this.usuarioIncorrectoToas("Halgo ha salido mal. COMPRUEBA TU CONEXION A INTERNET o PONGASE EN CONTACTO CON EL ADMINISTRADOR", 3000);
+              } else {
+                console.log(err.url + "|" + err.message + "|" + err.statusText + "|" + err.name);
+                this.usuarioIncorrectoToas(err.error.message, 3000),
+                  console.log(err)
+
+              }
+            }
+          );
         },
         err => {
           this.iniciandoSesion = false;
@@ -244,13 +244,13 @@ export class LoginPage implements OnInit {
     }
   }
 
-  cambiodepantallas(rol: number){
+  cambiodepantallas(rol: number) {
     if (rol === 1) {
       this.navCtroller.pop();
-      this.navCtroller.navigateRoot(['adminpage']); 
-    }else { 
+      this.navCtroller.navigateRoot(['adminpage']);
+    } else {
       this.navCtroller.pop();
-      this.navCtroller.navigateRoot(['empleado']); 
+      this.navCtroller.navigateRoot(['empleado']);
     }
 
     var FormId = 'formulariologin';
@@ -298,7 +298,7 @@ export class LoginPage implements OnInit {
             this.abrirToas("Debe registrar un dispositivo para usar el sistema", "danger", 3500);
           }
         },
-       {
+        {
           text: 'Listo',
           handler: () => {
             this.registrarIdDispositivoenBDD(this.id_celular, this.dispositi);
@@ -310,15 +310,18 @@ export class LoginPage implements OnInit {
     await alert.present();
   }
 
-  registrarIdDispositivoenBDD(id_celular: any, model_dispositivo: any){
+  registrarIdDispositivoenBDD(id_celular: any, model_dispositivo: any) {
     const id_usuario = this.usuarioObtenido.codigo;
-    this.relojService.registrarCelularUsuario(id_usuario, id_celular, model_dispositivo).subscribe(
+    var ip = localStorage.getItem('ip');
+    var user_name = this.userService.username;
+
+    this.relojService.registrarCelularUsuario(id_usuario, id_celular, model_dispositivo, user_name, ip).subscribe(
       res => {
         localStorage.setItem('UidDispositivo', id_celular);
         res.id_empleado = id_usuario
         res.id_dispositivo = id_celular;
         res.modelo_dispositivo = model_dispositivo;
-      },err => {
+      }, err => {
         this.iniciandoSesion = false;
         if (err.status == 0) {
           console.log(err.url + "|" + err.message + "|" + err.statusText + "|" + err.name);
@@ -326,7 +329,7 @@ export class LoginPage implements OnInit {
         } else {
           console.log(err.url + "|" + err.message + "|" + err.statusText + "|" + err.name);
           this.usuarioIncorrectoToas(err.error.message, 3000),
-          console.log(err)
+            console.log(err)
 
         }
       }

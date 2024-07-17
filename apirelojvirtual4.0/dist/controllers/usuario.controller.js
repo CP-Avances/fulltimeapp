@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17,6 +40,7 @@ const md5_typescript_1 = require("md5-typescript");
 const database_1 = require("../database");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const fs_1 = __importDefault(require("fs"));
+const AUDITORIA_CONTROLADOR = __importStar(require("../controllers/auditotia.controller"));
 const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const response = yield database_1.pool.query('SELECT * FROM eu_usuarios ORDER BY usuario ASC');
@@ -227,17 +251,28 @@ const compararContraseña = function (contrasena_ingresada, contrasena_bdd) {
 //ojo este metodo
 const ingresarIDdispositivo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id_empleado, id_celular, modelo_dispositivo } = req.body;
-        const [Response] = yield database_1.pool.query('INSERT INTO mrv_dispositivos(id_empleado, id_dispositivo, modelo_dispositivo)' +
-            'VALUES ($1, $2, $3) RETURNING *', [id_empleado, id_celular, modelo_dispositivo]).then(res => {
-            return res.rows;
+        const { id_empleado, id_celular, modelo_dispositivo, user_name, ip } = req.body;
+        yield database_1.pool.query('BEGIN');
+        const response = yield database_1.pool.query('INSERT INTO mrv_dispositivos(id_empleado, id_dispositivo, modelo_dispositivo)' +
+            'VALUES ($1, $2, $3) RETURNING *', [id_empleado, id_celular, modelo_dispositivo]);
+        const [objetoDispositivos] = response.rows;
+        // AUDITORIA
+        yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: "mrv_dispositivos",
+            usuario: user_name,
+            accion: "I",
+            datosOriginales: "",
+            datosNuevos: JSON.stringify(objetoDispositivos),
+            ip: ip,
+            observacion: null,
         });
+        yield database_1.pool.query('COMMIT');
         if (!Response)
             return res.status(400).jsonp({ message: "El dispositivo no se Registro" });
         return res.status(200).jsonp({
             body: {
                 mensaje: "Celular Registrado ",
-                response: Response.rowCount
+                response: response.rowCount
             }
         });
     }

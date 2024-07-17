@@ -90,6 +90,9 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     this.reg.dia_laborable = undefined;
     this.reg.dia_libre = undefined;
 
+    this.reg.user_name = this.userService.username;
+    this.reg.ip = localStorage.getItem('ip');
+
     console.log('peri_vacaciones: ', this.reg.id_periodo_vacacion);
     console.log('id_empleado_cargo: ', this.reg.id_empleado_cargo);
 

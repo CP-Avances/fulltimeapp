@@ -142,7 +142,7 @@ export const deleteMetodoGeneral = async (req: Request, res: Response): Promise<
                         user_name = '';
                         ip = '';
                         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                            tabla: `mv_solicitud_vacacion`,
+                            tabla: `mhe_solicitud_hora_extra`,
                             usuario: user_name,
                             accion: 'D',
                             datosOriginales: '',
@@ -212,7 +212,7 @@ export const deleteMetodoGeneral = async (req: Request, res: Response): Promise<
                         user_name = '';
                         ip = '';
                         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                            tabla: `mv_solicitud_vacacion`,
+                            tabla: `mp_solicitud_permiso`,
                             usuario: user_name,
                             accion: 'D',
                             datosOriginales: '',

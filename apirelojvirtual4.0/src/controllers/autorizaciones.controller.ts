@@ -223,7 +223,7 @@ export const updateEstadoSolicitudes = async (req: Request, res: Response): Prom
         const [solicitud]: any[] = response.rows;
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            tabla: 'nameTable',
+            tabla:  `${nameTable}`,
             usuario: user_name,
             accion: 'U',
             datosOriginales: JSON.stringify(datos),

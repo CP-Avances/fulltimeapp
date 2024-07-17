@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { pool } from '../database';
 import { QueryResult } from 'pg';
 import { Vacacion } from '../interfaces/Vacaciones';
+import * as AUDITORIA_CONTROLADOR from '../controllers/auditotia.controller';
+import { FormatearFecha2, FormatearHora } from '../libs/metodos';
 
 /**
  * Metodo para obtener listado de vacaciones por codigo del empleado
@@ -11,7 +13,7 @@ export const getlistaVacacionesByCodigo = async (req: Request, res: Response): P
     try {
         const { codigo } = req.query;
 
-        console.log('id_empleado: ',codigo);
+        console.log('id_empleado: ', codigo);
 
         const subquery1 = '( SELECT i.descripcion FROM mv_periodo_vacacion i WHERE i.id = v.id_periodo_vacacion) AS nperivacacion '
         const subquery2 = '( SELECT t.cargo FROM eu_empleado_cargos i, e_cat_tipo_cargo t WHERE i.id = v.id_empleado_cargo AND i.id_tipo_cargo = t.id) AS ncargo '
@@ -79,7 +81,7 @@ export const getlistaVacacionesByFechas = async (req: Request, res: Response): P
  * @returns Retorna un array de vacaciones
  */
 
- export const getlistaVacacionesByFechasyCodigo = async (req: Request, res: Response): Promise<Response> => {
+export const getlistaVacacionesByFechasyCodigo = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { fec_inicio, fec_final, codigo } = req.query;
 
@@ -91,9 +93,9 @@ export const getlistaVacacionesByFechas = async (req: Request, res: Response): P
              (v.fecha_final BETWEEN \'${fec_inicio}\' AND \'${fec_final}\'))
             )`
 
-            const response: QueryResult = await pool.query(query);
-            const vacaciones: Vacacion[] = response.rows;
-            return res.status(200).jsonp(vacaciones);
+        const response: QueryResult = await pool.query(query);
+        const vacaciones: Vacacion[] = response.rows;
+        return res.status(200).jsonp(vacaciones);
     } catch (error) {
         console.log(error);
         return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
@@ -128,7 +130,8 @@ export const getlistaVacacionesByFechasyCodigoEdit = async (req: Request, res: R
 export const postNuevaVacacion = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado, id_periodo_vacacion,
-            id_empleado_cargo, estado, codigo } = req.body;
+            id_empleado_cargo, estado, id_empleado, user_name, ip } = req.body;
+        await pool.query('BEGIN');
 
         console.log(req.body);
 
@@ -137,9 +140,25 @@ export const postNuevaVacacion = async (req: Request, res: Response): Promise<Re
             'legalizado, id_periodo_vacacion, id_empleado_cargo, estado, id_empleado) ' +
             'VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ) RETURNING *',
             [fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado, id_periodo_vacacion,
-                id_empleado_cargo, estado, codigo]);
+                id_empleado_cargo, estado, id_empleado]);
         const [objetoVacacion] = response.rows;
 
+        const fechaIngresoN = await FormatearFecha2(fecha_ingreso.toLocaleString(), 'ddd');
+        const fechaInicioN = await FormatearFecha2(fecha_inicio.toLocaleString(), 'ddd');
+        const fechaFinN = await FormatearFecha2(fecha_final.toLocaleString(), 'ddd');
+
+
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'mv_solicitud_vacacion',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: `{id_empleado_cargo: ${id_empleado_cargo}, id_periodo_vacacion: ${id_periodo_vacacion}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinN}, fecha_ingreso: ${fechaIngresoN}, dia_libre: ${dia_libre}, dia_laborable: ${dia_laborable}, legalizado: ${legalizado}, estado: ${estado}, id_empleado: ${id_empleado}}`,
+            ip: ip,
+            observacion: null
+        });
+
+        await pool.query('COMMIT');
         if (!objetoVacacion) return res.status(400)
             .jsonp({ message: 'Upps !!! algo salio mal. Solicitud de vacación no ingresada' })
 
@@ -157,7 +176,27 @@ export const postNuevaVacacion = async (req: Request, res: Response): Promise<Re
  */
 export const putVacacion = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const { id, fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado, estado } = req.body;
+        const { id, fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado, estado, user_name, ip } = req.body;
+
+
+        const solicitudVacacionesBuscada = await pool.query('SELECT * FROM mv_solicitud_vacacion WHERE id = $1', [id]);
+        const [datosOriginales] = solicitudVacacionesBuscada.rows;
+
+
+        if (!datosOriginales) {
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'mv_solicitud_vacacion',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: '',
+                datosNuevos: '',
+                ip: ip,
+                observacion: `Error al actualizar solicitud de vacaciones con id: ${id}. Registro no encontrado`
+            });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado' });
+        }
 
         console.log(req.body);
 
@@ -172,6 +211,27 @@ export const putVacacion = async (req: Request, res: Response): Promise<Response
 
             const [objetoVacacion] = response.rows;
 
+
+            const fechaIngresoO = await FormatearFecha2(fecha_ingreso.toLocaleString(), 'ddd');
+            const fechaInicioO = await FormatearFecha2(fecha_inicio.toLocaleString(), 'ddd');
+            const fechaFinO = await FormatearFecha2(fecha_final.toLocaleString(), 'ddd');
+
+            const fechaIngresoN = await FormatearFecha2(fecha_ingreso.toLocaleString(), 'ddd');
+            const fechaInicioN = await FormatearFecha2(fecha_inicio.toLocaleString(), 'ddd');
+            const fechaFinN = await FormatearFecha2(fecha_final.toLocaleString(), 'ddd');
+    
+    
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'mv_solicitud_vacacion',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: `{id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinO}, fecha_ingreso: ${fechaIngresoO}, dia_libre: ${datosOriginales.dia_libre}, dia_laborable: ${datosOriginales.dia_laborable}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}, id_empleado: ${datosOriginales.id_empleado}}`,
+                datosNuevos: `{id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinN}, fecha_ingreso: ${fechaIngresoN}, dia_libre: ${dia_libre}, dia_laborable: ${dia_laborable}, legalizado: ${legalizado}, estado: ${estado}, id_empleado: ${datosOriginales.id_empleado}}`,
+                ip: ip,
+                observacion: null
+            });
+
+            await pool.query('COMMIT');
             if (objetoVacacion) {
 
                 return res.status(200).jsonp(objetoVacacion);
@@ -205,7 +265,7 @@ export const listarPeriVacaciones = async (req: Request, res: Response): Promise
         const response: QueryResult = await pool.query(query);
         const vacaciones: Vacacion[] = response.rows;
         return res.status(200).jsonp(vacaciones);
-        
+
     } catch (error) {
         console.log(error);
         return res.status(500).jsonp({ message: 'No fue posible verificar el periodo a vacaciones - Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
