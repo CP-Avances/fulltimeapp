@@ -169,20 +169,20 @@ export class DeleteRegisterComponent{
       data.EmpleadosSendNotiEmail.push(infoUsuario);
       if (tabla === 'mp_solicitud_permiso') {
         this.EliminarDocumentoPermiso(data);
-        this.EnviarCorreoPermiso(data); 
+       // this.EnviarCorreoPermiso(data); 
         this.EnviarNotificacionPermiso(data, nota, user);
       }
       else if (tabla === 'mv_solicitud_vacacion') {
-        this.EnviarCorreoVacacion(data, infoUsuario);
+       // this.EnviarCorreoVacacion(data, infoUsuario);
         this.EnviarNotificacionVacacion(data, nota, user);
       }
       else if (tabla === 'mhe_solicitud_hora_extra') {
         this.EliminarDocumentoHoraE(data);
-        this.EnviarCorreoHE(data, infoUsuario);
+        //this.EnviarCorreoHE(data, infoUsuario);
         this.EnviarNotificacionHE(data, nota, user);
       }
       else if (tabla === 'ma_solicitud_comida') {
-        this.EnviarCorreoComida(data);
+        //this.EnviarCorreoComida(data);
         this.NotificarEventoComida(data, nota, user);
       }
     });
@@ -192,103 +192,7 @@ export class DeleteRegisterComponent{
    ** **                           MANEJO DE NOTIFICACIONES DE PERMISOS                          ** **
    ** ******************************************************************************************* **/
 
-  EnviarCorreoPermiso(permiso: any) {
-    var cont = 0;
-    var correo_usuarios = '';
-
-    // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE PERMISO
-    let solicitud = this.validar.FormatearFecha(permiso.fecha_creacion, this.formato_fecha, this.validar.dia_completo);
-    let desde = this.validar.FormatearFecha(permiso.fecha_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(permiso.fecha_final, this.formato_fecha, this.validar.dia_completo);
-
-    // CAPTURANDO ESTADO DE LA SOLICITUD DE PERMISO
-    if (permiso.estado === 1) {
-      var estado_p = 'Pendiente de autorización';
-    }
-    else if (permiso.estado === 2) {
-      var estado_p = 'Preautorizado';
-    }
-    else if (permiso.estado === 3) {
-      var estado_p = 'Autorizado';
-    }
-    else if (permiso.estado === 4) {
-      var estado_p = 'Negado';
-    }
-
-    // LEYENDO DATOS DE TIPO DE PERMISO
-    var tipo_permiso = '';
-    let correo_envia: boolean;
-    this.cg_tipo_permisos.filter(o => {
-      if (o.id === permiso.id_tipo_permiso) {
-        tipo_permiso = o.descripcion
-        correo_envia = o.correo_eliminar
-      }
-      return tipo_permiso;
-    })
-
-    if(correo_envia == true){
-      // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
-    permiso.EmpleadosSendNotiEmail.forEach((e: any) => {
-
-      // LECTURA DE DATOS LEIDOS
-      cont = cont + 1;
-
-      // SI EL USUARIO SE ENCUENTRA ACTIVO Y TIENEN CONFIGURACIÓN RECIBIRA CORREO DE SOLICITUD DE VACACIÓN
-      if (e.permiso_mail) {
-        if (e.estado === true) {
-          if (correo_usuarios === '') {
-            correo_usuarios = e.correo;
-          }
-          else {
-            correo_usuarios = correo_usuarios + ', ' + e.correo
-          }
-        }
-      }
-
-      if (cont === permiso.EmpleadosSendNotiEmail.length) {
-
-        let datosPermisoCreado = {
-          solicitud: solicitud,
-          desde: desde,
-          hasta: hasta,
-          h_inicio: this.validar.FormatearHora(permiso.hora_salida, this.formato_hora),
-          h_fin: this.validar.FormatearHora(permiso.hora_ingreso, this.formato_hora),
-          id_empl_contrato: permiso.id_empl_contrato,
-          tipo_solicitud: 'Permiso eliminado por',
-          horas_permiso: permiso.horas_permiso,
-          observacion: permiso.descripcion,
-          tipo_permiso: tipo_permiso,
-          dias_permiso: permiso.dia,
-          estado_p: estado_p,
-          proceso: 'eliminado',
-          id_dep: e.id_dep,
-          id_suc: e.id_suc,
-          correo: correo_usuarios,
-          asunto: 'ELIMINACION DE SOLICITUD DE PERMISO',
-          id: permiso.id,
-          solicitado_por: (localStorage.getItem('nom')) + ' ' + (localStorage.getItem('ap')),
-        }
-        if (correo_usuarios != '') {
-
-          this.autoriza.EnviarCorreoPermiso(this.idEmpresa, datosPermisoCreado).subscribe(
-            resp => {
-              if (resp.message === 'ok') {
-                this.validar.showToast('Correo de solicitud enviado exitosamente.', 5000, 'success');
-              }
-              else {
-                this.validar.showToast('Ups algo salio mal !!! No fue posible enviar correo de solicitud.', 5000, 'warning');
-              }
-            },
-            err => {
-              this.validar.showToast(err.error.message, 5000, 'danger');
-            },
-            () => { },
-          )
-        }
-      }
-    })
-    }
-  }
+  
 
   EnviarNotificacionPermiso(permiso: any, nota: string, user: string) {
 
@@ -380,78 +284,7 @@ export class DeleteRegisterComponent{
    ** ************************************************************************************************** **/
 
   // METODO PARA ENVIO DE NOTIFICACIONES DE VACACIONES
-  EnviarCorreoVacacion(vacacion: any, infoUsuario: any) {
-    var cont = 0;
-    var correo_usuarios = '';
 
-    vacacion.EmpleadosSendNotiEmail.forEach((e: any) => {
-      // LECTURA DE DATOS LEIDOS
-      cont = cont + 1;
-
-      // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
-      let desde = this.validar.FormatearFecha(vacacion.fecha_inicio, this.formato_fecha, this.validar.dia_completo);
-      let hasta = this.validar.FormatearFecha(vacacion.fecha_final, this.formato_fecha, this.validar.dia_completo);
-
-      // CAPTURANDO ESTADO DE LA SOLICITUD DE VACACIÓN
-      if (vacacion.estado === 1) {
-        var estado_v = 'Pendiente de autorización';
-      }
-      else if (vacacion.estado === 2) {
-        var estado_v = 'Preautorizado';
-      }
-      else if (vacacion.estado === 3) {
-        var estado_v = 'Autorizado';
-      }
-      else if (vacacion.estado === 4) {
-        var estado_v = 'Negado';
-      }
-
-      // SI EL USUARIO SE ENCUENTRA ACTIVO Y TIENEN CONFIGURACIÓN RECIBIRA CORREO DE SOLICITUD DE VACACIÓN
-      if (e.vaca_mail) {
-        if (e.estado === true) {
-          if (correo_usuarios === '') {
-            correo_usuarios = e.correo;
-          }
-          else {
-            correo_usuarios = correo_usuarios + ', ' + e.correo
-          }
-        }
-      }
-
-      // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
-      if (cont === vacacion.EmpleadosSendNotiEmail.length) {
-        let datosVacacionCreada = {
-          tipo_solicitud: 'Solicitud de vacaciones eliminada por',
-          idContrato: infoUsuario.id_contrato,
-          estado_v: estado_v!,
-          proceso: 'eliminado',
-          desde: desde,
-          hasta: hasta,
-          id_dep: e.id_dep, // VERIFICAR
-          id_suc: e.id_suc, // VERIFICAR
-          correo: correo_usuarios,
-          asunto: 'ELIMINACION DE SOLICITUD DE VACACIONES',
-          id: vacacion.id,
-          solicitado_por: (localStorage.getItem('nom')) + ' ' + (localStorage.getItem('ap')),
-        }
-
-        if (correo_usuarios != '') {
-          this.autoriza.EnviarCorreoVacacion(this.idEmpresa, datosVacacionCreada).subscribe(
-            resp => {
-              if (resp.message === 'ok') {
-                this.validar.showToast('Correo de solicitud enviado exitosamente.', 5000, 'success');
-              }
-              else {
-                this.validar.showToast('Ups algo salio mal !!! No fue posible enviar correo de solicitud.', 5000, 'warning');
-              }
-            },
-            err => { this.validar.showToast(err.error.message, 5000, 'danger'); },
-            () => { },
-          )
-        }
-      }
-    })
-  }
 
   // METODO PARA ENVIAR NOTIFICACIONES
   EnviarNotificacionVacacion(vacaciones: any, nota: string, user: string) {
@@ -522,85 +355,7 @@ export class DeleteRegisterComponent{
    ** **                METODO DE ENVIO DE NOTIFICACIONES DE HORAS EXTRAS                      ** **
    ** ******************************************************************************************* **/
 
-  // METODO PARA ENVIAR NOTIFICACIONES DE CORREO
-  EnviarCorreoHE(horaExtra: any, infoUsuario: any) {
-    var cont = 0;
-    var correo_usuarios = '';
-
-    // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let solicitud = this.validar.FormatearFecha(horaExtra.fecha_solicita, this.formato_fecha, this.validar.dia_completo);
-    let desde = this.validar.FormatearFecha(moment(horaExtra.fecha_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(moment(horaExtra.fecha_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-
-    // CAPTURANDO ESTADO DE LA SOLICITUD DE HORA EXTRA
-    if (horaExtra.estado === 1) {
-      var estado_h = 'Pendiente de autorización';
-    }
-    else if (horaExtra.estado === 2) {
-      var estado_h = 'Preautorizado';
-    }
-    else if (horaExtra.estado === 3) {
-      var estado_h = 'Autorizado';
-    }
-    else if (horaExtra.estado === 4) {
-      var estado_h = 'Negado';
-    }
-
-    horaExtra.EmpleadosSendNotiEmail.forEach((e: any)=> {
-
-      // LECTURA DE DATOS LEIDOS
-      cont = cont + 1;
-
-      if (e.hora_extra_mail) {
-        if (e.estado === true) {
-          if (correo_usuarios === '') {
-            correo_usuarios = e.correo;
-          }
-          else {
-            correo_usuarios = correo_usuarios + ', ' + e.correo
-          }
-        }
-      }
-
-      if (cont === horaExtra.EmpleadosSendNotiEmail.length) {
-
-        let datosHoraExtraCreada = {
-          id_empl_contrato: infoUsuario.id_contrato,
-          tipo_solicitud: 'Realización de Horas Extras eliminada por',
-          observacion: horaExtra.descripcion,
-          num_horas: moment(horaExtra.horas_solicitud, 'HH:mm').format('HH:mm'),
-          estado_h: estado_h,
-          solicitud: solicitud,
-          desde: desde,
-          hasta: hasta,
-          h_inicio: this.validar.FormatearHora(moment(horaExtra.fecha_inicio).format('HH:mm:ss'), this.formato_hora),
-          h_final: this.validar.FormatearHora(moment(horaExtra.fecha_final).format('HH:mm:ss'), this.formato_hora),
-          proceso: 'eliminado',
-          asunto: 'ELIMINACION DE SOLICITUD DE REALIZACION DE HORAS EXTRAS',
-          correo: correo_usuarios,
-          id_dep: e.id_dep,
-          id_suc: e.id_suc,
-          id: horaExtra.id,
-          solicitado_por: (localStorage.getItem('nom')) + ' ' + (localStorage.getItem('ap')),
-        }
-
-        if (correo_usuarios != '') {
-          this.autoriza.EnviarCorreoHoraExtra(this.idEmpresa, datosHoraExtraCreada).subscribe(
-            resp => {
-              if (resp.message === 'ok') {
-                this.validar.showToast('Correo de solicitud enviado exitosamente.', 5000, 'success');
-              }
-              else {
-                this.validar.showToast('Ups algo salio mal !!! No fue posible enviar correo de solicitud.', 5000, 'warning');
-              }
-            },
-            err => { this.validar.showToast(err.error.message, 3000, 'danger'); },
-            () => { },
-          )
-        }
-      }
-    })
-  }
+  
 
   // METODO PARA ENVIAR NOTIIFICACIONES AL SISTEMA
   EnviarNotificacionHE(horaExtra: any, nota: string, user: string) {
@@ -679,79 +434,7 @@ export class DeleteRegisterComponent{
    ** **                METODO DE ENVIO DE NOTIFICACIONES DE ALIMENTACION                      ** **
    ** ******************************************************************************************* **/
 
-  // METODO PARA ENVIO DE CORREO
-  EnviarCorreoComida(alimentacion: any) {
-    var cont = 0;
-    var correo_usuarios = '';
-
-    // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE ALIMENTACIÓN
-    let solicitud = this.validar.FormatearFecha(alimentacion.fecha_comida, this.formato_fecha, this.validar.dia_completo);
-
-    // CAPTURANDO ESTADO DE LA SOLICITUD 
-    if (alimentacion.aprobada === null) {
-      var estado_a = 'Pendiente de autorización';
-    }
-    else if (alimentacion.aprobada === true) {
-      var estado_a = 'Autorizado';
-    }
-    else if (alimentacion.aprobada === false) {
-      var estado_a = 'Negado';
-    }
-
-    alimentacion.EmpleadosSendNotiEmail.forEach((e: any) => {
-
-      // LECTURA DE DATOS LEIDOS
-      cont = cont + 1;
-
-      // SI EL USUARIO SE ENCUENTRA ACTIVO Y TIENEN CONFIGURACIÓN RECIBIRA CORREO DE SOLICITUD DE ALIMENTACIÓN
-      if (e.comida_mail) {
-        if (e.estado === true) {
-          if (correo_usuarios === '') {
-            correo_usuarios = e.correo;
-          }
-          else {
-            correo_usuarios = correo_usuarios + ', ' + e.correo
-          }
-        }
-      }
-
-      if (cont === alimentacion.EmpleadosSendNotiEmail.length) {
-        let comida = {
-          id_usua_solicita: alimentacion.id_empleado,
-          tipo_solicitud: 'Servicio de alimentación eliminado por',
-          fec_solicitud: solicitud,
-          observacion: alimentacion.observacion,
-          id_comida: alimentacion.id_comida,
-          proceso: 'eliminado',
-          estadoc: estado_a,
-          correo: correo_usuarios,
-          asunto: 'ELIMINACION DE SOLICITUD DE SERVICIO DE ALIMENTACION',
-          inicio: this.validar.FormatearHora(alimentacion.hora_inicio, this.formato_hora),
-          final: this.validar.FormatearHora(alimentacion.hora_fin, this.formato_hora),
-          extra: alimentacion.extra,
-          id: alimentacion.id,
-          solicitado_por: (localStorage.getItem('nom')) + ' ' + (localStorage.getItem('ap')),
-        }
-
-        if (correo_usuarios != '') {
-          this.autoriza.EnviarCorreoSolAlimentacion(this.idEmpresa, comida).subscribe(
-            resp => {
-              if (resp.message === 'ok') {
-                this.validar.showToast('Correo de solicitud enviado exitosamente.', 5000, 'success');
-              }
-              else {
-                this.validar.showToast('Ups algo salio mal !!! No fue posible enviar correo de solicitud.', 5000, 'warning');
-              }
-            },
-            err => {
-              this.validar.showToast(err.error.message, 5000, 'danger');
-            },
-            () => { },
-          )
-        }
-      }
-    })
-  }
+  
 
   // METODO PARA ENVIO DE NOTIFICACION
   NotificarEventoComida(alimentacion: any, nota: string, user: string) {

@@ -234,6 +234,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
         console.log("ver el codigo para ho", this.reg.id_empleado)
         this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
           horario => {
+            
             this.horarioEmpleado = horario;
             console.log("ver horario", this.horarioEmpleado)
 
@@ -405,7 +406,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
         vacacion.EmpleadosSendNotiEmail.push(this.solInfo);
         this.CrearNuevaAutorizacion(vacacion);
         this.CrearNuevaNotificacion(vacacion);
-        this.SendEmailsEmpleados(vacacion);
+        //this.SendEmailsEmpleados(vacacion);
         this.validar.abrirToas('Solicitud registrada exitosamente.', 5000, 'success', 'top')
         this.closeModalComponent.closeModal(true);
       },
@@ -478,73 +479,6 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     })
   }
 
-  SendEmailsEmpleados(vacacion: Vacacion) {
-
-    console.log('ver vacaciones..   ', vacacion)
-
-    var cont = 0;
-    var correo_usuarios = '';
-
-    vacacion.EmpleadosSendNotiEmail.forEach(e => {
-      // LECTURA DE DATOS LEIDOS
-      cont = cont + 1;
-
-      // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
-      let desde = this.validar.FormatearFecha(String(vacacion.fecha_inicio), this.formato_fecha, this.validar.dia_completo);
-      let hasta = this.validar.FormatearFecha(String(vacacion.fecha_final), this.formato_fecha, this.validar.dia_completo);
-
-      // CAPTURANDO ESTADO DE LA SOLICITUD DE VACACIÓN
-      if (vacacion.estado === 1) {
-        var estado_v = 'Pendiente';
-      }
-
-      // SI EL USUARIO SE ENCUENTRA ACTIVO Y TIENEN CONFIGURACIÓN RECIBIRA CORREO DE SOLICITUD DE VACACIÓN
-      if (e.vaca_mail) {
-        if (e.estado === true) {
-          if (correo_usuarios === '') {
-            correo_usuarios = e.correo;
-          }
-          else {
-            correo_usuarios = correo_usuarios + ', ' + e.correo
-          }
-        }
-      }
-
-      // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
-      if (cont === vacacion.EmpleadosSendNotiEmail.length) {
-        let datosVacacionCreada = {
-          tipo_solicitud: 'Vacaciones solicitadas por',
-          idContrato: parseInt(localStorage.getItem('ccontr')),
-          estado_v: estado_v,
-          proceso: 'creado',
-          id_dep: e.id_dep, // VERIFICAR
-          id_suc: e.id_suc, // VERIFICAR
-          desde: desde,
-          hasta: hasta,
-          correo: correo_usuarios,
-          asunto: 'SOLICITUD DE VACACIONES',
-          id: vacacion.id,
-          solicitado_por: (localStorage.getItem('nom')) + ' ' + (localStorage.getItem('ap')),
-        }
-
-        if (correo_usuarios != '') {
-          this.autorizaciones.EnviarCorreoVacacion(this.idEmpresa, datosVacacionCreada).subscribe(
-            resp => {
-              if (resp.message === 'ok') {
-                this.validar.showToast('Correo de solicitud enviado exitosamente.', 5000, 'success');
-              }
-              else {
-                this.validar.showToast('Ups algo salio mal !!! No fue posible enviar correo de solicitud.', 5000, 'warning');
-              }
-            },
-            err => { this.validar.showToast(err.error.message, 5000, 'danger'); },
-            () => { },
-          )
-        }
-      }
-    })
-
-  }
 
   ngOnDestroy() {
     if (this.subs_bool) {

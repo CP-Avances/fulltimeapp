@@ -13,7 +13,7 @@ exports.ObtenerComidaHorarioHorasDD = exports.ObtenerComidaHorarioHorasMD = expo
 const database_1 = require("../database");
 const getListaEmpleados = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const response = yield database_1.pool.query('SELECT id, cedula, codigo, (nombre || \' \' || apellido) as fullname FROM eu_empleados ORDER BY fullname ASC');
+        const response = yield database_1.pool.query('SELECT id, cedula, codigo,  (nombre || \' \' || apellido) as fullname FROM eu_empleados ORDER BY fullname ASC');
         const empleados = response.rows;
         console.log(empleados);
         return res.status(200).jsonp(empleados);

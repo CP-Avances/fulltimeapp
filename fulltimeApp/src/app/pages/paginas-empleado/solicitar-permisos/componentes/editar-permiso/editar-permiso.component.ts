@@ -175,7 +175,7 @@ export class EditarPermisoComponent implements OnInit {
 
     var busqueda = {
       fecha: moment(this.reg.fecha_inicio).format('YYYY-MM-D'),
-      codigo: this.reg.codigo
+      codigo: this.reg.id_empleado
     }
 
     this.empleadoService.getHorariosEmpleadobyCodigo(busqueda).subscribe(datos => {
@@ -251,7 +251,7 @@ export class EditarPermisoComponent implements OnInit {
 
   solInfo: any;
   obtenerInformacionEmpleado() {
-    this.autorizacion.getInfoEmpleadoByCodigo(this.reg.codigo).subscribe(
+    this.autorizacion.getInfoEmpleadoByCodigo(this.reg.id_empleado).subscribe(
       res => {
         if (res.estado === 1) {
           var estado = true;
@@ -273,7 +273,7 @@ export class EditarPermisoComponent implements OnInit {
 
   permisoAntiguo: any;
   datosAntiguos(permiso: any) {
-    this.permisoService.getPermisoIdyCodigo(permiso.codigo, permiso.id).subscribe(dato => {
+    this.permisoService.getPermisoIdyCodigo(permiso.id_empleado, permiso.id).subscribe(dato => {
       this.permisoAntiguo = dato[0];
       var [cg_permiso] = this.cg_tipo_permisos.filter(o => { return o.id === this.reg.id_tipo_permiso })
       this.tipo_permiso_anterior = cg_permiso.descripcion
@@ -418,7 +418,7 @@ export class EditarPermisoComponent implements OnInit {
     if (this.reg.fecha_inicio != null) {
       var busqueda = {
         fecha: moment(this.reg.fecha_inicio).format('YYYY-MM-D'),
-        codigo: this.reg.codigo
+        codigo: this.reg.id_empleado
       }
 
       this.empleadoService.getHorariosEmpleadobyCodigo(busqueda).subscribe(datos => {
@@ -486,7 +486,7 @@ export class EditarPermisoComponent implements OnInit {
 
       var busqueda = {
         fecha: moment(this.reg.fecha_final).format('YYYY-MM-D'),
-        codigo: this.reg.codigo
+        codigo: this.reg.id_empleado
       }
 
       this.empleadoService.getHorariosEmpleadobyCodigo(busqueda).subscribe(datos => {
@@ -761,7 +761,7 @@ export class EditarPermisoComponent implements OnInit {
     this.dato_comida = 0;
     this.valor_comida = 0;
     let horario = {
-      codigo: this.reg.codigo,
+      codigo: this.reg.id_empleado,
       fecha_inicio: fecha_inicio,
       hora_inicio: moment(this.reg.hora_salida).format('HH:mm:ss'),
       hora_final: moment(this.reg.hora_ingreso).format('HH:mm:ss'),
@@ -797,7 +797,7 @@ export class EditarPermisoComponent implements OnInit {
       fecha_final: fecha_final,
       hora_inicio: moment(this.reg.hora_salida).format('HH:mm:ss'),
       hora_final: moment(this.reg.hora_ingreso).format('HH:mm:ss'),
-      codigo: this.reg.codigo
+      codigo: this.reg.id_empleado
     }
 
     this.empleadoService.BuscarComidaHorarioHorasDD(horario).subscribe(informacion => {
@@ -845,7 +845,7 @@ export class EditarPermisoComponent implements OnInit {
     var data = {
       fecha_inicio: moment(this.reg.fecha_inicio).format('YYYY-MM-D'),
       fecha_final: moment(this.reg.fecha_final).format('YYYY-MM-D'),
-      codigo: '\'' + this.reg.codigo + '\''
+      codigo: '\'' + this.reg.id_empleado + '\''
     }
 
     this.empleadoService.BuscarPlanificacionHorarioEmple(data).subscribe(horario => {
@@ -1185,133 +1185,12 @@ export class EditarPermisoComponent implements OnInit {
     }
     this.autorizacion.BuscarJefes(datos).subscribe(permiso => {
       permiso.EmpleadosSendNotiEmail.push(this.solInfo);
-      this.EnviarCorreoPermiso(permiso);
+     // this.EnviarCorreoPermiso(permiso);
       this.EnviarNotificacionPermiso(permiso);
     });
   }
 
-  EnviarCorreoPermiso(permiso: any) {
-    var cont = 0;
-    var correo_usuarios = '';
-
-    // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE PERMISO
-    let solicitud = this.validar.FormatearFecha(permiso.fec_creacion, this.formato_fecha, this.validar.dia_completo);
-    let desde = this.validar.FormatearFecha(permiso.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(permiso.fec_final, this.formato_fecha, this.validar.dia_completo);
-
-    // CAPTURANDO ESTADO DE LA SOLICITUD DE PERMISO
-    if (permiso.estado === 1) {
-      var estado_p = 'Pendiente de autorización';
-    }
-    else if (permiso.estado === 2) {
-      var estado_p = 'Preautorizada';
-    }
-    else if (permiso.estado === 3) {
-      var estado_p = 'Autorizada';
-    }
-    else if (permiso.estado === 4) {
-      var estado_p = 'Negada';
-    }
-
-    // LEYENDO DATOS DE TIPO DE PERMISO
-    var tipo_permiso = '';
-    var correo_editar: boolean;
-    this.cg_tipo_permisos.filter(o => {
-      if (o.id === permiso.id_tipo_permiso) {
-        tipo_permiso = o.descripcion
-        correo_editar = o.correo_editar;
-      }
-      return tipo_permiso;
-    })
-
-    console.log("Envio de correo: ", correo_editar);
-
-    if (correo_editar === true) {
-      // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
-      permiso.EmpleadosSendNotiEmail.forEach((e: any) => {
-        // LECTURA DE DATOS LEIDOS
-        cont = cont + 1;
-
-        // SI EL USUARIO SE ENCUENTRA ACTIVO Y TIENEN CONFIGURACIÓN RECIBIRA CORREO DE SOLICITUD DE VACACIÓN
-        if (e.permiso_mail) {
-          if (e.estado === true) {
-            if (correo_usuarios === '') {
-              correo_usuarios = e.correo;
-            }
-            else {
-              correo_usuarios = correo_usuarios + ', ' + e.correo
-            }
-          }
-        }
-
-        console.log('contadores', permiso.EmpleadosSendNotiEmail.length + ' cont ' + cont)
-
-        if (cont === permiso.EmpleadosSendNotiEmail.length) {
-
-
-          // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE PERMISO
-          let asolicitud = this.validar.FormatearFecha(this.permisoAntiguo.fec_creacion, this.formato_fecha, this.validar.dia_completo);
-          let adesde = this.validar.FormatearFecha(this.permisoAntiguo.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-          let ahasta = this.validar.FormatearFecha(this.permisoAntiguo.fec_final, this.formato_fecha, this.validar.dia_completo);
-
-          let datosPermisoCreado = {
-            solicitud: solicitud,
-            desde: desde,
-            hasta: hasta,
-            h_inicio: this.validar.FormatearHora(permiso.hora_salida, this.formato_hora),
-            h_fin: this.validar.FormatearHora(permiso.hora_ingreso, this.formato_hora),
-            id_empl_contrato: permiso.id_empl_contrato,
-            tipo_solicitud: 'Permiso actualizado por',
-            horas_permiso: permiso.horas_permiso,
-            observacion: permiso.descripcion,
-            tipo_permiso: tipo_permiso,
-            dias_permiso: permiso.dia,
-            estado_p: estado_p,
-            proceso: 'actualizado',
-            id_dep: e.id_dep,
-            id_suc: e.id_suc,
-            correo: correo_usuarios,
-            asunto: 'ACTUALIZACION DE SOLICITUD DE PERMISO',
-            id: permiso.id,
-            solicitado_por: (localStorage.getItem('nom')) + ' ' + (localStorage.getItem('ap')),
-
-            //ESTOS SON LOS DATOS ANTERIORES QUE SE ENVIAN AL CORREO
-            asolicitud: asolicitud,
-            adesde: adesde,
-            ahasta: ahasta,
-            ah_inicio: this.permisoAntiguo.hora_salida,
-            ah_fin: this.permisoAntiguo.hora_ingreso,
-            ahoras_permiso: this.permisoAntiguo.horas_permiso,
-            aobservacion: this.permisoAntiguo.descripcion,
-            atipo_permiso: this.tipo_permiso_anterior,
-            adias_permiso: this.permisoAntiguo.dia,
-            aestado_p: estado_p,
-          }
-
-          console.log('datos de correo que se envia: ', datosPermisoCreado)
-
-          if (correo_usuarios != '') {
-            this.autorizacion.EnviarCorreoPermiso(this.idEmpresa, datosPermisoCreado).subscribe(
-              resp => {
-                if (resp.message === 'ok') {
-                  this.validaciones.abrirToas('Correo de solicitud enviado exitosamente.', 4000, 'success', 'top');
-                }
-                else {
-                  this.validaciones.showToast('Ups algo salio mal !!! No fue posible enviar correo de solicitud.', 5000, 'warning');
-                }
-              },
-              err => {
-                this.validaciones.showToast(err.error.message, 5000, 'danger');
-              },
-              () => { },
-            )
-          }
-
-        }
-      })
-    }
-  }
-
+  
   EnviarNotificacionPermiso(permiso: any) {
 
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE PERMISO

@@ -409,7 +409,7 @@ export class EnviarUsuarioComponent implements OnInit {
   BuscarParametro() {
     // id_tipo_parametro PARA LIMITE DE CORREOS = 13
     let datos = [];
-    this.restP.ObtenerDetallesParametros(13).subscribe(
+    this.restP.ObtenerDetallesParametros(33).subscribe(
       res => {
         datos = res;
         console.log('datos correo -----------')

@@ -164,7 +164,7 @@ const postNuevaHoraExtra = (req, res) => __awaiter(void 0, void 0, void 0, funct
         const response = yield database_1.pool.query(`
             INSERT INTO mhe_solicitud_hora_extra ( descripcion, estado, fecha_final, fecha_inicio, fecha_solicita,
             id_empleado_cargo, id_empleado_solicita, horas_solicitud, observacion, tiempo_autorizado)
-            VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11 ) RETURNING * 
+            VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ) RETURNING * 
             `, [descripcion, estado, fecha_final, fecha_inicio, fecha_solicita,
             id_empleado_cargo, id_empleado_solicita, horas_solicitud, observacion, tiempo_autorizado]);
         const [objetoHoraExtra] = response.rows;

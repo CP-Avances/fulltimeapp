@@ -77,20 +77,20 @@ const deleteMetodoGeneral = (req, res) => __awaiter(void 0, void 0, void 0, func
         console.log(response.rows);
         switch (nametable) {
             case 'mv_solicitud_vacacion':
-                const datosVacacion = yield database_1.pool.query(`SELECT * FROM mv_solicitud_vacacion WHERE id =  ${idreg} `);
+                const datosVacacion = yield database_1.pool.query(`SELECT * FROM ecm_autorizaciones WHERE id_vacacion =  ${idreg} `);
                 if (!datosVacacion) {
                     // AUDITORIA
                     if (!user_name || !ip) {
                         user_name = '';
                         ip = '';
                         yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                            tabla: `mv_solicitud_vacacion`,
+                            tabla: `ecm_autorizaciones`,
                             usuario: user_name,
                             accion: 'D',
                             datosOriginales: '',
                             datosNuevos: '',
                             ip: ip,
-                            observacion: `Error al eliminar el registro con id: ${idreg}. Registro no encontrado.`
+                            observacion: `Error al eliminar el registro con id_vacacion: ${idreg}. Registro no encontrado.`
                         });
                     }
                     yield database_1.pool.query('COMMIT');
@@ -104,7 +104,7 @@ const deleteMetodoGeneral = (req, res) => __awaiter(void 0, void 0, void 0, func
                         tabla: 'ecm_autorizaciones',
                         usuario: user_name,
                         accion: 'D',
-                        datosOriginales: JSON.stringify(datosVacacion),
+                        datosOriginales: JSON.stringify(datosVacacion.rows),
                         datosNuevos: '',
                         ip: ip,
                         observacion: null
@@ -136,7 +136,7 @@ const deleteMetodoGeneral = (req, res) => __awaiter(void 0, void 0, void 0, func
                         tabla: `ecm_realtime_notificacion`,
                         usuario: user_name,
                         accion: 'D',
-                        datosOriginales: JSON.stringify(datosNotificaciones),
+                        datosOriginales: JSON.stringify(datosNotificaciones.rows),
                         datosNuevos: '',
                         ip: ip,
                         observacion: null
@@ -145,20 +145,20 @@ const deleteMetodoGeneral = (req, res) => __awaiter(void 0, void 0, void 0, func
                 yield database_1.pool.query('COMMIT');
                 break;
             case 'mhe_solicitud_hora_extra':
-                const datosHE = yield database_1.pool.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id =  ${idreg} `);
+                const datosHE = yield database_1.pool.query(`SELECT * FROM ecm_autorizaciones WHERE id_hora_extra =  ${idreg} `);
                 if (!datosHE) {
                     // AUDITORIA
                     if (!user_name || !ip) {
                         user_name = '';
                         ip = '';
                         yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                            tabla: `mhe_solicitud_hora_extra`,
+                            tabla: `ecm_autorizaciones`,
                             usuario: user_name,
                             accion: 'D',
                             datosOriginales: '',
                             datosNuevos: '',
                             ip: ip,
-                            observacion: `Error al eliminar el registro con id: ${idreg}. Registro no encontrado.`
+                            observacion: `Error al eliminar el registro con id_hora_extra: ${idreg}. Registro no encontrado.`
                         });
                     }
                     yield database_1.pool.query('COMMIT');
@@ -171,7 +171,7 @@ const deleteMetodoGeneral = (req, res) => __awaiter(void 0, void 0, void 0, func
                         tabla: 'ecm_autorizaciones',
                         usuario: user_name,
                         accion: 'D',
-                        datosOriginales: JSON.stringify(datosHE),
+                        datosOriginales: JSON.stringify(datosHE.rows),
                         datosNuevos: '',
                         ip: ip,
                         observacion: null
@@ -203,7 +203,7 @@ const deleteMetodoGeneral = (req, res) => __awaiter(void 0, void 0, void 0, func
                         tabla: `ecm_realtime_notificacion`,
                         usuario: user_name,
                         accion: 'D',
-                        datosOriginales: JSON.stringify(datosNotificaciones2),
+                        datosOriginales: JSON.stringify(datosNotificaciones2.rows),
                         datosNuevos: '',
                         ip: ip,
                         observacion: null
@@ -212,20 +212,20 @@ const deleteMetodoGeneral = (req, res) => __awaiter(void 0, void 0, void 0, func
                 yield database_1.pool.query('COMMIT');
                 break;
             case 'mp_solicitud_permiso':
-                const datosPermiso = yield database_1.pool.query(`SELECT * FROM mp_solicitud_permiso WHERE id =  ${idreg} `);
+                const datosPermiso = yield database_1.pool.query(`SELECT * FROM ecm_autorizaciones WHERE id_permiso =  ${idreg} `);
                 if (!datosPermiso) {
                     // AUDITORIA
                     if (!user_name || !ip) {
                         user_name = '';
                         ip = '';
                         yield AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                            tabla: `mp_solicitud_permiso`,
+                            tabla: `ecm_autorizaciones`,
                             usuario: user_name,
                             accion: 'D',
                             datosOriginales: '',
                             datosNuevos: '',
                             ip: ip,
-                            observacion: `Error al eliminar el registro con id: ${idreg}. Registro no encontrado.`
+                            observacion: `Error al eliminar el registro con id_permiso: ${idreg}. Registro no encontrado.`
                         });
                     }
                     yield database_1.pool.query('COMMIT');
@@ -238,7 +238,7 @@ const deleteMetodoGeneral = (req, res) => __awaiter(void 0, void 0, void 0, func
                         tabla: 'ecm_autorizaciones',
                         usuario: user_name,
                         accion: 'D',
-                        datosOriginales: JSON.stringify(datosPermiso),
+                        datosOriginales: JSON.stringify(datosPermiso.rows),
                         datosNuevos: '',
                         ip: ip,
                         observacion: null
@@ -270,7 +270,7 @@ const deleteMetodoGeneral = (req, res) => __awaiter(void 0, void 0, void 0, func
                         tabla: `ecm_realtime_notificacion`,
                         usuario: user_name,
                         accion: 'D',
-                        datosOriginales: JSON.stringify(datosNotificaciones3),
+                        datosOriginales: JSON.stringify(datosNotificaciones3.rows),
                         datosNuevos: '',
                         ip: ip,
                         observacion: null

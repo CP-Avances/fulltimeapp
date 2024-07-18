@@ -6,7 +6,7 @@ import { HorarioE, HorarioEmpl } from '../interfaces/Horarios';
 
 export const getListaEmpleados = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const response: QueryResult = await pool.query('SELECT id, cedula, codigo, (nombre || \' \' || apellido) as fullname FROM eu_empleados ORDER BY fullname ASC');
+        const response: QueryResult = await pool.query('SELECT id, cedula, codigo,  (nombre || \' \' || apellido) as fullname FROM eu_empleados ORDER BY fullname ASC');
         const empleados: Empleado[] = response.rows;
         console.log(empleados);
 

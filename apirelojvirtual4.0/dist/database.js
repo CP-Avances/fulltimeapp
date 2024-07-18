@@ -16,6 +16,7 @@ exports.pool = new pg_1.Pool({
     password: 'fulltime',
     database: 'fulltime4_empresa1',
     port: 5432
+    //ver
     /*user: 'postgres',
     host: 'localhost',
     password: '123456',

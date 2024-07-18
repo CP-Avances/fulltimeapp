@@ -266,7 +266,7 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
         alimentacion.EmpleadosSendNotiEmail = [];
         alimentacion.EmpleadosSendNotiEmail.push(this.solInfo);
         this.CrearNuevaNotificacion(alimentacion);
-        this.SendEmailsEmpleados(alimentacion);
+       // this.SendEmailsEmpleados(alimentacion);
         this.detalle_menu_selected = { valor: '', nombre: '' };
         this.validar.abrirToas('Solicitud registrada exitosamente.', 5000, 'success', 'top');
         this.closeModalComponent.closeModal(true);
@@ -329,64 +329,6 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
 
   }
 
-  SendEmailsEmpleados(alimentacion: Alimentacion) {
-    console.log('ver lista', alimentacion)
-    var cont = 0;
-    var correo_usuarios = '';
-    // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE ALIMENTACIÓN
-    let solicitud = this.validar.FormatearFecha(String(alimentacion.fecha_comida), this.formato_fecha, this.validar.dia_completo);
-    alimentacion.EmpleadosSendNotiEmail.forEach(e => {
-
-      // LECTURA DE DATOS LEIDOS
-      cont = cont + 1;
-
-      // SI EL USUARIO SE ENCUENTRA ACTIVO Y TIENEN CONFIGURACIÓN RECIBIRA CORREO DE SOLICITUD DE ALIMENTACIÓN
-      if (e.comida_mail) {
-        if (e.estado === true) {
-          if (correo_usuarios === '') {
-            correo_usuarios = e.correo;
-          }
-          else {
-            correo_usuarios = correo_usuarios + ', ' + e.correo
-          }
-        }
-      }
-
-      if (cont === alimentacion.EmpleadosSendNotiEmail.length) {
-        let comida = {
-          id_usua_solicita: alimentacion.id_empleado,
-          tipo_solicitud: 'Servicio de alimentación solicitado por',
-          fec_solicitud: solicitud,
-          observacion: alimentacion.observacion,
-          id_comida: alimentacion.id_detalle_comida,
-          proceso: 'creado',
-          correo: correo_usuarios,
-          estadoc: 'Pendiente de autorización',
-          asunto: 'SOLICITUD DE SERVICIO DE ALIMENTACION',
-          inicio: this.validar.FormatearHora(alimentacion.hora_inicio, this.formato_hora),
-          final: this.validar.FormatearHora(alimentacion.hora_fin, this.formato_hora),
-          extra: alimentacion.extra,
-          solicitado_por: (localStorage.getItem('nom')) + ' ' + (localStorage.getItem('ap'))
-        }
-        if (correo_usuarios != '') {
-          this.autorizaciones.EnviarCorreoSolAlimentacion(this.idEmpresa, comida).subscribe(
-            resp => {
-              if (resp.message === 'ok') {
-                this.validar.showToast('Correo de solicitud enviado exitosamente.', 3000, 'success');
-              }
-              else {
-                this.validar.showToast('Ups algo salio mal !!! No fue posible enviar correo de solicitud.', 3000, 'warning');
-              }
-            },
-            err => {
-              this.validar.showToast(err.error.message, 3000, 'danger');
-            },
-            () => { },
-          )
-        }
-      }
-    })
-  }
 
   ngOnDestroy() {
     if (this.subs_bool) {

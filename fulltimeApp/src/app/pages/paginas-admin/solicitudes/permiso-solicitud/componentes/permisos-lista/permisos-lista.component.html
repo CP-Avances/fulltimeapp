@@ -97,7 +97,7 @@
           (click)="presentModalEditarRegistro( permiso )" style="margin-bottom:15%;"></ion-icon><br>
         <!-- Eliminar registro -->
         <btn-delete (onDelete)="ngOnInit()" [isButtom]="false" nameTable="mp_solicitud_permiso" [idreg]="permiso.id"
-          [userCodigo]="permiso.codigo"></btn-delete>
+          [userCodigo]="permiso.id_empleado"></btn-delete>
       </div>
 
     </ion-item>

@@ -453,89 +453,13 @@ export class EditarVacacionComponent implements OnInit {
     this.autoriza.BuscarJefes(datos).subscribe(vacacion => {
       vacacion.EmpleadosSendNotiEmail.push(this.solInfo);
       console.log(vacacion);
-      this.EnviarCorreoVacacion(vacacion);
+     // this.EnviarCorreoVacacion(vacacion);
       this.EnviarNotificacionVacacion(vacacion);
       this.validar.showToast('Proceso realizado exitosamente.', 5000, 'success');
     });
   }
 
-  // METODO PARA ENVIO DE NOTIFICACIONES DE VACACIONES
-  EnviarCorreoVacacion(vacacion: any) {
-
-    console.log('ver vacaciones..   ', vacacion)
-
-    var cont = 0;
-    var correo_usuarios = '';
-
-    vacacion.EmpleadosSendNotiEmail.forEach(e => {
-      // LECTURA DE DATOS LEIDOS
-      cont = cont + 1;
-
-      // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
-      let desde = this.validar.FormatearFecha(vacacion.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-      let hasta = this.validar.FormatearFecha(vacacion.fec_final, this.formato_fecha, this.validar.dia_completo);
-
-      // CAPTURANDO ESTADO DE LA SOLICITUD DE VACACIÓN
-      if (vacacion.estado === 1) {
-        var estado_v = 'Pendiente de autorización';
-      }
-      else if (vacacion.estado === 2) {
-        var estado_v = 'Preautorizada';
-      }
-      else if (vacacion.estado === 3) {
-        var estado_v = 'Autorizada';
-      }
-      else if (vacacion.estado === 1) {
-        var estado_v = 'Negada';
-      }
-
-      // SI EL USUARIO SE ENCUENTRA ACTIVO Y TIENEN CONFIGURACIÓN RECIBIRA CORREO DE SOLICITUD DE VACACIÓN
-      if (e.vaca_mail) {
-        if (e.estado === true) {
-          if (correo_usuarios === '') {
-            correo_usuarios = e.correo;
-          }
-          else {
-            correo_usuarios = correo_usuarios + ', ' + e.correo
-          }
-        }
-      }
-
-      // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
-      if (cont === vacacion.EmpleadosSendNotiEmail.length) {
-        let datosVacacionCreada = {
-          tipo_solicitud: 'Solicitud de vacaciones actualizada por',
-          idContrato: parseInt(localStorage.getItem('ccontr')),
-          estado_v: estado_v,
-          proceso: 'actualizado',
-          desde: desde,
-          hasta: hasta,
-          id_dep: e.id_dep, // VERIFICAR
-          id_suc: e.id_suc, // VERIFICAR
-          correo: correo_usuarios,
-          asunto: 'ACTUALIZACION DE SOLICITUD DE VACACIONES',
-          id: vacacion.id,
-          solicitado_por: (localStorage.getItem('nom')) + ' ' + (localStorage.getItem('ap')),
-        }
-
-        if (correo_usuarios != '') {
-          this.autoriza.EnviarCorreoVacacion(this.idEmpresa, datosVacacionCreada).subscribe(
-            resp => {
-              if (resp.message === 'ok') {
-                this.validar.showToast('Correo de solicitud enviado exitosamente.', 5000, 'success');
-              }
-              else {
-                this.validar.showToast('Ups algo salio mal !!! No fue posible enviar correo de solicitud.', 5000, 'warning');
-              }
-            },
-            err => { this.validar.showToast(err.error.message, 5000, 'danger'); },
-            () => { },
-          )
-        }
-      }
-    })
-  }
-
+  
   // METODO PARA ENVIAR NOTIFICACIONES
   EnviarNotificacionVacacion(vacaciones: any) {
 

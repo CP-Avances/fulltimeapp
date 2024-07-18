@@ -1080,10 +1080,10 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.autorizaciones.postNuevaAutorizacion(autorizacion).subscribe(
       resp => {
         this.CrearNuevaNotificacion(permiso);
-        this.SendEmailsEmpleados(permiso);
+       // this.SendEmailsEmpleados(permiso);
       }, err => {
         this.CrearNuevaNotificacion(permiso);
-        this.SendEmailsEmpleados(permiso);
+        //this.SendEmailsEmpleados(permiso);
         this.validaciones.showToast(err.error.message, 3000, 'danger')
       },
     )
@@ -1149,110 +1149,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   }
 
 
-  SendEmailsEmpleados(permiso: Permiso) {
-    var cont = 0;
-    var correo_usuarios = '';
-
-    // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE PERMISO
-    let solicitud = this.validar.FormatearFecha(permiso.fecha_creacion, this.formato_fecha, this.validar.dia_completo);
-    let desde = this.validar.FormatearFecha(String(permiso.fecha_inicio), this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(String(permiso.fecha_final), this.formato_fecha, this.validar.dia_completo);
-
-    // CAPTURANDO ESTADO DE LA SOLICITUD DE PERMISO
-    if (permiso.estado === 1) {
-      var estado_p = 'Pendiente de autorización';
-    }
-
-    // LEYENDO DATOS DE TIPO DE PERMISO
-    var tipo_permiso = '';
-    let correo_crear: boolean;
-
-    this.cg_tipo_permisos.filter(o => {
-      if (o.id === permiso.id_tipo_permiso) {
-        tipo_permiso = o.descripcion
-        correo_crear = o.correo_crear
-      }
-      return tipo_permiso;
-    })
-
-    console.log('Envio de correo: ', correo_crear)
-
-    //Listado para eliminar el usuario duplicado
-    var allCorreos = [];
-    //Ciclo por cada elemento del listado
-    permiso.EmpleadosSendNotiEmail.forEach(function (elemento: any, indice: any, array: any) {
-      // Discriminación de elementos iguales
-      if (allCorreos.find((p: any) => p.id_empleado == elemento.id_empleado) == undefined) {
-        // Nueva lista de empleados que reciben la notificacion
-        allCorreos.push(elemento);
-      }
-    });
-
-    if (correo_crear === true) {
-      // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
-      allCorreos.forEach(e => {
-
-        // LECTURA DE DATOS LEIDOS
-        cont = cont + 1;
-
-        // SI EL USUARIO SE ENCUENTRA ACTIVO Y TIENEN CONFIGURACIÓN RECIBIRA CORREO DE SOLICITUD DE PERMISOS
-        if (e.permiso_mail) {
-          if (e.estado === true) {
-            if (correo_usuarios === '') {
-              correo_usuarios = e.correo;
-            }
-            else {
-              correo_usuarios = correo_usuarios + ', ' + e.correo
-            }
-          }
-        }
-
-        if (cont === allCorreos.length) {
-          let datosPermisoCreado = {
-            tipo_solicitud: 'Permiso solicitado por',
-            solicitud: solicitud,
-            desde: desde,
-            hasta: hasta,
-            h_inicio: this.validar.FormatearHora(permiso.hora_salida!, this.formato_hora),
-            h_fin: this.validar.FormatearHora(permiso.hora_ingreso!, this.formato_hora),
-            id_empl_contrato: permiso.id_empleado_contrato,
-            horas_permiso: permiso.horas_permiso,
-            observacion: permiso.descripcion,
-            tipo_permiso: tipo_permiso,
-            dias_permiso: permiso.dias_permiso,
-            estado_p: estado_p,
-            proceso: 'creado',
-            id_dep: e.id_dep,
-            id_suc: e.id_suc,
-            correo: correo_usuarios,
-            asunto: 'SOLICITUD DE PERMISO',
-            solicitado_por: (localStorage.getItem('nom')) + ' ' + (localStorage.getItem('ap'))
-          }
-
-          console.log('datosPermisoCreado: ', datosPermisoCreado);
-
-          if (correo_usuarios != '') {
-
-            this.autorizaciones.EnviarCorreoPermiso(this.idEmpresa, datosPermisoCreado).subscribe(
-              resp => {
-                if (resp.message === 'ok') {
-                  this.validaciones.showToast('Correo de solicitud enviado exitosamente.', 4000, 'success');
-                }
-                else {
-                  this.validaciones.showToast('Ups algo salio mal !!! No fue posible enviar correo de solicitud.', 4000, 'warning');
-                }
-              },
-              err => {
-                this.validaciones.showToast(err.error.message, 5000, 'danger');
-              }
-            )
-
-          }
-        }
-      })
-    }
-  }
-
+ 
   ngOnDestroy() {
     if (this.subs_bool) {
       this.subscripted.unsubscribe();

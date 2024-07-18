@@ -77,7 +77,7 @@ export class VerHorariosEmpleadosComponent  implements OnInit {
       resp => {
         this.formato_fecha = resp.fecha;
         this.formato_hora = resp.hora;
-        this.obtenerHorariosEmpleado(this.data.codigo)
+        this.obtenerHorariosEmpleado(this.data.id)
       }
     )
   }

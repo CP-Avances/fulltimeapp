@@ -676,95 +676,25 @@ export class UpdateAutorizacionComponent implements OnInit {
     if (estado_p == 'Autorizado' || estado_p === 'Negado') {
       if (estado_p == 'Autorizado') {
         console.log('this.listaEnvioCorreo AUTO: ', this.listaEnvioCorreo);
-        this.EnviarCorreoPermiso(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
+       // this.EnviarCorreoPermiso(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
         this.EnviarNotificacionPermiso(permiso, this.listaEnvioCorreo, estado_p, infoUsuario, desde, hasta);
       } else {
         //Esta condicion es para enviar el correo a todos los usuraios que autorizan siempre y cuando la solicitud fue negada antes
         this.listaEnvioCorreo = this.listadoDepaAutoriza;
         console.log('this.listaEnvioCorreo NEGA: ', this.listaEnvioCorreo);
-        this.EnviarCorreoPermiso(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
+        //this.EnviarCorreoPermiso(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
         this.EnviarNotificacionPermiso(permiso, this.listaEnvioCorreo, estado_p, infoUsuario, desde, hasta);
       }
     } else if (estado_p == 'Preautorizado') {
       console.log('this.listaEnvioCorreo PRE: ', this.listaEnvioCorreo)
-      this.EnviarCorreoPermiso(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
+      //this.EnviarCorreoPermiso(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
       this.EnviarNotificacionPermiso(permiso, this.listaEnvioCorreo, estado_p, infoUsuario, desde, hasta);
     }
 
   }
 
-  EnviarCorreoPermiso(permiso: any, listaEnvioCorreo: any, estado_p: string, estado_c: string, solicitud: any, desde: any, hasta: any) {
-    var cont = 0;
-    var correo_usuarios = '';
-    permiso.EmpleadosSendNotiEmail = [];
-    permiso.EmpleadosSendNotiEmail = listaEnvioCorreo;
-    permiso.EmpleadosSendNotiEmail.push(this.solInfo);
-    console.log('Nueva lista Correo: ', permiso.EmpleadosSendNotiEmail);
 
-
-    // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
-    permiso.EmpleadosSendNotiEmail.forEach(e => {
-
-      // LECTURA DE DATOS LEIDOS
-      cont = cont + 1;
-
-      // SI EL USUARIO SE ENCUENTRA ACTIVO Y TIENEN CONFIGURACIÓN RECIBIRA CORREO DE SOLICITUD DE VACACIÓN
-      if (e.permiso_mail) {
-        if (e.estado === true) {
-          if (correo_usuarios === '') {
-            correo_usuarios = e.correo;
-          }
-          else {
-            correo_usuarios = correo_usuarios + ', ' + e.correo
-          }
-        }
-      }
-
-      console.log('correo_usuarios', correo_usuarios);
-
-      if (cont === permiso.EmpleadosSendNotiEmail.length) {
-
-        let datosPermisoCreado = {
-          solicitud: solicitud,
-          desde: desde,
-          hasta: hasta,
-          h_inicio: this.validar.FormatearHora(permiso.hora_salida, this.formato_hora),
-          h_fin: this.validar.FormatearHora(permiso.hora_ingreso, this.formato_hora),
-          id_empl_contrato: permiso.id_empl_contrato,
-          tipo_solicitud: 'Permiso ' + estado_p.toLowerCase() + ' por',
-          horas_permiso: permiso.horas_permiso,
-          observacion: permiso.descripcion,
-          tipo_permiso: permiso.ntipopermiso,
-          dias_permiso: permiso.dia,
-          estado_p: estado_p,
-          proceso: estado_p.toLowerCase(),
-          id_dep: e.id_departamento,
-          id_suc: e.id_suc,
-          correo: correo_usuarios,
-          asunto: 'SOLICITUD DE PERMISO ' + estado_c.toUpperCase(),
-          id: permiso.id,
-          solicitado_por: localStorage.getItem('nom') + ' ' + localStorage.getItem('ap'),
-        }
-        if (correo_usuarios != '') {
-          this.autoService.EnviarCorreoPermiso(this.idEmpresa, datosPermisoCreado).subscribe(
-            resp => {
-              if (resp.message === 'ok') {
-                this.validaciones.showToast('Correo de solicitud enviado exitosamente.', 5000, 'success');
-              }
-              else {
-                this.validaciones.showToast('Ups algo salio mal !!! No fue posible enviar correo de solicitud.', 5000, 'warning');
-              }
-            },
-            err => {
-              this.validaciones.showToast(err.error.message, 5000, 'danger');
-            }
-          )
-
-        }
-      }
-    })
-
-  }
+ 
 
   EnviarNotificacionPermiso(permiso: any, listaEnvioCorreo: any, estado_p: string, infoUsuario: any, desde: any, hasta: any) {
     permiso.EmpleadosSendNotiEmail = [];
@@ -895,7 +825,7 @@ export class UpdateAutorizacionComponent implements OnInit {
                     return this.listaEnvioCorreo.push(item);
                   }
                 })
-                this.EnviarCorreoVacacion(vacacion, this.listaEnvioCorreo, estado_v, estado_c);
+              //  this.EnviarCorreoVacacion(vacacion, this.listaEnvioCorreo, estado_v, estado_c);
               });
             } else if (this.estado_auto > 2) {
               this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion.id_departamento).subscribe(res => {
@@ -909,7 +839,7 @@ export class UpdateAutorizacionComponent implements OnInit {
                   }
                 })
 
-                this.EnviarCorreoVacacion(vacacion, this.listaEnvioCorreo, estado_v, estado_c);
+                //this.EnviarCorreoVacacion(vacacion, this.listaEnvioCorreo, estado_v, estado_c);
               });
             }
           }
@@ -921,76 +851,13 @@ export class UpdateAutorizacionComponent implements OnInit {
                 return this.listaEnvioCorreo.push(item);
               }
             })
-            this.EnviarCorreoVacacion(vacacion, this.listaEnvioCorreo, estado_v, estado_c);
+           // this.EnviarCorreoVacacion(vacacion, this.listaEnvioCorreo, estado_v, estado_c);
           });
         }
       })
     })
   }
 
-  // METODO PARA ENVIO DE CORREO DE VACACIONES
-  EnviarCorreoVacacion(vacacion: any, listaEnvioCorreo: any, estado_v: string, estado_c: string) {
-    var cont = 0;
-    var correo_usuarios = '';
-    vacacion.EmpleadosSendNotiEmail = listaEnvioCorreo;
-    vacacion.EmpleadosSendNotiEmail.push(this.solInfo);
-    console.log('nueva lista VA:  ', vacacion.EmpleadosSendNotiEmail);
-
-    vacacion.EmpleadosSendNotiEmail.forEach(e => {
-      // LECTURA DE DATOS LEIDOS
-      cont = cont + 1;
-
-      // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
-      let desde = this.validar.FormatearFecha(vacacion.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-      let hasta = this.validar.FormatearFecha(vacacion.fec_final, this.formato_fecha, this.validar.dia_completo);
-
-      // SI EL USUARIO SE ENCUENTRA ACTIVO Y TIENEN CONFIGURACIÓN RECIBIRA CORREO DE SOLICITUD DE VACACIÓN
-      if (e.vaca_mail) {
-        if (e.estado === true) {
-          if (correo_usuarios === '') {
-            correo_usuarios = e.correo;
-          }
-          else {
-            correo_usuarios = correo_usuarios + ', ' + e.correo
-          }
-        }
-      }
-
-      // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
-      if (cont === vacacion.EmpleadosSendNotiEmail.length) {
-        let datosVacacionCreada = {
-          tipo_solicitud: 'Vacaciones ' + estado_v.toLowerCase() + ' por',
-          idContrato: vacacion.id_contrato,
-          estado_v: estado_v,
-          proceso: estado_v.toLowerCase(),
-          desde: desde,
-          hasta: hasta,
-          id_dep: e.id_dep, // VERIFICAR
-          id_suc: e.id_suc, // VERIFICAR
-          correo: correo_usuarios,
-          asunto: 'SOLICITUD DE VACACIONES ' + estado_c.toUpperCase(),
-          id: vacacion.id,
-          solicitado_por: (localStorage.getItem('nom')) + ' ' + (localStorage.getItem('ap')),
-        }
-
-        if (correo_usuarios != '') {
-          this.autoService.EnviarCorreoVacacion(this.idEmpresa, datosVacacionCreada).subscribe(
-            resp => {
-              if (resp.message === 'ok') {
-                this.validaciones.showToast('Correo de solicitud enviado exitosamente.', 5000, 'success');
-              }
-              else {
-                this.validaciones.showToast('Ups algo salio mal !!! No fue posible enviar correo de aprobación.', 5000, 'warning');
-              }
-            },
-            err => { this.validaciones.showToast(err.error.message, 5000, 'danger'); },
-            () => { },
-          )
-        }
-      }
-    })
-
-  }
 
 
   // METODO PARA ENVIAR NOTIFICACIONES
@@ -1127,7 +994,7 @@ export class UpdateAutorizacionComponent implements OnInit {
                     return this.listaEnvioCorreo.push(item);
                   }
                 })
-                this.EnviarCorreoHE(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, valor, estado_n);
+              //  this.EnviarCorreoHE(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, valor, estado_n);
               });
             } else if (this.estado_auto > 2) {
               this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion.id_departamento).subscribe(res => {
@@ -1144,7 +1011,7 @@ export class UpdateAutorizacionComponent implements OnInit {
 
 
 
-                this.EnviarCorreoHE(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, valor, estado_n);
+              //  this.EnviarCorreoHE(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, valor, estado_n);
               });
             }
           }
@@ -1156,7 +1023,7 @@ export class UpdateAutorizacionComponent implements OnInit {
                 return this.listaEnvioCorreo.push(item);
               }
             })
-            this.EnviarCorreoHE(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, valor, estado_n);
+           // this.EnviarCorreoHE(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, valor, estado_n);
           });
         }
       })
@@ -1167,77 +1034,7 @@ export class UpdateAutorizacionComponent implements OnInit {
   }
 
 
-  // METODO PARA ENVIAR NOTIFICACIONES DE CORREO
-  EnviarCorreoHE(horaExtra: any, listaEnvioCorreo: any, estado_h: string, estado_c: string, valor: any, estado_n: string) {
-    var cont = 0;
-    var correo_usuarios = '';
-    horaExtra.EmpleadosSendNotiEmail = listaEnvioCorreo;
-    horaExtra.EmpleadosSendNotiEmail.push(this.solInfo);
-    console.log('nueva lista HE: ', horaExtra.EmpleadosSendNotiEmail);
-
-    // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let solicitud = this.validar.FormatearFecha(horaExtra.fecha_solicita, this.formato_fecha, this.validar.dia_completo);
-    let desde = this.validar.FormatearFecha(moment(horaExtra.fecha_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(moment(horaExtra.fecha_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-
-    horaExtra.EmpleadosSendNotiEmail.forEach(e => {
-
-      // LECTURA DE DATOS LEIDOS
-      cont = cont + 1;
-
-      if (e.hora_extra_mail) {
-        if (e.estado === true) {
-          if (correo_usuarios === '') {
-            correo_usuarios = e.correo;
-          }
-          else {
-            correo_usuarios = correo_usuarios + ', ' + e.correo
-          }
-        }
-      }
-
-      if (cont === horaExtra.EmpleadosSendNotiEmail.length) {
-
-        let datosHoraExtraCreada = {
-          tipo_solicitud: 'Solicitud de Hora Extra ' + estado_c.toLowerCase() + ' por',
-          solicitud: solicitud,
-          desde: desde,
-          hasta: hasta,
-          h_inicio: this.validar.FormatearHora(moment(horaExtra.fecha_inicio).format('HH:mm:ss'), this.formato_hora),
-          h_final: this.validar.FormatearHora(moment(horaExtra.fecha_final).format('HH:mm:ss'), this.formato_hora),
-          num_horas: moment(horaExtra.horas_solicitud, 'HH:mm').format('HH:mm') +
-            '<br> <b>Num. horas ' + estado_n + ':</b> ' + moment(valor, 'HH:mm').format('HH:mm') + ' <br>',
-          observacion: horaExtra.descripcion,
-          estado_h: estado_h,
-          proceso: estado_h.toLowerCase(),
-          asunto: 'SOLICITUD DE HORAS EXTRAS ' + estado_c.toUpperCase(),
-          id_dep: e.id_dep,
-          id_suc: e.id_suc,
-          correo: correo_usuarios,
-          id: horaExtra.id,
-          id_empl_contrato: horaExtra.id_contrato,
-          solicitado_por: localStorage.getItem('nom') + ' ' + localStorage.getItem('ap'),
-        }
-        console.log('ver horas extras ....   ', datosHoraExtraCreada)
-        if (correo_usuarios != '') {
-          this.autoService.EnviarCorreoHoraExtra(this.idEmpresa, datosHoraExtraCreada).subscribe(
-            resp => {
-              if (resp.message === 'ok') {
-                this.validaciones.showToast('Correo de solicitud enviado exitosamente.', 5000, 'success');
-              }
-              else {
-                this.validaciones.showToast('Ups algo salio mal !!! No fue posible enviar correo de solicitud.', 5000, 'warning');
-              }
-            },
-            err => { this.validaciones.showToast(err.error.message, 3000, 'danger'); },
-            () => { },
-          )
-        }
-
-      }
-    })
-  }
-
+ 
   // METODO PARA ENVIAR NOTIIFICACIONES AL SISTEMA
   EnviarNotificacionHE(horaExtra: any, estado_h: string, valor: any, estado_n: string, infoUsuario: any) {
 

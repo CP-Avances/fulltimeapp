@@ -291,74 +291,12 @@ export class EditarAlimentacionComponent implements OnInit {
     this.autoriza.BuscarJefes(datos).subscribe(alimentacion => {
       alimentacion.EmpleadosSendNotiEmail.push(this.solInfo);
       console.log(alimentacion);
-      this.EnviarCorreo(alimentacion);
+      //this.EnviarCorreo(alimentacion);
       this.NotificarEvento(alimentacion);
 
     });
   }
 
-  // METODO PARA ENVIO DE CORREO
-  EnviarCorreo(alimentacion: any) {
-    var cont = 0;
-    var correo_usuarios = '';
-
-    // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE ALIMENTACIÓN
-    let solicitud = this.validar.FormatearFecha(alimentacion.fec_comida, this.formato_fecha, this.validar.dia_completo);
-
-    alimentacion.EmpleadosSendNotiEmail.forEach(e => {
-
-      // LECTURA DE DATOS LEIDOS
-      cont = cont + 1;
-
-      // SI EL USUARIO SE ENCUENTRA ACTIVO Y TIENEN CONFIGURACIÓN RECIBIRA CORREO DE SOLICITUD DE ALIMENTACIÓN
-      if (e.comida_mail) {
-        if (e.estado === true) {
-          if (correo_usuarios === '') {
-            correo_usuarios = e.correo;
-          }
-          else {
-            correo_usuarios = correo_usuarios + ', ' + e.correo
-          }
-        }
-      }
-
-      if (cont === alimentacion.EmpleadosSendNotiEmail.length) {
-        let comida = {
-          id_usua_solicita: alimentacion.id_empleado,
-          tipo_solicitud: 'Servicio de alimentación actualizado por',
-          fec_solicitud: solicitud,
-          observacion: alimentacion.observacion,
-          id_comida: alimentacion.id_comida,
-          proceso: 'actualizado',
-          estadoc: 'Pendiente de autorización',
-          correo: correo_usuarios,
-          asunto: 'ACTUALIZACION DE SOLICITUD DE SERVICIO DE ALIMENTACION',
-          inicio: this.validar.FormatearHora(alimentacion.hora_inicio, this.formato_hora),
-          final: this.validar.FormatearHora(alimentacion.hora_fin, this.formato_hora),
-          extra: alimentacion.extra,
-          id: alimentacion.id,
-          solicitado_por: (localStorage.getItem('nom')) + ' ' + (localStorage.getItem('ap')),
-        }
-
-        if (correo_usuarios != '') {
-          this.autoriza.EnviarCorreoSolAlimentacion(this.idEmpresa, comida).subscribe(
-            resp => {
-              if (resp.message === 'ok') {
-                this.validar.showToast('Correo de solicitud enviado exitosamente.', 5000, 'success');
-              }
-              else {
-                this.validar.showToast('Ups algo salio mal !!! No fue posible enviar correo de solicitud.', 5000, 'warning');
-              }
-            },
-            err => {
-              this.validar.showToast(err.error.message, 5000, 'danger');
-            },
-            () => { },
-          )
-        }
-      }
-    })
-  }
 
   // METODO PARA ENVIO DE NOTIFICACION
   NotificarEvento(alimentacion: any) {

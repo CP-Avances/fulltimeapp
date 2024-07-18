@@ -423,93 +423,13 @@ export class EditarHoraExtraComponent implements OnInit {
     this.autoriza.BuscarJefes(datos).subscribe(horaExtra => {
       horaExtra.EmpleadosSendNotiEmail.push(this.solInfo);
       console.log(horaExtra);
-      this.EnviarCorreoHE(horaExtra);
+      //this.EnviarCorreoHE(horaExtra);
       this.EnviarNotificacionHE(horaExtra);
       //this.validar.showToast('Proceso realizado exitosamente.', 5000, 'success');
     });
   }
 
-  // METODO PARA ENVIAR NOTIFICACIONES DE CORREO
-  EnviarCorreoHE(horaExtra: any) {
-    var cont = 0;
-    var correo_usuarios = '';
-
-    // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let solicitud = this.validar.FormatearFecha(horaExtra.fecha_solicita, this.formato_fecha, this.validar.dia_completo);
-    let desde = this.validar.FormatearFecha(moment(horaExtra.fecha_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(moment(horaExtra.fecha_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-
-    // CAPTURANDO ESTADO DE LA SOLICITUD DE HORA EXTRA
-    if (horaExtra.estado === 1) {
-      var estado_h = 'Pendiente de autorización';
-    }
-    else if (horaExtra.estado === 1) {
-      var estado_h = 'Preautorizada';
-    }
-    else if (horaExtra.estado === 1) {
-      var estado_h = 'Autorizada';
-    }
-    else if (horaExtra.estado === 1) {
-      var estado_h = 'Negada';
-    }
-
-    horaExtra.EmpleadosSendNotiEmail.forEach(e => {
-
-      // LECTURA DE DATOS LEIDOS
-      cont = cont + 1;
-
-      if (e.hora_extra_mail) {
-        if (e.estado === true) {
-          if (correo_usuarios === '') {
-            correo_usuarios = e.correo;
-          }
-          else {
-            correo_usuarios = correo_usuarios + ', ' + e.correo
-          }
-        }
-      }
-
-      if (cont === horaExtra.EmpleadosSendNotiEmail.length) {
-
-        let datosHoraExtraCreada = {
-          id_empl_contrato: parseInt(localStorage.getItem('ccontr')),
-          tipo_solicitud: 'Solicitud de Horas Extras actualizada por',
-          observacion: horaExtra.descripcion,
-          num_horas: moment(horaExtra.horas_solicitud, 'HH:mm').format('HH:mm'),
-          estado_h: estado_h,
-          solicitud: solicitud,
-          desde: desde,
-          hasta: hasta,
-          h_inicio: this.validar.FormatearHora(moment(horaExtra.fecha_inicio).format('HH:mm:ss'), this.formato_hora),
-          h_final: this.validar.FormatearHora(moment(horaExtra.fecha_final).format('HH:mm:ss'), this.formato_hora),
-          proceso: 'actualizado',
-          asunto: 'ACTUALIZACION DE SOLICITUD DE REALIZACION DE HORAS EXTRAS',
-          correo: correo_usuarios,
-          id_dep: e.id_dep,
-          id_suc: e.id_suc,
-          id: horaExtra.id,
-          solicitado_por: (localStorage.getItem('nom')) + ' ' + (localStorage.getItem('ap')),
-        }
-
-        if (correo_usuarios != '') {
-          this.autoriza.EnviarCorreoHoraExtra(this.idEmpresa, datosHoraExtraCreada).subscribe(
-            resp => {
-              if (resp.message === 'ok') {
-                this.validar.showToast('Correo de solicitud enviado exitosamente.', 5000, 'success');
-              }
-              else {
-                this.validar.showToast('Ups algo salio mal !!! No fue posible enviar correo de solicitud.', 5000, 'warning');
-              }
-            },
-            err => { this.validar.showToast(err.error.message, 3000, 'danger'); },
-            () => { },
-          )
-        }
-
-      }
-    })
-  }
-
+ 
   // METODO PARA ENVIAR NOTIIFICACIONES AL SISTEMA
   EnviarNotificacionHE(horaExtra: any) {
 

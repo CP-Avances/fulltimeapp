@@ -97,7 +97,7 @@
           style="margin-bottom:15%;"></ion-icon><br>
         <!-- ELIMINAR REGISTRO -->
         <btn-delete *ngIf="permiso.estado === 1" (onDelete)="ngOnInit()" [isButtom]="false" nameTable="mp_solicitud_permiso"
-          [idreg]="permiso.id" [userCodigo]="permiso.codigo"></btn-delete>
+          [idreg]="permiso.id" [userCodigo]="permiso.id_empleado"></btn-delete>
       </div>
 
     </ion-item>

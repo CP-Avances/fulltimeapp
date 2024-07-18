@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild, OnDestroy,  } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, OnDestroy, } from '@angular/core';
 import { NgForm, FormControl } from '@angular/forms';
 import { IonDatetime } from '@ionic/angular';
 import { Subscription } from 'rxjs';
@@ -62,7 +62,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     public parametro: ParametrosService,
     private permisoService: PermisosService,
     private userService: DataUserLoggedService,
-    
+
 
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('id_empresa'));
@@ -133,7 +133,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     return false
   }
 
-  valoresDefectoValidacionResultados(){
+  valoresDefectoValidacionResultados() {
     this.reg.horas_solicitud = null;
     this.reg.tiempo_autorizado = null;
   }
@@ -141,30 +141,30 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
   /* ********************************************************************************** *
      *                 METODO PARA MOSTRAR EL TIEMPO EN LOS INPUTS                   *
    * ********************************************************************************** */
-  ChangeDiaInicio(e){
+  ChangeDiaInicio(e) {
     //Enceramos el resto de los Inputs
     this.reg.fecha_final = '';
     this.dia_fianl = '';
     this.valoresDefectoValidacionResultados();
     this.valoresDefectoValidacionHoras();
     //Validamos si hay un cambio en el ingreso de la Fecha.
-    if(!e.target.value){//Si no cambia nada en el ingreso de la fecha y pone ok directamente, se ingresa la hora actual que indica el componente
+    if (!e.target.value) {//Si no cambia nada en el ingreso de la fecha y pone ok directamente, se ingresa la hora actual que indica el componente
       return this.validar.showToast('Selecciones una fecha', 3500, 'warning');
-    }else{
+    } else {
       this.reg.fecha_inicio = e.target.value;//Igualamos la variable a la fecha ingresada
       this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
       return this.datetimeInicio.confirm(true);
     }
   }
 
-  ChangeDiaFinal(e){
+  ChangeDiaFinal(e) {
     //Enceramos el resto de los Inputs
     this.valoresDefectoValidacionHoras();
     this.valoresDefectoValidacionResultados();
-     //Validamos si hay un cambio en el ingreso de la Fecha.
-    if(!e.target.value){//Si no cambia nada en el ingreso de la fecha y pone ok directamente, se ingresa la hora actual que indica el componente
+    //Validamos si hay un cambio en el ingreso de la Fecha.
+    if (!e.target.value) {//Si no cambia nada en el ingreso de la fecha y pone ok directamente, se ingresa la hora actual que indica el componente
       return this.validar.showToast('Selecciones una fecha', 3500, 'warning');
-    }else{
+    } else {
       this.reg.fecha_final = e.target.value; //Igualamos la variable a la fecha ingresada
       this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
       return this.datetimeFinal.confirm(true);
@@ -172,37 +172,37 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
   }
 
   // METODO ALIDAR Y CAMBIAR EL INPUT DE HORA INICAL Y FINAL
-  ChangeHoraInicio(e){
+  ChangeHoraInicio(e) {
     this.valoresDefectoValidacionResultados();
     //Validamos si hay un cambio en el ingreso de la Hora.
-    if(!e.target.value){//Si no cambia nada en el ingreso de la hora y pone ok directamente, se ingresa la hora actual que indica el componente
+    if (!e.target.value) {//Si no cambia nada en el ingreso de la hora y pone ok directamente, se ingresa la hora actual que indica el componente
       this.reg.hora_salida = moment(new Date()).format();
       this.hora_inicio = moment(this.reg.hora_salida).format('h:mm a');
-    }else{//Si hay un cambion en la seleccion de la hora en el componente ingresa la hora seleccionada
+    } else {//Si hay un cambion en la seleccion de la hora en el componente ingresa la hora seleccionada
       this.reg.hora_salida = e.target.value;
       this.hora_inicio = moment(e.target.value).format('h:mm a');
-      
+
     }
   }
 
-  ChangeHoraFinal(e){
+  ChangeHoraFinal(e) {
     this.valoresDefectoValidacionResultados();
     //Validamos si hay un cambio en el ingreso de la Hora.
-    if(!e.target.value){//Si no cambia nada en el ingreso de la hora y pone ok directamente, se ingresa la hora actual que indica el componente
+    if (!e.target.value) {//Si no cambia nada en el ingreso de la hora y pone ok directamente, se ingresa la hora actual que indica el componente
       this.reg.hora_ingreso = moment(new Date()).format();
       this.hora_final = moment(this.reg.hora_ingreso).format('h:mm a');
-    }else{//Si hay un cambion en la seleccion de la hora en el componente ingresa la hora seleccionada
+    } else {//Si hay un cambion en la seleccion de la hora en el componente ingresa la hora seleccionada
       this.reg.hora_ingreso = e.target.value;
       this.hora_final = moment(e.target.value).format('h:mm a');
-      
+
     }
   }
 
 
-   /* ********************************************************************************** *
-     *                 METODO PARA MOSTRAR EL CALCULO EN LOS INPUTS                   *
-   * ********************************************************************************** */
-   mostrarCalculos(){
+  /* ********************************************************************************** *
+    *                 METODO PARA MOSTRAR EL CALCULO EN LOS INPUTS                   *
+  * ********************************************************************************** */
+  mostrarCalculos() {
     //variables para validar el dia de inicio completo y el dia final completo y buscar duplicidad.
     const minutosinicio = moment(this.reg.hora_salida).format('HH:mm');
     const minutosfinal = moment(this.reg.hora_ingreso).format('HH:mm');
@@ -211,25 +211,25 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     const codigo = localStorage.getItem('codigo');
 
     this.horasExtrasService.getlistaHorasExtrasByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
-      if(solicitados.length != 0){
+      if (solicitados.length != 0) {
         this.reg.horas_solicitud = null;
         this.reg.tiempo_autorizado = null;
         this.validar.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
         return false
-      }else{
+      } else {
         this.permisoService.getlistaPermisosByHorasyCodigo(fec_inicio, fec_final, minutosinicio, minutosfinal, codigo).subscribe(solicitados => {
-          if(solicitados.length != 0){
+          if (solicitados.length != 0) {
             this.reg.horas_solicitud = null;
             this.reg.tiempo_autorizado = null;
             this.validar.showToast('Ups! Ya existe permisos en esas fecha y hora ', 3500, 'warning');
             return false
           }
-          else{
+          else {
             this.calcularTiempo();
           }
-        },err => {
+        }, err => {
           this.validar.showToast('Lo sentimos tenemos problemas para verificar su solicitud\n Contactese con el administrador', 3500, 'warning');
-        }); 
+        });
       }
     }, error => {
       this.validar.showToast('Lo sentimos tenemos problemas para verificar su Solicitud\n Contactese con el administrador', 3500, 'danger');
@@ -249,11 +249,11 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     const fec_comp_final = this.validar.Unir_Fecha_Hora_HE(this.reg.fecha_final, hora_ingreso);
 
     const horasValidas = this.validar.validarHorasIngresadas(fec_comp_inicio, fec_comp_final) // evaluacion de fechas completas 
-    if (!horasValidas) {return this.valoresDefectoValidacionResultados()}
-    const total = this.validar.MilisegToSegundos( fec_comp_final.valueOf() - fec_comp_inicio.valueOf());
+    if (!horasValidas) { return this.valoresDefectoValidacionResultados() }
+    const total = this.validar.MilisegToSegundos(fec_comp_final.valueOf() - fec_comp_inicio.valueOf());
 
     //Condicion que valida el tiempo calculado de horas con la jornada laboral la cual es el numero de horas en segundos que trabaja el empleado
-    if(total > 86400){
+    if (total > 86400) {
       this.validar.showToast('Ups!, lo sentimos el rango de horas excede el dia completo', 3500, 'warning');
       return false;
     }
@@ -281,11 +281,11 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     this.reg.hora_ingreso = this.validar.TiempoFormatoHHMMSS(this.reg.hora_ingreso);
 
     this.reg.ip = localStorage.getItem("ip");
-    this.reg.user_name =this.userService.username ;
+    this.reg.user_name = this.userService.username;
 
-    if(this.archivoSubido != null){
+    if (this.archivoSubido != null) {
       this.reg.docu_nombre = this.archivoSubido[0].name; // Inserta el nombre del archivo al subir
-    }else{
+    } else {
       this.reg.docu_nombre = null;
     }
 
@@ -293,45 +293,46 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
       horaExtra => {
         horaExtra.EmpleadosSendNotiEmail = []
         horaExtra.EmpleadosSendNotiEmail.push(this.solInfo);
-        if(this.archivoSubido != null){this.subirRespaldo(horaExtra)}
+        if (this.archivoSubido != null) { this.subirRespaldo(horaExtra) }
         this.CrearNuevaAutorizacion(horaExtra);
         this.CrearNuevaNotificacion(horaExtra);
-        this.SendEmailsEmpleados(horaExtra);
+        //this.SendEmailsEmpleados(horaExtra);
         this.validar.abrirToas('Solicitud registrada exitosamente.', 4000, 'success', 'top');
         this.closeModalComponent.closeModal(true);
         this.formRegistro.resetForm();
       },
-      err => { this.validar.showToast(err.error.message, 3000, 'warning'); 
-               this.loadingBtn = false; 
-               this.formRegistro.resetForm(); 
-              },
+      err => {
+        this.validar.showToast(err.error.message, 3000, 'warning');
+        this.loadingBtn = false;
+        this.formRegistro.resetForm();
+      },
       () => { this.loadingBtn = false; this.subs_bool = true }
     )
     this.closeModalComponent.closeModal(true);
   }
 
-/* ********************************************************************************** *
-     *                       SUBIR ARCHIVO DE SOLICITUD DE HORA EXTRA                   *
-   * ********************************************************************************** */
+  /* ********************************************************************************** *
+       *                       SUBIR ARCHIVO DE SOLICITUD DE HORA EXTRA                   *
+     * ********************************************************************************** */
   //Metodo para ingresar el archivo
-  fileChange(element){
+  fileChange(element) {
     this.archivoSubido = element.target.files;
     console.log(this.archivoSubido);
     const name = this.archivoSubido[0].name;
-    if(this.archivoSubido.length != 0){
-      if(this.archivoSubido[0].size >= 2e+6){
+    if (this.archivoSubido.length != 0) {
+      if (this.archivoSubido[0].size >= 2e+6) {
         this.archivoSubido = null;
         this.reg.docu_nombre = '';
         this.mensajeFile = "Ingrese un archivo maximo de 2Mb";
-        this.validar.showToast('Ups el archivo pesa mas de 2Mb',3500, 'danger');
+        this.validar.showToast('Ups el archivo pesa mas de 2Mb', 3500, 'danger');
 
-      }else if(this.archivoSubido[0].name.length > 50){
+      } else if (this.archivoSubido[0].name.length > 50) {
         this.archivoSubido = null;
         this.reg.docu_nombre = ''
         this.mensajeFile = "El nombre debe tener 50 caracteres como maximo";
         this.validar.showToast('Ups el nombre del archivo es muy largo', 3500, 'warning');
 
-      }else{
+      } else {
         console.log(this.archivoSubido[0].name);
         this.reg.docu_nombre = name;
         this.validar.showToast('Archivo valido', 3500, 'success');
@@ -340,27 +341,27 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
   }
 
   //Metodo para actualizar un archivo
-  updataArchivo(horaExtra: any){
-    if(this.archivoSubido[0].name == this.reg.docu_nombre){
+  updataArchivo(horaExtra: any) {
+    if (this.archivoSubido[0].name == this.reg.docu_nombre) {
       this.horasExtrasService.EliminarArchivoRespaldo(this.reg.documento).subscribe(res => {
         this.subirRespaldo(horaExtra);
       })
-    }else{
+    } else {
       this.subirRespaldo(horaExtra);
     }
   }
 
   //Metodo para subir (cargar) el archivo al servidor
-  subirRespaldo(horaExtra: any){
+  subirRespaldo(horaExtra: any) {
     var id = horaExtra.id;
     let formData = new FormData();
     console.log("tamaño: ", this.archivoSubido[0].size);
 
-    if(this.archivoSubido == undefined){
+    if (this.archivoSubido == undefined) {
       return this.archivoSubido = null;
     }
-    
-    for(var i = 0; i < this.archivoSubido.length; i++){
+
+    for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
 
@@ -369,14 +370,14 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
       this.reg.docu_nombre = '';
 
     }, err => {
-        console.log(formData)
-        return this.validar.showToast('El archivo no se pudo Cargar al Servidor', 3500, 'danger');
-        
+      console.log(formData)
+      return this.validar.showToast('El archivo no se pudo Cargar al Servidor', 3500, 'danger');
+
     });
   }
 
   //Metodo para quitar el archivo de horaExtra
-  deleteDocumentohoraExtra(){
+  deleteDocumentohoraExtra() {
     console.log('El archivo ', this.reg.documento, ' Se quito Correctamente');
     this.validar.showToast('El archivo se quito correctamente', 3500, 'acua');
     this.reg.docu_nombre = null;
@@ -384,9 +385,9 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     this.archivoSubido = null;
   }
 
-   /* ********************************************************************************** *
-     *                       CREAR NUEVA AUTORIZACION DE HORAS EXTRAS                   *
-   * ********************************************************************************** */
+  /* ********************************************************************************** *
+    *                       CREAR NUEVA AUTORIZACION DE HORAS EXTRAS                   *
+  * ********************************************************************************** */
   CrearNuevaAutorizacion(horaExtra: HoraExtra) {
     const autorizacion: Autorizacion = autorizacionValueDefault;
     autorizacion.estado = 1; // pendiende
@@ -397,7 +398,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     autorizacion.id_autoriza_estado = '';
     autorizacion.user_name = this.userService.username;
     autorizacion.ip = localStorage.getItem('ip');
-    
+
 
     this.autorizaciones.postNuevaAutorizacion(autorizacion).subscribe(
       resp => { //this.validar.showToast(resp.message, 3000, 'success') 
@@ -433,10 +434,9 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     //Listado para eliminar el usuario duplicado
     var allNotificaciones = [];
     //Ciclo por cada elemento del listado
-    horaExtra.EmpleadosSendNotiEmail.forEach(function(elemento, indice, array) {
+    horaExtra.EmpleadosSendNotiEmail.forEach(function (elemento, indice, array) {
       // Discriminación de elementos iguales
-      if(allNotificaciones.find(p=>p.empleado == elemento.empleado) == undefined)
-      {
+      if (allNotificaciones.find(p => p.empleado == elemento.empleado) == undefined) {
         // Nueva lista de empleados que reciben la notificacion
         allNotificaciones.push(elemento);
       }
@@ -460,6 +460,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
 
   }
 
+  /*
   SendEmailsEmpleados(horaExtra: HoraExtra) {
 
     console.log('ver horas extras ....   ', horaExtra)
@@ -514,6 +515,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
           solicitado_por: (localStorage.getItem('nom')) + ' ' + (localStorage.getItem('ap')),
         }
         console.log('ver horas extras ....   ', datosHoraExtraCreada)
+        
         if (correo_usuarios != '') {
           this.autorizaciones.EnviarCorreoHoraExtra(this.idEmpresa, datosHoraExtraCreada).subscribe(
             resp => {
@@ -528,9 +530,12 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
             () => { },
           )
         }
+        
       }
     })
   }
+
+  */
 
   ngOnDestroy() {
     if (this.subs_bool) {

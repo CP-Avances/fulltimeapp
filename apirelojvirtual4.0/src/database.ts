@@ -16,7 +16,8 @@ export const pool = new Pool({
     password: 'fulltime',
     database: 'fulltime4_empresa1',
     port: 5432
-
+ 
+    //ver
 
 
 
