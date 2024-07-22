@@ -218,9 +218,9 @@ const putVacacion = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 WHERE id = $1 RETURNING *
                 `, [id, fecha_inicio, fecha_final, fecha_ingreso, dia_libre, dia_laborable, legalizado]);
             const [objetoVacacion] = response.rows;
-            const fechaIngresoO = yield (0, metodos_1.FormatearFecha2)(fecha_ingreso.toLocaleString(), 'ddd');
-            const fechaInicioO = yield (0, metodos_1.FormatearFecha2)(fecha_inicio.toLocaleString(), 'ddd');
-            const fechaFinO = yield (0, metodos_1.FormatearFecha2)(fecha_final.toLocaleString(), 'ddd');
+            const fechaIngresoO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_ingreso, 'ddd');
+            const fechaInicioO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
+            const fechaFinO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
             const fechaIngresoN = yield (0, metodos_1.FormatearFecha2)(fecha_ingreso.toLocaleString(), 'ddd');
             const fechaInicioN = yield (0, metodos_1.FormatearFecha2)(fecha_inicio.toLocaleString(), 'ddd');
             const fechaFinN = yield (0, metodos_1.FormatearFecha2)(fecha_final.toLocaleString(), 'ddd');

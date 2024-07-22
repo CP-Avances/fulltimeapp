@@ -45,7 +45,7 @@ export class RelojServiceService {
   }
 
   registrarCelularUsuario(id_empleado: any, id_celular: any, modelo_dispositivo: any, user_name : any, ip: any) {
-    return this.http.post<any>(this.URL + '/user/ingresarIDdispositivo', { id_empleado, id_celular, modelo_dispositivo });
+    return this.http.post<any>(this.URL + '/user/ingresarIDdispositivo', { id_empleado, id_celular, modelo_dispositivo, user_name,ip  });
   }
 
   obtenerIdDispositivosUsuario(id_empleado: number | string) {

@@ -212,9 +212,9 @@ export const putVacacion = async (req: Request, res: Response): Promise<Response
             const [objetoVacacion] = response.rows;
 
 
-            const fechaIngresoO = await FormatearFecha2(fecha_ingreso.toLocaleString(), 'ddd');
-            const fechaInicioO = await FormatearFecha2(fecha_inicio.toLocaleString(), 'ddd');
-            const fechaFinO = await FormatearFecha2(fecha_final.toLocaleString(), 'ddd');
+            const fechaIngresoO = await FormatearFecha2(datosOriginales.fecha_ingreso, 'ddd');
+            const fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
+            const fechaFinO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
 
             const fechaIngresoN = await FormatearFecha2(fecha_ingreso.toLocaleString(), 'ddd');
             const fechaInicioN = await FormatearFecha2(fecha_inicio.toLocaleString(), 'ddd');

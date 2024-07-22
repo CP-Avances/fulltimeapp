@@ -224,11 +224,13 @@ export const putHoraExtra = async (req: Request, res: Response): Promise<Respons
 
             const [objetoHora_extra] = response.rows;
 
+            const fechaSolicitaFechaO = await FormatearFecha2(datosOriginales.fechaSolicita, 'ddd');
+
             const fechaHoraInicioO = await FormatearHora(datosOriginales.fecha_inicio.toLocaleString().split(' ')[1]);
-            const fechaTimbreInicioO = await FormatearFecha2(datosOriginales.fecha_inicio.toLocaleString(), 'ddd');
+            const fechaTimbreInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
 
             const fechaHoraFinO = await FormatearHora(datosOriginales.fecha_final.toLocaleString().split(' ')[1]);
-            const fechaTimbreFinO = await FormatearFecha2(datosOriginales.fecha_final.toLocaleString(), 'ddd');
+            const fechaTimbreFinO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
 
 
             const fechaHoraInicioN = await FormatearHora(fecha_inicio.toLocaleString().split(' ')[1]);
@@ -241,10 +243,8 @@ export const putHoraExtra = async (req: Request, res: Response): Promise<Respons
                 tabla: 'mhe_solicitud_hora_extra',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: `{id_empleado_solicita: ${datosOriginales.id_empleado_solicita}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, fecha_solicita: ${datosOriginales.fechaSolicita}, fecha_inicio: ${fechaTimbreInicioO + ' ' + fechaHoraInicioO}, fecha_final: ${fechaTimbreFinO + ' ' + fechaHoraFinO}, descripcion: ${datosOriginales.descripcion}, estado: ${datosOriginales.estado}, horas_solicitud: ${datosOriginales.horas_solicitud}, tiempo_autorizado: ${datosOriginales.tiempo_autorizado}, observacion: ${datosOriginales.observacion}, documento: ${datosOriginales.documento}, docu_nombre: ${datosOriginales.docu_nombre}}`,
+                datosOriginales: `{id_empleado_solicita: ${datosOriginales.id_empleado_solicita}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, fecha_solicita: ${fechaSolicitaFechaO }, fecha_inicio: ${fechaTimbreInicioO + ' ' + fechaHoraInicioO}, fecha_final: ${fechaTimbreFinO + ' ' + fechaHoraFinO}, descripcion: ${datosOriginales.descripcion}, estado: ${datosOriginales.estado}, horas_solicitud: ${datosOriginales.horas_solicitud}, tiempo_autorizado: ${datosOriginales.tiempo_autorizado}, observacion: ${datosOriginales.observacion}, documento: ${datosOriginales.documento}, docu_nombre: ${datosOriginales.docu_nombre}}`,
                 datosNuevos: `{id_empleado_solicita: ${datosOriginales.id_empleado_solicita}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, fecha_solicita: ${datosOriginales.fechaSolicita}, fecha_inicio: ${fechaTimbreInicioN + ' ' + fechaHoraInicioN}, fecha_final: ${fechaTimbreFinN + ' ' + fechaHoraFinN}, descripcion: ${descripcion}, estado: ${estado}, horas_solicitud: ${horas_solicitud}, tiempo_autorizado: ${tiempo_autorizado}, observacion: ${observacion}, documento: ${documento}, docu_nombre: ${docu_nombre}}`,
-                
-                
                 ip: ip,
                 observacion: null
             });

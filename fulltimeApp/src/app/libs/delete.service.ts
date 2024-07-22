@@ -26,6 +26,9 @@ export class DeleteService {
         const params = new HttpParams()
             .set('nametable', nametable)
             .set('idreg', idreg)
+            .set('user_name', user_name)
+            .set('ip', ip)
+
         return this.http.delete<any>(`${this.apiUrl}/delete/registro`, { params })
             .pipe(
                 tap(console.log),

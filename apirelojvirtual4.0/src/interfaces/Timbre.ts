@@ -22,6 +22,7 @@ export interface Timbre {
     id_empleado?: string
     ip:string
     user_name: string
+    imagen: string
 
 }
 

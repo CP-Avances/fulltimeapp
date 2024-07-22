@@ -229,10 +229,11 @@ const putHoraExtra = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 WHERE id = $1  RETURNING *
                 `, [id, descripcion, fecha_final, fecha_inicio, horas_solicitud, observacion, tiempo_autorizado, documento, docu_nombre]);
             const [objetoHora_extra] = response.rows;
+            const fechaSolicitaFechaO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fechaSolicita, 'ddd');
             const fechaHoraInicioO = yield (0, metodos_1.FormatearHora)(datosOriginales.fecha_inicio.toLocaleString().split(' ')[1]);
-            const fechaTimbreInicioO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_inicio.toLocaleString(), 'ddd');
+            const fechaTimbreInicioO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
             const fechaHoraFinO = yield (0, metodos_1.FormatearHora)(datosOriginales.fecha_final.toLocaleString().split(' ')[1]);
-            const fechaTimbreFinO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_final.toLocaleString(), 'ddd');
+            const fechaTimbreFinO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
             const fechaHoraInicioN = yield (0, metodos_1.FormatearHora)(fecha_inicio.toLocaleString().split(' ')[1]);
             const fechaTimbreInicioN = yield (0, metodos_1.FormatearFecha2)(fecha_inicio.toLocaleString(), 'ddd');
             const fechaHoraFinN = yield (0, metodos_1.FormatearHora)(fecha_final.toLocaleString().split(' ')[1]);
@@ -241,7 +242,7 @@ const putHoraExtra = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 tabla: 'mhe_solicitud_hora_extra',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: `{id_empleado_solicita: ${datosOriginales.id_empleado_solicita}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, fecha_solicita: ${datosOriginales.fechaSolicita}, fecha_inicio: ${fechaTimbreInicioO + ' ' + fechaHoraInicioO}, fecha_final: ${fechaTimbreFinO + ' ' + fechaHoraFinO}, descripcion: ${datosOriginales.descripcion}, estado: ${datosOriginales.estado}, horas_solicitud: ${datosOriginales.horas_solicitud}, tiempo_autorizado: ${datosOriginales.tiempo_autorizado}, observacion: ${datosOriginales.observacion}, documento: ${datosOriginales.documento}, docu_nombre: ${datosOriginales.docu_nombre}}`,
+                datosOriginales: `{id_empleado_solicita: ${datosOriginales.id_empleado_solicita}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, fecha_solicita: ${fechaSolicitaFechaO}, fecha_inicio: ${fechaTimbreInicioO + ' ' + fechaHoraInicioO}, fecha_final: ${fechaTimbreFinO + ' ' + fechaHoraFinO}, descripcion: ${datosOriginales.descripcion}, estado: ${datosOriginales.estado}, horas_solicitud: ${datosOriginales.horas_solicitud}, tiempo_autorizado: ${datosOriginales.tiempo_autorizado}, observacion: ${datosOriginales.observacion}, documento: ${datosOriginales.documento}, docu_nombre: ${datosOriginales.docu_nombre}}`,
                 datosNuevos: `{id_empleado_solicita: ${datosOriginales.id_empleado_solicita}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, fecha_solicita: ${datosOriginales.fechaSolicita}, fecha_inicio: ${fechaTimbreInicioN + ' ' + fechaHoraInicioN}, fecha_final: ${fechaTimbreFinN + ' ' + fechaHoraFinN}, descripcion: ${descripcion}, estado: ${estado}, horas_solicitud: ${horas_solicitud}, tiempo_autorizado: ${tiempo_autorizado}, observacion: ${observacion}, documento: ${documento}, docu_nombre: ${docu_nombre}}`,
                 ip: ip,
                 observacion: null

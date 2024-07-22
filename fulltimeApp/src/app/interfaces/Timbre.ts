@@ -26,6 +26,7 @@ export interface Timbre {
 
     ip?:string
     user_name?: string
+    imagen?:string
     
 }
 

@@ -298,9 +298,9 @@ const putPermiso = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 `, [id, fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, legalizado, dia_libre, id_tipo_permiso,
                 horas_permiso,
                 documento, estado, hora_salida, hora_ingreso]);
-            const fechaCreacionO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_creacion.toLocaleString(), 'ddd');
-            const fechaInicioO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_inicio.toLocaleString(), 'ddd');
-            const fechaFinO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_final.toLocaleString(), 'ddd');
+            const fechaCreacionO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_creacion, 'ddd');
+            const fechaInicioO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
+            const fechaFinO = yield (0, metodos_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
             const horaIngresoO = yield (0, metodos_1.FormatearHora)(datosOriginales.hora_ingreso);
             const horaSalidaO = yield (0, metodos_1.FormatearHora)(datosOriginales.hora_salida);
             const horasPermisoO = yield (0, metodos_1.FormatearHora)(datosOriginales.horas_permiso);
@@ -314,7 +314,7 @@ const putPermiso = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 tabla: 'mp_solicitud_permiso',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: `{id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionO}, fecha_edicion: null, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horasPermisoN}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}, id_empleado: ${datosOriginales.id_empleado}}`,
+                datosOriginales: `{id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionO}, fecha_edicion: null, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${horasPermisoO}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}, id_empleado: ${datosOriginales.id_empleado}}`,
                 datosNuevos: `{id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: null, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dias_permiso}, dia_libre: ${dia_libre}, horas_permiso: ${horasPermisoN}, documento: ${documento}, legalizado: ${legalizado}, estado: ${estado}, id_empleado: ${datosOriginales.id_empleado}}`,
                 ip: ip,
                 observacion: null
