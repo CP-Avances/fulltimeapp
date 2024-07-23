@@ -1,0 +1,13 @@
+.image-container {
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center;    /* Centra verticalmente */
+  height: 100%;           /* Asegura que el contenedor ocupe todo el alto del contenido */
+  overflow: hidden;       /* Oculta cualquier contenido que se salga del contenedor */
+}
+
+ion-img.full-width {
+  width: 100%;  /* La imagen se ajustará al 100% del ancho del contenedor */
+  height: auto; /* Mantendrá su proporción original */
+  display: block; /* Para evitar que se considere como elemento flex */
+}

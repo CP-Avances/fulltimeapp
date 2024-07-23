@@ -36,6 +36,7 @@ import { ReporteSolicitudComponent } from './reporte-solicitud/reporte-solicitud
 import { ReporteAlimentacionComponent } from './reporte-alimentacion/reporte-alimentacion.component';
 import { ReporteHoraExtraComponent } from './reporte-hora-extra/reporte-hora-extra.component';
 import { ReporteVacacionComponent } from './reporte-vacacion/reporte-vacacion.component';
+import { VerImagenModalPage } from './ver-timbre-empleado/ver-imagen/ver-imagen.component';
 
 
 
@@ -62,6 +63,7 @@ import { ReporteVacacionComponent } from './reporte-vacacion/reporte-vacacion.co
     ReporteAlimentacionComponent,
     ReporteHoraExtraComponent,
     ReporteVacacionComponent,
+    VerImagenModalPage
   ],
   exports:[
     AtrasoJustificadoComponent,
@@ -79,6 +81,7 @@ import { ReporteVacacionComponent } from './reporte-vacacion/reporte-vacacion.co
     ReporteAlimentacionComponent,
     ReporteHoraExtraComponent,
     ReporteVacacionComponent,
+    VerImagenModalPage
   ],
   imports: [
     CommonModule,

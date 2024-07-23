@@ -218,10 +218,9 @@ export class EnviartimbrePage implements OnInit {
       correctOrientation: true,
       source: CameraSource.Camera,
       direction: CameraDirection.Front,
-      width: 400,
-      height: 400,
+      width: 200,
+      height: 200,
     });
-
     if (cameraPhoto.dataUrl) {
       this.imagen = cameraPhoto.dataUrl;
     } else {

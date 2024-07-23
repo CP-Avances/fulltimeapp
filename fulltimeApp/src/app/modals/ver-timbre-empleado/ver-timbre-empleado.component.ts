@@ -9,6 +9,9 @@ import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { TimbresService } from '../../services/timbres.service';
 
+import { VerImagenModalPage } from './ver-imagen/ver-imagen.component';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+
 
 @Component({
   selector: 'app-ver-timbre-empleado',
@@ -16,6 +19,10 @@ import { TimbresService } from '../../services/timbres.service';
   styleUrls: ['./ver-timbre-empleado.component.scss'],
 })
 export class VerTimbreEmpleadoComponent  implements OnInit {
+
+  //IMAGEN
+  imagenUrl: SafeUrl;
+
 
   @Input() data: any;
 
@@ -55,6 +62,7 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
     private filtimbre: TimbresService,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
+    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit() {
@@ -302,6 +310,22 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
     //aqui codigo ´para abrir el mapa con las cooorden
 
   }
+
+  async mostrarImagenModal(imagenDataUrl: string) {
+    const modal = await this.modalController.create({
+      component: VerImagenModalPage, // Nombre de la página modal que mostrará la imagen
+      componentProps: {
+        imagen: imagenDataUrl // Pasar el DataUrl como propiedad a la modal
+      }
+    });
+
+    return await modal.present();
+  }
+
+
+
+
+
 
   async presentAlert(obs: any, hora_timbre_diferente: any, ubicacion: any, novedades_conexion:any, conexion:any ) {
     const alert = await this.alertController.create({

@@ -34,7 +34,7 @@
     width: 5rem;
     height: 2rem;
     position: absolute;
-    right: 30%;
+    right: 50%;
     font-size: 70%;
 }
 .textoObs {
@@ -43,12 +43,31 @@
     font-size: 70%;
 }
 
+.ubicacionMED {
+    width: 5rem;
+    height: 3rem;
+    position: absolute;
+    right: 30%;
+}
+
 .ubicacionDER {
     width: 5rem;
     height: 3rem;
     position: absolute;
     right: 0%;
 }
+
+
+.botones-container {
+    position: absolute;
+  }
+  
+  .siguiente-botones {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-right: 10px; /* Opcional: ajusta el margen derecho según sea necesario */
+  }
 
 
 p {
