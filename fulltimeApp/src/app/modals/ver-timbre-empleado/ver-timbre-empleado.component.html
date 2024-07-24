@@ -267,7 +267,7 @@
   </ion-footer>
 
   <!-- Ventana de empleado sin registro-->
-  <ion-content [hidden]="vacio">
+  <ion-content *ngIf="!vacio">
     <div style="text-align: center; padding-top: 2%;">
       <ion-img class="tamanoImagen" src="../../../assets/images/Sin_registro.svg"></ion-img>
       <ion-label>
@@ -277,7 +277,7 @@
   </ion-content>
 
   <!-- Ventana de sin registro deacuerdo al filtro de fechas-->
-  <ion-content [hidden]="filtro_mensaje">
+  <ion-content *ngIf="!filtro_mensaje" >
     <div style="text-align: center; padding-top: 2%;">
       <ion-img class="tamanoImagen" src="../../../assets/images/Sin_registro.svg"></ion-img>
       <ion-label>

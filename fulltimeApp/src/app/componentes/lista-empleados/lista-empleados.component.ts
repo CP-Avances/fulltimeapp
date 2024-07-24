@@ -18,7 +18,6 @@ export class ListaEmpleadosComponent implements OnInit {
   pageActual: number = 1;
   ver: boolean = true;
   loading: boolean = true;
-
   @Input('open') presentModal!: (args: any) => void; //callback function
   @ViewChild(IonInfiniteScroll) infiniteScroll!: IonInfiniteScroll;
 

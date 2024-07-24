@@ -2,7 +2,7 @@
 
 <ion-searchbar autocomplete="off" showCancelButton="focus" (ionChange)="changeSearch($event)"></ion-searchbar>
 
-<ion-content [hidden]="loading">
+<ion-content *ngIf="!loading">
   <div style="text-align: center;">
     <br>
     <ion-text color="primary">

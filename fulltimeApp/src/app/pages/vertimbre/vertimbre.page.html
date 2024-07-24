@@ -45,7 +45,7 @@
 
 <ng-container>
   <!--Contenedor de todos los timbres admin-->
-  <ion-content [hidden]="todos">
+  <ion-content *ngIf="!todos">
     <div *ngIf="timbres.length === 0; else todo" style="text-align: center;">
       <br>
       <ion-text color="primary">
@@ -163,7 +163,7 @@
   </ion-content>
 
   <!--Configuracion del Pagination - ngxPaginationModulo-->
-  <ion-footer style=" width: 100%; padding: 1%;" [hidden]=todos>
+  <ion-footer style=" width: 100%; padding: 1%;" *ngIf="!todos" [hidden]=todos>
     <ion-item style="font-size: 80%; margin: 1% 0% 1% 0%;">
       <pagination-controls
         class="paginacion" 
@@ -183,7 +183,7 @@
 
 
 <!-- Contenedor del filtro de timbres admin-->
-<ion-content [hidden]="filtro">
+<ion-content *ngIf="!filtro" >
 
   <div *ngIf="timbres_filtro.length === 0; else showTimbres" style="text-align: center;">
     <br>
@@ -306,7 +306,7 @@
 </ion-content>
 
 <!--Configuracion del Pagination - ngxPaginationModulo-->
-<ion-footer style=" width: 100%; padding: 1%;" [hidden]=filtro>
+<ion-footer style=" width: 100%; padding: 1%;" *ngIf="!filtro" >
   <ion-item style="font-size: 80%; margin: 1% 0% 1% 0%;">
     <pagination-controls  
       class="paginacion" 
@@ -326,7 +326,7 @@
 
 <!-- Ventana de empleado sin registro -->
 
-<ion-content [hidden]='vacio'>
+<ion-content  *ngIf="!vacio" >
   <div style="text-align: center; padding-top: 2%;">
     <ion-img class="tamanoImagen" src="../../../assets/images/Sin_registro.svg"></ion-img>
     <br><br>
@@ -337,7 +337,7 @@
 </ion-content>
 
 <!-- Ventana de sin registro deacuerdo al filtro de fechas -->
-<ion-content [hidden]='filtro_mensaje'>
+<ion-content *ngIf="!filtro_mensaje" >
   <div style="text-align: center; padding-top: 2%;">
     <ion-img class="tamanoImagen" src="../../../assets/images/Sin_registro.svg"></ion-img>
     <br><br>

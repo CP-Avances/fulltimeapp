@@ -83,7 +83,7 @@ export class LoginPage implements OnInit {
 
   infoDispositivo() {
     Device.getId().then((id) => {
-      this.id_celular = id.uuid;
+      this.id_celular = id.identifier;
     });
 
     Device.getInfo().then((info) => {

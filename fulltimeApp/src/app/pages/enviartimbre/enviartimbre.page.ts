@@ -176,7 +176,7 @@ export class EnviartimbrePage implements OnInit {
     });
 
     Device.getId().then((id) => {
-      return this.nuevoTimbre.dispositivo_timbre = id.uuid + '';
+      return this.nuevoTimbre.dispositivo_timbre = id.identifier + '';
     }).catch((e) => {
       return this.nuevoTimbre.dispositivo_timbre = "Desconocido";
     });
