@@ -6,6 +6,7 @@ import { IdDispositivos } from 'src/app/interfaces/Usuario';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { Device } from '@capacitor/device';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
+import { Md5 } from 'ts-md5/dist/md5';
 
 @Component({
   selector: 'app-login',
@@ -15,8 +16,8 @@ import { DataUserLoggedService } from 'src/app/services/data-user-logged.service
 export class LoginPage implements OnInit {
   iniciandoSesion = false;
   user = {
-    usuario: "",
-    contrasena: ""
+    nombre_usuario: "",
+    pass: ""
   }
 
   iddispositivos: IdDispositivos[] = [];
@@ -59,6 +60,7 @@ export class LoginPage implements OnInit {
         this.navCtroller.navigateRoot(['empleado']);
       }
     }
+
   }
 
   rango_dispositivos: any;
@@ -95,9 +97,9 @@ export class LoginPage implements OnInit {
     this.verPassword = !this.verPassword;
   }
 
-  iniciarSesion1() {
 
 
+  BuscarParametroNumeroDispositivos() {
     let datos = [];
     this.parametros.ObtenerDetallesParametros(6).subscribe(
       res => {
@@ -112,24 +114,83 @@ export class LoginPage implements OnInit {
       });
 
 
+  }
 
+  iniciarSesion1() {
     this.infoDispositivo();
-    this.user.usuario = this.user.usuario.trim();
-    this.user.contrasena = this.user.contrasena.trim();
-    this.iniciandoSesion = true;
 
-    if (this.user.usuario == "" && this.user.contrasena == "") {
+    const md5 = new Md5();
+    let clave = md5.appendStr(this.user.pass).end();
+
+    let credenciales = {
+      nombre_usuario: this.user.nombre_usuario,
+      pass: clave
+    }
+
+    if (credenciales.nombre_usuario == "" && credenciales.pass == "") {
       this.iniciandoSesion = false;
       this.usuarioIncorrectoToas("Ups! Ingrese sus datos.", 2000);
     } else {
-      this.relojService.iniciarSesion(this.user).subscribe(
-        res => {
-          this.iniciandoSesion = false;
-          this.usuarioObtenido = res.body.usuario;
-          const codigo = this.usuarioObtenido.id;
-          let existeId_Dispositivo: boolean;
 
-          this.relojService.obtenerIdDispositivosUsuario(codigo).subscribe(
+
+      console.log('ingresa ', credenciales)
+
+      this.relojService.iniciarSesion(credenciales).subscribe(datos => {
+
+        let existeId_Dispositivo: boolean;
+
+        if (datos.message === 'error') {
+          this.usuarioIncorrectoToas("usuario y Contraseña incorrecta", 3000)
+        }
+
+        else if (datos.message === 'error_') {
+          this.usuarioIncorrectoToas("Usuario no cumple con todos los requerimientos necesarios para acceder al sistema.", 3000)
+        }
+
+        else if (datos.message === 'inactivo') {
+          this.usuarioIncorrectoToas("Usuario no se encuentra activo en el sistema.", 3000)
+        }
+
+        else if (datos.message === 'licencia_expirada') {
+          this.usuarioIncorrectoToas("Licencia del sistema ha expirado.", 3000)
+        }
+
+        else if (datos.message === 'sin_permiso_acceso') {
+          this.usuarioIncorrectoToas("Usuario no tiene permisos de acceso al sistema.", 3000)
+        }
+
+        else if (datos.message === 'licencia_no_existe') {
+          this.usuarioIncorrectoToas("No se ha encontrado registro de licencia del sistema.", 3000)
+        }
+
+        else {
+          localStorage.setItem('rol', datos.rol);
+          localStorage.setItem('token', datos.token);
+          localStorage.setItem('ip', datos.ip_adress);
+          localStorage.setItem('username', datos.usuario);
+          localStorage.setItem('id_empresa', datos.empresa);
+          // localStorage.setItem('autoriza', datos.estado);
+          localStorage.setItem('csucur', datos.sucursal);
+          localStorage.setItem('ccargo', datos.cargo);
+          localStorage.setItem('empleadoID', datos.empleado);
+          localStorage.setItem('cdepar', datos.departamento);
+          localStorage.setItem('ccontr', datos.id_contrato);
+          // localStorage.setItem('bool_timbres', datos.acciones_timbres);
+          // localStorage.setItem('fec_caducidad_licencia', datos.caducidad_licencia);
+
+          console.log("datos rol, ", datos.rol)
+          this.parametros.ObtenerDetallesParametros(6).subscribe(
+            res => {
+              console.log("ver parametro:", res)
+              datos = res;
+              if (datos.length != 0) {
+                return this.rango_dispositivos = (parseInt(datos[0].descripcion));
+              } else {
+                return this.rango_dispositivos = 1;
+              }
+            });
+
+          this.relojService.obtenerIdDispositivosUsuario(datos.empleado).subscribe(
             dispositivos => {
               console.log("ver dispositivos", dispositivos)
 
@@ -140,40 +201,12 @@ export class LoginPage implements OnInit {
                   existeId_Dispositivo = true;
                 }
               });
-
               if (existeId_Dispositivo == true) {
-                localStorage.setItem('token', res.body.autorizacion);
-                localStorage.setItem('Uid', String(this.usuarioObtenido.id));
-                localStorage.setItem('nom', String(this.usuarioObtenido.nombre));
-                localStorage.setItem('ap', String(this.usuarioObtenido.apellido));
-                localStorage.setItem('correo', String(this.usuarioObtenido.correo));
-                localStorage.setItem('rol', String(this.usuarioObtenido.id_rol));
-                localStorage.setItem('UCedula', this.usuarioObtenido.cedula);
-                localStorage.setItem('username', this.usuarioObtenido.usuario);
-                localStorage.setItem('ip', this.usuarioObtenido.ip);
-
-                localStorage.setItem('codigo', this.usuarioObtenido.codigo);
-                localStorage.setItem('empleadoID', res.body.usuario.id_registro_empleado);
-                localStorage.setItem('id_empresa', res.body.empresa.id_empresa);
-                localStorage.setItem('cperi_vacacion', res.body.empresa.id_peri_vacacion);
-                localStorage.setItem('ccontr', res.body.empresa.id_contrato);
-                localStorage.setItem('cdepar', res.body.empresa.id_departamento);
-                localStorage.setItem('ccargo', res.body.empresa.id_cargo);
-                localStorage.setItem('csucur', res.body.empresa.id_sucursal);
-                localStorage.setItem('horas_trabaja', res.body.empresa.hora_trabaja);
-                localStorage.setItem('ndepartamento', res.body.empresa.ndepartamento);
-                localStorage.setItem('config_noti', JSON.stringify(res.body.config_noti));
-                localStorage.setItem('app_info', JSON.stringify(res.body.app));
-                localStorage.setItem('vacuna_info', JSON.stringify(res.body.vacuna));
-                //console.log(res.body.usuario);
-                //console.log(res.body.vacuna);
-                //console.log(res.body.empresa);
-                //console.log(res.body.config_noti);
-                this.usuarioSuccessToas(res.message, 2000);
+                this.usuarioSuccessToas(dispositivos.message, 2000);
                 this.cambiodepantallas(this.usuarioObtenido.id_rol);
-
               } else {
-
+                this.BuscarParametroNumeroDispositivos();
+                console.log("ver rango_dispositivos", this.rango_dispositivos)
                 if (dispositivos.length >= this.rango_dispositivos) {
                   this.usuarioIncorrectoToas("Ups! El usuario llego al limite de dispositivos permitidos", 3000);
                   var FormId = 'formulariologin';
@@ -181,37 +214,9 @@ export class LoginPage implements OnInit {
                   resetForm.reset();
                 } else {
                   this.registrarCelular();
-                  localStorage.setItem('token', res.body.autorizacion);
-                  localStorage.setItem('Uid', String(this.usuarioObtenido.id));
-                  localStorage.setItem('nom', String(this.usuarioObtenido.nombre));
-                  localStorage.setItem('ap', String(this.usuarioObtenido.apellido));
-                  localStorage.setItem('correo', String(this.usuarioObtenido.correo));
-                  localStorage.setItem('rol', String(this.usuarioObtenido.id_rol));
-                  localStorage.setItem('UCedula', this.usuarioObtenido.cedula);
-                  localStorage.setItem('username', this.usuarioObtenido.usuario);
-                  localStorage.setItem('codigo', this.usuarioObtenido.codigo);
-                  localStorage.setItem('empleadoID', res.body.usuario.id_registro_empleado);
-                  localStorage.setItem('id_empresa', res.body.empresa.id_empresa);
-                  localStorage.setItem('cperi_vacacion', res.body.empresa.id_peri_vacacion);
-                  localStorage.setItem('ccontr', res.body.empresa.id_contrato);
-                  localStorage.setItem('cdepar', res.body.empresa.id_departamento);
-                  localStorage.setItem('ccargo', res.body.empresa.id_cargo);
-                  localStorage.setItem('csucur', res.body.empresa.id_sucursal);
-                  localStorage.setItem('horas_trabaja', res.body.empresa.hora_trabaja);
-                  localStorage.setItem('ndepartamento', res.body.empresa.ndepartamento);
-                  localStorage.setItem('config_noti', JSON.stringify(res.body.config_noti));
-                  localStorage.setItem('app_info', JSON.stringify(res.body.app));
-                  localStorage.setItem('vacuna_info', JSON.stringify(res.body.vacuna));
-                  localStorage.setItem('ip', this.usuarioObtenido.ip);
-
-                  //console.log(res.body.usuario);
-                  //console.log(res.body.vacuna);
-                  //console.log(res.body.empresa);
-                  //console.log(res.body.config_noti);
-                  this.usuarioSuccessToas(res.message, 2000);
+                  this.usuarioSuccessToas("Ingreso exitoso", 2000);
                   this.cambiodepantallas(this.usuarioObtenido.id_rol);
                 }
-
               }
             },
             err => {
@@ -223,24 +228,14 @@ export class LoginPage implements OnInit {
                 console.log(err.url + "|" + err.message + "|" + err.statusText + "|" + err.name);
                 this.usuarioIncorrectoToas(err.error.message, 3000),
                   console.log(err)
-
               }
             }
           );
-        },
-        err => {
-          this.iniciandoSesion = false;
-          if (err.status == 0) {
-            console.log(err.url + "|" + err.message + "|" + err.statusText + "|" + err.name);
-            this.usuarioIncorrectoToas("Ups! halgo ha salido mal. COMPRUEBA TU CONEXION A INTERNET o PONGASE EN CONTACTO CON EL ADMINISTRADOR", 3000);
-          } else {
-            console.log(err.url + "|" + err.message + "|" + err.statusText + "|" + err.name);
-            this.usuarioIncorrectoToas(err.error.message, 3000),
-              console.log(err)
-
-          }
         }
-      );
+      }, err => {
+        this.usuarioIncorrectoToas("Usuario Incorrecto", 3000)
+      }
+    )
     }
   }
 
@@ -311,7 +306,7 @@ export class LoginPage implements OnInit {
   }
 
   registrarIdDispositivoenBDD(id_celular: any, model_dispositivo: any) {
-    const id_usuario = this.usuarioObtenido.codigo;
+    const id_usuario = localStorage.getItem('empleadoID');
     var ip = localStorage.getItem('ip');
     var user_name = this.userService.username;
 

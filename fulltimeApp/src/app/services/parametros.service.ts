@@ -16,7 +16,7 @@ export class ParametrosService {
 
 
   ObtenerDetallesParametros(id: any) {
-    return this.http.get<any>(this.apiUrl + '/parametros/detalles/' + id);
+    return this.http.get<any>(this.apiUrl + '/parametrizacion/' + id);
   }
 
   ObtenerCoordenadas(data: any) {

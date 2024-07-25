@@ -8,10 +8,17 @@ export class TokenInterceptorService {
 
   constructor(
     private relojServiceService: RelojServiceService
-  ) 
-  {}
+  ) { }
 
   intercept(req: any, next: any) {
+    const tokenizeReq = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${this.relojServiceService.getToken()}`
+      }
+    });
+    return next.handle(tokenizeReq);
+
+    /*
     if (this.relojServiceService.estaLogueado()) {
       let tokenizeReq = req.clone({
         setHeaders: {
@@ -27,6 +34,8 @@ export class TokenInterceptorService {
       });
       return next.handle(tokenizeReq);
     }
+
+    */
   }
 
 }
