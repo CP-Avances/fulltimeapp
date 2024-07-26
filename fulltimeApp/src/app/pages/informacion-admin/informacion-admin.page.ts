@@ -18,7 +18,7 @@ export class InformacionAdminPage implements OnInit {
   pipe = new DatePipe('en-US');
   pageActual: number = 1;
 
-  empresa: Empresa = {
+  empresa: any = {
     nombre: '',
     ruc: '',
     direccion: '',
@@ -40,7 +40,7 @@ export class InformacionAdminPage implements OnInit {
   }
 
   public get app_info(): any {
-    return this.dataUser.dataApp
+    return localStorage.getItem("version")
   }
 
   public get app_vacuna(): any {
@@ -60,12 +60,12 @@ export class InformacionAdminPage implements OnInit {
     this.obtenerDatosEmpresa(localStorage.getItem('id_empresa'));
     this.searchEmpleado = this.empleados;
 
-    console.log('data vacuna .. ', this.dataUser.dataVacuna)
+   // console.log('data vacuna .. ', this.dataUser.dataVacuna)
     this.BuscarFormatos();
   }
 
   fecha_: string = '';
-  caduca_: string = '';
+  caduca_: string = localStorage.getItem("caducidad_licencia");
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
   formato_fecha: string = '';
@@ -73,10 +73,15 @@ export class InformacionAdminPage implements OnInit {
   BuscarFormatos() {
     this.parametro.ObtenerFormatos().subscribe(
       resp => {
-        this.formato_fecha = resp.fecha;
-        this.formato_hora = resp.hora;
-        this.fecha_ = this.validar.FormatearFecha(this.dataUser.dataVacuna.fecha, this.formato_fecha, this.validar.dia_completo);
-        this.caduca_ = this.validar.FormatearFecha(this.dataUser.dataApp.caducidad_licencia, this.formato_fecha, this.validar.dia_completo);      
+
+        console.log("Ver formato fecha ", resp)
+
+
+       // this.fecha_ = this.validar.FormatearFecha(this.dataUser.dataVacuna.fecha, this.formato_fecha, this.validar.dia_completo);
+        //this.caduca_ = this.validar.FormatearFecha(localStorage.getItem("caducidad_licencia"), this.formato_fecha, this.validar.dia_completo);      
+      },
+      err => {
+        console.log(err)
       }
     )
   }
@@ -84,6 +89,8 @@ export class InformacionAdminPage implements OnInit {
   obtenerDatosEmpresa(idEmpresa: any) {
     this.relojService.obtenerDatosEmpresa(idEmpresa).subscribe(
       res => {
+
+        console.log("ver datos empresa", res)
         console.log(res);
         this.empresa = res;
         this.obtenerEmpleados();

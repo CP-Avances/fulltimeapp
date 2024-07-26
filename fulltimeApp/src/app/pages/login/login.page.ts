@@ -55,7 +55,7 @@ export class LoginPage implements OnInit {
         this.navCtroller.navigateRoot(['adminpage']);
       }
 
-      else {
+     else {
         this.navCtroller.pop();
         this.navCtroller.navigateRoot(['empleado']);
       }
@@ -65,23 +65,7 @@ export class LoginPage implements OnInit {
 
   rango_dispositivos: any;
 
-  /*
-  BuscarParametro() {
-    // id_tipo_parametro PARA NUMERO DE DISPOSITIVOS = 6
-    let datos = [];
-    this.parametros.ObtenerDetallesParametros(6).subscribe(
-      res => {
-
-        console.log("ver parametro:", res)
-        datos = res;
-        if (datos.length != 0) {
-          return this.rango_dispositivos = (parseInt(datos[0].descripcion));
-        }else{
-          return this.rango_dispositivos = 1;
-        }
-    });
-  }
-    */
+  
 
   infoDispositivo() {
     Device.getId().then((id) => {
@@ -136,6 +120,7 @@ export class LoginPage implements OnInit {
       console.log('ingresa ', credenciales)
 
       this.relojService.iniciarSesion(credenciales).subscribe(datos => {
+        console.log("ver datos del usuario",datos);
 
         let existeId_Dispositivo: boolean;
 
@@ -175,6 +160,16 @@ export class LoginPage implements OnInit {
           localStorage.setItem('empleadoID', datos.empleado);
           localStorage.setItem('cdepar', datos.departamento);
           localStorage.setItem('ccontr', datos.id_contrato);
+          //INFORMACION USUARIO
+          localStorage.setItem('nom', datos.nombre);
+          localStorage.setItem('ap', datos.apellido);
+          localStorage.setItem('UCedula', datos.cedula);
+          localStorage.setItem('caducidad_licencia', datos.caducidad_licencia);
+          //APP INFORMACION
+          localStorage.setItem('ruc', datos.ruc);
+          localStorage.setItem('version', datos.version);
+
+
           // localStorage.setItem('bool_timbres', datos.acciones_timbres);
           // localStorage.setItem('fec_caducidad_licencia', datos.caducidad_licencia);
 
@@ -203,7 +198,7 @@ export class LoginPage implements OnInit {
               });
               if (existeId_Dispositivo == true) {
                 this.usuarioSuccessToas(dispositivos.message, 2000);
-                this.cambiodepantallas(this.usuarioObtenido.id_rol);
+                this.cambiodepantallas();
               } else {
                 this.BuscarParametroNumeroDispositivos();
                 console.log("ver rango_dispositivos", this.rango_dispositivos)
@@ -215,7 +210,7 @@ export class LoginPage implements OnInit {
                 } else {
                   this.registrarCelular();
                   this.usuarioSuccessToas("Ingreso exitoso", 2000);
-                  this.cambiodepantallas(this.usuarioObtenido.id_rol);
+                  this.cambiodepantallas();
                 }
               }
             },
@@ -239,14 +234,9 @@ export class LoginPage implements OnInit {
     }
   }
 
-  cambiodepantallas(rol: number) {
-    if (rol === 1) {
+  cambiodepantallas() {
       this.navCtroller.pop();
       this.navCtroller.navigateRoot(['adminpage']);
-    } else {
-      this.navCtroller.pop();
-      this.navCtroller.navigateRoot(['empleado']);
-    }
 
     var FormId = 'formulariologin';
     var resetForm = <HTMLFormElement>document.getElementById(FormId);

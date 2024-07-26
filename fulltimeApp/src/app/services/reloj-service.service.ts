@@ -25,7 +25,7 @@ export class RelojServiceService {
     return this.http.post<any>(this.URL + '/user/existeUsuario', { user_name: username });
   }
   obtenerUsuarioEmpresa() {
-    return this.http.get<any>(this.URL + '/user/usuarioEmpresa');
+    return this.http.get<any>(this.URL + '/usuarios/usuarioEmpresa');
   }
 
   obtenerUsuario(idUser: any) {
@@ -121,7 +121,9 @@ export class RelojServiceService {
     return this.http.post<any>(this.URL + '/enterprise/empresa', empresa);
   }
   obtenerDatosEmpresa(id: any) {
-    return this.http.get<any>(this.URL + '/enterprise/empresaId/' + id);
+   // return this.http.get<any>(this.URL + '/enterprise/empresaId/' + id);
+    return this.http.get(`${this.URL}/empresas/buscar/datos/${id}`);
+
   }
   //fin empresa
 

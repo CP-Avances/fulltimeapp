@@ -23,6 +23,12 @@ export class EmpleadosService {
     return this.http.get<any>(`${this.apiUrl}/empleado/lista`)
   }
 
+  
+
+
+
+
+
 
   ObtenerHorariosEmpleado(codigo: number | string) {
     const params = new HttpParams()
