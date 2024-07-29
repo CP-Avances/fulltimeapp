@@ -170,7 +170,7 @@ export class AutorizacionesService {
    */
 
   getNotificacionesTimbreByIdEmpleado(id_empleado: string | number): Observable<NotificacionTimbre[]> {
-    const url = `${this.apiUrl}/notificaciones/noti-tim/all-noti`;
+    const url = `${this.apiUrl}/notificacionSistema/noti-tim/all-noti`;
     const params = new HttpParams()
       .set('id_empleado', id_empleado)
     return this.http.get<Notificacion[]>(url, { params })
@@ -258,7 +258,7 @@ export class AutorizacionesService {
    *******************************************************
    */
   getInfoEmpleadoByCodigo(codigo: string | number): Observable<SettingsInfoEmpleado> {
-    const url = `${this.apiUrl}/notificaciones/info-empl-recieve`;
+    const url = `${this.apiUrl}/noti-real-time/info-empl-recieve`;
     const params = new HttpParams()
       .set('codigo', codigo)
     return this.http.get<SettingsInfoEmpleado>(url, { params })

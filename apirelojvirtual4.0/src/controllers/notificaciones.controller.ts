@@ -90,15 +90,12 @@ export const postNotificacion = async (req: Request, res: Response): Promise<Res
  */
 export const getNotificacionTimbres = async (req: Request, res: Response): Promise<Response> => {
     try {
-
         const { id_empleado } = req.query;
         const subquery1 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_envia ) as nempleadosend`
         const subquery2 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_recibe ) as nempleadoreceives`
         const query = `SELECT r.id, r.fecha_hora, r.id_empleado_envia, r.id_empleado_recibe,r.visto, r.descripcion as mensaje, r.id_timbre, r.tipo, ${subquery1}, ${subquery2} FROM ecm_realtime_timbres r WHERE r.id_empleado_recibe = ${id_empleado} ORDER BY r.fecha_hora DESC LIMIT 60`
-
         const response: QueryResult = await pool.query(query);
         const notificacion: NotificacionTimbre[] = response.rows;
-
         return res.status(200).jsonp(notificacion);
     } catch (error) {
         console.log(error);

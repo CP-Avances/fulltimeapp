@@ -68,6 +68,8 @@ export class VertimbrePage implements OnInit {
     this.limpiarRango_fechas();
     this.mostrarTimbres();
     this.rangoFechasComponent.closeRangoFecha();
+    //this.rangoFechasComponent.resetFecha();
+
   }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
@@ -78,7 +80,7 @@ export class VertimbrePage implements OnInit {
       resp => {
         this.formato_fecha = resp.fecha;
         this.formato_hora = resp.hora;
-        this.obtenerTimbres(localStorage.getItem('codigo'));
+        this.obtenerTimbres(localStorage.getItem('empleadoID'));
 
       }
     )
@@ -86,7 +88,7 @@ export class VertimbrePage implements OnInit {
 
   mostrarTimbres() {
     this.timbres_filtro = [];
-    this.obtenerTimbres(localStorage.getItem('codigo'));
+    this.obtenerTimbres(localStorage.getItem('empleadoID'));
     this.paginafiltro = 0;
     this.pageTodos = 1;
     this.todos = false;
@@ -115,6 +117,8 @@ export class VertimbrePage implements OnInit {
       this.filtro_mensaje = true;
       this.limpiarRango_fechas();
     }
+    this.rangoFechasComponent.resetFechaInicio();
+    this.rangoFechasComponent.resetFechaFinal();
 
   }
 
@@ -122,6 +126,7 @@ export class VertimbrePage implements OnInit {
   limpiarRango_fechas() {
     this.dataUserService.setFechaRangoInicio('');
     this.dataUserService.setFechaRangoFinal('');
+
   }
 
   //Pestalas de mensajes
@@ -196,11 +201,14 @@ export class VertimbrePage implements OnInit {
   }
 
   filtrarFechas() {
+    console.log("Entra al filtro fechas")
     this.timbres_filtro = [];
     if (this.fechaInicio <= this.fechaFinal) {
       var datos = { fecInicio: this.fechaInicio, fecFinal: this.fechaFinal, codigo: localStorage.getItem('codigo') }
       this.filtimbre.PostFiltrotimbres(datos).subscribe(
         ress => {
+          console.log("fechas encontradas",ress )
+
           var fechasObjeto_f = {};
 
           ress.forEach(data => {

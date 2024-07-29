@@ -130,16 +130,16 @@ export class RelojServiceService {
   // TIMBRE
   enviarTimbre(timbre) {
     console.log('dato de timbre a guardar en la base de datos: ',timbre.conexion)
-    return this.http.post<any>(this.URL + '/ring/timbre', timbre);
+    return this.http.post<any>(this.URL + '/timbres/timbre', timbre);
   }
 
   enviarTimbreSinConexion(timbre: any) {
     console.log('dato de timbre a guardar en la base de datos pero con novedades: ',timbre)
-    return this.http.post<any>(this.URL + '/ring/timbreSinConexion', timbre);
+    return this.http.post<any>(this.URL + '/timbres/timbreSinConexion', timbre);
   }
 
   obtenerTimbres(codigo: any) {
-    return this.http.get<any>(this.URL + '/ring/timbreEmpleado/' + codigo);
+    return this.http.get<any>(this.URL + '/timbres/timbreEmpleado/' + codigo);
   }
   //fin timbre
 

@@ -47,20 +47,19 @@ export class InformacionAdminPage implements OnInit {
     return this.dataUser.dataVacuna
   }
 
-  ver: boolean = true; 
+  ver: boolean = true;
 
   constructor(
     private relojService: RelojServiceService,
     private dataUser: DataUserLoggedService,
     public parametro: ParametrosService,
     public validar: ValidacionesService
-    ) {}
+  ) { }
 
-  ngOnInit(){
+  ngOnInit() {
     this.obtenerDatosEmpresa(localStorage.getItem('id_empresa'));
     this.searchEmpleado = this.empleados;
-
-   // console.log('data vacuna .. ', this.dataUser.dataVacuna)
+    // console.log('data vacuna .. ', this.dataUser.dataVacuna)
     this.BuscarFormatos();
   }
 
@@ -73,12 +72,10 @@ export class InformacionAdminPage implements OnInit {
   BuscarFormatos() {
     this.parametro.ObtenerFormatos().subscribe(
       resp => {
-
-        console.log("Ver formato fecha ", resp)
-
-
-       // this.fecha_ = this.validar.FormatearFecha(this.dataUser.dataVacuna.fecha, this.formato_fecha, this.validar.dia_completo);
-        //this.caduca_ = this.validar.FormatearFecha(localStorage.getItem("caducidad_licencia"), this.formato_fecha, this.validar.dia_completo);      
+        this.formato_fecha = resp.fecha;
+        this.formato_hora = resp.hora;
+        this.fecha_ = this.validar.FormatearFecha(this.dataUser.dataVacuna.fecha, this.formato_fecha, this.validar.dia_completo);
+        this.caduca_ = this.validar.FormatearFecha(localStorage.getItem("caducidad_licencia"), this.formato_fecha, this.validar.dia_completo);
       },
       err => {
         console.log(err)
@@ -92,7 +89,7 @@ export class InformacionAdminPage implements OnInit {
 
         console.log("ver datos empresa", res)
         console.log(res);
-        this.empresa = res;
+        this.empresa = res[0];
         this.obtenerEmpleados();
         // this.obtenerDatosAdministrador(localStorage.getItem('Uid'));
       },
@@ -101,6 +98,7 @@ export class InformacionAdminPage implements OnInit {
       }
     );
   }
+
   obtenerEmpleados() {
     this.relojService.obtenerUsuarioEmpresa().subscribe(
       res => {
@@ -109,11 +107,11 @@ export class InformacionAdminPage implements OnInit {
         this.existenEmpleados = true;
 
 
-        console.log('lista empleados: ',this.empleados)
+        console.log('lista empleados: ', this.empleados)
 
-        if(this.empleados.length < 11){
+        if (this.empleados.length < 11) {
           return this.ver = true;
-        }else{
+        } else {
           return this.ver = false;
         }
 
@@ -134,7 +132,7 @@ export class InformacionAdminPage implements OnInit {
       event.target.complete();
     }, 1500);
   }
-  
+
 
   //obtener datos de usuario administrador
   obtenerDatosAdministrador(iduser: string) {

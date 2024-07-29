@@ -984,7 +984,6 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       permiso => {
         permiso.EmpleadosSendNotiEmail = []
         permiso.EmpleadosSendNotiEmail.push(this.solInfo);
-        if (this.archivoSubido != null) { this.subirRespaldo(permiso) };
         this.CrearNuevaAutorizacion(permiso);
         this.num_permiso = this.num_permiso + 1;
         this.closeModalComponent.closeModal(true);
@@ -1031,28 +1030,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       }
     }
   }
-  //Metodo para subir (cargar) el archivo al servidor
-  subirRespaldo(permiso: any) {
-    var id = permiso.id;
-    let formData = new FormData();
-    console.log("tamaño: ", this.archivoSubido[0].size);
-    if (this.archivoSubido == undefined) {
-      return this.archivoSubido = null;
-    }
 
-    for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
-    }
-
-    console.log('formData: ', formData);
-    this.permisoService.SubirArchivoRespaldo(formData, id, this.reg.id_empleado, this.archivoSubido[0].name).subscribe(res => {
-      this.validaciones.showToast('El archivo se Cargo Correctamente', 3500, 'success');
-    }, err => {
-      console.log(err)
-      return this.validaciones.showToast('El archivo no se pudo Cargar al Servidor', 3500, 'danger');
-
-    });
-  }
   //Metodo para eliminar el archivo de permiso
   deleteDocumentoPermiso() {
     console.log('El archivo ', this.reg.documento, ' Se quito Correctamente')

@@ -75,7 +75,7 @@ export class PermisosService {
   }
 
   getListaPermisosByCodigo(codigo: string): Observable<Permiso[]> {
-    const url = `${this.apiUrl}/permisos/lista-permisos`;
+    const url = `${this.apiUrl}/empleadoPermiso/lista-permisos`;
     const params = new HttpParams().set('codigo', codigo)
     return this.http.get<Permiso[]>(url, { params })
       .pipe(
@@ -85,7 +85,7 @@ export class PermisosService {
   }
 
   getlistaPermisosByFechasyCodigo(fec_inicio: string, fec_final: string, codigo: number | string): Observable <Permiso[]>{
-    const url = `${this.apiUrl}/permisos/lista-permisosfechas`;
+    const url = `${this.apiUrl}/empleadoPermiso/lista-permisosfechas`;
     const params = new HttpParams()
       .set('fec_inicio', fec_inicio)
       .set('fec_final', fec_final)
@@ -112,7 +112,7 @@ export class PermisosService {
   }
 
   getlistaPermisosByHorasyCodigo(fec_inicio: string, fec_final: string, hora_inicio: string, hora_final: string, codigo: number | string ): Observable <Permiso[]>{
-    const url = `${this.apiUrl}/permisos/lista-permisoshoras`;
+    const url = `${this.apiUrl}/empleadoPermiso/lista-permisoshoras`;
     const params = new HttpParams()
       .set('fec_inicio', fec_inicio)
       .set('fec_final', fec_final)
@@ -146,7 +146,7 @@ export class PermisosService {
 
   postNuevoPermiso(permiso: Permiso): Observable<Permiso> {
     const cdepar: any = localStorage.getItem('cdepar');
-    const url = `${this.apiUrl}/permisos/insert-permiso`;
+    const url = `${this.apiUrl}/empleadoPermiso/insert-permiso`;
     const params = new HttpParams()
       .set('id_departamento', cdepar)
     return this.http.post<Permiso>(url, permiso, { params })

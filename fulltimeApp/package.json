@@ -37,7 +37,7 @@
     "@ionic-native/file": "^5.36.0",
     "@ionic-native/file-opener": "^5.36.0",
     "@ionic-native/fingerprint-aio": "^5.36.0",
-    "@ionic/angular": "^8.2.5",
+    "@ionic/angular": "^6.7.5",
     "@ionic/storage-angular": "^4.0.0",
     "@types/dom-to-image": "^2.6.7",
     "capacitor-biometric-auth": "^0.1.1",

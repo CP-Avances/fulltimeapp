@@ -5,6 +5,7 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { IonicStorageModule } from '@ionic/storage-angular';
+import { FormsModule } from '@angular/forms';
 
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AutenticacionGuard } from './guards/autenticacion.guard';
@@ -34,6 +35,7 @@ const config: SocketIoConfig = { url: "http://192.168.0.110:3003", options: {}};
     BrowserModule, 
     IonicModule.forRoot(), 
     AppRoutingModule,
+    FormsModule,
     HttpClientModule,
     ComponentesModule,
     ModalsPageModule,

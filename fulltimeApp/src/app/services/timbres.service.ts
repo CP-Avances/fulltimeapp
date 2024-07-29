@@ -18,11 +18,11 @@ export class TimbresService {
   }
 
   PostTimbreWebAdmin(datos: any) {
-    return this.http.post<any>(`${this.api_url}/ring/timbre/admin`, datos);
+    return this.http.post<any>(`${this.api_url}/timbres/timbre/admin`, datos);
   }
 
   PostFiltrotimbres(datos: any){
-    return this.http.post<any>(`${this.api_url}/ring/filtroTimbre`, datos)
+    return this.http.post<any>(`${this.api_url}/timbres/filtroTimbre`, datos)
   }
 
   PostJustificacionAtraso(datos: any) {

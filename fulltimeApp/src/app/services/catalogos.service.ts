@@ -76,7 +76,7 @@ export class CatalogosService {
       const lista: any = sessionStorage.getItem('cg_feriado')
       this.lista_feriados = JSON.parse(lista)
     } else {
-      const url = `${this.apiUrl}/catalogos/cg-feriados`;
+      const url = `${this.apiUrl}/feriados/cg-feriados`;
       this.http.get<Cg_Feriados[]>(url)
         .pipe(
           tap(console.log),

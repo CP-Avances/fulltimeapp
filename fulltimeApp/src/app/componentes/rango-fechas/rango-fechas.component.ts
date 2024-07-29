@@ -41,7 +41,6 @@ export class RangoFechasComponent {
       this.fechaIn = moment(this.fechaInicio).format('YYYY-MM-DD');
       this.datetimeInicio.confirm(true);
     }
-    
   }
 
   changeFechaFinal(e: any) {
@@ -85,6 +84,17 @@ export class RangoFechasComponent {
     this.dataUserService.setFechaRangoFinal('');
     this.fechaIn = "";
     this.fechaFi = "";
+  }
+
+  resetFechaInicio() {
+    this.fechaIn = ''; // Resetea el valor del modelo
+   // this.datetimeInicio.reset(); // Resetea el componente ion-datetime
+  }
+  
+  resetFechaFinal() {
+    this.fechaFi = ''; // Resetea el valor del modelo
+    //this.datetimeFinal.reset(); // Resetea el componente ion-datetime
+
   }
 
   async mostrarToas(mensaje: string, duracion: number, color: string) {

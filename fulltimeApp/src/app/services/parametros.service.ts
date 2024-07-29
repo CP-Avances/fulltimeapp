@@ -19,9 +19,12 @@ export class ParametrosService {
     return this.http.get<any>(this.apiUrl + '/parametrizacion/' + id);
   }
 
+  ObtenerFormatos() {
+    return this.http.get<any>(this.apiUrl + '/parametrizacion/buscar-formato');
+  }
 
 
-
+  
   ObtenerCoordenadas(data: any) {
     return this.http.post<any>(`${this.apiUrl}/parametros/coordenadas`, data);;
   }
@@ -31,10 +34,8 @@ export class ParametrosService {
   }
 
   ObtenerFunciones() {
-    return this.http.get<any>(this.apiUrl + '/parametros/funciones');
+    return this.http.get<any>(this.apiUrl + '/administracion/funcionalidad');
   }
 
-  ObtenerFormatos() {
-    return this.http.get<any>(this.apiUrl + '/parametrizacion/buscarformatos');
-  }
+ 
 }
