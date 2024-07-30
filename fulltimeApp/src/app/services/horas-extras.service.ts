@@ -73,7 +73,7 @@ export class HorasExtrasService {
   }
 
   getlistaHorasExtrasByFechasyCodigo(fec_inicio: string, fec_final: string, codigo: number | string): Observable <HoraExtra[]>{
-    const url = `${this.apiUrl}/horasextras/lista-horas-extrasfechas`;
+    const url = `${this.apiUrl}/horas-extras-pedidas/horas-extras/lista-horas-extrasfechas`;
     const params = new HttpParams()
       .set('fecha_inicio', fec_inicio)
       .set('fecha_final', fec_final)

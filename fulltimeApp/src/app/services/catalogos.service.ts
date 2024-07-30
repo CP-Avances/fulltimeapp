@@ -47,7 +47,7 @@ export class CatalogosService {
       const lista: any = sessionStorage.getItem('cg_tipo_permiso')
       this.lista_tipos_permisos = JSON.parse(lista)
     } else {
-      const url = `${this.apiUrl}/catalogos/cg-permisos`;
+      const url = `${this.apiUrl}/tipoPermisos`;
       this.http.get<Cg_TipoPermiso[]>(url)
         .pipe(
           tap(console.log),

@@ -82,7 +82,7 @@ export class VacacionesService {
   
 
   getlistaVacacionesByFechasyCodigo(fec_inicio: string, fec_final: string, codigo: number | string): Observable <Vacacion[]>{
-    const url = `${this.apiUrl}/vacaciones/lista-vacacionesfechas`;
+    const url = `${this.apiUrl}/vacaciones/lista-vacacionesfechas/fechas`;
     const params = new HttpParams()
       .set('fec_inicio', fec_inicio)
       .set('fec_final', fec_final)

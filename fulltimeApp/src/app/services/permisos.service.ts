@@ -14,7 +14,7 @@ import { Socket } from 'ngx-socket-io';
 export class PermisosService {
 
   private apiUrl = environment.url;
-  private recursoURL = 'http://186.4.226.49:3001';
+  private recursoURL = 'http://192.168.100.4:3001';
   //private recursoURL = 'http://186.4.226.49:3001';
 
 

@@ -145,7 +145,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       this.readonly = false;
     }
 
-    this.obtenerInformacionEmpleado();
+   // this.obtenerInformacionEmpleado();
     this.BuscarFormatos();
   }
 
@@ -163,6 +163,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
   //TODO obtenerInformacionEmpleado
   solInfo: any;
+  /*
   obtenerInformacionEmpleado() {
 
     console.log("ve id empleado",this.reg.id_empleado);
@@ -188,6 +189,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       }
     );
   }
+  */
 
   /** ******************************************************************************************* **
     ** **                            MANEJO DE VARIABLES INPUT                                 ** **
@@ -742,11 +744,13 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     var data = {
       fecha_inicio: moment(this.reg.fecha_inicio).format('YYYY-MM-D'),
       fecha_final: moment(this.reg.fecha_final).format('YYYY-MM-D'),
-      codigo: '\'' + this.reg.id_empleado + '\''
+      id_empleado: this.reg.id_empleado
     }
 
     this.empleadoService.BuscarPlanificacionHorarioEmple(data).subscribe(horario => {
-      this.horarioEmpleado = horario;
+      this.horarioEmpleado = horario.data;
+      console.log("ver horarios ", this.horarioEmpleado);
+
 
       if (this.selectItemDiasHoras === 'Horas') {
         this.AlmuerzoIncluidoCalculo();

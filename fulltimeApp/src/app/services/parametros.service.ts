@@ -20,7 +20,7 @@ export class ParametrosService {
   }
 
   ObtenerFormatos() {
-    return this.http.get<any>(this.apiUrl + '/parametrizacion/buscar-formato');
+    return this.http.get<any>(this.apiUrl + '/parametrizacion/buscar-formato/fecha_horas');
   }
 
 

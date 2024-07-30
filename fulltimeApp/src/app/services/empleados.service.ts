@@ -13,6 +13,7 @@ export class EmpleadosService {
 
   constructor(
     private http: HttpClient
+
   ) { }
 
   /**
@@ -43,7 +44,7 @@ export class EmpleadosService {
     const params = new HttpParams()
       .set('codigo', datos.codigo)
       .set('fecha_inicio', datos.fecha)
-    return this.http.get<HorarioE[]>(`${this.apiUrl}/empleado/horariosEmpleado`, { params })
+    return this.http.get<HorarioE[]>(`${this.apiUrl}/empleado/horarios/horariosEmpleado`, { params })
       .pipe(
         tap(console.log)
       )
@@ -59,14 +60,19 @@ export class EmpleadosService {
   }
 
   BuscarPlanificacionHorarioEmple(datos: any){
+    /*
     const params = new HttpParams()
       .set('fecha_inicio', datos.fecha_inicio)
       .set('fecha_final', datos.fecha_final)
-      .set('codigo', datos.codigo);
-    return this.http.get<HorarioE[]>(`${this.apiUrl}/empleado/horarioEmplefecha`, { params })
+      .set('id_empleado', datos.id_empleado);
+    return this.http.get<HorarioE[]>(`${this.apiUrl}/planificacion_general/horario-general-planificacion`, { params })
       .pipe(
         tap(console.log)
       )
+
+      */
+      return this.http.post<any>(`${environment.url}/planificacion_general/horario-general-planificacion`, datos);
+
   }
 
   ObtenerUnHorarioEmpleado(codigo: number | string, fecha_hoy: any) {
