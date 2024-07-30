@@ -137,7 +137,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.reg.id_empleado_contrato = parseInt(localStorage.getItem('ccontr')!)
     this.horas_trabaja_seg = this.validaciones.HorasTrabajaToSegundos(localStorage.getItem('horas_trabaja')!);
 
-    console.log("ID EMPLEADO",localStorage.getItem('empleadoID') );
+    console.log("ID EMPLEADO", localStorage.getItem('empleadoID'));
 
     if (this.reg.fecha_inicio == null || this.reg.fecha_inicio == undefined) {
       this.readonly = true;
@@ -145,7 +145,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       this.readonly = false;
     }
 
-   // this.obtenerInformacionEmpleado();
+    // this.obtenerInformacionEmpleado();
     this.BuscarFormatos();
   }
 
@@ -984,7 +984,30 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
     console.log('this.reg: ', this.reg);
 
-    this.subscripted = this.permisoService.postNuevoPermiso(this.reg).subscribe(
+    let datosPermiso = {
+      id_empl_contrato: this.reg.id_empleado_contrato,
+      id_peri_vacacion: this.reg.id_periodo_vacacion,
+      depa_user_loggin: localStorage.getItem('cdepar'),
+      id_tipo_permiso: this.reg.id_tipo_permiso,
+      id_empl_cargo: this.reg.id_empleado_cargo,
+      fec_creacion: this.reg.fecha_creacion,
+      hora_ingreso: this.reg.hora_ingreso,
+      descripcion: this.reg.descripcion,
+      hora_numero: this.reg.horas_permiso,
+      num_permiso: this.reg.numero_permiso,
+      hora_salida: this.reg.hora_salida,
+      legalizado: this.reg.legalizado,
+      fec_inicio: this.reg.fecha_inicio,
+      fec_final: this.reg.fecha_final,
+      dia_libre: this.reg.dia_libre,
+      id_empleado: this.reg.id_empleado,
+      estado: this.reg.estado,
+      dia: this.reg.dias_permiso,
+      user_name: this.reg.user_name,
+      ip: localStorage.getItem('ip'),
+      subir_documento: this.reg.documento
+    }
+    this.subscripted = this.permisoService.postNuevoPermiso(datosPermiso).subscribe(
       permiso => {
         permiso.EmpleadosSendNotiEmail = []
         permiso.EmpleadosSendNotiEmail.push(this.solInfo);
@@ -1030,9 +1053,13 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       } else {
         console.log(this.archivoSubido![0].name);
         this.reg.documento = name;
+        console.log("nombre del archivo", this.reg.documento)
         this.validaciones.showToast('Archivo valido', 3500, 'success');
+        
       }
     }
+
+
   }
 
   //Metodo para eliminar el archivo de permiso
@@ -1062,7 +1089,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.autorizaciones.postNuevaAutorizacion(autorizacion).subscribe(
       resp => {
         this.CrearNuevaNotificacion(permiso);
-       // this.SendEmailsEmpleados(permiso);
+        // this.SendEmailsEmpleados(permiso);
       }, err => {
         this.CrearNuevaNotificacion(permiso);
         //this.SendEmailsEmpleados(permiso);
@@ -1131,7 +1158,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   }
 
 
- 
+
   ngOnDestroy() {
     if (this.subs_bool) {
       this.subscripted.unsubscribe();

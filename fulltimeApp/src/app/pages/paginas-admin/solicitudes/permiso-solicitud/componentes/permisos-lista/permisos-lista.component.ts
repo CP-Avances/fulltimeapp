@@ -50,7 +50,7 @@ export class PermisosListaComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.codigo = String(localStorage.getItem('codigo'));
+    this.codigo = String(localStorage.getItem('empleadoID'));
     this.BuscarFormatos();
     this.cambioPaginaActual();
   }
@@ -107,6 +107,7 @@ export class PermisosListaComponent implements OnInit, OnDestroy {
     this.subscripted = this.permisosService.getListaPermisosByCodigo(this.codigo)
       .subscribe(
         permisos => {
+          console.log("ver permisos", permisos)
           this.permisos = permisos;
 
           this.permisos.forEach(p => {

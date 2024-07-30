@@ -14,7 +14,7 @@ import { Socket } from 'ngx-socket-io';
 export class PermisosService {
 
   private apiUrl = environment.url;
-  private recursoURL = 'http://192.168.100.4:3001';
+  private recursoURL = 'http://192.168.0.127:3001';
   //private recursoURL = 'http://186.4.226.49:3001';
 
 
@@ -144,7 +144,9 @@ export class PermisosService {
       )
   }
 
-  postNuevoPermiso(permiso: Permiso): Observable<Permiso> {
+
+  /*
+  postNuevoPermiso(permiso: any): Observable<Permiso> {
     const cdepar: any = localStorage.getItem('cdepar');
     const url = `${this.apiUrl}/empleadoPermiso/insert-permiso`;
     const params = new HttpParams()
@@ -155,6 +157,15 @@ export class PermisosService {
         catchError(this.handleError)
       )
   }
+
+  */
+
+
+   // METODO PARA REGISTRAR SOLICITUD DE PERMISO
+   postNuevoPermiso(datos: any) {
+    return this.http.post<any>(`${environment.url}/empleadoPermiso`, datos);
+  }
+
 
   putPermiso(permiso: Permiso): Observable<any> {
     const url = `${this.apiUrl}/permisos/update-permiso`;
