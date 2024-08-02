@@ -954,6 +954,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   //Metodo para registrar la solicitud y guardar
   SaveRegister() {
 
+    let subir_documento = false
     this.reg.fecha_inicio = this.fecha_inicio;
     this.reg.fecha_final = this.fecha_final;
 
@@ -971,9 +972,14 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       this.reg.hora_salida = this.validar.TiempoFormatoHHMMSS(this.reg.hora_salida!);
       this.reg.hora_ingreso = this.validar.TiempoFormatoHHMMSS(this.reg.hora_ingreso!);
     }
+    let formData = new FormData();
 
     if (this.archivoSubido != null) {
+      subir_documento = true;
       this.reg.documento = this.archivoSubido[0].name; // Inserta el nombre del archivo al subir
+      for (var i = 0; i < this.archivoSubido.length; i++) {
+        formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+      }
     } else {
       this.reg.documento = '';
     }
@@ -982,32 +988,35 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.reg.ip = localStorage.getItem('ip')
 
 
-    console.log('this.reg: ', this.reg);
+    console.log('this.reg: ', this.reg);  
+    console.log('ver subir Documento: ', subir_documento);  
 
-    let datosPermiso = {
-      id_empl_contrato: this.reg.id_empleado_contrato,
-      id_peri_vacacion: this.reg.id_periodo_vacacion,
-      depa_user_loggin: localStorage.getItem('cdepar'),
-      id_tipo_permiso: this.reg.id_tipo_permiso,
-      id_empl_cargo: this.reg.id_empleado_cargo,
-      fec_creacion: this.reg.fecha_creacion,
-      hora_ingreso: this.reg.hora_ingreso,
-      descripcion: this.reg.descripcion,
-      hora_numero: this.reg.horas_permiso,
-      num_permiso: this.reg.numero_permiso,
-      hora_salida: this.reg.hora_salida,
-      legalizado: this.reg.legalizado,
-      fec_inicio: this.reg.fecha_inicio,
-      fec_final: this.reg.fecha_final,
-      dia_libre: this.reg.dia_libre,
-      id_empleado: this.reg.id_empleado,
-      estado: this.reg.estado,
-      dia: this.reg.dias_permiso,
-      user_name: this.reg.user_name,
-      ip: localStorage.getItem('ip'),
-      subir_documento: this.reg.documento
-    }
-    this.subscripted = this.permisoService.postNuevoPermiso(datosPermiso).subscribe(
+    formData.append('id_empl_contrato', this.reg.id_empleado_contrato as any);
+    formData.append('id_peri_vacacion', this.reg.id_periodo_vacacion as any);
+    formData.append('depa_user_loggin', localStorage.getItem('cdepar') as string);
+    formData.append('id_tipo_permiso', this.reg.id_tipo_permiso as any);
+    formData.append('id_empl_cargo', this.reg.id_empleado_cargo as any);
+    formData.append('fec_creacion', this.reg.fecha_creacion as string);
+    formData.append('hora_ingreso', this.reg.hora_ingreso as string);
+    formData.append('descripcion', this.reg.descripcion as string);
+    formData.append('hora_numero', this.reg.horas_permiso as string);
+    formData.append('num_permiso', this.reg.numero_permiso as any);
+    formData.append('hora_salida', this.reg.hora_salida as string);
+    formData.append('legalizado', this.reg.legalizado as any);
+    formData.append('fec_inicio', this.reg.fecha_inicio as string);
+    formData.append('fec_final', this.reg.fecha_final as string);
+    formData.append('dia_libre', this.reg.dia_libre as any);
+    formData.append('id_empleado', this.reg.id_empleado as string);
+    formData.append('estado', this.reg.estado as any);
+    formData.append('dia', this.reg.dias_permiso as any);
+    formData.append('user_name', this.reg.user_name as string);
+    formData.append('ip', localStorage.getItem('ip') as string);
+    formData.append('subir_documento', subir_documento as any);
+    formData.append('codigo', localStorage.getItem('codigo') as string);
+    formData.append('documento', this.reg.documento as string);
+
+   
+    this.subscripted = this.permisoService.postNuevoPermiso(formData).subscribe(
       permiso => {
         permiso.EmpleadosSendNotiEmail = []
         permiso.EmpleadosSendNotiEmail.push(this.solInfo);
@@ -1055,7 +1064,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         this.reg.documento = name;
         console.log("nombre del archivo", this.reg.documento)
         this.validaciones.showToast('Archivo valido', 3500, 'success');
-        
+
       }
     }
 

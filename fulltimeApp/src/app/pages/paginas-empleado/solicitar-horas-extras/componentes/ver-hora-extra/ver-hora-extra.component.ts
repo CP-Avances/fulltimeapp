@@ -10,7 +10,7 @@ export class VerHoraExtraComponent {
 
   @Input() hora_extra: HoraExtra;
 
-  hipervinculo: string = 'http://192.168.0.193:3001';
+  hipervinculo: string = 'http://192.168.0.107:3001';
 
   constructor() { }
 }

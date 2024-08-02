@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { tap } from 'rxjs/operators';
 import { HorarioE } from '../interfaces/Horarios';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -24,13 +25,14 @@ export class EmpleadosService {
     return this.http.get<any>(`${this.apiUrl}/empleado/lista`)
   }
 
+
+
+   // BUSCAR UN REGISTRO DE USUARIO  --**VERIFICADO
+   BuscarUnEmpleado(id: number): Observable<any> {
+    return this.http.get<any>(`${environment.url}/empleado/${id}`);
+  }
+
   
-
-
-
-
-
-
   ObtenerHorariosEmpleado(codigo: number | string) {
     const params = new HttpParams()
       .set('codigo', codigo);

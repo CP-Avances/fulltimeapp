@@ -14,7 +14,7 @@ import { Socket } from 'ngx-socket-io';
 export class PermisosService {
 
   private apiUrl = environment.url;
-  private recursoURL = 'http://192.168.0.127:3001';
+  private recursoURL = 'http://192.168.0.107:3001';
   //private recursoURL = 'http://186.4.226.49:3001';
 
 
@@ -39,14 +39,14 @@ export class PermisosService {
    **********************************************************************  
    */
 
-   
 
-   getPermisoIdyCodigo(codigo: any, id: any): Observable<Permiso[]> {
+
+  getPermisoIdyCodigo(codigo: any, id: any): Observable<Permiso[]> {
     const url = `${this.apiUrl}/permisos/obtener-permiso`;
     const params = new HttpParams()
       .set('codigo', codigo)
-      .set('id',id)
-    return this.http.get<Permiso[]>(url, {params})
+      .set('id', id)
+    return this.http.get<Permiso[]>(url, { params })
       .pipe(
         tap(console.log),
         catchError(this.handleError)
@@ -84,7 +84,7 @@ export class PermisosService {
       )
   }
 
-  getlistaPermisosByFechasyCodigo(fec_inicio: string, fec_final: string, codigo: number | string): Observable <Permiso[]>{
+  getlistaPermisosByFechasyCodigo(fec_inicio: string, fec_final: string, codigo: number | string): Observable<Permiso[]> {
     const url = `${this.apiUrl}/empleadoPermiso/lista-permisosfechas`;
     const params = new HttpParams()
       .set('fec_inicio', fec_inicio)
@@ -97,7 +97,7 @@ export class PermisosService {
       )
   }
 
-  getlistaPermisosByFechasyCodigoEdit(fec_inicio: string, fec_final: string, codigo: number | string, id: number): Observable <Permiso[]>{
+  getlistaPermisosByFechasyCodigoEdit(fec_inicio: string, fec_final: string, codigo: number | string, id: number): Observable<Permiso[]> {
     const url = `${this.apiUrl}/permisos/lista-permisosfechasedit`;
     const params = new HttpParams()
       .set('fec_inicio', fec_inicio)
@@ -111,7 +111,7 @@ export class PermisosService {
       )
   }
 
-  getlistaPermisosByHorasyCodigo(fec_inicio: string, fec_final: string, hora_inicio: string, hora_final: string, codigo: number | string ): Observable <Permiso[]>{
+  getlistaPermisosByHorasyCodigo(fec_inicio: string, fec_final: string, hora_inicio: string, hora_final: string, codigo: number | string): Observable<Permiso[]> {
     const url = `${this.apiUrl}/empleadoPermiso/lista-permisoshoras`;
     const params = new HttpParams()
       .set('fec_inicio', fec_inicio)
@@ -127,7 +127,7 @@ export class PermisosService {
       )
   }
 
-  getlistaPermisosByHorasyCodigoEdit(fec_inicio: string, fec_final: string, hora_inicio: string, hora_final: string, codigo: number | string, id: number): Observable <Permiso[]>{
+  getlistaPermisosByHorasyCodigoEdit(fec_inicio: string, fec_final: string, hora_inicio: string, hora_final: string, codigo: number | string, id: number): Observable<Permiso[]> {
     const url = `${this.apiUrl}/permisos/lista-permisoshorasedit`;
     const params = new HttpParams()
       .set('fec_inicio', fec_inicio)
@@ -136,7 +136,7 @@ export class PermisosService {
       .set('hora_final', hora_final)
       .set('codigo', codigo)
       .set('id', id)
- 
+
     return this.http.get<Permiso[]>(url, { params })
       .pipe(
         tap(console.log),
@@ -161,22 +161,26 @@ export class PermisosService {
   */
 
 
-   // METODO PARA REGISTRAR SOLICITUD DE PERMISO
-   postNuevoPermiso(datos: any) {
+  // METODO PARA REGISTRAR SOLICITUD DE PERMISO
+  postNuevoPermiso(datos: any) {
     return this.http.post<any>(`${environment.url}/empleadoPermiso`, datos);
   }
 
 
-  putPermiso(permiso: Permiso): Observable<any> {
+  putPermiso(id: number, datos: any) {
+    /*
     const url = `${this.apiUrl}/permisos/update-permiso`;
     return this.http.put<any>(url, permiso)
       .pipe(
         tap(console.log),
         catchError(this.handleError)
       )
+        */
+    return this.http.put<any>(`${environment.url}/empleadoPermiso/${id}/permiso-solicitado`, datos);
+
   }
 
-  pruebaConsulta(): Observable<any>{
+  pruebaConsulta(): Observable<any> {
     const url = `${this.apiUrl}/permisos/consulta`;
     return this.http.get<any>(url)
       .pipe(
@@ -185,7 +189,7 @@ export class PermisosService {
       )
   }
 
- 
+
 
   BuscarPermisosSolicitados(datos: any) {
     return this.http.post<any>(`${this.recursoURL}/empleadoPermiso/permisos-solicitados/movil`, datos);
@@ -201,6 +205,6 @@ export class PermisosService {
     return this.http.delete(`${this.recursoURL}/empleadoPermiso/eliminar-movil/${documento}/validar/${codigo}`);
   }
 
-  
+
 
 }

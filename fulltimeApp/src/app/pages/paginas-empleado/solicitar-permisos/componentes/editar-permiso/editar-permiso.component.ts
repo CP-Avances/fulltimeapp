@@ -1082,7 +1082,7 @@ export class EditarPermisoComponent implements OnInit {
     this.reg.user_name = this.userService.username;
     this.reg.ip = localStorage.getItem('ip')
 
-    this.subscripted = this.permisoService.putPermiso(this.reg).subscribe(
+    this.subscripted = this.permisoService.putPermiso(this.reg.id ,this.reg).subscribe(
       permiso => {
         this.reg.id_tipo_permiso = this.cg_permiso.id;
         if (this.archivoSubido != null) { this.updataArchivo(permiso) }
