@@ -124,8 +124,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
           vaca_mail: res.vacacion_mail,
           vaca_noti: res.vacacion_notificacion,
           empleado: res.id_empleado,
-          id_suc: res.id_sucursal,
-          id_dep: res.id_departamento,
+          id_suc: res.id_suc,
+          id_dep: res.id_depa,
           estado: estado,
           correo: res.correo,
         }
@@ -423,7 +423,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     autorizacion.id_departamento = parseInt(localStorage.getItem('cdepar'));
     autorizacion.id_permiso = autorizacion.id_hora_extra = autorizacion.id_plan_hora_extra = null;
     autorizacion.id_vacacion = vacacion.id;
-    autorizacion.id_autoriza_estado = ''
+    autorizacion.id_documento = ''
     autorizacion.user_name = this.userService.username;
     autorizacion.ip = localStorage.getItem('ip');
     this.autorizaciones.postNuevaAutorizacion(autorizacion).subscribe(

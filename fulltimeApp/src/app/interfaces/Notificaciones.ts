@@ -94,7 +94,7 @@ export const notificacionTimbreValueDefault = {
 }
 
 export interface SettingsInfoEmpleado {
-    id_departamento: number;
+    id_depa: number;
     id_empleado: number;
     vacacion_mail: boolean;
     vacacion_notificacion: boolean;
@@ -111,6 +111,6 @@ export interface SettingsInfoEmpleado {
     nsucursal: string;
     codigo: number | string;
     estado: number;
-    id_sucursal: number;
+    id_suc: number;
     id_contrato: number;
 }

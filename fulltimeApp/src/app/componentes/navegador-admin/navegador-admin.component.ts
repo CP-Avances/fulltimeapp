@@ -156,6 +156,7 @@ export class NavegadorAdminComponent implements OnInit {
     //Carga y Muestra el numero de notificaciones,   
     this.notificacionService.getNotificacionesByIdEmpleado(id_empleado).subscribe(
       notificacion => {
+        console.log("ver todas la notificaciones del empleado: ", notificacion )
         this.notificaciones = notificacion;
 
         this.notificacionService.getNotificacionesTimbreByIdEmpleado(id_empleado).subscribe(

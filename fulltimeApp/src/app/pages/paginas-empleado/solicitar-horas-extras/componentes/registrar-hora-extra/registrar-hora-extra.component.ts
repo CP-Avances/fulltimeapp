@@ -107,8 +107,8 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
           hora_extra_mail: res.hora_extra_mail,
           hora_extra_noti: res.hora_extra_notificacion,
           empleado: res.id_empleado,
-          id_suc: res.id_sucursal,
-          id_dep: res.id_departamento,
+          id_suc: res.id_suc,
+          id_dep: res.id_depa,
           estado: estado,
           correo: res.correo,
         }
@@ -395,7 +395,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     autorizacion.id_departamento = parseInt(localStorage.getItem('cdepar'));
     autorizacion.id_vacacion = autorizacion.id_permiso = autorizacion.id_plan_hora_extra = null;
     autorizacion.id_hora_extra = horaExtra.id;
-    autorizacion.id_autoriza_estado = '';
+    autorizacion.id_documento = '';
     autorizacion.user_name = this.userService.username;
     autorizacion.ip = localStorage.getItem('ip');
 

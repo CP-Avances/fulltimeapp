@@ -42,7 +42,7 @@ export class PermisosService {
 
 
   getPermisoIdyCodigo(codigo: any, id: any): Observable<Permiso[]> {
-    const url = `${this.apiUrl}/permisos/obtener-permiso`;
+    const url = `${this.apiUrl}/empleadoPermiso/obtener-permiso`;
     const params = new HttpParams()
       .set('codigo', codigo)
       .set('id', id)
@@ -189,22 +189,16 @@ export class PermisosService {
       )
   }
 
-
-
   BuscarPermisosSolicitados(datos: any) {
     return this.http.post<any>(`${this.recursoURL}/empleadoPermiso/permisos-solicitados/movil`, datos);
   }
-
   // METODO PARA SUBIR ARCHIVOS DE PERMISOS
   SubirArchivoRespaldo(formData: any, id: number, codigo: any, archivo: any) {
     return this.http.put(`${this.recursoURL}/empleadoPermiso/${id}/archivo/${archivo}/validar/${codigo}`, formData)
   }
-
   // METODO PARA ELIMINAR ARCHIVOS DE PERMISOS
   EliminarArchivo(documento: string, codigo: any) {
     return this.http.delete(`${this.recursoURL}/empleadoPermiso/eliminar-movil/${documento}/validar/${codigo}`);
   }
-
-
 
 }

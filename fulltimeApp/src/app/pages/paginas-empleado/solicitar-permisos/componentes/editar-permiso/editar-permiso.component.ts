@@ -261,8 +261,8 @@ export class EditarPermisoComponent implements OnInit {
           permiso_mail: res.permiso_mail,
           permiso_noti: res.permiso_notificacion,
           empleado: res.id_empleado,
-          id_dep: res.id_departamento,
-          id_suc: res.id_sucursal,
+          id_dep: res.id_depa,
+          id_suc: res.id_suc,
           estado: estado!,
           correo: res.correo,
         }
@@ -1045,6 +1045,7 @@ export class EditarPermisoComponent implements OnInit {
   //Metodo para actualizar la solicitud
   permisoEdit: any = [];
   UpdateRegister() {
+    let subir_documento = false
 
     let validadionesFechasHoras: boolean;
     this.loadingBtn = true;
@@ -1082,7 +1083,47 @@ export class EditarPermisoComponent implements OnInit {
     this.reg.user_name = this.userService.username;
     this.reg.ip = localStorage.getItem('ip')
 
-    this.subscripted = this.permisoService.putPermiso(this.reg.id ,this.reg).subscribe(
+    console.log("ver permiso que se editara", this.reg)
+
+    let formData = new FormData();
+
+    if (this.archivoSubido != null) {
+      subir_documento = true;
+      this.reg.documento = this.archivoSubido[0].name; // Inserta el nombre del archivo al subir
+      for (var i = 0; i < this.archivoSubido.length; i++) {
+        formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+      }
+    } else {
+      this.reg.documento = '';
+    }
+
+    console.log('ver subir Documento: ', subir_documento);
+    formData.append('id_peri_vacacion', this.reg.id_periodo_vacacion as any);
+    formData.append('depa_user_loggin', localStorage.getItem('cdepar') as string);
+    formData.append('id_tipo_permiso', this.reg.id_tipo_permiso as any);
+    formData.append('fec_edicion', this.reg.fecha_edicion as string);
+    formData.append('hora_ingreso', this.reg.hora_ingreso as string);
+    formData.append('descripcion', this.reg.descripcion as string);
+    formData.append('hora_numero', this.reg.horas_permiso as string);
+    formData.append('num_permiso', this.reg.numero_permiso as any);
+    formData.append('hora_salida', this.reg.hora_salida as string);
+    //formData.append('legalizado', this.reg.legalizado as any);
+    formData.append('fec_inicio', this.reg.fecha_inicio as string);
+    formData.append('fec_final', this.reg.fecha_final as string);
+    formData.append('dia_libre', this.reg.dia_libre as any);
+    formData.append('id_empleado', this.reg.id_empleado as string);
+   // formData.append('estado', this.reg.estado as any);
+    formData.append('dia', this.reg.dias_permiso as any);
+    formData.append('user_name', this.reg.user_name as string);
+    formData.append('ip', localStorage.getItem('ip') as string);
+    formData.append('subir_documento', subir_documento as any);
+    formData.append('codigo', localStorage.getItem('codigo') as string);
+    formData.append('documento', this.reg.documento as string);
+
+
+    console.log("ver permiso a ingresar", formData)
+
+    this.subscripted = this.permisoService.putPermiso(this.reg.id, formData).subscribe(
       permiso => {
         this.reg.id_tipo_permiso = this.cg_permiso.id;
         if (this.archivoSubido != null) { this.updataArchivo(permiso) }
@@ -1131,14 +1172,15 @@ export class EditarPermisoComponent implements OnInit {
   updataArchivo(permiso: any) {
     if (this.archivoSubido[0].name != this.reg.documento) {
       this.permisoService.EliminarArchivo(this.reg.documento!, this.permiso.id_empleado).subscribe(res => {
-        this.subirRespaldo(permiso);
+      //this.subirRespaldo(permiso);
       })
     } else {
-      this.subirRespaldo(permiso);
+     // this.subirRespaldo(permiso);
     }
   }
 
   //Metodo para subir (cargar) el archivo al servidor
+  
   subirRespaldo(permiso: any) {
     var id = permiso.id;
     let formData = new FormData();
@@ -1152,7 +1194,8 @@ export class EditarPermisoComponent implements OnInit {
       formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
     }
 
-    this.permisoService.SubirArchivoRespaldo(formData, id, this.permiso.id_empleado, null).subscribe(res => {
+
+    this.permisoService.SubirArchivoRespaldo(formData, id, this.permiso.id_empleado, this.archivoSubido).subscribe(res => {
       this.validaciones.showToast('El archivo se actualizo Correctamente', 3000, 'success');
       this.reg.documento = '';
 
@@ -1162,6 +1205,8 @@ export class EditarPermisoComponent implements OnInit {
 
     });
   }
+
+  
 
   //Metodo para eliminar el archivo de permiso
   deleteDocumentoPermiso() {
@@ -1185,12 +1230,12 @@ export class EditarPermisoComponent implements OnInit {
     }
     this.autorizacion.BuscarJefes(datos).subscribe(permiso => {
       permiso.EmpleadosSendNotiEmail.push(this.solInfo);
-     // this.EnviarCorreoPermiso(permiso);
+      // this.EnviarCorreoPermiso(permiso);
       this.EnviarNotificacionPermiso(permiso);
     });
   }
 
-  
+
   EnviarNotificacionPermiso(permiso: any) {
 
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE PERMISO

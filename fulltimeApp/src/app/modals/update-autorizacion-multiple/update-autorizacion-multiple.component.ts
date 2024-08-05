@@ -222,8 +222,8 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
                       permiso_mail: res.permiso_mail,
                       permiso_noti: res.permiso_notificacion,
                       empleado: res.id_empleado,
-                      id_dep: res.id_departamento,
-                      id_suc: res.id_sucursal,
+                      id_dep: res.id_depa,
+                      id_suc: res.id_suc,
                       estado: estado,
                       correo: res.correo,
                     }
@@ -288,8 +288,8 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
                     vaca_mail: res.vacacion_mail,
                     vaca_noti: res.vacacion_notificacion,
                     empleado: res.id_empleado,
-                    id_suc: res.id_sucursal,
-                    id_dep: res.id_departamento,
+                    id_suc: res.id_suc,
+                    id_dep: res.id_depa,
                     estado: estado,
                     correo: res.correo,
                   }
@@ -347,8 +347,8 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
                   hora_extra_mail: res.hora_extra_mail,
                   hora_extra_noti: res.hora_extra_notificacion,
                   empleado: res.id_empleado,
-                  id_suc: res.id_sucursal,
-                  id_dep: res.id_departamento,
+                  id_suc: res.id_suc,
+                  id_dep: res.id_depa,
                   estado: estado,
                   correo: res.correo,
                 }
@@ -588,7 +588,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
             a.estado = this.estadoChange.id
             const data = {
               estado: a.estado,
-              id_autoriza_estados: a.id_autoriza_estado + `${localStorage.getItem("empleadoID")}_${this.estadoChange.id},`,
+              id_autoriza_estados: a.id_documento + `${localStorage.getItem("empleadoID")}_${this.estadoChange.id},`,
               user_name: this.dataUserServices.username,
               ip: localStorage.getItem('ip')
             }

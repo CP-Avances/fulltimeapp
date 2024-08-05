@@ -96,25 +96,28 @@ export class AutorizacionesService {
   }
 
   postNuevaAutorizacion(data: Autorizacion): Observable<any> {
+    /*
     console.log('autorizacion creada: ',data);
     const url = `${this.apiUrl}/autorizaciones/insert`;
     return this.http.post<any>(url, data)
       .pipe(
         tap(console.log),
       )
+      */
+    return this.http.post(`${environment.url}/autorizaciones`, data);
   }
 
   // METODO PARA BUSCAR USUARIO AUTORIZA
-  BuscarAutoridadUsuarioDepa(id: any): Observable <Autorizacion> {
+  BuscarAutoridadUsuarioDepa(id: any): Observable<Autorizacion> {
     const url = `${this.apiUrl}/autorizaciones/autorizaUsuarioDepa/${id}`;
     const params = new HttpParams()
       .set('id_empleado', id)
       .set('campo', 'id')
-    return this.http.get<Autorizacion>(url, {params})
-    .pipe(
-      tap(console.log),
-      catchError(this.handleError)
-    )
+    return this.http.get<Autorizacion>(url, { params })
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
+      )
   }
 
   BuscarListaAutorizaDepa(id_depar: any) {
@@ -144,7 +147,7 @@ export class AutorizacionesService {
    */
 
   getNotificacionesByIdEmpleado(id_empleado: string | number): Observable<Notificacion[]> {
-    const url = `${this.apiUrl}/notificaciones/all-noti`;
+    const url = `${this.apiUrl}/noti-real-time/all-noti`;
     const params = new HttpParams()
       .set('id_empleado', id_empleado)
     return this.http.get<Notificacion[]>(url, { params })
@@ -154,12 +157,17 @@ export class AutorizacionesService {
   }
 
   postNotificacion(datos: any): Observable<any> {
-    console.log("Notificacion enviada: ",datos);
+    /*
+    console.log("Notificacion enviada: ", datos);
     const url = `${this.apiUrl}/notificaciones/`;
     return this.http.post<any>(url, datos)
       .pipe(
         tap(console.log)
       )
+        */
+
+    return this.http.post<any>(`${environment.url}/noti-real-time`, datos);
+
   }
 
   /******************************************************
@@ -170,7 +178,7 @@ export class AutorizacionesService {
    */
 
   getNotificacionesTimbreByIdEmpleado(id_empleado: string | number): Observable<NotificacionTimbre[]> {
-    const url = `${this.apiUrl}/notificacionSistema/noti-tim/all-noti`;
+    const url = `${this.apiUrl}/noti-real-time/noti-tim/all-noti`;
     const params = new HttpParams()
       .set('id_empleado', id_empleado)
     return this.http.get<Notificacion[]>(url, { params })

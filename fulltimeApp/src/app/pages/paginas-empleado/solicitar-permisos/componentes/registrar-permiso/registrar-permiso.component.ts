@@ -145,7 +145,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       this.readonly = false;
     }
 
-    // this.obtenerInformacionEmpleado();
+    this.obtenerInformacionEmpleado();
     this.BuscarFormatos();
   }
 
@@ -163,7 +163,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
   //TODO obtenerInformacionEmpleado
   solInfo: any;
-  /*
+  
   obtenerInformacionEmpleado() {
 
     console.log("ve id empleado",this.reg.id_empleado);
@@ -180,16 +180,15 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
           permiso_mail: res.permiso_mail,
           permiso_noti: res.permiso_notificacion,
           id_empleado: res.id_empleado,
-          id_dep: res.id_departamento,
-          id_suc: res.id_sucursal,
+          id_dep: res.id_depa,
+          id_suc: res.id_suc,
           estado: estado!,
           correo: res.correo,
-
         }
       }
     );
   }
-  */
+  
 
   /** ******************************************************************************************* **
     ** **                            MANEJO DE VARIABLES INPUT                                 ** **
@@ -1017,9 +1016,13 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
    
     this.subscripted = this.permisoService.postNuevoPermiso(formData).subscribe(
-      permiso => {
+      x => {
+        console.log("Ver permiso insertado: ", x.permiso)
+        let permiso = x.permiso
         permiso.EmpleadosSendNotiEmail = []
         permiso.EmpleadosSendNotiEmail.push(this.solInfo);
+
+        console.log("ver informacion de solicitud: ", permiso.EmpleadosSendNotiEmail )
         this.CrearNuevaAutorizacion(permiso);
         this.num_permiso = this.num_permiso + 1;
         this.closeModalComponent.closeModal(true);
@@ -1091,7 +1094,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     autorizacion.id_departamento = parseInt(localStorage.getItem('cdepar')!);
     autorizacion.id_vacacion = autorizacion.id_hora_extra = autorizacion.id_plan_hora_extra = null;
     autorizacion.id_permiso = permiso.id;
-    autorizacion.id_autoriza_estado = ''
+    autorizacion.id_documento = ''
     autorizacion.user_name = this.userService.username;
     autorizacion.ip = localStorage.getItem('ip');
 
@@ -1138,10 +1141,10 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
     allNotificaciones.forEach(item => {
       let notificacion: any = {
-        id_empleado_envia: parseInt(localStorage.getItem('empleadoID')),
-        id_empleado_recibe: item.id_empleado,
-        id_departamento_recibe: item.id_dep,
-        fecha_hora: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
+        id_send_empl: parseInt(localStorage.getItem('empleadoID')),
+        id_receives_empl: item.id_empleado,
+        id_receives_depa: item.id_dep,
+        //fecha_hora: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
         estado: 'Pendiente',
         id_permiso: permiso.id,
         id_vacaciones: null,
@@ -1151,6 +1154,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         user_name: this.userService.username,
         ip: localStorage.getItem('ip')
       }
+
+      console.log("ver datos de la notificacion", notificacion)
 
       if (item.permiso_noti) {
         this.autorizaciones.postNotificacion(notificacion).subscribe(

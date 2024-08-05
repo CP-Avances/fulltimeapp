@@ -124,8 +124,8 @@ export class EditarVacacionComponent implements OnInit {
           vaca_mail: res.vacacion_mail,
           vaca_noti: res.vacacion_notificacion,
           empleado: res.id_empleado,
-          id_suc: res.id_sucursal,
-          id_dep: res.id_departamento,
+          id_suc: res.id_suc,
+          id_dep: res.id_depa,
           estado: estado,
           correo: res.correo,
         }

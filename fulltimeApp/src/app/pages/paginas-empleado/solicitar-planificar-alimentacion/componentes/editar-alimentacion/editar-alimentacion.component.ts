@@ -132,7 +132,7 @@ export class EditarAlimentacionComponent implements OnInit {
           empleado: res.id_empleado,
           estado: estado,
           correo: res.correo,
-          id_dep: res.id_departamento,
+          id_dep: res.id_depa,
         }
       })
   }

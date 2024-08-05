@@ -88,7 +88,7 @@ export const postNotificacion = async (req: Request, res: Response): Promise<Res
  * obtener registro de la tabla de realtime_timbres
  * @returns 
  */
-export const getNotificacionTimbres = async (req: Request, res: Response): Promise<Response> => {
+export const c = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { id_empleado } = req.query;
         const subquery1 = `( select (i.nombre || ' ' || i.apellido) from eu_empleados i where i.id = r.id_empleado_envia ) as nempleadosend`

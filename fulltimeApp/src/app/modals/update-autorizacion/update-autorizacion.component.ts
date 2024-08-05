@@ -179,8 +179,8 @@ export class UpdateAutorizacionComponent implements OnInit {
             permiso_mail: res.permiso_mail,
             permiso_noti: res.permiso_notificacion,
             id_empleado: res.id_empleado,
-            id_departamento: res.id_departamento,
-            id_suc: res.id_sucursal,
+            id_departamento: res.id_depa,
+            id_suc: res.id_suc,
             estado: estado,
             correo: res.correo,
           }
@@ -232,8 +232,8 @@ export class UpdateAutorizacionComponent implements OnInit {
             vaca_mail: res.vacacion_mail,
             vaca_noti: res.vacacion_notificacion,
             id_empleado: res.id_empleado,
-            id_suc: res.id_sucursal,
-            id_departamento: res.id_departamento,
+            id_suc: res.id_suc,
+            id_departamento: res.id_depa,
             estado: estado,
             correo: res.correo,
           }
@@ -271,8 +271,8 @@ export class UpdateAutorizacionComponent implements OnInit {
             hora_extra_mail: res.hora_extra_mail,
             hora_extra_noti: res.hora_extra_notificacion,
             id_empleado: res.id_empleado,
-            id_suc: res.id_sucursal,
-            id_departamento: res.id_departamento,
+            id_suc: res.id_suc,
+            id_departamento: res.id_depa,
             estado: estado,
             correo: res.correo,
           }
@@ -487,7 +487,7 @@ export class UpdateAutorizacionComponent implements OnInit {
       id_permiso: this.permiso.id,
       id_vacacion: null,
       id_hora_extra: null,
-      id_autoriza_estado: data.id_autoriza_estado,
+      id_documento: data.id_autoriza_estado,
       id_plan_hora_extra: null,
       user_name: null,
       ip: null
@@ -520,8 +520,8 @@ export class UpdateAutorizacionComponent implements OnInit {
     ** **                        METODO PARA ACTUALIZAR PERMISO                               ** **
    ** ******************************************************************************************* **/
   UpdateRegister() {
-    if (this.autorizacion.id_autoriza_estado == null && this.autorizacion.id_autoriza_estado == undefined) {
-      this.autorizacion.id_autoriza_estado = '';
+    if (this.autorizacion.id_documento == null && this.autorizacion.id_documento == undefined) {
+      this.autorizacion.id_documento = '';
     }
 
     if (this.autorizacion.estado == 1) {
@@ -531,7 +531,7 @@ export class UpdateAutorizacionComponent implements OnInit {
       this.loadingBtn = true;
       const data = {
         estado: this.estadoChange.id,
-        id_autoriza_estado: this.autorizacion.id_autoriza_estado + `${localStorage.getItem("empleadoID")}_${this.estadoChange.id},`,
+        id_autoriza_estado: this.autorizacion.id_documento + `${localStorage.getItem("empleadoID")}_${this.estadoChange.id},`,
         user_name: this.userService.username,
         ip: localStorage.getItem('ip')
       }
@@ -791,7 +791,7 @@ export class UpdateAutorizacionComponent implements OnInit {
     this.autoService.getAutorizacionVacacion(this.vacacion.id).subscribe(res2 => {
       this.autorizacion = res2;
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
-      var autorizaciones = this.autorizacion.id_autoriza_estado.split(',');
+      var autorizaciones = this.autorizacion.id_documento.split(',');
       autorizaciones.map((obj: string) => {
         this.lectura = this.lectura + 1;
         if (obj != '') {
@@ -960,7 +960,7 @@ export class UpdateAutorizacionComponent implements OnInit {
     this.autoService.getAutorizacionHoraExtra(this.hora_extra.id).subscribe(res3 => {
       this.autorizacion = res3;
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
-      var autorizaciones = this.autorizacion.id_autoriza_estado.split(',');
+      var autorizaciones = this.autorizacion.id_documento.split(',');
       autorizaciones.map((obj: string) => {
         this.lectura = this.lectura + 1;
         if (obj != '') {
