@@ -19,7 +19,7 @@ export const VerDetalleParametro = async (req: Request, res: Response): Promise<
         return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
 };
-
+//LOOK ME
 export const CompararCoordenadas = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { lat1, lng1, lat2, lng2, valor } = req.body;

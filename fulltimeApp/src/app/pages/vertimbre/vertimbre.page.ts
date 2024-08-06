@@ -80,7 +80,7 @@ export class VertimbrePage implements OnInit {
       resp => {
         this.formato_fecha = resp.fecha;
         this.formato_hora = resp.hora;
-        this.obtenerTimbres(localStorage.getItem('empleadoID'));
+        this.obtenerTimbres(localStorage.getItem('codigo'));
 
       }
     )
@@ -88,7 +88,7 @@ export class VertimbrePage implements OnInit {
 
   mostrarTimbres() {
     this.timbres_filtro = [];
-    this.obtenerTimbres(localStorage.getItem('empleadoID'));
+    this.obtenerTimbres(localStorage.getItem('codigo'));
     this.paginafiltro = 0;
     this.pageTodos = 1;
     this.todos = false;
@@ -153,9 +153,9 @@ export class VertimbrePage implements OnInit {
     return 0;
   }
 
-  obtenerTimbres(idEmpleado) {
+  obtenerTimbres(codigo) {
     this.timbres = [];
-    this.relojService.obtenerTimbres(idEmpleado).subscribe(
+    this.relojService.obtenerTimbres(codigo).subscribe(
       res => {
 
         let fechasObjeto = {}

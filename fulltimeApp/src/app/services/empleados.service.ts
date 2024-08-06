@@ -22,7 +22,7 @@ export class EmpleadosService {
    * Campos q trae { id, fullname, codigo, cedula}
    */
   ObtenerListaEmpleados() {
-    return this.http.get<any>(`${this.apiUrl}/empleado/lista`)
+    return this.http.get<any>(`${this.apiUrl}/empleado/todosempleados/lista`)
   }
 
 
@@ -55,7 +55,7 @@ export class EmpleadosService {
   getPlanificacionHorariosEmplbyCodigo(codigo){
     const params = new HttpParams()
       .set('codigo', codigo)
-    return this.http.get<HorarioE[]>(`${this.apiUrl}/empleado/planificacionHorarioEmplCodigo`, { params })
+    return this.http.get<HorarioE[]>(`${this.apiUrl}/empleado/horariosempleado/planificacionHorarioEmplCodigo`, { params })
       .pipe(
         tap(console.log)
       )
@@ -87,8 +87,9 @@ export class EmpleadosService {
       )
   }
 
-  ObtenerUbicacion(codigo: any) {
-    return this.http.get<any>(this.apiUrl + '/empleado/ubicacion/' + codigo);
+  ObtenerUbicacion(id: any) {
+    return this.http.get<any>(`${environment.url}/empleado/ubicacion/${id}`);
+
   }
 
   // METODO PARA BUSCAR INFORMACION DEL USUARIO QUE APRUEBA SOLICITUDES

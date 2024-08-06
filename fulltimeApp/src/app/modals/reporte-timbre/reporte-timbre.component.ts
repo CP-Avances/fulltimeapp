@@ -178,7 +178,7 @@ export class ReporteTimbreComponent implements OnInit {
     return [{
       style: 'tableMargin',
       table: {
-        widths: ['auto', '*', '*', '*', '*', 'auto', 'auto', '*', '*', '*'],
+        widths: ['auto', '*', '*', '*', '*', 'auto', 'auto', '*', 'auto', 'auto'],
         body: [
           [
             { rowSpan: 2, text: 'N.', style: 'tableHeader' },

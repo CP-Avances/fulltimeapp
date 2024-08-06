@@ -26,7 +26,7 @@ export class ReportesService {
       .set('codigo', codigo)
       .set('fec_inicio', fec_inicio)
       .set('fec_final', fec_final)
-    return this.http.get<Timbre[]>(`${this.api_url}/reportes/timbres`, { params })
+    return this.http.get<Timbre[]>(`${this.api_url}/reporte/timbres`, { params })
       .pipe(
         tap(console.log),
         catchError(this.handleError)

@@ -14,7 +14,7 @@ export class TimbresService {
   ) { }
 
   getTimbresEmpleadoByCodigo(codigo: number | string) {
-    return this.http.get<any>(`${this.api_url}/ring/timbreEmpleado/${codigo}`)
+    return this.http.get<any>(`${this.api_url}/timbres/timbreEmpleado/${codigo}`)
   }
 
   PostTimbreWebAdmin(datos: any) {
@@ -26,7 +26,7 @@ export class TimbresService {
   }
 
   PostJustificacionAtraso(datos: any) {
-    return this.http.post<any>(`${this.api_url}/ring/atraso`, datos)
+    return this.http.post<any>(`${this.api_url}/timbres/atraso`, datos)
   }
 
 

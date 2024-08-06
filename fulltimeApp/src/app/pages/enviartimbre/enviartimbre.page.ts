@@ -90,7 +90,6 @@ export class EnviartimbrePage implements OnInit {
     longitud: "",
     id_reloj: 97,
     ubicacion: "",
-    id_empleado: "",
     ip: "",
     user_name: ""
   };
@@ -458,9 +457,6 @@ export class EnviartimbrePage implements OnInit {
 
   //Metodo que guarda el timbre en la base de datos en la tabla timbres.
   guardarEnBDD() {
-
-    this.nuevoTimbre.id_empleado = this.id_usuario;
-
     this.nuevoTimbre.codigo = this.codigo;
     this.nuevoTimbre.tecla_funcion = this.obtenerIdTipo();
     this.nuevoTimbre.fecha_hora_timbre = this.fechaTransformada + " " + this.horaTransformada;

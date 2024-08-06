@@ -573,3 +573,5 @@ export const ObtenerConfigEmpleado = async (req: Request, res: Response): Promis
 }
 
 
+
+
