@@ -442,7 +442,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
 
     const noti: Notificacion = notificacionValueDefault;
     noti.id_vacaciones = vacacion.id;
-    noti.id_empleado_envia = parseInt(localStorage.getItem('empleadoID'));
+    noti.id_send_empl = parseInt(localStorage.getItem('empleadoID'));
     noti.id_permiso = noti.id_hora_extra = null;
     noti.fecha_hora = f.format('YYYY-MM-DD') + ' ' + f.format('HH:mm:ss');
     noti.estado = 'Pendiente';
@@ -465,8 +465,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     });
 
     allNotificaciones.forEach(e => {
-      noti.id_departamento_recibe = e.id_dep
-      noti.id_empleado_recibe = e.empleado
+      noti.id_receives_depa = e.id_dep
+      noti.id_receives_empl = e.empleado
       if (e.vaca_noti) {
         this.autorizaciones.postNotificacion(noti).subscribe(
           resp => {

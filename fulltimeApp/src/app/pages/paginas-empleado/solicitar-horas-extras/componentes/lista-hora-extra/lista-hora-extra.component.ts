@@ -48,7 +48,7 @@ export class ListaHoraExtraComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.codigo = localStorage.getItem('codigo')
+    this.codigo = localStorage.getItem('empleadoID')
     this.BuscarFormatos();
   }
 

@@ -1255,7 +1255,7 @@ export class EditarPermisoComponent implements OnInit {
 
     const noti: Notificacion = notificacionValueDefault;
     noti.id_vacaciones = noti.id_hora_extra = null;
-    noti.id_empleado_envia = parseInt(localStorage.getItem('empleadoID')!);
+    noti.id_send_empl = parseInt(localStorage.getItem('empleadoID')!);
     noti.id_permiso = permiso.id;
     noti.fecha_hora = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
     noti.estado = 'Pendiente';
@@ -1281,8 +1281,8 @@ export class EditarPermisoComponent implements OnInit {
     console.log("Usuarios que reciben la notificacion: ", allNotificaciones);
 
     allNotificaciones.forEach((e: any) => {
-      noti.id_departamento_recibe = e.id_dep;
-      noti.id_empleado_recibe = e.empleado;
+      noti.id_receives_depa = e.id_dep;
+      noti.id_receives_empl = e.empleado;
       if (e.permiso_noti) {
         this.autorizacion.postNotificacion(noti).subscribe(
           resp => {

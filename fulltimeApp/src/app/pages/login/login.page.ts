@@ -45,8 +45,7 @@ export class LoginPage implements OnInit {
   }
 
   ngOnInit() {
-
-    //this.BuscarParametro();
+    this.BuscarParametroTimbreSinInternet();
     if (!this.relojService.esPrimeraVez()) {
       this.navCtroller.navigateForward(['inicio']);
     } else if (this.relojService.estaLogueado() && this.relojService.existeRol()) {
@@ -55,7 +54,7 @@ export class LoginPage implements OnInit {
         this.navCtroller.navigateRoot(['adminpage']);
       }
 
-     else {
+      else {
         this.navCtroller.pop();
         this.navCtroller.navigateRoot(['empleado']);
       }
@@ -65,7 +64,16 @@ export class LoginPage implements OnInit {
 
   rango_dispositivos: any;
 
-  
+
+  BuscarParametroTimbreSinInternet() {
+
+    this.parametros.ObtenerDetallesParametros(13).subscribe(
+      res => {
+        console.log("ver parametro sin internet:", res[0])
+        localStorage.setItem('timbrarSinInternet',res[0].descripcion);
+      });
+  }
+
 
   infoDispositivo() {
     Device.getId().then((id) => {
@@ -120,7 +128,7 @@ export class LoginPage implements OnInit {
       console.log('ingresa ', credenciales)
 
       this.relojService.iniciarSesion(credenciales).subscribe(datos => {
-        console.log("ver datos del usuario",datos);
+        console.log("ver datos del usuario", datos);
 
         let existeId_Dispositivo: boolean;
 
@@ -169,6 +177,8 @@ export class LoginPage implements OnInit {
           //APP INFORMACION
           localStorage.setItem('ruc', datos.ruc);
           localStorage.setItem('version', datos.version);
+          //LOOK ME
+         // localStorage.setItem('horas_trabaja', res.body.empresa.hora_trabaja);
 
 
           // localStorage.setItem('bool_timbres', datos.acciones_timbres);
@@ -231,13 +241,13 @@ export class LoginPage implements OnInit {
       }, err => {
         this.usuarioIncorrectoToas("Usuario Incorrecto", 3000)
       }
-    )
+      )
     }
   }
 
   cambiodepantallas() {
-      this.navCtroller.pop();
-      this.navCtroller.navigateRoot(['adminpage']);
+    this.navCtroller.pop();
+    this.navCtroller.navigateRoot(['adminpage']);
 
     var FormId = 'formulariologin';
     var resetForm = <HTMLFormElement>document.getElementById(FormId);

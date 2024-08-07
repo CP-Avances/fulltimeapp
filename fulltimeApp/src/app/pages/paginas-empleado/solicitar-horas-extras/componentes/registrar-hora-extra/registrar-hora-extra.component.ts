@@ -272,6 +272,8 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
   }
 
   SaveRegister() {
+    let subir_documento = false
+
     this.loadingBtn = true;
     const validadionesFechas = this.calcularTiempo(true)
     if (!validadionesFechas) return
@@ -282,18 +284,44 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
 
     this.reg.ip = localStorage.getItem("ip");
     this.reg.user_name = this.userService.username;
+    let formData = new FormData();
 
     if (this.archivoSubido != null) {
+      subir_documento = true;
+
       this.reg.docu_nombre = this.archivoSubido[0].name; // Inserta el nombre del archivo al subir
+      for (var i = 0; i < this.archivoSubido.length; i++) {
+        formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+      }
     } else {
       this.reg.docu_nombre = null;
     }
 
-    this.subscripted = this.horasExtrasService.postNuevaHorasExtras(this.reg).subscribe(
+    formData.append('id_empl_cargo', this.reg.id_empleado_cargo as any);
+    formData.append('id_usua_solicita', this.reg.id_empleado_solicita as any);
+    formData.append('fec_inicio', this.reg.fecha_inicio as string);
+    formData.append('fec_final', this.reg.fecha_final as string);
+    formData.append('fec_solicita', this.reg.fecha_solicita as string);
+    formData.append('num_hora', this.reg.horas_solicitud as string);
+    formData.append('descripcion', this.reg.descripcion as string);
+    formData.append('estado', this.reg.estado as any);
+    formData.append('observacion', this.reg.observacion as any);
+    //
+    formData.append('tipo_funcion', this.reg.tipo_funcion as any);
+    formData.append('user_name', this.reg.user_name as string);
+    formData.append('ip', localStorage.getItem('ip') as string);
+    formData.append('subir_documento', this.reg.observacion as any);
+    formData.append('codigo', localStorage.getItem('codigo') as string);
+    formData.append('documento', this.reg.documento as any);
+
+    this.subscripted = this.horasExtrasService.postNuevaHorasExtras(formData).subscribe(
       horaExtra => {
         horaExtra.EmpleadosSendNotiEmail = []
         horaExtra.EmpleadosSendNotiEmail.push(this.solInfo);
-        if (this.archivoSubido != null) { this.subirRespaldo(horaExtra) }
+        /*
+        if (this.archivoSubido != null) { 
+          this.subirRespaldo(horaExtra) }
+          */
         this.CrearNuevaAutorizacion(horaExtra);
         this.CrearNuevaNotificacion(horaExtra);
         //this.SendEmailsEmpleados(horaExtra);
@@ -344,14 +372,16 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
   updataArchivo(horaExtra: any) {
     if (this.archivoSubido[0].name == this.reg.docu_nombre) {
       this.horasExtrasService.EliminarArchivoRespaldo(this.reg.documento).subscribe(res => {
-        this.subirRespaldo(horaExtra);
+        //this.subirRespaldo(horaExtra);
       })
     } else {
-      this.subirRespaldo(horaExtra);
+      //this.subirRespaldo(horaExtra);
     }
   }
 
   //Metodo para subir (cargar) el archivo al servidor
+
+  /*
   subirRespaldo(horaExtra: any) {
     var id = horaExtra.id;
     let formData = new FormData();
@@ -375,6 +405,8 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
 
     });
   }
+
+  */
 
   //Metodo para quitar el archivo de horaExtra
   deleteDocumentohoraExtra() {
@@ -418,8 +450,9 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     let h_final = this.validar.FormatearHora(moment(horaExtra.fecha_final).format('HH:mm:ss'), this.formato_hora);
 
     const noti: Notificacion = notificacionValueDefault;
+
     noti.id_hora_extra = horaExtra.id;
-    noti.id_empleado_envia = parseInt(localStorage.getItem('empleadoID'));
+    noti.id_send_empl = parseInt(localStorage.getItem('empleadoID'));
     noti.id_permiso = noti.id_vacaciones = null;
     noti.fecha_hora = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
     noti.estado = 'Pendiente';
@@ -443,8 +476,8 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     });
 
     allNotificaciones.forEach(e => {
-      noti.id_departamento_recibe = e.id_dep
-      noti.id_empleado_recibe = e.empleado
+      noti.id_receives_depa = e.id_dep
+      noti.id_receives_empl = e.empleado
       if (e.hora_extra_noti) {
         this.autorizaciones.postNotificacion(noti).subscribe(
           resp => { //this.validar.showToast(resp.message, 3000, 'success')

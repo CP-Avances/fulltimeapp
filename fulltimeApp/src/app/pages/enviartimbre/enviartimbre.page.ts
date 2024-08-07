@@ -504,7 +504,7 @@ export class EnviartimbrePage implements OnInit {
     } else {
       //SIN INTERNET
       //Proceso de almacenamiento de informacion del timbre cuendo no tiene conexion al Internet.
-      if (this.timbrarSinInternet == 'Si') {
+      if (localStorage.getItem('timbrarSinInternet') == 'Si') {
 
         console.log('entro aqui timbres sin conexion');
         if (this.geoLatitude != 0 || this.geoLongitude != 0) {
@@ -577,13 +577,14 @@ export class EnviartimbrePage implements OnInit {
   }
   BuscarParametroTimbreSinInternet() {
 
-  this.parametros.ObtenerDetallesParametros(13).subscribe(
-    res => {
-      console.log("ver parametro sin internet:", res[0])
-      this.timbrarSinInternet = res[0].descripcion;
-      console.log("ver parametro sin internet descripcion:", this.timbrarSinInternet)
-      return this.timbrarSinInternet;
-    });
+    this.parametros.ObtenerDetallesParametros(13).subscribe(
+      res => {
+        console.log("ver parametro sin internet:", res[0])
+        this.timbrarSinInternet = res[0].descripcion;
+        console.log("ver parametro sin internet descripcion:", this.timbrarSinInternet)
+        localStorage.setItem('timbrarSinInternet',res[0].descripcion);
+        return this.timbrarSinInternet;
+      });
   }
 
 

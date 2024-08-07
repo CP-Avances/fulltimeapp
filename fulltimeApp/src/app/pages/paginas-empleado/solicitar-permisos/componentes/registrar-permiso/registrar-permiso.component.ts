@@ -922,12 +922,24 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       }
 
       // 86400 seg ==> es un dia de 24 horas
+      console.log("ver cg_feriado",this.cg_feriados)
+      console.log("ver this.reg.fecha_inicio!.toString()",this.reg.fecha_inicio!.toString())
+      console.log("ver  this.reg.fecha_final!.toString()",this.reg.fecha_final!.toString())
+      console.log("ver  total",total)
+      console.log("ver this.totalhoras", this.totalhoras)
+      console.log("ver this.horarioEmpleado",  this.horarioEmpleado)
+      console.log("ver this.horas_trabaja_seg",  this.horas_trabaja_seg)
       const { dia, tiempo_transcurrido, dia_libre } =
         this.validaciones.SegundosTransformDiaLaboral(this.reg.fecha_inicio!.toString(), this.reg.fecha_final!.toString(), total, this.totalhoras, this.horarioEmpleado, this.horas_trabaja_seg, this.cg_feriados)
-      this.reg.dias_permiso = dia
+      
+      console.log("ver timpo trascurrido", tiempo_transcurrido)
+        this.reg.dias_permiso = dia
       this.reg.horas_permiso = tiempo_transcurrido
       this.reg.dia_libre = dia_libre;
 
+
+
+      console.log("ver ")
       switch (this.selectItemDiasHoras) {
         case 'Horas':
           //Por defecto ya q es permiso por solo horas.
@@ -1115,6 +1127,10 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     let desde = this.validar.FormatearFecha(String(permiso.fecha_inicio), this.formato_fecha, this.validar.dia_completo);
     let hasta = this.validar.FormatearFecha(String(permiso.fecha_final), this.formato_fecha, this.validar.dia_completo);
 
+    console.log("ver desde fecha Final", permiso.fecha_final)
+    console.log("ver hasta ", hasta)
+    console.log("ver desde fecha Final", permiso.fecha_final)
+    console.log("ver hasta ", hasta)
     let h_inicio = this.validar.FormatearHora(permiso.hora_salida!, this.formato_hora);
     let h_fin = this.validar.FormatearHora(permiso.hora_ingreso!, this.formato_hora);
 
@@ -1144,12 +1160,12 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         id_send_empl: parseInt(localStorage.getItem('empleadoID')),
         id_receives_empl: item.id_empleado,
         id_receives_depa: item.id_dep,
-        //fecha_hora: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
+        fecha_hora: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
         estado: 'Pendiente',
         id_permiso: permiso.id,
         id_vacaciones: null,
         id_hora_extra: null,
-        mensaje: 'Ha realizado una solicitud de permiso desde ' + desde + ' ' + h_inicio + ' hasta ' + hasta + ' ' + h_fin,
+        mensaje: 'Ha realizado una solicitud de permiso desde ' + permiso.fecha_inicio + ' ' + h_inicio + ' hasta ' + permiso.fecha_final + ' ' + h_fin,
         tipo: 1,
         user_name: this.userService.username,
         ip: localStorage.getItem('ip')

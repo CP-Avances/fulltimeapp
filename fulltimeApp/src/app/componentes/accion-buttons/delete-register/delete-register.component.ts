@@ -227,7 +227,7 @@ export class DeleteRegisterComponent{
 
     const noti: Notificacion = notificacionValueDefault;
     noti.id_vacaciones = noti.id_hora_extra = null;
-    noti.id_empleado_envia = parseInt(String(localStorage.getItem('empleadoID')));
+    noti.id_send_empl = parseInt(String(localStorage.getItem('empleadoID')));
     noti.id_permiso = permiso.id;
     noti.fecha_hora = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
     noti.estado = estado_p!;
@@ -251,8 +251,8 @@ export class DeleteRegisterComponent{
     console.log("Usuarios que reciben la notificacion Permiso: ",NotificacionesPermisoFiltrados);
 
     NotificacionesPermisoFiltrados.forEach((e: any) => {
-      noti.id_departamento_recibe = e.id_dep;
-      noti.id_empleado_recibe = e.empleado;
+      noti.id_receives_depa = e.id_dep;
+      noti.id_receives_empl = e.empleado;
       noti.user_name =this.dataUserServices.username;
       noti.ip =localStorage.getItem('ip');
 
@@ -309,7 +309,7 @@ export class DeleteRegisterComponent{
 
     const noti: Notificacion = notificacionValueDefault;
     noti.id_vacaciones = vacaciones.id;
-    noti.id_empleado_envia = parseInt(String(localStorage.getItem('empleadoID')));
+    noti.id_send_empl = parseInt(String(localStorage.getItem('empleadoID')));
     noti.id_permiso = noti.id_hora_extra = null;
     noti.fecha_hora = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
     noti.estado = estado_v!
@@ -333,8 +333,8 @@ export class DeleteRegisterComponent{
 
 
     NotificacionesVacacionesFiltrados.forEach((e: any) => {
-      noti.id_departamento_recibe = e.id_dep;
-      noti.id_empleado_recibe = e.empleado;
+      noti.id_receives_depa = e.id_dep;
+      noti.id_receives_empl = e.empleado;
       noti.user_name =this.dataUserServices.username;
       noti.ip =localStorage.getItem('ip');
       if (e.vaca_noti) {
@@ -383,7 +383,7 @@ export class DeleteRegisterComponent{
 
     const noti: Notificacion = notificacionValueDefault;
     noti.id_hora_extra = horaExtra.id;
-    noti.id_empleado_envia = parseInt(String(localStorage.getItem('empleadoID')));
+    noti.id_send_empl = parseInt(String(localStorage.getItem('empleadoID')));
     noti.id_permiso = noti.id_vacaciones = null;
     noti.fecha_hora = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
     noti.estado = estado_h!;
@@ -407,7 +407,7 @@ export class DeleteRegisterComponent{
     console.log("Usuarios que reciben la notificacion Horas: ",NotificacionesHorasExtrasFiltrados);
 
     NotificacionesHorasExtrasFiltrados.forEach((e: any) => {
-      noti.id_empleado_recibe = e.empleado;
+      noti.id_receives_empl = e.empleado;
 
       noti.user_name =this.dataUserServices.username;
       noti.ip =localStorage.getItem('ip');

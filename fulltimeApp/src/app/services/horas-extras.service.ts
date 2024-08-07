@@ -63,7 +63,7 @@ export class HorasExtrasService {
   }
 
   getListaHorasExtrasByCodigo(codigo: number | string): Observable<HoraExtra[]> {
-    const url = `${this.apiUrl}/horasextras/lista-horas-extras`;
+    const url = `${this.apiUrl}/horas-extras-pedidas/horas-extras/lista-horas-extras`;
     const params = new HttpParams().set('codigo', codigo)
     return this.http.get<HoraExtra[]>(url, { params })
       .pipe(
@@ -72,7 +72,7 @@ export class HorasExtrasService {
       )
   }
 
-  getlistaHorasExtrasByFechasyCodigo(fec_inicio: string, fec_final: string, codigo: number | string): Observable <HoraExtra[]>{
+  getlistaHorasExtrasByFechasyCodigo(fec_inicio: string, fec_final: string, codigo: number | string): Observable<HoraExtra[]> {
     const url = `${this.apiUrl}/horas-extras-pedidas/horas-extras/lista-horas-extrasfechas`;
     const params = new HttpParams()
       .set('fecha_inicio', fec_inicio)
@@ -85,7 +85,7 @@ export class HorasExtrasService {
       )
   }
 
-  getlistaHorasExtrasByFechasyCodigoEdit(fec_inicio: string, fec_final: string, codigo: number | string, id:number): Observable <HoraExtra[]>{
+  getlistaHorasExtrasByFechasyCodigoEdit(fec_inicio: string, fec_final: string, codigo: number | string, id: number): Observable<HoraExtra[]> {
     const url = `${this.apiUrl}/horasextras/lista-horas-extrasfechasedit`;
     const params = new HttpParams()
       .set('fecha_inicio', fec_inicio)
@@ -99,17 +99,9 @@ export class HorasExtrasService {
       )
   }
 
-  postNuevaHorasExtras(hora_extra: HoraExtra): Observable<HoraExtra> {
+  postNuevaHorasExtras(datos: any): Observable<HoraExtra> {
 
-    const cdepar: any = localStorage.getItem('cdepar');
-    const url = `${this.apiUrl}/horasextras/insert-horas-extras`;
-    const params = new HttpParams()
-      .set('id_departamento', cdepar)
-    return this.http.post<HoraExtra>(url, hora_extra, { params })
-      .pipe(
-        tap(console.log),
-        catchError(this.handleError)
-      )
+    return this.http.post<any>(`${environment.url}/horas-extras-pedidas`, datos);
   }
 
   putHoraExtra(hora_extra: HoraExtra): Observable<any> {
