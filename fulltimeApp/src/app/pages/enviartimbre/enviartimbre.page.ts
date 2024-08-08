@@ -31,6 +31,11 @@ import { Camera, CameraDirection, CameraResultType, CameraSource, Photo } from '
 })
 export class EnviartimbrePage implements OnInit {
 
+
+  //Parametros
+  timbrarSinInternet: string;
+  timbrarConFoto: string;
+
   //variables Foto
   imagen: string;
 
@@ -71,10 +76,9 @@ export class EnviartimbrePage implements OnInit {
 
     this.obtenerIdCelular();
     this.BuscarParametro();
-    this.BuscarParametroTimbreDesconocido();
+    this.BuscarParametroTimbreUbicacionDesconocida();
     this.BuscarParametroTimbreConFoto();
     this.BuscarParametroTimbreSinInternet();
-    //this.BuscarUbicacion(this.id_usuario);
   }
 
   private readonly IDENTIFICACION_BIOMETRICA = "B"
@@ -193,7 +197,7 @@ export class EnviartimbrePage implements OnInit {
 
   async iniciarProcesoFoto() {
     console.log("ENTRA A iniciarProcesoFoto")
-    if (this.timbrarConFoto == 'Si') {
+    if (localStorage.getItem('timbrarConFoto')== 'Si') {
       console.log("ENTRA CON SI")
       await this.tomarFoto()
         .then(() => {
@@ -258,6 +262,7 @@ export class EnviartimbrePage implements OnInit {
         this.intentos = this.intentos + 1;
         if (this.intentos == 2) {
           this.enviarTimbreAuthProble();
+
           this.intentos = 0;
         }
       }
@@ -314,6 +319,9 @@ export class EnviartimbrePage implements OnInit {
 
   enviarTimbre(ev?: any) {
     //comprueba si estamos en un emulador o PC para envíar el timbre
+    this.BuscarParametroTimbreSinInternet();
+    this.BuscarParametroTimbreUbicacionDesconocida();
+    
     if ((this.platform.is('ios')) || (this.platform.is('android')) || (this.platform.is('capacitor'))) {
       console.log("Entrando en TIMBRES VER")
       this.identificarUsuario();
@@ -460,25 +468,13 @@ export class EnviartimbrePage implements OnInit {
     this.nuevoTimbre.codigo = this.codigo;
     this.nuevoTimbre.tecla_funcion = this.obtenerIdTipo();
     this.nuevoTimbre.fecha_hora_timbre = this.fechaTransformada + " " + this.horaTransformada;
-
     this.nuevoTimbre.tecla_funcion = this.obtenerIdTipo();
     this.nuevoTimbre.user_name = this.userService.username;
     this.nuevoTimbre.ip = localStorage.getItem('ip');
     this.nuevoTimbre.imagen = this.imagen;
 
-    console.log("ver usuario e IP", this.nuevoTimbre.user_name, this.nuevoTimbre.ip)
-
     if (this.nuevoTimbre.accion === "HA" && this.nuevoTimbre.observacion === null) return this.abrirToas('Lo siento! Debes ingresar una observación antes de enviar un timbre abierto 😅', "danger", 5000, "bottom");
     if (this.nuevoTimbre.accion === "HA" && this.nuevoTimbre.observacion === "") return this.abrirToas('Lo siento! Debes ingresar una observación antes de enviar un timbre abierto 😅', "danger", 5000, "bottom");
-
-
-    this.parametros.ObtenerDetallesParametros(13).subscribe(
-      res => {
-        console.log("ver parametro sin internet:", res[0])
-        this.timbrarSinInternet = res[0].descripcion;
-        console.log("ver parametro sin internet descripcion:", this.timbrarSinInternet)
-        return this.timbrarSinInternet;
-      });
 
 
     if (this.isConnected == true) {
@@ -488,17 +484,7 @@ export class EnviartimbrePage implements OnInit {
       this.nuevoTimbre.longitud = this.geoLongitude + "";
       this.nuevoTimbre.conexion = this.isConnected;
       this.nuevoTimbre.novedades_conexion = 'Sin problemas de conexion';
-
-      this.parametros.ObtenerDetallesParametros(5).subscribe(
-        res => {
-
-          console.log("ver parametro:", res[0])
-          this.timbrarDesconocido = res[0].descripcion;
-          console.log("ver parametro descripcion:", this.timbrarDesconocido)
-
-
-          return this.timbrarDesconocido;
-        });
+      
       this.ValidarModulo(this.geoLatitude, this.geoLongitude, this.rango, this.nuevoTimbre);
       console.log('paso validaciones de horario abierto');
     } else {
@@ -527,9 +513,7 @@ export class EnviartimbrePage implements OnInit {
       } else {
         this.abrirToas('Timbre sin conexión a Internet. No Permitido', "danger", 5000, "bottom");
         return this.router.navigate(['/login']);
-
       }
-
     }
 
   }
@@ -562,44 +546,31 @@ export class EnviartimbrePage implements OnInit {
 
   timbrarDesconocido: string;
 
-  BuscarParametroTimbreDesconocido() {
+  BuscarParametroTimbreUbicacionDesconocida() {
     // id_tipo_parametro PARA PERMITIR TIMBRE UBICACION DESCONOCIDA = 4
     this.parametros.ObtenerDetallesParametros(5).subscribe(
       res => {
 
-        console.log("ver parametro:", res[0])
         this.timbrarDesconocido = res[0].descripcion;
-        console.log("ver parametro descripcion:", this.timbrarDesconocido)
+        localStorage.setItem('timbrarUbicacionDesconocida', res[0].descripcion);
 
-
-        return this.timbrarDesconocido;
+        console.log("ver parametro ubicacion desconocidad:", this.timbrarDesconocido)
       });
   }
+
   BuscarParametroTimbreSinInternet() {
 
     this.parametros.ObtenerDetallesParametros(13).subscribe(
       res => {
-        console.log("ver parametro sin internet:", res[0])
-        this.timbrarSinInternet = res[0].descripcion;
-        console.log("ver parametro sin internet descripcion:", this.timbrarSinInternet)
-        localStorage.setItem('timbrarSinInternet',res[0].descripcion);
-        return this.timbrarSinInternet;
+        localStorage.setItem('timbrarSinInternet', res[0].descripcion);
       });
   }
 
-
-
-
-
-  timbrarSinInternet: string;
-  timbrarConFoto: string;
   BuscarParametroTimbreConFoto() {
     // id_tipo_parametro PARA TIMBRAR CON FOTO = 14
     this.parametros.ObtenerDetallesParametros(14).subscribe(
       res => {
-        this.timbrarConFoto = res[0].descripcion;
-        console.log("ver parametro CON FOTO descripcion:", this.timbrarConFoto)
-        return this.timbrarConFoto;
+        localStorage.setItem('timbrarConFoto',res[0].descripcion);
       });
   }
 
@@ -633,7 +604,7 @@ export class EnviartimbrePage implements OnInit {
           }
         }
       }, err => {
-        if (this.timbrarDesconocido == 'Si') {
+        if (localStorage.getItem('timbrarUbicacionDesconocida')  == 'Si') {
           timbre.ubicacion = 'DESCONOCIDO';
           this.storageUbica = timbre.ubicacion;
           this.EnviarDatos(timbre);
@@ -675,7 +646,7 @@ export class EnviartimbrePage implements OnInit {
           this.ValidarDomicilio(informacion, timbre);
         }
       }, () => {
-        if (this.timbrarDesconocido === 'Si') {
+        if (localStorage.getItem('timbrarUbicacionDesconocida') === 'Si') {
           console.log("entra aqui??? si")
           timbre.ubicacion = 'DESCONOCIDO';
           this.storageUbica = timbre.ubicacion;
@@ -749,7 +720,7 @@ export class EnviartimbrePage implements OnInit {
             console.log('COORDENADAS DE DOMICILIO  NOOOOOOOO------')
 
 
-            if (this.timbrarDesconocido == 'Si') {
+            if (localStorage.getItem('timbrarUbicacionDesconocida')  == 'Si') {
               timbre.ubicacion = 'DESCONOCIDO';
               this.storageUbica = timbre.ubicacion;
               this.abrirToas('Marcación realizada dentro de un perímetro DESCONOCIDO.', "primary", 3000, "top");
@@ -765,7 +736,7 @@ export class EnviartimbrePage implements OnInit {
 
           console.log('SIN COORDENADAS DE DOMICILIO ------')
 
-          if (this.timbrarDesconocido == 'Si') {
+          if (localStorage.getItem('timbrarUbicacionDesconocida') == 'Si') {
 
             timbre.ubicacion = 'DESCONOCIDO';
             this.storageUbica = timbre.ubicacion;
@@ -781,7 +752,7 @@ export class EnviartimbrePage implements OnInit {
       else {
 
         console.log("no tiene longitud")
-        if (this.timbrarDesconocido == 'Si') {
+        if (localStorage.getItem('timbrarUbicacionDesconocida') == 'Si') {
           timbre.ubicacion = 'DESCONOCIDO';
           this.storageUbica = timbre.ubicacion;
           this.abrirToas('Marcación realizada dentro de un perímetro DESCONOCIDO.', "primary", 3000, "top");
@@ -796,7 +767,7 @@ export class EnviartimbrePage implements OnInit {
 
     }, err => {
 
-      if (this.timbrarDesconocido == 'Si') {
+      if (localStorage.getItem('timbrarUbicacionDesconocida') == 'Si') {
         timbre.ubicacion = 'DESCONOCIDO';
         this.storageUbica = timbre.ubicacion;
         this.GuardartimbresinServidor(timbre);

@@ -6,6 +6,9 @@ const config: CapacitorConfig = {
   appName: 'fulltimeApp',
   webDir: 'www',
   bundledWebRuntime: false,
+  server: {
+    androidScheme: 'http'
+  },
   plugins: {
     Keyboard: {
       resize: KeyboardResize.Body,

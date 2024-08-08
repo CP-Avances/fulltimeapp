@@ -29,7 +29,7 @@ export class RelojServiceService {
   }
 
   obtenerUsuario(idUser: any) {
-    return this.http.get<any>(this.URL + '/user/usuario/' + idUser);
+    return this.http.get<any>(this.URL + '/usuarios/usuario/' + idUser);
   }
 
   iniciarSesion(user: any) {

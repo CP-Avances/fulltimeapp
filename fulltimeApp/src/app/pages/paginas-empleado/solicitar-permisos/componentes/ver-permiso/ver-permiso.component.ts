@@ -14,7 +14,7 @@ export class VerPermisoComponent implements OnInit {
 
 
   public codigo: string = ''; // Variable para almacenar el código
-  hipervinculo: string = 'http://192.168.0.127:3001';
+  hipervinculo: string = 'http://186.4.226.49:3001';
   file: any;
 
 

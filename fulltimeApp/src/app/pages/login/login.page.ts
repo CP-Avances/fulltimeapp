@@ -46,6 +46,8 @@ export class LoginPage implements OnInit {
 
   ngOnInit() {
     this.BuscarParametroTimbreSinInternet();
+    this.BuscarParametroTimbreConFoto();
+    this.BuscarParametroTimbreUbicacionDesconocida();
     if (!this.relojService.esPrimeraVez()) {
       this.navCtroller.navigateForward(['inicio']);
     } else if (this.relojService.estaLogueado() && this.relojService.existeRol()) {
@@ -71,6 +73,24 @@ export class LoginPage implements OnInit {
       res => {
         console.log("ver parametro sin internet:", res[0])
         localStorage.setItem('timbrarSinInternet',res[0].descripcion);
+      });
+  }
+
+  BuscarParametroTimbreConFoto() {
+
+    this.parametros.ObtenerDetallesParametros(14).subscribe(
+      res => {
+        console.log("ver parametro sin internet:", res[0])
+        localStorage.setItem('timbrarConFoto',res[0].descripcion);
+      });
+  }
+
+  BuscarParametroTimbreUbicacionDesconocida() {
+    // id_tipo_parametro PARA PERMITIR TIMBRE UBICACION DESCONOCIDA = 4
+    this.parametros.ObtenerDetallesParametros(5).subscribe(
+      res => {
+
+        localStorage.setItem('timbrarUbicacionDesconocida', res[0].descripcion);
       });
   }
 
@@ -208,7 +228,7 @@ export class LoginPage implements OnInit {
                 }
               });
               if (existeId_Dispositivo == true) {
-                this.usuarioSuccessToas(dispositivos.message, 2000);
+                this.usuarioSuccessToas("Ingreso exitoso", 2000);
                 this.cambiodepantallas();
               } else {
                 this.BuscarParametroNumeroDispositivos();

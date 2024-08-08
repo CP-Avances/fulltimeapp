@@ -12,7 +12,7 @@ export class NotificacionesService {
 
   private apiUrl = environment.url;
 
-  private recursoURL = 'http://192.168.0.127:3001';
+  private recursoURL = 'http://186.4.226.49:3001';
   //private recursoURL = 'http://186.4.226.49:3001';
 
 
