@@ -10,6 +10,7 @@ import { TimbresService } from 'src/app/services/timbres.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { RangoFechasComponent } from 'src/app/componentes/rango-fechas/rango-fechas.component';
+import { VerImagenModalPage } from 'src/app/modals/ver-timbre-empleado/ver-imagen/ver-imagen.component';
 
 @Component({
   selector: 'app-vertimbre',
@@ -322,6 +323,20 @@ export class VertimbrePage implements OnInit {
   screenReaderPageLabel: 'page',
   screenReaderCurrentLabel: `You're on page`
   };
+
+
+  async mostrarImagenModal(imagenDataUrl: string) {
+    const modal = await this.modalController.create({
+      component: VerImagenModalPage, // Nombre de la página modal que mostrará la imagen
+      componentProps: {
+        imagen: imagenDataUrl // Pasar el DataUrl como propiedad a la modal
+      }
+    });
+
+    return await modal.present();
+  }
+
+
 
 }
 

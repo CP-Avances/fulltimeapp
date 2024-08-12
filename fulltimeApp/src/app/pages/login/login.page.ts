@@ -136,7 +136,8 @@ export class LoginPage implements OnInit {
 
     let credenciales = {
       nombre_usuario: this.user.nombre_usuario,
-      pass: clave
+      pass: clave,
+      movil: true
     }
 
     if (credenciales.nombre_usuario == "" && credenciales.pass == "") {
@@ -153,7 +154,7 @@ export class LoginPage implements OnInit {
         let existeId_Dispositivo: boolean;
 
         if (datos.message === 'error') {
-          this.usuarioIncorrectoToas("usuario y Contraseña incorrecta", 3000)
+          this.usuarioIncorrectoToas("Usuario y contraseña incorrecta", 3000)
         }
 
         else if (datos.message === 'error_') {
