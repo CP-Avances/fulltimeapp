@@ -73,14 +73,13 @@ export class DataLocalService {
       this.timbres = timbres;
     }
   }
-
   guardarTimbresPerdidos(timbre: Timbre) {
     const existe = this.timbresPerdidos.find(tim => tim.fecha_hora_timbre === timbre.fecha_hora_timbre)
     if (!existe) {
       this.mensaje =  `<div class="card-alert">
                             <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                             <br>
-                            <p> Timbre enviado al listado "Timbres no enviados" </p>
+                            <p> Timbre guardado en la memoria del telefono. Revisar en el listado de "Timbres no enviados" </p>
                           </div>`;
       this.showAlert(this.mensaje);
       this.timbresPerdidos.push(timbre);

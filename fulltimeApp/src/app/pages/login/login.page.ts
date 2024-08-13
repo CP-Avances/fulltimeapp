@@ -15,6 +15,8 @@ import { Md5 } from 'ts-md5/dist/md5';
 })
 export class LoginPage implements OnInit {
   iniciandoSesion = false;
+  aceptaTerminos: boolean = false; // Inicialización predeterminada
+
   user = {
     nombre_usuario: "",
     pass: ""
@@ -39,12 +41,16 @@ export class LoginPage implements OnInit {
     private userService: DataUserLoggedService,
 
   ) { }
+  mostrarCheckboxInicialmente: boolean;
 
   ionViewWillEnter() {
     this.infoDispositivo();
+
   }
 
   ngOnInit() {
+
+    this.obtenerInfoTerminosCondiciones();
     this.BuscarParametroTimbreSinInternet();
     this.BuscarParametroTimbreConFoto();
     this.BuscarParametroTimbreUbicacionDesconocida();
@@ -72,7 +78,7 @@ export class LoginPage implements OnInit {
     this.parametros.ObtenerDetallesParametros(13).subscribe(
       res => {
         console.log("ver parametro sin internet:", res[0])
-        localStorage.setItem('timbrarSinInternet',res[0].descripcion);
+        localStorage.setItem('timbrarSinInternet', res[0].descripcion);
       });
   }
 
@@ -81,7 +87,7 @@ export class LoginPage implements OnInit {
     this.parametros.ObtenerDetallesParametros(14).subscribe(
       res => {
         console.log("ver parametro sin internet:", res[0])
-        localStorage.setItem('timbrarConFoto',res[0].descripcion);
+        localStorage.setItem('timbrarConFoto', res[0].descripcion);
       });
   }
 
@@ -95,14 +101,36 @@ export class LoginPage implements OnInit {
   }
 
 
+  //Aqui
+
   infoDispositivo() {
     Device.getId().then((id) => {
       this.id_celular = id.identifier;
     });
-
     Device.getInfo().then((info) => {
       this.dispositi = info.model;
     });
+  }
+
+  obtenerInfoTerminosCondiciones() {
+    this.infoDispositivo();
+    Device.getId().then((id) => {
+      this.relojService.obtenerDispositivoPorID(id.identifier).subscribe(
+        dispositivos => {
+          if (dispositivos.terminos_condiciones!=null) {
+            this.aceptaTerminos = dispositivos.terminos_condiciones;
+            this.mostrarCheckboxInicialmente = this.aceptaTerminos;
+          } else {
+            this.aceptaTerminos = false;
+          }
+          console.log("TERMINOS Y CONDICIONES", this.aceptaTerminos);
+        }, error => {
+          this.aceptaTerminos = false;
+          console.log("TERMINOS Y CONDICIONES", this.aceptaTerminos);
+        }
+      )
+    });
+
   }
 
   mostrarPassword(): void {
@@ -140,23 +168,17 @@ export class LoginPage implements OnInit {
       movil: true
     }
 
-    if (credenciales.nombre_usuario == "" && credenciales.pass == "") {
+    if (credenciales.nombre_usuario == null && credenciales.pass == null) {
       this.iniciandoSesion = false;
       this.usuarioIncorrectoToas("Ups! Ingrese sus datos.", 2000);
     } else {
-
-
       console.log('ingresa ', credenciales)
-
       this.relojService.iniciarSesion(credenciales).subscribe(datos => {
         console.log("ver datos del usuario", datos);
-
         let existeId_Dispositivo: boolean;
-
         if (datos.message === 'error') {
           this.usuarioIncorrectoToas("Usuario y contraseña incorrecta", 3000)
         }
-
         else if (datos.message === 'error_') {
           this.usuarioIncorrectoToas("Usuario no cumple con todos los requerimientos necesarios para acceder al sistema.", 3000)
         }
@@ -199,7 +221,7 @@ export class LoginPage implements OnInit {
           localStorage.setItem('ruc', datos.ruc);
           localStorage.setItem('version', datos.version);
           //LOOK ME
-         // localStorage.setItem('horas_trabaja', res.body.empresa.hora_trabaja);
+          // localStorage.setItem('horas_trabaja', res.body.empresa.hora_trabaja);
 
 
           // localStorage.setItem('bool_timbres', datos.acciones_timbres);
@@ -221,7 +243,7 @@ export class LoginPage implements OnInit {
             dispositivos => {
               console.log("ver dispositivos", dispositivos)
 
-              //Buscar el id_dispositivo y el id_empleado si son el mismo
+              //Buscar el id_dispositivo y el id_celular si son el mismo
               dispositivos.forEach((item: any) => {
                 if (item.id_dispositivo == this.id_celular) {
                   this.iddispositivos = dispositivos
@@ -328,16 +350,20 @@ export class LoginPage implements OnInit {
   }
 
   registrarIdDispositivoenBDD(id_celular: any, model_dispositivo: any) {
+    this.obtenerInfoTerminosCondiciones();
+    console.log('aceptaTerminos:', this.aceptaTerminos); // Depuración
+
     const id_usuario = localStorage.getItem('empleadoID');
     var ip = localStorage.getItem('ip');
     var user_name = this.userService.username;
 
-    this.relojService.registrarCelularUsuario(id_usuario, id_celular, model_dispositivo, user_name, ip).subscribe(
+    this.relojService.registrarCelularUsuario(id_usuario, id_celular, model_dispositivo, user_name, ip, true).subscribe(
       res => {
         localStorage.setItem('UidDispositivo', id_celular);
         res.id_empleado = id_usuario
         res.id_dispositivo = id_celular;
         res.modelo_dispositivo = model_dispositivo;
+
       }, err => {
         this.iniciandoSesion = false;
         if (err.status == 0) {
