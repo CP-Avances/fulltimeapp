@@ -19,6 +19,8 @@ export class EnviarUsuarioComponent implements OnInit {
 
   @Input() data: any;
 
+  loadingEmpleado: boolean = false;
+  listLoaded: boolean = false;      
   opcion_sucursal: boolean = false;
   opcion_depa: boolean = false;
   opcion_empleado: boolean = false;
@@ -56,6 +58,7 @@ export class EnviarUsuarioComponent implements OnInit {
     this.tiempo = moment();
     sessionStorage.removeItem('datos_comunicado');
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
+      console.log("VER BuscarDatosGenerales ", res)
       sessionStorage.setItem('datos_comunicado', JSON.stringify(res))
 
       res.forEach(obj => {
@@ -77,7 +80,7 @@ export class EnviarUsuarioComponent implements OnInit {
       res.forEach(obj => {
         obj.departamentos.forEach(ele => {
           ele.empleado.forEach(r => {
-            if (r.comunicado_mail === true || r.comunicado_noti === true) {
+            if (r.comunicado_mail === true || r.comunicado_notificacion === true) {
 
               let elemento = {
                 id: r.id,
@@ -86,18 +89,21 @@ export class EnviarUsuarioComponent implements OnInit {
                 cedula: r.cedula,
                 correo: r.correo,
                 comunicado_mail: r.comunicado_mail,
-                comunicado_noti: r.comunicado_notificacion,
+                comunicado_notificacion: r.comunicado_notificacion,
               }
               this.empleados.push(elemento)
+
             }
           })
         })
       })
+      this.loadingEmpleado = true;
       this.BuscarParametro();
 
     }, err => {
       this.mostrarAlertas("No se ha encontrado información.", 1000, 'danger')
     })
+
   }
 
   closeModal() {
@@ -244,7 +250,7 @@ export class EnviarUsuarioComponent implements OnInit {
         if (obj.id_suc === obj1.id) {
           obj.departamentos.forEach((obj2: any) => {
             obj2.empleado.forEach((obj3: any) => {
-              if (obj3.comunicado_mail === true || obj3.comunicado_noti === true) {
+              if (obj3.comunicado_mail === true || obj3.comunicado_notificacion === true) {
                 usuarios.push(obj3)
               }
             })
@@ -265,7 +271,7 @@ export class EnviarUsuarioComponent implements OnInit {
         dataDepartamentos.find(obj2 => {
           if (obj1.id_depa === obj2.id) {
             obj1.empleado.forEach((obj3: any) => {
-              if (obj3.comunicado_mail === true || obj3.comunicado_noti === true) {
+              if (obj3.comunicado_mail === true || obj3.comunicado_notificacion === true) {
                 usuarios.push(obj3)
               }
             })
@@ -276,6 +282,9 @@ export class EnviarUsuarioComponent implements OnInit {
     console.log('ver usuario---------------------------', usuarios);
     this.EnviarNotificaciones(usuarios);
     this.closeModal();
+
+    console.log(' ver empleados de departamentos', respuesta)
+
   }
 
   ModelarEmpleados(dataEmpleados) {
@@ -289,10 +298,9 @@ export class EnviarUsuarioComponent implements OnInit {
     })
 
     console.log('ver usuario---------------------------', respuesta);
-    this.closeModal();
     this.EnviarNotificaciones(respuesta);
+    this.closeModal();
     console.log(' ver donde falla', respuesta)
-
   }
 
 
@@ -316,7 +324,7 @@ export class EnviarUsuarioComponent implements OnInit {
         data.forEach((obj: any) => {
 
           console.log("obj.comunicado_noti ", obj.comunicado_noti);
-          if (obj.comunicado_noti === true) {
+          if (obj.comunicado_notificacion === true) {
 
             this.NotificarSistema(this.idEmpleado, obj.id);
           }
@@ -390,10 +398,10 @@ export class EnviarUsuarioComponent implements OnInit {
 
   NotificarSistema(empleado_envia: any, empleado_recive: any) {
     let mensaje = {
-      fecha_hora: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
-      id_empleado_envia: empleado_envia,
-      id_empleado_recibe: empleado_recive,
-      descripcion: this.data.asunto + '; ' + this.data.mensaje, 
+      id_empl_envia: empleado_envia,
+      id_empl_recive: empleado_recive,
+      descripcion: this.data.asunto, 
+      mensaje: this.data.mensaje,
       tipo: 6,
       user_name: this.dataUserServices.username,
       ip:localStorage.getItem('ip')

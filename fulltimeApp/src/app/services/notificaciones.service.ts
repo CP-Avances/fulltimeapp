@@ -41,7 +41,7 @@ export class NotificacionesService {
 
   BuscarDatosGenerales() {
     const estado = 1; // 1 = activo 
-    return this.http.get<any>(`${this.apiUrl}/notificaciones/datos_generales/${estado}`);
+    return this.http.get<any>(`${this.apiUrl}/generalidades/datos_generales/ver/${estado}`);
   }
 
   PutNotificaVisto(datos: any) {
@@ -59,7 +59,7 @@ export class NotificacionesService {
 
   // ALERTAS DE NOTIFICACIÓN DE COMUNICADOS
   EnviarMensajeComunicado(data: any) {
-    return this.http.post<any>(`${environment.url}/notificaciones/noti-comunicado-movil/`, data);
+    return this.http.post<any>(`${this.apiUrl}/noti-real-time/noti-comunicado-movil/`, data);
   }
 
 

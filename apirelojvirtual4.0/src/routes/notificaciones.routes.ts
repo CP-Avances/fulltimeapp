@@ -13,7 +13,7 @@ class NotificacionesRoutes {
         this.router.get('/all-noti', NOTIFICACIONES.getNotificacion);
         this.router.post('/', NOTIFICACIONES.postNotificacion);
         // RUTAS DE NOTIFICACIONES TIMBRES
-        this.router.get('/noti-tim/all-noti', NOTIFICACIONES.getNotificacionTimbres);
+       // this.router.get('/noti-tim/all-noti', NOTIFICACIONES.getNotificacionTimbres);
         this.router.post('/noti-tim', NOTIFICACIONES.postAvisosGenerales);
         // INFO NECESARIA DE EMPLEADO
         this.router.get('/info-empl-recieve', NOTIFICACIONES.getInfoEmpleadoByCodigo);
