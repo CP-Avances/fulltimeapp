@@ -1,17 +1,6 @@
 <app-close-modal titleModal="Usuarios"></app-close-modal>
 <ion-content>
-
-
-    <ion-content *ngIf="!loadingEmpleado">
-        <div style="text-align: center;">
-            <br>
-            <ion-text color="primary">
-                <span>Obteniendo Criterios de Búsqueda Por favor Espere</span>
-            </ion-text>
-            <ion-progress-bar type="indeterminate"></ion-progress-bar>
-            <br>
-        </div>
-    </ion-content>
+    
     <ion-list>
         <ion-radio-group [(ngModel)]="radioValue" (ionChange)="showValue()">
             <ion-text mode="ios" color="dark" style="text-align: center;">
@@ -24,7 +13,17 @@
         </ion-radio-group>
     </ion-list>
 
-
+    
+    <ion-content *ngIf="!loadingEmpleado">
+        <div style="text-align: center;">
+            <br>
+            <ion-text color="primary">
+                <span>Obteniendo Datos Por favor Espere</span>
+            </ion-text>
+            <ion-progress-bar type="indeterminate"></ion-progress-bar>
+            <br>
+        </div>
+    </ion-content>
     <!-- LISTAR SUCURSALES -->
 
     <ion-row *ngIf="opcion_sucursal">
@@ -39,12 +38,12 @@
             </ion-button>
         </ion-col>
     </ion-row>
-
+    <ion-searchbar *ngIf="opcion_sucursal" autocomplete="off" showCancelButton="focus" (ionChange)="changeSearchSucursales($event)"></ion-searchbar>
     <ion-list *ngIf="opcion_sucursal">
         <ion-text mode="ios" color="dark" style="text-align: center;">
             <h3>Resultado Sucursales</h3>
         </ion-text>
-        <ion-item *ngFor="let s of sucursales" class="item-color" mode="md" lines="full">
+        <ion-item *ngFor="let s of sucursales_filtro" class="item-color" mode="md" lines="full">
             <ion-checkbox *ngIf="isChecked_sucu" slot="start" [(ngModel)]="s.isChecked_sucu"></ion-checkbox>
             <ion-label>{{ s.nombre }}</ion-label>
         </ion-item>
@@ -64,12 +63,13 @@
             </ion-button>
         </ion-col>
     </ion-row>
+    <ion-searchbar *ngIf="opcion_depa" autocomplete="off" showCancelButton="focus" (ionChange)="changeSearchDepartamento($event)"></ion-searchbar>
 
     <ion-list *ngIf="opcion_depa">
         <ion-text mode="ios" color="dark" style="text-align: center;">
             <h3>Resultado Departamentos</h3>
         </ion-text>
-        <ion-item *ngFor="let d of departamentos" class="item-color" mode="md" lines="full">
+        <ion-item *ngFor="let d of departamentos_filtro" class="item-color" mode="md" lines="full">
             <ion-checkbox *ngIf="isChecked_depa" slot="start" [(ngModel)]="d.isChecked_depa"></ion-checkbox>
             <ion-label>{{ d.nombre }}</ion-label>
         </ion-item>
@@ -89,26 +89,13 @@
             </ion-button>
         </ion-col>
     </ion-row>
+    <ion-searchbar *ngIf="opcion_empleado" autocomplete="off" showCancelButton="focus" (ionChange)="changeSearch($event)"></ion-searchbar>
 
-
-
-    <!--
-    <ion-content  *ngIf="!listLoaded">
-        <div style="text-align: center;" >
-            <br>
-            <ion-text color="primary">
-                <span>Obteniendo Criterios de Búsqueda Por favor Espere</span>
-            </ion-text>
-            <ion-progress-bar type="indeterminate"></ion-progress-bar>
-            <br>
-        </div>
-    </ion-content>
--->
-    <ion-list *ngIf="opcion_empleado" (ionViewDidEnter)="listLoaded = true">
+    <ion-list *ngIf="opcion_empleado">
         <ion-text mode="ios" color="dark" style="text-align: center;">
             <h3>Resultado Usuarios</h3>
         </ion-text>
-        <ion-item *ngFor="let e of empleados" class="item-color" mode="md" lines="full">
+        <ion-item *ngFor="let e of empleados_filtro" class="item-color" mode="md" lines="full">
             <ion-checkbox *ngIf="isChecked_empl" slot="start" [(ngModel)]="e.isChecked_empl"></ion-checkbox>
             <ion-label>{{ e.nombre }}</ion-label>
         </ion-item>

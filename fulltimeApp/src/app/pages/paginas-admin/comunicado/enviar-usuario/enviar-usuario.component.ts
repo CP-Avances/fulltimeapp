@@ -19,8 +19,8 @@ export class EnviarUsuarioComponent implements OnInit {
 
   @Input() data: any;
 
-  loadingEmpleado: boolean = false;
-  listLoaded: boolean = false;      
+  loadingEmpleado: boolean = true;
+  listLoaded: boolean = false;
   opcion_sucursal: boolean = false;
   opcion_depa: boolean = false;
   opcion_empleado: boolean = false;
@@ -38,6 +38,9 @@ export class EnviarUsuarioComponent implements OnInit {
   sucursales: any = [];
   respuesta: any[];
   empleados: any = [];
+  empleados_filtro: any = [];
+  departamentos_filtro: any = [];
+  sucursales_filtro: any = [];
 
   isChecked: boolean = true;
 
@@ -53,21 +56,39 @@ export class EnviarUsuarioComponent implements OnInit {
     this.idEmpresa = parseInt(localStorage.getItem('id_empresa'));
   }
 
-  tiempo: any;    
   ngOnInit(): void {
-    this.tiempo = moment();
     sessionStorage.removeItem('datos_comunicado');
+
+    this.loadingEmpleado = true;
+    console.log("Ver loadinEmpleado", this.loadingEmpleado)
+  }
+
+  cargarListaSucursales() {
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
       console.log("VER BuscarDatosGenerales ", res)
       sessionStorage.setItem('datos_comunicado', JSON.stringify(res))
-
       res.forEach(obj => {
         this.sucursales.push({
           id: obj.id_suc,
           nombre: obj.name_suc
         })
       })
+      this.sucursales_filtro = [...this.sucursales]
+      this.loadingEmpleado = true;
+      this.departamentos= [];
+      this.empleados=[];
+      this.BuscarParametro();
 
+    }, err => {
+      this.mostrarAlertas("No se ha encontrado información.", 1000, 'danger')
+    })
+  }
+
+
+  cargarDepartamentos() {
+    this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
+      sessionStorage.setItem('datos_comunicado', JSON.stringify(res))
+      
       res.forEach(obj => {
         obj.departamentos.forEach(ele => {
           this.departamentos.push({
@@ -76,7 +97,21 @@ export class EnviarUsuarioComponent implements OnInit {
           })
         })
       })
+      this.departamentos_filtro = [...this.departamentos]
+      this.loadingEmpleado = true;
+      this.sucursales = [];
+      this.empleados = [];
+      this.BuscarParametro();
+    }, err => {
+      this.mostrarAlertas("No se ha encontrado información.", 1000, 'danger')
+    })
+  }
 
+
+  cargarEmpleados() {
+    this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
+      console.log("VER BuscarDatosGenerales ", res)
+      sessionStorage.setItem('datos_comunicado', JSON.stringify(res))
       res.forEach(obj => {
         obj.departamentos.forEach(ele => {
           ele.empleado.forEach(r => {
@@ -97,14 +132,42 @@ export class EnviarUsuarioComponent implements OnInit {
           })
         })
       })
+      this.empleados_filtro = [...this.empleados];
       this.loadingEmpleado = true;
-      this.BuscarParametro();
+      this.sucursales = [];
+      this.departamentos = [];
 
+      this.BuscarParametro();
     }, err => {
       this.mostrarAlertas("No se ha encontrado información.", 1000, 'danger')
     })
+  }
+  changeSearchSucursales(e: any) {
+    const query = e.detail.value;
+    const filtro = this.sucursales.filter((o:any) => {
+      return o.nombre.toLowerCase().indexOf(query.toLowerCase()) > -1 
+    })
+    this.sucursales_filtro = filtro
+  }
+
+  changeSearchDepartamento(e: any) {
+    const query = e.detail.value;
+    const filtro = this.departamentos.filter((o:any) => {
+      return o.nombre.toLowerCase().indexOf(query.toLowerCase()) > -1 
+    })
+    this.departamentos_filtro = filtro
+  }
+
+  changeSearch(e: any) {
+    const query = e.detail.value;
+    const filtro = this.empleados.filter((o:any) => {
+      return o.nombre.toLowerCase().indexOf(query.toLowerCase()) > -1 
+  
+    })
+    this.empleados_filtro = filtro
 
   }
+
 
   closeModal() {
     console.log('CERRAR MODAL USUARIOS');
@@ -137,23 +200,29 @@ export class EnviarUsuarioComponent implements OnInit {
 
   radioValue;
   showValue() {
+   // 
     console.log(this.radioValue);
 
     if (this.radioValue === 1) {
+      this.loadingEmpleado = false;
       this.opcion_sucursal = true;
       this.opcion_depa = false;
       this.opcion_empleado = false;
-
+      this.cargarListaSucursales();
     }
     else if (this.radioValue === 2) {
+      this.loadingEmpleado = false;
       this.opcion_sucursal = false;
       this.opcion_depa = true;
       this.opcion_empleado = false;
+      this.cargarDepartamentos();
     }
     else if (this.radioValue === 3) {
+      this.loadingEmpleado = false;
       this.opcion_sucursal = false;
       this.opcion_depa = false;
       this.opcion_empleado = true;
+      this.cargarEmpleados();
     }
   }
 
@@ -400,11 +469,11 @@ export class EnviarUsuarioComponent implements OnInit {
     let mensaje = {
       id_empl_envia: empleado_envia,
       id_empl_recive: empleado_recive,
-      descripcion: this.data.asunto, 
+      descripcion: this.data.asunto,
       mensaje: this.data.mensaje,
       tipo: 6,
       user_name: this.dataUserServices.username,
-      ip:localStorage.getItem('ip')
+      ip: localStorage.getItem('ip')
     }
     console.log(mensaje);
     this.restN.EnviarMensajeComunicado(mensaje).subscribe(res => {
