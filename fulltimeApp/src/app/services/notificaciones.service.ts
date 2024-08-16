@@ -19,8 +19,7 @@ export class NotificacionesService {
   constructor(
     private http: HttpClient,
     //public socket: Socket,
-  ) 
-  {}
+  ) { }
 
   // realtime
   RecibirNuevosAvisos(data: any) {
@@ -41,15 +40,18 @@ export class NotificacionesService {
 
   BuscarDatosGenerales() {
     const estado = 1; // 1 = activo 
-    return this.http.get<any>(`${this.apiUrl}/generalidades/datos_generales/ver/${estado}`);
+    // return this.http.get<any>(`${this.apiUrl}/generalidades/datos_generales/ver/${estado}`);
+    return this.http.get<any>(`${this.apiUrl}/generalidades/informacion-data-general/${estado}`);
   }
 
-  PutNotificaVisto(datos: any) {
-    return this.http.put<any>(`${this.apiUrl}/notificaciones/notifica_visto/`, datos);
+  PutNotificaVisto(id_realtime: number, data: any) {
+    //return this.http.put<any>(`${this.apiUrl}/notificaciones/notifica_visto/`, datos);
+    return this.http.put(`${environment.url}/noti-real-time/vista/${id_realtime}`, data);
   }
 
-  PutNotifiTimbreVisto(datos: any) {
-    return this.http.put<any>(`${this.apiUrl}/notificaciones/notifiTimbre_visto/`, datos);
+  PutNotifiTimbreVisto(id_noti_timbre: number, datos: any) {
+    //return this.http.put<any>(`${this.apiUrl}/notificaciones/notifiTimbre_visto/`, datos);
+    return this.http.put(`${environment.url}/timbres/noti-timbres/vista/${id_noti_timbre}`, datos);
   }
 
   // ALERTAS DE NOTIFICACIÓN DE SOLICITUD DE SERVICIO DE ALIMENTACIÓN
@@ -67,8 +69,8 @@ export class NotificacionesService {
    ** **                   MÉTODOS PARA ENVIO DE CORREOS MULTIPLES                      ** ** 
    ** ************************************************************************************ **/
   // METODO PARA ENVIO DE CORREO MULTIPLE
-  EnviarCorreoMultiple(datos: any){
-    console.log('datos  11: ',datos);
+  EnviarCorreoMultiple(datos: any) {
+    console.log('datos  11: ', datos);
     return this.http.post<any>(`${this.recursoURL}/noti-real-time/mail-multiple-movil`, datos)
   }
 

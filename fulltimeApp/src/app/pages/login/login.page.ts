@@ -173,7 +173,8 @@ export class LoginPage implements OnInit {
       this.usuarioIncorrectoToas("Ups! Ingrese sus datos.", 2000);
     } else {
       console.log('ingresa ', credenciales)
-      this.relojService.iniciarSesion(credenciales).subscribe(datos => {
+      this.relojService.iniciarSesion(credenciales).subscribe(datos => 
+        {
         console.log("ver datos del usuario", datos);
         let existeId_Dispositivo: boolean;
         if (datos.message === 'error') {
