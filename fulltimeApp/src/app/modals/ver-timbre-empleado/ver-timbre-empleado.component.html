@@ -135,14 +135,14 @@
             </ion-button>
 
             <ion-button class="ubicacionMED" mode="ios" color="light" shape="round"
-              (click)="abrirMapa(t.latitud, t.longitud)" [disabled]="t.latitud === null || t.longitud === null">
+              (click)="abrirMapa(t.latitud, t.longitud)" [disabled]=" !t.latitud || !t.longitud">
               <div>
                 <ion-icon color="primary" class="tamanoIconoEmpleado" name="location-outline"></ion-icon>
               </div>
             </ion-button>
 
             <ion-button class="ubicacionDER" mode="ios" color="light" shape="round"
-              (click)="mostrarImagenModal(t.imagen)" [disabled]="t.imagen === null">
+              (click)="mostrarImagenModal(t.imagen)" [disabled]="!t.imagen">
               <div>
 
                 <ion-icon color="primary" class="tamanoIconoEmpleado" name="happy-outline"></ion-icon>
@@ -232,14 +232,14 @@
             </ion-button>
 
             <ion-button class="ubicacionMED" mode="ios" color="light" shape="round"
-              (click)="abrirMapa(t.latitud, t.longitud)" [disabled]="t.latitud === null || t.longitud === null">
+              (click)="abrirMapa(t.latitud, t.longitud)" [disabled]=" !t.latitud || !t.longitud">
               <div>
                 <ion-icon color="primary" class="tamanoIconoEmpleado" name="location-outline"></ion-icon>
               </div>
             </ion-button>
 
             <ion-button class="ubicacionDER" mode="ios" color="light" shape="round"
-            (click)="mostrarImagenModal(t.imagen)" [disabled]="t.imagen === null">
+            (click)="mostrarImagenModal(t.imagen)" [disabled]="!t.imagen">
             <div>
               <ion-icon color="primary" class="tamanoIconoEmpleado" name="happy-outline"></ion-icon>
             </div>

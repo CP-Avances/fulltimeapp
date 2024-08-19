@@ -158,6 +158,7 @@ export class VertimbrePage implements OnInit {
     this.timbres = [];
     this.relojService.obtenerTimbres(codigo).subscribe(
       res => {
+        console.log("ver timbres filtrados", res)
 
         let fechasObjeto = {}
         
@@ -182,6 +183,8 @@ export class VertimbrePage implements OnInit {
           }
           fechasObjeto[x.fecha].push(x)
         })
+        console.log('fechas ver ..... ', fechasObjeto);
+
 
         this.timbres = fechasObjeto
 
@@ -256,7 +259,7 @@ export class VertimbrePage implements OnInit {
   }
 
   //cambiar el timbre del celular al del servidor y viceversa
-  verTipoTimbre: string = 'timbreCelular';
+  verTipoTimbre: string = 'timbreServidor';
   cambioHoraSC(event) {
     console.log(event.target.value);
     this.verTipoTimbre = event.target.value;
@@ -297,12 +300,21 @@ export class VertimbrePage implements OnInit {
         novedad = 'Hora timbre diferente al del Servidor'
       } 
     }
+
+    let mensaje = '';
+
+    if (ubicacion) {
+        mensaje += `<br><br><ion-icon name="location-outline"></ion-icon> ${ubicacion}`;
+    }
+
+    if (novedad) {
+        mensaje += `<br><br>${novedad}`;
+    }
+
     const alert = await this.alertController.create({
-      header: 'Observación',
+      header: obs,
       //  message: obs + " <br> Dispositivo desde el que se timbró: "  + tdispsitivo + "<br> Dispositivo registrado para este usuario: " + idcelularUsuario,
-      message: obs+` <br><br> <ion-icon name="location-outline"></ion-icon> `+ubicacion+` 
-              <br><br> 
-              `+ novedad,
+      message: mensaje,
       cssClass: 'my-custom-class',
       mode: 'ios',
       buttons: ['OK']

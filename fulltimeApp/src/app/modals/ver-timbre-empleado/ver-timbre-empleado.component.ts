@@ -198,23 +198,26 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
 
       let fechasObjeto = {}
 
+     
       res.forEach(data => {
-        data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
-        data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+        if(!data.fecha_hora_timbre_servidor){
+          data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
+          data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+        }else{
+          data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo);
+          data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
+        }
+       
       })
 
       res.forEach(x => {
         if (!fechasObjeto.hasOwnProperty(x.fecha)) {
           fechasObjeto[x.fecha] = []
         }
-
         fechasObjeto[x.fecha].push(x)
-
       })
-
-
-
-      //console.log('fechas ver ..... ', fechasObjeto);
+      
+      console.log('fechas ver ..... ', fechasObjeto);
       this.timbres = fechasObjeto;
 
       console.log('fechas ver timbres..... ', Object.keys(fechasObjeto).length);
@@ -231,8 +234,6 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
         this.todosPagina = false;
       }
 
-      
-
     }, err => {
       console.log(err);  this.todosPagina = true;
     })
@@ -243,13 +244,24 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
     this.timbres_filtro = [];
     if (this.fechaInicio < this.fechaFinal) {
       var datos = { fecInicio: this.fechaInicio, fecFinal: this.fechaFinal, codigo: this.codigo }
+
+      console.log("ver fechas a filtrar", datos )
       this.filtimbre.PostFiltrotimbres(datos).subscribe(
         ress => {
+
+          console.log("ver timbres filtrados", ress)
           let fechasObjeto_f = {}
 
+          
+
           ress.forEach(data => {
-            data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
-            data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+            if(!data.fecha_hora_timbre_servidor){
+              data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
+              data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+            }else{
+              data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo);
+              data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
+            }
           })
 
           ress.forEach(i => {
@@ -328,13 +340,31 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
 
 
   async presentAlert(obs: any, hora_timbre_diferente: any, ubicacion: any, novedades_conexion:any, conexion:any ) {
-    const alert = await this.alertController.create({
-      header: 'Observación',
-      message: obs + " Ubicacion: " + ubicacion + "<br>" + novedades_conexion,
+    let novedad = novedades_conexion;
+    if(conexion == true){ 
+      novedad = 'Timbre sin novedad';
+      if(hora_timbre_diferente == true){
+        novedad = 'Hora timbre diferente al del Servidor'
+      } 
+    }
+    
+    let mensaje = '';
 
+    if (ubicacion) {
+        mensaje += `<br><br><ion-icon name="location-outline"></ion-icon> ${ubicacion}`;
+    }
+
+    if (novedad) {
+        mensaje += `<br><br>${novedad}`;
+    }
+    const alert = await this.alertController.create({
+      header: obs,
+      //  message: obs + " <br> Dispositivo desde el que se timbró: "  + tdispsitivo + "<br> Dispositivo registrado para este usuario: " + idcelularUsuario,
+      message: mensaje,
+      cssClass: 'my-custom-class',
+      mode: 'ios',
       buttons: ['OK']
     });
-
     await alert.present();
   }
 

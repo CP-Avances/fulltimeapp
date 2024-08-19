@@ -11,15 +11,12 @@
     <!-- Botones de Hora celular y la hora del servidor -->
     <ion-segment *ngIf="rol_empleado === 1" color="primary" [(ngModel)]="verTipoTimbre" mode="md"
       (ionChange)="cambioHoraSC($event)">
-
-      <ion-segment-button value="timbreCelular">
-        <ion-label>Hora del celular</ion-label>
-      </ion-segment-button>
-
       <ion-segment-button value="timbreServidor">
         <ion-label>Hora del Servidor</ion-label>
       </ion-segment-button>
-
+      <ion-segment-button value="timbreCelular">
+        <ion-label>Hora del celular</ion-label>
+      </ion-segment-button>
     </ion-segment>
 
     <!-- filtro de timbres por fechas -->
@@ -101,14 +98,14 @@
               </ion-button>
 
               <ion-button class="ubicacionMED" mode="ios" color="light" shape="round"
-                (click)="abrirMapa(t.latitud, t.longitud)" [disabled]="t.latitud === null || t.longitud === null">
+                (click)="abrirMapa(t.latitud, t.longitud)" [disabled]=" !t.latitud || !t.longitud">
                 <div>
                   <ion-icon color="primary" class="tamanoIconoEmpleado" name="location-outline"></ion-icon>
                 </div>
               </ion-button>
 
               <ion-button class="ubicacionDER" mode="ios" color="light" shape="round"
-                (click)="mostrarImagenModal(t.imagen)" [disabled]="t.imagen === null">
+                (click)="mostrarImagenModal(t.imagen)" [disabled]="!t.imagen">
                 <div>
                   <ion-icon color="primary" class="tamanoIconoEmpleado" name="happy-outline"></ion-icon>
                 </div>
@@ -159,13 +156,13 @@
               </ion-button>
 
               <ion-button class="ubicacionMED" mode="ios" color="light" shape="round"
-                (click)="abrirMapa(t.latitud, t.longitud)" [disabled]="t.latitud === null || t.longitud === null">
+                (click)="abrirMapa(t.latitud, t.longitud)" [disabled]=" !t.latitud || !t.longitud">
                 <div>
                   <ion-icon color="primary" class="tamanoIconoEmpleado" name="location-outline"></ion-icon>
                 </div>
               </ion-button>
               <ion-button class="ubicacionDER" mode="ios" color="light" shape="round"
-                (click)="mostrarImagenModal(t.imagen)" [disabled]="t.imagen === null">
+                (click)="mostrarImagenModal(t.imagen)" [disabled]="!t.imagen">
                 <div>
                   <ion-icon color="primary" class="tamanoIconoEmpleado" name="happy-outline"></ion-icon>
                 </div>
@@ -249,14 +246,14 @@
               </ion-button>
 
               <ion-button class="ubicacionMED" mode="ios" color="light" shape="round"
-                (click)="abrirMapa(t.latitud, t.longitud)" [disabled]="t.latitud === null || t.longitud === null">
+                (click)="abrirMapa(t.latitud, t.longitud)" [disabled]=" !t.latitud || !t.longitud">
                 <div>
                   <ion-icon color="primary" class="tamanoIconoEmpleado" name="location-outline"></ion-icon>
                 </div>
               </ion-button>
 
               <ion-button class="ubicacionDER" mode="ios" color="light" shape="round"
-                (click)="mostrarImagenModal(t.imagen)" [disabled]="t.imagen === null">
+                (click)="mostrarImagenModal(t.imagen)" [disabled]="!t.imagen">
                 <div>
                   <ion-icon color="primary" class="tamanoIconoEmpleado" name="happy-outline"></ion-icon>
                 </div>
@@ -308,14 +305,14 @@
               </ion-button>
 
               <ion-button class="ubicacionMED" mode="ios" color="light" shape="round"
-                (click)="abrirMapa(t.latitud, t.longitud)" [disabled]="t.latitud === null || t.longitud === null">
+                (click)="abrirMapa(t.latitud, t.longitud)" [disabled]=" !t.latitud || !t.longitud">
                 <div>
                   <ion-icon color="primary" class="tamanoIconoEmpleado" name="location-outline"></ion-icon>
                 </div>
               </ion-button>
 
               <ion-button class="ubicacionDER" mode="ios" color="light" shape="round"
-                (click)="mostrarImagenModal(t.imagen)" [disabled]="t.imagen === null">
+                (click)="mostrarImagenModal(t.imagen)" [disabled]="!t.imagen">
                 <div>
                   <ion-icon color="primary" class="tamanoIconoEmpleado" name="happy-outline"></ion-icon>
                 </div>
