@@ -15,7 +15,7 @@
         <ion-label>Hora del Servidor</ion-label>
       </ion-segment-button>
       <ion-segment-button value="timbreCelular">
-        <ion-label>Hora del celular</ion-label>
+        <ion-label>Hora del dispositivo</ion-label>
       </ion-segment-button>
     </ion-segment>
 
@@ -71,10 +71,10 @@
                     <p *ngSwitchCase="'PES'">Entrada o salida permiso</p>
                     <p *ngSwitchCase="'AES'">Entrada o salida almuerzo/p>
                     <p *ngSwitchCase="'EoS'">Entrada o salida jornada</p>
-                    <p *ngSwitchCase="'E'">Inicio de la jornada</p>
-                    <p *ngSwitchCase="'S'">Fin de la jornada</p>
-                    <p *ngSwitchCase="'S/A'">Inicio almuerzo</p>
-                    <p *ngSwitchCase="'E/A'">Fin almuerzo</p>
+                    <p *ngSwitchCase="'E'">Entrada jornada</p>
+                    <p *ngSwitchCase="'S'">Salida jornada</p>
+                    <p *ngSwitchCase="'I/A'">Inicio alimentación</p>
+                    <p *ngSwitchCase="'F/A'">Fin alimentación</p>
                     <p *ngSwitchCase="'S/P'">Inicio permiso</p>
                     <p *ngSwitchCase="'E/P'">Fin permiso</p>
                     <p *ngSwitchCase="'HA'">Timbre abierto</p>
@@ -129,10 +129,10 @@
                     <p *ngSwitchCase="'PES'">Entrada o salida permiso</p>
                     <p *ngSwitchCase="'AES'">Entrada o salida almuerzo/p>
                     <p *ngSwitchCase="'EoS'">Entrada o salida jornada</p>
-                    <p *ngSwitchCase="'E'">Inicio de la jornada</p>
-                    <p *ngSwitchCase="'S'">Fin de la jornada</p>
-                    <p *ngSwitchCase="'S/A'">Inicio almuerzo</p>
-                    <p *ngSwitchCase="'E/A'">Fin almuerzo</p>
+                    <p *ngSwitchCase="'E'">Entrada jornada</p>
+                    <p *ngSwitchCase="'S'">Salida jornada</p>
+                    <p *ngSwitchCase="'I/A'">Inicio alimentación</p>
+                    <p *ngSwitchCase="'F/A'">Fin alimentación</p>
                     <p *ngSwitchCase="'S/P'">Inicio permiso</p>
                     <p *ngSwitchCase="'E/P'">Fin permiso</p>
                     <p *ngSwitchCase="'HA'">Timbre abierto</p>
@@ -206,7 +206,7 @@
         <ion-list *ngIf="verTipoTimbre === 'timbreCelular'">
 
           <ion-item-group
-            *ngFor="let item of timbres_filtro | keyvalue | paginate: { itemsPerPage: 7, currentPage: paginafiltro }">
+            *ngFor="let item of timbres_filtro | keyvalue : ordenOriginal | paginate: { itemsPerPage: 7, currentPage: paginafiltro }">
             <ion-item-divider mode="md" mode="ios" style="font-size: 90%; font-weight: 100;">
               <ion-label> {{item.key}}</ion-label>
             </ion-item-divider>
@@ -219,10 +219,10 @@
                     <p *ngSwitchCase="'PES'">Entrada o salida permiso</p>
                     <p *ngSwitchCase="'AES'">Entrada o salida almuerzo/p>
                     <p *ngSwitchCase="'EoS'">Entrada o salida jornada</p>
-                    <p *ngSwitchCase="'E'">Inicio de la jornada</p>
-                    <p *ngSwitchCase="'S'">Fin de la jornada</p>
-                    <p *ngSwitchCase="'S/A'">Inicio almuerzo</p>
-                    <p *ngSwitchCase="'E/A'">Fin almuerzo</p>
+                    <p *ngSwitchCase="'E'">Entrada jornada</p>
+                    <p *ngSwitchCase="'S'">Salida jornada</p>
+                    <p *ngSwitchCase="'I/A'">Inicio alimentación</p>
+                    <p *ngSwitchCase="'F/A'">Fin alimentación</p>
                     <p *ngSwitchCase="'S/P'">Inicio permiso</p>
                     <p *ngSwitchCase="'E/P'">Fin permiso</p>
                     <p *ngSwitchCase="'HA'">Timbre abierto</p>
@@ -265,7 +265,7 @@
 
         <ion-list *ngIf="rol_empleado === 1 && verTipoTimbre === 'timbreServidor'">
           <ion-item-group
-            *ngFor="let item of timbres_filtro | keyvalue | paginate: { itemsPerPage: 7, currentPage: paginafiltro }">
+            *ngFor="let item of timbres_filtro | keyvalue : ordenOriginal | paginate: { itemsPerPage: 7, currentPage: paginafiltro }">
             <ion-item-divider mode="md" mode="ios" style="font-size: 90%; font-weight: 100;">
               <ion-label> {{item.key}}</ion-label>
             </ion-item-divider>
@@ -277,10 +277,10 @@
                     <p *ngSwitchCase="'PES'">Entrada o salida permiso</p>
                     <p *ngSwitchCase="'AES'">Entrada o salida almuerzo/p>
                     <p *ngSwitchCase="'EoS'">Entrada o salida jornada</p>
-                    <p *ngSwitchCase="'E'">Inicio de la jornada</p>
-                    <p *ngSwitchCase="'S'">Fin de la jornada</p>
-                    <p *ngSwitchCase="'S/A'">Inicio almuerzo</p>
-                    <p *ngSwitchCase="'E/A'">Fin almuerzo</p>
+                    <p *ngSwitchCase="'E'">Entrada jornada</p>
+                    <p *ngSwitchCase="'S'">Salida jornada</p>
+                    <p *ngSwitchCase="'I/A'">Inicio alimentación</p>
+                    <p *ngSwitchCase="'F/A'">Fin alimentación</p>
                     <p *ngSwitchCase="'S/P'">Inicio permiso</p>
                     <p *ngSwitchCase="'E/P'">Fin permiso</p>
                     <p *ngSwitchCase="'HA'">Timbre abierto</p>

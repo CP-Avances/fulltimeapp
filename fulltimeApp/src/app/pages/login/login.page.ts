@@ -205,6 +205,8 @@ export class LoginPage implements OnInit {
           localStorage.setItem('token', datos.token);
           localStorage.setItem('ip', datos.ip_adress);
           localStorage.setItem('username', datos.usuario);
+          localStorage.setItem('imagen', datos.imagen);
+
           localStorage.setItem('id_empresa', datos.empresa);
           // localStorage.setItem('autoriza', datos.estado);
           localStorage.setItem('csucur', datos.sucursal);

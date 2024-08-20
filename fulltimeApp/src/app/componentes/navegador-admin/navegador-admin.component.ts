@@ -13,8 +13,10 @@ import { ActionPerformed, LocalNotifications, ScheduleOptions } from '@capacitor
 
 import { Router } from '@angular/router';
 import { ParametrosService } from 'src/app/services/parametros.service';
+import { EmpleadosService } from 'src/app/services/empleados.service';
 import { Socket } from 'ngx-socket-io';
 import { PluginListenerHandle } from '@capacitor/core';
+import { VerImagenModalPage } from 'src/app/modals/ver-timbre-empleado/ver-imagen/ver-imagen.component';
 
 
 @Component({
@@ -25,6 +27,8 @@ import { PluginListenerHandle } from '@capacitor/core';
 export class NavegadorAdminComponent implements OnInit {
 
   username: string = '';
+  imagen: string = '';
+
   idEmpleadoIngresa: number = 0;
   valor: boolean = true;
   loading: boolean = true;
@@ -46,6 +50,7 @@ export class NavegadorAdminComponent implements OnInit {
   constructor(
     private userService: DataUserLoggedService,
     private relojService: RelojServiceService,
+    private empleadoService: EmpleadosService,
     private menu: MenuController,
     public modalController: ModalController,
     public pooverCtrl: PopoverController,
@@ -66,7 +71,7 @@ export class NavegadorAdminComponent implements OnInit {
 
   ngOnInit() {
     this.username = this.userService.username;
-
+    this.obtenerImagen64();
     this.idEmpleadoIngresa = parseInt(localStorage.getItem('empleadoID'));
     this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
 
@@ -95,9 +100,7 @@ export class NavegadorAdminComponent implements OnInit {
                 largeBody: this.mensaje + "\n" + data_llega.mensaje,
               }]
             }
-
             LocalNotifications.schedule(options);
-
             /*LocalNotifications.addListener('localNotificationActionPerformed', (notificationAction: ActionPerformed) => void {})
             .then((value: PluginListenerHandle) => {
               this.router.navigate(['/empleado/solicitar-permisos']);
@@ -123,7 +126,7 @@ export class NavegadorAdminComponent implements OnInit {
           console.log("Usuario envio", this.empleEnvia);
 
           try {
-            //this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
+            this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
             var t = new Date();
             t.setSeconds(t.getSeconds() + 5);
             let id = this.ids.length;
@@ -156,7 +159,7 @@ export class NavegadorAdminComponent implements OnInit {
     //Carga y Muestra el numero de notificaciones,   
     this.notificacionService.getNotificacionesByIdEmpleado(id_empleado).subscribe(
       notificacion => {
-        console.log("ver todas la notificaciones del empleado: ", notificacion )
+        console.log("ver todas la notificaciones del empleado: ", notificacion)
         this.notificaciones = notificacion;
 
         this.notificacionService.getNotificacionesTimbreByIdEmpleado(id_empleado).subscribe(
@@ -355,6 +358,20 @@ export class NavegadorAdminComponent implements OnInit {
     this.relojService.cerrarSesion();
     this.closeAdmin();
   }
+
+  obtenerImagen64() {
+    this.empleadoService.ObtenerImagen(localStorage.getItem("empleadoID"), localStorage.getItem("imagen")).subscribe(data => {
+      if (!data.imagen) {
+        this.imagen = '';
+        console.log("imagen base 64: ", data.imagen)
+      }
+      else {
+        this.imagen = 'data:image/jpeg;base64,' + data.imagen;
+        console.log("imagen base 64: ", this.imagen)
+      }
+    });
+  }
+
 
   async presentModalTimbresPerdidos() {
     this.closeAdmin();

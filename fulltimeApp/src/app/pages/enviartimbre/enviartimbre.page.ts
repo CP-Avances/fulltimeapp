@@ -395,7 +395,7 @@ export class EnviartimbrePage implements OnInit {
       case "Timbre abierto":
         {
           this.nuevoTimbre.accion = "HA";
-          return "6";
+          return "7";
         }
         break;
 
@@ -479,7 +479,7 @@ export class EnviartimbrePage implements OnInit {
   //Metodo que guarda el timbre en la base de datos en la tabla timbres.
   guardarEnBDD() {
     this.nuevoTimbre.codigo = this.codigo;
-    this.nuevoTimbre.tecla_funcion = this.obtenerIdTipo();
+    //this.nuevoTimbre.tecla_funcion = this.obtenerIdTipo();
     this.nuevoTimbre.fecha_hora_timbre = this.fechaTransformada + " " + this.horaTransformada;
     this.nuevoTimbre.tecla_funcion = this.obtenerIdTipo();
     this.nuevoTimbre.user_name = this.userService.username;

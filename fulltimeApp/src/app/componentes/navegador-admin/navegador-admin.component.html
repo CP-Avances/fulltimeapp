@@ -1,24 +1,33 @@
 <ion-header id="main-admin">
     <ion-toolbar>
-        <div class="nombreusua">
-            <h6> Admin - <b>{{username}}</b></h6>
-        </div>
-        
+        <!-- Mover el botón de notificaciones al inicio del header -->
         <ion-buttons slot="start">
             <ion-button (click)="openAdmin()" style="margin-right: -5px;">
                 <ion-icon name="menu-outline"></ion-icon>
             </ion-button>
         </ion-buttons>
+        <ion-buttons slot="start">
+            <img [src]="imagen"
+                 alt="Perfil" 
+                 style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-left: 15%">
+        </ion-buttons>
+
+
+        <div class="nombreusua" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);">
+            <h6>Admin - <b>{{username}}</b></h6>
+        </div>
+
 
         <ion-buttons slot="end">
-            <ion-button slot="end" (click)="Mostrarpopnotificaciones($event)" id="notification-button" style="width: 40px;">
+            <ion-button slot="end" (click)="Mostrarpopnotificaciones($event)" id="notification-button"
+                style="width: 40px;">
                 <ion-icon name="notifications-outline"></ion-icon>
             </ion-button>
             <ion-badge *ngIf="(countNoti != 0) && (countNoti != null)" id="notifications-badge" mode="md">
                 {{countNoti}}
             </ion-badge>
         </ion-buttons>
-        
+
     </ion-toolbar>
 </ion-header>
 
@@ -35,7 +44,7 @@
     </ion-header>
     <ion-content>
         <ion-list mode="md" style="height: 100%;">
-            <ion-item [routerLink]="['/adminpage/solicitudes']"  (click)="closeAdmin()">
+            <ion-item [routerLink]="['/adminpage/solicitudes']" (click)="closeAdmin()">
                 <ion-icon name="folder-open-outline" slot="start" color="dark"></ion-icon>
                 <ion-label>Solicitudes</ion-label>
             </ion-item>
@@ -60,20 +69,20 @@
                 <ion-label>Justificar Atrasos</ion-label>
             </ion-item>
             <ion-item (click)="btn_aproPermisosClick()">
-                <ion-icon name="document-outline" slot="start" [color] = "colorp"></ion-icon>
-                <ion-label [color] = "colorp">Aprobar Permisos</ion-label>
+                <ion-icon name="document-outline" slot="start" [color]="colorp"></ion-icon>
+                <ion-label [color]="colorp">Aprobar Permisos</ion-label>
             </ion-item>
             <ion-item (click)="btn_aproVacacionesClick()">
-                <ion-icon name="airplane-outline" slot="start" [color] = "colorv"></ion-icon>
-                <ion-label [color] = "colorv">Aprobar Vacaciones</ion-label>
+                <ion-icon name="airplane-outline" slot="start" [color]="colorv"></ion-icon>
+                <ion-label [color]="colorv">Aprobar Vacaciones</ion-label>
             </ion-item>
             <ion-item (click)="btn_aproHorasExtrasClick()">
-                <ion-icon name="timer-outline" slot="start" [color] = "colorh"></ion-icon>
-                <ion-label [color] = "colorh">Aprobar Horas Extras</ion-label>
+                <ion-icon name="timer-outline" slot="start" [color]="colorh"></ion-icon>
+                <ion-label [color]="colorh">Aprobar Horas Extras</ion-label>
             </ion-item>
             <ion-item (click)="btn_aproAlimentacionClick()">
-                <ion-icon name="restaurant-outline" slot="start" [color] = "colora"></ion-icon>
-                <ion-label [color] = "colora">Aprobar Alimentación</ion-label>
+                <ion-icon name="restaurant-outline" slot="start" [color]="colora"></ion-icon>
+                <ion-label [color]="colora">Aprobar Alimentación</ion-label>
             </ion-item>
             <ion-item [routerLink]="['/adminpage/reportes']" (click)="closeAdmin()">
                 <ion-icon name="documents-outline" slot="start" color="dark"></ion-icon>

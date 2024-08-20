@@ -232,6 +232,8 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
         this.todosPagina = true;
       }else{
         this.todosPagina = false;
+        this.filtroPagina = true;
+
       }
 
     }, err => {
@@ -248,11 +250,8 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
       console.log("ver fechas a filtrar", datos )
       this.filtimbre.PostFiltrotimbres(datos).subscribe(
         ress => {
-
           console.log("ver timbres filtrados", ress)
           let fechasObjeto_f = {}
-
-          
 
           ress.forEach(data => {
             if(!data.fecha_hora_timbre_servidor){
@@ -272,7 +271,7 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
           })
 
           this.timbres_filtro = fechasObjeto_f
-          console.log(this.timbres_filtro.length);
+          console.log("timbre filtrado por fechas ", this.timbres_filtro);
 
           if (Object.keys(fechasObjeto_f).length === 0) {
             this.filtro_mensaje = false;
@@ -280,8 +279,11 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
             this.vacio = true;
           }else if(Object.keys(fechasObjeto_f).length < 8){
             this.filtroPagina = true;
+
           }else{
             this.filtroPagina = false;
+
+            this.todosPagina =  true;
           }
 
         },

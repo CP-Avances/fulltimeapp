@@ -578,7 +578,7 @@ export class EnviarUsuarioComponent implements OnInit {
     }
     console.log(mensaje);
     this.restN.EnviarMensajeComunicado(mensaje).subscribe(res => {
-      console.log(res.message);
+      console.log(res.respuesta);
       this.restN.RecibirNuevosAvisos(res.respuesta);
     })
   }

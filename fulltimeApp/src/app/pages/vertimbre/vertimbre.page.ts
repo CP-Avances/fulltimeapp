@@ -158,7 +158,7 @@ export class VertimbrePage implements OnInit {
     this.timbres = [];
     this.relojService.obtenerTimbres(codigo).subscribe(
       res => {
-        console.log("ver timbres filtrados", res)
+        console.log("ver timbres ", res)
 
         let fechasObjeto = {}
         
@@ -183,7 +183,7 @@ export class VertimbrePage implements OnInit {
           }
           fechasObjeto[x.fecha].push(x)
         })
-        console.log('fechas ver ..... ', fechasObjeto);
+        console.log('timbres en el objeto', fechasObjeto);
 
 
         this.timbres = fechasObjeto
@@ -211,17 +211,14 @@ export class VertimbrePage implements OnInit {
       var datos = { fecInicio: this.fechaInicio, fecFinal: this.fechaFinal, codigo: localStorage.getItem('codigo') }
       this.filtimbre.PostFiltrotimbres(datos).subscribe(
         ress => {
-          console.log("fechas encontradas",ress )
-
+          console.log("ver timbres filtrados",ress )
           var fechasObjeto_f = {};
-
           ress.forEach(data => {
+            
             data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
             data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
-
             data.sfecha = '';
             data.shora = '';
-
             if (data.fecha_hora_timbre_servidor != null) {
               data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo);
               data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
@@ -229,9 +226,7 @@ export class VertimbrePage implements OnInit {
               data.sfecha = this.validar.FormatearFecha(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo);
               data.shora = this.validar.FormatearHora(moment(data.fecha_subida_servidor).format('HH:mm:ss'), this.formato_hora);
             }
-
           })
-
 
           ress.forEach(i => {
             if (!fechasObjeto_f.hasOwnProperty(i.fecha)) {
@@ -249,7 +244,14 @@ export class VertimbrePage implements OnInit {
             this.filtro = true;
             this.vacio = true;
           }
-
+          /*
+          else if(Object.keys(fechasObjeto_f).length < 8){
+            this.filtro = true;
+          }else{
+            this.filtro = false;
+          }
+            */
+        
         },
         err => {
           this.presentLoading("Intentando conectar con el servidor");
@@ -257,6 +259,9 @@ export class VertimbrePage implements OnInit {
       );
     }
   }
+
+
+  
 
   //cambiar el timbre del celular al del servidor y viceversa
   verTipoTimbre: string = 'timbreServidor';

@@ -96,27 +96,22 @@
           <ion-item-divider mode="md" mode="ios" style="font-size: 90%; font-weight: 100;">
             <ion-label> {{item.key}}</ion-label>
           </ion-item-divider>
-
           <ion-item *ngFor="let t of item.value">
             <div>
               <ion-label class="textoTimbreEmpleado" color="primary">
-
-
                 <div [ngSwitch]="t.accion">
                   <p *ngSwitchCase="'PES'">Entrada o salida permiso</p>
                   <p *ngSwitchCase="'AES'">Entrada o salida almuerzo/p>
                   <p *ngSwitchCase="'EoS'">Entrada o salida jornada</p>
-                  <p *ngSwitchCase="'E'">Inicio de la jornada</p>
-                  <p *ngSwitchCase="'S'">Fin de la jornada</p>
-                  <p *ngSwitchCase="'S/A'">Inicio almuerzo</p>
-                  <p *ngSwitchCase="'E/A'">Fin almuerzo</p>
+                  <p *ngSwitchCase="'E'">Entrada jornada</p>
+                  <p *ngSwitchCase="'S'">Salida jornada</p>
+                  <p *ngSwitchCase="'I/A'">Inicio alimentación</p>
+                  <p *ngSwitchCase="'F/A'">Fin alimentación</p>
                   <p *ngSwitchCase="'S/P'">Inicio permiso</p>
                   <p *ngSwitchCase="'E/P'">Fin permiso</p>
                   <p *ngSwitchCase="'HA'">Timbre abierto</p>
                   <p *ngSwitchDefault>Timbre desconocido</p>
                 </div>
-
-
                 <ion-label color="dark" class="textoObs" *ngIf="t.dispositivo_timbre!=''"
                   (click)="presentAlert(t.observacion,t.hora_timbre_diferente, t.ubicacion, t.novedades_conexion, t.conexion)">
                   <ion-icon color="danger" *ngIf="t.hora_timbre_diferente || t.conexion != true"
@@ -125,37 +120,26 @@
                 </ion-label>
               </ion-label>
             </div>
-
             <ion-button class="tamanoBotonDER" mode="ios" color="light">
               <div>
                 Hora: <br>
                 {{t.hora}}
-
               </div>
             </ion-button>
-
             <ion-button class="ubicacionMED" mode="ios" color="light" shape="round"
               (click)="abrirMapa(t.latitud, t.longitud)" [disabled]=" !t.latitud || !t.longitud">
               <div>
                 <ion-icon color="primary" class="tamanoIconoEmpleado" name="location-outline"></ion-icon>
               </div>
             </ion-button>
-
             <ion-button class="ubicacionDER" mode="ios" color="light" shape="round"
               (click)="mostrarImagenModal(t.imagen)" [disabled]="!t.imagen">
               <div>
-
                 <ion-icon color="primary" class="tamanoIconoEmpleado" name="happy-outline"></ion-icon>
-
               </div>
             </ion-button>
-
-
-
           </ion-item>
-
         </ion-item-group>
-
       </ion-list>
 
 
@@ -163,7 +147,7 @@
   </ion-content>
 
   <!--Configuracion del Pagination - ngxPaginationModulo-->
-  <ion-footer style=" width: 100%; padding: 0.5%;" [hidden]="todosPagina">
+  <ion-footer style=" width: 100%; padding: 0.5%;" *ngIf="!todosPagina">
     <ion-item style="font-size: 80%; margin: 1% 0% 1% 0%;">
       <pagination-controls class="paginacion" (pageChange)="pageActual = $event" [maxSize]=maxSize
         [directionLinks]=directionLinks [responsive]=responsive [autoHide]="autoHide"
@@ -198,23 +182,19 @@
           <ion-item *ngFor="let t of item.value">
             <div>
               <ion-label class="textoTimbreEmpleado" color="primary">
-
-
                 <div [ngSwitch]="t.accion">
                   <p *ngSwitchCase="'PES'">Entrada o salida permiso</p>
                   <p *ngSwitchCase="'AES'">Entrada o salida almuerzo/p>
                   <p *ngSwitchCase="'EoS'">Entrada o salida jornada</p>
                   <p *ngSwitchCase="'E'">Inicio de la jornada</p>
                   <p *ngSwitchCase="'S'">Fin de la jornada</p>
-                  <p *ngSwitchCase="'S/A'">Inicio almuerzo</p>
-                  <p *ngSwitchCase="'E/A'">Fin almuerzo</p>
+                  <p *ngSwitchCase="'I/A'">Inicio almuerzo</p>
+                  <p *ngSwitchCase="'F/A'">Fin almuerzo</p>
                   <p *ngSwitchCase="'S/P'">Inicio permiso</p>
                   <p *ngSwitchCase="'E/P'">Fin permiso</p>
                   <p *ngSwitchCase="'HA'">Timbre abierto</p>
                   <p *ngSwitchDefault>Timbre desconocido</p>
                 </div>
-
-
                 <ion-label color="dark" class="textoObs" *ngIf="t.dispositivo_timbre!=''"
                   (click)="presentAlert(t.observacion,t.hora_timbre_diferente, t.ubicacion, t.novedades_conexion, t.conexion)">
                   <ion-icon color="danger" *ngIf="t.hora_timbre_diferente || t.conexion != true"
@@ -223,38 +203,32 @@
                 </ion-label>
               </ion-label>
             </div>
-
             <ion-button class="tamanoBotonDER" mode="ios" color="light">
               <div>
                 Hora: <br>
                 {{t.hora}}
               </div>
             </ion-button>
-
             <ion-button class="ubicacionMED" mode="ios" color="light" shape="round"
               (click)="abrirMapa(t.latitud, t.longitud)" [disabled]=" !t.latitud || !t.longitud">
               <div>
                 <ion-icon color="primary" class="tamanoIconoEmpleado" name="location-outline"></ion-icon>
               </div>
             </ion-button>
-
             <ion-button class="ubicacionDER" mode="ios" color="light" shape="round"
             (click)="mostrarImagenModal(t.imagen)" [disabled]="!t.imagen">
             <div>
               <ion-icon color="primary" class="tamanoIconoEmpleado" name="happy-outline"></ion-icon>
             </div>
           </ion-button>
-
           </ion-item>
-
         </ion-item-group>
-
       </ion-list>
     </ng-template>
   </ion-content>
 
   <!--Configuracion del Pagination - ngxPaginationModulo-->
-  <ion-footer style=" width: 100%; padding: 0.5%;" [hidden]="filtroPagina">
+  <ion-footer style=" width: 100%; padding: 0.5%;" *ngIf="!filtroPagina">
     <ion-item style="font-size: 80%; margin: 1% 0% 2% 0%;">
       <pagination-controls class="paginacion" (pageChange)="pagefiltro = $event" [maxSize]=maxSize
         [directionLinks]=directionLinks [responsive]=responsive [autoHide]="autoHide"

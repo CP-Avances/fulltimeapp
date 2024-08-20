@@ -22,6 +22,12 @@ export class DataUserLoggedService {
   }
 
 
+  public get imagen(): any {
+    const u = (localStorage.getItem('imagen') === null) ? '' : localStorage.getItem('imagen');
+    return u;
+  }
+
+
   public get dataUser(): any {
     return {
       Udepartamento: localStorage.getItem('ndepartamento'),

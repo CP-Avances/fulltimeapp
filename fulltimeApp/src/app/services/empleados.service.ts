@@ -27,12 +27,12 @@ export class EmpleadosService {
 
 
 
-   // BUSCAR UN REGISTRO DE USUARIO  --**VERIFICADO
-   BuscarUnEmpleado(id: number): Observable<any> {
+  // BUSCAR UN REGISTRO DE USUARIO  --**VERIFICADO
+  BuscarUnEmpleado(id: number): Observable<any> {
     return this.http.get<any>(`${environment.url}/empleado/${id}`);
   }
 
-  
+
   ObtenerHorariosEmpleado(codigo: number | string) {
     const params = new HttpParams()
       .set('codigo', codigo);
@@ -42,7 +42,7 @@ export class EmpleadosService {
       )
   }
 
-  getHorariosEmpleadobyCodigo(datos){
+  getHorariosEmpleadobyCodigo(datos) {
     const params = new HttpParams()
       .set('codigo', datos.codigo)
       .set('fecha_inicio', datos.fecha)
@@ -52,7 +52,7 @@ export class EmpleadosService {
       )
   }
 
-  getPlanificacionHorariosEmplbyCodigo(codigo){
+  getPlanificacionHorariosEmplbyCodigo(codigo) {
     const params = new HttpParams()
       .set('codigo', codigo)
     return this.http.get<HorarioE[]>(`${this.apiUrl}/empleado/horariosempleado/planificacionHorarioEmplCodigo`, { params })
@@ -61,7 +61,7 @@ export class EmpleadosService {
       )
   }
 
-  BuscarPlanificacionHorarioEmple(datos: any){
+  BuscarPlanificacionHorarioEmple(datos: any) {
     /*
     const params = new HttpParams()
       .set('fecha_inicio', datos.fecha_inicio)
@@ -73,7 +73,7 @@ export class EmpleadosService {
       )
 
       */
-      return this.http.post<any>(`${environment.url}/planificacion_general/horario-general-planificacion`, datos);
+    return this.http.post<any>(`${environment.url}/planificacion_general/horario-general-planificacion`, datos);
 
   }
 
@@ -105,6 +105,11 @@ export class EmpleadosService {
   // METODO PARA BUSCAR HORARIO DEL USUARIO POR HORAS DIAS DIFERENTES (DD)
   BuscarComidaHorarioHorasDD(datos: any) {
     return this.http.post<any>(`${environment.url}/empleado/horario-comida-horas-dias-diferentes/`, datos);
+  }
+
+  // METODO PARA MOSTRAR IMAGEN DEL EMPLEADO **USADO
+  ObtenerImagen(id: any, imagen: any) {
+    return this.http.get<any>(`${this.apiUrl}/empleado/img/codificado/${id}/${imagen}`)
   }
 
 }

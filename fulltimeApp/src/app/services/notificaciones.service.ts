@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { Socket } from 'ngx-socket-io';
 
 
 @Injectable({
@@ -18,12 +19,13 @@ export class NotificacionesService {
 
   constructor(
     private http: HttpClient,
-    //public socket: Socket,
+    public socket: Socket,
   ) { }
 
   // realtime
   RecibirNuevosAvisos(data: any) {
-    //console.log('Socket emite',this.socket.emit('nuevo_aviso', data));
+    console.log('Socket emite', this.socket.emit('nuevo_aviso', data));
+    this.socket.emit('nuevo_aviso', data);
   }
 
   /** ************************************************************************************ **
