@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
 import { Empresa } from 'src/app/interfaces/Empresa';
 import { Usuario } from 'src/app/interfaces/Usuario';
 import { DatePipe } from '@angular/common';
-import { AlertController, Platform, ToastController } from '@ionic/angular';
+import { AlertController, Platform, ToastController, ModalController } from '@ionic/angular';
 import { DataUserLoggedService } from '../../services/data-user-logged.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
+
 
 @Component({
   selector: 'app-informacion-empleado',
@@ -14,6 +15,10 @@ import { ValidacionesService } from 'src/app/libs/validaciones.service';
   styleUrls: ['./informacion-empleado.page.scss'],
 })
 export class InformacionEmpleadoPage implements OnInit {
+
+  @Input() data: any;
+
+
   pipe = new DatePipe('en-US');
   fecha: any;
 
@@ -52,22 +57,31 @@ export class InformacionEmpleadoPage implements OnInit {
     public platform: Platform,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
+    public modalController: ModalController,
+
   ) { }
 
   ngOnInit() {
-    this.usuario.correo = localStorage.getItem('correo')!;
-    this.usuario.apellido = localStorage.getItem('ap')!;
-    this.usuario.nombre = localStorage.getItem('nom')!;
-    this.usuario.cedula = localStorage.getItem('UCedula')!;
-    this.usuario.usuario = localStorage.getItem('username')!;
+    this.usuario.correo = this.data.correo;
+    this.usuario.apellido = this.data.apellido;
+    this.usuario.nombre = this.data.nombre;
+    this.usuario.cedula = this.data.cedula;
+    this.usuario.usuario = this.data.usuario;
 
     console.log('data vacuna empleado ... ', this.dataUser.dataVacuna)
     this.BuscarFormatos();
   }
 
+  closeModal() {
+    console.log('CERRAR MODAL USUARIOS');
+    this.modalController.dismiss({
+      'refreshInfo': true
+    });
+  }
+
   fecha_: string = '';
   caduca_: string = '';
-  
+
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
   formato_fecha: string;
   formato_hora: string;
@@ -77,7 +91,7 @@ export class InformacionEmpleadoPage implements OnInit {
         this.formato_fecha = resp.fecha;
         this.formato_hora = resp.hora;
         this.fecha_ = this.validar.FormatearFecha(this.dataUser.dataVacuna.fecha, this.formato_fecha, this.validar.dia_completo);
-        this.caduca_ = this.validar.FormatearFecha(this.dataUser.dataApp.caducidad_licencia, this.formato_fecha, this.validar.dia_completo);      
+        this.caduca_ = this.validar.FormatearFecha(this.dataUser.dataApp.caducidad_licencia, this.formato_fecha, this.validar.dia_completo);
       }
     )
   }

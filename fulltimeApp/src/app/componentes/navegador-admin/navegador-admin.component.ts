@@ -73,87 +73,91 @@ export class NavegadorAdminComponent implements OnInit {
     this.username = this.userService.username;
     this.obtenerImagen64();
     this.idEmpleadoIngresa = parseInt(localStorage.getItem('empleadoID'));
+    console.log
     this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
 
     this.socket.on('recibir_notificacion', (data_llega: any) => {
       this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
-      if (data_llega.id_send_empl !== this.idEmpleadoIngresa) {
-        console.log("Notificacion: ", data_llega);
-        if (data_llega.id_receives_empl === this.idEmpleadoIngresa) {
-          this.mensaje = data_llega.usuario;
+      console.log("Notificacion: ", data_llega);
+      if (data_llega.id_receives_empl === this.idEmpleadoIngresa) {
+        this.mensaje = data_llega.usuario;
 
-          try {
-            //this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
-            var t = new Date();
-            t.setSeconds(t.getSeconds() + 5);
-            let id = this.ids.length;
-            this.ids.push(id);
+        try {
+          //this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
+          var t = new Date();
+          t.setSeconds(t.getSeconds() + 5);
+          let id = this.ids.length;
+          this.ids.push(id);
 
-            let options: ScheduleOptions = {
-              notifications: [{
-                id: data_llega.id,
-                title: "Fulltime Notificacion",
-                body: this.mensaje,
-                schedule: {
-                  allowWhileIdle: false,
-                },
-                largeBody: this.mensaje + "\n" + data_llega.mensaje,
-              }]
-            }
-            LocalNotifications.schedule(options);
-            /*LocalNotifications.addListener('localNotificationActionPerformed', (notificationAction: ActionPerformed) => void {})
-            .then((value: PluginListenerHandle) => {
-              this.router.navigate(['/empleado/solicitar-permisos']);
-            });*/
-
-          } catch (error) {
-            this.mostrarToasNoti("No se pudo resibir la notificacion: \n" + error);
-            console.log("Problemas en la notificacion: ", error);
+          let options: ScheduleOptions = {
+            notifications: [{
+              id: data_llega.id,
+              title: "Fulltime Notificacion",
+              body: this.mensaje,
+              schedule: {
+                allowWhileIdle: false,
+              },
+              largeBody: this.mensaje + "\n" + data_llega.mensaje,
+            }]
           }
-        }
+          LocalNotifications.schedule(options);
+          /*LocalNotifications.addListener('localNotificationActionPerformed', (notificationAction: ActionPerformed) => void {})
+          .then((value: PluginListenerHandle) => {
+            this.router.navigate(['/empleado/solicitar-permisos']);
+          });*/
 
+        } catch (error) {
+          this.mostrarToasNoti("No se pudo resibir la notificacion: \n" + error);
+          console.log("Problemas en la notificacion: ", error);
+        }
       }
+
+
 
     });
 
     this.socket.on('recibir_aviso', (data_llega: any) => {
+      console.log(" entrando al proceso de notificaciones")
       this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
-      if (data_llega.id_send_empl !== this.idEmpleadoIngresa) {
-        console.log("Aviso recibido", data_llega.id);
+      console.log("Aviso recibido", data_llega.id);
 
-        if (data_llega.id_receives_empl === this.idEmpleadoIngresa) {
-          this.mensaje = data_llega.usuario;
-          console.log("Usuario envio", this.empleEnvia);
+      if (data_llega.id_receives_empl === this.idEmpleadoIngresa) {
+        this.mensaje = data_llega.usuario;
+        console.log("Usuario envio", this.empleEnvia);
 
-          try {
-            this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
-            var t = new Date();
-            t.setSeconds(t.getSeconds() + 5);
-            let id = this.ids.length;
-            this.ids.push(id);
+        try {
+          this.mostrarToasNoti("Notificacion Recibida de " + data_llega + "\n");
+          var t = new Date();
+          t.setSeconds(t.getSeconds() + 5);
+          let id = this.ids.length;
+          this.ids.push(id);
 
-            let options: ScheduleOptions = {
-              notifications: [{
-                id: data_llega.id,
-                title: "Fulltime Aviso",
-                body: this.mensaje,
-                largeBody: this.mensaje + "\n" + data_llega.descripcion,
-                schedule: {
-                  allowWhileIdle: true,
-                }
-              }]
-            }
-
-            LocalNotifications.schedule(options).then(() => { });
-
-          } catch (error) {
-            this.mostrarToasNoti("No se pudo resibir el Aviso: \n" + error);
-            console.log("Problemas en el Aviso: ", error);
+          let options: ScheduleOptions = {
+            notifications: [{
+              id: data_llega.id,
+              title: "Fulltime Aviso",
+              body: this.mensaje,
+              largeBody: this.mensaje + "\n" + data_llega.descripcion,
+              schedule: {
+                allowWhileIdle: true,
+              }
+            }]
           }
+          console.log("ver options", options)
+
+          LocalNotifications.schedule(options).then(() => { });
+
+        } catch (error) {
+          this.mostrarToasNoti("No se pudo resibir el Aviso: \n" + error);
+          console.log("Problemas en el Aviso: ", error);
         }
       }
+
     });
+
+
   }
+
 
   LlamarNotificcaccciones(id_empleado: number) {
     //Carga y Muestra el numero de notificaciones,   

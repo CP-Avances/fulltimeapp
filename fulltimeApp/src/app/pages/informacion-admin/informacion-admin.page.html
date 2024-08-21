@@ -94,7 +94,7 @@
       <ion-progress-bar value="0.5" buffer="0.75"></ion-progress-bar>
     </div>
 
-    <ion-item style="margin: 2.5%; padding: -2%; border-radius: 3%;" 
+    <ion-item style="margin: 2.5%; padding: -2%; border-radius: 3%;"
       *ngFor="let e of empleados | paginate: { itemsPerPage: 10, currentPage: pageActual }">
       <ion-avatar slot="start">
         <ion-icon name="person-circle-outline" color="theme" style="font-size: 30px;"></ion-icon>
@@ -103,28 +103,26 @@
 
         <h2> {{e.fullname}}</h2>
 
-        <p>Nombre de usuario: {{e.usuario}} </p>
         <ion-text color="success">
           <p *ngIf="e.id_rol==1" color="success"> Administrador </p>
         </ion-text>
       </ion-label>
+
+      <div (click)="presentModal(e)">
+        <ion-icon color="theme" style="font-size: 30px;" class="tamanoIconoEmpleado" name="information-circle-outline"></ion-icon>
+      </div>
+
     </ion-item>
   </ion-list>
 
   <!--Configuracion del Pagination - ngxPaginationModulo-->
   <ion-item style="font-size: 80%; margin: 0% 0% 1% 0%;" [hidden]="ver">
-    <pagination-controls 
-        class="paginacion" 
-        (pageChange)="pageActual = $event" 
-        [maxSize] = maxSize
-        [directionLinks] = directionLinks
-        [responsive] = responsive 
-        [autoHide]="autoHide"
-        [previousLabel]="labels.previousLabel"
-        [nextLabel]="labels.nextLabel"
-        [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
-        [screenReaderPageLabel]="labels.screenReaderPageLabel"
-        [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+    <pagination-controls class="paginacion" (pageChange)="pageActual = $event" [maxSize]=maxSize
+      [directionLinks]=directionLinks [responsive]=responsive [autoHide]="autoHide"
+      [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
+      [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+      [screenReaderPageLabel]="labels.screenReaderPageLabel"
+      [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
     </pagination-controls>
   </ion-item>
 </ion-content>

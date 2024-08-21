@@ -1,4 +1,12 @@
 <ion-header style="color: #000000;">
+  <ion-toolbar>
+    <ion-title>Ver Usuario</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
   <div style="padding:1%; background: white">
     <br><br>
     <ion-img class="center" style="width:45%;" src="../../../assets/images/C_FTLOGORV.png"></ion-img>
@@ -39,6 +47,7 @@
       </ion-card>
     </ion-list>
 
+    <!--
     <ion-list mode="md">
       <ion-list-header>
         <ion-label style="text-align:center">
@@ -58,6 +67,7 @@
         </ion-list>
       </ion-card>
     </ion-list>
+    -->
 
     <ion-list mode="md" *ngIf="app_vacuna.id_tipo_vacuna != ''">
       <ion-list-header>

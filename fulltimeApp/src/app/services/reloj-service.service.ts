@@ -105,6 +105,7 @@ export class RelojServiceService {
     localStorage.setItem('primeraVez', "true");
   }
   esPrimeraVez() {
+    console.log("esPrimeraVez()",!!localStorage.getItem('primeraVez') )
     return !!localStorage.getItem('primeraVez');
   }
   esAdministrador() {

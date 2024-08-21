@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
+
 import { InformacionEmpleadoPage } from './informacion-empleado.page';
 import { InformacionEmpleadoPageRoutingModule } from './informacion-empleado-routing.module';
 import { ComponentesModule } from '../../componentes/componentes.module';

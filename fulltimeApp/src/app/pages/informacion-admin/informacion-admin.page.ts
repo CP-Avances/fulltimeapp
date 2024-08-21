@@ -6,13 +6,15 @@ import { DatePipe } from '@angular/common';
 import { DataUserLoggedService } from '../../services/data-user-logged.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
-
+import { ModalController, Platform, ToastController } from '@ionic/angular';
+import { InformacionEmpleadoPage } from '../informacion-empleado/informacion-empleado.page'; 
 @Component({
   selector: 'app-informacion-admin',
   templateUrl: './informacion-admin.page.html',
   styleUrls: ['./informacion-admin.page.scss']
 })
 export class InformacionAdminPage implements OnInit {
+  modal: HTMLIonModalElement;
 
   existenEmpleados = false;
   pipe = new DatePipe('en-US');
@@ -53,7 +55,9 @@ export class InformacionAdminPage implements OnInit {
     private relojService: RelojServiceService,
     private dataUser: DataUserLoggedService,
     public parametro: ParametrosService,
-    public validar: ValidacionesService
+    public validar: ValidacionesService,
+    public modalController: ModalController,
+
   ) { }
 
   ngOnInit() {
@@ -145,6 +149,28 @@ export class InformacionAdminPage implements OnInit {
       }
     );
   }
+
+  async presentModal(usuario: any) {
+    console.log("ver usuario", usuario)
+  
+    const modal = await this.modalController.create({
+      component: InformacionEmpleadoPage,
+      componentProps: {
+        'data': usuario,
+      },
+      cssClass: 'my-custom-class'
+    });
+    this.modal = modal;
+    await modal.present();
+
+
+    const { data: { refreshInfo } } = await modal.onDidDismiss()
+
+    if (refreshInfo) {
+      this.ngOnInit()
+    }
+  }
+
 
   //variables de configuracion del componente de paginacion (pagination-controls)
   public maxSize: number = 5;

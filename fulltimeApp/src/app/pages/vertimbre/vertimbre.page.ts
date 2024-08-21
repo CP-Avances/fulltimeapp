@@ -56,15 +56,16 @@ export class VertimbrePage implements OnInit {
     public platform: Platform,
     public validar: ValidacionesService,
 
-  ) {}
+  ) { }
 
   ngOnInit() {
     //obtener timbres de empleado  
     this.BuscarFormatos();
+    this.cargarTipoTimbreInicial();
     this.mostrarTimbres();
   }
 
-  ionViewWillLeave(){
+  ionViewWillLeave() {
     console.log('Sali de Vertimbre');
     this.limpiarRango_fechas();
     this.mostrarTimbres();
@@ -161,7 +162,7 @@ export class VertimbrePage implements OnInit {
         console.log("ver timbres ", res)
 
         let fechasObjeto = {}
-        
+
         res.forEach(data => {
           data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
           data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
@@ -171,7 +172,7 @@ export class VertimbrePage implements OnInit {
           if (data.fecha_hora_timbre_servidor != null) {
             data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo);
             data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
-          }else if(data.fecha_subida_servidor != null){
+          } else if (data.fecha_subida_servidor != null) {
             data.sfecha = this.validar.FormatearFecha(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo);
             data.shora = this.validar.FormatearHora(moment(data.fecha_subida_servidor).format('HH:mm:ss'), this.formato_hora);
           }
@@ -211,10 +212,10 @@ export class VertimbrePage implements OnInit {
       var datos = { fecInicio: this.fechaInicio, fecFinal: this.fechaFinal, codigo: localStorage.getItem('codigo') }
       this.filtimbre.PostFiltrotimbres(datos).subscribe(
         ress => {
-          console.log("ver timbres filtrados",ress )
+          console.log("ver timbres filtrados", ress)
           var fechasObjeto_f = {};
           ress.forEach(data => {
-            
+
             data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
             data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
             data.sfecha = '';
@@ -222,7 +223,7 @@ export class VertimbrePage implements OnInit {
             if (data.fecha_hora_timbre_servidor != null) {
               data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo);
               data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
-            }else if(data.fecha_subida_servidor != null){
+            } else if (data.fecha_subida_servidor != null) {
               data.sfecha = this.validar.FormatearFecha(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo);
               data.shora = this.validar.FormatearHora(moment(data.fecha_subida_servidor).format('HH:mm:ss'), this.formato_hora);
             }
@@ -251,7 +252,7 @@ export class VertimbrePage implements OnInit {
             this.filtro = false;
           }
             */
-        
+
         },
         err => {
           this.presentLoading("Intentando conectar con el servidor");
@@ -261,10 +262,21 @@ export class VertimbrePage implements OnInit {
   }
 
 
-  
+
 
   //cambiar el timbre del celular al del servidor y viceversa
-  verTipoTimbre: string = 'timbreServidor';
+  verTipoTimbre: string = '';
+
+  cargarTipoTimbreInicial() {
+    if(this.rol_empleado == 1){
+      this.verTipoTimbre = "timbreServidor";
+
+    }else{
+      this.verTipoTimbre = "timbreCelular";
+
+    }
+
+  }
   cambioHoraSC(event) {
     console.log(event.target.value);
     this.verTipoTimbre = event.target.value;
@@ -286,12 +298,12 @@ export class VertimbrePage implements OnInit {
 
   // ABRIR MAPA
   abrirMapa(latitud, longitud) {
-    if(latitud != '' && longitud != ''){
+    if (latitud != '' && longitud != '') {
       //codigo ´para abrir el mapa con las coordenadas
       //const rutaMapa = "https://www.google.com/maps/search/+" + latitud + "+" + longitud;
       const rutaMapa = "https://maps.google.com/?q=" + latitud + " , " + longitud
       window.open(rutaMapa);
-    }else{
+    } else {
       return this.mostrarToas('Lo sentimos no tiene las coordenadas de Ubicacion registradas', 3000, "danger");
     }
   }
@@ -299,21 +311,21 @@ export class VertimbrePage implements OnInit {
 
   async presentAlert(obs: any, hora_timbre_diferente: any, ubicacion: any, novedades_conexion: string, conexion: boolean) {
     let novedad = novedades_conexion;
-    if(conexion == true){ 
+    if (conexion == true) {
       novedad = 'Timbre sin novedad';
-      if(hora_timbre_diferente == true){
+      if (hora_timbre_diferente == true) {
         novedad = 'Hora timbre diferente al del Servidor'
-      } 
+      }
     }
 
     let mensaje = '';
 
     if (ubicacion) {
-        mensaje += `<br><br><ion-icon name="location-outline"></ion-icon> ${ubicacion}`;
+      mensaje += `<br><br><ion-icon name="location-outline"></ion-icon> ${ubicacion}`;
     }
 
     if (novedad) {
-        mensaje += `<br><br>${novedad}`;
+      mensaje += `<br><br>${novedad}`;
     }
 
     const alert = await this.alertController.create({
@@ -334,11 +346,11 @@ export class VertimbrePage implements OnInit {
   public autoHide: boolean = false;
   public responsive: boolean = true;
   public labels: any = {
-  previousLabel: 'Anterior',
-  nextLabel: 'Siguiente',
-  screenReaderPaginationLabel: 'Pagination',
-  screenReaderPageLabel: 'page',
-  screenReaderCurrentLabel: `You're on page`
+    previousLabel: 'Anterior',
+    nextLabel: 'Siguiente',
+    screenReaderPaginationLabel: 'Pagination',
+    screenReaderPageLabel: 'page',
+    screenReaderCurrentLabel: `You're on page`
   };
 
 
