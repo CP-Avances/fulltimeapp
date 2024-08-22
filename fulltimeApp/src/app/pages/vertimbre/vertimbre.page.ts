@@ -268,13 +268,13 @@ export class VertimbrePage implements OnInit {
   verTipoTimbre: string = '';
 
   cargarTipoTimbreInicial() {
-    if(this.rol_empleado == 1){
+   // if(this.rol_empleado == 1){
       this.verTipoTimbre = "timbreServidor";
 
-    }else{
-      this.verTipoTimbre = "timbreCelular";
+   // }else{
+    //  this.verTipoTimbre = "timbreCelular";
 
-    }
+   // }
 
   }
   cambioHoraSC(event) {

@@ -3,7 +3,7 @@ import { KeyboardResize, KeyboardStyle } from '@capacitor/keyboard';
 
 const config: CapacitorConfig = {
   appId: 'io.ionic.starter',
-  appName: 'fulltimeApp',
+  appName: 'Fulltime 4.0',
   webDir: 'www',
   bundledWebRuntime: false,
   server: {
@@ -20,6 +20,11 @@ const config: CapacitorConfig = {
       iconColor: "#488AFF",
       sound: "beep.wav",
     },
+    assets: {
+      iconPath: 'resources/icon.png',
+      splashPath: 'resources/splash.png'
+    }
+
   },
 };
 

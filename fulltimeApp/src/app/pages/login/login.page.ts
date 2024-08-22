@@ -59,7 +59,7 @@ export class LoginPage implements OnInit {
       this.navCtroller.navigateForward(['inicio']);
     } else if (this.relojService.estaLogueado() && this.relojService.existeRol()) {
      
-     
+     /*
       if (localStorage.getItem('rol') == "1") {
         this.navCtroller.pop();
         this.navCtroller.navigateRoot(['adminpage']);
@@ -69,9 +69,11 @@ export class LoginPage implements OnInit {
         this.navCtroller.pop();
         this.navCtroller.navigateRoot(['empleado']);
       }
+
+      */
         
-        //this.navCtroller.pop();
-        //this.navCtroller.navigateRoot(['adminpage']);
+        this.navCtroller.pop();
+        this.navCtroller.navigateRoot(['adminpage']);
       
 
 

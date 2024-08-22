@@ -34,7 +34,10 @@
           <!-- Checkbox para aceptar términos y condiciones -->
           <ion-item lines="none" *ngIf="!mostrarCheckboxInicialmente">
             <ion-checkbox slot="start" [(ngModel)]="aceptaTerminos" name="aceptaTerminos" required></ion-checkbox>
-            <ion-label>Acepto los <a href="https://casapazmino.com.ec/politicas-de-privacidad-reloj-virtual-ft/">términos y condiciones</a></ion-label>
+            <p class="paragraph-text">
+              He leído y presto mi consentimiento a los términos de uso de la aplicación, al procesamiento y tratamiento de mis datos personales conforme a lo dispuesto en la 
+              <a href="https://casapazmino.com.ec/politicas-de-privacidad-reloj-virtual-ft/"> Política de privacidad Reloj Virtual Fulltime</a>.
+            </p>
           </ion-item>
 
           <br>
