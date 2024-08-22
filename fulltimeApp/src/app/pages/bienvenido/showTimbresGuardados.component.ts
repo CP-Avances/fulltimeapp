@@ -24,7 +24,7 @@ import { DataUserLoggedService } from 'src/app/services/data-user-logged.service
     <br>
     <br>
     <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;">
-        Se iran registrando aqui los timbres simpre y cuando tenga conexion a Internet
+        Se iran registrando aqui los timbres cuando no tenga conexión a internet
     </ion-text>
   </div>
 

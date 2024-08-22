@@ -170,6 +170,11 @@ export class EnviarUsuarioComponent implements OnInit {
       });
       this.sucursales = verificados_suc;
       this.sucursales_filtro = [...this.sucursales]
+      if (this.sucursales_filtro.length < 11) {
+        this.verSucursal = true;
+     } else {
+        this.verSucursal = false;
+     }
       this.loadingEmpleado = true;
       this.departamentos = [];
       this.empleados = [];
@@ -206,6 +211,12 @@ export class EnviarUsuarioComponent implements OnInit {
       });
       this.departamentos = verificados_dep;
       this.departamentos_filtro = [...this.departamentos]
+
+      if (this.departamentos_filtro.length < 11) {
+        this.verDepartamento = true;
+     } else {
+        this.verDepartamento = false;
+     }
       this.loadingEmpleado = true;
       this.sucursales = [];
       this.empleados = [];
@@ -241,6 +252,12 @@ export class EnviarUsuarioComponent implements OnInit {
         })
       })
       this.empleados_filtro = [...this.empleados];
+      if (this.empleados_filtro.length < 11) {
+         this.ver = true;
+      } else {
+         this.ver = false;
+      }
+
       this.loadingEmpleado = true;
       this.sucursales = [];
       this.departamentos = [];
@@ -433,21 +450,21 @@ export class EnviarUsuarioComponent implements OnInit {
     })
     console.log('ver usuario---------------------------', usuarios);
     this.EnviarNotificaciones(usuarios);
-    this.closeModal();
+   this.closeModal();
   }
 
   ModelarDepartamentos(dataDepartamentos) {
     let usuarios: any = [];
     let respuesta = JSON.parse(sessionStorage.getItem('datos_comunicado'))
     respuesta.forEach((obj: any) => {
-        dataDepartamentos.find(obj2 => {
-          if (obj.id_depa === obj2.id) {
-             // if (obj3.comunicado_mail === true || obj3.comunicado_notificacion === true) {
-                usuarios.push(obj)
-             // }
-          }
-        })
-     
+      dataDepartamentos.find(obj2 => {
+        if (obj.id_depa === obj2.id) {
+          // if (obj3.comunicado_mail === true || obj3.comunicado_notificacion === true) {
+          usuarios.push(obj)
+          // }
+        }
+      })
+
     })
     console.log('ver usuario---------------------------', usuarios);
     this.EnviarNotificaciones(usuarios);
@@ -494,10 +511,10 @@ export class EnviarUsuarioComponent implements OnInit {
         data.forEach((obj: any) => {
 
           console.log("obj.comunicado_noti ", obj.comunicado_noti);
-         // if (obj.comunicado_notificacion === true) {
+          // if (obj.comunicado_notificacion === true) {
 
-            this.NotificarSistema(this.idEmpleado, obj.id);
-         // }
+          this.NotificarSistema(this.idEmpleado, obj.id);
+          // }
 
           this.cont = this.cont + 1;
           if (this.cont === data.length) {
@@ -599,6 +616,29 @@ export class EnviarUsuarioComponent implements OnInit {
         }
       });
   }
+
+
+  //variables de configuracion del componente de paginacion (pagination-controls)
+  pageActual: number = 1;
+  pageActualDepartamento: number = 1;
+  pageActualSucursal: number = 1;
+
+  ver: boolean = true;
+  verDepartamento: boolean = true;
+  verSucursal: boolean = true;
+
+
+  public maxSize: number = 5;
+  public directionLinks: boolean = true;
+  public autoHide: boolean = false;
+  public responsive: boolean = true;
+  public labels: any = {
+    previousLabel: 'ante..',
+    nextLabel: 'sigui..',
+    screenReaderPaginationLabel: 'Pagination',
+    screenReaderPageLabel: 'page',
+    screenReaderCurrentLabel: `You're on page`
+  };
 
 
 

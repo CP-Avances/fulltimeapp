@@ -239,7 +239,7 @@ export class LoginPage implements OnInit {
           // localStorage.setItem('bool_timbres', datos.acciones_timbres);
           // localStorage.setItem('fec_caducidad_licencia', datos.caducidad_licencia);
 
-          console.log("datos rol, ", datos.rol)
+          console.log("datos de ingreso ", datos)
           this.parametros.ObtenerDetallesParametros(6).subscribe(
             res => {
               console.log("ver parametro:", res)

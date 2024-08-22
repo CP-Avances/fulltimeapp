@@ -1,10 +1,6 @@
 <app-close-modal titleModal="Usuarios"></app-close-modal>
 <ion-content>
 
-
-
-
-
     <ion-list>
         <ion-radio-group [(ngModel)]="radioValue" (ionChange)="showValue()">
             <ion-text mode="ios" color="dark" style="text-align: center;">
@@ -28,7 +24,6 @@
         </div>
     </ion-content>
 
-
     <!-- LISTAR SUCURSALES -->
 
     <ion-row *ngIf="opcion_sucursal">
@@ -49,11 +44,25 @@
         <ion-text mode="ios" color="dark" style="text-align: center;">
             <h3>Resultado Sucursales</h3>
         </ion-text>
-        <ion-item *ngFor="let s of sucursales_filtro" class="item-color" mode="md" lines="full">
+        <ion-item
+            *ngFor="let s of sucursales_filtro| paginate: { itemsPerPage: 10, currentPage: pageActualSucursal }"
+            class="item-color" mode="md" lines="full">
             <ion-checkbox *ngIf="isChecked_sucu" slot="start" [(ngModel)]="s.isChecked_sucu"></ion-checkbox>
             <ion-label>{{ s.sucursal }}</ion-label>
         </ion-item>
     </ion-list>
+
+    <!--Configuracion del Pagination - ngxPaginationModulo-->
+    <ion-item style="font-size: 80%; margin: 0% 0% 1% 0%; display: flex; justify-content: center;"
+        [hidden]="verSucursal" *ngIf="opcion_sucursal">
+        <pagination-controls class="paginacion" (pageChange)="pageActualSucursal = $event" [maxSize]=maxSize
+            [directionLinks]=directionLinks [responsive]=responsive [autoHide]="autoHide"
+            [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
+            [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+            [screenReaderPageLabel]="labels.screenReaderPageLabel"
+            [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+        </pagination-controls>
+    </ion-item>
 
     <!-- LISTAR DEPARTAMENTOS -->
 
@@ -76,7 +85,9 @@
         <ion-text mode="ios" color="dark" style="text-align: center;">
             <h3>Resultado Departamentos</h3>
         </ion-text>
-        <ion-item style="margin: 2.5%; padding: -2%; border-radius: 3%;"  *ngFor="let d of departamentos_filtro" class="item-color" mode="md" lines="full">
+        <ion-item style="margin: 2.5%; padding: -2%; border-radius: 3%;"
+            *ngFor="let d of departamentos_filtro | paginate: { itemsPerPage: 10, currentPage: pageActualDepartamento }"
+            class="item-color" mode="md" lines="full">
             <ion-checkbox *ngIf="isChecked_depa" slot="start" [(ngModel)]="d.isChecked_depa"></ion-checkbox>
             <ion-label>
                 <h2> {{ d.sucursal }}</h2>
@@ -84,6 +95,19 @@
             </ion-label>
         </ion-item>
     </ion-list>
+
+    <!--Configuracion del Pagination - ngxPaginationModulo-->
+    <ion-item style="font-size: 80%; margin: 0% 0% 1% 0%; display: flex; justify-content: center;"
+        [hidden]="verDepartamento" *ngIf="opcion_depa">
+        <pagination-controls class="paginacion" (pageChange)="pageActualDepartamento = $event" [maxSize]=maxSize
+            [directionLinks]=directionLinks [responsive]=responsive [autoHide]="autoHide"
+            [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
+            [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+            [screenReaderPageLabel]="labels.screenReaderPageLabel"
+            [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+        </pagination-controls>
+    </ion-item>
+
 
     <!-- LISTAR EMPLEADOS -->
 
@@ -106,9 +130,25 @@
         <ion-text mode="ios" color="dark" style="text-align: center;">
             <h3>Resultado Usuarios</h3>
         </ion-text>
-        <ion-item *ngFor="let e of empleados_filtro" class="item-color" mode="md" lines="full">
+        <ion-item *ngFor="let e of empleados_filtro | paginate: { itemsPerPage: 10, currentPage: pageActual }"
+            class="item-color" mode="md" lines="full">
             <ion-checkbox *ngIf="isChecked_empl" slot="start" [(ngModel)]="e.isChecked_empl"></ion-checkbox>
             <ion-label>{{ e.nombre }}</ion-label>
         </ion-item>
     </ion-list>
+    <!--Configuracion del Pagination - ngxPaginationModulo-->
+    <ion-item style="font-size: 80%; margin: 0% 0% 1% 0%; display: flex; justify-content: center;" [hidden]="ver"
+        *ngIf="opcion_empleado">
+        <pagination-controls class="paginacion" (pageChange)="pageActual = $event" [maxSize]=maxSize
+            [directionLinks]=directionLinks [responsive]=responsive [autoHide]="autoHide"
+            [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
+            [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+            [screenReaderPageLabel]="labels.screenReaderPageLabel"
+            [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+        </pagination-controls>
+    </ion-item>
+
+
+
+
 </ion-content>
