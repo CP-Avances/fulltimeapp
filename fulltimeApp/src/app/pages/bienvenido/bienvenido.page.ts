@@ -18,8 +18,6 @@ export class BienvenidoPage implements OnInit, OnDestroy{
   horarioAbierto: boolean = false;
   valorsol: string = "none";
   valorluna: string = "none";
-
-  rol: any;
   intervalo: any;
 
   constructor(
@@ -28,7 +26,6 @@ export class BienvenidoPage implements OnInit, OnDestroy{
     public alertCrtl: AlertController,
   ) {
     this.cambioimagen();
-    this.rol = localStorage.getItem('rol');
   }
 
   ionViewDidLoad() {

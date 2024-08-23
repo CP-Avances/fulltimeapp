@@ -10,7 +10,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: '/adminpage/reportes',
+    redirectTo: '/reloj/reportes',
     pathMatch: 'full'
   },
   {

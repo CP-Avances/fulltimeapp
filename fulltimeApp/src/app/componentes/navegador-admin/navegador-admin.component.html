@@ -7,9 +7,8 @@
             </ion-button>
         </ion-buttons>
         <ion-buttons slot="start">
-            <img [src]="imagen"
-                 alt="Perfil" 
-                 style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-left: 15%">
+            <img [src]="imagen" alt="Perfil"
+                style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-left: 15%">
         </ion-buttons>
 
 
@@ -44,30 +43,32 @@
     </ion-header>
     <ion-content>
         <ion-list mode="md" style="height: 100%;">
-            <ion-item [routerLink]="['/adminpage/solicitudes']" (click)="closeAdmin()">
+            <ion-item [routerLink]="['/reloj/solicitudes']" (click)="closeAdmin()">
                 <ion-icon name="folder-open-outline" slot="start" color="dark"></ion-icon>
                 <ion-label>Solicitudes</ion-label>
             </ion-item>
-            <ion-item [routerLink]="['/adminpage/comunicado']" (click)="closeAdmin()">
+            <ion-item [routerLink]="['/reloj/comunicado']" (click)="closeAdmin()">
                 <ion-icon name="megaphone-outline" slot="start" color="dark"></ion-icon>
                 <ion-label>Comunicados</ion-label>
             </ion-item>
-            <ion-item [routerLink]="['/adminpage/timbres-empleados']" (click)="closeAdmin()">
+            <ion-item [routerLink]="['/reloj/timbres-empleados']" (click)="closeAdmin()">
                 <ion-icon name="people-outline" slot="start" color="dark"></ion-icon>
                 <ion-label>Timbres Empleados</ion-label>
             </ion-item>
-            <ion-item [routerLink]="['/adminpage/horarios-empleados']" (click)="closeAdmin()">
+            <ion-item [routerLink]="['/reloj/horarios-empleados']" (click)="closeAdmin()">
                 <ion-icon name="calendar-outline" slot="start" color="dark"></ion-icon>
                 <ion-label>Horarios Empleados</ion-label>
             </ion-item>
-            <ion-item [routerLink]="['/adminpage/justificar-timbres']" (click)="closeAdmin()">
+            <ion-item [routerLink]="['/reloj/justificar-timbres']" (click)="closeAdmin()">
                 <ion-icon name="hourglass-outline" slot="start" color="dark"></ion-icon>
-                <ion-label>Justificar Timbres</ion-label>
+                <ion-label>Registrar Timbres</ion-label>
             </ion-item>
-            <ion-item [routerLink]="['/adminpage/justificar-atrasos']" (click)="closeAdmin()">
+            <!--
+            <ion-item [routerLink]="['/reloj/justificar-atrasos']" (click)="closeAdmin()">
                 <ion-icon name="accessibility-outline" slot="start" color="dark"></ion-icon>
                 <ion-label>Justificar Atrasos</ion-label>
             </ion-item>
+        -->
             <ion-item (click)="btn_aproPermisosClick()">
                 <ion-icon name="document-outline" slot="start" [color]="colorp"></ion-icon>
                 <ion-label [color]="colorp">Aprobar Permisos</ion-label>
@@ -84,7 +85,7 @@
                 <ion-icon name="restaurant-outline" slot="start" [color]="colora"></ion-icon>
                 <ion-label [color]="colora">Aprobar Alimentación</ion-label>
             </ion-item>
-            <ion-item [routerLink]="['/adminpage/reportes']" (click)="closeAdmin()">
+            <ion-item [routerLink]="['/reloj/reportes']" (click)="closeAdmin()">
                 <ion-icon name="documents-outline" slot="start" color="dark"></ion-icon>
                 <ion-label>Reportes</ion-label>
             </ion-item>

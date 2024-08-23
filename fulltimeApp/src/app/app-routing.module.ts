@@ -17,7 +17,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/inicio/inicio.module').then(m => m.InicioPageModule)
   },
   {
-    path: 'adminpage',
+    path: 'reloj',
     loadChildren: () => import('./pages/adminpage/adminpage.module').then(m => m.AdminpagePageModule), canActivate: [AutenticacionGuard]
   },
   {

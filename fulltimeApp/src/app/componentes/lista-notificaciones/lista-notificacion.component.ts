@@ -148,20 +148,22 @@ export class ListaNotificacionComponent implements OnInit {
 
     if (noti.nempleadoreceives === noti.nempleadosend) {
 
-      if (localStorage.getItem("rol") == "1") {
-        //Solicitudes Admin envia
-        if (noti.id_permiso != null && noti.estado === "Pendiente") {
-          return this.router.navigate(['/adminpage/solicitudes/permiso-solicitud']);
-        } else if (noti.id_hora_extra != null && noti.estado === "Pendiente") {
-          return this.router.navigate(['/adminpage/solicitudes/hora-extra-solicitud']);
-        } else if (noti.id_vacaciones != null && noti.estado === "Pendiente") {
-          return this.router.navigate(['/adminpage/solicitudes/vacacion-solicitud']);
-        }
-        if (noti.tipo === 1) {
-          return this.router.navigate(['/adminpage/solicitudes/alimentacion-solicitud']);
-        }
+      // if (localStorage.getItem("rol") == "1") {
+      //Solicitudes Admin envia
+      if (noti.id_permiso != null && noti.estado === "Pendiente") {
+        return this.router.navigate(['/reloj/solicitudes/permiso-solicitud']);
+      } else if (noti.id_hora_extra != null && noti.estado === "Pendiente") {
+        return this.router.navigate(['/reloj/solicitudes/hora-extra-solicitud']);
+      } else if (noti.id_vacaciones != null && noti.estado === "Pendiente") {
+        return this.router.navigate(['/reloj/solicitudes/vacacion-solicitud']);
+      }
+      if (noti.tipo === 1) {
+        return this.router.navigate(['/reloj/solicitudes/alimentacion-solicitud']);
+      }
 
-      } else {
+      //} 
+      /*
+      else {
         //Solicitudes Empleado envia
         if (noti.id_permiso != null) {
           this.router.navigate(['/empleado/solicitar-permisos']);
@@ -177,61 +179,65 @@ export class ListaNotificacionComponent implements OnInit {
         //Aprobar las solicitudes Admin envia respuesta
         if (noti.id_permiso != null && noti.estado != "Pendiente") {
           console.log("Aprobar Permiso ", noti.id_permiso, " = ", noti.estado);
-          return this.router.navigate(['/adminpage/aprobar-permisos']);
+          return this.router.navigate(['/reloj/aprobar-permisos']);
         } else if (noti.tipo === 12) {
           console.log("Aprobar Hora Extra ", noti.tipo);
           console.log("Aprobar Hora Extra ", noti.id_hora_extra, " = ", noti.estado)
-          return this.router.navigate(['/adminpage/aprobar-horas-extras']);
+          return this.router.navigate(['/reloj/aprobar-horas-extras']);
         } else if (noti.id_vacaciones != null && noti.estado != "Pendiente") {
           console.log("Aprobar Vacaciones ", noti.id_vacaciones, " = ", noti.estado)
-          return this.router.navigate(['/adminpage/aprobar-vacaciones']);
-        }
-
-        if (localStorage.getItem('rol') == "1" && noti.tipo === 2) {
-          console.log("Aprobar Alimentacion ", noti.tipo, " = ", noti.estado)
-          return this.router.navigate(['/adminpage/aprobar-alimentacion']);
-        }
-
-        return this.router.navigate(['/adminpage/aprobar-alimentacion']);
-
-      }
-
-    }
-    else {
-
-      if (localStorage.getItem("rol") === "1") {
-        //Solicitudes Admin Respuesta que recibe
-        if (noti.id_permiso != null && noti.estado != "Pendiente") {
-          console.log("Aprobar Permiso ", noti.id_permiso, " = ", noti.estado);
-          return this.router.navigate(['/adminpage/solicitudes/permiso-solicitud']);
-        } else if (noti.tipo === 12) {
-          console.log("Aprobar Hora Extra ", noti.tipo);
-          return this.router.navigate(['/adminpage/solicitudes/hora-extra-solicitud']);
-        } else if (noti.id_vacaciones != null && noti.estado != "Pendiente") {
-          console.log("Aprobar Vacaciones ", noti.id_vacaciones, " = ", noti.estado)
-          return this.router.navigate(['/adminpage/solicitudes/vacacion-solicitud']);
+          return this.router.navigate(['/reloj/aprobar-vacaciones']);
         }
 
         if (noti.tipo === 2) {
           console.log("Aprobar Alimentacion ", noti.tipo, " = ", noti.estado)
-          return this.router.navigate(['/adminpage/solicitudes/alimentacion-solicitud']);
+          return this.router.navigate(['/reloj/aprobar-alimentacion']);
         }
 
-        //Aprobaciones Admin envia
-        if (noti.id_permiso != null && noti.estado === "Pendiente") {
-          return this.router.navigate(['/adminpage/aprobar-permisos']);
-        } else if (noti.id_hora_extra != null && noti.estado === "Pendiente") {
-          return this.router.navigate(['/adminpage/aprobar-horas-extras']);
-        } else if (noti.id_vacaciones != null && noti.estado === "Pendiente") {
-          return this.router.navigate(['/adminpage/aprobar-vacaciones']);
-        }
+        return this.router.navigate(['/reloj/aprobar-alimentacion']);
 
-        if (noti.tipo === 1) {
-          return this.router.navigate(['/adminpage/aprobar-alimentacion']);
-        }
+      }
+        */
+
+    }
+    else {
+
+      // if (localStorage.getItem("rol") === "1") {
+      //Solicitudes Admin Respuesta que recibe
+      if (noti.id_permiso != null && noti.estado != "Pendiente") {
+        console.log("Aprobar Permiso ", noti.id_permiso, " = ", noti.estado);
+        return this.router.navigate(['/reloj/solicitudes/permiso-solicitud']);
+      } else if (noti.tipo === 12) {
+        console.log("Aprobar Hora Extra ", noti.tipo);
+        return this.router.navigate(['/reloj/solicitudes/hora-extra-solicitud']);
+      } else if (noti.id_vacaciones != null && noti.estado != "Pendiente") {
+        console.log("Aprobar Vacaciones ", noti.id_vacaciones, " = ", noti.estado)
+        return this.router.navigate(['/relojo/solicitudes/vacacion-solicitud']);
+      }
+
+      if (noti.tipo === 2) {
+        console.log("Aprobar Alimentacion ", noti.tipo, " = ", noti.estado)
+        return this.router.navigate(['/reloj/solicitudes/alimentacion-solicitud']);
+      }
+
+      //Aprobaciones Admin envia
+      if (noti.id_permiso != null && noti.estado === "Pendiente") {
+        return this.router.navigate(['/reloj/aprobar-permisos']);
+      } else if (noti.id_hora_extra != null && noti.estado === "Pendiente") {
+        return this.router.navigate(['/reloj/aprobar-horas-extras']);
+      } else if (noti.id_vacaciones != null && noti.estado === "Pendiente") {
+        return this.router.navigate(['/reloj/aprobar-vacaciones']);
+      }
+
+      if (noti.tipo === 1) {
+        return this.router.navigate(['/reloj/aprobar-alimentacion']);
+      }
 
 
-      } else {
+      //} 
+
+      /*
+      else {
         //Solicitudes Empleado Respuesta que recibe
         if (noti.id_permiso != null) {
           return this.router.navigate(['/empleado/solicitar-permisos']);
@@ -247,17 +253,18 @@ export class ListaNotificacionComponent implements OnInit {
 
         //Aprobaciones Admin envia
         if (noti.id_permiso != null && noti.estado === "Pendiente") {
-          return this.router.navigate(['/adminpage/aprobar-permisos']);
+          return this.router.navigate(['/reloj/aprobar-permisos']);
         } else if (noti.id_hora_extra != null && noti.estado === "Pendiente") {
-          return this.router.navigate(['/adminpage/aprobar-horas-extras']);
+          return this.router.navigate(['/reloj/aprobar-horas-extras']);
         } else if (noti.id_vacaciones != null && noti.estado === "Pendiente") {
-          return this.router.navigate(['/adminpage/aprobar-vacaciones']);
+          return this.router.navigate(['/reloj/aprobar-vacaciones']);
         }
         if (noti.tipo === 1) {
-          return this.router.navigate(['/adminpage/aprobar-alimentacion']);
+          return this.router.navigate(['/reloj/aprobar-alimentacion']);
         }
 
       }
+        */
     }
 
   }
@@ -281,7 +288,7 @@ export class ListaNotificacionComponent implements OnInit {
     const vista = true;
     const datos = { id_notificacion: noti.id, vista: vista, user_name: this.userService.username, ip: localStorage.getItem('ip') }
 
-    this.vistonotificacion.PutNotifiTimbreVisto(noti.id,datos).subscribe(
+    this.vistonotificacion.PutNotifiTimbreVisto(noti.id, datos).subscribe(
       (res: any) => {
         res.visto = false;
       },
@@ -298,7 +305,7 @@ export class ListaNotificacionComponent implements OnInit {
     allNotificaciones = noti;
 
     noti.forEach((item: any) => {
-      if (item.visto == false) {
+      if (item.visto != true) {
         datos.id_notificacion = item.id
         this.vistonotificacion.PutNotificaVisto(item.id, datos).subscribe(
           (res: any) => {

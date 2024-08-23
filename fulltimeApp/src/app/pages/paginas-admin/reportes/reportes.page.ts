@@ -15,7 +15,7 @@ import { Platform } from '@ionic/angular';
 
       <ion-row>
         <ion-col size="6">
-          <ion-button expand="block" fill="clear" [routerLink]="['/adminpage/reportes/timbres']">
+          <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/timbres']">
             <div>
               <ion-icon name="alarm-outline"></ion-icon> <br>
               <ion-text>
@@ -25,7 +25,7 @@ import { Platform } from '@ionic/angular';
           </ion-button>
         </ion-col>
         <ion-col size="6">
-          <ion-button expand="block" fill="clear" [routerLink]="['/adminpage/reportes/inasistencia']">
+          <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/inasistencia']">
             <div>
               <ion-icon name="timer-outline"></ion-icon> <br>
               <ion-text>
@@ -38,7 +38,7 @@ import { Platform } from '@ionic/angular';
 
       <ion-row>
         <ion-col size="6">
-          <ion-button expand="block" fill="clear" [routerLink]="['/adminpage/reportes/atrasos']">
+          <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/atrasos']">
             <div>
               <ion-icon name="time-outline"></ion-icon> <br>
               <ion-text>
@@ -48,7 +48,7 @@ import { Platform } from '@ionic/angular';
           </ion-button>
         </ion-col>
         <ion-col size="6">
-          <ion-button expand="block" fill="clear" [routerLink]="['/adminpage/reportes/horas-extras']">
+          <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/horas-extras']">
             <div>
               <ion-icon name="hourglass-outline"></ion-icon> <br>
               <ion-text>
@@ -61,7 +61,7 @@ import { Platform } from '@ionic/angular';
 
       <ion-row>
         <ion-col size="6">
-          <ion-button expand="block" fill="clear" [routerLink]="['/adminpage/reportes/vacaciones']">
+          <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/vacaciones']">
             <div>
               <ion-icon name="airplane-outline"></ion-icon> <br>
               <ion-text>
@@ -71,7 +71,7 @@ import { Platform } from '@ionic/angular';
           </ion-button>
         </ion-col>
         <ion-col size="6">
-          <ion-button expand="block" fill="clear" [routerLink]="['/adminpage/reportes/alimentacion']">
+          <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/alimentacion']">
             <div>
               <ion-icon name="fast-food-outline"></ion-icon> <br>
               <ion-text>
@@ -84,7 +84,7 @@ import { Platform } from '@ionic/angular';
 
       <ion-row>
         <ion-col size="6">
-          <ion-button expand="block" fill="clear" [routerLink]="['/adminpage/reportes/solicitud']">
+          <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/solicitud']">
             <div>
               <ion-icon name="mail-unread-outline"></ion-icon> <br>
               <ion-text>
@@ -94,7 +94,7 @@ import { Platform } from '@ionic/angular';
           </ion-button>
         </ion-col>
         <ion-col size="6">
-        <ion-button expand="block" fill="clear" [routerLink]="['/adminpage/reportes/timbresConNovedades']">
+        <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/timbresConNovedades']">
           <div>
             <ion-icon name="alarm-outline"></ion-icon> <br>
             <ion-text>

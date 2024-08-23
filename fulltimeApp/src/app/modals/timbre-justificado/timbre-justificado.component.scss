@@ -1,4 +1,4 @@
-.contenido{
+.contenido {
     margin: 5% 4% 2% 4%;
     padding: 1%;
     border-radius: 5px;
@@ -10,4 +10,10 @@ ion-datetime {
     --color: #f0ffffe4;
     border-radius: 16px;
     box-shadow: rgba(59, 135, 93, 0.429) 0px 10px 15px -3px;
+}
+
+.item_fondo {
+    border-radius: 6px 6px 0px 0px;
+    background-color: rgba(65, 65, 64, 0.961);
+    margin-bottom: 2%;
 }

@@ -10,16 +10,16 @@ import { AlertController, NavController, Platform } from '@ionic/angular';
 export class EmpleadoPage implements OnInit {
 
   constructor(
-    private relojServiceService:RelojServiceService, 
-    private navCtroller:NavController,
+    private relojServiceService: RelojServiceService,
+    private navCtroller: NavController,
     public alertCrtl: AlertController,
-    
-    )
-    {}
+
+  ) { }
 
   ngOnInit() {
   }
 
+  /*
   noesAdministrador(): boolean {
     if (this.relojServiceService.esEmpleado()) {
       this.navCtroller.navigateRoot(['empleado']);
@@ -30,5 +30,5 @@ export class EmpleadoPage implements OnInit {
    
     }
   }
-
+  */
 }

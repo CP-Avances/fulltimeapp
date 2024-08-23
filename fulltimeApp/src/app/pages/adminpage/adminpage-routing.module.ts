@@ -80,14 +80,14 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/adminpage/bienvenido',
+        redirectTo: '/reloj/bienvenido',
         pathMatch: 'full'
       },
     ]
   },
   {
     path: '',
-    redirectTo: '/adminpage/bienvenido',
+    redirectTo: '/reloj/bienvenido',
     pathMatch: 'full'
   }
 ];

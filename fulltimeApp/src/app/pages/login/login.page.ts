@@ -59,24 +59,9 @@ export class LoginPage implements OnInit {
       this.navCtroller.navigateForward(['inicio']);
     } else if (this.relojService.estaLogueado() && this.relojService.existeRol()) {
      
-     /*
-      if (localStorage.getItem('rol') == "1") {
         this.navCtroller.pop();
-        this.navCtroller.navigateRoot(['adminpage']);
-      }
-
-      else {
-        this.navCtroller.pop();
-        this.navCtroller.navigateRoot(['empleado']);
-      }
-
-      */
-        
-        this.navCtroller.pop();
-        this.navCtroller.navigateRoot(['adminpage']);
-      
-
-
+        this.navCtroller.navigateRoot(['reloj']);
+  
     }
 
   }
@@ -296,7 +281,7 @@ export class LoginPage implements OnInit {
           );
         }
       }, err => {
-        this.usuarioIncorrectoToas("Usuario Incorrecto", 3000)
+        this.usuarioIncorrectoToas("Error en la conexión con el servidor", 3000)
       }
       )
     }
@@ -304,7 +289,7 @@ export class LoginPage implements OnInit {
 
   cambiodepantallas() {
     this.navCtroller.pop();
-    this.navCtroller.navigateRoot(['adminpage']);
+    this.navCtroller.navigateRoot(['reloj']);
 
     var FormId = 'formulariologin';
     var resetForm = <HTMLFormElement>document.getElementById(FormId);

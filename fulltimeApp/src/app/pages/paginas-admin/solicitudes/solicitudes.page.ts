@@ -192,7 +192,7 @@ export class SolicitudesPage implements OnInit {
 
   BtnPermisos_click(){
     if(this.Btn_permisos == true){
-      this.router.navigateByUrl("/adminpage/solicitudes/permiso-solicitud");
+      this.router.navigateByUrl("/reloj/solicitudes/permiso-solicitud");
     }else if(this.Btn_permisos == false){
       this.usuarioIncorrectoToas(" Ups! No tiene habilitado el modulo de Permisos");
     }else{
@@ -202,7 +202,7 @@ export class SolicitudesPage implements OnInit {
 
   BtnHorasExtras_click(){
     if(this.Btn_horasExtras == true){
-      this.router.navigateByUrl("/adminpage/solicitudes/hora-extra-solicitud");
+      this.router.navigateByUrl("/reloj/solicitudes/hora-extra-solicitud");
     }else if(this.Btn_horasExtras == false){
       this.usuarioIncorrectoToas(" Ups! No tiene habilitado el modulo de Horas Extras\n\nTe gustaria activarlo?");
     }else{
@@ -212,7 +212,7 @@ export class SolicitudesPage implements OnInit {
 
   BtnAlimentacion_click(){
     if(this.Btn_alimentacion == true){
-      this.router.navigateByUrl("/adminpage/solicitudes/alimentacion-solicitud");
+      this.router.navigateByUrl("/reloj/solicitudes/alimentacion-solicitud");
     }else if(this.Btn_alimentacion == false){
       this.usuarioIncorrectoToas(" Ups! No tiene habilitado el modulo de Alimentacion\n\nTe gustaria activarlo?");
     }else{
@@ -222,7 +222,7 @@ export class SolicitudesPage implements OnInit {
 
   BtnVacaciones_click(){
     if(this.Btn_vacaciones == true){
-      this.router.navigateByUrl("/adminpage/solicitudes/vacacion-solicitud");
+      this.router.navigateByUrl("/reloj/solicitudes/vacacion-solicitud");
     }else if(this.Btn_vacaciones == false){
       this.usuarioIncorrectoToas(" Ups! No tiene habilitado el modulo de Vacaciones\n\nTe gustaria activarlo?");
     }else{

@@ -12,9 +12,10 @@ export class AdminpagePage {
 
   constructor(
     private relojServiceService: RelojServiceService,
-    private navCtroller: NavController, 
-  ) {}
+    private navCtroller: NavController,
+  ) { }
 
+  /*
   esAdministrador(): boolean {
     console.log('llego a la pagina de administrador');
     if (this.relojServiceService.esAdministrador()) {
@@ -25,5 +26,6 @@ export class AdminpagePage {
      return false;
     }
   }
+    */
 
 }

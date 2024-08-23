@@ -26,7 +26,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: '/adminpage/solicitudes',
+    redirectTo: '/reloj/solicitudes',
     pathMatch: 'full'
   },
 ];

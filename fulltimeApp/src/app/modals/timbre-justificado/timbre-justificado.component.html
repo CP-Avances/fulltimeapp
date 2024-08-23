@@ -3,7 +3,7 @@
 <ion-content>
 
   <div class="contenido">
-    <ion-list style="margin-top: 3%; padding: -2%; border-radius: 3%;" >
+    <ion-list style="margin-top: 3%; padding: -2%; border-radius: 3%;">
       <ion-item>
         <ion-icon slot="end" name="person" color="secondary"></ion-icon>
         <b> NOMBRE DEL EMPLEADO:</b>
@@ -13,7 +13,7 @@
       </ion-item>
     </ion-list>
 
-    <ion-list style="margin-top: 3%; padding: -2%; border-radius: 3%;" >
+    <ion-list style="margin-top: 3%; padding: -2%; border-radius: 3%;">
       <ion-item>
         <ion-icon slot="end" name="time-outline" color="secondary"></ion-icon>
         <b> TIPO DE TIMBRE: </b>
@@ -25,20 +25,64 @@
       </ion-item>
     </ion-list>
 
-    <ion-list style="margin-top: 3%; padding: -2%; border-radius: 3%;" >
+
+    <ion-list style="margin-top: 3%; padding: -2%; border-radius: 3%;">
+      <ion-item>
+        <ion-icon slot="end" name="time-outline" color="secondary"></ion-icon>
+        <b> OBSERVACIONES: </b>
+      </ion-item>
+      <ion-item>
+        <ion-textarea placeholder="Escriba aquí..." maxlength=299 spellcheck (ionChange)="ionChange()"
+          [(ngModel)]="observacion"> </ion-textarea>
+        <p class="letraPeque">{{numeroCaracteres}}/299</p>
+      </ion-item>
+    </ion-list>
+    <div class="formdiv" >
+      <ion-item class="item_fondo" for="file">
+        <b> SUBIR IMAGEN </b>
+    
+        <!--Este input, permite validar el boton btn_save, que se active o este desactivado deacurdo al documento ingresado-->
+        <ion-input  name="file" id="file" ></ion-input> 
+
+        <!-- Esto, permite ingresar el documento-->
+        <ion-label  position="floating" style="font-size: 90%; margin-bottom: 3%;"> 
+          <ion-icon slot="start" color="theme" class="icon_upload" name="cloud-upload-outline"></ion-icon>&nbsp; &nbsp; 
+          &nbsp; Subir foto: 
+        </ion-label> 
+        <ion-input type="file" (change)="fileChange($event)" #fileInput  id="file" accept="image/*"></ion-input>
+
+        <!-- Mesaje que tiene el nombre del archivo a subir -->
+        <ion-text style="font-size: 82%; margin:2% 0% 3% 0%; " color="theme">{{ fileName }}</ion-text>   
+    
+        <!-- Mesaje que indica el error en subir el archivo -->
+     
+      </ion-item>
+
+      <div >
+        <ion-button  [disabled]=" !fileName"
+        color="medium" shape="round" expand="block" (click)="deleteImagen()" >
+          <ion-text style="font-size: 90%;"> <ion-icon color="danger" name="trash-outline"></ion-icon> Quitar documento </ion-text>
+        </ion-button>
+      </div>
+    </div>
+
+
+    <ion-list style="margin-top: 3%; padding: -2%; border-radius: 3%;">
       <ion-item>
         <ion-icon slot="end" name="calendar-outline" color="success"></ion-icon>
         <b> FECHA Y HORA TIMBRE:</b>
       </ion-item>
       <ion-item>
-        <ion-datetime hourCycle="h12" color="success" (ionChange)="fechaChange($event)" placeholder="Seleccion Fecha" mode="ios">
+        <ion-datetime hourCycle="h12" color="success" (ionChange)="fechaChange($event)" placeholder="Seleccion Fecha"
+          mode="ios">
           <span slot="title">Seleccione el dia</span>
           <span slot="time-label">Ingrese la Hora</span>
         </ion-datetime>
       </ion-item>
     </ion-list>
     <br>
-    <ion-button shape="round" expand="block" (click)="enviarTimbre()"><ion-icon name="paper-plane-outline"></ion-icon>&nbsp;&nbsp; Enviar Timbre</ion-button>
+    <ion-button shape="round" expand="block" (click)="enviarTimbre()"><ion-icon
+        name="paper-plane-outline"></ion-icon>&nbsp;&nbsp; Enviar Timbre</ion-button>
   </div>
 
 </ion-content>

@@ -35,7 +35,7 @@
      </ion-item>
    </ion-button>
 
-   <ion-card *ngFor="let noti of notificacionesAll | paginate: { itemsPerPage: 20, currentPage: pageActual} ">
+   <ion-card *ngFor="let noti of notificacionesAll | paginate: { itemsPerPage: 10, currentPage: pageActual} ">
      <ng-container>
        <div>
        <ion-item (click)="AbrirNoti(noti)" class="ion-activated" [color]='tiponotificacion(noti)'>
@@ -61,7 +61,7 @@
    </ion-card>
 
     <!--Configuracion del Pagination - ngxPaginationModulo-->
- <ion-item style="font-size: 80%; margin: 1% 0% 1% 0%;" [hidden] = "ver">
+ <ion-item style="font-size: 80%; margin: 1% 0% 1% 0%;">
     <pagination-controls 
         class="paginacion" 
         (pageChange)="pageActual = $event" 

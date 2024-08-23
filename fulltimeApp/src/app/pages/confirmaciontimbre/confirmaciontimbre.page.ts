@@ -31,12 +31,6 @@ export class ConfirmaciontimbrePage implements OnInit {
   }
 
   irABienvenido(){
-   // if( parseInt(localStorage.getItem('rol'))==1){
-      this.navCtroller.navigateForward(['adminpage'])
-   // }else{
-    //  this.navCtroller.navigateForward(['empleado'])
-
-   // }
-    
+      this.navCtroller.navigateForward(['reloj'])
   }
 }

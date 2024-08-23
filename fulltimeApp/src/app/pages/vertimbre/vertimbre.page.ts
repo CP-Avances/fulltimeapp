@@ -261,21 +261,10 @@ export class VertimbrePage implements OnInit {
     }
   }
 
-
-
-
-  //cambiar el timbre del celular al del servidor y viceversa
   verTipoTimbre: string = '';
 
   cargarTipoTimbreInicial() {
-   // if(this.rol_empleado == 1){
       this.verTipoTimbre = "timbreServidor";
-
-   // }else{
-    //  this.verTipoTimbre = "timbreCelular";
-
-   // }
-
   }
   cambioHoraSC(event) {
     console.log(event.target.value);

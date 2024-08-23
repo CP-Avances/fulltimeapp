@@ -27,7 +27,6 @@ export class ConstruirPDFComponent implements OnInit {
   @Input() timbres: Timbre[];
   @Input() horaServidor: boolean;
   loading: any;
-  esAdministrador = false;
   pipe = new DatePipe('en-US');
 
   constructor(private modalCtrl: ModalController,
@@ -43,7 +42,6 @@ export class ConstruirPDFComponent implements OnInit {
 
   ngOnInit() {
     this.modificarJson
-    this.esAdministrador = this.relojService.esAdministrador();
   }
 
 

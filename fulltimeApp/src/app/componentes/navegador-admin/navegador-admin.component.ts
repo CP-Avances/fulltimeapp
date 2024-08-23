@@ -276,7 +276,7 @@ export class NavegadorAdminComponent implements OnInit {
   //funciones para el click de cada metodo de aprobacion
   btn_aproPermisosClick() {
     if (this.apro_permisos == true) {
-      this.router.navigateByUrl("/adminpage/aprobar-permisos");
+      this.router.navigateByUrl("/reloj/aprobar-permisos");
       this.closeAdmin()
     } else {
       this.mostrarToas(" Ups!! Al parecer no tienes activado en tu plan el Modulo 'Aprobar Permisos'");
@@ -285,7 +285,7 @@ export class NavegadorAdminComponent implements OnInit {
 
   btn_aproVacacionesClick() {
     if (this.apro_vacaciones == true) {
-      this.router.navigateByUrl("/adminpage/aprobar-vacaciones");
+      this.router.navigateByUrl("/reloj/aprobar-vacaciones");
       this.closeAdmin()
     } else {
       this.mostrarToas(" Ups!! Al parecer no tienes activado en tu plan el Modulo 'Aprobar Vacaciones'");
@@ -294,7 +294,7 @@ export class NavegadorAdminComponent implements OnInit {
 
   btn_aproHorasExtrasClick() {
     if (this.apro_horasExtras == true) {
-      this.router.navigateByUrl("/adminpage/aprobar-horas-extras");
+      this.router.navigateByUrl("/reloj/aprobar-horas-extras");
       this.closeAdmin()
     } else {
       this.mostrarToas(" Ups!! Al parecer no tienes activado en tu plan el Modulo 'Aprobar Horas Extras'");
@@ -303,7 +303,7 @@ export class NavegadorAdminComponent implements OnInit {
 
   btn_aproAlimentacionClick() {
     if (this.apro_alimentaciones == true) {
-      this.router.navigateByUrl("/adminpage/aprobar-alimentacion");
+      this.router.navigateByUrl("/reloj/aprobar-alimentacion");
       this.closeAdmin()
     } else {
       this.mostrarToas(" Ups!! Al parecer no tienes activado en tu plan el Modulo 'Aprobar Alimentacion'");

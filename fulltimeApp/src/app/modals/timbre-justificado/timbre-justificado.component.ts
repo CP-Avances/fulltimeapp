@@ -1,14 +1,21 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
 import { TimbresService } from '../../services/timbres.service';
 import { DataUserLoggedService } from '../../services/data-user-logged.service';
+import { ValidacionesService } from 'src/app/libs/validaciones.service';
 
 @Component({
   selector: 'app-timbre-justificado',
   templateUrl: './timbre-justificado.component.html',
   styleUrls: ['./timbre-justificado.component.scss'],
 })
-export class TimbreJustificadoComponent  implements OnInit {
+export class TimbreJustificadoComponent implements OnInit {
+  @ViewChild('fileInput') fileInput: any; // Accede al input de archivo
+
+  numeroCaracteres = 0;
+  mensajeFile: string | null;
+
+  archivoSubido: Array<File> | null;
 
   @Input() data: any;
 
@@ -25,12 +32,15 @@ export class TimbreJustificadoComponent  implements OnInit {
   accion: string = '';
   tecla_funcion: number = -1;
   fec_timbre: string = '';
+  observacion: string = '';
 
   private get fullnameAdmin(): string {
     return this.dataUserService.UserFullname
   }
 
   constructor(
+    public validar: ValidacionesService,
+
     public modalController: ModalController,
     private timbresService: TimbresService,
     private dataUserService: DataUserLoggedService,
@@ -62,13 +72,14 @@ export class TimbreJustificadoComponent  implements OnInit {
       fec_hora_timbre: this.fec_timbre,
       accion: this.accion,
       tecl_funcion: this.tecla_funcion,
-      observacion: 'Timbre creado por Administrador ' + this.fullnameAdmin,
+      observacion: 'Timbre realizado por ' + this.fullnameAdmin + ', ' + this.observacion,
       latitud: null,
       longitud: null,
       codigo: this.data.codigo,
       id_reloj: 97,
       id: this.data.id,
-      ip : localStorage.getItem('ip')
+      ip: localStorage.getItem('ip'),
+      documento: this.base64Image
     }
 
     this.timbresService.PostTimbreWebAdmin(dataTimbre).subscribe(res => {
@@ -89,11 +100,67 @@ export class TimbreJustificadoComponent  implements OnInit {
     toast.present();
   }
 
+
+
   closeModal(refreshInfo: Boolean) {
     console.log('CERRAR MODAL timbre justificado');
     this.modalController.dismiss({
       'refreshInfo': refreshInfo
     });
   }
+  fileName: string = '';
+  uploadError: string = '';
+  base64Image: string | ArrayBuffer | null = null;
 
-}
+  fileChange(element) {
+    this.archivoSubido = element.target.files;
+
+    console.log(this.archivoSubido);
+    const name = this.archivoSubido[0].name;
+    if (this.archivoSubido.length != 0) {
+
+
+      if (this.archivoSubido[0].name.length > 50) {
+        this.archivoSubido = null;
+        this.fileName = ''
+        this.mensajeFile = "El nombre debe tener 50 caracteres como maximo";
+        this.validar.showToast('Ups el nombre del archivo es muy largo', 3500, 'warning');
+
+      } else {
+        console.log(this.archivoSubido[0].name);
+        this.fileName = name;
+        this.validar.showToast('Archivo valido', 3500, 'success');
+      }
+    }
+
+    // Convert file to Base64
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      this.base64Image = reader.result; // Base64 string
+      console.log("Imagen en Base64: ", this.base64Image); // Aquí ya está disponible
+
+    };
+    reader.onerror = () => {
+      this.uploadError = 'Error al leer el archivo.';
+    };
+    reader.readAsDataURL(this.archivoSubido[0]);
+  }
+
+  ionChange() {
+    this.numeroCaracteres = this.observacion.length;
+  }
+
+  deleteImagen() {
+    console.log('El archivo ', this.fileName, ' Se quito Correctamente');
+    this.validar.showToast('El archivo se quito correctamente', 3500, 'acua');
+    // Resetea el input de archivo
+    if (this.fileInput) {
+      this.fileInput.value = '';
+    }
+
+    this.fileName = null;
+    this.mensajeFile = null;
+    this.base64Image = null;
+  }
+
+} 
