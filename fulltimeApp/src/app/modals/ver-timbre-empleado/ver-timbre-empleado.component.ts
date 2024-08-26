@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import moment from 'moment';
-import { ModalController, AlertController, LoadingController, ToastController, IonDatetime  } from '@ionic/angular';
+import { ModalController, AlertController, LoadingController, ToastController, IonDatetime } from '@ionic/angular';
 
 import { Timbre } from '../../interfaces/Timbre';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
@@ -18,10 +18,11 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
   templateUrl: './ver-timbre-empleado.component.html',
   styleUrls: ['./ver-timbre-empleado.component.scss'],
 })
-export class VerTimbreEmpleadoComponent  implements OnInit {
+export class VerTimbreEmpleadoComponent implements OnInit {
 
   //IMAGEN
   imagenUrl: SafeUrl;
+
 
 
   @Input() data: any;
@@ -70,7 +71,9 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
     console.log("Ventana todosss", this.todos);
     console.log("Ventana filtro", this.filtro);
     this.BuscarFormatos();
+    this.mostrarTimbres();
   }
+
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
   formato_fecha: string;
@@ -84,15 +87,23 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
       }
     )
   }
+  verTipoTimbre: string = '';
+
+
+  cambioHoraSC(event) {
+    console.log(event.target.value);
+    this.verTipoTimbre = event.target.value;
+  }
 
   mostrarTimbres() {
     this.timbres_filtro = [];
     this.buscarTimbresEmpleado(this.data.codigo);
+    this.pagefiltro = 0;
+    this.pageActual = 1;
     this.todos = false;
     this.filtro = true;
     this.filtro_mensaje = true;
-    this.pagefiltro = 0;
-    this.pageActual = 1;
+    this.limpiarRango_fechas();
   }
 
   mostrarfiltro() {
@@ -120,44 +131,44 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
 
 
   changeFechaInicio(e) {
-    if(!e.target.value){
+    if (!e.target.value) {
       this.dataUserService.setFechaRangoInicio(moment(new Date()).format('YYYY-MM-DD'));
       return this.fechaIn = moment(e.target.value).format('YYYY-MM-DD');
-    }else{
+    } else {
       this.dataUserService.setFechaRangoInicio(e.target.value);
       this.datetimeInicio.confirm(true);
-      if(this.fechaInicio == null || this.fechaInicio == ''){
+      if (this.fechaInicio == null || this.fechaInicio == '') {
         this.fechaIn = null;
-      }else{
+      } else {
         this.fechaIn = moment(this.fechaInicio).format('YYYY-MM-DD');
       }
     }
   }
 
   changeFechaFinal(e) {
-    if(!e.target.value){
-      if(moment(this.fechaInicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
+    if (!e.target.value) {
+      if (moment(this.fechaInicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')) {
         this.dataUserService.setFechaRangoFinal(this.fechaInicio)
         return this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
-      }else{
+      } else {
         this.dataUserService.setFechaRangoFinal('');
         this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
         return this.fechaFi = null
       }
-    }else{
+    } else {
       this.dataUserService.setFechaRangoFinal(e.target.value);
       const f_inicio = new Date(this.fechaInicio);
       const f_final = new Date(e.target.value);
       this.datetimeFinal.confirm(true);
 
-      if (f_final < f_inicio ) {
+      if (f_final < f_inicio) {
         this.limpiarRango_fechas();
         return this.mostrarToas('La fecha de inicio no puede ser mayor a la fecha final de consulta', 3000, "danger");
       }
 
-      if(this.fechaFinal == null || this.fechaFinal == ''){
+      if (this.fechaFinal == null || this.fechaFinal == '') {
         this.fechaFi = null;
-      }else{
+      } else {
         this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');
       }
     }
@@ -198,16 +209,25 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
 
       let fechasObjeto = {}
 
-     
+
       res.forEach(data => {
-        if(!data.fecha_hora_timbre_servidor){
-          data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
-          data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
-        }else{
-          data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo);
-          data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
+        data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
+        data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+        data.sfecha = '';
+        data.shora = '';
+
+        if (!data.fecha_hora_timbre_servidor) {
+          data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
+          data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+
+          if (data.fecha_subida_servidor != null) {
+            data.sfecha = this.validar.FormatearFecha(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo);
+            data.shora = this.validar.FormatearHora(moment(data.fecha_subida_servidor).format('HH:mm:ss'), this.formato_hora);
+          }
+        } else {
+          data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo);
+          data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
         }
-       
       })
 
       res.forEach(x => {
@@ -216,7 +236,7 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
         }
         fechasObjeto[x.fecha].push(x)
       })
-      
+
       console.log('fechas ver ..... ', fechasObjeto);
       this.timbres = fechasObjeto;
 
@@ -228,16 +248,16 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
         this.todos = true;
         this.btn_filtro = true;
         this.btn_todos = true;
-      }else if(Object.keys(fechasObjeto).length < 8){
+      } else if (Object.keys(fechasObjeto).length < 8) {
         this.todosPagina = true;
-      }else{
+      } else {
         this.todosPagina = false;
         this.filtroPagina = true;
 
       }
 
     }, err => {
-      console.log(err);  this.todosPagina = true;
+      console.log(err); this.todosPagina = true;
     })
   }
 
@@ -247,19 +267,29 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
     if (this.fechaInicio < this.fechaFinal) {
       var datos = { fecInicio: this.fechaInicio, fecFinal: this.fechaFinal, codigo: this.codigo }
 
-      console.log("ver fechas a filtrar", datos )
+      console.log("ver fechas a filtrar", datos)
       this.filtimbre.PostFiltrotimbres(datos).subscribe(
         ress => {
           console.log("ver timbres filtrados", ress)
           let fechasObjeto_f = {}
 
           ress.forEach(data => {
-            if(!data.fecha_hora_timbre_servidor){
-              data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
-              data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
-            }else{
-              data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo);
-              data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
+
+            data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
+            data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+            data.sfecha = '';
+            data.shora = '';
+            if (!data.fecha_hora_timbre_servidor) {
+              data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
+              data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+
+              if (data.fecha_subida_servidor != null) {
+                data.sfecha = this.validar.FormatearFecha(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo);
+                data.shora = this.validar.FormatearHora(moment(data.fecha_subida_servidor).format('HH:mm:ss'), this.formato_hora);
+              }
+            } else {
+              data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo);
+              data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
             }
           })
 
@@ -277,13 +307,13 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
             this.filtro_mensaje = false;
             this.filtro = true;
             this.vacio = true;
-          }else if(Object.keys(fechasObjeto_f).length < 8){
+          } else if (Object.keys(fechasObjeto_f).length < 8) {
             this.filtroPagina = true;
 
-          }else{
+          } else {
             this.filtroPagina = false;
 
-            this.todosPagina =  true;
+            this.todosPagina = true;
           }
 
         },
@@ -291,7 +321,7 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
           this.presentLoading("Intentando conectar con el servidor");
         }
       ), err => {
-        console.log(err);  this.filtroPagina = true;
+        console.log(err); this.filtroPagina = true;
       };
     }
   }
@@ -341,23 +371,23 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
 
 
 
-  async presentAlert(obs: any, hora_timbre_diferente: any, ubicacion: any, novedades_conexion:any, conexion:any ) {
+  async presentAlert(obs: any, hora_timbre_diferente: any, ubicacion: any, novedades_conexion: any, conexion: any) {
     let novedad = novedades_conexion;
-    if(conexion == true){ 
+    if (conexion == true) {
       novedad = 'Timbre sin novedad';
-      if(hora_timbre_diferente == true){
+      if (hora_timbre_diferente == true) {
         novedad = 'Hora timbre diferente al del Servidor'
-      } 
+      }
     }
-    
+
     let mensaje = '';
 
     if (ubicacion) {
-        mensaje += `<br><br><ion-icon name="location-outline"></ion-icon> ${ubicacion}`;
+      mensaje += `<br><br><ion-icon name="location-outline"></ion-icon> ${ubicacion}`;
     }
 
     if (novedad) {
-        mensaje += `<br><br>${novedad}`;
+      mensaje += `<br><br>${novedad}`;
     }
     const alert = await this.alertController.create({
       header: obs,
@@ -376,11 +406,11 @@ export class VerTimbreEmpleadoComponent  implements OnInit {
   public autoHide: boolean = false;
   public responsive: boolean = true;
   public labels: any = {
-  previousLabel: 'anterior',
-  nextLabel: 'siguiente',
-  screenReaderPaginationLabel: 'Pagination',
-  screenReaderPageLabel: 'page',
-  screenReaderCurrentLabel: `You're on page`
+    previousLabel: 'anterior',
+    nextLabel: 'siguiente',
+    screenReaderPaginationLabel: 'Pagination',
+    screenReaderPageLabel: 'page',
+    screenReaderCurrentLabel: `You're on page`
   };
 
 }

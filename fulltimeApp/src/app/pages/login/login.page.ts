@@ -58,10 +58,10 @@ export class LoginPage implements OnInit {
     if (!this.relojService.esPrimeraVez()) {
       this.navCtroller.navigateForward(['inicio']);
     } else if (this.relojService.estaLogueado() && this.relojService.existeRol()) {
-     
-        this.navCtroller.pop();
-        this.navCtroller.navigateRoot(['reloj']);
-  
+
+      this.navCtroller.pop();
+      this.navCtroller.navigateRoot(['reloj']);
+
     }
 
   }
@@ -113,7 +113,7 @@ export class LoginPage implements OnInit {
     Device.getId().then((id) => {
       this.relojService.obtenerDispositivoPorID(id.identifier).subscribe(
         dispositivos => {
-          if (dispositivos.terminos_condiciones!=null) {
+          if (dispositivos.terminos_condiciones != null) {
             this.aceptaTerminos = dispositivos.terminos_condiciones;
             this.mostrarCheckboxInicialmente = this.aceptaTerminos;
           } else {
@@ -169,8 +169,7 @@ export class LoginPage implements OnInit {
       this.usuarioIncorrectoToas("Ups! Ingrese sus datos.", 2000);
     } else {
       console.log('ingresa ', credenciales)
-      this.relojService.iniciarSesion(credenciales).subscribe(datos => 
-        {
+      this.relojService.iniciarSesion(credenciales).subscribe(datos => {
         console.log("ver datos del usuario", datos);
         let existeId_Dispositivo: boolean;
         if (datos.message === 'error') {
@@ -194,6 +193,9 @@ export class LoginPage implements OnInit {
 
         else if (datos.message === 'licencia_no_existe') {
           this.usuarioIncorrectoToas("No se ha encontrado registro de licencia del sistema.", 3000)
+        }
+        else if (datos.message === 'sin_permiso_acces_movil') {
+          this.usuarioIncorrectoToas("Usuario no habilitado para el aplicativo movil", 3000)
         }
 
         else {
