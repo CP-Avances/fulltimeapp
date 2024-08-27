@@ -70,11 +70,13 @@ export class RangoFechasComponent {
         this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');
       }
       
+      /*
       if (f_final.toJSON() === f_inicio.toJSON()) {
         this.dataUserService.setFechaRangoFinal('');
         this.fechaFi = '';
         return this.mostrarToas('Las fechas no pueden ser iguales', 3000, "danger");
       }
+        */
     }
   }
 

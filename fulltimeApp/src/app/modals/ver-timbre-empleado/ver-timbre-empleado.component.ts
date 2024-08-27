@@ -147,14 +147,15 @@ export class VerTimbreEmpleadoComponent implements OnInit {
 
   changeFechaFinal(e) {
     if (!e.target.value) {
-      if (moment(this.fechaInicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')) {
-        this.dataUserService.setFechaRangoFinal(this.fechaInicio)
-        return this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
-      } else {
-        this.dataUserService.setFechaRangoFinal('');
-        this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
-        return this.fechaFi = null
-      }
+      //if (moment(this.fechaInicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')) {
+      //this.dataUserService.setFechaRangoFinal(this.fechaInicio)
+      //return this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
+      //} else {
+
+      this.dataUserService.setFechaRangoFinal('');
+      this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
+      return this.fechaFi = null
+      // }
     } else {
       this.dataUserService.setFechaRangoFinal(e.target.value);
       const f_inicio = new Date(this.fechaInicio);
@@ -168,9 +169,20 @@ export class VerTimbreEmpleadoComponent implements OnInit {
 
       if (this.fechaFinal == null || this.fechaFinal == '') {
         this.fechaFi = null;
+        return this.dataUserService.setFechaRangoFinal('');
+
       } else {
         this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');
       }
+
+      /*
+      if (f_final.toJSON() === f_inicio.toJSON()) {
+        this.dataUserService.setFechaRangoFinal('');
+        this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');
+      }
+*/
+    
+
     }
   }
 
@@ -264,7 +276,7 @@ export class VerTimbreEmpleadoComponent implements OnInit {
   filtrarFechas(codigo) {
     this.codigo = codigo
     this.timbres_filtro = [];
-    if (this.fechaInicio < this.fechaFinal) {
+    if (this.fechaInicio <= this.fechaFinal) {
       var datos = { fecInicio: this.fechaInicio, fecFinal: this.fechaFinal, codigo: this.codigo }
 
       console.log("ver fechas a filtrar", datos)

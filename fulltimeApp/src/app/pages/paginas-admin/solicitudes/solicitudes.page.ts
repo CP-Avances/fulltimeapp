@@ -183,7 +183,7 @@ export class SolicitudesPage implements OnInit {
         this.colorv = "deshabilitado";
       }
     }, error => {
-      this.colorp = "deshabilitado";
+      this.colorp = "c";
       this.colorh = "deshabilitado";
       this.colorv = "deshabilitado";
       this.colora = "deshabilitado";

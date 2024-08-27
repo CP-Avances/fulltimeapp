@@ -3,8 +3,8 @@
     width: 55%;
     display: block;
     margin: auto;
-    
-  }
+
+}
 
 .textoTimbreEmpleado {
     text-align: center;
@@ -18,6 +18,7 @@
     position: absolute;
     left: 5%;
 }
+
 .centrarTimbre {
     margin: auto;
     width: 90%;
@@ -30,17 +31,74 @@
     margin: 0;
     border: 0;
 }
-.tamanoBotonDER {
-    width: 4rem;
-    height: 2rem;
-    position: absolute;
-    right: 27%;
-    font-size: 70%;
-}
+
 .textoObs {
     text-align: center;
     cursor: pointer;
     font-size: 70%;
+}
+
+.botones-container {
+    position: absolute;
+}
+
+.siguiente-botones {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-right: 10px;
+    /* Opcional: ajusta el margen derecho según sea necesario */
+}
+
+
+p {
+    font-size: 70%;
+    overflow-wrap: break-word;
+}
+
+h4 {
+    margin-top: 1%;
+    font-size: 85%;
+}
+
+ion-label {
+    font-size: 70%;
+}
+
+.paginacion {
+    margin: auto;
+    padding-top: 2%;
+    padding-bottom: 2%;
+}
+
+.paginacion ::ng-deep .ngx-pagination {
+    padding: 0%;
+    margin: auto;
+}
+
+.paginacion ::ng-deep .ngx-pagination .current {
+    background: rgb(28, 133, 219);
+    color: rgb(255, 255, 255);
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.paginacion :host ::ng-deep .ngx-pagination span {
+    color: rgb(211, 211, 211);
+    font-family: monospace;
+}
+
+.paginacion ::ng-deep .ngx-pagination a {
+    background-color: transparent;
+    color: rgb(46, 143, 235);
+}
+
+
+.ubicacionIZQ {
+    width: 3rem;
+    height: 3rem;
+    position: absolute;
+    right: 26%;
 }
 
 .ubicacionMED {
@@ -57,56 +115,10 @@
     right: 0%;
 }
 
-
-.botones-container {
+.tamanoBotonDER {
+    width: 4rem;
+    height: 2rem;
     position: absolute;
-  }
-  
-  .siguiente-botones {
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin-right: 10px; /* Opcional: ajusta el margen derecho según sea necesario */
-  }
-
-
-p {
+    right: 40%;
     font-size: 70%;
-    overflow-wrap: break-word;
-}
-h4 {
-    margin-top: 1%;
-    font-size: 85%;
-}
-
-ion-label {
-    font-size: 70%;
-}
-
-.paginacion{
-    margin: auto;
-    padding-top: 2%;
-    padding-bottom: 2%;
-  }
-  
-  .paginacion ::ng-deep .ngx-pagination {
-    padding: 0%;
-    margin: auto;
-  }
-  
-.paginacion ::ng-deep .ngx-pagination .current {
-    background: rgb(28, 133, 219);
-    color: rgb(255, 255, 255);
-    font-weight: bold;
-    border-radius: 5px;
-}
-    
-.paginacion :host ::ng-deep .ngx-pagination span {
-    color: rgb(211, 211, 211);
-    font-family:monospace;
-}
-
-.paginacion ::ng-deep .ngx-pagination a{
-    background-color: transparent;
-    color: rgb(46, 143, 235);
 }

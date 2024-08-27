@@ -525,6 +525,7 @@ export class EnviartimbrePage implements OnInit {
 
       } else {
         this.abrirToas('Timbre sin conexión a Internet. No Permitido', "danger", 5000, "bottom");
+        
         return this.router.navigate(['/login']);
       }
     }

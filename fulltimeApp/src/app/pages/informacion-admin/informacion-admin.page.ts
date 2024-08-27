@@ -30,6 +30,8 @@ export class InformacionAdminPage implements OnInit {
   };
 
   empleados: any = [];
+  empleados_filtro: any[] = [];
+
   searchEmpleado: any = [];
 
   usuario: Usuario = {
@@ -106,19 +108,15 @@ export class InformacionAdminPage implements OnInit {
   obtenerEmpleados() {
     this.relojService.obtenerUsuarioEmpresa().subscribe(
       res => {
-
         this.empleados = res;
         this.existenEmpleados = true;
-
-
+        this.empleados_filtro = [...this.empleados];
         console.log('lista empleados: ', this.empleados)
-
         if (this.empleados.length < 11) {
           return this.ver = true;
         } else {
           return this.ver = false;
         }
-
       },
       err => {
         console.log(err)
@@ -126,6 +124,18 @@ export class InformacionAdminPage implements OnInit {
     );
 
   }
+
+  changeSearch(e: any) {
+    const query = e.detail.value;
+    const filtro = this.empleados.filter((o:any) => {
+      return o.fullname.toLowerCase().indexOf(query.toLowerCase()) > -1 ||
+        o.codigo.toLowerCase().indexOf(query.toLowerCase()) > -1 ||
+        o.cedula.toLowerCase().indexOf(query.toLowerCase()) > -1
+    })
+    this.empleados_filtro = filtro
+
+  }
+
 
   //refrescar la pagina
   doRefresh(event: any) {

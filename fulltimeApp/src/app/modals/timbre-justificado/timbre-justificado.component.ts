@@ -3,6 +3,7 @@ import { ModalController, ToastController } from '@ionic/angular';
 import { TimbresService } from '../../services/timbres.service';
 import { DataUserLoggedService } from '../../services/data-user-logged.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
+import { Device } from '@capacitor/device';
 
 @Component({
   selector: 'app-timbre-justificado',
@@ -49,8 +50,25 @@ export class TimbreJustificadoComponent implements OnInit {
 
   ngOnInit() {
     console.log('Timbre CODIGO DEL EMPLEADO: ', this.data);
+    this.obtenerIdCelular();
   }
 
+  modelo_dispositivo: string = "";
+  dispositivo_timbre: string = "";
+  //obtener ID de celular, para identificar en que celular timbró
+  obtenerIdCelular() {
+    Device.getInfo().then((info) => {
+      return this.modelo_dispositivo = info.model;
+    }).catch((e) => {
+      return this.modelo_dispositivo = "Desconocido";
+    });
+
+    Device.getId().then((id) => {
+      return this.dispositivo_timbre = id.identifier + '';
+    }).catch((e) => {
+      return this.dispositivo_timbre = "Desconocido";
+    });
+  }
   accionChange(e) {
     console.log(e.target.value);
     this.accion = e.target.value;
@@ -58,12 +76,15 @@ export class TimbreJustificadoComponent implements OnInit {
     this.tecla_funcion = obj1
   }
 
+
   fechaChange(e) {
     console.log(e.target.value);
     this.fec_timbre = e.target.value
   }
 
+
   enviarTimbre() {
+
     console.log('timbre enviar...');
     if (this.accion === '' || this.tecla_funcion === -1 || this.fec_timbre === '') return this.abrirToas('Falta llenar todos los campos', "warning", 3000)
 
@@ -79,7 +100,11 @@ export class TimbreJustificadoComponent implements OnInit {
       id_reloj: 97,
       id: this.data.id,
       ip: localStorage.getItem('ip'),
-      documento: this.base64Image
+      documento: this.base64Image,
+      dispositivo_timbre: this.dispositivo_timbre,
+      conexion: true,
+      hora_timbre_diferente: false
+
     }
 
     this.timbresService.PostTimbreWebAdmin(dataTimbre).subscribe(res => {

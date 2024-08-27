@@ -61,7 +61,6 @@ export class VertimbrePage implements OnInit {
   ngOnInit() {
     //obtener timbres de empleado  
     this.BuscarFormatos();
-    this.cargarTipoTimbreInicial();
     this.mostrarTimbres();
   }
 
@@ -261,15 +260,6 @@ export class VertimbrePage implements OnInit {
     }
   }
 
-  verTipoTimbre: string = '';
-
-  cargarTipoTimbreInicial() {
-      this.verTipoTimbre = "timbreServidor";
-  }
-  cambioHoraSC(event) {
-    console.log(event.target.value);
-    this.verTipoTimbre = event.target.value;
-  }
 
   //mensaje de cargando
   private async presentLoading(msg: string) {
@@ -306,20 +296,15 @@ export class VertimbrePage implements OnInit {
         novedad = 'Hora timbre diferente al del Servidor'
       }
     }
-
-    let mensaje = '';
-
+    let mensaje = `<b>${obs}</b>`;
     if (ubicacion) {
       mensaje += `<br><br><ion-icon name="location-outline"></ion-icon> ${ubicacion}`;
     }
-
     if (novedad) {
       mensaje += `<br><br>${novedad}`;
     }
-
     const alert = await this.alertController.create({
-      header: obs,
-      //  message: obs + " <br> Dispositivo desde el que se timbró: "  + tdispsitivo + "<br> Dispositivo registrado para este usuario: " + idcelularUsuario,
+    //  header: obs,
       message: mensaje,
       cssClass: 'my-custom-class',
       mode: 'ios',

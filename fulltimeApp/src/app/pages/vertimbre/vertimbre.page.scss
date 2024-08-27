@@ -37,27 +37,13 @@
   border: 0;
 }
 
-.tamanoBotonDER {
-  background-color: transparent;
-  width: 4rem;
-  height: 2rem;
-  position: absolute;
-  right: 27%;
-  font-size: 70%;
-}
-
 .textoObs {
   text-align: center;
   cursor: pointer;
   font-size: 70%;
 }
 
-.ubicacionDER {
-  width: 3rem;
-  height: 3rem;
-  position: absolute;
-  right: 0%;
-}
+
 
 
 p {
@@ -102,16 +88,39 @@ ion-label {
   color: rgb(67, 149, 226);
 }
 
+.ubicacionIZQ {
+  width: 3rem;
+  height: 3rem;
+  position: absolute;
+  right: 26%;
+}
+
 .ubicacionMED {
   width: 3rem;
   height: 3rem;
   position: absolute;
   right: 13%;
 }
+.ubicacionDER {
+  width: 3rem;
+  height: 3rem;
+  position: absolute;
+  right: 0%;
+}
 
 .custom-message {
   text-align: center;
   font-size: 18px;
   font-weight: bold;
+}
+
+
+.tamanoBotonDER {
+  background-color: transparent;
+  width: 4rem;
+  height: 2rem;
+  position: absolute;
+  right: 40%;
+  font-size: 70%;
 }
 

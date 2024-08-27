@@ -80,12 +80,14 @@
     </ion-card>
   </ion-list>
 
+
   <ion-list mode="md" style="margin-bottom: 1%; background-color: transparent;">
     <ion-list-header>
       <ion-label>
         <h1 style="font-size: 120%"><b> LISTA EMPLEADOS </b></h1>
       </ion-label>
     </ion-list-header>
+    <ion-searchbar autocomplete="off" showCancelButton="focus" (ionChange)="changeSearch($event)"></ion-searchbar>
 
     <div *ngIf="!existenEmpleados">
       <ion-text color="primary">
@@ -95,7 +97,7 @@
     </div>
 
     <ion-item style="margin: 2.5%; padding: -2%; border-radius: 3%;"
-      *ngFor="let e of empleados | paginate: { itemsPerPage: 10, currentPage: pageActual }">
+      *ngFor="let e of empleados_filtro | paginate: { itemsPerPage: 10, currentPage: pageActual }">
       <ion-avatar slot="start">
         <ion-icon name="person-circle-outline" color="theme" style="font-size: 30px;"></ion-icon>
       </ion-avatar>
@@ -109,7 +111,8 @@
       </ion-label>
 
       <div (click)="presentModal(e)">
-        <ion-icon color="theme" style="font-size: 30px;" class="tamanoIconoEmpleado" name="information-circle-outline"></ion-icon>
+        <ion-icon color="theme" style="font-size: 30px;" class="tamanoIconoEmpleado"
+          name="information-circle-outline"></ion-icon>
       </div>
 
     </ion-item>
