@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController, PopoverController } from '@ionic/angular';
+import { ModalController, PopoverController, NavParams } from '@ionic/angular';
 import { AutorizacionesService } from '../../services/autorizaciones.service';
 import { Notificacion } from '../../interfaces/Notificaciones';
 import { NotificacionTimbre } from '../../interfaces/Notificaciones';
@@ -34,7 +34,10 @@ export class ListaNotificacionComponent implements OnInit {
   paginaccionvista: boolean = false;
   ver: boolean = false;
 
+  id_noti :any;
+
   constructor(
+    private navParams: NavParams,
     private notificacionService: AutorizacionesService,
     private router: Router,
     public pooverCtrl: PopoverController,
@@ -42,7 +45,9 @@ export class ListaNotificacionComponent implements OnInit {
     public modalController: ModalController,
     private userService: DataUserLoggedService,
 
-  ) { }
+  ) { 
+    this.id_noti =this.navParams.get('id')
+  }
 
   ngOnInit() {
     const id_empleado = localStorage.getItem('empleadoID')
@@ -112,7 +117,7 @@ export class ListaNotificacionComponent implements OnInit {
 
   }
 
-  tiponotificacion(noti: { id_permiso: string; id_vacaciones: string; id_hora_extra: string; visto: boolean, tipo: number }) {
+  tiponotificacion(noti: {id: any,  id_permiso: string; id_vacaciones: string; id_hora_extra: string; visto: boolean, tipo: number }) {
     if (noti.visto === true) {
       return "reportes";
     }

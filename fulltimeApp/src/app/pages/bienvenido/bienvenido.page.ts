@@ -37,16 +37,26 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     this.cambioimagen();
   }
 
+  /*
   ionViewDidLoad() {
     this.cambioimagen();
   }
-
+*/
   ngOnInit() {
+    this.startClock();
+    this.VerificarFunciones();
+  }
+  ionViewWillEnter() {
+    this.cambioimagen(); // Ensure that image changes are applied when the page is about to be shown
+    this.startClock(); // Start or reset the clock
+    this.VerificarFunciones();
+  }
+
+  startClock() {
     setInterval(() => {
       this.horaTransformada = this.pipe.transform(Date.now(), 'hh:mm:ss a');
       this.fechaTransformada = this.pipe.transform(Date.now(), 'fullDate');
     }, 1000);
-    this.VerificarFunciones();
   }
 
   async usuarioIncorrectoToas(mensaje: string, duracion: number) {

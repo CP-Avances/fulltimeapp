@@ -312,11 +312,26 @@ export class VerHorariosEmpleadosComponent  implements OnInit {
     
     var busqueda = {
       fecha: moment(dia).format('YYYY-MM-D'), 
-      codigo: this.data.codigo
+      codigo: this.data.id
     }
 
     this.empleadoService.getHorariosEmpleadobyCodigo(busqueda).subscribe(datos => { 
+
+
+      console.log("ver datos present alert ", datos)
       this.plan_horario = this.validar.ObtenerDetallesPlanificacion(datos);
+      //this.
+      console.log("ver paln horario", this.plan_horario)
+      this.plan_horario.forEach((x)=>{
+
+        this.empleadoService.BuscarUnHorario(x.horario).subscribe(y =>{
+          x.horario_codigo =y[0].codigo;
+
+        })
+      })
+
+
+
       this.isModalOpen = true;
     });
   }

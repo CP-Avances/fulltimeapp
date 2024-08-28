@@ -129,18 +129,18 @@ export class ValidacionesService {
         return hora + ':' + min + ':' + seg
     }
 
-    
+
 
     //SegundosTransformDiaLaboral( inicio: Date, final: Date, tiempo_total: number, horario: HorarioE, horas_trabaja: number): any {
     //inicio = hora_inicio / final = hora_final
-    SegundosTransformDiaLaboral(inicio: string, final: string, tiempo_total: number, totalHorar: number, horario: HorarioE, horas_trabaja: number, feriado: Cg_Feriados[] ): any {
+    SegundosTransformDiaLaboral(inicio: string, final: string, tiempo_total: number, totalHorar: number, horario: HorarioE, horas_trabaja: number, feriado: Cg_Feriados[]): any {
 
         //Condicion para calcular horas de permiso tomando simepre un dia de permiso
         if (tiempo_total <= (horas_trabaja)) { // validacion para permisos de un mismo dia laboral 
             console.log('----Horas----');
-            let tiempo_transcurrido_horas =  this.SegundosToHHMM(tiempo_total);
-            console.log('horas: ',tiempo_transcurrido_horas);
-            
+            let tiempo_transcurrido_horas = this.SegundosToHHMM(tiempo_total);
+            console.log('horas: ', tiempo_transcurrido_horas);
+
             return {
                 dia: 0,
                 tiempo_transcurrido: tiempo_transcurrido_horas,
@@ -150,7 +150,7 @@ export class ValidacionesService {
 
         //Condicion para calcular los dias de permiso 
         if (tiempo_total % 86400 === 0) { // logica para comprovar si el tiempo ingresado solo son dias de 24 horas exactos tomando en cuenta que la hora final es igual a la de inicio.
-            
+
             console.log('----Dias----');
             //logica de validacion de dias laborales y libres.
             const { dia_laborable, dia_libre } = this.vacacionesByFeriadoAndHorarioE(inicio, final, horario, feriado);
@@ -162,13 +162,13 @@ export class ValidacionesService {
 
         } else {// para unir calculo de dias y horas
 
-             //const d = (Math.floor(tiempo_total / 86400)) + 1; //Esto ya no va por que se usa el metodo de vacaciones
+            //const d = (Math.floor(tiempo_total / 86400)) + 1; //Esto ya no va por que se usa el metodo de vacaciones
             console.log('----Dias y Horas----');
             const { dia_laborable, dia_libre } = this.vacacionesByFeriadoAndHorarioE(inicio, final, horario, feriado);
             let tiempotranscurrido_horas = '00:00:00';
 
-            tiempotranscurrido_horas =  this.SegundosToHHMM(totalHorar);
-            console.log('Dias: ', dia_laborable - 1,' horas: ',tiempotranscurrido_horas);
+            tiempotranscurrido_horas = this.SegundosToHHMM(totalHorar);
+            console.log('Dias: ', dia_laborable - 1, ' horas: ', tiempotranscurrido_horas);
 
             return {
                 dia: dia_laborable - 1,
@@ -184,10 +184,10 @@ export class ValidacionesService {
     vacacionesByFeriadoAndHorarioE(inicio: string, final: string, horario: HorarioE, feriado: Cg_Feriados[]): any {
         this.lista_plan = horario;
         this.filtro = [];
-        console.log('horario: ',horario);
-        console.log('inicio: ',inicio);
-        console.log('final: ',final);
-        console.log('feriado: ',feriado);
+        console.log('horario: ', horario);
+        console.log('inicio: ', inicio);
+        console.log('final: ', final);
+        console.log('feriado: ', feriado);
         const fec_aux = new Date(inicio.split('T')[0])//variable auxiliar de la fecha de inicio, me toma un dia anterior.90p-[=]
         const fecha1 = moment(inicio);
         const fecha2 = moment(final);
@@ -197,23 +197,23 @@ export class ValidacionesService {
         let res: Array<any> = [];
         // se aplica logica matematica
 
-        console.log('diasDiferencia: ',diasDiferencia);
+        console.log('diasDiferencia: ', diasDiferencia);
 
 
         for (let i = 0; i <= diasDiferencia; i++) {
             const fec_string = fec_aux.toJSON().split('T')[0];
-            const [fer] = feriado.filter(o => { return o.fecha === fec_string })       
+            const [fer] = feriado.filter(o => { return o.fecha === fec_string })
             var dia: any = moment(fec_string).format('D');
             var mes: any = moment(fec_string).format('M');
 
-            console.log('dia: ',dia);
-            console.log('mes: ',mes);
+            console.log('dia: ', dia);
+            console.log('mes: ', mes);
 
-            console.log('ver this.lista_plan: ',this.lista_plan);
+            console.log('ver this.lista_plan: ', this.lista_plan);
 
 
-            this.lista_plan.filter(item =>{
-                if(item.mes == mes){
+            this.lista_plan.filter(item => {
+                if (item.mes == mes) {
                     this.filtro = item;
                 }
             })
@@ -230,11 +230,11 @@ export class ValidacionesService {
             //diaslibre = horario_laboral.labora;
         }
 
-        const labora = res.filter(o => { 
-            return 0 === (o.labora * o.feriado) 
+        const labora = res.filter(o => {
+            return 0 === (o.labora * o.feriado)
         })
-        const libre = res.filter(o => { 
-            return 1 === (o.labora * o.feriado) 
+        const libre = res.filter(o => {
+            return 1 === (o.labora * o.feriado)
         })
 
         return {
@@ -247,7 +247,7 @@ export class ValidacionesService {
     validarDiaLaboral_Libre(dia: string, horario: HorarioE, feriado: Cg_Feriados[]): any {
         const fec_aux = new Date(dia.split('T')[0])//variable auxiliar de la fecha de inicio, me toma un dia anterior.
         const fec_string = fec_aux.toJSON().split('T')[0];
-        const [fer] = feriado.filter(o => { return o.fecha === fec_string })  
+        const [fer] = feriado.filter(o => { return o.fecha === fec_string })
 
         let horario_laboral = {
             fecha: fec_string,
@@ -258,7 +258,7 @@ export class ValidacionesService {
         return horario_laboral.labora
     }
 
-   ObtenerDiaLabora(horario: HorarioE, dia: number): number {
+    ObtenerDiaLabora(horario: HorarioE, dia: number): number {
         let bool_return = undefined;
         switch (dia) { // true = no labora | false = labora
             case 0: bool_return = horario.domingo; break;
@@ -276,462 +276,651 @@ export class ValidacionesService {
         return (bool_return) ? 0 : 1 // 0 = no labora | 1 = labora
     }
 
-    ObtenerPlanHorarioPorDia(res: any, dia_ingresa: any, identificador: boolean ){
+    ObtenerPlanHorarioPorDia(res: any, dia_ingresa: any, identificador: boolean) {
         let laboral = 1;
-        switch(dia_ingresa){
-                case '1' || 1:
-                    if(res.dia1 != 'L' && res.dia1 != '-' && res.dia1 != 'FD' && res.dia1 != 'L, L'  && res.dia1 != 'L, L, L'){
-                        console.log('dia 1: ',res.dia1);
-                        laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+        switch (dia_ingresa) {
+            case '1' || 1:
+                if (res.dia1 != 'L' && res.dia1 != '-' && res.dia1 != 'FD' && res.dia1 != 'L, L' && res.dia1 != 'L, L, L') {
+
+                    if (res.dia1 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '2' || 2:
-                    if(res.dia2 != 'L' && res.dia2 != '-' && res.dia2 != 'FD' && res.dia2 != 'L, L'  && res.dia2 != 'L, L, L'){
-                      console.log('dia 2: ',res.dia2);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 1: ', res.dia1);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '2' || 2:
+                if (res.dia2 != 'L' && res.dia2 != '-' && res.dia2 != 'FD' && res.dia2 != 'L, L' && res.dia2 != 'L, L, L') {
+
+                    if (res.dia2 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '3' || 3:
-                    if(res.dia3 != "L" && res.dia3 != "-" && res.dia3 != "FD" && res.dia3 != "L, L"  && res.dia3 != "L, L, L"){
-                      console.log('dia 3: ',res.dia3);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 2: ', res.dia2);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '3' || 3:
+                if (res.dia3 != "L" && res.dia3 != "-" && res.dia3 != "FD" && res.dia3 != "L, L" && res.dia3 != "L, L, L") {
+
+                    if (res.dia3 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '4' || 4:
-                    if(res.dia4 != "L" && res.dia4 != "-" && res.dia4 != 'FD' && res.dia4 != 'L, L'  && res.dia4 != 'L, L, L'){
-                      console.log('dia 4: ',res.dia4);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 3: ', res.dia3);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '4' || 4:
+                if (res.dia4 != "L" && res.dia4 != "-" && res.dia4 != 'FD' && res.dia4 != 'L, L' && res.dia4 != 'L, L, L') {
+                    if (res.dia4 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '5' || 5:
-                    if(res.dia5 != "L" && res.dia5 != "-"  && res.dia5 != 'FD' && res.dia5 != 'L, L'  && res.dia5 != 'L, L, L'){
-                      console.log('dia 5: ',res.dia5);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 4: ', res.dia4);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '5' || 5:
+                if (res.dia5 != "L" && res.dia5 != "-" && res.dia5 != 'FD' && res.dia5 != 'L, L' && res.dia5 != 'L, L, L') {
+                    if (res.dia5 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '6' || 6:
-                    if(res.dia6 != "L" && res.dia6 != "-" && res.dia6 != 'FD' && res.dia6 != 'L, L'  && res.dia6 != 'L, L, L'){
-                      console.log('dia 6: ',res.dia6);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 5: ', res.dia5);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '6' || 6:
+                if (res.dia6 != "L" && res.dia6 != "-" && res.dia6 != 'FD' && res.dia6 != 'L, L' && res.dia6 != 'L, L, L') {
+                    if (res.dia6 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '7' || 7:
-                    if(res.dia7 != "L" && res.dia7 != "-" && res.dia7 != 'FD' && res.dia7 != 'L, L'  && res.dia7 != 'L, L, L'){
-                      console.log('dia 7: ',res.dia7);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 6: ', res.dia6);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '7' || 7:
+                if (res.dia7 != "L" && res.dia7 != "-" && res.dia7 != 'FD' && res.dia7 != 'L, L' && res.dia7 != 'L, L, L') {
+                    if (res.dia7 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '8' || 8:
-                    if(res.dia8 != "L" && res.dia8 != "-" && res.dia8 != 'FD' && res.dia8 != 'L, L'  && res.dia8 != 'L, L, L'){
-                      console.log('dia 8: ',res.dia8);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 7: ', res.dia7);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '8' || 8:
+                if (res.dia8 != "L" && res.dia8 != "-" && res.dia8 != 'FD' && res.dia8 != 'L, L' && res.dia8 != 'L, L, L') {
+                    if (res.dia8 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '9' || 9:
-                    if(res.dia9 != "L" && res.dia9 != "-" && res.dia9 != 'FD' && res.dia9 != 'L, L'  && res.dia9 != 'L, L, L'){
-                      console.log('dia 9: ',res.dia9);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 8: ', res.dia8);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '9' || 9:
+                if (res.dia9 != "L" && res.dia9 != "-" && res.dia9 != 'FD' && res.dia9 != 'L, L' && res.dia9 != 'L, L, L') {
+                    if (res.dia9 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '10' || 10:
-                    if(res.dia10 != "L" && res.dia10 != "-" && res.dia10 != 'FD' && res.dia10 != 'L, L'  && res.dia10 != 'L, L, L'){
-                      console.log('dia 10: ',res.dia10);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 9: ', res.dia9);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '10' || 10:
+                if (res.dia10 != "L" && res.dia10 != "-" && res.dia10 != 'FD' && res.dia10 != 'L, L' && res.dia10 != 'L, L, L') {
+                    if (res.dia10 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '11' || 11:
-                    if(res.dia11 != "L" && res.dia11 != "-" && res.dia11 != 'FD' && res.dia11 != 'L, L'  && res.dia11 != 'L, L, L'){
-                      console.log('dia 11: ',res.dia11);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 10: ', res.dia10);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '11' || 11:
+                if (res.dia11 != "L" && res.dia11 != "-" && res.dia11 != 'FD' && res.dia11 != 'L, L' && res.dia11 != 'L, L, L') {
+                    if (res.dia11 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '12' || 12:
-                    if(res.dia12 != "L" && res.dia12 != "-" && res.dia12 != 'FD' && res.dia12 != 'L, L'  && res.dia12 != 'L, L, L'){
-                      console.log('dia 12: ',res.dia12);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 11: ', res.dia11);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '12' || 12:
+                if (res.dia12 != "L" && res.dia12 != "-" && res.dia12 != 'FD' && res.dia12 != 'L, L' && res.dia12 != 'L, L, L') {
+                    if (res.dia12 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '13' || 13:
-                    if(res.dia13 != "L" && res.dia13 != "-" && res.dia13 != 'FD' && res.dia13 != 'L, L'  && res.dia13 != 'L, L, L'){
-                      console.log('dia 13: ',res.dia13);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 12: ', res.dia12);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '13' || 13:
+                if (res.dia13 != "L" && res.dia13 != "-" && res.dia13 != 'FD' && res.dia13 != 'L, L' && res.dia13 != 'L, L, L') {
+                    if (res.dia13 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '14' || 14:
-                    if(res.dia14 != "L" && res.dia14 != "-" && res.dia14 != 'FD' && res.dia14 != 'L, L'  && res.dia14 != 'L, L, L'){
-                      console.log('dia 14: ',res.dia14);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 13: ', res.dia13);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '14' || 14:
+                if (res.dia14 != "L" && res.dia14 != "-" && res.dia14 != 'FD' && res.dia14 != 'L, L' && res.dia14 != 'L, L, L') {
+                    if (res.dia14 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '15' || 15:
-                    if(res.dia15 != "L" && res.dia15 != "-" && res.dia15 != 'FD' && res.dia15 != 'L, L'  && res.dia15 != 'L, L, L'){
-                      console.log('dia 15: ',res.dia15);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 14: ', res.dia14);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '15' || 15:
+                if (res.dia15 != "L" && res.dia15 != "-" && res.dia15 != 'FD' && res.dia15 != 'L, L' && res.dia15 != 'L, L, L') {
+                    if (res.dia15 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '16' || 16:
-                    if(res.dia16 != "L" && res.dia16 != "-" && res.dia16 != 'FD' && res.dia16 != 'L, L'  && res.dia16 != 'L, L, L'){
-                      console.log('dia 16: ',res.dia16);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 15: ', res.dia15);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '16' || 16:
+                if (res.dia16 != "L" && res.dia16 != "-" && res.dia16 != 'FD' && res.dia16 != 'L, L' && res.dia16 != 'L, L, L') {
+                    if (res.dia15 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '17' || 17:
-                    if(res.dia17 != "L" && res.dia17 != "-" && res.dia17 != 'FD' && res.dia17 != 'L, L'  && res.dia17 != 'L, L, L'){
-                      console.log('dia 17: ',res.dia17);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    } else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 16: ', res.dia16);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '17' || 17:
+                if (res.dia17 != "L" && res.dia17 != "-" && res.dia17 != 'FD' && res.dia17 != 'L, L' && res.dia17 != 'L, L, L') {
+                    if (res.dia17 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '18' || 18:
-                    if(res.dia18 != "L" && res.dia18 != "-" && res.dia18 != 'FD' && res.dia18 != 'L, L'  && res.dia18 != 'L, L, L'){
-                      console.log('dia 18: ',res.dia18);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 17: ', res.dia17);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '18' || 18:
+                if (res.dia18 != "L" && res.dia18 != "-" && res.dia18 != 'FD' && res.dia18 != 'L, L' && res.dia18 != 'L, L, L') {
+                    if (res.dia18 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '19' || 19:
-                    if(res.dia19 != "L" && res.dia19 != "-" && res.dia19 != 'FD' && res.dia19 != 'L, L'  && res.dia19 != 'L, L, L'){
-                      console.log('dia 19: ',res.dia19);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 18: ', res.dia18);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '19' || 19:
+                if (res.dia19 != "L" && res.dia19 != "-" && res.dia19 != 'FD' && res.dia19 != 'L, L' && res.dia19 != 'L, L, L') {
+                    if (res.dia19 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '20' || 20:
-                    if(res.dia20 != "L" && res.dia20 != "-" && res.dia20 != 'FD' && res.dia20 != 'L, L'  && res.dia20 != 'L, L, L'){
-                      console.log('dia 20: ',res.dia20);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 19: ', res.dia19);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '20' || 20:
+                if (res.dia20 != "L" && res.dia20 != "-" && res.dia20 != 'FD' && res.dia20 != 'L, L' && res.dia20 != 'L, L, L') {
+                    if (res.dia20 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '21' || 21:
-                    if(res.dia21 != "L" && res.dia21 != "-" && res.dia21 != 'FD' && res.dia21 != 'L, L'  && res.dia21 != 'L, L, L'){
-                      console.log('dia 21: ',res.dia21);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 20: ', res.dia20);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '21' || 21:
+                if (res.dia21 != "L" && res.dia21 != "-" && res.dia21 != 'FD' && res.dia21 != 'L, L' && res.dia21 != 'L, L, L') {
+                    if (res.dia21 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '22' || 22:
-                    if(res.dia22 != "L" && res.dia22 != "-" && res.dia22 != 'FD' && res.dia22 != 'L, L'  && res.dia22 != 'L, L, L'){
-                      console.log('dia 22: ',res.dia22);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 21: ', res.dia21);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '22' || 22:
+                if (res.dia22 != "L" && res.dia22 != "-" && res.dia22 != 'FD' && res.dia22 != 'L, L' && res.dia22 != 'L, L, L') {
+                    if (res.dia22 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '23' || 23:
-                    if(res.dia23 != "L" && res.dia23 != "-" && res.dia23 != 'FD' && res.dia23 != 'L, L'  && res.dia23 != 'L, L, L'){
-                      console.log('dia 23: ',res.dia23);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }else{
-                            return {dia_retur: 1, codigo: res[0].dia23}
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 22: ', res.dia22);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '23' || 23:
+                if (res.dia23 != "L" && res.dia23 != "-" && res.dia23 != 'FD' && res.dia23 != 'L, L' && res.dia23 != 'L, L, L') {
+                    if (res.dia23 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '24' || 24:
-                    if(res.dia24 != "L" && res.dia24 != "-" && res.dia24 != 'FD' && res.dia24 != 'L, L'  && res.dia24 != 'L, L, L'){
-                      console.log('dia 24: ',res.dia24);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 23: ', res.dia23);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    } else {
+                        return { dia_retur: 1, codigo: res[0].dia23 }
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '24' || 24:
+                if (res.dia24 != "L" && res.dia24 != "-" && res.dia24 != 'FD' && res.dia24 != 'L, L' && res.dia24 != 'L, L, L') {
+                    if (res.dia24 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '25' || 25:
-                    if(res.dia25 != "L" && res.dia25 != "-" && res.dia25 != 'FD' && res.dia25 != 'L, L'  && res.dia25 != 'L, L, L'){
-                      console.log('dia 25: ',res.dia25);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 24: ', res.dia24);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '25' || 25:
+                if (res.dia25 != "L" && res.dia25 != "-" && res.dia25 != 'FD' && res.dia25 != 'L, L' && res.dia25 != 'L, L, L') {
+                    if (res.dia25 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '26' || 26:
-                    if(res.dia26 != "L" && res.dia26 != "-" && res.dia26 != 'FD' && res.dia26 != 'L, L'  && res.dia26 != 'L, L, L'){
-                      console.log('dia 26: ',res.dia26);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 25: ', res.dia25);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '26' || 26:
+                if (res.dia26 != "L" && res.dia26 != "-" && res.dia26 != 'FD' && res.dia26 != 'L, L' && res.dia26 != 'L, L, L') {
+                    if (res.dia26 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '27' || 27:
-                    if(res.dia27 != "L" && res.dia27 != "-" && res.dia27 != 'FD' && res.dia27 != 'L, L'  && res.dia27 != 'L, L, L'){
-                      console.log('dia 27: ',res.dia27);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    } 
-                    break;
-                case '28' || 28:
-                    if(res.dia28 != "L" && res.dia28 != "-" && res.dia38 != 'FD' && res.dia28 != 'L, L'  && res.dia28 != 'L, L, L'){
-                      console.log('dia 28: ',res.dia28);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 26: ', res.dia26);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '27' || 27:
+                if (res.dia27 != "L" && res.dia27 != "-" && res.dia27 != 'FD' && res.dia27 != 'L, L' && res.dia27 != 'L, L, L') {
+                    if (res.dia27 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '29' || 29:
-                    if(res.dia29 != "L" && res.dia29 != "-" && res.dia29 != 'FD' && res.dia29 != 'L, L'  && res.dia29 != 'L, L, L'){
-                      console.log('dia 29: ',res.dia29);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 27: ', res.dia27);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '28' || 28:
+                if (res.dia28 != "L" && res.dia28 != "-" && res.dia38 != 'FD' && res.dia28 != 'L, L' && res.dia28 != 'L, L, L') {
+                    if (res.dia28 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '30' || 30:
-                    if(res.dia30 != "L" && res.dia30 != "-" && res.dia30 != 'FD' && res.dia30 != 'L, L'  && res.dia30 != 'L, L, L'){
-                      console.log('dia 30: ',res.dia30);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 28: ', res.dia28);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '29' || 29:
+                if (res.dia29 != "L" && res.dia29 != "-" && res.dia29 != 'FD' && res.dia29 != 'L, L' && res.dia29 != 'L, L, L') {
+                    if (res.dia29 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                case '31' || 31:
-                    if(res.dia31 != "L" && res.dia31 != "-"  && res.dia31 != 'FD' && res.dia31 != 'L, L'  && res.dia31 != 'L, L, L'){
-                      console.log('dia 31: ',res.dia31);
-                      laboral = 0;
-                        if(identificador == true){
-                            return laboral
-                        }else{
-                            return {dia_retur: 1, codigo: res[0].dia31};
-                        }
-                    }else{
-                        laboral = 1;
-                        if(identificador == true){
+                    console.log('dia 29: ', res.dia29);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '30' || 30:
+                if (res.dia30 != "L" && res.dia30 != "-" && res.dia30 != 'FD' && res.dia30 != 'L, L' && res.dia30 != 'L, L, L') {
+                    if (res.dia30 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
                             return laboral
                         }
                     }
-                    break;
-                default:
-                    if(identificador == true){
-                        return laboral = 1;
-                    }else{
-                        return {dia_retur: undefined, codigo: undefined}; 
+                    console.log('dia 30: ', res.dia30);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
                     }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            case '31' || 31:
+                if (res.dia31 != "L" && res.dia31 != "-" && res.dia31 != 'FD' && res.dia31 != 'L, L' && res.dia31 != 'L, L, L') {
+                    if (res.dia31 == 'DEFAULT-FERIADO') {
+                        laboral = 2;
+                        if (identificador == true) {
+                            return laboral
+                        }
+                    }
+                    console.log('dia 31: ', res.dia31);
+                    laboral = 0;
+                    if (identificador == true) {
+                        return laboral
+                    } else {
+                        return { dia_retur: 1, codigo: res[0].dia31 };
+                    }
+                } else {
+                    laboral = 1;
+                    if (identificador == true) {
+                        return laboral
+                    }
+                }
+                break;
+            default:
+                if (identificador == true) {
+                    return laboral = 1;
+                } else {
+                    return { dia_retur: undefined, codigo: undefined };
+                }
         }
-    
-        if(identificador == false){
-            return {dia_retur: 0, codigo: ''};
-        }else{
+
+        if (identificador == false) {
+            return { dia_retur: 0, codigo: '' };
+        } else {
             //return laboral = 1;
         }
     }
-    
+
     // METODO PARA OBTENER DETALLE DE PLANIFICACION
     ver_detalle: boolean = false;
     ver_acciones: boolean = false;
@@ -752,7 +941,7 @@ export class ValidacionesService {
         let codigo_horario = '';
         let tipos: any = [];
         let accion = '';
-        let tipo_dia = ''; 
+        let tipo_dia = '';
         // VARIABLES AUXILIARES
         let aux_h = '';
         let aux_a = '';
@@ -768,14 +957,14 @@ export class ValidacionesService {
                     tipo_dia = obj.tipo_dia;
                     this.ValidarAcciones(obj);
 
-                }else if (obj.id_horario === aux_h) {
+                } else if (obj.id_horario === aux_h) {
                     if (obj.tipo_hora != aux_a) {
                         accion = accion + ' , ' + obj.tipo_hora + ': ' + obj.horario
                         codigo_horario = obj.id_horario;
                         tipo_dia = obj.tipo_dia;
                         this.ValidarAcciones(obj);
                     }
-                }else {
+                } else {
                     // CONCATENAR VALORES ANTERIORES
                     tipos = [{
                         acciones: accion,
@@ -803,7 +992,7 @@ export class ValidacionesService {
                 aux_h = obj.id_horario;
                 aux_a = obj.tipo_hora;
             })
-              
+
             // AL FINALIZAR EL CICLO CONCATENAR VALORES
             tipos = [{
                 acciones: accion,
@@ -814,13 +1003,13 @@ export class ValidacionesService {
                 salida: this.salida,
                 tipo_dia: tipo_dia
             }]
-                
+
             this.detalle_acciones = this.detalle_acciones.concat(tipos);
-            return this.detalle_acciones                
+            return this.detalle_acciones
         }
         else {
             this.showToast('Ups no se han encontrado registros!!!,  No existe detalle de planificación.', 4000, "warning");
-            return this.detalle_acciones = undefined;  
+            return this.detalle_acciones = undefined;
         }
     }
 
@@ -872,16 +1061,16 @@ export class ValidacionesService {
 
     dia_abreviado: string = 'ddd';
     dia_completo: string = 'dddd';
-  
+
     FormatearFecha(fecha: string, formato: string, dia: string) {
-      let valor = moment(fecha).format(dia).charAt(0).toUpperCase() +
-        moment(fecha).format(dia).slice(1) +
-        ', ' + moment(fecha).format(formato);
-      return valor;
+        let valor = moment(fecha).format(dia).charAt(0).toUpperCase() +
+            moment(fecha).format(dia).slice(1) +
+            ', ' + moment(fecha).format(formato);
+        return valor;
     }
-  
+
     FormatearHora(hora: string, formato: string) {
-      let valor = moment(hora, 'HH:mm:ss').format(formato);
-      return valor;
+        let valor = moment(hora, 'HH:mm:ss').format(formato);
+        return valor;
     }
 }

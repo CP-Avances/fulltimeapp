@@ -112,4 +112,9 @@ export class EmpleadosService {
     return this.http.get<any>(`${this.apiUrl}/empleado/img/codificado/${id}/${imagen}`)
   }
 
+   // BUSCAR DATOS DE UN HORARIO    **USADO
+   BuscarUnHorario(id: number) {
+    return this.http.get(`${this.apiUrl}/horario/${id}`);
+  }
+
 }

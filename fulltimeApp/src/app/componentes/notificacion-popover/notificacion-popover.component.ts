@@ -151,10 +151,21 @@ export class NotificacionPopoverComponent implements OnInit {
   }
 
 
-  AbrirNoti(noti: { id: number, id_permiso: string; id_vacaciones: string; id_hora_extra: string; estado: string; tipo: number; nempleadoreceives: string; id_receives_empl: number; nempleadosend: string; }) {
+  async AbrirNoti(noti: { id: number, id_permiso: string; id_vacaciones: string; id_hora_extra: string; estado: string; tipo: number; nempleadoreceives: string; id_receives_empl: number; nempleadosend: string; }) {
     this.cambiovistanoti(noti);
     this.cambiovistanotitimbre(noti);
+
     this.pooverCtrl.dismiss({});
+    this.valor = false;
+    const modal = await this.modalController.create({
+      component: ListaNotificacionComponent,
+      cssClass: 'my-custom-class',
+      componentProps: {
+        id: noti.id // Pasar el DataUrl como propiedad a la modal
+      }
+    });
+    return await modal.present();
+
 
     if (noti.nempleadoreceives === noti.nempleadosend) {
 
@@ -295,9 +306,9 @@ export class NotificacionPopoverComponent implements OnInit {
 
   cambiovistanotitimbre(noti: { id: number }) {
     const vista = true;
-    const datos = { id_notificacion: noti.id, visible: vista, user_name: this.userService.username, ip: localStorage.getItem('ip') }
+    const datos = { id_notificacion: noti.id, visto: vista, user_name: this.userService.username, ip: localStorage.getItem('ip') }
 
-    this.vistonotificacion.PutNotifiTimbreVisto(noti.id, vista).subscribe(
+    this.vistonotificacion.PutNotifiTimbreVisto(noti.id, datos).subscribe(
       (res: any) => {
         res.visto = false;
       },

@@ -52,8 +52,9 @@
              </p>
              <h5 style="font-size: 85%;"> <b>Fecha: </b> {{noti.fecha_hora | date:'MMM d,y '}}   <b> Hora: </b> {{noti.fecha_hora | date:'h:mm:ss a'}} </h5>
            </small>
-
          </ion-label>
+         <ion-icon color="primary" class="tamanoIconoEmpleado" name="eye-outline" *ngIf="noti.id == id_noti"></ion-icon>
+
        </ion-item>
        </div>
    </ng-container>
