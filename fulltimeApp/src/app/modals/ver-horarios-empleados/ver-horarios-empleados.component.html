@@ -53,14 +53,16 @@
         </ion-row>  
         <ion-row class="columna">
           <ion-col class="cuadroDia" [style.gridColumnStart] = "first ? day?.indexWeek : 'auto'"
-            *ngFor="let day of monthSelect; let first = first">
+            *ngFor="let day of monthSelect; let first = first"
+            (click)="onClickDay(day)"
+            >
             <span style="float: left; margin-left: 5%; margin-bottom: 10px; color: rgb(255, 255, 255);">{{day?.value}}</span>
             <br>
-            <div *ngIf="day?.labora === 0" (click)="presentAlert(day)" style="margin-bottom: 20px; margin-top: 5px; margin-bottom: 5px;"  > 
+            <div *ngIf="day?.labora === 0" style="margin-bottom: 20px; margin-top: 5px; margin-bottom: 5px;"  > 
               <ion-icon color="success" name="alarm-outline" style="font-size: 22px;"></ion-icon>
             </div>
-            <div *ngIf="day?.labora === 2" (click)="presentAlert(day)" style="margin-bottom: 20px; margin-top: 5px; margin-bottom: 5px;"  > 
-              <ion-icon color="warning" name="alarm-outline" style="font-size: 22px;"></ion-icon>
+            <div *ngIf="day?.labora === 2" style="margin-bottom: 20px; margin-top: 5px; margin-bottom: 5px;"  > 
+              <ion-icon color="warning" name="sunny-outline" style="font-size: 22px;"></ion-icon>
             </div>
             <div *ngIf="day?.labora === 1" style="margin-bottom: 20px; margin-top: 5px; margin-bottom: 5px;" > 
               <ion-icon color="medium" name="tablet-portrait-outline"></ion-icon>
@@ -129,7 +131,7 @@
           <ion-item>
             <ion-icon color="success" name="alarm-outline" style="font-size: 22px;"></ion-icon>
             <ion-label style="font-size: 12px;">&nbsp;&nbsp;&nbsp; Día Laboral </ion-label>
-            <ion-icon color="warning" name="alarm-outline" style="font-size: 22px;"></ion-icon>
+            <ion-icon color="warning" name="sunny-outline" style="font-size: 22px;"></ion-icon>
             <ion-label style="font-size: 12px;">&nbsp;&nbsp;&nbsp; Feriado </ion-label>
             <ion-icon color="medium" name="tablet-portrait-outline"></ion-icon>
             <ion-label style="font-size: 12px;">&nbsp;&nbsp; Día Libre </ion-label>

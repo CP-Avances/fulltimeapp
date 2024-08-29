@@ -4,6 +4,8 @@ import { TimbresService } from '../../services/timbres.service';
 import { DataUserLoggedService } from '../../services/data-user-logged.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { Device } from '@capacitor/device';
+import { Camera, CameraDirection, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
+import { Filesystem, Directory } from '@capacitor/filesystem';
 
 @Component({
   selector: 'app-timbre-justificado',
@@ -137,6 +139,61 @@ export class TimbreJustificadoComponent implements OnInit {
   uploadError: string = '';
   base64Image: string | ArrayBuffer | null = null;
 
+
+  /*
+  async  selectImage() {
+    console.log("ver imagen")
+    
+    const image = await Camera.getPhoto({
+      quality: 90,
+      allowEditing: false,
+      resultType: CameraResultType.DataUrl,
+      source: CameraSource.Photos // Permite seleccionar una imagen de la galería
+    });
+  
+    if (image.dataUrl) {
+      this.base64Image = image.dataUrl;
+  
+      if (image.webPath) {
+        // Extraer el nombre del archivo a partir de webPath
+        const filePath = image.webPath;
+        const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
+        this.fileName = fileName;
+        console.log("Nombre del archivo:", this.fileName);
+      } else {
+        console.log("No se pudo obtener el nombre del archivo.");
+      }
+    } else {
+      this.base64Image = "";
+      this.fileName = "";
+    }
+    
+  }
+*/
+
+
+  async selectImage() {
+    console.log("ver imagen");
+  
+    const image = await Camera.getPhoto({
+      quality: 90,
+      allowEditing: false,
+      resultType: CameraResultType.DataUrl,
+      source: CameraSource.Photos
+    });
+  
+    if (image.dataUrl) {
+      this.base64Image = image.dataUrl;
+
+    } else {
+      this.base64Image = "";
+      this.fileName = "";
+    }
+  }
+
+
+  
+/*
   fileChange(element) {
     this.archivoSubido = element.target.files;
 
@@ -154,7 +211,7 @@ export class TimbreJustificadoComponent implements OnInit {
       } else {
         console.log(this.archivoSubido[0].name);
         this.fileName = name;
-        this.validar.showToast('Archivo valido', 3500, 'success');
+       // this.validar.showToast('Archivo valido', 3500, 'success');
       }
     }
 
@@ -163,13 +220,20 @@ export class TimbreJustificadoComponent implements OnInit {
     reader.onloadend = () => {
       this.base64Image = reader.result; // Base64 string
       console.log("Imagen en Base64: ", this.base64Image); // Aquí ya está disponible
+      //this.showToast("Imagen en Base64 lista", 3000, 'success');
+      this.validar.showToast('Imagen en Base64 lista', 3500, 'success');
 
     };
     reader.onerror = () => {
       this.uploadError = 'Error al leer el archivo.';
+     // this.showToast('Error al leer el archivo.', 3000, 'danger');
+      this.validar.showToast('Error al leer el archivo.', 3500, 'success');
+
     };
     reader.readAsDataURL(this.archivoSubido[0]);
   }
+
+  */
 
   ionChange() {
     this.numeroCaracteres = this.observacion.length;

@@ -349,6 +349,12 @@ export class VerHorariosEmpleadosComponent  implements OnInit {
     this.data = [];
   }
 
+  onClickDay(day: any) {
+    if (day?.labora === 0 || day?.labora === 2) {
+      this.presentAlert(day);
+    }
+  }
+
   //variables de configuracion del componente de paginacion (pagination-controls)
   public maxSize: number = 5;
   public directionLinks: boolean = true;
