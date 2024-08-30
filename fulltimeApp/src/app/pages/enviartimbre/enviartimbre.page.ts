@@ -254,7 +254,7 @@ export class EnviartimbrePage implements OnInit {
         disableBackup: false,
         title: 'Comprobando',
         fallbackButtonTitle: 'PIN',
-        subtitle: 'Es necesario autenticarse para envíar el timbre',
+        subtitle: 'Es necesario autenticarse para enviar el timbre',
         description: 'Casa Pazmiño S.A'
       }).then((resul: any) => {
         if (resul) {
@@ -266,7 +266,7 @@ export class EnviartimbrePage implements OnInit {
         }
       }).catch((error: any) => {
         console.log(error);
-        this.abrirToas('Ocurrió un error al autenticar del usuario. El timbre no se envío', "danger", 1000, "bottom");
+        this.abrirToas('Ocurrió un error al autenticar del usuario. El timbre no se envió', "danger", 1000, "bottom");
         this.intentos = this.intentos + 1;
         if (this.intentos == 2) {
           this.enviarTimbreAuthProble();
@@ -307,8 +307,8 @@ export class EnviartimbrePage implements OnInit {
   //mostrar Alerta que pregunta si enviar timbre sin autenticarse porque hay un problema para autenticarse
   async enviarTimbreAuthProble() {
     const alert = await this.alertController.create({
-      header: 'Problema con la autenticacion',
-      message: 'Al parecer tiene problemas con la autenticacion.\n ¿Desea enviar el timbre de todos modos?',
+      header: 'Problema con la autenticación',
+      message: 'Al parecer tiene problemas con la autenticación.\n ¿Desea enviar el timbre de todos modos?',
       buttons: [
         {
           text: 'Cancelar',
@@ -491,12 +491,12 @@ export class EnviartimbrePage implements OnInit {
 
 
     if (this.isConnected == true) {
-      if (this.geoLatitude == 0) return this.abrirToas('Ups, Debe activar la ubicacion para enviar el timbre', "success", 1000, "bottom");
+      if (this.geoLatitude == 0) return this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "success", 1000, "bottom");
 
       this.nuevoTimbre.latitud = this.geoLatitude + "";
       this.nuevoTimbre.longitud = this.geoLongitude + "";
       this.nuevoTimbre.conexion = this.isConnected;
-      this.nuevoTimbre.novedades_conexion = 'Sin problemas de conexion';
+      this.nuevoTimbre.novedades_conexion = 'Sin problemas de conexión';
 
       this.ValidarModulo(this.geoLatitude, this.geoLongitude, this.rango, this.nuevoTimbre);
       console.log('paso validaciones de horario abierto');
@@ -514,10 +514,10 @@ export class EnviartimbrePage implements OnInit {
           this.nuevoTimbre.longitud = "0";
         }
 
-        this.nuevoTimbre.ubicacion = 'Sin Ubicacion';
+        this.nuevoTimbre.ubicacion = 'Sin Ubicación';
         this.storageUbica = this.nuevoTimbre.ubicacion;
         this.nuevoTimbre.conexion = this.isConnected;
-        this.nuevoTimbre.novedades_conexion = 'Fallo conexion al Internet';
+        this.nuevoTimbre.novedades_conexion = 'Fallo conexión al Internet';
         this.guardarTimbreStorage(this.nuevoTimbre);
         localStorage.setItem("storageUbicacion", this.storageUbica);
         return;
@@ -816,9 +816,9 @@ export class EnviartimbrePage implements OnInit {
   }
 
   GuardartimbresinServidor(data) {
-    console.log('Error con la conexión al servidor. El timbre se guardo en memoria del telefono', data);
+    console.log('Error con la conexión al servidor. El timbre se guardó en memoria del telefono', data);
     data.conexion = false;
-    data.novedades_conexion = 'Fallo conexion al servidor';
+    data.novedades_conexion = 'Fallo conexión al servidor';
     this.nuevoTimbre.conexion = data.conexion;
     this.nuevoTimbre.novedades_conexion = data.novedades_conexion;
     this.dataLocalService.guardarTimbresPerdidos(data);

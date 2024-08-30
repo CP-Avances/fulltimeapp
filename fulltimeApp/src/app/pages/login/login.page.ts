@@ -7,6 +7,7 @@ import { ParametrosService } from 'src/app/services/parametros.service';
 import { Device } from '@capacitor/device';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { Md5 } from 'ts-md5/dist/md5';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -14,6 +15,9 @@ import { Md5 } from 'ts-md5/dist/md5';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
+
+  private URL = environment.url
+
   iniciandoSesion = false;
   aceptaTerminos: boolean = false; // Inicialización predeterminada
 
@@ -199,6 +203,9 @@ export class LoginPage implements OnInit {
         }
 
         else {
+
+
+
           localStorage.setItem('rol', datos.rol);
           localStorage.setItem('token', datos.token);
           localStorage.setItem('ip', datos.ip_adress);
@@ -223,8 +230,6 @@ export class LoginPage implements OnInit {
           localStorage.setItem('version', datos.version);
           //LOOK ME
           // localStorage.setItem('horas_trabaja', res.body.empresa.hora_trabaja);
-
-
           // localStorage.setItem('bool_timbres', datos.acciones_timbres);
           // localStorage.setItem('fec_caducidad_licencia', datos.caducidad_licencia);
 
@@ -281,6 +286,7 @@ export class LoginPage implements OnInit {
               }
             }
           );
+          
         }
       }, err => {
         this.usuarioIncorrectoToas("Error en la conexión con el servidor", 3000)

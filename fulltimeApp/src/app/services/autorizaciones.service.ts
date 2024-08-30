@@ -3,6 +3,7 @@ import { Observable, throwError } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { catchError, tap } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import { Notificacion, NotificacionTimbre, SettingsInfoEmpleado } from '../interfaces/Notificaciones';
 import { Autorizacion } from '../interfaces/Autorizaciones';
@@ -283,6 +284,18 @@ export class AutorizacionesService {
       .pipe(
         tap(console.log)
       )
+  }
+
+  private subscription: Subscription | null = null;
+  setSubscription(subscription: Subscription) {
+    this.subscription = subscription;
+  }
+
+  unsubscribe() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+      this.subscription = null;
+    }
   }
 
 }

@@ -117,4 +117,8 @@ export class EmpleadosService {
     return this.http.get(`${this.apiUrl}/horario/${id}`);
   }
 
+  // METODO PARA BUSCAR DATOS GENERALES DE USUARIOS TIMBRE MOVIL    **USADO
+  accesoMovil(id_epleado: any) {
+    return this.http.get<any>(`${environment.url}/usuarios/movil/acceso/activo/${id_epleado}`);
+  }
 }

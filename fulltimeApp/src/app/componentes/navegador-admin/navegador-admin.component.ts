@@ -61,7 +61,8 @@ export class NavegadorAdminComponent implements OnInit {
     public loadingController: LoadingController,
     private toastController: ToastController,
     public parametros: ParametrosService,
-    private socket: Socket
+    private socket: Socket,
+
   ) { }
 
   ionViewWillEnter() {
@@ -325,6 +326,9 @@ export class NavegadorAdminComponent implements OnInit {
   cerrarSesion() {
     this.relojService.cerrarSesion();
     this.closeAdmin();
+
+    this.notificacionService.unsubscribe(); // Desuscribirse usando el servicio
+
   }
 
   obtenerImagen64() {

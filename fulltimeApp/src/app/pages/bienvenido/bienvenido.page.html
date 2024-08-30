@@ -1,6 +1,6 @@
 <ion-app style="padding:0% 0% 0% 0%; margin: 0%;">
 
-  <ng-container  style="margin-top: 2%;" fullscreen>
+  <ng-container style="margin-top: 2%;" fullscreen>
     <app-navegador-admin style="z-index: 100"></app-navegador-admin>
   </ng-container>
 
@@ -156,6 +156,7 @@
       </svg>
     </div>
 
+
     <div class="Info_hora">
       <ion-fab vertical="center" horizontal="end" slot="fixed" style="width:13.5%;">
         <ion-fab-button color="tertiary" [routerLink]="['/enviartimbre','Timbre abierto']">
@@ -229,7 +230,7 @@
           <ion-row>
 
             <ion-col size="6">
-              <ion-button [color]="colorIp" class="tamanoBoton" (click)="btn_InicioPermisosClick()" >
+              <ion-button [color]="colorIp" class="tamanoBoton" (click)="btn_InicioPermisosClick()">
                 <div class="tamano">
                   Inicio<br>
                   Permiso

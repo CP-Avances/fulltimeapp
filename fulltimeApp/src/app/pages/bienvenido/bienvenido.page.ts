@@ -2,8 +2,13 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ToastController, ModalController, Platform, AlertController } from '@ionic/angular';
 import { TimbresPerdidosComponent } from './showTimbresGuardados.component';
-import { ParametrosService } from 'src/app/services/parametros.service'; 
+import { ParametrosService } from 'src/app/services/parametros.service';
 import { Router } from '@angular/router';
+import { RelojServiceService } from 'src/app/services/reloj-service.service';
+import { EmpleadosService } from 'src/app/services/empleados.service';
+import { Subscription, interval } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 
 @Component({
   selector: 'app-bienvenido',
@@ -31,8 +36,10 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     public modalController: ModalController,
     public alertCrtl: AlertController,
     public parametros: ParametrosService,
-    public router: Router
-
+    public router: Router,
+    public relojService: RelojServiceService,
+    public empleadoService: EmpleadosService, 
+    public autorizacionesServices: AutorizacionesService,
   ) {
     this.cambioimagen();
   }
@@ -45,9 +52,20 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   ngOnInit() {
     this.startClock();
     this.VerificarFunciones();
+    const subscription = interval(10000) // Intervalo de 1 hora en milisegundos
+    .pipe(
+      switchMap(() => this.checkSession(localStorage.getItem("empleadoID")))
+    )
+    .subscribe(
+      () => {
+      },
+      error => console.error('Error fetching data:', error)
+    );
+    this.autorizacionesServices.setSubscription(subscription); // Guardar la suscripción en el servicio
+
   }
   ionViewWillEnter() {
-    this.cambioimagen(); // Ensure that image changes are applied when the page is about to be shown
+    //this.cambioimagen(); // Ensure that image changes are applied when the page is about to be shown
     this.startClock(); // Start or reset the clock
     this.VerificarFunciones();
   }
@@ -115,7 +133,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   btn_InicioPermisosClick() {
     if (this.apro_permisos == true) {
-     // this.router.navigateByUrl("/reloj/aprobar-permisos");
+      // this.router.navigateByUrl("/reloj/aprobar-permisos");
       this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
       //this.closeAdmin()
     } else {
@@ -125,8 +143,8 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   btn_FinPermisosClick() {
     if (this.apro_permisos == true) {
-     // this.router.navigateByUrl("/reloj/aprobar-permisos");
-      this.router.navigate(['/enviartimbre','Fin de permiso']);
+      // this.router.navigateByUrl("/reloj/aprobar-permisos");
+      this.router.navigate(['/enviartimbre', 'Fin de permiso']);
       //this.closeAdmin()
     } else {
       this.mostrarToas(" Ups!! Al parecer no tienes activado en tu plan el Modulo 'Aprobar Permisos'");
@@ -147,6 +165,26 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     await toast.present();
   }
 
+  async checkSession(id_empleado) {
+    this.empleadoService.accesoMovil(id_empleado).subscribe((x: any) => {
+
+      if (x[0].app_habilita == false) {
+        console.log('Session invalid. Closing session...');
+
+        this.cerrarSesion();
+      }else{
+        console.log('Session valid');
+
+      }
+    })
+  }
+
+
+  cerrarSesion() {
+    this.relojService.cerrarSesion();
+    this.autorizacionesServices.unsubscribe(); // Desuscribirse usando el servicio
+
+  }
 
   ngOnDestroy() {
     clearInterval(this.intervalo);
