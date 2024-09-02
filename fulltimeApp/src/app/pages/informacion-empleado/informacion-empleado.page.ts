@@ -39,6 +39,7 @@ export class InformacionEmpleadoPage implements OnInit {
     correo: "",
     id_rol: 0,
     codigo: "",
+    telefono: ""
   }
 
   public get app_info(): any {
@@ -67,6 +68,7 @@ export class InformacionEmpleadoPage implements OnInit {
     this.usuario.nombre = this.data.nombre;
     this.usuario.cedula = this.data.cedula;
     this.usuario.usuario = this.data.usuario;
+    this.usuario.telefono = this.data.telefono;
 
     console.log('data vacuna empleado ... ', this.dataUser.dataVacuna)
     this.BuscarFormatos();

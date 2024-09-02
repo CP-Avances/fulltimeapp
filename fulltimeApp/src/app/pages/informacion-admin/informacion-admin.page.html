@@ -10,122 +10,155 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
+  <ion-content *ngIf="isConnected">
+    <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
 
-  <ion-list mode="md" style="margin-top: 2%; background-color: transparent;">
-    <ion-card>
-      <ion-item>
-        <ion-label>
-          <h2 style="font-size: 130%; text-align: center;"><b>{{empresa.nombre}}</b></h2>
-        </ion-label>
-      </ion-item>
-      <ion-item>
-        <ion-label>
-          <p style="font-size: 100%; text-align: center;"> RUC: {{empresa.ruc}}</p>
-        </ion-label>
-      </ion-item>
-    </ion-card>
-  </ion-list>
-
-  <ion-list mode="md" style="background-color: transparent;">
-    <ion-list-header>
-      <ion-label>
-        <h1 style="font-size: 115%"><b>INFORMACIÓN APP</b></h1>
-      </ion-label>
-    </ion-list-header>
-    <ion-card>
-      <ion-list>
-        <ion-item style="font-size: 110%">
-          <ion-label>Licencia caduca:</ion-label>
-          <ion-label slot="end">{{caduca_}}</ion-label>
-        </ion-item>
-        <ion-item style="font-size: 110%">
-          <ion-label>Versión:</ion-label>
-          <ion-label slot="end">{{app_info}}</ion-label>
-        </ion-item>
-      </ion-list>
-    </ion-card>
-  </ion-list>
-
-  <ion-list mode="md" *ngIf="app_vacuna.id_tipo_vacuna != ''" style="background-color: transparent;">
-    <ion-list-header>
-      <ion-label>
-        <h1 style="font-size: 120%"><b> HISTORIAL DE VACUNAS </b></h1>
-      </ion-label>
-    </ion-list-header>
-    <ion-card>
-      <ion-list>
+    <ion-list mode="md" style="margin-top: 2%; background-color: transparent;">
+      <ion-card>
         <ion-item>
-          <ion-label>Descripción: </ion-label>
-          <ion-label slot="end">{{app_vacuna.descripcion}}</ion-label>
-        </ion-item>
-        <ion-item>
-          <ion-label>Fecha:</ion-label>
-          <ion-label slot="end">{{fecha_}}</ion-label>
-        </ion-item>
-        <ion-item>
-          <ion-label>Vacuna:</ion-label>
-          <ion-label slot="end">{{app_vacuna.nombre}}</ion-label>
-        </ion-item>
-        <ion-item
-          *ngIf="app_vacuna.nom_carnet != null && app_vacuna.nom_carnet != '' && app_vacuna.nom_carnet != undefined">
-          <ion-label>Carnet:</ion-label>
-          <ion-label slot="end">
-            <a href="http://186.71.19.82:3001/vacunas/documentos/{{app_vacuna.carnet}}"> {{app_vacuna.nom_carnet}}
-            </a>
+          <ion-label>
+            <h2 style="font-size: 130%; text-align: center;"><b>{{empresa.nombre}}</b></h2>
           </ion-label>
         </ion-item>
-      </ion-list>
+        <ion-item>
+          <ion-label>
+            <p style="font-size: 100%; text-align: center;"> RUC: {{empresa.ruc}}</p>
+          </ion-label>
+        </ion-item>
+      </ion-card>
+    </ion-list>
 
-    </ion-card>
-  </ion-list>
+    <ion-list mode="md" style="background-color: transparent;">
+      <ion-list-header>
+        <ion-label>
+          <h1 style="font-size: 115%"><b>INFORMACIÓN APP</b></h1>
+        </ion-label>
+      </ion-list-header>
+      <ion-card>
+        <ion-list>
+          <ion-item style="font-size: 110%">
+            <ion-label>Licencia caduca:</ion-label>
+            <ion-label slot="end">{{caduca_}}</ion-label>
+          </ion-item>
+          <ion-item style="font-size: 110%">
+            <ion-label>Versión:</ion-label>
+            <ion-label slot="end">{{app_info}}</ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card>
+    </ion-list>
+
+    <ion-list mode="md" *ngIf="app_vacuna.id_tipo_vacuna != ''" style="background-color: transparent;">
+      <ion-list-header>
+        <ion-label>
+          <h1 style="font-size: 120%"><b> HISTORIAL DE VACUNAS </b></h1>
+        </ion-label>
+      </ion-list-header>
+      <ion-card>
+        <ion-list>
+          <ion-item>
+            <ion-label>Descripción: </ion-label>
+            <ion-label slot="end">{{app_vacuna.descripcion}}</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-label>Fecha:</ion-label>
+            <ion-label slot="end">{{fecha_}}</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-label>Vacuna:</ion-label>
+            <ion-label slot="end">{{app_vacuna.nombre}}</ion-label>
+          </ion-item>
+          <ion-item
+            *ngIf="app_vacuna.nom_carnet != null && app_vacuna.nom_carnet != '' && app_vacuna.nom_carnet != undefined">
+            <ion-label>Carnet:</ion-label>
+            <ion-label slot="end">
+              <a href="http://186.71.19.82:3001/vacunas/documentos/{{app_vacuna.carnet}}"> {{app_vacuna.nom_carnet}}
+              </a>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+
+      </ion-card>
+    </ion-list>
 
 
-  <ion-list mode="md" style="margin-bottom: 1%; background-color: transparent;">
-    <ion-list-header>
-      <ion-label>
-        <h1 style="font-size: 120%"><b> LISTA EMPLEADOS </b></h1>
-      </ion-label>
-    </ion-list-header>
-    <ion-searchbar autocomplete="off" showCancelButton="focus" (ionChange)="changeSearch($event)"></ion-searchbar>
+    <ion-list mode="md" style="margin-bottom: 1%; background-color: transparent;">
+      <ion-list-header>
+        <ion-label>
+          <h1 style="font-size: 120%"><b> LISTA EMPLEADOS </b></h1>
+        </ion-label>
+      </ion-list-header>
+      <ion-searchbar autocomplete="off" showCancelButton="focus" (ionChange)="changeSearch($event)"></ion-searchbar>
 
-    <div *ngIf="!existenEmpleados">
-      <ion-text color="primary">
-        <span>Obteniendo empleados</span>
-      </ion-text>
-      <ion-progress-bar value="0.5" buffer="0.75"></ion-progress-bar>
-    </div>
-
-    <ion-item style="margin: 2.5%; padding: -2%; border-radius: 3%;"
-      *ngFor="let e of empleados_filtro | paginate: { itemsPerPage: 10, currentPage: pageActual }">
-      <ion-avatar slot="start">
-        <ion-icon name="person-circle-outline" color="theme" style="font-size: 30px;"></ion-icon>
-      </ion-avatar>
-      <ion-label>
-
-        <h2> {{e.fullname}}</h2>
-
-        <ion-text color="success">
-          <p *ngIf="e.id_rol==1" color="success"> Administrador </p>
+      <div *ngIf="!existenEmpleados">
+        <ion-text color="primary">
+          <span>Obteniendo empleados</span>
         </ion-text>
-      </ion-label>
-
-      <div (click)="presentModal(e)">
-        <ion-icon color="theme" style="font-size: 30px;" class="tamanoIconoEmpleado"
-          name="information-circle-outline"></ion-icon>
+        <ion-progress-bar value="0.5" buffer="0.75"></ion-progress-bar>
       </div>
 
-    </ion-item>
-  </ion-list>
+      <ion-item style="margin: 2.5%; padding: -2%; border-radius: 3%;"
+        *ngFor="let e of empleados_filtro | paginate: { itemsPerPage: 10, currentPage: pageActual }">
+        <ion-avatar slot="start">
+          <ion-icon name="person-circle-outline" color="theme" style="font-size: 30px;"></ion-icon>
+        </ion-avatar>
+        <ion-label>
 
-  <!--Configuracion del Pagination - ngxPaginationModulo-->
-  <ion-item style="font-size: 80%; margin: 0% 0% 1% 0%;" [hidden]="ver">
-    <pagination-controls class="paginacion" (pageChange)="pageActual = $event" [maxSize]=maxSize
-      [directionLinks]=directionLinks [responsive]=responsive [autoHide]="autoHide"
-      [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
-      [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
-      [screenReaderPageLabel]="labels.screenReaderPageLabel"
-      [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
-    </pagination-controls>
-  </ion-item>
+          <h2> {{e.fullname}}</h2>
+
+          <ion-text color="success">
+            <p *ngIf="e.id_rol==1" color="success"> Administrador </p>
+          </ion-text>
+        </ion-label>
+
+        <div (click)="presentModal(e)">
+          <ion-icon color="theme" style="font-size: 30px;" class="tamanoIconoEmpleado"
+            name="information-circle-outline"></ion-icon>
+        </div>
+
+      </ion-item>
+    </ion-list>
+
+    <!--Configuracion del Pagination - ngxPaginationModulo-->
+    <ion-item style="font-size: 80%; margin: 0% 0% 1% 0%;" [hidden]="ver">
+      <pagination-controls class="paginacion" (pageChange)="pageActual = $event" [maxSize]=maxSize
+        [directionLinks]=directionLinks [responsive]=responsive [autoHide]="autoHide"
+        [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
+        [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+        [screenReaderPageLabel]="labels.screenReaderPageLabel"
+        [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+      </pagination-controls>
+    </ion-item>
+  </ion-content>
+  <ion-content *ngIf="!isConnected">
+    <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
+
+    <!-- Ventana de no conexion a internet-->
+    <div style="margin: 2%; padding: 2%; text-align: center; border-radius: 2%;">
+      <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 90%;">
+        En esta vista encontrara información de la empresa y de sus empleados
+      </ion-text>
+      <br>
+      <br>
+      <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;">
+        Se podrán visualizar cuando tenga conexión a internet
+      </ion-text>
+    </div>
+    <div class="Imagen">
+      <span class="center1">
+        <img src="../../../assets/images/C_FTLOGORV.png">
+        <ion-label style="text-align:center" mode="md" color="medium">
+          <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
+        </ion-label>
+      </span>
+      <img src="../../../assets/images/lost_timee.svg" />
+    </div>
+
+    <div style="margin: 4%; padding: 4%; text-align: center; border-radius: 2%;">
+      <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;">
+        No tiene conexión a internet
+      </ion-text>
+    </div>
+  </ion-content>
+
 </ion-content>

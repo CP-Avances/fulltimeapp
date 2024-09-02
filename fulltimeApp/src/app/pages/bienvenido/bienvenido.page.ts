@@ -44,11 +44,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     this.cambioimagen();
   }
 
-  /*
-  ionViewDidLoad() {
-    this.cambioimagen();
-  }
-*/
+
   ngOnInit() {
     this.startClock();
     this.VerificarFunciones();
@@ -65,8 +61,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   }
   ionViewWillEnter() {
-    //this.cambioimagen(); // Ensure that image changes are applied when the page is about to be shown
-    this.startClock(); // Start or reset the clock
+    this.startClock(); 
     this.VerificarFunciones();
   }
 

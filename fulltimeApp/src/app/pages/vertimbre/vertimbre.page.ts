@@ -11,6 +11,9 @@ import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { RangoFechasComponent } from 'src/app/componentes/rango-fechas/rango-fechas.component';
 import { VerImagenModalPage } from 'src/app/modals/ver-timbre-empleado/ver-imagen/ver-imagen.component';
+import { NetworkService } from '../../libs/network.service';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-vertimbre',
@@ -20,6 +23,7 @@ import { VerImagenModalPage } from 'src/app/modals/ver-timbre-empleado/ver-image
 
 export class VertimbrePage implements OnInit {
   @ViewChild(RangoFechasComponent) rangoFechasComponent: RangoFechasComponent;
+  private unsubscribe$ = new Subject<void>();
 
   // loading: any;
   timbres: any = []; //esta variable contiene los timbres que se muestran en la lista y se VAN A ENVIAR AL 
@@ -55,22 +59,52 @@ export class VertimbrePage implements OnInit {
     public parametro: ParametrosService,
     public platform: Platform,
     public validar: ValidacionesService,
+    private networkService: NetworkService,
+  
 
   ) { }
 
   ngOnInit() {
-    //obtener timbres de empleado  
-    this.BuscarFormatos();
-    this.mostrarTimbres();
+    this.networkSubscriber();
   }
-
+  ionViewWillEnter() {
+ 
+    this.networkSubscriber();
+  }
   ionViewWillLeave() {
     console.log('Sali de Vertimbre');
     this.limpiarRango_fechas();
-    this.mostrarTimbres();
     this.rangoFechasComponent.closeRangoFecha();
-    //this.rangoFechasComponent.resetFecha();
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
 
+  isConnected : boolean;
+  networkSubscriber() {
+      this.isConnected = this.networkService.getNetworkStatusDispositivo();
+      console.log("Esta conectado: ", this.isConnected)
+      if (!this.isConnected) {
+        this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "bottom");
+        console.log('Desconectado');
+        this.filtro = true;
+        this.vacio = true;
+        this.filtro_mensaje= true
+
+      } else {
+        this.BuscarFormatos();
+        this.mostrarTimbres();
+        console.log('conectado');
+      }
+  }
+
+  async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: duracion,
+      color: color,
+      position: position
+    });
+    toast.present();
   }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
@@ -86,6 +120,8 @@ export class VertimbrePage implements OnInit {
       }
     )
   }
+
+
 
   mostrarTimbres() {
     this.timbres_filtro = [];
@@ -156,7 +192,7 @@ export class VertimbrePage implements OnInit {
 
   obtenerTimbres(codigo) {
     this.timbres = [];
-    this.relojService.obtenerTimbres(codigo).subscribe(
+    this.relojService.obtenerTimbres(codigo).pipe(takeUntil(this.unsubscribe$)).subscribe(
       res => {
         console.log("ver timbres ", res)
 
@@ -270,7 +306,9 @@ export class VertimbrePage implements OnInit {
       response.present();
       response.onDidDismiss().then((response) => {
         return this.mostrarToas('Lo sentimos no fue posible conectar con la red', 3000, "danger");
-      });
+      }).catch((error) => {
+        console.error('Error showing loader or toast:', error);
+      })
     });
   }
   //fin mensaje cargando
@@ -304,7 +342,7 @@ export class VertimbrePage implements OnInit {
       mensaje += `<br><br>${novedad}`;
     }
     const alert = await this.alertController.create({
-    //  header: obs,
+      //  header: obs,
       message: mensaje,
       cssClass: 'my-custom-class',
       mode: 'ios',

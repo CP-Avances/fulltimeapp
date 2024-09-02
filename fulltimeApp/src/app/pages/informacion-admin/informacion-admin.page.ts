@@ -7,7 +7,9 @@ import { DataUserLoggedService } from '../../services/data-user-logged.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ModalController, Platform, ToastController } from '@ionic/angular';
-import { InformacionEmpleadoPage } from '../informacion-empleado/informacion-empleado.page'; 
+import { InformacionEmpleadoPage } from '../informacion-empleado/informacion-empleado.page';
+import { NetworkService } from '../../libs/network.service';
+
 @Component({
   selector: 'app-informacion-admin',
   templateUrl: './informacion-admin.page.html',
@@ -19,6 +21,7 @@ export class InformacionAdminPage implements OnInit {
   existenEmpleados = false;
   pipe = new DatePipe('en-US');
   pageActual: number = 1;
+  isConnected: boolean;
 
   empresa: any = {
     nombre: '',
@@ -59,14 +62,41 @@ export class InformacionAdminPage implements OnInit {
     public parametro: ParametrosService,
     public validar: ValidacionesService,
     public modalController: ModalController,
+    private toastController: ToastController,
+    private networkService: NetworkService,
 
   ) { }
 
   ngOnInit() {
-    this.obtenerDatosEmpresa(localStorage.getItem('id_empresa'));
-    this.searchEmpleado = this.empleados;
-    // console.log('data vacuna .. ', this.dataUser.dataVacuna)
-    this.BuscarFormatos();
+    this.networkSubscriber();
+  }
+  ionViewWillEnter() {
+ 
+    this.networkSubscriber();
+  }
+
+  networkSubscriber() {
+    this.isConnected = this.networkService.getNetworkStatusDispositivo();
+    console.log("Esta conectado: ", this.isConnected)
+    if (!this.isConnected) {
+      this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "bottom");
+
+    } else {
+      this.obtenerDatosEmpresa(localStorage.getItem('id_empresa'));
+      this.searchEmpleado = this.empleados;
+      // console.log('data vacuna .. ', this.dataUser.dataVacuna)
+      this.BuscarFormatos();
+      console.log('conectado');
+    }
+  }
+  async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: duracion,
+      color: color,
+      position: position
+    });
+    toast.present();
   }
 
   fecha_: string = '';
@@ -127,7 +157,7 @@ export class InformacionAdminPage implements OnInit {
 
   changeSearch(e: any) {
     const query = e.detail.value;
-    const filtro = this.empleados.filter((o:any) => {
+    const filtro = this.empleados.filter((o: any) => {
       return o.fullname.toLowerCase().indexOf(query.toLowerCase()) > -1 ||
         o.codigo.toLowerCase().indexOf(query.toLowerCase()) > -1 ||
         o.cedula.toLowerCase().indexOf(query.toLowerCase()) > -1
@@ -162,7 +192,7 @@ export class InformacionAdminPage implements OnInit {
 
   async presentModal(usuario: any) {
     console.log("ver usuario", usuario)
-  
+
     const modal = await this.modalController.create({
       component: InformacionEmpleadoPage,
       componentProps: {
