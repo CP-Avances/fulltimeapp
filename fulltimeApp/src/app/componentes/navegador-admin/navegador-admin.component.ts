@@ -27,7 +27,7 @@ import { VerImagenModalPage } from 'src/app/modals/ver-timbre-empleado/ver-image
 export class NavegadorAdminComponent implements OnInit {
 
   username: string = '';
-  imagen: string = '';
+  imagen: string = localStorage.getItem('imagen64');
 
   idEmpleadoIngresa: number = 0;
   valor: boolean = true;
@@ -159,6 +159,10 @@ export class NavegadorAdminComponent implements OnInit {
 
   }
 
+  onImageError(event: any) {
+    event.target.src = "../../../assets/images/perfildefecto.png";
+  }
+
 
   LlamarNotificcaccciones(id_empleado: number) {
     //Carga y Muestra el numero de notificaciones,   
@@ -233,6 +237,7 @@ export class NavegadorAdminComponent implements OnInit {
   apro_vacaciones: any;
   apro_horasExtras: any;
   apro_alimentaciones: any;
+  
 
   colorp: any;
   colorh: any;
@@ -335,7 +340,9 @@ export class NavegadorAdminComponent implements OnInit {
     this.empleadoService.ObtenerImagen(localStorage.getItem("empleadoID"), localStorage.getItem("imagen")).subscribe(data => {
       if (!data.imagen) {
         this.imagen = '';
-        console.log("imagen base 64: ", data.imagen)
+        localStorage.setItem('imagen64', data.imagen);
+
+        //console.log("imagen base 64: ", data.imagen)
       }
       else {
         this.imagen = 'data:image/jpeg;base64,' + data.imagen;

@@ -35,228 +35,230 @@
 
 </ion-header>
 
-<ng-container>
+<ng-container *ngIf="isConnected">
   <!--Contenedor de todos los timbres admin-->
-  <ion-content *ngIf="isConnected">
+
+  <ion-content *ngIf="!todos">
     <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
 
-    <ion-content *ngIf="!todos">
-      <div *ngIf="timbres.length === 0; else todo" style="text-align: center;">
-        <br>
-        <ion-text color="primary">
-          <span>Obteniendo timbres Por favor Espere</span>
-        </ion-text>
-        <ion-progress-bar type="indeterminate"></ion-progress-bar>
-        <br>
-      </div>
+    <div *ngIf="timbres.length === 0; else todo" style="text-align: center;">
+      <br>
+      <ion-text color="primary">
+        <span>Obteniendo timbres Por favor Espere</span>
+      </ion-text>
+      <ion-progress-bar type="indeterminate"></ion-progress-bar>
+      <br>
+    </div>
 
-      <ng-template #todo>
-        <ion-content>
-          <ion-list>
-            <ion-item-group
-              *ngFor="let item of timbres | keyvalue : ordenOriginal | paginate: { itemsPerPage: 7, currentPage: pageTodos }">
-              <ion-item-divider mode="md" mode="ios" style="font-size: 90%; font-weight: 100;">
-                <ion-label> {{item.key}}</ion-label>
-              </ion-item-divider>
+    <ng-template #todo>
+      <ion-content>
+        <ion-list>
+          <ion-item-group
+            *ngFor="let item of timbres | keyvalue : ordenOriginal | paginate: { itemsPerPage: 7, currentPage: pageTodos }">
+            <ion-item-divider mode="md" mode="ios" style="font-size: 90%; font-weight: 100;">
+              <ion-label> {{item.key}}</ion-label>
+            </ion-item-divider>
 
-              <ion-item *ngFor="let t of item.value">
-                <div>
-                  <ion-label class="textoTimbreEmpleado" color="primary">
-                    <div [ngSwitch]="t.accion">
-                      <p *ngSwitchCase="'PES'">Entrada o salida permiso</p>
-                      <p *ngSwitchCase="'AES'">Entrada o salida almuerzo/p>
-                      <p *ngSwitchCase="'EoS'">Entrada o salida jornada</p>
-                      <p *ngSwitchCase="'E'">Entrada jornada</p>
-                      <p *ngSwitchCase="'S'">Salida jornada</p>
-                      <p *ngSwitchCase="'I/A'">Inicio alimentación</p>
-                      <p *ngSwitchCase="'F/A'">Fin alimentación</p>
-                      <p *ngSwitchCase="'S/P'">Inicio permiso</p>
-                      <p *ngSwitchCase="'E/P'">Fin permiso</p>
-                      <p *ngSwitchCase="'HA'">Timbre abierto</p>
-                      <p *ngSwitchDefault>Timbre desconocido</p>
-                    </div>
+            <ion-item *ngFor="let t of item.value">
+              <div>
+                <ion-label class="textoTimbreEmpleado" color="primary">
+                  <div [ngSwitch]="t.accion">
+                    <p *ngSwitchCase="'PES'">Entrada o salida permiso</p>
+                    <p *ngSwitchCase="'AES'">Entrada o salida almuerzo/p>
+                    <p *ngSwitchCase="'EoS'">Entrada o salida jornada</p>
+                    <p *ngSwitchCase="'E'">Entrada jornada</p>
+                    <p *ngSwitchCase="'S'">Salida jornada</p>
+                    <p *ngSwitchCase="'I/A'">Inicio alimentación</p>
+                    <p *ngSwitchCase="'F/A'">Fin alimentación</p>
+                    <p *ngSwitchCase="'S/P'">Inicio permiso</p>
+                    <p *ngSwitchCase="'E/P'">Fin permiso</p>
+                    <p *ngSwitchCase="'HA'">Timbre abierto</p>
+                    <p *ngSwitchDefault>Timbre desconocido</p>
+                  </div>
 
-                    <ion-label color="dark" class="textoObs" *ngIf="t.dispositivo_timbre!=''"
-                      (click)="presentAlert(t.observacion,t.hora_timbre_diferente, t.ubicacion, t.novedades_conexion, t.conexion)">
-                      <ion-icon color="danger"
-                        *ngIf="t.hora_timbre_diferente || t.conexion != true && (t.dispositivo_timbre!= 'biometrico' || t.dispositivo_timbre!= 'app_web') "
-                        name="alert-circle-outline"></ion-icon>
-                      Toque aquí para más info..
-                    </ion-label>
+                  <ion-label color="dark" class="textoObs" *ngIf="t.dispositivo_timbre!=''"
+                    (click)="presentAlert(t.observacion,t.hora_timbre_diferente, t.ubicacion, t.novedades_conexion, t.conexion)">
+                    <ion-icon color="danger"
+                      *ngIf="t.hora_timbre_diferente || t.conexion != true && (t.dispositivo_timbre!= 'biometrico' || t.dispositivo_timbre!= 'app_web') "
+                      name="alert-circle-outline"></ion-icon>
+                    Toque aquí para más info..
                   </ion-label>
-                </div>
+                </ion-label>
+              </div>
 
-                <ion-button class="tamanoBotonDER" mode="ios" color="light">
-                  <div>
-                    Hora: <br>
-                    <ion-text>{{t.shora}}</ion-text>
-                  </div>
-                </ion-button>
-
-                <ion-button class="ubicacionDER" mode="ios" color="light" shape="round"
-                  (click)="abrirMapa(t.latitud, t.longitud)" [disabled]=" !t.latitud || !t.longitud">
-                  <div>
-                    <ion-icon color="primary" class="tamanoIconoEmpleado" name="location-outline"></ion-icon>
-                  </div>
-                </ion-button>
-                <ion-button class="ubicacionMED" mode="ios" color="light" shape="round"
-                  (click)="mostrarImagenModal(t.documento)" [disabled]="!t.documento">
-                  <div>
-                    <ion-icon color="primary" class="tamanoIconoEmpleado" name="image-outline"></ion-icon>
-                  </div>
-                </ion-button>
-                <ion-button class="ubicacionIZQ" mode="ios" color="light" shape="round"
-                  (click)="mostrarImagenModal(t.imagen)" [disabled]="!t.imagen">
-                  <div>
-                    <ion-icon color="primary" class="tamanoIconoEmpleado" name="happy-outline"></ion-icon>
-                  </div>
-                </ion-button>
-
-              </ion-item>
-            </ion-item-group>
-          </ion-list>
-        </ion-content>
-      </ng-template>
-    </ion-content>
-
-    <!--Configuracion del Pagination - ngxPaginationModulo-->
-    <ion-footer style=" width: 100%; padding: 1%;" *ngIf="!todos" [hidden]=todos>
-      <ion-item style="font-size: 80%; margin: 1% 0% 1% 0%;">
-        <pagination-controls class="paginacion" (pageChange)="pageTodos = $event" [maxSize]=maxSize
-          [directionLinks]=directionLinks [responsive]=responsive [autoHide]="autoHide"
-          [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
-          [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
-          [screenReaderPageLabel]="labels.screenReaderPageLabel"
-          [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
-        </pagination-controls>
-      </ion-item>
-    </ion-footer>
-
-
-    <!-- Contenedor del filtro de timbres admin-->
-    <ion-content *ngIf="!filtro">
-
-      <div *ngIf="timbres_filtro.length === 0; else showTimbres" style="text-align: center;">
-        <br>
-        <ion-text color="primary">
-          <span>Obteniendo timbres Por favor Espere</span>
-        </ion-text>
-        <ion-progress-bar type="indeterminate"></ion-progress-bar>
-        <br>
-      </div>
-
-      <ng-template #showTimbres>
-        <ion-content>
-          <ion-list>
-            <ion-item-group
-              *ngFor="let item of timbres_filtro | keyvalue : ordenOriginal | paginate: { itemsPerPage: 7, currentPage: paginafiltro }">
-              <ion-item-divider mode="md" mode="ios" style="font-size: 90%; font-weight: 100;">
-                <ion-label> {{item.key}}</ion-label>
-              </ion-item-divider>
-              <ion-item *ngFor="let t of item.value">
+              <ion-button class="tamanoBotonDER" mode="ios" color="light">
                 <div>
-                  <ion-label class="textoTimbreEmpleado" color="primary">
-
-                    <div [ngSwitch]="t.accion">
-                      <p *ngSwitchCase="'PES'">Entrada o salida permiso</p>
-                      <p *ngSwitchCase="'AES'">Entrada o salida almuerzo/p>
-                      <p *ngSwitchCase="'EoS'">Entrada o salida jornada</p>
-                      <p *ngSwitchCase="'E'">Entrada jornada</p>
-                      <p *ngSwitchCase="'S'">Salida jornada</p>
-                      <p *ngSwitchCase="'I/A'">Inicio alimentación</p>
-                      <p *ngSwitchCase="'F/A'">Fin alimentación</p>
-                      <p *ngSwitchCase="'S/P'">Inicio permiso</p>
-                      <p *ngSwitchCase="'E/P'">Fin permiso</p>
-                      <p *ngSwitchCase="'HA'">Timbre abierto</p>
-                      <p *ngSwitchDefault>Timbre desconocido</p>
-                    </div>
-
-                    <ion-label color="dark" class="textoObs" *ngIf="t.dispositivo_timbre!=''"
-                      (click)="presentAlert(t.observacion,t.hora_timbre_diferente,t.ubicacion , t.novedades_conexion, t.conexion)">
-                      <ion-icon color="danger" *ngIf="t.hora_timbre_diferente || t.conexion != true"
-                        name="alert-circle-outline"></ion-icon>
-                      Toque aquí para más info..
-                    </ion-label>
-                  </ion-label>
+                  Hora: <br>
+                  <ion-text>{{t.shora}}</ion-text>
                 </div>
+              </ion-button>
 
-                <ion-button class="tamanoBotonDER" mode="ios" color="light">
-                  <div>
-                    Hora: <br>
-                    {{t.shora}}
+              <ion-button class="ubicacionDER" mode="ios" color="light" shape="round"
+                (click)="abrirMapa(t.latitud, t.longitud)" [disabled]=" !t.latitud || !t.longitud">
+                <div>
+                  <ion-icon color="primary" class="tamanoIconoEmpleado" name="location-outline"></ion-icon>
+                </div>
+              </ion-button>
+              <ion-button class="ubicacionMED" mode="ios" color="light" shape="round"
+                (click)="mostrarImagenModal(t.documento)" [disabled]="!t.documento">
+                <div>
+                  <ion-icon color="primary" class="tamanoIconoEmpleado" name="image-outline"></ion-icon>
+                </div>
+              </ion-button>
+              <ion-button class="ubicacionIZQ" mode="ios" color="light" shape="round"
+                (click)="mostrarImagenModal(t.imagen)" [disabled]="!t.imagen">
+                <div>
+                  <ion-icon color="primary" class="tamanoIconoEmpleado" name="happy-outline"></ion-icon>
+                </div>
+              </ion-button>
 
-                  </div>
-                </ion-button>
-
-                <ion-button class="ubicacionMED" mode="ios" color="light" shape="round"
-                  (click)="abrirMapa(t.latitud, t.longitud)" [disabled]=" !t.latitud || !t.longitud">
-                  <div>
-                    <ion-icon color="primary" class="tamanoIconoEmpleado" name="location-outline"></ion-icon>
-                  </div>
-                </ion-button>
-
-                <ion-button class="ubicacionDER" mode="ios" color="light" shape="round"
-                  (click)="mostrarImagenModal(t.imagen)" [disabled]="!t.imagen">
-                  <div>
-                    <ion-icon color="primary" class="tamanoIconoEmpleado" name="happy-outline"></ion-icon>
-                  </div>
-                </ion-button>
-
-              </ion-item>
-            </ion-item-group>
-          </ion-list>
-        </ion-content>
-      </ng-template>
-    </ion-content>
-
-    <!--Configuracion del Pagination - ngxPaginationModulo-->
-    <ion-footer style=" width: 100%; padding: 1%;" *ngIf="!filtro">
-      <ion-item style="font-size: 80%; margin: 1% 0% 1% 0%;">
-        <pagination-controls class="paginacion" (pageChange)="paginafiltro = $event" [maxSize]=maxSize
-          [directionLinks]=directionLinks [responsive]=responsive [autoHide]="autoHide"
-          [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
-          [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
-          [screenReaderPageLabel]="labels.screenReaderPageLabel"
-          [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
-        </pagination-controls>
-      </ion-item>
-    </ion-footer>
-
-    <!-- Ventana de empleado sin registro -->
-
-    <ion-content *ngIf="!vacio">
-      <div style="text-align: center; padding-top: 2%;">
-        <ion-img class="tamanoImagen" src="../../../assets/images/Sin_registro.svg"></ion-img>
-        <br><br>
-        <ion-label>
-          El Empleado no tiene registrados timbres
-        </ion-label>
-      </div>
-    </ion-content>
-
-    <!-- Ventana de sin registro deacuerdo al filtro de fechas -->
-    <ion-content *ngIf="!filtro_mensaje">
-      <div style="text-align: center; padding-top: 2%;">
-        <ion-img class="tamanoImagen" src="../../../assets/images/Sin_registro.svg"></ion-img>
-        <br><br>
-        <ion-label>
-          No existen timbres registrados en esas fechas
-        </ion-label>
-      </div>
-    </ion-content>
-
-
-
-
+            </ion-item>
+          </ion-item-group>
+        </ion-list>
+      </ion-content>
+    </ng-template>
   </ion-content>
 
-  <ion-content *ngIf="!isConnected">
+  <!--Configuracion del Pagination - ngxPaginationModulo-->
+  <ion-footer style=" width: 100%; padding: 1%;" *ngIf="!todos" [hidden]=todos>
+    <ion-item style="font-size: 80%; margin: 1% 0% 1% 0%;">
+      <pagination-controls class="paginacion" (pageChange)="pageTodos = $event" [maxSize]=maxSize
+        [directionLinks]=directionLinks [responsive]=responsive [autoHide]="autoHide"
+        [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
+        [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+        [screenReaderPageLabel]="labels.screenReaderPageLabel"
+        [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+      </pagination-controls>
+    </ion-item>
+  </ion-footer>
+
+
+  <!-- Contenedor del filtro de timbres admin-->
+  <ion-content *ngIf="!filtro ">
+
+    <div *ngIf="timbres_filtro.length === 0; else showTimbres" style="text-align: center;">
+      <br>
+      <ion-text color="primary">
+        <span>Obteniendo timbres Por favor Espere</span>
+      </ion-text>
+      <ion-progress-bar type="indeterminate"></ion-progress-bar>
+      <br>
+    </div>
+
+    <ng-template #showTimbres>
+      <ion-content>
+        <ion-list>
+          <ion-item-group
+            *ngFor="let item of timbres_filtro | keyvalue : ordenOriginal | paginate: { itemsPerPage: 7, currentPage: paginafiltro }">
+            <ion-item-divider mode="md" mode="ios" style="font-size: 90%; font-weight: 100;">
+              <ion-label> {{item.key}}</ion-label>
+            </ion-item-divider>
+            <ion-item *ngFor="let t of item.value">
+              <div>
+                <ion-label class="textoTimbreEmpleado" color="primary">
+
+                  <div [ngSwitch]="t.accion">
+                    <p *ngSwitchCase="'PES'">Entrada o salida permiso</p>
+                    <p *ngSwitchCase="'AES'">Entrada o salida almuerzo/p>
+                    <p *ngSwitchCase="'EoS'">Entrada o salida jornada</p>
+                    <p *ngSwitchCase="'E'">Entrada jornada</p>
+                    <p *ngSwitchCase="'S'">Salida jornada</p>
+                    <p *ngSwitchCase="'I/A'">Inicio alimentación</p>
+                    <p *ngSwitchCase="'F/A'">Fin alimentación</p>
+                    <p *ngSwitchCase="'S/P'">Inicio permiso</p>
+                    <p *ngSwitchCase="'E/P'">Fin permiso</p>
+                    <p *ngSwitchCase="'HA'">Timbre abierto</p>
+                    <p *ngSwitchDefault>Timbre desconocido</p>
+                  </div>
+
+                  <ion-label color="dark" class="textoObs" *ngIf="t.dispositivo_timbre!=''"
+                    (click)="presentAlert(t.observacion,t.hora_timbre_diferente,t.ubicacion , t.novedades_conexion, t.conexion)">
+                    <ion-icon color="danger" *ngIf="t.hora_timbre_diferente || t.conexion != true"
+                      name="alert-circle-outline"></ion-icon>
+                    Toque aquí para más info..
+                  </ion-label>
+                </ion-label>
+              </div>
+
+              <ion-button class="tamanoBotonDER" mode="ios" color="light">
+                <div>
+                  Hora: <br>
+                  <ion-text>{{t.shora}}</ion-text>
+                </div>
+              </ion-button>
+
+              <ion-button class="ubicacionDER" mode="ios" color="light" shape="round"
+                (click)="abrirMapa(t.latitud, t.longitud)" [disabled]=" !t.latitud || !t.longitud">
+                <div>
+                  <ion-icon color="primary" class="tamanoIconoEmpleado" name="location-outline"></ion-icon>
+                </div>
+              </ion-button>
+              <ion-button class="ubicacionMED" mode="ios" color="light" shape="round"
+                (click)="mostrarImagenModal(t.documento)" [disabled]="!t.documento">
+                <div>
+                  <ion-icon color="primary" class="tamanoIconoEmpleado" name="image-outline"></ion-icon>
+                </div>
+              </ion-button>
+              <ion-button class="ubicacionIZQ" mode="ios" color="light" shape="round"
+                (click)="mostrarImagenModal(t.imagen)" [disabled]="!t.imagen">
+                <div>
+                  <ion-icon color="primary" class="tamanoIconoEmpleado" name="happy-outline"></ion-icon>
+                </div>
+              </ion-button>
+
+            </ion-item>
+          </ion-item-group>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-content>
+
+  <!--Configuracion del Pagination - ngxPaginationModulo-->
+  <ion-footer style=" width: 100%; padding: 1%;" *ngIf="!filtro">
+    <ion-item style="font-size: 80%; margin: 1% 0% 1% 0%;">
+      <pagination-controls class="paginacion" (pageChange)="paginafiltro = $event" [maxSize]=maxSize
+        [directionLinks]=directionLinks [responsive]=responsive [autoHide]="autoHide"
+        [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
+        [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+        [screenReaderPageLabel]="labels.screenReaderPageLabel"
+        [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+      </pagination-controls>
+    </ion-item>
+  </ion-footer>
+
+  <!-- Ventana de empleado sin registro -->
+
+  <ion-content *ngIf="!vacio">
+    <div style="text-align: center; padding-top: 2%;">
+      <ion-img class="tamanoImagen" src="../../../assets/images/Sin_registro.svg"></ion-img>
+      <br><br>
+      <ion-label>
+        El Empleado no tiene registrados timbres
+      </ion-label>
+    </div>
+  </ion-content>
+
+  <!-- Ventana de sin registro deacuerdo al filtro de fechas -->
+  <ion-content *ngIf="!filtro_mensaje">
+    <div style="text-align: center; padding-top: 2%;">
+      <ion-img class="tamanoImagen" src="../../../assets/images/Sin_registro.svg"></ion-img>
+      <br><br>
+      <ion-label>
+        No existen timbres registrados en esas fechas
+      </ion-label>
+    </div>
+  </ion-content>
+</ng-container>
+
+
+<ng-container *ngIf="!isConnected">
+  <ion-content>
     <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
 
     <!-- Ventana de no conexion a internet-->
     <div style="margin: 2%; padding: 2%; text-align: center; border-radius: 2%;">
       <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 90%;">
-        En esta lista encontrara los timbres de este usuario
+        En esta lista encontrará los timbres de este usuario
       </ion-text>
       <br>
       <br>
@@ -280,6 +282,5 @@
       </ion-text>
     </div>
   </ion-content>
-
 
 </ng-container>

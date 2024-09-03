@@ -19,13 +19,14 @@ export class ConfirmaciontimbrePage implements OnInit {
   ubicacion: any = "";
 
   constructor( private navCtroller: NavController,) { 
-    this.ubicacion = localStorage.getItem('storageUbicacion');
   }
 
   ngOnInit() {
    
     this.nombre_usuario = localStorage.getItem('nom');
     this.apellido_usuario = localStorage.getItem('ap');
+    this.ubicacion = localStorage.getItem('storageUbicacion');
+
     console.log('Ubicacion: ', localStorage.getItem('storageUbicacion'));
     console.log('Variable this.ubicacion: ', this.ubicacion);
   }

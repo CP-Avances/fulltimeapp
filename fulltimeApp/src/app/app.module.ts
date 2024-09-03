@@ -28,7 +28,6 @@ registerLocaleData(localEsEC);
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 const config: SocketIoConfig = { url: "http://186.4.226.49:3002", options: {}};
 
-
 @NgModule({
   declarations: [AppComponent],
   imports: [

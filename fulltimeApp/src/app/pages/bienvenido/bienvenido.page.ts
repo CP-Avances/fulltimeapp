@@ -132,7 +132,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
       //this.closeAdmin()
     } else {
-      this.mostrarToas(" Ups!! Al parecer no tienes activado en tu plan el Modulo 'Aprobar Permisos'");
+      this.mostrarToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.");
     }
   }
 
@@ -142,23 +142,25 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       this.router.navigate(['/enviartimbre', 'Fin de permiso']);
       //this.closeAdmin()
     } else {
-      this.mostrarToas(" Ups!! Al parecer no tienes activado en tu plan el Modulo 'Aprobar Permisos'");
+      this.mostrarToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.");
     }
   }
 
-
-
   async mostrarToas(mensaje: string) {
     const toast = await this.toastController.create({
-      message: `<ion-icon name="information-circle-outline"></ion-icon>` + mensaje + "\n\n Te gustaria activarlo? \n Comunicate con nosotros: www.casapazmino.com.ec",
+      message: `<div style="text-align: left;">
+                  <ion-icon name="information-circle-outline"></ion-icon>` 
+               + mensaje 
+               + `<br><br>Te gustaría activarlo? <br> Comunícate con nosotros: www.casapazmino.com.ec
+                </div>`,
       duration: 4500,
       position: "top",
       color: "notificacicon",
       mode: "ios",
-      cssClass: 'toast-custom-class',
     });
     await toast.present();
   }
+  
 
   async checkSession(id_empleado) {
     this.empleadoService.accesoMovil(id_empleado).subscribe((x: any) => {

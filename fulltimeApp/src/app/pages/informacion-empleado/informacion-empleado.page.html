@@ -36,7 +36,7 @@
           <ion-label slot="end">{{usuario.apellido}}</ion-label>
         </ion-item>
         <ion-item style="font-size: 4vw">
-          <ion-label>Cedula:</ion-label>
+          <ion-label>Cédula:</ion-label>
           <ion-label slot="end">{{usuario.cedula}}</ion-label>
         </ion-item>
         <ion-item style="font-size: 4vw">
@@ -45,9 +45,11 @@
         </ion-item>
         <ion-item style="font-size: 4vw">
           <ion-label>Teléfono:</ion-label>
-          <ion-label> <a slot="end" [href]="'https://api.whatsapp.com/send?phone=' + usuario.telefono" class="ion-text">
+          <ion-label slot="end"> 
+            <a slot="end" [href]="'https://api.whatsapp.com/send?phone=' + usuario.telefono" class="ion-text">
               {{ usuario.telefono }}
-            </a></ion-label> </ion-item>
+            </a>
+          </ion-label> </ion-item>
         <ion-item style="font-size: 4vw">
 
         </ion-item>

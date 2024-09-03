@@ -194,7 +194,7 @@ export class SolicitudesPage implements OnInit {
     if(this.Btn_permisos == true){
       this.router.navigateByUrl("/reloj/solicitudes/permiso-solicitud");
     }else if(this.Btn_permisos == false){
-      this.usuarioIncorrectoToas(" Ups! No tiene habilitado el modulo de Permisos");
+      this.usuarioIncorrectoToas("Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.\n\nTe gustaría activarlo?");
     }else{
       this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion. \n Comprueba tu conexion a internet o");
     }
@@ -204,7 +204,7 @@ export class SolicitudesPage implements OnInit {
     if(this.Btn_horasExtras == true){
       this.router.navigateByUrl("/reloj/solicitudes/hora-extra-solicitud");
     }else if(this.Btn_horasExtras == false){
-      this.usuarioIncorrectoToas(" Ups! No tiene habilitado el modulo de Horas Extras\n\nTe gustaria activarlo?");
+      this.usuarioIncorrectoToas("Ups!!! al parecer no tienes activado en tu plan el Módulo de Horas Extras.\n\nTe gustaría activarlo?");
     }else{
       this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion. \n Comprueba tu conexion a internet o");
     }
@@ -214,7 +214,7 @@ export class SolicitudesPage implements OnInit {
     if(this.Btn_alimentacion == true){
       this.router.navigateByUrl("/reloj/solicitudes/alimentacion-solicitud");
     }else if(this.Btn_alimentacion == false){
-      this.usuarioIncorrectoToas(" Ups! No tiene habilitado el modulo de Alimentacion\n\nTe gustaria activarlo?");
+      this.usuarioIncorrectoToas("  Ups!!! al parecer no tienes activado en tu plan el Módulo de Alimentación.\n\nTe gustaría activarlo?");
     }else{
       this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion.\n Comprueba tu conexion a internet o");
     }
@@ -224,7 +224,7 @@ export class SolicitudesPage implements OnInit {
     if(this.Btn_vacaciones == true){
       this.router.navigateByUrl("/reloj/solicitudes/vacacion-solicitud");
     }else if(this.Btn_vacaciones == false){
-      this.usuarioIncorrectoToas(" Ups! No tiene habilitado el modulo de Vacaciones\n\nTe gustaria activarlo?");
+      this.usuarioIncorrectoToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Vacaciones.\n\nTe gustaría activarlo?");
     }else{
       this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion. \n Comprueba tu conexion a internet o");
     }

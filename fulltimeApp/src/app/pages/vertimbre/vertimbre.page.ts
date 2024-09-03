@@ -86,10 +86,6 @@ export class VertimbrePage implements OnInit {
       if (!this.isConnected) {
         this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "bottom");
         console.log('Desconectado');
-        this.filtro = true;
-        this.vacio = true;
-        this.filtro_mensaje= true
-
       } else {
         this.BuscarFormatos();
         this.mostrarTimbres();

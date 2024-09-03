@@ -261,8 +261,6 @@ export class EnviartimbrePage implements OnInit {
           console.log('verified: ', resul.verified);
           this.nuevoTimbre.tipo_autenticacion = this.IDENTIFICACION_BIOMETRICA;
           this.guardarEnBDD();
-          //this.BuscarParametroTimbreConFoto();
-          // this.iniciarProcesoFoto();
         }
       }).catch((error: any) => {
         console.log(error);
@@ -517,7 +515,7 @@ export class EnviartimbrePage implements OnInit {
         this.nuevoTimbre.ubicacion = 'Sin Ubicación';
         this.storageUbica = this.nuevoTimbre.ubicacion;
         this.nuevoTimbre.conexion = this.isConnected;
-        this.nuevoTimbre.novedades_conexion = 'Fallo conexión al Internet';
+        this.nuevoTimbre.novedades_conexion = 'Falló conexión al Internet';
         this.guardarTimbreStorage(this.nuevoTimbre);
         localStorage.setItem("storageUbicacion", this.storageUbica);
         return;
@@ -550,7 +548,7 @@ export class EnviartimbrePage implements OnInit {
         datos = res;
         console.log('Parametro Detalle: ', datos)
         if (datos.length != 0) {
-          return this.rango = ((parseInt(datos[0].descripcion) * (0.0048)) / 500) //0.006719999999999999 - DOMICILIO
+          return this.rango = (parseInt(datos[0].descripcion));
         }
         else {
           return this.rango = 0.00
@@ -595,7 +593,7 @@ export class EnviartimbrePage implements OnInit {
   CompararCoordenadas(informacion: any, timbre: any, descripcion: any, data: any) {
     this.restP.ObtenerCoordenadas(informacion).subscribe(
       res => {
-        console.log("comparar coordenadas")
+        console.log("datos de ObtenerCoordenadas", res)
         if (res[0].verificar === 'ok') {
           console.log("coordenadas OK")
           this.contar = this.contar + 1;
@@ -645,7 +643,7 @@ export class EnviartimbrePage implements OnInit {
     //Usa el servicio de buscar coordenadas del usuario
     this.restP.ObtenerUbicacionUsuario(this.id_usuario).subscribe(
       res => {
-        console.log('Obteniendo Ubicacion ------')
+        console.log('Obteniendo Ubicacion de Usuario ------', res)
         if (res.length != 0) {
           datosUbicacion = res;
           datosUbicacion.forEach((obj: any) => {
