@@ -22,14 +22,16 @@ export class TimbreJustificadoComponent implements OnInit {
 
   @Input() data: any;
 
+
   selectOptions: any = [
     { accion: 'Ninguno', view: 'Ninguno', teclaFuncion: -1 },
     { accion: 'E', view: 'Inicio de jornada laboral', teclaFuncion: 0 },
+    { accion: 'S', view: 'Fin de jornada laboral', teclaFuncion: 1 },
     { accion: 'S/A', view: 'Inicio de almuerzo', teclaFuncion: 2 },
     { accion: 'E/A', view: 'Fin de almuerzo', teclaFuncion: 3 },
-    { accion: 'S', view: 'Fin de jornada laboral', teclaFuncion: 1 },
-    { accion: 'S/P', view: 'Fin de permiso', teclaFuncion: 4 },
     { accion: 'E/P', view: 'Inicio de permiso', teclaFuncion: 5 },
+    { accion: 'S/P', view: 'Fin de permiso', teclaFuncion: 4 },
+    
   ]
 
   accion: string = '';

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ToastController, ModalController, Platform, AlertController } from '@ionic/angular';
 import { TimbresPerdidosComponent } from './showTimbresGuardados.component';
@@ -9,6 +9,8 @@ import { EmpleadosService } from 'src/app/services/empleados.service';
 import { Subscription, interval } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
+import { NetworkService } from '../../libs/network.service';
+import { NavegadorAdminComponent } from 'src/app/componentes/navegador-admin/navegador-admin.component';
 
 @Component({
   selector: 'app-bienvenido',
@@ -17,6 +19,7 @@ import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 })
 export class BienvenidoPage implements OnInit, OnDestroy {
 
+  @ViewChild(NavegadorAdminComponent) navegadorAdmin: NavegadorAdminComponent;
   pipe: DatePipe = new DatePipe('es-EC', null);
   time: Date = new Date();
   horaTransformada = this.pipe.transform(Date.now(), 'hh:mm a');
@@ -38,8 +41,10 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     public parametros: ParametrosService,
     public router: Router,
     public relojService: RelojServiceService,
-    public empleadoService: EmpleadosService, 
+    public empleadoService: EmpleadosService,
     public autorizacionesServices: AutorizacionesService,
+    private networkService: NetworkService,
+
   ) {
     this.cambioimagen();
   }
@@ -49,20 +54,30 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     this.startClock();
     this.VerificarFunciones();
     const subscription = interval(10000) // Intervalo de 1 hora en milisegundos
-    .pipe(
-      switchMap(() => this.checkSession(localStorage.getItem("empleadoID")))
-    )
-    .subscribe(
-      () => {
-      },
-      error => console.error('Error fetching data:', error)
-    );
+      .pipe(
+        switchMap(() => this.checkSession(localStorage.getItem("empleadoID")))
+      )
+      .subscribe(
+        () => {
+        },
+        error => console.error('Error fetching data:', error)
+      );
     this.autorizacionesServices.setSubscription(subscription); // Guardar la suscripción en el servicio
+    this.networkSubscriber();
 
   }
   ionViewWillEnter() {
-    this.startClock(); 
-    this.VerificarFunciones();
+    this.startClock();
+    //this.VerificarFunciones();
+
+    this.networkSubscriber();
+    this.refreshNavegadorAdmin();
+  }
+
+  refreshNavegadorAdmin() {
+    if (this.navegadorAdmin) {
+      this.navegadorAdmin.ngOnInit(); // O cualquier otro método que necesites ejecutar para refrescar
+    }
   }
 
   startClock() {
@@ -108,12 +123,50 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   }
 
 
+
+  isConnected: boolean;
+  networkSubscriber() {
+    this.isConnected = this.networkService.getNetworkStatusDispositivo();
+    console.log("Esta conectado: ", this.isConnected)
+    if (!this.isConnected) {
+      this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "bottom");
+      console.log('Desconectado');
+      this.colorIp = "primary"
+      this.colorFp = "dark"
+    } else {
+      console.log('conectado');
+      this.BuscarParametroTimbreSinInternet();
+
+      this.VerificarFunciones();
+    }
+  }
+
+  conexionInternet: string = ';'
+
+  BuscarParametroTimbreSinInternet() {
+
+    this.parametros.ObtenerDetallesParametros(13).subscribe(
+      res => {
+        console.log("ver parametro sin internet:", res[0])
+        localStorage.setItem('timbrarSinInternet', res[0].descripcion);
+        this.conexionInternet = localStorage.getItem('timbrarSinInternet')
+      });
+  }
+
+  async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: duracion,
+      color: color,
+      position: position
+    });
+    toast.present();
+  }
+
   VerificarFunciones() {
     this.parametros.ObtenerFunciones().subscribe(res => {
       this.funciones = res[0];
       this.apro_permisos = this.funciones.permisos;
-
-
       if (this.apro_permisos == true) {
         this.colorIp = "primary"
         this.colorFp = "dark"
@@ -124,6 +177,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
       }
     });
+
   }
 
   btn_InicioPermisosClick() {
@@ -149,9 +203,9 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   async mostrarToas(mensaje: string) {
     const toast = await this.toastController.create({
       message: `<div style="text-align: left;">
-                  <ion-icon name="information-circle-outline"></ion-icon>` 
-               + mensaje 
-               + `<br><br>Te gustaría activarlo? <br> Comunícate con nosotros: www.casapazmino.com.ec
+                  <ion-icon name="information-circle-outline"></ion-icon>`
+        + mensaje
+        + `<br><br>Te gustaría activarlo? <br> Comunícate con nosotros: www.casapazmino.com.ec
                 </div>`,
       duration: 4500,
       position: "top",
@@ -160,7 +214,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     });
     await toast.present();
   }
-  
+
 
   async checkSession(id_empleado) {
     this.empleadoService.accesoMovil(id_empleado).subscribe((x: any) => {
@@ -169,7 +223,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
         console.log('Session invalid. Closing session...');
 
         this.cerrarSesion();
-      }else{
+      } else {
         console.log('Session valid');
 
       }

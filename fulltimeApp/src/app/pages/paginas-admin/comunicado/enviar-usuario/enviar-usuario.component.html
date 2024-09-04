@@ -4,7 +4,7 @@
     <ion-list>
         <ion-radio-group [(ngModel)]="radioValue" (ionChange)="showValue()">
             <ion-text mode="ios" color="dark" style="text-align: center;">
-                <h3>Criterios de Búsqueda</h3>
+                <h3>Criterios de búsqueda</h3>
             </ion-text>
             <ion-item *ngFor="let c of solicitudes">
                 <ion-label>{{ c.nombre }}</ion-label>
@@ -147,8 +147,4 @@
             [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
         </pagination-controls>
     </ion-item>
-
-
-
-
 </ion-content>

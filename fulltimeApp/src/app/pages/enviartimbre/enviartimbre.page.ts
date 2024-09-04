@@ -220,14 +220,14 @@ export class EnviartimbrePage implements OnInit {
 
   async tomarFoto() {
     const cameraPhoto = await Camera.getPhoto({
-      quality: 55,
+      quality: 0.9,
       allowEditing: false,
       resultType: CameraResultType.DataUrl,
       correctOrientation: true,
       source: CameraSource.Camera,
       direction: CameraDirection.Front,
-      width: 500,
-      height: 500,
+      width: 1200,
+      height: 1200,
     });
     if (cameraPhoto.dataUrl) {
       this.imagen = cameraPhoto.dataUrl;
@@ -489,7 +489,7 @@ export class EnviartimbrePage implements OnInit {
 
 
     if (this.isConnected == true) {
-      if (this.geoLatitude == 0) return this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "success", 1000, "bottom");
+      if (this.geoLatitude == 0) return this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "danger", 3000, "bottom");
 
       this.nuevoTimbre.latitud = this.geoLatitude + "";
       this.nuevoTimbre.longitud = this.geoLongitude + "";
@@ -499,6 +499,8 @@ export class EnviartimbrePage implements OnInit {
       this.ValidarModulo(this.geoLatitude, this.geoLongitude, this.rango, this.nuevoTimbre);
       console.log('paso validaciones de horario abierto');
     } else {
+      if (this.geoLatitude == 0) return this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "danger", 3000, "bottom");
+
       //SIN INTERNET
       //Proceso de almacenamiento de informacion del timbre cuendo no tiene conexion al Internet.
       if (localStorage.getItem('timbrarSinInternet') == 'Si') {

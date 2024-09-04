@@ -1,4 +1,4 @@
-<ion-header style="color: #000000;">
+<ion-header style="color: #000000;" *ngIf="isConnected">
   <div>
     <div style="padding:1%; background: white">
       <br><br>
@@ -35,6 +35,17 @@
 
 </ion-header>
 
+<ion-header style="color: #000000;"  *ngIf="!isConnected">
+  <div style="padding:1%; background: white">
+    <br><br>
+    <ion-img class="center" style="width:45%;" src="../../../assets/images/C_FTLOGORV.png"></ion-img>
+    <ion-label mode="md" color="medium" style="text-align:center">
+      <h1 style="font-size: 4.5vw"><b>Reloj Virtual</b></h1>
+    </ion-label>
+  </div>
+  <br>
+</ion-header>
+
 <ng-container *ngIf="isConnected">
   <!--Contenedor de todos los timbres admin-->
 
@@ -44,7 +55,7 @@
     <div *ngIf="timbres.length === 0; else todo" style="text-align: center;">
       <br>
       <ion-text color="primary">
-        <span>Obteniendo timbres Por favor Espere</span>
+        <span>Obteniendo timbres, por favor espere</span>
       </ion-text>
       <ion-progress-bar type="indeterminate"></ion-progress-bar>
       <br>
@@ -135,11 +146,12 @@
 
   <!-- Contenedor del filtro de timbres admin-->
   <ion-content *ngIf="!filtro ">
+    <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
 
     <div *ngIf="timbres_filtro.length === 0; else showTimbres" style="text-align: center;">
       <br>
       <ion-text color="primary">
-        <span>Obteniendo timbres Por favor Espere</span>
+        <span>Obteniendo timbres, por favor espere</span>
       </ion-text>
       <ion-progress-bar type="indeterminate"></ion-progress-bar>
       <br>
@@ -214,6 +226,7 @@
   </ion-content>
 
   <!--Configuracion del Pagination - ngxPaginationModulo-->
+  
   <ion-footer style=" width: 100%; padding: 1%;" *ngIf="!filtro">
     <ion-item style="font-size: 80%; margin: 1% 0% 1% 0%;">
       <pagination-controls class="paginacion" (pageChange)="paginafiltro = $event" [maxSize]=maxSize

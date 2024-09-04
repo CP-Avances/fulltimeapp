@@ -8,6 +8,7 @@ import { Device } from '@capacitor/device';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { Md5 } from 'ts-md5/dist/md5';
 import { environment } from 'src/environments/environment';
+import { EmpleadosService } from 'src/app/services/empleados.service';
 
 @Component({
   selector: 'app-login',
@@ -43,6 +44,8 @@ export class LoginPage implements OnInit {
     public parametros: ParametrosService,
     public platform: Platform,
     private userService: DataUserLoggedService,
+    private empleadoService: EmpleadosService,
+
 
   ) { }
   mostrarCheckboxInicialmente: boolean;
@@ -57,6 +60,7 @@ export class LoginPage implements OnInit {
     this.obtenerInfoTerminosCondiciones();
     this.BuscarParametroTimbreSinInternet();
     this.BuscarParametroTimbreConFoto();
+
     this.BuscarParametroTimbreUbicacionDesconocida();
 
     if (!this.relojService.esPrimeraVez()) {
@@ -232,6 +236,7 @@ export class LoginPage implements OnInit {
           // localStorage.setItem('horas_trabaja', res.body.empresa.hora_trabaja);
           // localStorage.setItem('bool_timbres', datos.acciones_timbres);
           // localStorage.setItem('fec_caducidad_licencia', datos.caducidad_licencia);
+          this.obtenerImagen64();
 
           console.log("datos de ingreso ", datos)
           this.parametros.ObtenerDetallesParametros(6).subscribe(
@@ -286,13 +291,28 @@ export class LoginPage implements OnInit {
               }
             }
           );
-          
+
         }
       }, err => {
         this.usuarioIncorrectoToas("Error en la conexión con el servidor", 3000)
       }
       )
     }
+  }
+
+  obtenerImagen64() {
+    this.empleadoService.ObtenerImagen(localStorage.getItem("empleadoID"), localStorage.getItem("imagen")).subscribe(data => {
+      if (!data.imagen) {
+        localStorage.setItem('imagen64', '');
+        console.log( localStorage.getItem('imagen64'));
+
+      }
+      else {
+        let imagen = 'data:image/jpeg;base64,' + data.imagen;
+        localStorage.setItem('imagen64', imagen);
+        console.log( localStorage.getItem('imagen64'));
+      }
+    });
   }
 
   cambiodepantallas() {

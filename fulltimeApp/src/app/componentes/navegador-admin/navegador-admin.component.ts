@@ -15,8 +15,7 @@ import { Router } from '@angular/router';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
 import { Socket } from 'ngx-socket-io';
-import { PluginListenerHandle } from '@capacitor/core';
-import { VerImagenModalPage } from 'src/app/modals/ver-timbre-empleado/ver-imagen/ver-imagen.component';
+import { NetworkService } from '../../libs/network.service';
 
 
 @Component({
@@ -62,17 +61,19 @@ export class NavegadorAdminComponent implements OnInit {
     private toastController: ToastController,
     public parametros: ParametrosService,
     private socket: Socket,
+    private networkService: NetworkService,
 
   ) { }
 
   ionViewWillEnter() {
     this.ngOnInit();
     this.VerificarFunciones();
+    this.networkSubscriber()
+
   }
 
   ngOnInit() {
     this.username = this.userService.username;
-    this.obtenerImagen64();
     this.idEmpleadoIngresa = parseInt(localStorage.getItem('empleadoID'));
     console.log
     this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
@@ -155,14 +156,36 @@ export class NavegadorAdminComponent implements OnInit {
       }
 
     });
-
-
+    this.networkSubscriber()
   }
 
   onImageError(event: any) {
     event.target.src = "../../../assets/images/perfildefecto.png";
   }
 
+  isConnected: boolean;
+  networkSubscriber() {
+    this.isConnected = this.networkService.getNetworkStatusDispositivo();
+    console.log("Esta conectado: ", this.isConnected)
+    if (!this.isConnected) {
+      this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "bottom");
+      console.log('Desconectado');
+      this.imagen = localStorage.getItem("imagen64")
+    } else {
+      console.log('conectado');
+      this.imagen = localStorage.getItem("imagen64")
+    }
+  }
+
+  async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: duracion,
+      color: color,
+      position: position
+    });
+    toast.present();
+  }
 
   LlamarNotificcaccciones(id_empleado: number) {
     //Carga y Muestra el numero de notificaciones,   
@@ -237,7 +260,7 @@ export class NavegadorAdminComponent implements OnInit {
   apro_vacaciones: any;
   apro_horasExtras: any;
   apro_alimentaciones: any;
-  
+
 
   colorp: any;
   colorh: any;
@@ -279,7 +302,7 @@ export class NavegadorAdminComponent implements OnInit {
     });
   }
 
-  
+
   //Pestalas de mensajes
   async mostrarToas(mensaje: string) {
     const toast = await this.toastController.create({
@@ -334,21 +357,6 @@ export class NavegadorAdminComponent implements OnInit {
 
     this.notificacionService.unsubscribe(); // Desuscribirse usando el servicio
 
-  }
-
-  obtenerImagen64() {
-    this.empleadoService.ObtenerImagen(localStorage.getItem("empleadoID"), localStorage.getItem("imagen")).subscribe(data => {
-      if (!data.imagen) {
-        this.imagen = '';
-        localStorage.setItem('imagen64', data.imagen);
-
-        //console.log("imagen base 64: ", data.imagen)
-      }
-      else {
-        this.imagen = 'data:image/jpeg;base64,' + data.imagen;
-        console.log("imagen base 64: ", this.imagen)
-      }
-    });
   }
 
 

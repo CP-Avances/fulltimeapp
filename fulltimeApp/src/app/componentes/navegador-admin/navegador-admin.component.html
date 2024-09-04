@@ -12,15 +12,13 @@
                 (error)="onImageError($event)">
         </ion-buttons>
 
-
         <div class="nombreusua" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);">
             <h6>Admin - <b>{{username}}</b></h6>
         </div>
-
-
+        
         <ion-buttons slot="end">
             <ion-button slot="end" (click)="Mostrarpopnotificaciones($event)" id="notification-button"
-                style="width: 40px;">
+                style="width: 40px;" [disabled]="isConnected == false">
                 <ion-icon name="notifications-outline"></ion-icon>
             </ion-button>
             <ion-badge *ngIf="(countNoti != 0) && (countNoti != null)" id="notifications-badge" mode="md">
