@@ -133,6 +133,8 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       console.log('Desconectado');
       this.colorIp = "primary"
       this.colorFp = "dark"
+      this.conexionInternet = localStorage.getItem('timbrarSinInternet')
+
     } else {
       console.log('conectado');
       this.BuscarParametroTimbreSinInternet();
@@ -142,6 +144,17 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   }
 
   conexionInternet: string = ';'
+
+  VerificarTimbresSinInternet(accion: string){
+
+    if(localStorage.getItem('timbrarSinInternet')== "Si"){
+      this.router.navigate(['/enviartimbre',accion ]);
+
+    }else {
+      this.abrirToas('No puede realizar tímbres sin conexión a Internet', "danger", 3000, "bottom");
+    }
+
+  }
 
   BuscarParametroTimbreSinInternet() {
 
