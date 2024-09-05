@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { AlertController, MenuController, ToastController } from '@ionic/angular';
 import { Platform } from '@ionic/angular';
+import { NetworkService } from 'src/app/libs/network.service';
 
 @Component({
   selector: 'app-solicitudes',
@@ -11,10 +12,10 @@ import { Platform } from '@ionic/angular';
   <hr>
   <ion-content>
     <header style="text-align: center;">
-      <h3>Solicitudes</h3>
+      <h3 *ngIf="isConnected">Solicitudes</h3>
     </header>
 
-    <div class="Imagen">
+    <div class="Imagen" *ngIf="isConnected">
       <img class="center" src="../../../assets/images/C_FTLOGORV.png">
         <ion-label style="text-align:center" mode="md" color="medium">
           <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
@@ -22,7 +23,7 @@ import { Platform } from '@ionic/angular';
         <img class="tamanoImagen" src="../../../assets/images/Solicitudes.svg">
     </div>
 
-    <ion-grid>
+    <ion-grid *ngIf="isConnected">
       <ion-row>
         <ion-col size="6">
           <ion-button [color] = "colorp" expand="block" (click)="BtnPermisos_click()">
@@ -71,6 +72,37 @@ import { Platform } from '@ionic/angular';
         </ion-col>
       </ion-row>
     </ion-grid>
+
+    <ion-content *ngIf="!isConnected">
+    <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
+
+        <!-- Ventana de no conexion a internet-->
+        <div style="margin: 2%; padding: 2%; text-align: center; border-radius: 2%;">
+          <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 90%;">
+            En esta vista encontrará información de Solicitudes
+          </ion-text>
+          <br>
+          <br>
+          <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;">
+            Se podrá visualizar cuando tenga conexión a internet
+          </ion-text>
+        </div>
+        <div class="Imagen">
+          <span class="center1">
+            <img src="../../../assets/images/C_FTLOGORV.png">
+            <ion-label style="text-align:center" mode="md" color="medium">
+              <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
+            </ion-label>
+          </span>
+          <img src="../../../assets/images/lost_timee.svg" />
+        </div>
+
+        <div style="margin: 4%; padding: 4%; text-align: center; border-radius: 2%;">
+          <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;">
+            No tiene conexión a internet
+          </ion-text>
+        </div>
+    </ion-content>
 
   </ion-content>
   `,
@@ -130,14 +162,30 @@ export class SolicitudesPage implements OnInit {
     public toastController: ToastController,
     public alertController: AlertController,
     public parametros: ParametrosService,
-  ) {}
+    private networkService: NetworkService,
 
-  ionViewWillEnter(){
+  ) { }
+
+
+  //refrescar la pagina
+  doRefresh(event: any) {
+    this.ngOnInit();
+
+    setTimeout(() => {
+      console.log('Async operation has ended');
+      event.target.complete();
+    }, 1500);
+  }
+
+  ionViewWillEnter() {
     this.VerificarFunciones();
+    this.networkSubscriber();
   }
 
   ngOnInit() {
     this.VerificarFunciones();
+    this.networkSubscriber();
+
   }
 
   Btn_permisos: boolean;
@@ -151,35 +199,60 @@ export class SolicitudesPage implements OnInit {
   colora: any;
 
   funciones: any = [];
+  isConnected: boolean;
+
+
+
+  networkSubscriber() {
+    this.isConnected = this.networkService.getNetworkStatusDispositivo();
+    console.log("Esta conectado: ", this.isConnected)
+    if (!this.isConnected) {
+      this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "bottom");
+
+    } else {
+
+      console.log('conectado');
+    }
+  }
+
+  async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: duracion,
+      color: color,
+      position: position
+    });
+    toast.present();
+  }
   VerificarFunciones() {
     this.parametros.ObtenerFunciones().subscribe(res => {
-      this.funciones = res[0]; 
+      this.funciones = res[0];
       this.Btn_permisos = this.funciones.permisos;
       this.Btn_horasExtras = this.funciones.hora_extra;
       this.Btn_alimentacion = this.funciones.alimentacion;
       this.Btn_vacaciones = this.funciones.vacaciones
 
-      if(this.Btn_permisos == true){
+      if (this.Btn_permisos == true) {
         this.colorp = "habilitado";
-      }else{
+      } else {
         this.colorp = "deshabilitado";
       }
 
-      if(this.Btn_horasExtras == true){
+      if (this.Btn_horasExtras == true) {
         this.colorh = "habilitado";
-      }else{
+      } else {
         this.colorh = "deshabilitado";
       }
 
-      if(this.Btn_alimentacion == true){
+      if (this.Btn_alimentacion == true) {
         this.colora = "habilitado";
-      }else{
+      } else {
         this.colora = "deshabilitado";
       }
 
-      if(this.Btn_vacaciones == true){
+      if (this.Btn_vacaciones == true) {
         this.colorv = "habilitado";
-      }else{
+      } else {
         this.colorv = "deshabilitado";
       }
     }, error => {
@@ -190,42 +263,42 @@ export class SolicitudesPage implements OnInit {
     });
   }
 
-  BtnPermisos_click(){
-    if(this.Btn_permisos == true){
+  BtnPermisos_click() {
+    if (this.Btn_permisos == true) {
       this.router.navigateByUrl("/reloj/solicitudes/permiso-solicitud");
-    }else if(this.Btn_permisos == false){
+    } else if (this.Btn_permisos == false) {
       this.usuarioIncorrectoToas("Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.\n\nTe gustaría activarlo?");
-    }else{
+    } else {
       this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion. \n Comprueba tu conexion a internet o");
     }
   }
 
-  BtnHorasExtras_click(){
-    if(this.Btn_horasExtras == true){
+  BtnHorasExtras_click() {
+    if (this.Btn_horasExtras == true) {
       this.router.navigateByUrl("/reloj/solicitudes/hora-extra-solicitud");
-    }else if(this.Btn_horasExtras == false){
+    } else if (this.Btn_horasExtras == false) {
       this.usuarioIncorrectoToas("Ups!!! al parecer no tienes activado en tu plan el Módulo de Horas Extras.\n\nTe gustaría activarlo?");
-    }else{
+    } else {
       this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion. \n Comprueba tu conexion a internet o");
     }
   }
 
-  BtnAlimentacion_click(){
-    if(this.Btn_alimentacion == true){
+  BtnAlimentacion_click() {
+    if (this.Btn_alimentacion == true) {
       this.router.navigateByUrl("/reloj/solicitudes/alimentacion-solicitud");
-    }else if(this.Btn_alimentacion == false){
+    } else if (this.Btn_alimentacion == false) {
       this.usuarioIncorrectoToas("  Ups!!! al parecer no tienes activado en tu plan el Módulo de Alimentación.\n\nTe gustaría activarlo?");
-    }else{
+    } else {
       this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion.\n Comprueba tu conexion a internet o");
     }
   }
 
-  BtnVacaciones_click(){
-    if(this.Btn_vacaciones == true){
+  BtnVacaciones_click() {
+    if (this.Btn_vacaciones == true) {
       this.router.navigateByUrl("/reloj/solicitudes/vacacion-solicitud");
-    }else if(this.Btn_vacaciones == false){
+    } else if (this.Btn_vacaciones == false) {
       this.usuarioIncorrectoToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Vacaciones.\n\nTe gustaría activarlo?");
-    }else{
+    } else {
       this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion. \n Comprueba tu conexion a internet o");
     }
   }
@@ -233,7 +306,7 @@ export class SolicitudesPage implements OnInit {
 
   async usuarioIncorrectoToas(mensaje: string) {
     const toast = await this.toastController.create({
-      message: `<ion-icon name="information-circle-outline"></ion-icon>`+mensaje+`\n Comunicate con nosotros: www.casapazmino.com.ec`,
+      message: `<ion-icon name="information-circle-outline"></ion-icon>` + mensaje + `\n Comunicate con nosotros: www.casapazmino.com.ec`,
       duration: 4500,
       position: "top",
       color: "notificacicon",

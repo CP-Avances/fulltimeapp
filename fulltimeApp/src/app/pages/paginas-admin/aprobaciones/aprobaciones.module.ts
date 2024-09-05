@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
+import { ComponentesModule } from 'src/app/componentes/componentes.module';
 
 import {
   AprobacionesPageRoutingModule
@@ -17,7 +18,9 @@ import { NgxPaginationModule } from 'ngx-pagination';
     FormsModule,
     IonicModule,
     AprobacionesPageRoutingModule,
-    NgxPaginationModule
+    NgxPaginationModule,
+    ComponentesModule
+
   ],
   declarations: [AprobacionesPage]
 })

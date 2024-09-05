@@ -58,6 +58,10 @@ export class ReportesService {
       )
   }
 
+  BuscarFaltas(data: any, inicio: string, fin: string) {
+    return this.http.post<any>(`${environment.url}/reporte-faltas/faltas/${inicio}/${fin}`, data);
+  }
+
   getInfoReporteAtrasos(codigo: number, fec_inicio: string, fec_final: string): Observable<any> {
     const params = new HttpParams()
       .set('codigo', codigo)
@@ -117,6 +121,14 @@ export class ReportesService {
         tap(console.log),
         catchError(this.handleError)
       )
+  }
+
+  SumarRegistros(array: any[]) {
+    let valor = 0;
+    for (let i = 0; i < array.length; i++) {
+      valor = valor + array[i];
+    }
+    return valor;
   }
 
 

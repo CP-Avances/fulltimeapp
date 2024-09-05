@@ -203,7 +203,7 @@ export class LoginPage implements OnInit {
           this.usuarioIncorrectoToas("No se ha encontrado registro de licencia del sistema.", 3000)
         }
         else if (datos.message === 'sin_permiso_acces_movil') {
-          this.usuarioIncorrectoToas("Usuario no habilitado para el aplicativo movil", 3000)
+          this.usuarioIncorrectoToas("Usuario no habilitado para usar la aplicación móvil.", 3000)
         }
 
         else {

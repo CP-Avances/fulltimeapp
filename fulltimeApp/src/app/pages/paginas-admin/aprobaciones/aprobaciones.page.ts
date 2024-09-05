@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { AlertController, MenuController, ToastController } from '@ionic/angular';
 import { Platform } from '@ionic/angular';
+import { NetworkService } from 'src/app/libs/network.service';
 
 @Component({
   selector: 'app-aprobaciones',
@@ -14,7 +15,7 @@ import { Platform } from '@ionic/angular';
       <h3>Aprobaciones</h3>
     </header>
 
-    <div class="Imagen">
+    <div class="Imagen" *ngIf="isConnected">
       <img class="center" src="../../../assets/images/C_FTLOGORV.png">
         <ion-label style="text-align:center" mode="md" color="medium">
           <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
@@ -22,7 +23,7 @@ import { Platform } from '@ionic/angular';
         <img class="tamanoImagen" src="../../../assets/images/Solicitudes.svg">
     </div>
 
-    <ion-grid>
+    <ion-grid *ngIf="isConnected">
       <ion-row>
         <ion-col size="6">
           <ion-button [color] = "colorp" expand="block" (click)="BtnPermisos_click()">
@@ -71,6 +72,37 @@ import { Platform } from '@ionic/angular';
         </ion-col>
       </ion-row>
     </ion-grid>
+
+    <ion-content *ngIf="!isConnected">
+    <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
+
+        <!-- Ventana de no conexion a internet-->
+        <div style="margin: 2%; padding: 2%; text-align: center; border-radius: 2%;">
+          <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 90%;">
+            En esta vista encontrará información de Aprobaciones.
+          </ion-text>
+          <br>
+          <br>
+          <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;">
+            Se podrá visualizar cuando tenga conexión a internet
+          </ion-text>
+        </div>
+        <div class="Imagen">
+          <span class="center1">
+            <img src="../../../assets/images/C_FTLOGORV.png">
+            <ion-label style="text-align:center" mode="md" color="medium">
+              <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
+            </ion-label>
+          </span>
+          <img src="../../../assets/images/lost_timee.svg" />
+        </div>
+
+        <div style="margin: 4%; padding: 4%; text-align: center; border-radius: 2%;">
+          <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;">
+            No tiene conexión a internet
+          </ion-text>
+        </div>
+    </ion-content>
 
   </ion-content>
   `,
@@ -130,14 +162,20 @@ export class AprobacionesPage implements OnInit {
     public toastController: ToastController,
     public alertController: AlertController,
     public parametros: ParametrosService,
+    private networkService: NetworkService,
+
   ) {}
+  isConnected: boolean;
 
   ionViewWillEnter(){
     this.VerificarFunciones();
+    this.networkSubscriber();
+
   }
 
   ngOnInit() {
     this.VerificarFunciones();
+    this.networkSubscriber();
   }
 
   Btn_permisos: boolean;
@@ -150,6 +188,27 @@ export class AprobacionesPage implements OnInit {
   colorv: any;
   colora: any;
 
+  networkSubscriber() {
+    this.isConnected = this.networkService.getNetworkStatusDispositivo();
+    console.log("Esta conectado: ", this.isConnected)
+    if (!this.isConnected) {
+      this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "bottom");
+
+    } else {
+
+      console.log('conectado');
+    }
+  }
+
+  async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: duracion,
+      color: color,
+      position: position
+    });
+    toast.present();
+  }
   funciones: any = [];
   VerificarFunciones() {
     this.parametros.ObtenerFunciones().subscribe(res => {

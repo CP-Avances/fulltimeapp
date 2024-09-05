@@ -145,12 +145,12 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   conexionInternet: string = ';'
 
-  VerificarTimbresSinInternet(accion: string){
+  VerificarTimbresSinInternet(accion: string) {
 
-    if(localStorage.getItem('timbrarSinInternet')== "Si"){
-      this.router.navigate(['/enviartimbre',accion ]);
+    if (localStorage.getItem('timbrarSinInternet') == "Si") {
+      this.router.navigate(['/enviartimbre', accion]);
 
-    }else {
+    } else {
       this.abrirToas('No puede realizar tímbres sin conexión a Internet', "danger", 3000, "bottom");
     }
 
@@ -196,8 +196,15 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   btn_InicioPermisosClick() {
     if (this.apro_permisos == true) {
       // this.router.navigateByUrl("/reloj/aprobar-permisos");
-      this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
       //this.closeAdmin()
+
+      if (localStorage.getItem('timbrarSinInternet') == "Si") {
+        this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
+
+      } else {
+        this.abrirToas('No puede realizar tímbres sin conexión a Internet', "danger", 3000, "bottom");
+      }
+
     } else {
       this.mostrarToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.");
     }
@@ -206,8 +213,13 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   btn_FinPermisosClick() {
     if (this.apro_permisos == true) {
       // this.router.navigateByUrl("/reloj/aprobar-permisos");
-      this.router.navigate(['/enviartimbre', 'Fin de permiso']);
       //this.closeAdmin()
+      if (localStorage.getItem('timbrarSinInternet') == "Si") {
+        this.router.navigate(['/enviartimbre', 'Fin de permiso']);
+
+      } else {
+        this.abrirToas('No puede realizar tímbres sin conexión a Internet', "danger", 3000, "bottom");
+      }
     } else {
       this.mostrarToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.");
     }

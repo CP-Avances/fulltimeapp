@@ -12,8 +12,8 @@ import { LoadingController, IonInfiniteScroll } from '@ionic/angular';
 })
 export class ListaEmpleadosComponent implements OnInit {
 
-  empleados: Empleado[] = [];
-  empleados_filtro: Empleado[] = [];
+  empleados: any[] = [];
+  empleados_filtro: any[] = [];
 
   pageActual: number = 1;
   ver: boolean = true;
@@ -56,6 +56,7 @@ export class ListaEmpleadosComponent implements OnInit {
     if (emp === null) {
       console.log('entro a peticion');
       this.empleadoService.ObtenerListaEmpleados().subscribe(res => {
+        console.log("ver busqueda de empleados, ", res);
         this.empleados = res;
         this.empleados_filtro = [...this.empleados];
         sessionStorage.setItem('lista-empleados', JSON.stringify(this.empleados))

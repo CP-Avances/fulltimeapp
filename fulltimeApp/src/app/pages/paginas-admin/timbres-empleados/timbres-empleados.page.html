@@ -4,7 +4,7 @@
   </div>
 </ion-header>
 
-<ion-content>
+<ion-content *ngIf="isConnected">
   <ion-text mode="ios" style="text-align: center;">
     <h3 style="font-size: 5vw"><ion-icon name="stopwatch-outline"></ion-icon>
     Timbres Empleados
@@ -12,3 +12,35 @@
   </ion-text>
   <app-lista-empleados [open]="presentModal"></app-lista-empleados>
 </ion-content>
+
+<ion-content *ngIf="!isConnected">
+  <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
+
+  <!-- Ventana de no conexion a internet-->
+  <div style="margin: 2%; padding: 2%; text-align: center; border-radius: 2%;">
+    <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 90%;">
+      En esta vista puede enviar comunicados.
+    </ion-text>
+    <br>
+    <br>
+    <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;">
+      Se podrá visualizar cuando tenga conexión a internet
+    </ion-text>
+  </div>
+  <div class="Imagen">
+    <span class="center1">
+      <img src="../../../assets/images/C_FTLOGORV.png">
+      <ion-label style="text-align:center" mode="md" color="medium">
+        <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
+      </ion-label>
+    </span>
+    <img src="../../../assets/images/lost_timee.svg" />
+  </div>
+
+  <div style="margin: 4%; padding: 4%; text-align: center; border-radius: 2%;">
+    <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;">
+      No tiene conexión a internet
+    </ion-text>
+  </div>
+</ion-content>
+
