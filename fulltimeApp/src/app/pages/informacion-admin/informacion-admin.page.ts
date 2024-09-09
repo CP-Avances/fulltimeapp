@@ -111,6 +111,7 @@ export class InformacionAdminPage implements OnInit {
         this.formato_fecha = resp.fecha;
         this.formato_hora = resp.hora;
         this.fecha_ = this.validar.FormatearFecha(this.dataUser.dataVacuna.fecha, this.formato_fecha, this.validar.dia_completo);
+        console.log("ver fecha",localStorage.getItem("caducidad_licencia"))
         this.caduca_ = this.validar.FormatearFecha(localStorage.getItem("caducidad_licencia"), this.formato_fecha, this.validar.dia_completo);
       },
       err => {

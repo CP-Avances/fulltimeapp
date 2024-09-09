@@ -133,7 +133,6 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       console.log('Desconectado');
       this.colorIp = "primary"
       this.colorFp = "dark"
-      this.conexionInternet = localStorage.getItem('timbrarSinInternet')
 
     } else {
       console.log('conectado');
@@ -143,17 +142,20 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     }
   }
 
-  conexionInternet: string = ';'
 
-  VerificarTimbresSinInternet(accion: string) {
+  async VerificarTimbresSinInternet(accion: string) {
+    await this.BuscarParametroTimbreSinInternet();
 
-    if (localStorage.getItem('timbrarSinInternet') == "Si") {
+    // Después de que BuscarParametroTimbreSinInternet() se complete
+    if (localStorage.getItem('timbrarSinInternet') === "Si") {
       this.router.navigate(['/enviartimbre', accion]);
-
     } else {
-      this.abrirToas('No puede realizar tímbres sin conexión a Internet', "danger", 3000, "bottom");
+      if (!this.isConnected) {
+        this.abrirToas('No puede realizar tímbres sin conexión a Internet', "danger", 3000, "bottom");
+      } else {
+        this.router.navigate(['/enviartimbre', accion]);
+      }
     }
-
   }
 
   BuscarParametroTimbreSinInternet() {
@@ -162,8 +164,8 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       res => {
         console.log("ver parametro sin internet:", res[0])
         localStorage.setItem('timbrarSinInternet', res[0].descripcion);
-        this.conexionInternet = localStorage.getItem('timbrarSinInternet')
-      });
+      },
+    );
   }
 
   async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
@@ -175,6 +177,8 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     });
     toast.present();
   }
+
+
 
   VerificarFunciones() {
     this.parametros.ObtenerFunciones().subscribe(res => {
@@ -189,7 +193,8 @@ export class BienvenidoPage implements OnInit, OnDestroy {
         this.colorFp = "deshabilitado"
 
       }
-    });
+    }
+  );
 
   }
 

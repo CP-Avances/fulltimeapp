@@ -28,6 +28,20 @@ export class PlantillaReportesService {
     private dataUser: DataUserLoggedService,
   ) { }
 
+  private apiUrl = environment.url;
+
+  // SERVICIOS DE LA APLICACION WEB PARA REPORTES
+  ConsultarDatosEmpresa(id: number) {
+    return this.http.get(`${this.apiUrl}/empresas/buscar/datos/${id}`);
+  }
+
+   // METODO PARA OBTENER LOGO DE EMPRESA              **USADO
+   LogoEmpresaImagenBase64(id_empresa: string) {
+    return this.http.get<any>(`${this.apiUrl}/empresas/logo/codificado/${parseInt(id_empresa)}`)
+  }
+  
+  
+  
   // Método para obtener colores y logotipo empresa
 
   private _imagenBase64: string;

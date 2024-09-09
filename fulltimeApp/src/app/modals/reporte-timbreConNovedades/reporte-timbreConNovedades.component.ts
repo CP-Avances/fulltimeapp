@@ -7,6 +7,8 @@ import { Timbre } from '../../interfaces/Timbre';
 import moment from 'moment';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
+import { RelojServiceService } from 'src/app/services/reloj-service.service';
+
 
 @Component({
   selector: 'app-reporte-timbreConNovedades',
@@ -27,7 +29,14 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
   loading: boolean = true;
   conexion: boolean = false;
   count: number = 0;
-
+  empresa: any = {
+    nombre: '',
+    ruc: '',
+    direccion: '',
+    telefono: '',
+    correo: '',
+    representante: '',
+  };
   constructor(
     private dataUserService: DataUserLoggedService,
     private reporteService: ReportesService,
@@ -36,6 +45,8 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
     public parametro: ParametrosService,
     public validar: ValidacionesService,
     public alertController: AlertController,
+    private relojService: RelojServiceService,
+
   ) { }
 
   ngOnInit() {
@@ -43,7 +54,43 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
     const id_empresa = localStorage.getItem('id_empresa');
     (id_empresa !== null) ? this.plantillaPDF.ShowColoresLogo(id_empresa) : this.plantillaPDF.abrirToas('No existe codigo de empresa', 'danger', 3000)
     this.BuscarFormatos();
+    this.obtenerDatosEmpresa(localStorage.getItem('id_empresa'));
+    this.ObtenerLogo();
+    this.ObtenerColores();
   }
+
+  obtenerDatosEmpresa(idEmpresa: any) {
+    this.relojService.obtenerDatosEmpresa(idEmpresa).subscribe(
+      res => {
+
+        console.log("ver datos empresa", res)
+        console.log(res);
+        this.empresa = res[0];
+      },
+      err => {
+        console.log(err)
+      }
+    );
+  }
+
+  p_color: any;
+  s_color: any;
+  frase: any;
+  ObtenerColores() {
+    this.plantillaPDF.ConsultarDatosEmpresa(parseInt(localStorage.getItem('id_empresa') as string)).subscribe(res => {
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
+      this.frase = res[0].marca_agua;
+    });
+  }
+
+  logo: any = String;
+  ObtenerLogo() {
+    this.plantillaPDF.LogoEmpresaImagenBase64(localStorage.getItem('id_empresa') as string).subscribe(res => {
+      this.logo = 'data:image/jpeg;base64,' + res.imagen;
+    });
+  }
+
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
   formato_fecha: string;
@@ -77,7 +124,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
       this.showBtnPdf = true;
       this.loading = true;
 
-      if(this.count == 100){
+      if (this.count == 100) {
         this.alertLimiteReporte();
       }
 
@@ -108,10 +155,6 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
   }
   //FIN mostrar Alerta
 
-  generarPDF() {
-    const filename = 'reporteTimbres.pdf'
-    this.plantillaPDF.generarPdf(this.getDocumentDefinicion(), filename)
-  }
 
   closeModal() {
     console.log('CERRAR MODAL Reporte timbre');
@@ -124,51 +167,160 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
    *                               PARA LA EXPORTACIÓN DE ARCHIVOS PDF
    * ****************************************************************************************************/
 
-  getDocumentDefinicion() {
-    var inicio = this.validar.FormatearFecha(this.fechaInicio, this.formato_fecha, this.validar.dia_completo);    
+  GenerarPDF() {
+    let documentDefinition: any;
+    documentDefinition = this.DefinirInformacionPDF();
+    let doc_name = `Timbres_novedades_usuario.pdf`;
+    this.plantillaPDF.generarPdf(documentDefinition, doc_name)
+  }
+
+  DefinirInformacionPDF() {
+    // DEFINIR ORIENTACION DE LA PAGINA
+    var inicio = this.validar.FormatearFecha(this.fechaInicio, this.formato_fecha, this.validar.dia_completo);
     var fin = this.validar.FormatearFecha(this.fechaFinal, this.formato_fecha, this.validar.dia_completo);
-    
     return {
+      pageSize: 'A4',
+      pageOrientation: 'landscape',
+      pageMargins: [40, 50, 40, 50],
+      watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
+      header: { text: 'Impreso por:  ' + localStorage.getItem('nom') + ' ' + localStorage.getItem('ap'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
-      pageOrientation: this.plantillaPDF.Orientacion(false),
-      watermark: this.plantillaPDF.MargaDeAgua(),
-      header: this.plantillaPDF.HeaderText(),
-
-      footer: function (currentPage, pageCount, fecha) {
-        const h = new Date();
-        const f = moment();
+      footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
+        var f = moment();
         fecha = f.format('YYYY-MM-DD');
-        h.setUTCHours(h.getHours());
-        const time = h.toJSON().split("T")[1].split(".")[0];
+        hora = f.format('HH:mm:ss');
+
         return {
           margin: 10,
           columns: [
+            { text: 'Fecha: ' + fecha + ' Hora: ' + hora, opacity: 0.3 },
             {
-              text: [{
-                text: 'Fecha: ' + fecha + ' Hora: ' + time,
-                alignment: 'left', opacity: 0.3
-              }]
-            },
-            {
-              text: [{
-                text: '© Pag ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', opacity: 0.3
-              }],
+              text: [
+                {
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount,
+                  alignment: 'right', opacity: 0.3
+                }
+              ],
             }
-          ], fontSize: 10
+          ],
+          fontSize: 10
         }
       },
       content: [
-        this.plantillaPDF.EncabezadoHorizontal('Reporte de Timbres', inicio, fin),
-        this.plantillaPDF.presentarDatosGenerales(this.data),
-        this.impresionDatosPDF(this.timbres),
+        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
+        { text: this.empresa.nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: `TIMBRES`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+        { text: 'PERIODO DEL: ' + inicio + " AL " + fin, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
+        ...this.EstructurarDatosPDF(this.timbres).map((obj: any) => {
+          return obj
+        })
       ],
-      styles: this.plantillaPDF.estilosPdf()
+      styles: {
+        derecha: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color, alignment: 'left' },
+        tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color },
+        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 7, 0, 0] },
+        itemsTable: { fontSize: 8 },
+        itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
+        itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0], fillColor: '#E3E3E3' },
+        itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2], fillColor: '#E3E3E3' },
+        itemsTableCentrado: { fontSize: 8, alignment: 'center' },
+        tableMargin: { margin: [0, 0, 0, 0] },
+        tableMarginCabecera: { margin: [0, 15, 0, 0] },
+        tableMarginCabeceraEmpleado: { margin: [0, 10, 0, 0] },
+        quote: { margin: [5, -2, 0, -2], italics: true },
+        small: { fontSize: 8, color: 'blue', opacity: 0.5 }
+      }
     };
   }
 
-  impresionDatosPDF(data: any[]): Array<any> {
+  EstructurarDatosPDF(data: any): Array<any> {
     let c = 0;
-    return [{
+
+    let n: any = []
+    let descripcion = '';
+
+    let reg = this.timbres.length
+    let establecimiento = 'SUCURSAL: ' + data.sucursal;
+
+    descripcion = 'LISTA EMPLEADOS';
+    establecimiento = '';
+
+    n.push({
+      style: 'tableMarginCabecera',
+      table: {
+        widths: ['*', '*', '*'],
+        headerRows: 1,
+        body: [
+          [
+            {
+              border: [true, true, false, true],
+              bold: true,
+              text: descripcion,
+              style: 'itemsTableInfo',
+            },
+            {
+              border: [false, true, false, true],
+              bold: true,
+              text: establecimiento,
+              style: 'itemsTableInfo',
+            },
+            {
+              border: [false, true, true, true],
+              text: 'N° Registros: ' + reg,
+              style: 'derecha',
+            },
+          ],
+        ],
+      },
+    });
+
+
+    n.push({
+      style: 'tableMarginCabeceraEmpleado',
+      table: {
+        widths: ['*', 'auto', 'auto'],
+        headerRows: 2,
+        body: [
+          [
+            {
+              border: [true, true, false, false],
+              text: 'C.C.: ' + this.data.cedula,
+              style: 'itemsTableInfoEmpleado',
+            },
+            {
+              border: [true, true, false, false],
+              text: 'EMPLEADO: ' + this.data.fullname,
+              style: 'itemsTableInfoEmpleado',
+            },
+            {
+              border: [true, true, true, false],
+              text: 'COD: ' + this.data.codigo,
+              style: 'itemsTableInfoEmpleado',
+            },
+          ],
+          [
+            {
+              border: [true, false, true, false],
+              text: 'RÉGIMEN LABORAL ' + this.data.regimen,
+              style: 'itemsTableInfoEmpleado'
+            },
+            {
+              border: [true, false, false, false],
+              text: 'DEPARTAMENTO: ' + this.data.departamento,
+              style: 'itemsTableInfoEmpleado'
+            },
+            {
+              border: [true, false, true, false],
+              text: 'CARGO: ' + this.data.cargo,
+              style: 'itemsTableInfoEmpleado'
+            }
+          ]
+        ],
+      },
+    });
+
+
+    n.push({
       style: 'tableMargin',
       table: {
         widths: ['auto', '*', '*', '*', '*', 'auto', 'auto', '*', '*', '*'],
@@ -193,7 +345,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
             { text: 'HORA', style: 'tableHeader' },
             '', '', '', '', ''
           ],
-          
+
           ...data.map(obj => {
             c = c + 1
             let accionT: string = '';
@@ -203,8 +355,8 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
               case 'PES': accionT = 'Entrada o Salida Permiso'; break;
               case 'E': accionT = 'Entrada'; break;
               case 'S': accionT = 'Salida'; break;
-              case 'E/A': accionT = 'Entrada Almuerzo'; break;
-              case 'S/A': accionT = 'Salida Almuerzo'; break;
+              case 'I/A': accionT = 'Entrada Almuerzo'; break;
+              case 'F/A': accionT = 'Salida Almuerzo'; break;
               case 'E/P': accionT = 'Entrada Permiso'; break;
               case 'S/P': accionT = 'Salida Permiso'; break;
               case 'HA': accionT = 'Horario Abierto'; break;
@@ -221,7 +373,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
               { style: 'itemsTable', text: accionT },
               { style: 'itemsTable', text: obj.observacion },
               { style: 'itemsTable', text: (obj.ubicacion === null) ? '' : obj.ubicacion },
-              { style: 'itemsTable', text: (obj.novedades_conexion === null) ? '' : obj.novedades_conexion},
+              { style: 'itemsTable', text: (obj.novedades_conexion === null) ? '' : obj.novedades_conexion },
             ]
           })
 
@@ -232,7 +384,9 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
           return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
         }
       }
-    }]
+    })
+
+    return n;
   }
 
 }

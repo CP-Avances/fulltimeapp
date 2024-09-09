@@ -62,7 +62,7 @@ import { NetworkService } from 'src/app/libs/network.service';
 
       <ion-row>
         <ion-col size="6">
-          <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/solicitud']">
+          <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/solicitud']" [disabled]="deshabilitado">
             <div>
               <ion-icon name="mail-unread-outline"></ion-icon> <br>
               <ion-text>
@@ -72,7 +72,7 @@ import { NetworkService } from 'src/app/libs/network.service';
           </ion-button>
         </ion-col>
         <ion-col size="6">
-          <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/vacaciones']">
+          <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/vacaciones']" [disabled]="deshabilitado">
             <div>
               <ion-icon name="airplane-outline"></ion-icon> <br>
               <ion-text>
@@ -85,7 +85,7 @@ import { NetworkService } from 'src/app/libs/network.service';
 
       <ion-row>
       <ion-col size="6">
-          <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/horas-extras']">
+          <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/horas-extras']" [disabled]="deshabilitado">
             <div>
               <ion-icon name="hourglass-outline"></ion-icon> <br>
               <ion-text>
@@ -95,7 +95,7 @@ import { NetworkService } from 'src/app/libs/network.service';
           </ion-button>
         </ion-col>
      <ion-col size="6">
-       <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/alimentacion']">
+       <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/alimentacion']" [disabled]="deshabilitado">
          <div>
            <ion-icon name="fast-food-outline"></ion-icon> <br>
            <ion-text>
@@ -176,6 +176,7 @@ export class ReportesPage implements OnInit {
     private networkService: NetworkService,
 
   ) { }
+  deshabilitado: boolean = true;
 
 
   isConnected: boolean;

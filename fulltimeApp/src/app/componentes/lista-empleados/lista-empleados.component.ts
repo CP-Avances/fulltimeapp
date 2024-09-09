@@ -17,7 +17,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
   pageActual: number = 1;
   ver: boolean = true;
-  loading: boolean = true;
+  loading: boolean = false;
   @Input('open') presentModal!: (args: any) => void; //callback function
   @ViewChild(IonInfiniteScroll) infiniteScroll!: IonInfiniteScroll;
 
@@ -75,6 +75,8 @@ export class ListaEmpleadosComponent implements OnInit {
         return this.abrirToas('Ups!, No fue posible conectarse con el servidor', 'danger', 3500, 'bottom')
       });
     } else {
+      this.loading = true;
+
       this.empleados = JSON.parse(emp)
       this.empleados_filtro = [...this.empleados];
       if (this.empleados_filtro.length < 11) {

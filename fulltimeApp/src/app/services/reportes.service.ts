@@ -39,7 +39,7 @@ export class ReportesService {
       .set('fec_inicio', fec_inicio)
       .set('fec_final', fec_final)
       .set('conexion', conexion)
-    return this.http.get<Timbre[]>(`${this.api_url}/reportes/timbresConNovedad`, { params })
+    return this.http.get<Timbre[]>(`${this.api_url}/reporte/timbresConNovedad`, { params })
       .pipe(
         tap(console.log),
         catchError(this.handleError)
@@ -62,6 +62,10 @@ export class ReportesService {
     return this.http.post<any>(`${environment.url}/reporte-faltas/faltas/${inicio}/${fin}`, data);
   }
 
+  BuscarAtrasos(data: any, desde: string, hasta: string) {
+    return this.http.post<any>(`${environment.url}/reporte-atrasos/atrasos-empleados/${desde}/${hasta}`, data);
+  }
+
   getInfoReporteAtrasos(codigo: number, fec_inicio: string, fec_final: string): Observable<any> {
     const params = new HttpParams()
       .set('codigo', codigo)
@@ -73,6 +77,7 @@ export class ReportesService {
         catchError(this.handleError)
       )
   }
+
 
   getInfoReporteHorasExtras(id_empleado: number, codigo: number, fec_inicio: any, fec_final: any): Observable<any> {
     const params = new HttpParams()

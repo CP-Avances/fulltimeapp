@@ -3,6 +3,8 @@ import { ModalController, ToastController } from '@ionic/angular';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
+import { LocalNotifications } from '@capacitor/local-notifications';
+
 import moment from 'moment';
 
 interface checkOptions {
@@ -61,92 +63,20 @@ export class EnviarUsuarioComponent implements OnInit {
     //this.BuscarInformacionGeneral();
     this.loadingEmpleado = true;
     console.log("Ver loadinEmpleado", this.loadingEmpleado)
+    this.requestNotificationPermission();
 
   }
 
-  /*
-    BuscarInformacionGeneral() {
-      // LIMPIAR DATOS DE ALMACENAMIENTO
-      this.departamentos = [];
-      this.sucursales = [];
-      this.empleados = [];
-      this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
-        this.ProcesarDatos(res);
-      }, err => {
-        this.mostrarAlertas("No se ha encontrado información.", 1000, 'danger')
-      })
+  async requestNotificationPermission() {
+    // Solicitar permiso para enviar notificaciones locales
+    const permission = await LocalNotifications.requestPermissions();
+  
+    if (permission.display === 'granted') {
+      console.log('Permiso concedido para notificaciones locales');
+    } else {
+      console.log('Permiso denegado para notificaciones locales');
     }
-  
-    ProcesarDatos(informacion: any) {
-      informacion.forEach((obj: any) => {
-        this.sucursales.push({
-          id: obj.id_suc,
-          sucursal: obj.name_suc
-        })
-  
-        this.departamentos.push({
-          id: obj.id_depa,
-          departamento: obj.name_dep,
-          sucursal: obj.name_suc,
-          id_suc: obj.id_suc,
-          id_regimen: obj.id_regimen,
-        })
-  
-        this.empleados.push({
-          id: obj.id,
-          nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
-          codigo: obj.codigo,
-          cedula: obj.cedula,
-          correo: obj.correo,
-          id_cargo: obj.id_cargo,
-          id_contrato: obj.id_contrato,
-          sucursal: obj.name_suc,
-          id_suc: obj.id_suc,
-          id_regimen: obj.id_regimen,
-          id_depa: obj.id_depa,
-          id_cargo_: obj.id_cargo_, // TIPO DE CARGO
-          hora_trabaja: obj.hora_trabaja,
-        })
-      })
-      this.empleados_filtro = [...this.empleados];
-      this.OmitirDuplicados();
-      this.listLoaded = true;
-    }
-  
-  
-    // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
-    OmitirDuplicados() {
-  
-      // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
-      let verificados_dep = this.departamentos.filter((objeto: any, indice: any, valor: any) => {
-        // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-        for (let i = 0; i < indice; i++) {
-          if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-            return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-          }
-        }
-        return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-      });
-      this.departamentos = verificados_dep;
-      this.departamentos_filtro = [...this.departamentos]
-  
-  
-      // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
-      let verificados_suc = this.sucursales.filter((objeto: any, indice: any, valor: any) => {
-        // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-        for (let i = 0; i < indice; i++) {
-          if (valor[i].id === objeto.id) {
-            return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-          }
-        }
-        return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-      });
-      this.sucursales = verificados_suc;
-      this.sucursales_filtro = [...this.sucursales]
-  
-    }
-  
-  */
+  }
 
   cargarListaSucursales() {
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {

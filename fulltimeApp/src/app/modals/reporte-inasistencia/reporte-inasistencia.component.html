@@ -21,7 +21,8 @@
       <ion-row>
 
         <ion-col size="6">
-          <ion-button color="success" shape="round" expand="full" (click)="consultarDataReporte()" [disabled]="showBtnPdf">
+          <ion-button color="success" shape="round" expand="full" (click)="consultarDataReporte()"
+            [disabled]="showBtnPdf">
 
             <ng-container *ngIf="loading; then consultar; else spiner"></ng-container>
             <ng-template #consultar>
@@ -35,7 +36,7 @@
         </ion-col>
 
         <ion-col size="6">
-          <ion-button color="secondary" shape="round" expand="full" (click)="generarPDF()" [disabled]="!showBtnPdf">
+          <ion-button color="secondary" shape="round" expand="full" (click)="GenerarPDF()" [disabled]="!showBtnPdf">
             <ion-icon name="document-text-outline"></ion-icon>PDF
           </ion-button>
         </ion-col>
@@ -44,23 +45,49 @@
 
     </ion-grid>
 
-    <!--<table id="tablaReporte">
+
+    <div class="info" *ngIf="count != 0">
+      <h5>
+        Faltas encontradas {{count}}
+      </h5>
+    </div>
+    <table id="tablaReporte" style="color: rgb(0, 0, 0);">
       <thead class="header-table">
+
         <tr>
-
-          <td>Fecha y hora</td>
-        
+          <td style="text-align: center;" rowspan="2">N#</td>
+          <td style="text-align: center;" rowspan="2">Cédula</td>
+          <td style="text-align: center;" rowspan="2">Código</td>
+          <td style="text-align: center;" rowspan="2">Empleado</td>
+          <td style="text-align: center;" rowspan="2">Departamento</td>
+          <td style="text-align: center;" rowspan="2">Cargo</td>
+          <td style="text-align: center;" rowspan="2">Fecha</td>
         </tr>
+
       </thead>
+
       <tbody class="detail-table">
-        <tr *ngFor="let v of vacaciones">
-
-          <td>{{v.id}}</td>
-         
+        <tr *ngFor="let t of timbres">
+          <td>{{ t.n }}</td>
+          <td>{{ t.cedula }}</td>
+          <td>{{ t.codigo }}</td>
+          <td>{{ t.empleado }}</td>
+          <td>{{ t.departamento }}</td>
+          <td>{{ t.cargo }}</td>
+          <td>{{ t.fecha }}</td>
         </tr>
-      </tbody>
-    </table>-->
 
+        <tr>
+          <td colspan="8" *ngIf="count != 0">
+            <p>
+              Total atrasos filtrados {{count}}
+            </p>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+    <br><br>
   </ng-template>
 
 </ion-content>

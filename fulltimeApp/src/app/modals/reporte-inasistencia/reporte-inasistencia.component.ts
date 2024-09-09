@@ -6,6 +6,11 @@ import { PlantillaReportesService } from 'src/app/libs/plantilla-reportes.servic
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import moment from 'moment';
 import { ParametrosService } from 'src/app/services/parametros.service';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import { RelojServiceService } from 'src/app/services/reloj-service.service';
+
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-reporte-inasistencia',
@@ -32,6 +37,7 @@ export class ReporteInasistenciaComponent implements OnInit {
   showBtnPdf: boolean = false;
   loading: boolean = true;
   count: number = 0;
+  timbres: any = [];
 
 
   constructor(
@@ -42,11 +48,17 @@ export class ReporteInasistenciaComponent implements OnInit {
     public alertController: AlertController,
     public validar: ValidacionesService,
     public parametro: ParametrosService,
+    private relojService: RelojServiceService,
+
 
   ) { }
 
   ngOnInit() {
     console.log('reporte inasistencia | Data empleado: ', this.data);
+    this.BuscarFormatos();
+    this.obtenerDatosEmpresa(localStorage.getItem('id_empresa'));
+    this.ObtenerLogo();
+    this.ObtenerColores();
   }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
@@ -60,22 +72,71 @@ export class ReporteInasistenciaComponent implements OnInit {
       }
     )
   }
+  empresa: any = {
+    nombre: '',
+    ruc: '',
+    direccion: '',
+    telefono: '',
+    correo: '',
+    representante: '',
+  };
+
+  obtenerDatosEmpresa(idEmpresa: any) {
+    this.relojService.obtenerDatosEmpresa(idEmpresa).subscribe(
+      res => {
+
+        console.log("ver datos empresa", res)
+        console.log(res);
+        this.empresa = res[0];
+      },
+      err => {
+        console.log(err)
+      }
+    );
+  }
 
   consultarDataReporte() {
+    this.timbres = [];
+    let n = 0; // Inicializa n en 0
     console.log('generar reporte...');
     console.log(this.fechaFinal);
     console.log(this.fechaInicio);
     this.listadeUno[0].empleados.push(this.data)
     console.log("ver lista de empleados 1:",  this.listadeUno)
     this.loading = false;
+    
     this.reporteService.BuscarFaltas(this.listadeUno, this.fechaInicio, this.fechaFinal).subscribe(res => {
       this.faltas = res;
       console.log("ver faltas buscadas",  this.faltas)
 
       this.faltas.forEach(data => {
 
-        this.count = this.count + 1;
-        data.num = this.count;
+      
+        data.empleados.forEach((empl: any) => {
+          empl.faltas.forEach((usu: any) => {
+
+
+            const fecha = this.validar.FormatearFecha(usu.fecha_horario, this.formato_fecha, this.validar.dia_completo);
+            n = n + 1;
+            this.count = this.count + 1;
+            data.num = this.count;
+            let ele = {
+              n: n,
+              cedula: empl.cedula,
+              codigo: empl.codigo,
+              empleado: empl.fullname,
+              ciudad: empl.ciudad,
+              sucursal: empl.sucursal,
+              departamento: empl.departamento,
+              cargo: empl.cargo,
+              fecha
+            }
+            this.timbres.push(ele);
+          })
+          console.log("ver timbre ", this.timbres)
+        })
+
+
       })
       this.showBtnPdf = true;
       this.loading = true;
@@ -83,16 +144,16 @@ export class ReporteInasistenciaComponent implements OnInit {
         this.alertLimiteReporte();
       }
     }, err => {
-
       console.log("ver el error", err)
       this.showBtnPdf = false;
       this.loading = true;
       console.log(err);
       this.plantillaPDF.abrirToas(err.error.message, 'danger', 3000)
     })
-
   }
 
+
+ 
   async alertLimiteReporte() {
     const alert = await this.alertController.create({
       header: 'Notificacion',
@@ -108,12 +169,6 @@ export class ReporteInasistenciaComponent implements OnInit {
     await alert.present();
   }
 
-
-  generarPDF() {
-    const filename = 'reporteTimbres.pdf'
-    this.plantillaPDF.generarPdf(this.getDocumentDefinicion(), filename)
-  }
-
   closeModal() {
     console.log('CERRAR MODAL Reporte timbre');
     this.modalController.dismiss({
@@ -121,118 +176,99 @@ export class ReporteInasistenciaComponent implements OnInit {
     });
   }
 
-  getDocumentDefinicion() {
-    var inicio = this.validar.FormatearFecha(this.fechaInicio, this.formato_fecha, this.validar.dia_completo);
-    var fin = this.validar.FormatearFecha(this.fechaFinal, this.formato_fecha, this.validar.dia_completo);
 
-    return {
 
-      pageOrientation: this.plantillaPDF.Orientacion(false),
-      watermark: this.plantillaPDF.MargaDeAgua(),
-      header: this.plantillaPDF.HeaderText(),
-
-      footer: function (currentPage, pageCount, fecha) {
-        const h = new Date();
-        const f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        h.setUTCHours(h.getHours());
-        const time = h.toJSON().split("T")[1].split(".")[0];
-        return {
-          margin: 10,
-          columns: [
-            {
-              text: [{
-                text: 'Fecha: ' + fecha + ' Hora: ' + time,
-                alignment: 'left', opacity: 0.3
-              }]
-            },
-            {
-              text: [{
-                text: '© Pag ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', opacity: 0.3
-              }],
-            }
-          ], fontSize: 10
-        }
-      },
-      content: [
-        this.plantillaPDF.EncabezadoHorizontal('Reporte de Timbres', inicio, fin),
-        this.plantillaPDF.presentarDatosGenerales(this.data),
-        this.EstructurarDatosPDF(this.faltas),
-      ],
-      styles: this.plantillaPDF.estilosPdf()
-    };
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
+  p_color: any;
+  s_color: any;
+  frase: any;
+  ObtenerColores() {
+    this.plantillaPDF.ConsultarDatosEmpresa(parseInt(localStorage.getItem('id_empresa') as string)).subscribe(res => {
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
+      this.frase = res[0].marca_agua;
+    });
   }
 
   
-
-  impresionDatosPDF(data: any[]): Array<any> {
-    let c = 0;
-    return [{
-      style: 'tableMargin',
-      table: {
-        widths: ['auto', '*', '*', '*', '*', 'auto', 'auto', '*', 'auto', 'auto'],
-        body: [
-          [
-            { rowSpan: 2, text: 'N.', style: 'tableHeader' },
-            { colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-            '',
-            { colSpan: 2, text: 'SERVIDOR', style: 'tableHeader' },
-            '',
-            { rowSpan: 2, text: 'RELOJ', style: 'tableHeader' },
-            { rowSpan: 2, text: 'ACCIÓN', style: 'tableHeader' },
-            { rowSpan: 2, text: 'OBSERVACIÓN', style: 'tableHeader' },
-            { rowSpan: 2, text: 'LATITUD', style: 'tableHeader' },
-            { rowSpan: 2, text: 'LONGITUD', style: 'tableHeader' },
-          ],
-          [
-            '',
-            { text: 'FECHA', style: 'tableHeader' },
-            { text: 'HORA', style: 'tableHeader' },
-            { text: 'FECHA', style: 'tableHeader' },
-            { text: 'HORA', style: 'tableHeader' },
-            '', '', '', '', ''
-          ],
-          ...data.map(obj => {
-            c = c + 1
-            let accionT: string = '';
-            switch (obj.accion) {
-              case 'EoS': accionT = 'Entrada o Salida'; break;
-              case 'AES': accionT = 'Entrada o Salida Almuerzo'; break;
-              case 'PES': accionT = 'Entrada o Salida Permiso'; break;
-              case 'E': accionT = 'Entrada'; break;
-              case 'S': accionT = 'Salida'; break;
-              case 'E/A': accionT = 'Entrada Almuerzo'; break;
-              case 'S/A': accionT = 'Salida Almuerzo'; break;
-              case 'E/P': accionT = 'Entrada Permiso'; break;
-              case 'S/P': accionT = 'Salida Permiso'; break;
-              case 'HA': accionT = 'Horario Abierto'; break;
-              default: accionT = 'codigo 99'; break;
-            }
-
-            return [
-              { style: 'itemsTableCentrado', text: c },
-              { style: 'itemsTable', text: obj.fecha },
-              { style: 'itemsTable', text: obj.hora },
-              { style: 'itemsTable', text: (obj.fecha_hora_timbre_servidor === null) ? '' : obj.sfecha },
-              { style: 'itemsTable', text: (obj.fecha_hora_timbre_servidor === null) ? '' : obj.shora },
-              { style: 'itemsTable', text: obj.id_reloj },
-              { style: 'itemsTable', text: accionT },
-              { style: 'itemsTable', text: obj.observacion },
-              { style: 'itemsTable', text: (obj.longitud === null) ? '' : obj.longitud.slice(0, 9) },
-              { style: 'itemsTable', text: (obj.latitud === null) ? '' : obj.latitud.slice(0, 9) },
-            ]
-          })
-
-        ]
-      },
-      layout: {
-        fillColor: function (rowIndex) {
-          return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-        }
-      }
-    }]
+  logo: any = String;
+  ObtenerLogo() {
+    this.plantillaPDF.LogoEmpresaImagenBase64(localStorage.getItem('id_empresa') as string).subscribe(res => {
+      this.logo = 'data:image/jpeg;base64,' + res.imagen;
+    });
   }
 
+
+  GenerarPDF() {
+    let documentDefinition: any;
+    documentDefinition = this.DefinirInformacionPDF();
+    let doc_name = `Faltas_usuario.pdf`;
+    this.plantillaPDF.generarPdf(documentDefinition, doc_name)
+
+    //pdfMake.createPdf(documentDefinition).download(doc_name);
+ 
+  }
+
+  DefinirInformacionPDF() {
+
+    var inicio = this.validar.FormatearFecha(this.fechaInicio, this.formato_fecha, this.validar.dia_completo);
+    var fin = this.validar.FormatearFecha(this.fechaFinal, this.formato_fecha, this.validar.dia_completo);
+    return {
+      pageSize: 'A4',
+      pageOrientation: 'portrait',
+      pageMargins: [40, 50, 40, 50],
+      watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
+      header: { text: 'Impreso por:  ' + localStorage.getItem('nom') + ' ' +localStorage.getItem('ap') , margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
+      footer: function (currentPage: any, pageCount: any, fecha: any) {
+        let f = moment();
+        fecha = f.format('YYYY-MM-DD');
+        let time = f.format('HH:mm:ss');
+        return {
+          margin: 10,
+          columns: [
+            { text: 'Fecha: ' + fecha + ' Hora: ' + time, opacity: 0.3 },
+            {
+              text: [
+                {
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount,
+                  alignment: 'right', opacity: 0.3
+                }
+              ],
+            }
+          ],
+          fontSize: 10
+        }
+      },
+      content: [
+        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
+        { text: this.empresa.nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: `FALTAS - USUARIOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+        { text: 'PERIODO DEL: ' + inicio + " AL " + fin, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
+        ...this.EstructurarDatosPDF(this.faltas).map((obj: any) => {
+          return obj
+        })
+      ],
+      styles: {
+        derecha: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color, alignment: 'left' },
+        tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 1, 0, 1] },
+        itemsTable: { fontSize: 8 },
+        itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
+        itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0], fillColor: '#E3E3E3' },
+        itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2], fillColor: '#E3E3E3' },
+        itemsTableCentrado: { fontSize: 8, alignment: 'center' },
+        itemsTableDerecha: { fontSize: 8, alignment: 'right' },
+        itemsTableInfoTotal: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.s_color },
+        itemsTableTotal: { fontSize: 8, bold: true, alignment: 'right', fillColor: '#E3E3E3' },
+        itemsTableCentradoTotal: { fontSize: 8, bold: true, alignment: 'center', fillColor: '#E3E3E3' },
+        tableMargin: { margin: [0, 0, 0, 0] },
+        tableMarginCabecera: { margin: [0, 15, 0, 0] },
+        tableMarginCabeceraEmpleado: { margin: [0, 10, 0, 0] },
+        tableMarginCabeceraTotal: { margin: [0, 20, 0, 0] },
+        quote: { margin: [5, -2, 0, -2], italics: true },
+        small: { fontSize: 8, color: 'blue', opacity: 0.5 }
+      }
+    };
+  }
 
   EstructurarDatosPDF(data: any[]): Array<any> {
     let totalFaltasEmpleado: number = 0;
@@ -256,7 +292,7 @@ export class ReporteInasistenciaComponent implements OnInit {
       let informacion = {
         sucursal: selec.sucursal,
         nombre: opcion,
-        faltas: 8,
+        faltas: reg,
       }
       general.push(informacion);
 
@@ -351,9 +387,13 @@ export class ReporteInasistenciaComponent implements OnInit {
                 { text: 'FECHA', style: 'tableHeader' },
               ],
               ...empl.faltas.map((usu: any) => {
-                const fecha = this.validar.FormatearFecha(usu.fecha_horario, this.formato_fecha, this.validar.dia_abreviado);
+                const fecha = this.validar.FormatearFecha(usu.fecha_horario , this.formato_fecha, this.validar.dia_completo);
+                console.log("ver fecha formateada",fecha )
+                usu.fechaFormat= fecha;
                 totalFaltasEmpleado++;
                 c = c + 1;
+                usu.conteo = c
+
                 return [
                   { style: 'itemsTableCentrado', text: c },
                   { style: 'itemsTableCentrado', text: fecha },
