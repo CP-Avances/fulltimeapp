@@ -102,12 +102,17 @@
         <ion-avatar slot="start">
           <ion-icon name="person-circle-outline" color="theme" style="font-size: 30px;"></ion-icon>
         </ion-avatar>
-        <ion-label>
-
+        <ion-label *ngIf="e.id_rol==1 || e.id_rol==2">
           <h2> {{e.fullname}}</h2>
-
           <ion-text color="success">
-            <p *ngIf="e.id_rol==1" color="success"> Administrador </p>
+            <p  color="success"> {{e.name_rol}} </p>
+          </ion-text>
+       
+        </ion-label>
+        <ion-label *ngIf="e.id_rol>2 ">
+          <h2> {{e.fullname}}</h2>
+          <ion-text color="theme">
+            <p  color="theme"> {{e.name_rol}} </p>
           </ion-text>
         </ion-label>
 

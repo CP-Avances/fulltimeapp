@@ -18,6 +18,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
 
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { File } from '@ionic-native/file/ngx';
+import { Diagnostic } from '@ionic-native/diagnostic/ngx';
 
 // Cambiar el local de la APP
 import localEsEC from '@angular/common/locales/es-EC';
@@ -47,6 +48,7 @@ const config: SocketIoConfig = { url: "http://186.4.226.49:3002", options: {}};
   ],
   providers: [
     File,
+    Diagnostic,
     FileOpener,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     AutenticacionGuard,{

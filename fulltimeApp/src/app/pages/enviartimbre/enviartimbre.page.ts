@@ -5,23 +5,20 @@ import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { DataUserLoggedService } from '../../services/data-user-logged.service';
-
-
 import { FingerprintAIO } from '@ionic-native/fingerprint-aio';
 import { Geolocation } from '@capacitor/geolocation';
 import { Device } from '@capacitor/device';
 import { BiometricAuth } from 'capacitor-biometric-auth';
-
 import { Timbre } from "../../interfaces/Timbre";
-
 import { DataLocalService } from '../../libs/data-local.service';
 import { NetworkService } from '../../libs/network.service';
-
 //Servicios
 import { RelojServiceService } from "../../services/reloj-service.service";
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
 import { Camera, CameraDirection, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
+import { Diagnostic } from '@ionic-native/diagnostic/ngx';
+
 
 
 @Component({
@@ -60,7 +57,7 @@ export class EnviartimbrePage implements OnInit {
     public parametros: ParametrosService,
     private router: Router,
     private userService: DataUserLoggedService,
-
+    private diagnostic: Diagnostic
   ) { }
 
   ngOnInit() {
@@ -116,8 +113,9 @@ export class EnviartimbrePage implements OnInit {
   novedades_conexion: string = "";
 
   networkSubscriber() {
-    this.networkService.getNetworkStatus().subscribe((connected: boolean) => {
-      this.isConnected = connected;
+
+    this.isConnected = this.networkService.getNetworkStatusDispositivo();
+
       if (!this.isConnected) {
         this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "bottom");
         console.log('Desconectado');
@@ -136,16 +134,20 @@ export class EnviartimbrePage implements OnInit {
           //this.obtenerPosicion();
         }
       }
-    });
   }
 
   //UBICACION
   async comprobarGPS() {
+
     const checkPermissions = async () => {
+
       const permiso = await Geolocation.checkPermissions().then((isAvailable) => {
         if (isAvailable) {
           this.obtenerPosicion();
         } else {
+          
+          this.isConnected = this.networkService.getNetworkStatusDispositivo();
+
           if (this.isConnected) {
             this.abrirToas('Ups, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "bottom");
           }
@@ -153,9 +155,21 @@ export class EnviartimbrePage implements OnInit {
       }).catch(
         (e) => console.error(e)
       )
-    }
 
+    }
     return checkPermissions();
+
+  }
+
+  async isLocationEnabled() {
+    // Aquí puedes usar un plugin como Diagnostic para verificar si el GPS está encendido
+    try {
+      const isEnabled = await this.diagnostic.isLocationEnabled();
+      return isEnabled;
+    } catch (error) {
+      console.error('Error checking if GPS is enabled:', error);
+      return false;
+    }
   }
 
   async obtenerPosicion() {
@@ -329,21 +343,29 @@ export class EnviartimbrePage implements OnInit {
     //comprueba si estamos en un emulador o PC para envíar el timbre
     this.BuscarParametroTimbreSinInternet();
     this.BuscarParametroTimbreUbicacionDesconocida();
-
-    if ((this.platform.is('ios')) || (this.platform.is('android')) || (this.platform.is('capacitor'))) {
-      console.log("Entrando en TIMBRES VER")
-
-      //this.identificarUsuario();
-      this.BuscarParametroTimbreConFoto();
-      this.iniciarProcesoFoto();
+    if(this.geoLongitude == 0){
+      this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "danger", 3000, "bottom");
+    }else{
+      if ((this.platform.is('ios')) || (this.platform.is('android')) || (this.platform.is('capacitor'))) {
+        console.log("Entrando en TIMBRES VER")
+  
+        //this.identificarUsuario();
+        
+        this.BuscarParametroTimbreConFoto();
+        this.iniciarProcesoFoto();
+      }
+      else {
+        console.log("Entrando en web")
+        this.abrirToas('No se detecto autenticación, se guardara el timbre con esta observación.', "warning", 2000, "bottom");
+        this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
+        this.BuscarParametroTimbreConFoto();
+        this.iniciarProcesoFoto();
+      }
     }
-    else {
-      console.log("Entrando en web")
-      this.abrirToas('No se detecto autenticación, se guardara el timbre con esta observación.', "warning", 2000, "bottom");
-      this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
-      this.BuscarParametroTimbreConFoto();
-      this.iniciarProcesoFoto();
-    }
+
+    
+
+ 
   }
 
   obtenerIdTipo(): string {
@@ -487,6 +509,7 @@ export class EnviartimbrePage implements OnInit {
     if (this.nuevoTimbre.accion === "HA" && this.nuevoTimbre.observacion === null) return this.abrirToas('Lo siento! Debes ingresar una observación antes de enviar un timbre abierto 😅', "danger", 5000, "bottom");
     if (this.nuevoTimbre.accion === "HA" && this.nuevoTimbre.observacion === "") return this.abrirToas('Lo siento! Debes ingresar una observación antes de enviar un timbre abierto 😅', "danger", 5000, "bottom");
 
+    this.isConnected = this.networkService.getNetworkStatusDispositivo();
 
     if (this.isConnected == true) {
       if (this.geoLatitude == 0) return this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "danger", 3000, "bottom");

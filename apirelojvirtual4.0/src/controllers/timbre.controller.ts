@@ -52,13 +52,7 @@ export const crearTimbre = async (req: Request, res: Response) => {
         const restaTimbresMinutos = timbreRV.getMinutes() - hoy.getMinutes();
         const restaTimbresDias = timbreRV.getDate() - hoy.getDate();
         if (restaTimbresDias != 0 || restaTimbresHoras != 0 || restaTimbresMinutos > 3 || restaTimbresMinutos < -3) {
-            if (restaTimbresHoras == 1 && restaTimbresMinutos > 58 && restaTimbresMinutos < -58) {
-                timbre.hora_timbre_diferente = false;
-            } else if (restaTimbresDias == 1 && restaTimbresHoras == 23 || restaTimbresHoras == -23 && restaTimbresMinutos > 58 && restaTimbresMinutos < -58) {
-                timbre.hora_timbre_diferente = false;
-            } else {
-                timbre.hora_timbre_diferente = true;
-            }
+            timbre.hora_timbre_diferente = true;
         } else {
             timbre.hora_timbre_diferente = false;
         }

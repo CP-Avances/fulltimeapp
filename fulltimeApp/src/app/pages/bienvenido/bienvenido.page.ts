@@ -52,7 +52,6 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.startClock();
-    this.VerificarFunciones();
     const subscription = interval(10000) // Intervalo de 1 hora en milisegundos
       .pipe(
         switchMap(() => this.checkSession(localStorage.getItem("empleadoID")))
@@ -64,12 +63,12 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       );
     this.autorizacionesServices.setSubscription(subscription); // Guardar la suscripción en el servicio
     this.networkSubscriber();
+    this.refreshNavegadorAdmin();
 
   }
+
   ionViewWillEnter() {
     this.startClock();
-    //this.VerificarFunciones();
-
     this.networkSubscriber();
     this.refreshNavegadorAdmin();
   }
@@ -131,33 +130,32 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     if (!this.isConnected) {
       this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "bottom");
       console.log('Desconectado');
-      this.colorIp = "primary"
-      this.colorFp = "dark"
-
+      this.colorIp = localStorage.getItem("colorIp")
+      this.colorFp = localStorage.getItem("colorFp")
     } else {
       console.log('conectado');
       this.BuscarParametroTimbreSinInternet();
-
       this.VerificarFunciones();
     }
   }
 
-
   async VerificarTimbresSinInternet(accion: string) {
-    await this.BuscarParametroTimbreSinInternet();
 
-    // Después de que BuscarParametroTimbreSinInternet() se complete
-    if (localStorage.getItem('timbrarSinInternet') === "Si") {
-      this.router.navigate(['/enviartimbre', accion]);
+    if (this.networkService.getNetworkStatusDispositivo() == true) {
+      this.parametros.ObtenerDetallesParametros(13).subscribe(
+        res => {
+          localStorage.setItem('timbrarSinInternet', res[0].descripcion);
+            this.router.navigate(['/enviartimbre', accion]);       
+        },
+      );
     } else {
-      if (!this.isConnected) {
-        this.abrirToas('No puede realizar tímbres sin conexión a Internet', "danger", 3000, "bottom");
-      } else {
+      if (localStorage.getItem("timbrarSinInternet") == "Si") {
         this.router.navigate(['/enviartimbre', accion]);
+      } else {
+        this.abrirToas('No puede realizar tímbres sin conexión a Internet', "danger", 3000, "bottom");
       }
-    }
+    };
   }
-
   BuscarParametroTimbreSinInternet() {
 
     this.parametros.ObtenerDetallesParametros(13).subscribe(
@@ -179,7 +177,6 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   }
 
 
-
   VerificarFunciones() {
     this.parametros.ObtenerFunciones().subscribe(res => {
       this.funciones = res[0];
@@ -187,15 +184,16 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       if (this.apro_permisos == true) {
         this.colorIp = "primary"
         this.colorFp = "dark"
-
+        localStorage.setItem("colorIp", "primary")
+        localStorage.setItem("colorFp", "dark")
       } else {
         this.colorIp = "deshabilitado"
         this.colorFp = "deshabilitado"
-
+        localStorage.setItem("colorIp", "deshabilitado")
+        localStorage.setItem("colorFp", "deshabilitado")
       }
     }
-  );
-
+    );
   }
 
   btn_InicioPermisosClick() {
