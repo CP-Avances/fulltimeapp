@@ -35,7 +35,7 @@ import { Permiso } from 'src/app/interfaces/Permisos';
     </p>
 
     <p align=left style="font-size: 12px; margin-top:-2%;">
-      <strong> Calculo </strong><br>
+      <strong> Cálculo </strong><br>
       <strong>Días: </strong> {{ permiso.dias_permiso }} - 
       <strong>Horas permiso: </strong> {{ permiso.horas_permiso }}
     </p>

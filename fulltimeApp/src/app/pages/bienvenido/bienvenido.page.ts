@@ -152,7 +152,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       if (localStorage.getItem("timbrarSinInternet") == "Si") {
         this.router.navigate(['/enviartimbre', accion]);
       } else {
-        this.abrirToas('No puede realizar tímbres sin conexión a Internet', "danger", 3000, "bottom");
+        this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "bottom");
       }
     };
   }
@@ -205,7 +205,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
         this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
 
       } else {
-        this.abrirToas('No puede realizar tímbres sin conexión a Internet', "danger", 3000, "bottom");
+        this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "bottom");
       }
 
     } else {
@@ -221,7 +221,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
         this.router.navigate(['/enviartimbre', 'Fin de permiso']);
 
       } else {
-        this.abrirToas('No puede realizar tímbres sin conexión a Internet', "danger", 3000, "bottom");
+        this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "bottom");
       }
     } else {
       this.mostrarToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.");

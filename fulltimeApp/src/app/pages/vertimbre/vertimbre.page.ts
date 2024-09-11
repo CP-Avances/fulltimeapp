@@ -317,7 +317,7 @@ export class VertimbrePage implements OnInit {
       const rutaMapa = "https://maps.google.com/?q=" + latitud + " , " + longitud
       window.open(rutaMapa);
     } else {
-      return this.mostrarToas('Lo sentimos no tiene las coordenadas de Ubicacion registradas', 3000, "danger");
+      return this.mostrarToas('Lo sentimos no tiene las coordenadas de Ubicación registradas', 3000, "danger");
     }
   }
   // FIN ABRIR MAPA 

@@ -16,7 +16,7 @@ import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
       <h6>
         <p style="font-size: 12px; margin-top:-4%;"> Solicita {{ VacacionDato.nperivacacion }}</p>
 
-        <ion-card-title style="margin-top:-2%; margin-bottom:-3%; font-size: 12px;"><b> Informacion </b></ion-card-title>
+        <ion-card-title style="margin-top:-2%; margin-bottom:-3%; font-size: 12px;"><b> Información </b></ion-card-title>
         <p style="font-size: 11px; margin: top -0.5em;">
           <strong> Usuario - </strong>{{ VacacionDato.nempleado | titlecase }} &nbsp;
           <strong> Código - </strong>{{ VacacionDato.codigo }}<br> 

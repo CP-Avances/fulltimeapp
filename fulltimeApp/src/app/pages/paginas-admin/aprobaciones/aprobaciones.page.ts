@@ -255,7 +255,7 @@ export class AprobacionesPage implements OnInit {
     }else if(this.Btn_permisos == false){
       this.usuarioIncorrectoToas("Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.\n\nTe gustaría activarlo?");
     }else{
-      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion. \n Comprueba tu conexion a internet o");
+      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexión. \n Comprueba tu conexión a internet o");
     }
   }
 
@@ -265,7 +265,7 @@ export class AprobacionesPage implements OnInit {
     }else if(this.Btn_horasExtras == false){
       this.usuarioIncorrectoToas("Ups!!! al parecer no tienes activado en tu plan el Módulo de Horas Extras.\n\nTe gustaría activarlo?");
     }else{
-      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion. \n Comprueba tu conexion a internet o");
+      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexión. \n Comprueba tu conexión a internet o");
     }
   }
 
@@ -275,7 +275,7 @@ export class AprobacionesPage implements OnInit {
     }else if(this.Btn_alimentacion == false){
       this.usuarioIncorrectoToas("  Ups!!! al parecer no tienes activado en tu plan el Módulo de Alimentación.\n\nTe gustaría activarlo?");
     }else{
-      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion.\n Comprueba tu conexion a internet o");
+      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexión.\n Comprueba tu conexión a internet o");
     }
   }
 
@@ -285,7 +285,7 @@ export class AprobacionesPage implements OnInit {
     }else if(this.Btn_vacaciones == false){
       this.usuarioIncorrectoToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Vacaciones.\n\nTe gustaría activarlo?");
     }else{
-      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion. \n Comprueba tu conexion a internet o");
+      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexión. \n Comprueba tu conexión a internet o");
     }
   }
 

@@ -269,7 +269,7 @@ export class SolicitudesPage implements OnInit {
     } else if (this.Btn_permisos == false) {
       this.usuarioIncorrectoToas("Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.\n\nTe gustaría activarlo?");
     } else {
-      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion. \n Comprueba tu conexion a internet o");
+      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexión. \n Comprueba tu conexión a internet o");
     }
   }
 
@@ -279,7 +279,7 @@ export class SolicitudesPage implements OnInit {
     } else if (this.Btn_horasExtras == false) {
       this.usuarioIncorrectoToas("Ups!!! al parecer no tienes activado en tu plan el Módulo de Horas Extras.\n\nTe gustaría activarlo?");
     } else {
-      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion. \n Comprueba tu conexion a internet o");
+      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexión. \n Comprueba tu conexión a internet o");
     }
   }
 

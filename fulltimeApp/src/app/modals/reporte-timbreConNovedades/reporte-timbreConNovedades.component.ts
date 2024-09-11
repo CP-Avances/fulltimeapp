@@ -142,7 +142,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
   async alertLimiteReporte() {
     const alert = await this.alertController.create({
       header: 'Notificacion',
-      message: 'El limite de timbres de reporte son 100. \n Contactese con el Administrador del sistema para optener timbres mas antiguos',
+      message: 'El limite de timbres de reporte son 100. \n Contactese con el Administrador del sistema para optener timbres más antiguos',
       buttons: [
         {
           text: 'OK',

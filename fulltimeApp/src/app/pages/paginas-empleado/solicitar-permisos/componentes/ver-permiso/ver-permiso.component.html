@@ -34,7 +34,7 @@
   </ion-grid>
 
   <div style="text-align: center;">
-    <ion-text style="font-size: 80%; margin:6% 0% -2% 2%; margin-top: 2%;"> Informacion
+    <ion-text style="font-size: 80%; margin:6% 0% -2% 2%; margin-top: 2%;"> Información
       de la Solicitud </ion-text>
   </div>
 
@@ -77,7 +77,7 @@
     </ion-item>
   </div>
 
-  <ion-text class="text_info"> Informacion Fecha </ion-text>
+  <ion-text class="text_info"> Información Fecha </ion-text>
   <div class="formdiv">
     <ion-item class="item_fondo" mode="md">
       <ion-label>
@@ -133,15 +133,15 @@
     </ion-row>
   </ion-grid>
 
-  <ion-text class="text_info"> Informacion Tiempo Calculado </ion-text>
+  <ion-text class="text_info"> Información Tiempo Calculado </ion-text>
   <ion-grid style="margin-top: -2%;" mode="md">
     <ion-row>
       <ion-col size="6">
         <div class="formdiv_tiempo">
           <ion-item class="item_fondo" mode="md">
             <ion-label>
-              <b style="font-size: 85%;"> Dias Permiso  </b> <br>
-              <p style="margin-top: 3%; margin-left: 4%;"> {{ permiso.dias_permiso }} dias</p>
+              <b style="font-size: 85%;"> Días Permiso  </b> <br>
+              <p style="margin-top: 3%; margin-left: 4%;"> {{ permiso.dias_permiso }} días</p>
             </ion-label>
           </ion-item>
         </div>
@@ -156,13 +156,13 @@
             </ion-label>
 
             <ion-label *ngIf="permiso.dias_permiso !== 0 && permiso.horas_permiso === '00:00:00' ">
-              <b style="font-size: 85%;"> Dias Libres </b><br>
-              <p style="margin-top: 3%; margin-left: 4%;"> {{ permiso.dia_libre }} dias</p>
+              <b style="font-size: 85%;"> Días Libres </b><br>
+              <p style="margin-top: 3%; margin-left: 4%;"> {{ permiso.dia_libre }} días</p>
             </ion-label>
 
             <ion-label *ngIf="permiso.dias_permiso !== 0 && permiso.horas_permiso !== '00:00:00' ">
-              <b style="font-size: 85%;"> Dias Libres </b><br>
-              <p style="margin-top: 3%; margin-left: 4%;"> {{ permiso.dia_libre }} dias</p>
+              <b style="font-size: 85%;"> Días Libres </b><br>
+              <p style="margin-top: 3%; margin-left: 4%;"> {{ permiso.dia_libre }} días</p>
             </ion-label>
           </ion-item>
         </div>

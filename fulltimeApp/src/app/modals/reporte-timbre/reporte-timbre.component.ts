@@ -20,6 +20,12 @@ import { ValidacionesService } from 'src/app/libs/validaciones.service';
 export class ReporteTimbreComponent implements OnInit {
 
   @Input() data: any;
+  listadeUno: any = [
+    { 
+      nombre: 'Empleados', 
+      empleados: [] // Lista vacía de empleados
+    }
+  ];
 
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
@@ -87,43 +93,62 @@ export class ReporteTimbreComponent implements OnInit {
     )
   }
 
+  data_pdf: any = [];
+
   consultarDataReporte() {
-    console.log('generar reporte...');
-    this.loading = false;
-    this.reporteService.getInfoReporteTimbres(this.data.codigo, this.fechaInicio, this.fechaFinal).subscribe(res => {
-      this.timbres = res;
-      this.timbres.forEach(data => {
-        data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_abreviado);
-        data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+    this.data_pdf = [];
+    /*
+        console.log('generar reporte...');
+        this.loading = false;
+        this.reporteService.getInfoReporteTimbres(this.data.codigo, this.fechaInicio, this.fechaFinal).subscribe(res => {
+          this.timbres = res;
+          this.timbres.forEach(data => {
+            data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_abreviado);
+            data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+    
+            data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
+            data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
+    
+            if (data.latitud == null || data.latitud == undefined) {
+              data.latitud = '0';
+            }
+    
+            if (data.longitud == null || data.longitud == undefined) {
+              data.longitud = '0';
+            }
+    
+            this.count = this.count + 1;
+            data.num = this.count;
+          })
+          console.log('data_consultada ...', this.timbres)
+          this.showBtnPdf = true;
+          this.loading = true;
+    
+          if (this.count == 100) {
+            this.alertLimiteReporte();
+          }
+    
+        }, err => {
+          this.showBtnPdf = false;
+          this.loading = true;
+          console.log(err);
+          this.plantillaPDF.abrirToas(err.error.message, 'danger', 3000)
+        })
+        */
+        this.listadeUno[0].empleados= this.data
+        const fechaI = new Date(this.fechaInicio);
+        const fechaFormateadaInicio = fechaI.toISOString().split('T')[0];
+        const fechaF = new Date(this.fechaFinal);
+        const fechaFormateadaFin = fechaF.toISOString().split('T')[0];
 
-        data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
-        data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
-
-        if (data.latitud == null || data.latitud == undefined) {
-          data.latitud = '0';
-        }
-
-        if (data.longitud == null || data.longitud == undefined) {
-          data.longitud = '0';
-        }
-
-        this.count = this.count + 1;
-        data.num = this.count;
-      })
-      console.log('data_consultada ...', this.timbres)
-      this.showBtnPdf = true;
-      this.loading = true;
-
-      if (this.count == 100) {
-        this.alertLimiteReporte();
-      }
+    this.reporteService.ReporteTimbresMultiple(this.listadeUno,  fechaFormateadaInicio,  fechaFormateadaFin).subscribe(res => {
+      this.data_pdf = res;
 
     }, err => {
-      this.showBtnPdf = false;
-      this.loading = true;
-      console.log(err);
       this.plantillaPDF.abrirToas(err.error.message, 'danger', 3000)
     })
+
+
 
   }
 
@@ -270,7 +295,7 @@ export class ReporteTimbreComponent implements OnInit {
         { text: this.empresa.nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
         { text: `TIMBRES`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         { text: 'PERIODO DEL: ' + inicio + " AL " + fin, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
-        ...this.EstructurarDatosPDF(this.timbres).map((obj: any) => {
+        ...this.EstructurarDatosPDF(this.data_pdf).map((obj: any) => {
           return obj
         })
       ],
@@ -298,7 +323,7 @@ export class ReporteTimbreComponent implements OnInit {
     let n: any = []
     let descripcion = '';
 
-    let reg = this.timbres.length
+    let reg = this.data_pdf.length
     let establecimiento = 'SUCURSAL: ' + data.sucursal;
 
     descripcion = 'LISTA EMPLEADOS';
@@ -376,7 +401,7 @@ export class ReporteTimbreComponent implements OnInit {
         ],
       },
     });
- 
+
     n.push({
       style: 'tableMargin',
       table: {

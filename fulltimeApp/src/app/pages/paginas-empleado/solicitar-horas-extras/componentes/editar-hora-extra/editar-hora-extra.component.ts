@@ -288,7 +288,7 @@ export class EditarHoraExtraComponent implements OnInit {
 
     //Condicion que valida el tiempo calculado de horas con la jornada laboral la cual es el numero de horas en segundos que trabaja el empleado
     if(total > 86400){
-      this.validar.showToast('Ups!, lo sentimos el rango de horas excede el dia completo', 3500, 'warning');
+      this.validar.showToast('Ups!, lo sentimos el rango de horas excede el día completo', 3500, 'warning');
       return false;
     }
 
@@ -354,12 +354,12 @@ export class EditarHoraExtraComponent implements OnInit {
       if(this.archivoSubido[0].size >= 2e+6){
         this.archivoSubido = null;
         this.reg.docu_nombre = '';
-        this.mensajeFile = "Ingrese un archivo maximo de 2Mb";
-        this.validar.showToast('Ups el archivo pesa mas de 2Mb',3500, 'danger');
+        this.mensajeFile = "Ingrese un archivo máximo de 2Mb";
+        this.validar.showToast('Ups el archivo pesa más de 2Mb',3500, 'danger');
       }else if(this.archivoSubido[0].name.length > 50){
         this.archivoSubido = null;
         this.reg.docu_nombre = '';
-        this.mensajeFile = "El nombre debe tener 50 caracteres como maximo";
+        this.mensajeFile = "El nombre debe tener 50 caracteres como máximo";
         this.validar.showToast('Ups el nombre del archivo es muy largo', 3500, 'warning');
       }else{
         console.log(this.archivoSubido[0].name);

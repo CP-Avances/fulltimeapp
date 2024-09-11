@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController, PopoverController, NavParams } from '@ionic/angular';
+import { ModalController, PopoverController, NavParams, ToastController } from '@ionic/angular';
 import { AutorizacionesService } from '../../services/autorizaciones.service';
 import { Notificacion } from '../../interfaces/Notificaciones';
 import { NotificacionTimbre } from '../../interfaces/Notificaciones';
@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 
+import { NetworkService } from '../../libs/network.service';
 
 @Component({
   selector: 'app-lista-notificacion',
@@ -44,12 +45,17 @@ export class ListaNotificacionComponent implements OnInit {
     private vistonotificacion: NotificacionesService,
     public modalController: ModalController,
     private userService: DataUserLoggedService,
+    private networkService: NetworkService,
+    private toastController: ToastController,
+
 
   ) { 
     this.id_noti =this.navParams.get('id')
   }
 
   ngOnInit() {
+
+    this.networkSubscriber();
     const id_empleado = localStorage.getItem('empleadoID')
     this.notificacionService.getNotificacionesByIdEmpleado(id_empleado + '').subscribe(
       notificacion => {
@@ -116,6 +122,29 @@ export class ListaNotificacionComponent implements OnInit {
     )
 
   }
+
+  isConnected: boolean;
+
+  networkSubscriber() {
+    this.isConnected = this.networkService.getNetworkStatusDispositivo();
+    console.log("Esta conectado: ", this.isConnected)
+    if (!this.isConnected) {
+      this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "bottom");
+
+    } else {
+  
+    }
+  }
+  async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: duracion,
+      color: color,
+      position: position
+    });
+    toast.present();
+  }
+
 
   tiponotificacion(noti: {id: any,  id_permiso: string; id_vacaciones: string; id_hora_extra: string; visto: boolean, tipo: number }) {
     if (noti.visto === true) {

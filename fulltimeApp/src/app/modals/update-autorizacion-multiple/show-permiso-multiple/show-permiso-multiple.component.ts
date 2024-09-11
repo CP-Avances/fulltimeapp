@@ -16,7 +16,7 @@ import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
           
   
         <h6>
-          <ion-card-title style="margin-top:-2%; margin-bottom:2%; font-size: 12px;"><b> Informacion </b></ion-card-title>
+          <ion-card-title style="margin-top:-2%; margin-bottom:2%; font-size: 12px;"><b> Información </b></ion-card-title>
 
           <p style="font-size: 12px; margin-top:-2%;"> Solicita Permiso por {{ PermisoDato.ntipopermiso | titlecase }}</p>
           <p style="font-size: 12px; margin-top:-2%;" *ngIf="PermisoDato.descripcion != null">Descripcion<br>{{ PermisoDato.descripcion }}</p>
@@ -33,7 +33,7 @@ import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
             <strong> Hora inicia: </strong> {{ PermisoDato.hora_salida_ }} - 
             <strong> Hora finaliza:</strong> {{ PermisoDato.hora_ingreso_ }} <br>
             <strong> Permiso - Horas: </strong> {{ PermisoDato.horas_permiso }} /&nbsp;
-            <strong> Dias: </strong> {{ PermisoDato.dia }} <br>
+            <strong> Días: </strong> {{ PermisoDato.dia }} <br>
             <br>
             <ion-card-title style="margin-top:-2%; margin-bottom:-3%; font-size: 100%; float: right;"> <b> Fecha solicitada:</b> {{ PermisoDato.fec_creacion_ }}</ion-card-title> 
           </p>

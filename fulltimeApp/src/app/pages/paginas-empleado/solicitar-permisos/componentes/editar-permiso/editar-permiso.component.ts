@@ -327,7 +327,7 @@ export class EditarPermisoComponent implements OnInit {
 
       if (this.cg_permiso.id == this.reg.id_tipo_permiso) {
         const num_maxPermiso = this.cg_permiso.dias_maximo_permiso;
-        console.log('Dias maximo ', this.cg_permiso.dias_maximo_permiso);
+        console.log('Dias máximo ', this.cg_permiso.dias_maximo_permiso);
 
         const permilegalizado = this.cg_permiso.legalizar;
 
@@ -351,7 +351,7 @@ export class EditarPermisoComponent implements OnInit {
           this.informacion_comida = `Aplica descuento de minutos de alimentación si el permiso es solicitado por horas y se encuentra dentro del horario de alimentación.`;
         }
 
-        this.validaciones.abrirToas(' Dias maximos de Permiso - ' + num_maxPermiso, 3000, 'tertiary', 'top');
+        this.validaciones.abrirToas(' Días máximos de Permiso - ' + num_maxPermiso, 3000, 'tertiary', 'top');
         return console.log('Se requiere documento ', this.required), this.cg_permiso.dias_maximo_permiso;
       }
     }
@@ -396,8 +396,8 @@ export class EditarPermisoComponent implements OnInit {
       message: `<div class="card-alert">
                   <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                   <br>
-                  <p> Ups! El dia que ingreso esta fuera de su calendario laboral </p>
-                  <p> Por favor cambie a un dia dentro de su calendario </p>
+                  <p> Ups! El día que ingreso esta fuera de su calendario laboral </p>
+                  <p> Por favor cambie a un día dentro de su calendario </p>
                 </div>`,
       buttons: [
         {
@@ -515,7 +515,7 @@ export class EditarPermisoComponent implements OnInit {
               this.btnOculto = true;
               return this.readonly = false;
             } else if ((this.dia_inicio <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD') && (this.dia_fianl >= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD')))) {
-              this.validaciones.showToast('El rango de dias de permiso estan reservados, no puede pedir en el rango de ' + moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD') + ' - ' + moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'), 4000, 'warning');
+              this.validaciones.showToast('El rango de días de permiso estan reservados, no puede pedir en el rango de ' + moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD') + ' - ' + moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'), 4000, 'warning');
               this.valoresDefectoValidacionHoras();
               this.btnOculto = true;
               return this.readonly = false;
@@ -578,7 +578,7 @@ export class EditarPermisoComponent implements OnInit {
           }
         } else if (item.entrada < item.salida) {
           if (this.dia_inicio != this.dia_fianl) {
-            this.validaciones.showToast('Ups! De acuerdo a su plan horario el dia final debe ser el mismo al dia inicial, ya que es horario normal', 4500, 'warning');
+            this.validaciones.showToast('Ups! De acuerdo a su plan horario el día final debe ser el mismo al día inicial, ya que es horario normal', 4500, 'warning');
             return this.fech_bloquf = true
           }
         }
@@ -1031,7 +1031,7 @@ export class EditarPermisoComponent implements OnInit {
     this.cg_permiso = cg_permiso;
 
     if ((this.cg_permiso.dias_maximo_permiso < this.reg.dias_permiso!) && (this.cg_permiso.dias_maximo_permiso != 0)) {
-      this.validaciones.showToast('Lo Sentimos el maximo de dias de permiso es ' + this.cg_permiso.dias_maximo_permiso, 3500, 'warning');
+      this.validaciones.showToast('Lo Sentimos el máximo de días de permiso es ' + this.cg_permiso.dias_maximo_permiso, 3500, 'warning');
       this.reg.fecha_final = null;
       return false;
     }
@@ -1150,13 +1150,13 @@ export class EditarPermisoComponent implements OnInit {
       if (this.archivoSubido![0].size >= 2e+6) {
         this.archivoSubido = null;
         this.reg.documento = '';
-        this.mensajeFile = "Ingrese un archivo maximo de 2Mb";
-        this.validaciones.showToast('Ups el archivo pesa mas de 2Mb', 3500, 'danger');
+        this.mensajeFile = "Ingrese un archivo máximo de 2Mb";
+        this.validaciones.showToast('Ups el archivo pesa más de 2Mb', 3500, 'danger');
 
       } else if (this.archivoSubido![0].name.length > 50) {
         this.archivoSubido = null;
         this.reg.documento = ''
-        this.mensajeFile = "El nombre debe tener 50 caracteres como maximo";
+        this.mensajeFile = "El nombre debe tener 50 caracteres como máximo";
         this.validaciones.showToast('Ups el nombre del archivo es muy largo', 3500, 'warning');
 
       } else {

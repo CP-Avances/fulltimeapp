@@ -19,7 +19,7 @@ import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
           <p style="font-size: 12px; margin-top:-4%;" *ngIf="horaExtraDato.descripcion != null"> Solicita horas extras para <br>{{ horaExtraDato.descripcion }}</p>
           <p style="font-size: 12px; margin-top:-4%;" *ngIf="horaExtraDato.descripcion == null" > El Usuario no ha ingresado una descrcipcion</p>
 
-          <ion-card-title style="margin-top:-2%; margin-bottom:-3%; font-size: 12px;"><b> Informacion </b></ion-card-title>
+          <ion-card-title style="margin-top:-2%; margin-bottom:-3%; font-size: 12px;"><b> Información </b></ion-card-title>
           <p style="font-size: 11px; margin: top -0.5em;">
             <strong> Usuario - </strong>{{ horaExtraDato.nempleado | titlecase }} &nbsp;
             <strong> Código - </strong>{{ horaExtraDato.codigo }}<br> 

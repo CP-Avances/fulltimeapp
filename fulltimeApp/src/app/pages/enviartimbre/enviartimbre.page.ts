@@ -828,7 +828,7 @@ export class EnviartimbrePage implements OnInit {
       },
       () => {
         this.GuardartimbresinServidor(data);
-        this.abrirToas('Error con la conexión al servidor. El timbre se guardo en memoria del telefono', "danger", 5000, "bottom");
+        this.abrirToas('Error con la conexión al servidor. El timbre se guardo en memoria del teléfono', "danger", 5000, "bottom");
       }
     ), error => {
       this.GuardartimbresinServidor(data);
@@ -839,9 +839,9 @@ export class EnviartimbrePage implements OnInit {
   }
 
   GuardartimbresinServidor(data) {
-    console.log('Error con la conexión al servidor. El timbre se guardó en memoria del telefono', data);
+    console.log('Error con la conexión al servidor. El timbre se guardó en memoria del teléfono', data);
     data.conexion = false;
-    data.novedades_conexion = 'Fallo conexión al servidor';
+    data.novedades_conexion = 'Falló conexión al servidor';
     this.nuevoTimbre.conexion = data.conexion;
     this.nuevoTimbre.novedades_conexion = data.novedades_conexion;
     this.dataLocalService.guardarTimbresPerdidos(data);

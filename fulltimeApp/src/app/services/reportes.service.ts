@@ -33,6 +33,12 @@ export class ReportesService {
       )
   }
 
+    // METODO PARA CONSULTAR LISTA DE TIMBRES DEL USUARIO    **USADO
+    ReporteTimbresMultiple(data: any, desde: string, hasta: string) {
+      return this.http.post<any>(`${this.api_url}/reportes-asistencias/timbres/${desde}/${hasta}`, data);
+    }
+  
+
   getInfoReporteTimbresNovedad(codigo: number | string, fec_inicio: any, fec_final: any, conexion: boolean): Observable<Timbre[]> {
     const params = new HttpParams()
       .set('codigo', codigo)

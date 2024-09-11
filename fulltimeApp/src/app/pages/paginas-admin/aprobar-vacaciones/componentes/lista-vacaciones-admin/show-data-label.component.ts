@@ -30,7 +30,7 @@ import { Vacacion } from 'src/app/interfaces/Vacacion';
       </p>
 
       <p align=left style="font-size: 12px; margin-top:-2%;">
-        <strong> Calculo </strong><br>
+        <strong> Cálculo </strong><br>
         <strong>Días laborales: </strong> {{ vacacion.dia_laborable}} - 
         <strong>Días Libres: </strong> {{ vacacion.dia_libre}}
       </p>

@@ -315,7 +315,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         console.log('this.cg_permiso.num_dia_anticipo: ', this.cg_permiso.dias_maximo_permiso);
 
         //Numero maxio de días y horas de permiso
-        this.validaciones.abrirToas(' Dias maximos de Permiso - ' + num_maxPermiso, 3000, 'tertiary', 'top');
+        this.validaciones.abrirToas(' Días máximos de Permiso - ' + num_maxPermiso, 3000, 'tertiary', 'top');
         if (this.cg_permiso.horas_maximo_permiso != '00:00:00') {
           this.horas_trabaja_seg = this.validaciones.HorasTrabajaToSegundos(this.cg_permiso.horas_maximo_permiso);
         }
@@ -435,7 +435,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
               this.readonly = false;
               return this.dia_validado;
             } else if ((this.dia_inicio <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD') && (this.dia_fianl >= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD')))) {
-              this.validaciones.showToast('El rango de dias de permiso estan reservados, no puede pedir en el rango de ' + moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD') + ' - ' + moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'), 4000, 'warning');
+              this.validaciones.showToast('El rango de días de permiso estan reservados, no puede pedir en el rango de ' + moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD') + ' - ' + moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'), 4000, 'warning');
               this.valoresDefectoValidacionHoras();
               this.btnOculto = true;
               this.readonly = false;
@@ -469,8 +469,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       message: `<div class="card-alert">
                   <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                   <br>
-                  <p> Ups! El dia que ingreso esta fuera de su calendario laboral </p>
-                  <p> Por favor cambie a un dia dentro de su calendario </p>
+                  <p> Ups! El día que ingresó esta fuera de su calendario laboral </p>
+                  <p> Por favor cambie a un día dentro de su calendario </p>
                 </div>`,
       buttons: [
         {
@@ -577,7 +577,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
           }
         } else if (item.entrada < item.salida) {
           if (this.dia_inicio != this.dia_fianl) {
-            this.validaciones.showToast('Ups! De acuerdo a su plan horario el dia final debe ser el mismo al dia inicial, ya que es horario normal', 4500, 'warning');
+            this.validaciones.showToast('Ups! De acuerdo a su plan horario el día final debe ser el mismo al día inicial, ya que es horario normal', 4500, 'warning');
             return this.fech_bloquf = true
           }
         }
@@ -951,7 +951,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     }
 
     if ((this.cg_permiso.dias_maximo_permiso < this.reg.dias_permiso!) && (this.cg_permiso.dias_maximo_permiso != 0)) {
-      this.validaciones.showToast('Lo Sentimos el maximo de dias de permiso es ' + this.cg_permiso.dias_maximo_permiso, 3500, 'warning');
+      this.validaciones.showToast('Lo Sentimos el máximo de días de permiso es ' + this.cg_permiso.dias_maximo_permiso, 3500, 'warning');
       this.reg.fecha_final = null;
       return this.validacion = false;
     }
@@ -1065,13 +1065,13 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       if (this.archivoSubido[0].size >= 2e+6) {
         this.archivoSubido = null;
         this.reg.documento = '';
-        this.mensajeFile = "Ingrese un archivo maximo de 2Mb";
-        this.validaciones.showToast('Ups el archivo pesa mas de 2Mb', 3500, 'danger');
+        this.mensajeFile = "Ingrese un archivo máximo de 2Mb";
+        this.validaciones.showToast('Ups el archivo pesa más de 2Mb', 3500, 'danger');
 
       } else if (this.archivoSubido![0].name.length > 50) {
         this.archivoSubido = null;
         this.reg.documento = '';
-        this.mensajeFile = "El nombre debe tener 50 caracteres como maximo";
+        this.mensajeFile = "El nombre debe tener 50 caracteres como máximo";
         this.validaciones.showToast('Ups el nombre del archivo es muy largo', 3500, 'warning');
 
       } else {

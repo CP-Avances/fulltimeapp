@@ -9,7 +9,7 @@
     </div>
 
     <div>
-      <h1> <label>Tímbre enviado con éxito</label></h1>
+      <h1> <label>Timbre enviado con éxito</label></h1>
 
       <h4> <label>{{nombre_usuario}} {{apellido_usuario}}</label></h4>
 
@@ -22,7 +22,7 @@
       <label>Timbre enviado el: </label>
       <p>{{fechaTransformada}} a las {{horaTransformada}} </p>
       <p *ngIf="ubicacion != null || ubicacion != undefined"> Ubicación: {{ubicacion}}</p>
-      <p *ngIf="ubicacion == null || ubicacion == undefined"> Ubicación: Sin Ubicacion</p>
+      <p *ngIf="ubicacion == null || ubicacion == undefined"> Ubicación: Sin Ubicación</p>
     </div>
 
     <ion-chip outline color="primary" (click)="irABienvenido()">

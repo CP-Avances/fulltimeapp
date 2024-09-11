@@ -19,7 +19,7 @@ import { DataUserLoggedService } from 'src/app/services/data-user-logged.service
 
   <div style="margin: 2%; padding: 2%; text-align: center; border-radius: 2%;">
     <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 90%;">
-        En esta lista encontrara los timbres que no se enviaron debido a un problema con el servidor
+        En esta lista encontrará los timbres que no se enviaron debido a un problema con el servidor
     </ion-text>
     <br>
     <br>
@@ -53,7 +53,7 @@ import { DataUserLoggedService } from 'src/app/services/data-user-logged.service
 
     <div *ngIf="this.timbres.length == 0" style="margin: 4%; padding: 4%; text-align: center; border-radius: 2%;" >
       <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;">
-        No tiene almacenado timbres aqui
+        No tiene almacenado timbres aquí
       </ion-text>
     </div>
 
@@ -169,8 +169,8 @@ export class TimbresPerdidosComponent implements OnInit {
           this.mensage = `<div class="card-alert">
                             <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                             <br>
-                            <p> Ups! Fallo la conexión con el servidor, no se podrán enviar los timbres </p>
-                            <p> Por favor intentelo mas tarde </p>
+                            <p> Ups! Falló la conexión con el servidor, no se podrán enviar los timbres </p>
+                            <p> Por favor intentelo más tarde </p>
                           </div>`;
           this.presentAlert(this.mensage);
           return this.btn_Enviar = true;
@@ -180,8 +180,8 @@ export class TimbresPerdidosComponent implements OnInit {
         this.mensage = `<div class="card-alert">
                             <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                             <br>
-                            <p> Ups! Fallo la conexión con el servidor, no se podrán enviar los timbres </p>
-                            <p> Por favor intentelo mas tarde prueba móvil </p>
+                            <p> Ups! Falló la conexión con el servidor, no se podrán enviar los timbres </p>
+                            <p> Por favor intentelo más tarde prueba móvil </p>
                           </div>`;
         this.presentAlert(this.mensage);
         return this.btn_Enviar = true;
@@ -357,8 +357,8 @@ export class TimbresPerdidosComponent implements OnInit {
           this.mensage = `<div class="card-alert">
                             <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                             <br>
-                            <p> Ups! Fallo la conexión con el servidor, no se podrán enviar los timbre </p>
-                            <p> Por favor intentelo mas tarde </p>
+                            <p> Ups! Falló la conexión con el servidor, no se podrán enviar los timbre </p>
+                            <p> Por favor intentelo más tarde </p>
                           </div>`;
           this.presentAlert(this.mensage);
           return this.btn_Enviar = true;
@@ -373,7 +373,7 @@ export class TimbresPerdidosComponent implements OnInit {
     timbre.fecha_hora_timbre_servidor = null;
     timbre.latitud = latitud + "";
     timbre.longitud = longitud + "";
-    timbre.novedades_conexion = "Fallo conexión al servidor";
+    timbre.novedades_conexion = "Falló conexión al servidor";
     timbre.user_name = this.dataUserServices.username,
       timbre.ip = localStorage.getItem('ip')
 
