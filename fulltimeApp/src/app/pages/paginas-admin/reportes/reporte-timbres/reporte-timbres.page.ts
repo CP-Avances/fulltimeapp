@@ -18,6 +18,18 @@ interface checkOptions {
 })
 export class ReporteTimbresPage {
 
+  activarOpcion: boolean = false;
+  toggleChanged(event: any) {
+    //ctivarOpcion= false;
+
+    this.activarOpcion = event.detail.checked;
+    if (this.activarOpcion) {
+      console.log('El interruptor está activado');
+    } else {
+      console.log('El interruptor está desactivado');
+    }
+  }
+
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
 
@@ -49,6 +61,17 @@ export class ReporteTimbresPage {
     { valor: 3, nombre: 'Empleado' },
   ];
 
+  ngOnInit() {
+    sessionStorage.removeItem('datos_comunicado');
+
+    this.activarOpcion = false;
+
+  }
+
+  ionViewWillEnter() {
+    this.activarOpcion = false;
+
+  }
 
   constructor(
     public modalController: ModalController,
@@ -132,6 +155,7 @@ export class ReporteTimbresPage {
       component: ReporteTimbreComponent,
       componentProps: {
         'data': objeto,
+        'activarOpcion': this.activarOpcion
       },
       cssClass: 'my-custom-class'
     });
@@ -180,7 +204,12 @@ export class ReporteTimbresPage {
       res.forEach(obj => {
         this.sucursales.push({
           id: obj.id_suc,
-          sucursal: obj.name_suc
+          sucursal: obj.name_suc,
+          ciudad: obj.ciudad,
+          cargo: obj.name_cargo,
+          departemento: obj.name_dep,
+          regimen: obj.name_regimen,
+          nombre1: obj.apellido + ' ' + obj.nombre
         })
       })
       // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
@@ -222,6 +251,12 @@ export class ReporteTimbresPage {
           sucursal: obj.name_suc,
           id_suc: obj.id_suc,
           id_regimen: obj.id_regimen,
+          ciudad: obj.ciudad,
+          cargo: obj.name_cargo,
+          departemento: obj.name_dep,
+          regimen: obj.name_regimen,
+          nombre1: obj.apellido + ' ' + obj.nombre
+
         })
       })
 
@@ -269,7 +304,8 @@ export class ReporteTimbresPage {
       res.forEach(obj => {
         this.empleados.push({
           id: obj.id,
-          nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
+          nombre: obj.nombre,
+          apellido: obj.apellido,
           codigo: obj.codigo,
           cedula: obj.cedula,
           correo: obj.correo,
@@ -281,6 +317,9 @@ export class ReporteTimbresPage {
           id_depa: obj.id_depa,
           id_cargo_: obj.id_cargo_, // TIPO DE CARGO
           hora_trabaja: obj.hora_trabaja,
+          name_cargo: obj.name_cargo,
+          name_dep: obj.name_dep,
+          name_regimen: obj.name_regimen,
         })
       })
       this.empleados_filtro = [...this.empleados];
@@ -358,19 +397,21 @@ export class ReporteTimbresPage {
 
   }
   ModelarSucursal(dataSucursal) {
-    let usuarios: any = [];
-    let respuesta = JSON.parse(sessionStorage.getItem('datos_comunicado'))
-    respuesta.forEach((obj: any) => {
-      dataSucursal.find(obj1 => {
-        if (obj.id_suc === obj1.id) {
-          //if (obj3.comunicado_mail === true || obj3.comunicado_notificacion === true) {
-          usuarios.push(obj)
-          // }
-        }
-      })
+    let seleccionados: any = [];
+    dataSucursal.forEach((sucursales: any) => {
+      seleccionados.push(sucursales);
     })
-    console.log('ver usuario---------------------------', usuarios);
-    this.presentModal(usuarios)
+    let respuesta = JSON.parse(sessionStorage.getItem('datos_comunicado'))
+    seleccionados.forEach((sucursales: any) => {
+      sucursales.opcion = 1
+      sucursales.empleados = respuesta.filter((selec: any) => {
+        if (selec.id_suc === sucursales.id) {
+          return true;
+        }
+        return false;
+      });
+    });
+    this.presentModal(seleccionados)
   }
 
   isChecked_depa: boolean = true;
@@ -385,23 +426,23 @@ export class ReporteTimbresPage {
     this.ModelarDepartamentos(depa);
   }
   ModelarDepartamentos(dataDepartamentos) {
-    let usuarios: any = [];
-    let respuesta = JSON.parse(sessionStorage.getItem('datos_comunicado'))
-    respuesta.forEach((obj: any) => {
-      dataDepartamentos.find(obj2 => {
-        if (obj.id_depa === obj2.id) {
-          // if (obj3.comunicado_mail === true || obj3.comunicado_notificacion === true) {
-          usuarios.push(obj)
-          // }
-        }
-      })
 
+    let seleccionados: any = [];
+    dataDepartamentos.forEach((departamento: any) => {
+      seleccionados.push(departamento);
     })
-    console.log('ver usuario---------------------------', usuarios);
-    this.presentModal(usuarios)
+    let respuesta = JSON.parse(sessionStorage.getItem('datos_comunicado'))
+    seleccionados.forEach((departamentos: any) => {
+      departamentos.opcion = 2
+      departamentos.empleados = respuesta.filter((selec: any) => {
 
-    console.log(' ver empleados de departamentos', respuesta)
-
+        if (selec.id_depa === departamentos.id) {
+          return true;
+        }
+        return false;
+      });
+    });
+    this.presentModal(seleccionados)
   }
 
   isChecked_empl: boolean = true;
@@ -417,18 +458,9 @@ export class ReporteTimbresPage {
   }
 
   ModelarEmpleados(dataEmpleados) {
-    let respuesta: any = [];
-    this.empleados.forEach((obj: any) => {
-      dataEmpleados.find(obj1 => {
-        if (obj1.id === obj.id) {
-          respuesta.push(obj)
-        }
-      })
-    })
-    this.presentModal(respuesta)
-
-    console.log('ver usuario---------------------------', respuesta);
-    console.log(' ver donde falla', respuesta)
+    let seleccionados: any = [{ nombre: 'Empleados', opcion: 3 }];
+    seleccionados[0].empleados = dataEmpleados;
+    this.presentModal(seleccionados)
   }
 
 
@@ -473,5 +505,7 @@ export class ReporteTimbresPage {
     screenReaderCurrentLabel: `You're on page`
   };
 
+
+  
 
 }

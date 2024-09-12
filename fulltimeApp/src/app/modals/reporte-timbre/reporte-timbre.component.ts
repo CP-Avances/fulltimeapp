@@ -20,15 +20,16 @@ import { ValidacionesService } from 'src/app/libs/validaciones.service';
 export class ReporteTimbreComponent implements OnInit {
 
   @Input() data: any;
-  listadeUno: any = [
-    { 
-      nombre: 'Empleados', 
-      empleados: [] // Lista vacía de empleados
-    }
-  ];
+  @Input() activarOpcion: any;
+
+
+
+ // get timbreDispositivo() { return this.reporteService.mostrarTimbreDispositivo };
 
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
+
+   
 
   timbres: Timbre[];
 
@@ -53,6 +54,7 @@ export class ReporteTimbreComponent implements OnInit {
     public validar: ValidacionesService,
     public alertController: AlertController,
     private relojService: RelojServiceService,
+
 
   ) { }
 
@@ -97,59 +99,25 @@ export class ReporteTimbreComponent implements OnInit {
 
   consultarDataReporte() {
     this.data_pdf = [];
-    /*
-        console.log('generar reporte...');
-        this.loading = false;
-        this.reporteService.getInfoReporteTimbres(this.data.codigo, this.fechaInicio, this.fechaFinal).subscribe(res => {
-          this.timbres = res;
-          this.timbres.forEach(data => {
-            data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_abreviado);
-            data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
-    
-            data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
-            data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
-    
-            if (data.latitud == null || data.latitud == undefined) {
-              data.latitud = '0';
-            }
-    
-            if (data.longitud == null || data.longitud == undefined) {
-              data.longitud = '0';
-            }
-    
-            this.count = this.count + 1;
-            data.num = this.count;
-          })
-          console.log('data_consultada ...', this.timbres)
-          this.showBtnPdf = true;
-          this.loading = true;
-    
-          if (this.count == 100) {
-            this.alertLimiteReporte();
-          }
-    
-        }, err => {
-          this.showBtnPdf = false;
-          this.loading = true;
-          console.log(err);
-          this.plantillaPDF.abrirToas(err.error.message, 'danger', 3000)
-        })
-        */
-        this.listadeUno[0].empleados= this.data
-        const fechaI = new Date(this.fechaInicio);
-        const fechaFormateadaInicio = fechaI.toISOString().split('T')[0];
-        const fechaF = new Date(this.fechaFinal);
-        const fechaFormateadaFin = fechaF.toISOString().split('T')[0];
+    const fechaI = new Date(this.fechaInicio);
+    const fechaFormateadaInicio = fechaI.toISOString().split('T')[0];
 
-    this.reporteService.ReporteTimbresMultiple(this.listadeUno,  fechaFormateadaInicio,  fechaFormateadaFin).subscribe(res => {
+    const fechaF = new Date(this.fechaFinal);
+    const fechaFormateadaFin = fechaF.toISOString().split('T')[0];
+    this.reporteService.ReporteTimbresMultiple(this.data, fechaFormateadaInicio, fechaFormateadaFin).subscribe(res => {
       this.data_pdf = res;
 
+      this.ExtraerDatos();
+      console.log("ver datos de los timbres ", this.data_pdf)
+      this.showBtnPdf = true;
+      this.loading = true;
+
+      if (this.count == 100) {
+        this.alertLimiteReporte();
+      }
     }, err => {
       this.plantillaPDF.abrirToas(err.error.message, 'danger', 3000)
     })
-
-
-
   }
 
 
@@ -187,51 +155,6 @@ export class ReporteTimbreComponent implements OnInit {
   /* ****************************************************************************************************
    *                               PARA LA EXPORTACIÓN DE ARCHIVOS PDF
    * ****************************************************************************************************/
-
-  /*
-  getDocumentDefinicion() {
-    var inicio = this.validar.FormatearFecha(this.fechaInicio, this.formato_fecha, this.validar.dia_completo);
-    var fin = this.validar.FormatearFecha(this.fechaFinal, this.formato_fecha, this.validar.dia_completo);
-
-    return {
-
-      pageOrientation: this.plantillaPDF.Orientacion(false),
-      watermark: this.plantillaPDF.MargaDeAgua(),
-      header: this.plantillaPDF.HeaderText(),
-
-      footer: function (currentPage, pageCount, fecha) {
-        const h = new Date();
-        const f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        h.setUTCHours(h.getHours());
-        const time = h.toJSON().split("T")[1].split(".")[0];
-        return {
-          margin: 10,
-          columns: [
-            {
-              text: [{
-                text: 'Fecha: ' + fecha + ' Hora: ' + time,
-                alignment: 'left', opacity: 0.3
-              }]
-            },
-            {
-              text: [{
-                text: '© Pag ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', opacity: 0.3
-              }],
-            }
-          ], fontSize: 10
-        }
-      },
-      content: [
-        this.plantillaPDF.EncabezadoHorizontal('Reporte de Timbres', inicio, fin),
-        this.plantillaPDF.presentarDatosGenerales(this.data),
-        this.impresionDatosPDF(this.timbres),
-      ],
-      styles: this.plantillaPDF.estilosPdf()
-    };
-  }
-
-  */
 
   p_color: any;
   s_color: any;
@@ -294,7 +217,7 @@ export class ReporteTimbreComponent implements OnInit {
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         { text: this.empresa.nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
         { text: `TIMBRES`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
-        { text: 'PERIODO DEL: ' + inicio + " AL " + fin, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
+        { text: 'PERIODO DEL: ' + this.fechaInicio.split('T')[0] + " AL " + this.fechaFinal.split('T')[0], bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
         ...this.EstructurarDatosPDF(this.data_pdf).map((obj: any) => {
           return obj
         })
@@ -317,158 +240,257 @@ export class ReporteTimbreComponent implements OnInit {
     };
   }
 
+ 
 
-  EstructurarDatosPDF(data: any): Array<any> {
+  // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
+  EstructurarDatosPDF(data: any[]): Array<any> {
+    let n: any = [];
     let c = 0;
-    let n: any = []
-    let descripcion = '';
+    data.forEach((selec: any) => {
+      let arr_reg = selec.empleados.map((o: any) => { return o.timbres.length })
+      let reg = this.reporteService.SumarRegistros(arr_reg);
+      // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
 
-    let reg = this.data_pdf.length
-    let establecimiento = 'SUCURSAL: ' + data.sucursal;
-
-    descripcion = 'LISTA EMPLEADOS';
-    establecimiento = '';
-
-    n.push({
-      style: 'tableMarginCabecera',
-      table: {
-        widths: ['*', '*', '*'],
-        headerRows: 1,
-        body: [
-          [
-            {
-              border: [true, true, false, true],
-              bold: true,
-              text: descripcion,
-              style: 'itemsTableInfo',
-            },
-            {
-              border: [false, true, false, true],
-              bold: true,
-              text: establecimiento,
-              style: 'itemsTableInfo',
-            },
-            {
-              border: [false, true, true, true],
-              text: 'N° Registros: ' + reg,
-              style: 'derecha',
-            },
-          ],
-        ],
-      },
-    });
-
-    n.push({
-      style: 'tableMarginCabeceraEmpleado',
-      table: {
-        widths: ['*', 'auto', 'auto'],
-        headerRows: 2,
-        body: [
-          [
-            {
-              border: [true, true, false, false],
-              text: 'C.C.: ' + this.data.cedula,
-              style: 'itemsTableInfoEmpleado',
-            },
-            {
-              border: [true, true, false, false],
-              text: 'EMPLEADO: ' + this.data.fullname,
-              style: 'itemsTableInfoEmpleado',
-            },
-            {
-              border: [true, true, true, false],
-              text: 'COD: ' + this.data.codigo,
-              style: 'itemsTableInfoEmpleado',
-            },
-          ],
-          [
-            {
-              border: [true, false, true, false],
-              text: 'RÉGIMEN LABORAL ' + this.data.regimen,
-              style: 'itemsTableInfoEmpleado'
-            },
-            {
-              border: [true, false, false, false],
-              text: 'DEPARTAMENTO: ' + this.data.departamento,
-              style: 'itemsTableInfoEmpleado'
-            },
-            {
-              border: [true, false, true, false],
-              text: 'CARGO: ' + this.data.cargo,
-              style: 'itemsTableInfoEmpleado'
-            }
-          ]
-        ],
-      },
-    });
-
-    n.push({
-      style: 'tableMargin',
-      table: {
-        widths: ['auto', '*', '*', '*', '*', 'auto', 'auto', '*', 'auto', 'auto'],
-        body: [
-          [
-            { rowSpan: 2, text: 'N.', style: 'tableHeader' },
-            { colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-            '',
-            { colSpan: 2, text: 'SERVIDOR', style: 'tableHeader' },
-            '',
-            { rowSpan: 2, text: 'RELOJ', style: 'tableHeader' },
-            { rowSpan: 2, text: 'ACCIÓN', style: 'tableHeader' },
-            { rowSpan: 2, text: 'OBSERVACIÓN', style: 'tableHeader' },
-            { rowSpan: 2, text: 'LATITUD', style: 'tableHeader' },
-            { rowSpan: 2, text: 'LONGITUD', style: 'tableHeader' },
-          ],
-          [
-            '',
-            { text: 'FECHA', style: 'tableHeader' },
-            { text: 'HORA', style: 'tableHeader' },
-            { text: 'FECHA', style: 'tableHeader' },
-            { text: 'HORA', style: 'tableHeader' },
-            '', '', '', '', ''
-          ],
-          ...data.map(obj => {
-            c = c + 1
-            let accionT: string = '';
-            switch (obj.accion) {
-              case 'EoS': accionT = 'Entrada o Salida'; break;
-              case 'AES': accionT = 'Entrada o Salida Almuerzo'; break;
-              case 'PES': accionT = 'Entrada o Salida Permiso'; break;
-              case 'E': accionT = 'Entrada'; break;
-              case 'S': accionT = 'Salida'; break;
-              case 'I/A': accionT = 'Entrada Almuerzo'; break;
-              case 'F/A': accionT = 'Salida Almuerzo'; break;
-              case 'E/P': accionT = 'Entrada Permiso'; break;
-              case 'S/P': accionT = 'Salida Permiso'; break;
-              case 'HA': accionT = 'Horario Abierto'; break;
-              default: accionT = 'codigo 99'; break;
-            }
-
-            return [
-              { style: 'itemsTableCentrado', text: c },
-              { style: 'itemsTable', text: obj.fecha },
-              { style: 'itemsTable', text: obj.hora },
-              { style: 'itemsTable', text: (obj.fecha_hora_timbre_servidor === null) ? '' : obj.sfecha },
-              { style: 'itemsTable', text: (obj.fecha_hora_timbre_servidor === null) ? '' : obj.shora },
-              { style: 'itemsTable', text: obj.id_reloj },
-              { style: 'itemsTable', text: accionT },
-              { style: 'itemsTable', text: obj.observacion },
-              { style: 'itemsTable', text: (obj.longitud === null) ? '' : obj.longitud.slice(0, 9) },
-              { style: 'itemsTable', text: (obj.latitud === null) ? '' : obj.latitud.slice(0, 9) },
-            ]
-          })
-
-        ]
-      },
-      layout: {
-        fillColor: function (rowIndex) {
-          return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-        }
+      let descripcion = '';
+      let establecimiento = 'SUCURSAL: ' + selec.sucursal;
+      if (selec.opcion == 2) {
+        descripcion = 'DEPARTAMENTO: ' + selec.departamento;
+      } else if (selec.opcion == 1) {
+        descripcion = 'CIUDAD: ' + selec.ciudad;
       }
+      else if (selec.opcion == 3) {
+        descripcion = 'LISTA EMPLEADOS';
+        establecimiento = '';
+      }
+            //}
+      // CABECERA PRINCIPAL
+      n.push({
+        style: 'tableMarginCabecera',
+        table: {
+          widths: ['*', '*', '*'],
+          headerRows: 1,
+          body: [
+            [
+              {
+                border: [true, true, false, true],
+                bold: true,
+                text: descripcion,
+                style: 'itemsTableInfo',
+              },
+              {
+                border: [false, true, false, true],
+                bold: true,
+                text: establecimiento,
+                style: 'itemsTableInfo',
+              },
+              {
+                border: [false, true, true, true],
+                text: 'N° Registros: ' + reg,
+                style: 'derecha',
+              },
+            ],
+          ],
+        },
+      });
+      // PRESENTACION DE LA INFORMACION USUARIO
+      selec.empleados.forEach((empl: any) => {
+        n.push({
+          style: 'tableMarginCabeceraEmpleado',
+          table: {
+            widths: ['*', 'auto', 'auto'],
+            headerRows: 2,
+            body: [
+              [
+                {
+                  border: [true, true, false, false],
+                  text: 'C.C.: ' + empl.cedula,
+                  style: 'itemsTableInfoEmpleado',
+                },
+                {
+                  border: [true, true, false, false],
+                  text: 'EMPLEADO: ' + empl.apellido + ' '+ empl.nombre ,
+                  style: 'itemsTableInfoEmpleado',
+                },
+                {
+                  border: [true, true, true, false],
+                  text: 'COD: ' + empl.codigo,
+                  style: 'itemsTableInfoEmpleado',
+                },
+              ],
+              [
+                {
+                  border: [true, false, false, false],
+                  text: 'RÉGIMEN LABORAL: ' + empl.name_regimen,
+                  style: 'itemsTableInfoEmpleado'
+                },
+                {
+                  border: [true, false, false, false],
+                  text: 'DEPARTAMENTO: ' + empl.name_dep,
+                  style: 'itemsTableInfoEmpleado'
+                },
+                {
+                  border: [true, false, true, false],
+                  text: 'CARGO: ' + empl.name_cargo,
+                  style: 'itemsTableInfoEmpleado'
+                }
+              ],
+            ],
+          },
+        });
+        // ENCERAR VARIABLES
+        c = 0;
+        // ESTRUCTURAR PRESENTACION
+        const CrearFilaEncabezado = (conDispositivo: boolean) => [
+          [
+            { rowSpan: 2, text: 'N°', style: 'centrado' },
+            { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+            {},
+            ...(conDispositivo
+              ? [
+                { rowSpan: 1, colSpan: 2, text: 'DISPOSITIVO', style: 'tableHeader' },
+                {},
+              ]
+              : []),
+            { rowSpan: 2, text: 'RELOJ', style: 'centrado' },
+            { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
+            { rowSpan: 2, text: 'OBSERVACIÓN', style: 'centrado' },
+            { rowSpan: 2, text: 'LONGITUD', style: 'centrado' },
+            { rowSpan: 2, text: 'LATITUD', style: 'centrado' }
+          ],
+          [
+            {},
+            { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+            { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+            ...(conDispositivo
+              ? [
+                { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                { rowSpan: 1, text: 'HORA', style: 'tableHeader' }
+              ]
+              : []),
+            {}, {}, {}, {}, {}
+          ]
+        ];
+        // LEER ACCIONES DE LOS TIMBRES
+        const ObtenerAccionTexto = (accion: string) => {
+          const acciones = {
+            'EoS': 'Entrada o salida',
+            'AES': 'Inicio o fin alimentación',
+            'PES': 'Inicio o fin permiso',
+            'E': 'Entrada',
+            'S': 'Salida',
+            'I/A': 'Inicio alimentación',
+            'F/A': 'Fin alimentación',
+            'I/P': 'Inicio permiso',
+            'F/P': 'Fin permiso',
+            'HA': 'Timbre libre',
+          };
+          return acciones[accion] || 'Desconocido';
+        };
+        // LEER DATOS
+        const CrearFilasCuerpo = (timbres: any[], conDispositivo: boolean) => timbres.map((t: any) => {
+          let servidor_fecha = '';
+          let servidor_hora = '';
+          if (t.fecha_hora_timbre_validado) {
+            [servidor_fecha, servidor_hora] = [
+              this.validar.FormatearFecha(t.fecha_hora_timbre_validado.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado),
+              this.validar.FormatearHora(t.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora)
+            ];
+          }
+          const fechaTimbre = this.validar.FormatearFecha(t.fecha_hora_timbre.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+          const horaTimbre = this.validar.FormatearHora(t.fecha_hora_timbre.split(' ')[1], this.formato_hora);
+          const accionT = ObtenerAccionTexto(t.accion);
+          c++;
+          return [
+            { style: 'itemsTableCentrado', text: c },
+            { style: 'itemsTable', text: servidor_fecha },
+            { style: 'itemsTable', text: servidor_hora },
+            ...(conDispositivo ? [
+              { style: 'itemsTable', text: fechaTimbre },
+              { style: 'itemsTable', text: horaTimbre }
+            ] : []),
+            { style: 'itemsTableCentrado', text: t.id_reloj },
+            { style: 'itemsTableCentrado', text: accionT },
+            { style: 'itemsTable', text: t.observacion },
+            { style: 'itemsTable', text: t.longitud },
+            { style: 'itemsTable', text: t.latitud },
+          ];
+        });
+        // ELABORAR TABLA
+        const crearTabla = (conDispositivo: any) => ({
+          style: 'tableMargin',
+          table: {
+            widths: conDispositivo
+              ? ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto']
+              : ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto'],
+            headerRows: 2,
+            body: [
+              ...CrearFilaEncabezado(conDispositivo),
+              ...CrearFilasCuerpo(empl.timbres, conDispositivo),
+            ]
+          },
+          layout: {
+            fillColor: (rowIndex: any) => (rowIndex % 2 === 0) ? '#E5E7E9' : null,
+          }
+        });
+        n.push(crearTabla(this.activarOpcion));
+      })
     })
-
     return n;
   }
+
+  ExtraerDatos() {
+    this.timbres = [];
+    let n = 0;
+    let accionT = '';
+    this.data_pdf.forEach((data: any) => {
+      data.empleados.forEach((usu: any) => {
+        usu.timbres.forEach((t: any) => {
+          n = n + 1;
+          let servidor_fecha = '';
+          let servidor_hora = '';
+          if (t.fecha_hora_timbre_validado != '' && t.fecha_hora_timbre_validado != null) {
+            servidor_fecha = this.validar.FormatearFecha(t.fecha_hora_timbre_validado.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+            servidor_hora = this.validar.FormatearHora(t.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora);
+          };
+          const fechaTimbre = this.validar.FormatearFecha(t.fecha_hora_timbre.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+          const horaTimbre = this.validar.FormatearHora(t.fecha_hora_timbre.split(' ')[1], this.formato_hora);
+          switch (t.accion) {
+            case 'EoS': accionT = 'Entrada o salida'; break;
+            case 'AES': accionT = 'Inicio o fin alimentación'; break;
+            case 'PES': accionT = 'Inicio o fin permiso'; break;
+            case 'E': accionT = 'Entrada'; break;
+            case 'S': accionT = 'Salida'; break;
+            case 'I/A': accionT = 'Inicio alimentación'; break;
+            case 'F/A': accionT = 'Fin alimentación'; break;
+            case 'I/P': accionT = 'Inicio permiso'; break;
+            case 'F/P': accionT = 'Fin permiso'; break;
+            case 'HA': accionT = 'Timbre libre'; break;
+            default: accionT = 'Desconocido'; break;
+          }
+          let ele = {
+            n: n,
+            cedula: usu.cedula,
+            codigo: usu.codigo,
+            empleado: usu.apellido + ' ' + usu.nombre,
+            ciudad: usu.ciudad,
+            sucursal: usu.sucursal,
+            departamento: usu.departamento,
+            fechaTimbre,
+            horaTimbre,
+            fechaTimbreServidor: servidor_fecha,
+            horaTimbreServidor: servidor_hora,
+            accion: accionT,
+            reloj: t.id_reloj,
+            latitud: t.latitud,
+            longitud: t.longitud,
+            observacion: t.observacion
+          }
+          this.timbres.push(ele);
+        })
+      })
+    })
+  }
+
 
 
 }

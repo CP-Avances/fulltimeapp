@@ -70,6 +70,12 @@
       </ion-item>
     </ion-radio-group>
   </ion-list>
+
+  <ion-item>
+    <ion-toggle (ionChange)="toggleChanged($event)"></ion-toggle>
+    <ion-label>Información del dispositivo</ion-label>
+  </ion-item>
+
   <ion-content *ngIf="!loadingEmpleado">
     <div style="text-align: center;">
       <br>
@@ -83,7 +89,8 @@
 
 
   <!-- LISTAR SUCURSALES -->
-
+  <ion-row *ngIf="opcion_sucursal">
+  </ion-row>
   <ion-row *ngIf="opcion_sucursal">
     <ion-col *ngIf="isChecked_sucu" size="2">
       <ion-button color="secondary" (click)="checkedAll_sucu( isAllCheck_sucu )">
@@ -92,10 +99,11 @@
     </ion-col>
     <ion-col [size]="isChecked_sucu ? 10: 12">
       <ion-button (click)="EnviarSucursal()" shape="round">
-        ENVIAR
+        PDF
       </ion-button>
     </ion-col>
   </ion-row>
+
   <ion-searchbar *ngIf="opcion_sucursal" autocomplete="off" showCancelButton="focus"
     (ionChange)="changeSearchSucursales($event)"></ion-searchbar>
   <ion-list *ngIf="opcion_sucursal">
@@ -190,7 +198,7 @@
     <ion-item *ngFor="let e of empleados_filtro | paginate: { itemsPerPage: 10, currentPage: pageActual }"
       class="item-color" mode="md" lines="full">
       <ion-checkbox *ngIf="isChecked_empl" slot="start" [(ngModel)]="e.isChecked_empl"></ion-checkbox>
-      <ion-label>{{ e.nombre }}</ion-label>
+      <ion-label>{{ e.nombre + " " + e.apellido }}</ion-label>
     </ion-item>
   </ion-list>
   <!--Configuracion del Pagination - ngxPaginationModulo-->

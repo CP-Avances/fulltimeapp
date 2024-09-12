@@ -142,5 +142,8 @@ export class ReportesService {
     return valor;
   }
 
+  private _valueTimbreDispositivo: Boolean = false;
+
+  get mostrarTimbreDispositivo() { return this._valueTimbreDispositivo }
 
 }
