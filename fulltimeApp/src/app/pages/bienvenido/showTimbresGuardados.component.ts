@@ -346,7 +346,7 @@ export class TimbresPerdidosComponent implements OnInit {
             if (timbres.length > 1) {
               this.mensage = 'Los ' + timbres.length + ' timbres perdidos se han enviado.';
             } else {
-              this.mensage = 'El timbre perdido se ha enviado.';
+              this.mensage = 'El timbre ha sido enviado exitosamente.';
             }
             this.presentAlert(this.mensage);
           }, 1000);
@@ -357,7 +357,7 @@ export class TimbresPerdidosComponent implements OnInit {
           this.mensage = `<div class="card-alert">
                             <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                             <br>
-                            <p> Ups! Falló la conexión con el servidor, no se podrán enviar los timbre </p>
+                            <p> Ups!!! Falló la conexión con el servidor, no se podrán enviar los timbres </p>
                             <p> Por favor intentelo más tarde </p>
                           </div>`;
           this.presentAlert(this.mensage);

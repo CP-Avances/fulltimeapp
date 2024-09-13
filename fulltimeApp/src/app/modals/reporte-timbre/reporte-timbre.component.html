@@ -46,13 +46,20 @@
 
     </ion-grid>
 
+    <div *ngIf="!existenEmpleados">
+      <ion-text color="primary">
+        <span>Obteniendo empleados</span>
+      </ion-text>
+      <ion-progress-bar value="0.5" buffer="0.75"></ion-progress-bar>
+    </div>
+
     <div class="info" *ngIf="count != 0">
       <h5>
         Timbres encontrados {{count}}
       </h5>
     </div>
 
-    <div class="table-responsive">
+    <div class="table-responsive" *ngIf="verReporte">
       <table id="tablaReporte" class="responsive-table">
         <thead class="header-table">
           <tr>

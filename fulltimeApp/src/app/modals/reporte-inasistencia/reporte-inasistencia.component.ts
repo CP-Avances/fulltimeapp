@@ -21,16 +21,9 @@ export class ReporteInasistenciaComponent implements OnInit {
 
   @Input() data: any;
 
-  listadeUno: any = [
-    { 
-      nombre: 'Empleados', 
-      empleados: [] // Lista vacía de empleados
-    }
-  ];
-
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
-
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
+  existenEmpleados = true;
 
   faltas: any = [];
 
@@ -38,7 +31,7 @@ export class ReporteInasistenciaComponent implements OnInit {
   loading: boolean = true;
   count: number = 0;
   timbres: any = [];
-
+  verReporte = false
 
   constructor(
     private reporteService: ReportesService,
@@ -48,17 +41,31 @@ export class ReporteInasistenciaComponent implements OnInit {
     public alertController: AlertController,
     public validar: ValidacionesService,
     public parametro: ParametrosService,
-    private relojService: RelojServiceService,
-
+    private relojService: RelojServiceService
 
   ) { }
 
   ngOnInit() {
     console.log('reporte inasistencia | Data empleado: ', this.data);
+    const id_empresa: string = localStorage.getItem('id_empresa');
+    (id_empresa !== null) ? this.plantillaPDF.ShowColoresLogo(id_empresa) : this.plantillaPDF.abrirToas('No existe codigo de empresa', 'danger', 3000)
     this.BuscarFormatos();
     this.obtenerDatosEmpresa(localStorage.getItem('id_empresa'));
     this.ObtenerLogo();
     this.ObtenerColores();
+  }
+
+  obtenerDatosEmpresa(idEmpresa: any) {
+    this.relojService.obtenerDatosEmpresa(idEmpresa).subscribe(
+      res => {
+        console.log("ver datos empresa", res)
+        console.log(res);
+        this.empresa = res[0];
+      },
+      err => {
+        console.log(err)
+      }
+    );
   }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
@@ -72,6 +79,7 @@ export class ReporteInasistenciaComponent implements OnInit {
       }
     )
   }
+
   empresa: any = {
     nombre: '',
     ruc: '',
@@ -81,40 +89,24 @@ export class ReporteInasistenciaComponent implements OnInit {
     representante: '',
   };
 
-  obtenerDatosEmpresa(idEmpresa: any) {
-    this.relojService.obtenerDatosEmpresa(idEmpresa).subscribe(
-      res => {
-
-        console.log("ver datos empresa", res)
-        console.log(res);
-        this.empresa = res[0];
-      },
-      err => {
-        console.log(err)
-      }
-    );
-  }
+  data_pdf: any = [];
 
   consultarDataReporte() {
-    this.timbres = [];
-    let n = 0; // Inicializa n en 0
-    console.log('generar reporte...');
-    console.log(this.fechaFinal);
-    console.log(this.fechaInicio);
-    this.listadeUno[0].empleados.push(this.data)
-    console.log("ver lista de empleados 1:",  this.listadeUno)
-    this.loading = false;
-    
-    this.reporteService.BuscarFaltas(this.listadeUno, this.fechaInicio, this.fechaFinal).subscribe(res => {
+    this.showBtnPdf = true;
+    this.existenEmpleados = false;
+    this.data_pdf = [];
+    let n = 0;
+    const fechaI = new Date(this.fechaInicio);
+    const fechaFormateadaInicio = fechaI.toISOString().split('T')[0];
+    const fechaF = new Date(this.fechaFinal);
+    const fechaFormateadaFin = fechaF.toISOString().split('T')[0];
+
+    this.reporteService.BuscarFaltas(this.data, this.fechaInicio, this.fechaFinal).subscribe(res => {
       this.faltas = res;
-      console.log("ver faltas buscadas",  this.faltas)
-
+      console.log("ver faltas buscadas", this.faltas)
       this.faltas.forEach(data => {
-
-      
         data.empleados.forEach((empl: any) => {
           empl.faltas.forEach((usu: any) => {
-
 
             const fecha = this.validar.FormatearFecha(usu.fecha_horario, this.formato_fecha, this.validar.dia_completo);
             n = n + 1;
@@ -124,21 +116,20 @@ export class ReporteInasistenciaComponent implements OnInit {
               n: n,
               cedula: empl.cedula,
               codigo: empl.codigo,
-              empleado: empl.fullname,
+              empleado: empl.apellido + ' ' + empl.nombre,
               ciudad: empl.ciudad,
               sucursal: empl.sucursal,
-              departamento: empl.departamento,
-              cargo: empl.cargo,
+              departamento: empl.name_dep,
+              cargo: empl.name_cargo,
               fecha
             }
             this.timbres.push(ele);
           })
-          console.log("ver timbre ", this.timbres)
         })
-
-
       })
-      this.showBtnPdf = true;
+      console.log("ver timbre ", this.timbres)
+      this.existenEmpleados = true;
+      this.verReporte = true;
       this.loading = true;
       if (this.count == 100) {
         this.alertLimiteReporte();
@@ -153,7 +144,7 @@ export class ReporteInasistenciaComponent implements OnInit {
   }
 
 
- 
+
   async alertLimiteReporte() {
     const alert = await this.alertController.create({
       header: 'Notificacion',
@@ -190,7 +181,7 @@ export class ReporteInasistenciaComponent implements OnInit {
     });
   }
 
-  
+
   logo: any = String;
   ObtenerLogo() {
     this.plantillaPDF.LogoEmpresaImagenBase64(localStorage.getItem('id_empresa') as string).subscribe(res => {
@@ -203,10 +194,7 @@ export class ReporteInasistenciaComponent implements OnInit {
     let documentDefinition: any;
     documentDefinition = this.DefinirInformacionPDF();
     let doc_name = `Faltas_usuario.pdf`;
-    this.plantillaPDF.generarPdf(documentDefinition, doc_name)
-
-    //pdfMake.createPdf(documentDefinition).download(doc_name);
- 
+    this.plantillaPDF.generarPdf(documentDefinition, doc_name);
   }
 
   DefinirInformacionPDF() {
@@ -218,7 +206,7 @@ export class ReporteInasistenciaComponent implements OnInit {
       pageOrientation: 'portrait',
       pageMargins: [40, 50, 40, 50],
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
-      header: { text: 'Impreso por:  ' + localStorage.getItem('nom') + ' ' +localStorage.getItem('ap') , margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
+      header: { text: 'Impreso por:  ' + localStorage.getItem('nom') + ' ' + localStorage.getItem('ap'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       footer: function (currentPage: any, pageCount: any, fecha: any) {
         let f = moment();
         fecha = f.format('YYYY-MM-DD');
@@ -243,7 +231,7 @@ export class ReporteInasistenciaComponent implements OnInit {
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         { text: this.empresa.nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
         { text: `FALTAS - USUARIOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
-        { text: 'PERIODO DEL: ' + inicio + " AL " + fin, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
+        { text: 'PERIODO DEL: ' + this.fechaInicio.split('T')[0] + " AL " + this.fechaFinal.split('T')[0], bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
         ...this.EstructurarDatosPDF(this.faltas).map((obj: any) => {
           return obj
         })
@@ -276,17 +264,28 @@ export class ReporteInasistenciaComponent implements OnInit {
     let general: any = [];
     let n: any = [];
     let c = 0;
+    console.log("ver la data del pdf", data)
     data.forEach((selec: any) => {
       let arr_reg = selec.empleados.map((o: any) => { return o.faltas.length })
-      let reg = this.reporteService.SumarRegistros(arr_reg);
       // NOMBRE DE CABECERAS DEL REPORTE DE ACUERDO CON EL FILTRO DE BUSQUEDA
+      let reg = this.reporteService.SumarRegistros(arr_reg);
       let descripcion = '';
       let establecimiento = 'SUCURSAL: ' + selec.sucursal;
       let opcion = selec.nombre;
 
-      descripcion = 'LISTA EMPLEADOS';
-      establecimiento = '';
+      if (selec.opcion == 2) {
+        descripcion = 'DEPARTAMENTO: ' + selec.departamento;
+        resumen = 'TOTAL DEPARTAMENTOS';
+        opcion = selec.departamento;
 
+      } else if (selec.opcion == 1) {
+        descripcion = 'CIUDAD: ' + selec.ciudad;
+        resumen = 'TOTAL SUCURSALES';
+      }
+      else if (selec.opcion == 3) {
+        descripcion = 'LISTA EMPLEADOS';
+        establecimiento = '';
+      }
 
       // DATOS DE RESUMEN GENERAL
       let informacion = {
@@ -343,7 +342,7 @@ export class ReporteInasistenciaComponent implements OnInit {
                 },
                 {
                   border: [true, true, false, false],
-                  text: 'EMPLEADO: ' + empl.fullname,
+                  text: 'EMPLEADO: ' + empl.apellido + ' ' + empl.nombre,
                   style: 'itemsTableInfoEmpleado',
                 },
                 {
@@ -355,17 +354,17 @@ export class ReporteInasistenciaComponent implements OnInit {
               [
                 {
                   border: [true, false, false, false],
-                  text: 'RÉGIMEN LABORAL: ' + empl.regimen,
+                  text: 'RÉGIMEN LABORAL: ' + empl.name_regimen,
                   style: 'itemsTableInfoEmpleado'
                 },
                 {
                   border: [true, false, false, false],
-                  text: 'DEPARTAMENTO: ' + empl.departamento,
+                  text: 'DEPARTAMENTO: ' + empl.name_dep,
                   style: 'itemsTableInfoEmpleado'
                 },
                 {
                   border: [true, false, true, false],
-                  text: 'CARGO: ' + empl.cargo,
+                  text: 'CARGO: ' + empl.name_cargo,
                   style: 'itemsTableInfoEmpleado'
                 }
               ],
@@ -387,9 +386,9 @@ export class ReporteInasistenciaComponent implements OnInit {
                 { text: 'FECHA', style: 'tableHeader' },
               ],
               ...empl.faltas.map((usu: any) => {
-                const fecha = this.validar.FormatearFecha(usu.fecha_horario , this.formato_fecha, this.validar.dia_completo);
-                console.log("ver fecha formateada",fecha )
-                usu.fechaFormat= fecha;
+                const fecha = this.validar.FormatearFecha(usu.fecha_horario, this.formato_fecha, this.validar.dia_completo);
+                console.log("ver fecha formateada", fecha)
+                usu.fechaFormat = fecha;
                 totalFaltasEmpleado++;
                 c = c + 1;
                 usu.conteo = c
@@ -411,8 +410,61 @@ export class ReporteInasistenciaComponent implements OnInit {
             },
           },
         });
+
+
       });
     })
+
+console.log("Ver data[0].opcion",data[0].opcion);
+    if (data[0].opcion != 3) {
+      n.push({
+        style: 'tableMarginCabeceraTotal',
+        table: {
+          widths: ['*', '*', '*'],
+          headerRows: 1,
+          body: [
+            [
+              {
+                border: [true, true, false, true],
+                bold: true,
+                text: resumen,
+                style: 'itemsTableInfoTotal',
+                colSpan: 2
+              },
+              {},
+              { text: 'FALTAS', style: 'itemsTableInfoTotal' },
+            ],
+            ...general.map((info: any) => {
+              let valor = 0;
+              if (data[0].opcion == 1) {
+                valor = 2;
+              }
+              return [
+                {
+                  border: [true, true, false, true],
+                  bold: true,
+                  text: info.sucursal,
+                  style: 'itemsTableCentrado',
+                  colSpan: valor
+                },
+                {
+                  border: [true, true, false, true],
+                  bold: true,
+                  text: info.nombre,
+                  style: 'itemsTableCentrado',
+                },
+                { text: info.faltas, style: 'itemsTableCentrado' },
+              ]
+            })
+          ]
+        },
+        layout: {
+          fillColor: function (rowIndex: any) {
+            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+          }
+        }
+      });
+    }
 
     return n;
   }

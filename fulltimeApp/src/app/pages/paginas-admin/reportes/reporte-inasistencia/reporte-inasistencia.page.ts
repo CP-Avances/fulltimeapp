@@ -18,12 +18,13 @@ interface checkOptions {
 })
 export class ReporteInasistenciaPage {
 
+  // VARIABLES
+  maxDate: string = new Date().toISOString().split('T')[0];
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
 
   @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
   @ViewChild(IonDatetime) datetimeFinal: IonDatetime;
-
 
   loadingEmpleado: boolean = true;
 
@@ -48,6 +49,18 @@ export class ReporteInasistenciaPage {
     { valor: 2, nombre: 'Departamento' },
     { valor: 3, nombre: 'Empleado' },
   ];
+
+
+  ngOnInit() {
+    sessionStorage.removeItem('datos_comunicado');
+    this.radioValue = 0;
+  }
+
+  ionViewWillEnter() {
+    sessionStorage.removeItem('datos_comunicado');
+    this.radioValue = 0;
+  }
+
 
   constructor(
     public modalController: ModalController,
@@ -141,7 +154,7 @@ export class ReporteInasistenciaPage {
     console.log('Salo de reporte de Inasistencias');
     this.limpiarRango_fechas();
   }
-  radioValue;
+  radioValue = 0;
   showValue() {
     // 
     console.log(this.radioValue);
@@ -166,9 +179,19 @@ export class ReporteInasistenciaPage {
       this.opcion_depa = false;
       this.opcion_empleado = true;
       this.cargarEmpleados();
+    } else if (this.radioValue === 0) {
+      this.loadingEmpleado = true;
+      this.opcion_sucursal = false;
+      this.opcion_depa = false;
+      this.opcion_empleado = false;
+      sessionStorage.removeItem('datos_comunicado');
+      this.sucursales = [];
+      this.departamentos = [];
+      this.empleados = [];
     }
-  }
 
+
+  }
 
 
   cargarListaSucursales() {
@@ -178,7 +201,8 @@ export class ReporteInasistenciaPage {
       res.forEach(obj => {
         this.sucursales.push({
           id: obj.id_suc,
-          sucursal: obj.name_suc
+          sucursal: obj.name_suc,
+          ciudad: obj.ciudad,
         })
       })
       // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
@@ -209,7 +233,6 @@ export class ReporteInasistenciaPage {
   }
 
   cargarDepartamentos() {
-
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
       sessionStorage.setItem('datos_comunicado', JSON.stringify(res))
 
@@ -220,6 +243,7 @@ export class ReporteInasistenciaPage {
           sucursal: obj.name_suc,
           id_suc: obj.id_suc,
           id_regimen: obj.id_regimen,
+          ciudad: obj.ciudad,
         })
       })
 
@@ -267,7 +291,8 @@ export class ReporteInasistenciaPage {
       res.forEach(obj => {
         this.empleados.push({
           id: obj.id,
-          nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
+          nombre: obj.nombre,
+          apellido: obj.apellido,
           codigo: obj.codigo,
           cedula: obj.cedula,
           correo: obj.correo,
@@ -279,6 +304,9 @@ export class ReporteInasistenciaPage {
           id_depa: obj.id_depa,
           id_cargo_: obj.id_cargo_, // TIPO DE CARGO
           hora_trabaja: obj.hora_trabaja,
+          name_cargo: obj.name_cargo,
+          name_dep: obj.name_dep,
+          name_regimen: obj.name_regimen,
         })
       })
       this.empleados_filtro = [...this.empleados];
@@ -315,7 +343,6 @@ export class ReporteInasistenciaPage {
     this.isAllCheck_sucu = !isAllChecked_sucu;
     if (this.radioValue === 1) {
       this.sucursales.forEach(o => { o.isChecked_sucu = this.isAllCheck_sucu })
-
       return;
     }
   }
@@ -345,7 +372,6 @@ export class ReporteInasistenciaPage {
   EnviarSucursal() {
     console.log('ver sucu-------', this.sucursales);
     let sucu = [];
-
     this.sucursales.forEach(o => {
       if (o.isChecked_sucu === true) {
         sucu.push(o);
@@ -353,84 +379,84 @@ export class ReporteInasistenciaPage {
     });
     console.log('ver depa-------', sucu);
     this.ModelarSucursal(sucu)
-
   }
+
   ModelarSucursal(dataSucursal) {
-    let usuarios: any = [];
-    let respuesta = JSON.parse(sessionStorage.getItem('datos_comunicado'))
-    respuesta.forEach((obj: any) => {
-      dataSucursal.find(obj1 => {
-        if (obj.id_suc === obj1.id) {
-          //if (obj3.comunicado_mail === true || obj3.comunicado_notificacion === true) {
-          usuarios.push(obj)
-          // }
-        }
-      })
+    let seleccionados: any = [];
+    dataSucursal.forEach((sucursales: any) => {
+      seleccionados.push(sucursales);
     })
-    console.log('ver usuario---------------------------', usuarios);
-    this.presentModal(usuarios)
+    let respuesta = JSON.parse(sessionStorage.getItem('datos_comunicado'))
+    seleccionados.forEach((sucursales: any) => {
+      sucursales.opcion = 1
+      sucursales.empleados = respuesta.filter((selec: any) => {
+        if (selec.id_suc === sucursales.id) {
+          return true;
+        }
+        return false;
+      });
+    });
+    this.presentModal(seleccionados)
   }
 
 
   isChecked_depa: boolean = true;
   EnviarDepartamento() {
-    let depa = [];
-    this.departamentos.forEach(o => {
-      if (o.isChecked_depa === true) {
-        depa.push(o);
-      }
-    });
-    console.log('ver depa-------', depa);
-    this.ModelarDepartamentos(depa);
-  }
-  ModelarDepartamentos(dataDepartamentos) {
-    let usuarios: any = [];
-    let respuesta = JSON.parse(sessionStorage.getItem('datos_comunicado'))
-    respuesta.forEach((obj: any) => {
-      dataDepartamentos.find(obj2 => {
-        if (obj.id_depa === obj2.id) {
-          // if (obj3.comunicado_mail === true || obj3.comunicado_notificacion === true) {
-          usuarios.push(obj)
-          // }
+    if (!this.fechaFi || !this.fechaIn) {
+      this.mostrarToas('Seleccione Fechas', 3000, "warning");
+    } else {
+      let depa = [];
+      this.departamentos.forEach(o => {
+        if (o.isChecked_depa === true) {
+          depa.push(o);
         }
-      })
+      });
+      console.log('ver depa-------', depa);
+      this.ModelarDepartamentos(depa);
+    }
+  }
 
+
+  ModelarDepartamentos(dataDepartamentos) {
+    let seleccionados: any = [];
+    dataDepartamentos.forEach((departamento: any) => {
+      seleccionados.push(departamento);
     })
-    console.log('ver usuario---------------------------', usuarios);
-    this.presentModal(usuarios)
+    let respuesta = JSON.parse(sessionStorage.getItem('datos_comunicado'))
+    seleccionados.forEach((departamentos: any) => {
+      departamentos.opcion = 2
+      departamentos.empleados = respuesta.filter((selec: any) => {
 
-    console.log(' ver empleados de departamentos', respuesta)
-
+        if (selec.id_depa === departamentos.id) {
+          return true;
+        }
+        return false;
+      });
+    });
+    this.presentModal(seleccionados)
   }
 
   isChecked_empl: boolean = true;
   EnviarEmpleado() {
-    let empl = [];
-    this.empleados.forEach(o => {
-      if (o.isChecked_empl === true) {
-        empl.push(o);
-      }
-    });
-    console.log('ver depa-------', empl);
-    this.ModelarEmpleados(empl)
+    if (!this.fechaFi || !this.fechaIn) {
+      this.mostrarToas('Seleccione Fechas', 3000, "warning");
+    } else {
+      let empl = [];
+      this.empleados.forEach(o => {
+        if (o.isChecked_empl === true) {
+          empl.push(o);
+        }
+      });
+      console.log('ver depa-------', empl);
+      this.ModelarEmpleados(empl)
+    }
   }
 
   ModelarEmpleados(dataEmpleados) {
-    let respuesta: any = [];
-    this.empleados.forEach((obj: any) => {
-      dataEmpleados.find(obj1 => {
-        if (obj1.id === obj.id) {
-          respuesta.push(obj)
-        }
-      })
-    })
-    this.presentModal(respuesta)
-
-    console.log('ver usuario---------------------------', respuesta);
-    console.log(' ver donde falla', respuesta)
+    let seleccionados: any = [{ nombre: 'Empleados', opcion: 3 }];
+    seleccionados[0].empleados = dataEmpleados;
+    this.presentModal(seleccionados)
   }
-
-
 
   changeSearchSucursales(e: any) {
     const query = e.detail.value;
@@ -452,10 +478,8 @@ export class ReporteInasistenciaPage {
     const query = e.detail.value;
     const filtro = this.empleados.filter((o: any) => {
       return o.nombre.toLowerCase().indexOf(query.toLowerCase()) > -1
-
     })
     this.empleados_filtro = filtro
-
   }
 
   pageActual: number = 1;
@@ -472,9 +496,5 @@ export class ReporteInasistenciaPage {
     screenReaderPageLabel: 'page',
     screenReaderCurrentLabel: `You're on page`
   };
-
-
-
-
 
 }

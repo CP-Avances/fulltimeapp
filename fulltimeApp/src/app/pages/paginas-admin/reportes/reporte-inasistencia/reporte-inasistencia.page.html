@@ -26,11 +26,12 @@
                   mode="md" 
                   (ionChange)="changeFechaInicio($event)" 
                   min="1990-01-01" 
-                  max="2050-12-31"
+                  [max]="maxDate"
                   color="success">
                 </ion-datetime>
                 <div style="width: 95%">
-                  <ion-label style="float: right; margin: 2%; font-size: medium;" color="success" (click) = "datetimeInicio.cancel(true)">Cancelar</ion-label>
+                  <ion-label style="float: right; margin: 2%; font-size: medium;" color="success" 
+                  (click)="datetimeInicio.cancel(true)">Cancelar</ion-label>
                 </div>
               </ion-content>
             </ng-template>
@@ -53,10 +54,10 @@
                   mode="md" 
                   (ionChange)="changeFechaFinal($event)" 
                   [min]="fechaIn" 
-                  max="2050-12-31">
+                  [max]="maxDate">
                 </ion-datetime>
                 <div style="width: 95%">
-                  <ion-label style="float: right; margin: 2%; font-size: medium;" color="primary" (click) = "datetimeFinal.cancel(true)">Cancelar</ion-label>
+                  <ion-label style="float: right; margin: 2%; font-size: medium;" color="primary" (click)="datetimeFinal.cancel(true)">Cancelar</ion-label>
                 </div>
               </ion-content>
             </ng-template>
@@ -85,11 +86,12 @@
       </ion-item>
     </ion-radio-group>
   </ion-list>
+
   <ion-content *ngIf="!loadingEmpleado">
     <div style="text-align: center;">
       <br>
       <ion-text color="primary">
-        <span>Obteniendo Datos Por favor Espere</span>
+        <span>Obteniendo datos, por favor espere</span>
       </ion-text>
       <ion-progress-bar type="indeterminate"></ion-progress-bar>
       <br>
@@ -98,7 +100,6 @@
 
 
   <!-- LISTAR SUCURSALES -->
-
   <ion-row *ngIf="opcion_sucursal">
     <ion-col *ngIf="isChecked_sucu" size="2">
       <ion-button color="secondary" (click)="checkedAll_sucu( isAllCheck_sucu )">
@@ -107,7 +108,7 @@
     </ion-col>
     <ion-col [size]="isChecked_sucu ? 10: 12">
       <ion-button (click)="EnviarSucursal()" shape="round">
-        ENVIAR
+        PDF
       </ion-button>
     </ion-col>
   </ion-row>
@@ -146,7 +147,7 @@
     </ion-col>
     <ion-col [size]="isChecked_depa ? 10: 12">
       <ion-button (click)="EnviarDepartamento()" shape="round">
-        ENVIAR
+        PDF
       </ion-button>
     </ion-col>
   </ion-row>
@@ -191,7 +192,7 @@
     </ion-col>
     <ion-col [size]="isChecked_empl ? 10: 12">
       <ion-button (click)="EnviarEmpleado()" shape="round">
-        ENVIAR
+        PDF
       </ion-button>
     </ion-col>
   </ion-row>
@@ -205,7 +206,7 @@
     <ion-item *ngFor="let e of empleados_filtro | paginate: { itemsPerPage: 10, currentPage: pageActual }"
       class="item-color" mode="md" lines="full">
       <ion-checkbox *ngIf="isChecked_empl" slot="start" [(ngModel)]="e.isChecked_empl"></ion-checkbox>
-      <ion-label>{{ e.nombre }}</ion-label>
+      <ion-label>{{  e.nombre + " " + e.apellido}}</ion-label>
     </ion-item>
   </ion-list>
   <!--Configuracion del Pagination - ngxPaginationModulo-->

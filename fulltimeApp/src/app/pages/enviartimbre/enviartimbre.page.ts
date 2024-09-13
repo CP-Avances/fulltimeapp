@@ -117,10 +117,10 @@ export class EnviartimbrePage implements OnInit {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
 
       if (!this.isConnected) {
-        this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "bottom");
+        this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
         console.log('Desconectado');
-        this.geoLatitude = 0;
-        this.geoLongitude = 0;
+        //this.geoLatitude = 0;
+        //this.geoLongitude = 0;
         this.comprobarGPS();
       } else {
         console.log('conectado');
@@ -145,17 +145,15 @@ export class EnviartimbrePage implements OnInit {
         if (isAvailable) {
           this.obtenerPosicion();
         } else {
-          
+          //LOOOK ME
           this.isConnected = this.networkService.getNetworkStatusDispositivo();
-
           if (this.isConnected) {
-            this.abrirToas('Ups, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "bottom");
+            this.abrirToas('Ups, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
           }
         }
       }).catch(
         (e) => console.error(e)
       )
-
     }
     return checkPermissions();
 
@@ -183,7 +181,7 @@ export class EnviartimbrePage implements OnInit {
       this.cargandoPosicion = false;
     }).catch((error) => {
       this.cargandoPosicion = false;
-      this.abrirToas('Ups, al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.', "danger", 6000, "bottom");
+      this.abrirToas('Ups, al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.', "danger", 6000, "middle");
       console.log('No se pudo obtener la posicion:', error);
     });
   }
@@ -223,7 +221,7 @@ export class EnviartimbrePage implements OnInit {
           this.identificarUsuario();
         })
         .catch((error) => {
-          this.abrirToas('No se pudo obtener la foto, timbre cancelado.', "warning", 2000, "bottom");
+          this.abrirToas('No se pudo obtener la foto, timbre cancelado.', "warning", 2000, "middle");
         });
     } else {
       console.log("ENTRA CON NO")
@@ -278,7 +276,7 @@ export class EnviartimbrePage implements OnInit {
         }
       }).catch((error: any) => {
         console.log(error);
-        this.abrirToas('Ocurrió un error al autenticar del usuario. El timbre no se envió', "danger", 1000, "bottom");
+        this.abrirToas('Ocurrió un error al autenticar del usuario. El timbre no se envió', "danger", 1000, "middle");
         this.intentos = this.intentos + 1;
         if (this.intentos == 2) {
           this.enviarTimbreAuthProble();
@@ -344,7 +342,7 @@ export class EnviartimbrePage implements OnInit {
     this.BuscarParametroTimbreSinInternet();
     this.BuscarParametroTimbreUbicacionDesconocida();
     if(this.geoLongitude == 0){
-      this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "danger", 3000, "bottom");
+      this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "danger", 3000, "middle");
     }else{
       if ((this.platform.is('ios')) || (this.platform.is('android')) || (this.platform.is('capacitor'))) {
         console.log("Entrando en TIMBRES VER")
@@ -356,7 +354,7 @@ export class EnviartimbrePage implements OnInit {
       }
       else {
         console.log("Entrando en web")
-        this.abrirToas('No se detecto autenticación, se guardara el timbre con esta observación.', "warning", 2000, "bottom");
+        this.abrirToas('No se detecto autenticación, se guardara el timbre con esta observación.', "warning", 2000, "middle");
         this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
         this.BuscarParametroTimbreConFoto();
         this.iniciarProcesoFoto();
@@ -506,13 +504,13 @@ export class EnviartimbrePage implements OnInit {
     this.nuevoTimbre.ip = localStorage.getItem('ip');
     this.nuevoTimbre.imagen = this.imagen;
 
-    if (this.nuevoTimbre.accion === "HA" && this.nuevoTimbre.observacion === null) return this.abrirToas('Lo siento! Debes ingresar una observación antes de enviar un timbre abierto 😅', "danger", 5000, "bottom");
-    if (this.nuevoTimbre.accion === "HA" && this.nuevoTimbre.observacion === "") return this.abrirToas('Lo siento! Debes ingresar una observación antes de enviar un timbre abierto 😅', "danger", 5000, "bottom");
+    if (this.nuevoTimbre.accion === "HA" && this.nuevoTimbre.observacion === null) return this.abrirToas('Lo siento! Debes ingresar una observación antes de enviar un timbre abierto 😅', "danger", 5000, "middle");
+    if (this.nuevoTimbre.accion === "HA" && this.nuevoTimbre.observacion === "") return this.abrirToas('Lo siento! Debes ingresar una observación antes de enviar un timbre abierto 😅', "danger", 5000, "middle");
 
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
 
     if (this.isConnected == true) {
-      if (this.geoLatitude == 0) return this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "danger", 3000, "bottom");
+      if (this.geoLatitude == 0) return this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "danger", 3000, "middle");
 
       this.nuevoTimbre.latitud = this.geoLatitude + "";
       this.nuevoTimbre.longitud = this.geoLongitude + "";
@@ -522,7 +520,7 @@ export class EnviartimbrePage implements OnInit {
       this.ValidarModulo(this.geoLatitude, this.geoLongitude, this.rango, this.nuevoTimbre);
       console.log('paso validaciones de horario abierto');
     } else {
-      if (this.geoLatitude == 0) return this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "danger", 3000, "bottom");
+      if (this.geoLatitude == 0) return this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "danger", 3000, "middle");
 
       //SIN INTERNET
       //Proceso de almacenamiento de informacion del timbre cuendo no tiene conexion al Internet.
@@ -547,7 +545,7 @@ export class EnviartimbrePage implements OnInit {
 
 
       } else {
-        this.abrirToas('Timbre sin conexión a Internet. No Permitido', "danger", 5000, "bottom");
+        this.abrirToas('Timbre sin conexión a Internet. No Permitido', "danger", 5000, "middle");
         
         return this.router.navigate(['/login']);
       }
@@ -646,7 +644,7 @@ export class EnviartimbrePage implements OnInit {
           this.storageUbica = timbre.ubicacion;
           this.EnviarDatos(timbre);
         } else {
-          this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "bottom");
+          this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "middle");
           return this.router.navigate(['/login']);
         }
       }
@@ -692,7 +690,7 @@ export class EnviartimbrePage implements OnInit {
 
           console.log("entra aqui??? no")
 
-          this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "bottom");
+          this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "middle");
 
           return this.router.navigate(['/login']);
 
@@ -763,7 +761,7 @@ export class EnviartimbrePage implements OnInit {
               this.abrirToas('Marcación realizada dentro de un perímetro DESCONOCIDO.', "primary", 3000, "top");
               this.EnviarDatos(timbre);
             } else {
-              this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "bottom");
+              this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "middle");
               return this.router.navigate(['/login']);
 
             }
@@ -780,7 +778,7 @@ export class EnviartimbrePage implements OnInit {
             this.EnviarDatos(timbre);
 
           } else {
-            this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "bottom");
+            this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "middle");
             return this.router.navigate(['/login']);
 
           }
@@ -795,7 +793,7 @@ export class EnviartimbrePage implements OnInit {
           this.abrirToas('Marcación realizada dentro de un perímetro DESCONOCIDO.', "primary", 3000, "top");
           this.EnviarDatos(timbre);
         } else {
-          this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "bottom");
+          this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "middle");
           return this.router.navigate(['/login']);
 
         }
@@ -809,7 +807,7 @@ export class EnviartimbrePage implements OnInit {
         this.storageUbica = timbre.ubicacion;
         this.GuardartimbresinServidor(timbre);
       } else {
-        this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "bottom");
+        this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "middle");
 
         return this.router.navigate(['/login']);
 
@@ -828,11 +826,11 @@ export class EnviartimbrePage implements OnInit {
       },
       () => {
         this.GuardartimbresinServidor(data);
-        this.abrirToas('Error con la conexión al servidor. El timbre se guardo en memoria del teléfono', "danger", 5000, "bottom");
+        this.abrirToas('Error con la conexión al servidor. El timbre se guardo en memoria del teléfono', "danger", 5000, "middle");
       }
     ), error => {
       this.GuardartimbresinServidor(data);
-      this.abrirToas('Problemas con el servidor', "danger", 5000, "bottom");
+      this.abrirToas('Problemas con el servidor', "danger", 5000, "middle");
 
     };
 

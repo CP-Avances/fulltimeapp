@@ -128,7 +128,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
     console.log("Esta conectado: ", this.isConnected)
     if (!this.isConnected) {
-      this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "bottom");
+      this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
       console.log('Desconectado');
       this.colorIp = localStorage.getItem("colorIp")
       this.colorFp = localStorage.getItem("colorFp")
@@ -145,14 +145,14 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       this.parametros.ObtenerDetallesParametros(13).subscribe(
         res => {
           localStorage.setItem('timbrarSinInternet', res[0].descripcion);
-            this.router.navigate(['/enviartimbre', accion]);       
+          this.router.navigate(['/enviartimbre', accion]);
         },
       );
     } else {
       if (localStorage.getItem("timbrarSinInternet") == "Si") {
         this.router.navigate(['/enviartimbre', accion]);
       } else {
-        this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "bottom");
+        this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
       }
     };
   }
@@ -171,7 +171,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       message: mensaje,
       duration: duracion,
       color: color,
-      position: position
+      position: position,
     });
     toast.present();
   }
@@ -205,7 +205,12 @@ export class BienvenidoPage implements OnInit, OnDestroy {
         this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
 
       } else {
-        this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "bottom");
+        if (this.networkService.getNetworkStatusDispositivo() == false) {
+          this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
+
+        } else {
+          this.router.navigate(['/enviartimbre', 'Fin de permiso']);
+        }
       }
 
     } else {
@@ -221,7 +226,12 @@ export class BienvenidoPage implements OnInit, OnDestroy {
         this.router.navigate(['/enviartimbre', 'Fin de permiso']);
 
       } else {
-        this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "bottom");
+        if (this.networkService.getNetworkStatusDispositivo() == false) {
+          this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
+
+        } else {
+          this.router.navigate(['/enviartimbre', 'Fin de permiso']);
+        }
       }
     } else {
       this.mostrarToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.");

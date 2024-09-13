@@ -5,12 +5,13 @@ import { ReportesService } from '../../services/reportes.service';
 import { PlantillaReportesService } from '../../libs/plantilla-reportes.service';
 import { Timbre } from '../../interfaces/Timbre';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
-
-
 import moment from 'moment';
-
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
 
 @Component({
   selector: 'app-reporte-timbre',
@@ -24,12 +25,14 @@ export class ReporteTimbreComponent implements OnInit {
 
 
 
- // get timbreDispositivo() { return this.reporteService.mostrarTimbreDispositivo };
+  // get timbreDispositivo() { return this.reporteService.mostrarTimbreDispositivo };
 
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
 
-   
+  existenEmpleados = true;
+
+  verReporte = false
 
   timbres: Timbre[];
 
@@ -54,8 +57,6 @@ export class ReporteTimbreComponent implements OnInit {
     public validar: ValidacionesService,
     public alertController: AlertController,
     private relojService: RelojServiceService,
-
-
   ) { }
 
   ngOnInit() {
@@ -72,7 +73,6 @@ export class ReporteTimbreComponent implements OnInit {
   obtenerDatosEmpresa(idEmpresa: any) {
     this.relojService.obtenerDatosEmpresa(idEmpresa).subscribe(
       res => {
-
         console.log("ver datos empresa", res)
         console.log(res);
         this.empresa = res[0];
@@ -98,7 +98,10 @@ export class ReporteTimbreComponent implements OnInit {
   data_pdf: any = [];
 
   consultarDataReporte() {
+    this.showBtnPdf = true;
+    this.existenEmpleados = false;
     this.data_pdf = [];
+
     const fechaI = new Date(this.fechaInicio);
     const fechaFormateadaInicio = fechaI.toISOString().split('T')[0];
 
@@ -109,13 +112,15 @@ export class ReporteTimbreComponent implements OnInit {
 
       this.ExtraerDatos();
       console.log("ver datos de los timbres ", this.data_pdf)
-      this.showBtnPdf = true;
       this.loading = true;
 
       if (this.count == 100) {
         this.alertLimiteReporte();
       }
     }, err => {
+      this.existenEmpleados = true
+      this.showBtnPdf = false;
+      this.loading = true;
       this.plantillaPDF.abrirToas(err.error.message, 'danger', 3000)
     })
   }
@@ -138,13 +143,7 @@ export class ReporteTimbreComponent implements OnInit {
     });
     await alert.present();
   }
-  //FIN mostrar Alerta
-  /*
-    generarPDF() {
-      const filename = 'reporteTimbres.pdf'
-      this.plantillaPDF.generarPdf(this.getDocumentDefinicion(), filename)
-    }
-  */
+
   closeModal() {
     console.log('CERRAR MODAL Reporte timbre');
     this.modalController.dismiss({
@@ -178,7 +177,7 @@ export class ReporteTimbreComponent implements OnInit {
     let documentDefinition: any;
     documentDefinition = this.DefinirInformacionPDF();
     let doc_name = `Timbres_usuario.pdf`;
-    this.plantillaPDF.generarPdf(documentDefinition, doc_name)
+    this.plantillaPDF.generarPdf(documentDefinition, doc_name);
   }
 
   DefinirInformacionPDF() {
@@ -240,7 +239,7 @@ export class ReporteTimbreComponent implements OnInit {
     };
   }
 
- 
+
 
   // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
   EstructurarDatosPDF(data: any[]): Array<any> {
@@ -262,7 +261,7 @@ export class ReporteTimbreComponent implements OnInit {
         descripcion = 'LISTA EMPLEADOS';
         establecimiento = '';
       }
-            //}
+      //}
       // CABECERA PRINCIPAL
       n.push({
         style: 'tableMarginCabecera',
@@ -308,7 +307,7 @@ export class ReporteTimbreComponent implements OnInit {
                 },
                 {
                   border: [true, true, false, false],
-                  text: 'EMPLEADO: ' + empl.apellido + ' '+ empl.nombre ,
+                  text: 'EMPLEADO: ' + empl.apellido + ' ' + empl.nombre,
                   style: 'itemsTableInfoEmpleado',
                 },
                 {
@@ -446,6 +445,7 @@ export class ReporteTimbreComponent implements OnInit {
       data.empleados.forEach((usu: any) => {
         usu.timbres.forEach((t: any) => {
           n = n + 1;
+          this.count = n;
           let servidor_fecha = '';
           let servidor_hora = '';
           if (t.fecha_hora_timbre_validado != '' && t.fecha_hora_timbre_validado != null) {
@@ -486,9 +486,13 @@ export class ReporteTimbreComponent implements OnInit {
             observacion: t.observacion
           }
           this.timbres.push(ele);
+
         })
       })
     })
+    this.existenEmpleados = true;
+    this.verReporte = true;
+
   }
 
 

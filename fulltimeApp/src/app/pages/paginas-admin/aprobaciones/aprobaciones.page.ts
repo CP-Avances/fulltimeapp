@@ -192,7 +192,7 @@ export class AprobacionesPage implements OnInit {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
     console.log("Esta conectado: ", this.isConnected)
     if (!this.isConnected) {
-      this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "bottom");
+      this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
 
     } else {
 

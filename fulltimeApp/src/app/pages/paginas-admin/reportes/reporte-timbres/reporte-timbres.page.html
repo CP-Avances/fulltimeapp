@@ -18,7 +18,7 @@
             <ng-template>
               <ion-content>
                 <ion-datetime presentation="date" [showDefaultButtons]="false" [value]="fechaInicio" name="finicio"
-                  mode="md" (ionChange)="changeFechaInicio($event)" min="1990-01-01" max="2050-12-31" color="success">
+                  mode="md" (ionChange)="changeFechaInicio($event)" min="1990-01-01"  [max]="maxDate" color="success">
                 </ion-datetime>
                 <div style="width: 95%">
                   <ion-label style="float: right; margin: 2%; font-size: medium;" color="success"
@@ -38,7 +38,7 @@
             <ng-template>
               <ion-content>
                 <ion-datetime #datetimeFinal presentation="date" [showDefaultButtons]="false" [value]="fechaFinal"
-                  name="ffinal" mode="md" (ionChange)="changeFechaFinal($event)" [min]="fechaIn" max="2050-12-31">
+                  name="ffinal" mode="md" (ionChange)="changeFechaFinal($event)" [min]="fechaIn" [max]="maxDate">
                 </ion-datetime>
                 <div style="width: 95%">
                   <ion-label style="float: right; margin: 2%; font-size: medium;" color="primary"
@@ -72,7 +72,7 @@
   </ion-list>
 
   <ion-item>
-    <ion-toggle (ionChange)="toggleChanged($event)"></ion-toggle>
+    <ion-toggle (ionChange)="toggleChanged($event)" [(ngModel)]="activarOpcion"></ion-toggle>
     <ion-label>Información del dispositivo</ion-label>
   </ion-item>
 
@@ -80,7 +80,7 @@
     <div style="text-align: center;">
       <br>
       <ion-text color="primary">
-        <span>Obteniendo Datos Por favor Espere</span>
+        <span>Obteniendo datos, por favor espere</span>
       </ion-text>
       <ion-progress-bar type="indeterminate"></ion-progress-bar>
       <br>
@@ -89,8 +89,6 @@
 
 
   <!-- LISTAR SUCURSALES -->
-  <ion-row *ngIf="opcion_sucursal">
-  </ion-row>
   <ion-row *ngIf="opcion_sucursal">
     <ion-col *ngIf="isChecked_sucu" size="2">
       <ion-button color="secondary" (click)="checkedAll_sucu( isAllCheck_sucu )">
@@ -139,7 +137,7 @@
     </ion-col>
     <ion-col [size]="isChecked_depa ? 10: 12">
       <ion-button (click)="EnviarDepartamento()" shape="round">
-        ENVIAR
+        PDF
       </ion-button>
     </ion-col>
   </ion-row>
@@ -184,7 +182,7 @@
     </ion-col>
     <ion-col [size]="isChecked_empl ? 10: 12">
       <ion-button (click)="EnviarEmpleado()" shape="round">
-        ENVIAR
+        PDF
       </ion-button>
     </ion-col>
   </ion-row>

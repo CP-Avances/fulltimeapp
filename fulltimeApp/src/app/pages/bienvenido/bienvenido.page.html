@@ -160,7 +160,7 @@
 
     <div class="Info_hora">
       <ion-fab vertical="center" horizontal="end" slot="fixed" style="width:13.5%;">
-        <ion-fab-button color="tertiary" [routerLink]="['/enviartimbre','Timbre abierto']">
+        <ion-fab-button (click)="VerificarTimbresSinInternet('Timbre abierto')" horarioAbierto color="tertiary" >
           <ion-icon name="alarm-outline"></ion-icon>
         </ion-fab-button>
       </ion-fab>

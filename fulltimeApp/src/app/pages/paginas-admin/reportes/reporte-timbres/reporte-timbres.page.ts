@@ -18,10 +18,9 @@ interface checkOptions {
 })
 export class ReporteTimbresPage {
 
+  // INTERRUPTOR PARA VER LA INFORMACION DEL DISPOSITIVO
   activarOpcion: boolean = false;
   toggleChanged(event: any) {
-    //ctivarOpcion= false;
-
     this.activarOpcion = event.detail.checked;
     if (this.activarOpcion) {
       console.log('El interruptor está activado');
@@ -30,6 +29,8 @@ export class ReporteTimbresPage {
     }
   }
 
+  // VARIABLES
+  maxDate: string = new Date().toISOString().split('T')[0];
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
 
@@ -39,8 +40,6 @@ export class ReporteTimbresPage {
 
   fechaIn: string = "";
   fechaFi: string = "";
-
-
   listLoaded: boolean = false;
   opcion_sucursal: boolean = false;
   opcion_depa: boolean = false;
@@ -63,14 +62,14 @@ export class ReporteTimbresPage {
 
   ngOnInit() {
     sessionStorage.removeItem('datos_comunicado');
-
     this.activarOpcion = false;
-
+    this.radioValue = 0;
   }
 
   ionViewWillEnter() {
     this.activarOpcion = false;
-
+    sessionStorage.removeItem('datos_comunicado');
+    this.radioValue = 0;
   }
 
   constructor(
@@ -167,10 +166,11 @@ export class ReporteTimbresPage {
     this.limpiarRango_fechas();
   }
 
-  radioValue;
+  radioValue = 0;
   showValue() {
     // 
     console.log(this.radioValue);
+
 
     if (this.radioValue === 1) {
       this.loadingEmpleado = false;
@@ -192,6 +192,15 @@ export class ReporteTimbresPage {
       this.opcion_depa = false;
       this.opcion_empleado = true;
       this.cargarEmpleados();
+    } else if (this.radioValue === 0) {
+      this.loadingEmpleado = true;
+      this.opcion_sucursal = false;
+      this.opcion_depa = false;
+      this.opcion_empleado = false;
+      sessionStorage.removeItem('datos_comunicado');
+      this.sucursales = [];
+      this.departamentos = [];
+      this.empleados = [];
     }
   }
 
@@ -240,7 +249,6 @@ export class ReporteTimbresPage {
   }
 
   cargarDepartamentos() {
-
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
       sessionStorage.setItem('datos_comunicado', JSON.stringify(res))
 
@@ -252,6 +260,7 @@ export class ReporteTimbresPage {
           id_suc: obj.id_suc,
           id_regimen: obj.id_regimen,
           ciudad: obj.ciudad,
+          //
           cargo: obj.name_cargo,
           departemento: obj.name_dep,
           regimen: obj.name_regimen,
@@ -384,18 +393,22 @@ export class ReporteTimbresPage {
 
   isChecked_sucu: boolean = true;
   EnviarSucursal() {
-    console.log('ver sucu-------', this.sucursales);
-    let sucu = [];
+    if (!this.fechaFi || !this.fechaIn) {
+      this.mostrarToas('Seleccione Fechas', 3000, "warning");
 
-    this.sucursales.forEach(o => {
-      if (o.isChecked_sucu === true) {
-        sucu.push(o);
-      }
-    });
-    console.log('ver depa-------', sucu);
-    this.ModelarSucursal(sucu)
-
+    } else {
+      console.log('ver sucu-------', this.sucursales);
+      let sucu = [];
+      this.sucursales.forEach(o => {
+        if (o.isChecked_sucu === true) {
+          sucu.push(o);
+        }
+      });
+      console.log('ver depa-------', sucu);
+      this.ModelarSucursal(sucu)
+    }
   }
+
   ModelarSucursal(dataSucursal) {
     let seleccionados: any = [];
     dataSucursal.forEach((sucursales: any) => {
@@ -416,17 +429,20 @@ export class ReporteTimbresPage {
 
   isChecked_depa: boolean = true;
   EnviarDepartamento() {
-    let depa = [];
-    this.departamentos.forEach(o => {
-      if (o.isChecked_depa === true) {
-        depa.push(o);
-      }
-    });
-    console.log('ver depa-------', depa);
-    this.ModelarDepartamentos(depa);
+    if (!this.fechaFi || !this.fechaIn) {
+      this.mostrarToas('Seleccione Fechas', 3000, "warning");
+    } else {
+      let depa = [];
+      this.departamentos.forEach(o => {
+        if (o.isChecked_depa === true) {
+          depa.push(o);
+        }
+      });
+      console.log('ver depa-------', depa);
+      this.ModelarDepartamentos(depa);
+    }
   }
   ModelarDepartamentos(dataDepartamentos) {
-
     let seleccionados: any = [];
     dataDepartamentos.forEach((departamento: any) => {
       seleccionados.push(departamento);
@@ -447,14 +463,18 @@ export class ReporteTimbresPage {
 
   isChecked_empl: boolean = true;
   EnviarEmpleado() {
-    let empl = [];
-    this.empleados.forEach(o => {
-      if (o.isChecked_empl === true) {
-        empl.push(o);
-      }
-    });
-    console.log('ver depa-------', empl);
-    this.ModelarEmpleados(empl)
+    if (!this.fechaFi || !this.fechaIn) {
+      this.mostrarToas('Seleccione Fechas', 3000, "warning");
+    } else {
+      let empl = [];
+      this.empleados.forEach(o => {
+        if (o.isChecked_empl === true) {
+          empl.push(o);
+        }
+      });
+      console.log('ver depa-------', empl);
+      this.ModelarEmpleados(empl)
+    }
   }
 
   ModelarEmpleados(dataEmpleados) {
@@ -462,7 +482,6 @@ export class ReporteTimbresPage {
     seleccionados[0].empleados = dataEmpleados;
     this.presentModal(seleccionados)
   }
-
 
   changeSearchSucursales(e: any) {
     const query = e.detail.value;
@@ -484,10 +503,8 @@ export class ReporteTimbresPage {
     const query = e.detail.value;
     const filtro = this.empleados.filter((o: any) => {
       return o.nombre.toLowerCase().indexOf(query.toLowerCase()) > -1
-
     })
     this.empleados_filtro = filtro
-
   }
 
   pageActual: number = 1;
@@ -504,8 +521,5 @@ export class ReporteTimbresPage {
     screenReaderPageLabel: 'page',
     screenReaderCurrentLabel: `You're on page`
   };
-
-
-  
 
 }

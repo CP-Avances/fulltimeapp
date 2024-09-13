@@ -45,48 +45,59 @@
 
     </ion-grid>
 
+    <div *ngIf="!existenEmpleados">
+      <ion-text color="primary">
+        <span>Obteniendo Reporte de Inasistencia</span>
+      </ion-text>
+      <ion-progress-bar value="0.5" buffer="0.75"></ion-progress-bar>
+    </div>
 
     <div class="info" *ngIf="count != 0">
       <h5>
         Faltas encontradas {{count}}
       </h5>
     </div>
-    <table id="tablaReporte" style="color: rgb(0, 0, 0);">
-      <thead class="header-table">
 
-        <tr>
-          <td style="text-align: center;" rowspan="2">N#</td>
-          <td style="text-align: center;" rowspan="2">Cédula</td>
-          <td style="text-align: center;" rowspan="2">Código</td>
-          <td style="text-align: center;" rowspan="2">Empleado</td>
-          <td style="text-align: center;" rowspan="2">Departamento</td>
-          <td style="text-align: center;" rowspan="2">Cargo</td>
-          <td style="text-align: center;" rowspan="2">Fecha</td>
-        </tr>
+    <div class="table-responsive" *ngIf="verReporte">
 
-      </thead>
+      <table id="tablaReporte" style="color: rgb(0, 0, 0);">
+        <thead class="header-table">
 
-      <tbody class="detail-table">
-        <tr *ngFor="let t of timbres">
-          <td>{{ t.n }}</td>
-          <td>{{ t.cedula }}</td>
-          <td>{{ t.codigo }}</td>
-          <td>{{ t.empleado }}</td>
-          <td>{{ t.departamento }}</td>
-          <td>{{ t.cargo }}</td>
-          <td>{{ t.fecha }}</td>
-        </tr>
+          <tr>
+            <td style="text-align: center;" rowspan="2">N#</td>
+            <td style="text-align: center;" rowspan="2">Cédula</td>
+            <td style="text-align: center;" rowspan="2">Código</td>
+            <td style="text-align: center;" rowspan="2">Empleado</td>
+            <td style="text-align: center;" rowspan="2">Departamento</td>
+            <td style="text-align: center;" rowspan="2">Cargo</td>
+            <td style="text-align: center;" rowspan="2">Fecha</td>
+          </tr>
 
-        <tr>
-          <td colspan="8" *ngIf="count != 0">
-            <p>
-              Total atrasos filtrados {{count}}
-            </p>
-          </td>
-        </tr>
+        </thead>
 
-      </tbody>
-    </table>
+        <tbody class="detail-table">
+          <tr *ngFor="let t of timbres">
+            <td>{{ t.n }}</td>
+            <td>{{ t.cedula }}</td>
+            <td>{{ t.codigo }}</td>
+            <td>{{ t.empleado }}</td>
+            <td>{{ t.departamento }}</td>
+            <td>{{ t.cargo }}</td>
+            <td>{{ t.fecha }}</td>
+          </tr>
+
+          <tr>
+            <td colspan="8" *ngIf="count != 0">
+              <p>
+                Total atrasos filtrados {{count}}
+              </p>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
     <br><br>
   </ng-template>
 
