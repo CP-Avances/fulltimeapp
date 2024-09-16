@@ -11,6 +11,7 @@ import { switchMap } from 'rxjs/operators';
 import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { NetworkService } from '../../libs/network.service';
 import { NavegadorAdminComponent } from 'src/app/componentes/navegador-admin/navegador-admin.component';
+import { Geolocation } from '@capacitor/geolocation';
 
 @Component({
   selector: 'app-bienvenido',
@@ -52,7 +53,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.startClock();
-    const subscription = interval(10000) // Intervalo de 1 hora en milisegundos
+    const subscription = interval(3600000) // Intervalo de 1 hora en milisegundos
       .pipe(
         switchMap(() => this.checkSession(localStorage.getItem("empleadoID")))
       )
@@ -141,21 +142,33 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   async VerificarTimbresSinInternet(accion: string) {
 
-    if (this.networkService.getNetworkStatusDispositivo() == true) {
-      this.parametros.ObtenerDetallesParametros(13).subscribe(
-        res => {
-          localStorage.setItem('timbrarSinInternet', res[0].descripcion);
-          this.router.navigate(['/enviartimbre', accion]);
-        },
-      );
-    } else {
-      if (localStorage.getItem("timbrarSinInternet") == "Si") {
-        this.router.navigate(['/enviartimbre', accion]);
+    await Geolocation.checkPermissions().then(() => {
+      if (this.networkService.getNetworkStatusDispositivo() == true) {
+        this.parametros.ObtenerDetallesParametros(13).subscribe(
+          res => {
+            localStorage.setItem('timbrarSinInternet', res[0].descripcion);
+            this.router.navigate(['/enviartimbre', accion]);
+          }, error => {
+            if (localStorage.getItem("timbrarSinInternet") == "Si") {
+              this.router.navigate(['/enviartimbre', accion]);
+            } else {
+              this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
+            }
+          }
+        );
       } else {
-        this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
-      }
-    };
+        if (localStorage.getItem("timbrarSinInternet") == "Si") {
+          this.router.navigate(['/enviartimbre', accion]);
+        } else {
+          this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
+        }
+      };
+    }).catch((error) => {
+      this.abrirToas('Ups, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
+    });
   }
+
+
   BuscarParametroTimbreSinInternet() {
 
     this.parametros.ObtenerDetallesParametros(13).subscribe(
@@ -181,6 +194,8 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     this.parametros.ObtenerFunciones().subscribe(res => {
       this.funciones = res[0];
       this.apro_permisos = this.funciones.permisos;
+      localStorage.setItem("apro_permisos", JSON.stringify(this.funciones.permisos));
+
       if (this.apro_permisos == true) {
         this.colorIp = "primary"
         this.colorFp = "dark"
@@ -192,50 +207,58 @@ export class BienvenidoPage implements OnInit, OnDestroy {
         localStorage.setItem("colorIp", "deshabilitado")
         localStorage.setItem("colorFp", "deshabilitado")
       }
+    },error =>{
+      this.colorIp = localStorage.getItem("colorIp")
+      this.colorFp = localStorage.getItem("colorFp")
     }
     );
   }
 
-  btn_InicioPermisosClick() {
-    if (this.apro_permisos == true) {
-      // this.router.navigateByUrl("/reloj/aprobar-permisos");
-      //this.closeAdmin()
-
-      if (localStorage.getItem('timbrarSinInternet') == "Si") {
-        this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
-
-      } else {
-        if (this.networkService.getNetworkStatusDispositivo() == false) {
-          this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
-
+  async btn_InicioPermisosClick() {
+    await Geolocation.checkPermissions().then(() => {
+      if (localStorage.getItem("apro_permisos")== "true") {
+        if (localStorage.getItem('timbrarSinInternet') == "Si") {
+          this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
         } else {
-          this.router.navigate(['/enviartimbre', 'Fin de permiso']);
+          if (this.networkService.getNetworkStatusDispositivo() == false) {
+            this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
+          } else {
+            this.router.navigate(['/enviartimbre', 'Fin de permiso']);
+          }
         }
+      } else {
+        this.mostrarToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.");
       }
-
-    } else {
-      this.mostrarToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.");
-    }
+    })
+      .catch((error) => {
+        this.abrirToas('Ups, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
+      })
   }
 
-  btn_FinPermisosClick() {
-    if (this.apro_permisos == true) {
-      // this.router.navigateByUrl("/reloj/aprobar-permisos");
-      //this.closeAdmin()
-      if (localStorage.getItem('timbrarSinInternet') == "Si") {
-        this.router.navigate(['/enviartimbre', 'Fin de permiso']);
-
-      } else {
-        if (this.networkService.getNetworkStatusDispositivo() == false) {
-          this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
+  async btn_FinPermisosClick() {
+    await Geolocation.checkPermissions().then(() => {
+      if (localStorage.getItem("apro_permisos")== "true") {
+        // this.router.navigateByUrl("/reloj/aprobar-permisos");
+        //this.closeAdmin()
+        if (localStorage.getItem('timbrarSinInternet') == "Si") {
+          this.router.navigate(['/enviartimbre', 'Fin de permiso']);
 
         } else {
-          this.router.navigate(['/enviartimbre', 'Fin de permiso']);
+          if (this.networkService.getNetworkStatusDispositivo() == false) {
+            this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
+
+          } else {
+            this.router.navigate(['/enviartimbre', 'Fin de permiso']);
+          }
         }
+      } else {
+        this.mostrarToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.");
       }
-    } else {
-      this.mostrarToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.");
-    }
+    })
+      .catch((error) => {
+        this.abrirToas('Ups, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
+      })
+
   }
 
   async mostrarToas(mensaje: string) {

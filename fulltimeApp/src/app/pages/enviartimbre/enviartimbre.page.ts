@@ -17,7 +17,6 @@ import { RelojServiceService } from "../../services/reloj-service.service";
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
 import { Camera, CameraDirection, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
-import { Diagnostic } from '@ionic-native/diagnostic/ngx';
 
 
 
@@ -57,7 +56,6 @@ export class EnviartimbrePage implements OnInit {
     public parametros: ParametrosService,
     private router: Router,
     private userService: DataUserLoggedService,
-    private diagnostic: Diagnostic
   ) { }
 
   ngOnInit() {
@@ -65,7 +63,6 @@ export class EnviartimbrePage implements OnInit {
     this.networkSubscriber();
     this.id_usuario = localStorage.getItem('empleadoID');
     this.codigo = localStorage.getItem('codigo');
-
     this.nombre_usuario = localStorage.getItem('nom');
     this.apellido_usuario = this.apellido_usuario = localStorage.getItem('ap');
     this.nombreInfo_timbre = this.activateRoute.snapshot.paramMap.get('idTimbre')
@@ -113,62 +110,27 @@ export class EnviartimbrePage implements OnInit {
   novedades_conexion: string = "";
 
   networkSubscriber() {
-
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
-
-      if (!this.isConnected) {
-        this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
-        console.log('Desconectado');
-        //this.geoLatitude = 0;
-        //this.geoLongitude = 0;
-        this.comprobarGPS();
-      } else {
-        console.log('conectado');
-        if (this.platform.is('capacitor')) {
-          console.log('entra 1')
-          this.comprobarGPS();
-        }
-        else {
-          console.log('entra 2')
-          this.comprobarGPS();
-          //this.obtenerPosicion();
-        }
-      }
+    if (!this.isConnected) {
+      this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
+      console.log('Desconectado');
+      this.comprobarGPS();
+    } else {
+      this.comprobarGPS();
+    }
   }
 
   //UBICACION
   async comprobarGPS() {
+      const permiso = await Geolocation.checkPermissions().then(() => {
+        this.obtenerPosicion();
+      })
+      .catch((error) => {
+        this.abrirToas('Ups, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
+      });
+      return permiso;
+  }0
 
-    const checkPermissions = async () => {
-
-      const permiso = await Geolocation.checkPermissions().then((isAvailable) => {
-        if (isAvailable) {
-          this.obtenerPosicion();
-        } else {
-          //LOOOK ME
-          this.isConnected = this.networkService.getNetworkStatusDispositivo();
-          if (this.isConnected) {
-            this.abrirToas('Ups, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
-          }
-        }
-      }).catch(
-        (e) => console.error(e)
-      )
-    }
-    return checkPermissions();
-
-  }
-
-  async isLocationEnabled() {
-    // Aquí puedes usar un plugin como Diagnostic para verificar si el GPS está encendido
-    try {
-      const isEnabled = await this.diagnostic.isLocationEnabled();
-      return isEnabled;
-    } catch (error) {
-      console.error('Error checking if GPS is enabled:', error);
-      return false;
-    }
-  }
 
   async obtenerPosicion() {
     this.cargandoPosicion = true;
@@ -337,33 +299,43 @@ export class EnviartimbrePage implements OnInit {
     await alert.present();
   }//fin mostrar Alerta
 
-  enviarTimbre(ev?: any) {
+  async verificarPermisoLocation(): Promise<boolean> {
+    const result = await Geolocation.checkPermissions();
+    if (result.location === 'granted') {
+      return true;
+    } else {
+      return false
+    }
+  }
+
+
+  async enviarTimbre(ev?: any) {
     //comprueba si estamos en un emulador o PC para envíar el timbre
     this.BuscarParametroTimbreSinInternet();
     this.BuscarParametroTimbreUbicacionDesconocida();
-    if(this.geoLongitude == 0){
-      this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "danger", 3000, "middle");
-    }else{
-      if ((this.platform.is('ios')) || (this.platform.is('android')) || (this.platform.is('capacitor'))) {
-        console.log("Entrando en TIMBRES VER")
-  
-        //this.identificarUsuario();
-        
-        this.BuscarParametroTimbreConFoto();
-        this.iniciarProcesoFoto();
-      }
-      else {
-        console.log("Entrando en web")
-        this.abrirToas('No se detecto autenticación, se guardara el timbre con esta observación.', "warning", 2000, "middle");
-        this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
-        this.BuscarParametroTimbreConFoto();
-        this.iniciarProcesoFoto();
-      }
-    }
 
-    
+    await this.verificarPermisoLocation()
+      .then(() => {
+        if ((this.platform.is('ios')) || (this.platform.is('android')) || (this.platform.is('capacitor'))) {
+          console.log("Entrando en TIMBRES VER")
 
- 
+          //this.identificarUsuario();
+
+          this.BuscarParametroTimbreConFoto();
+          this.iniciarProcesoFoto();
+        }
+        else {
+          console.log("Entrando en web")
+          this.abrirToas('No se detecto autenticación, se guardara el timbre con esta observación.', "warning", 2000, "middle");
+          this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
+          this.BuscarParametroTimbreConFoto();
+          this.iniciarProcesoFoto();
+        }
+
+      }).catch((error) => {
+        this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "danger", 3000, "middle");
+
+      });
   }
 
   obtenerIdTipo(): string {
@@ -510,7 +482,6 @@ export class EnviartimbrePage implements OnInit {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
 
     if (this.isConnected == true) {
-      if (this.geoLatitude == 0) return this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "danger", 3000, "middle");
 
       this.nuevoTimbre.latitud = this.geoLatitude + "";
       this.nuevoTimbre.longitud = this.geoLongitude + "";
@@ -520,8 +491,6 @@ export class EnviartimbrePage implements OnInit {
       this.ValidarModulo(this.geoLatitude, this.geoLongitude, this.rango, this.nuevoTimbre);
       console.log('paso validaciones de horario abierto');
     } else {
-      if (this.geoLatitude == 0) return this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "danger", 3000, "middle");
-
       //SIN INTERNET
       //Proceso de almacenamiento de informacion del timbre cuendo no tiene conexion al Internet.
       if (localStorage.getItem('timbrarSinInternet') == 'Si') {
@@ -534,7 +503,6 @@ export class EnviartimbrePage implements OnInit {
           this.nuevoTimbre.latitud = "0";
           this.nuevoTimbre.longitud = "0";
         }
-
         this.nuevoTimbre.ubicacion = 'Sin Ubicación';
         this.storageUbica = this.nuevoTimbre.ubicacion;
         this.nuevoTimbre.conexion = this.isConnected;
@@ -542,11 +510,8 @@ export class EnviartimbrePage implements OnInit {
         this.guardarTimbreStorage(this.nuevoTimbre);
         localStorage.setItem("storageUbicacion", this.storageUbica);
         return;
-
-
       } else {
         this.abrirToas('Timbre sin conexión a Internet. No Permitido', "danger", 5000, "middle");
-        
         return this.router.navigate(['/login']);
       }
     }
