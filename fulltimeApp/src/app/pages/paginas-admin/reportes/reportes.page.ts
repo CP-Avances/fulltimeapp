@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Platform, ToastController } from '@ionic/angular';
 import { NetworkService } from 'src/app/libs/network.service';
+import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
 
 @Component({
   selector: 'app-reportes',
@@ -12,7 +13,7 @@ import { NetworkService } from 'src/app/libs/network.service';
       <h3>Consulta tus reportes</h3>
     </header>
 
-    <ion-grid *ngIf="isConnected">
+    <ion-grid *ngIf="isConnected && serverConnected">
 
     <ion-row>
         <ion-col size="6">
@@ -109,7 +110,7 @@ import { NetworkService } from 'src/app/libs/network.service';
 
     </ion-grid>
 
-    <ion-content *ngIf="!isConnected">
+    <ion-content *ngIf="!isConnected || !serverConnected">
     <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
 
         <!-- Ventana de no conexion a internet-->
@@ -119,8 +120,11 @@ import { NetworkService } from 'src/app/libs/network.service';
           </ion-text>
           <br>
           <br>
-          <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;">
+          <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;"  *ngIf="serverConnected">
             Se podrá visualizar cuando tenga conexión a internet
+          </ion-text>
+          <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;" *ngIf="!serverConnected" >
+            Se podrán visualizar cuando tenga conexión al servidor
           </ion-text>
         </div>
         <div class="Imagen">
@@ -134,9 +138,12 @@ import { NetworkService } from 'src/app/libs/network.service';
         </div>
 
         <div style="margin: 4%; padding: 4%; text-align: center; border-radius: 2%;">
-          <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;">
-            No tiene conexión a internet
-          </ion-text>
+        <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;" *ngIf="serverConnected">
+          No tiene conexión a internet
+        </ion-text>
+        <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;" *ngIf="!serverConnected">
+          No tiene conexión al servidor
+        </ion-text>
         </div>
     </ion-content>
   </ion-content>
@@ -168,21 +175,24 @@ import { NetworkService } from 'src/app/libs/network.service';
   `],
 })
 export class ReportesPage implements OnInit {
+  serverConnected: boolean = true;
 
   constructor(
     public platform: Platform,
     private router: Router,
     public toastController: ToastController,
     private networkService: NetworkService,
-
+    private connectivityService: ConnectivityService
   ) { }
   deshabilitado: boolean = true;
 
 
   isConnected: boolean;
 
-  ngOnInit() {
+  async ngOnInit() {
     this.networkSubscriber();
+    this.serverConnected = await this.connectivityService.checkServerConnection();
+
   }
   ionViewWillEnter() {
     this.networkSubscriber();

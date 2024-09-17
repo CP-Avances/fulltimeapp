@@ -1,4 +1,4 @@
-<ion-header style="color: #000000;" *ngIf="isConnected">
+<ion-header style="color: #000000;" *ngIf="isConnected && serverConnected">
   <div>
     <div style="padding:1%; background: white">
       <br><br>
@@ -35,7 +35,7 @@
 
 </ion-header>
 
-<ion-header style="color: #000000;"  *ngIf="!isConnected">
+<ion-header style="color: #000000;"  *ngIf="!isConnected || !serverConnected">
   <div style="padding:1%; background: white">
     <br><br>
     <ion-img class="center" style="width:45%;" src="../../../assets/images/C_FTLOGORV.png"></ion-img>
@@ -46,7 +46,7 @@
   <br>
 </ion-header>
 
-<ng-container *ngIf="isConnected">
+<ng-container *ngIf="isConnected && serverConnected">
   <!--Contenedor de todos los timbres admin-->
 
   <ion-content *ngIf="!todos">
@@ -264,7 +264,7 @@
 </ng-container>
 
 
-<ng-container *ngIf="!isConnected">
+<ng-container *ngIf="!isConnected || !serverConnected ">
   <ion-content>
     <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
 
@@ -275,8 +275,11 @@
       </ion-text>
       <br>
       <br>
-      <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;">
+      <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;" *ngIf="serverConnected" >
         Se podrán visualizar cuando tenga conexión a internet
+      </ion-text>
+      <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;" *ngIf="!serverConnected" >
+        Se podrán visualizar cuando tenga conexión al servidor
       </ion-text>
     </div>
     <div class="Imagen">
@@ -290,8 +293,12 @@
     </div>
 
     <div style="margin: 4%; padding: 4%; text-align: center; border-radius: 2%;">
-      <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;">
+      <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;" *ngIf="serverConnected">
         No tiene conexión a internet
+      </ion-text>
+
+      <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;" *ngIf="!serverConnected">
+        No tiene conexión al servidor
       </ion-text>
     </div>
   </ion-content>

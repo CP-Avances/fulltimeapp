@@ -22,18 +22,11 @@ export class ReporteTimbreComponent implements OnInit {
 
   @Input() data: any;
   @Input() activarOpcion: any;
-
-
-
-  // get timbreDispositivo() { return this.reporteService.mostrarTimbreDispositivo };
-
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
 
   existenEmpleados = true;
-
   verReporte = false
-
   timbres: Timbre[];
 
   showBtnPdf: boolean = false;

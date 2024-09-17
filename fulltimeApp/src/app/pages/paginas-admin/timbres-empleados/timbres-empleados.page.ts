@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ModalController, Platform, ToastController } from '@ionic/angular';
 import { VerTimbreEmpleadoComponent } from 'src/app/modals/ver-timbre-empleado/ver-timbre-empleado.component';
 import { NetworkService } from 'src/app/libs/network.service';
+import { ConnectivityService } from 'src/app/services/conexion-servidor.service';
 
 @Component({
   selector: 'app-timbres-empleados',
@@ -12,6 +13,7 @@ import { NetworkService } from 'src/app/libs/network.service';
 export class TimbresEmpleadosPage implements OnInit {
 
   modal: any;
+  serverConnected: boolean = true;
 
   constructor(
     public toastController: ToastController,
@@ -19,11 +21,14 @@ export class TimbresEmpleadosPage implements OnInit {
     public platform: Platform,
     private router: Router,
     private networkService: NetworkService,
+    private connectivityService: ConnectivityService
 
     ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.networkSubscriber();
+    this.serverConnected = await this.connectivityService.checkServerConnection();
+
   }
 
   ionViewWillEnter() {

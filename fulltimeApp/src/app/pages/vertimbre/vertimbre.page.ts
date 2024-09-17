@@ -14,6 +14,7 @@ import { VerImagenModalPage } from 'src/app/modals/ver-timbre-empleado/ver-image
 import { NetworkService } from '../../libs/network.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { ConnectivityService } from '../../services/conexion-servidor.service'  
 
 @Component({
   selector: 'app-vertimbre',
@@ -28,18 +29,17 @@ export class VertimbrePage implements OnInit {
   // loading: any;
   timbres: any = []; //esta variable contiene los timbres que se muestran en la lista y se VAN A ENVIAR AL 
   timbres_filtro: any = []; //esta variable contiene los timbres filtrados que se muestran en la lista
-
   pageTodos: number;
   paginafiltro: number;
   showBtnPdf: boolean = false;
   loading: boolean = false;
-
   filtro: boolean = true;
   todos: boolean = false;
   filtro_mensaje: boolean = true;
   vacio: boolean = true;
   btn_filtro: boolean = false;
   btn_todos: boolean = false;
+  serverConnected: boolean = true;
 
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
@@ -60,12 +60,13 @@ export class VertimbrePage implements OnInit {
     public platform: Platform,
     public validar: ValidacionesService,
     private networkService: NetworkService,
-  
-
+    private connectivityService: ConnectivityService
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.networkSubscriber();
+    this.serverConnected = await this.connectivityService.checkServerConnection();
+
   }
   ionViewWillEnter() {
  
@@ -230,7 +231,7 @@ export class VertimbrePage implements OnInit {
 
       },
       err => {
-        this.presentLoading("Intentando conectar con el servidor");
+        //this.presentLoading("Intentando conectar con el servidor");
       }
 
     );
@@ -286,7 +287,7 @@ export class VertimbrePage implements OnInit {
 
         },
         err => {
-          this.presentLoading("Intentando conectar con el servidor");
+          return this.mostrarToas('Lo sentimos no fue posible conectar con el servidor', 3000, "danger");
         }
       );
     }

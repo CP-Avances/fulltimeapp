@@ -154,11 +154,9 @@ export class ReporteInasistenciaPage {
     console.log('Salo de reporte de Inasistencias');
     this.limpiarRango_fechas();
   }
+
   radioValue = 0;
   showValue() {
-    // 
-    console.log(this.radioValue);
-
     if (this.radioValue === 1) {
       this.loadingEmpleado = false;
       this.opcion_sucursal = true;
@@ -189,8 +187,6 @@ export class ReporteInasistenciaPage {
       this.departamentos = [];
       this.empleados = [];
     }
-
-
   }
 
 

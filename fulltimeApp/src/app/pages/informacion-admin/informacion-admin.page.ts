@@ -9,6 +9,7 @@ import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ModalController, Platform, ToastController } from '@ionic/angular';
 import { InformacionEmpleadoPage } from '../informacion-empleado/informacion-empleado.page';
 import { NetworkService } from '../../libs/network.service';
+import { ConnectivityService } from '../../services/conexion-servidor.service'  
 
 @Component({
   selector: 'app-informacion-admin',
@@ -22,6 +23,7 @@ export class InformacionAdminPage implements OnInit {
   pipe = new DatePipe('en-US');
   pageActual: number = 1;
   isConnected: boolean;
+  serverConnected: boolean = true;
 
   empresa: any = {
     nombre: '',
@@ -64,11 +66,12 @@ export class InformacionAdminPage implements OnInit {
     public modalController: ModalController,
     private toastController: ToastController,
     private networkService: NetworkService,
-
+    private connectivityService: ConnectivityService
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.networkSubscriber();
+    this.serverConnected = await this.connectivityService.checkServerConnection();
   }
   ionViewWillEnter() {
  

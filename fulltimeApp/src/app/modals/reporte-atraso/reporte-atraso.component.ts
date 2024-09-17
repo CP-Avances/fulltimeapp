@@ -19,8 +19,9 @@ export class ReporteAtrasoComponent implements OnInit {
   @Input() data: any;
 
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
-
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
+  existenEmpleados = true;
+
   timbres: any = [];
   count: number = 0;
   formato_fecha: string;
@@ -72,7 +73,6 @@ export class ReporteAtrasoComponent implements OnInit {
   obtenerDatosEmpresa(idEmpresa: any) {
     this.relojService.obtenerDatosEmpresa(idEmpresa).subscribe(
       res => {
-
         console.log("ver datos empresa", res)
         console.log(res);
         this.empresa = res[0];
@@ -115,19 +115,13 @@ export class ReporteAtrasoComponent implements OnInit {
 
 
   consultarDataReporte() {
+    this.showBtnPdf = true;
+    this.existenEmpleados = false;
     this.timbres = [];
-    let n = 0; // Inicializa n en 0
-    console.log('generar reporte...');
-    console.log(this.fechaFinal);
-    console.log(this.fechaInicio);
-    this.listadeUno[0].empleados.push(this.data)
-    console.log("ver lista de empleados 1:", this.listadeUno)
-    this.loading = false;
-
-    this.reporteService.BuscarAtrasos(this.listadeUno, this.fechaInicio, this.fechaFinal).subscribe(res => {
+    let n = 0; 
+    this.reporteService.BuscarAtrasos(this.data, this.fechaInicio, this.fechaFinal).subscribe(res => {
       this.atrasos = res;
       console.log("ver atrasos buscadas", this.atrasos)
-
       this.atrasos.forEach(data => {
         data.empleados.forEach((empl: any) => {
           empl.atrasos.forEach((usu: any) => {
@@ -160,7 +154,6 @@ export class ReporteAtrasoComponent implements OnInit {
         })
 
       })
-      this.showBtnPdf = true;
       this.loading = true;
       if (this.count == 100) {
         this.alertLimiteReporte();
@@ -194,7 +187,7 @@ export class ReporteAtrasoComponent implements OnInit {
   *                               PARA LA EXPORTACIÓN DE ARCHIVOS PDF
   * ****************************************************************************************************/
 
-  
+
   // METODO PARA CONVERTIR SEGUNDOS A MINUTOS
   SegundosAMinutosConDecimales(segundos: number) {
     return Number((segundos / 60).toFixed(2));
@@ -218,7 +211,7 @@ export class ReporteAtrasoComponent implements OnInit {
       this.frase = res[0].marca_agua;
     });
   }
-    
+
   logo: any = String;
   ObtenerLogo() {
     this.plantillaPDF.LogoEmpresaImagenBase64(localStorage.getItem('id_empresa') as string).subscribe(res => {
@@ -226,19 +219,15 @@ export class ReporteAtrasoComponent implements OnInit {
     });
   }
 
-
- GenerarPDF() {
+  GenerarPDF() {
     let documentDefinition: any;
     documentDefinition = this.DefinirInformacionPDF();
     let doc_name = `Atrasos_usuario.pdf`;
     this.plantillaPDF.generarPdf(documentDefinition, doc_name)
-
-    //pdfMake.createPdf(documentDefinition).download(doc_name);
- 
   }
 
-  
-  
+
+
   DefinirInformacionPDF() {
     var inicio = this.validar.FormatearFecha(this.fechaInicio, this.formato_fecha, this.validar.dia_completo);
     var fin = this.validar.FormatearFecha(this.fechaFinal, this.formato_fecha, this.validar.dia_completo);
@@ -247,7 +236,7 @@ export class ReporteAtrasoComponent implements OnInit {
       pageOrientation: 'portrait',
       pageMargins: [40, 50, 40, 50],
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
-      header: { text: 'Impreso por:  '+ localStorage.getItem('nom') + ' ' +localStorage.getItem('ap'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
+      header: { text: 'Impreso por:  ' + localStorage.getItem('nom') + ' ' + localStorage.getItem('ap'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       footer: function (currentPage: any, pageCount: any, fecha: any) {
         let f = moment();
         fecha = f.format('YYYY-MM-DD');
@@ -325,9 +314,20 @@ export class ReporteAtrasoComponent implements OnInit {
       let descripcion = '';
       let establecimiento = 'SUCURSAL: ' + selec.sucursal;
       let opcion = selec.nombre;
+      if (selec.opcion == 2) {
+        descripcion = 'DEPARTAMENTO: ' + selec.departamento;
+        resumen = 'TOTAL DEPARTAMENTOS';
+        opcion = selec.departamento;
 
-      descripcion = 'LISTA EMPLEADOS';
-      establecimiento = '';
+      } else if (selec.opcion == 1) {
+        descripcion = 'CIUDAD: ' + selec.ciudad;
+        resumen = 'TOTAL SUCURSALES';
+      }
+      else if (selec.opcion == 3) {
+        descripcion = 'LISTA EMPLEADOS';
+        establecimiento = '';
+      }
+      
 
       // DATOS DE RESUMEN GENERAL
       let informacion = {
@@ -382,7 +382,7 @@ export class ReporteAtrasoComponent implements OnInit {
                 },
                 {
                   border: [true, true, false, false],
-                  text: 'EMPLEADO: ' + empl.fullname,
+                  text: 'EMPLEADO: ' + empl.apellido + ' ' + empl.nombre,
                   style: 'itemsTableInfoEmpleado',
                 },
                 {
@@ -394,17 +394,17 @@ export class ReporteAtrasoComponent implements OnInit {
               [
                 {
                   border: [true, false, true, false],
-                  text: 'RÉGIMEN LABORAL ' + empl.regimen,
+                  text: 'RÉGIMEN LABORAL ' + empl.name_regimen,
                   style: 'itemsTableInfoEmpleado'
                 },
                 {
                   border: [true, false, false, false],
-                  text: 'DEPARTAMENTO: ' + empl.departamento,
+                  text: 'DEPARTAMENTO: ' + empl.name_dep,
                   style: 'itemsTableInfoEmpleado'
                 },
                 {
                   border: [true, false, true, false],
-                  text: 'CARGO: ' + empl.cargo,
+                  text: 'CARGO: ' + empl.name_cargo,
                   style: 'itemsTableInfoEmpleado'
                 }
               ]
@@ -537,8 +537,58 @@ export class ReporteAtrasoComponent implements OnInit {
 
       })
     })
+    if (data[0].opcion != 3) {
+      n.push({
+        style: 'tableMarginCabeceraTotal',
+        table: {
+          widths: ['*', '*', '*'],
+          headerRows: 1,
+          body: [
+            [
+              {
+                border: [true, true, false, true],
+                bold: true,
+                text: resumen,
+                style: 'itemsTableInfoTotal',
+                colSpan: 2
+              },
+              {},
+              { text: 'FALTAS', style: 'itemsTableInfoTotal' },
+            ],
+            ...general.map((info: any) => {
+              let valor = 0;
+              if (data[0].opcion == 1) {
+                valor = 2;
+              }
+              return [
+                {
+                  border: [true, true, false, true],
+                  bold: true,
+                  text: info.sucursal,
+                  style: 'itemsTableCentrado',
+                  colSpan: valor
+                },
+                {
+                  border: [true, true, false, true],
+                  bold: true,
+                  text: info.nombre,
+                  style: 'itemsTableCentrado',
+                },
+                { text: info.faltas, style: 'itemsTableCentrado' },
+              ]
+            })
+          ]
+        },
+        layout: {
+          fillColor: function (rowIndex: any) {
+            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+          }
+        }
+      });
+    }
+
     // RESUMEN TOTALES DE REGISTROS
-   
+
     return n;
   }
 

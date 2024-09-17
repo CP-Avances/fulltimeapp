@@ -4,6 +4,7 @@ import { ParametrosService } from 'src/app/services/parametros.service';
 import { AlertController, MenuController, ToastController } from '@ionic/angular';
 import { Platform } from '@ionic/angular';
 import { NetworkService } from 'src/app/libs/network.service';
+import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
 
 @Component({
   selector: 'app-solicitudes',
@@ -12,10 +13,10 @@ import { NetworkService } from 'src/app/libs/network.service';
   <hr>
   <ion-content>
     <header style="text-align: center;">
-      <h3 *ngIf="isConnected">Solicitudes</h3>
+      <h3 *ngIf="isConnected && serverConnected">Solicitudes</h3>
     </header>
 
-    <div class="Imagen" *ngIf="isConnected">
+    <div class="Imagen" *ngIf="isConnected && serverConnected">
       <img class="center" src="../../../assets/images/C_FTLOGORV.png">
         <ion-label style="text-align:center" mode="md" color="medium">
           <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
@@ -23,7 +24,7 @@ import { NetworkService } from 'src/app/libs/network.service';
         <img class="tamanoImagen" src="../../../assets/images/Solicitudes.svg">
     </div>
 
-    <ion-grid *ngIf="isConnected">
+    <ion-grid *ngIf="isConnected && serverConnected">
       <ion-row>
         <ion-col size="6">
           <ion-button [color] = "colorp" expand="block" (click)="BtnPermisos_click()">
@@ -73,8 +74,8 @@ import { NetworkService } from 'src/app/libs/network.service';
       </ion-row>
     </ion-grid>
 
-    <ion-content *ngIf="!isConnected">
-    <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
+    <ion-content *ngIf="!isConnected || !serverConnected">
+      <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
 
         <!-- Ventana de no conexion a internet-->
         <div style="margin: 2%; padding: 2%; text-align: center; border-radius: 2%;">
@@ -83,8 +84,11 @@ import { NetworkService } from 'src/app/libs/network.service';
           </ion-text>
           <br>
           <br>
-          <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;">
+          <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;"  *ngIf="serverConnected">
             Se podrá visualizar cuando tenga conexión a internet
+          </ion-text>
+          <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;" *ngIf="!serverConnected" >
+            Se podrán visualizar cuando tenga conexión al servidor
           </ion-text>
         </div>
         <div class="Imagen">
@@ -98,9 +102,12 @@ import { NetworkService } from 'src/app/libs/network.service';
         </div>
 
         <div style="margin: 4%; padding: 4%; text-align: center; border-radius: 2%;">
-          <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;">
-            No tiene conexión a internet
-          </ion-text>
+        <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;" *ngIf="serverConnected">
+          No tiene conexión a internet
+        </ion-text>
+        <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;" *ngIf="!serverConnected">
+          No tiene conexión al servidor
+        </ion-text>
         </div>
     </ion-content>
 
@@ -154,6 +161,7 @@ import { NetworkService } from 'src/app/libs/network.service';
   `],
 })
 export class SolicitudesPage implements OnInit {
+  serverConnected: boolean = true;
 
   constructor(
     private menu: MenuController,
@@ -163,6 +171,7 @@ export class SolicitudesPage implements OnInit {
     public alertController: AlertController,
     public parametros: ParametrosService,
     private networkService: NetworkService,
+    private connectivityService: ConnectivityService
 
   ) { }
 
@@ -182,10 +191,10 @@ export class SolicitudesPage implements OnInit {
     this.networkSubscriber();
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.VerificarFunciones();
     this.networkSubscriber();
-
+    this.serverConnected = await this.connectivityService.checkServerConnection();
   }
 
   Btn_permisos: boolean;

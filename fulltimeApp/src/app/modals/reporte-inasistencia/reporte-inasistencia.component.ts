@@ -89,18 +89,11 @@ export class ReporteInasistenciaComponent implements OnInit {
     representante: '',
   };
 
-  data_pdf: any = [];
 
   consultarDataReporte() {
     this.showBtnPdf = true;
     this.existenEmpleados = false;
-    this.data_pdf = [];
     let n = 0;
-    const fechaI = new Date(this.fechaInicio);
-    const fechaFormateadaInicio = fechaI.toISOString().split('T')[0];
-    const fechaF = new Date(this.fechaFinal);
-    const fechaFormateadaFin = fechaF.toISOString().split('T')[0];
-
     this.reporteService.BuscarFaltas(this.data, this.fechaInicio, this.fechaFinal).subscribe(res => {
       this.faltas = res;
       console.log("ver faltas buscadas", this.faltas)

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ModalController, Platform, ToastController } from '@ionic/angular';
 import { TimbreJustificadoComponent } from 'src/app/modals/timbre-justificado/timbre-justificado.component';
 import { NetworkService } from 'src/app/libs/network.service';
+import { ConnectivityService } from 'src/app/services/conexion-servidor.service';
 
 @Component({
   selector: 'app-justificar-timbres',
@@ -13,6 +14,7 @@ export class JustificarTimbresPage implements OnInit {
 
   modal: any;
   isConnected: boolean;
+  serverConnected: boolean = true;
 
   constructor(
     public toastController: ToastController,
@@ -21,11 +23,13 @@ export class JustificarTimbresPage implements OnInit {
     public platform: Platform,
     private router: Router,
     private networkService: NetworkService,
+    private connectivityService: ConnectivityService
 
     ) {}
 
-    ngOnInit() {
+    async ngOnInit() {
       this.networkSubscriber();
+      this.serverConnected = await this.connectivityService.checkServerConnection();
     }
   
     ionViewWillEnter() {
