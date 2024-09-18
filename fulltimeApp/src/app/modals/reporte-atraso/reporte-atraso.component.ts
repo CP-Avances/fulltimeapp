@@ -17,15 +17,14 @@ import moment from 'moment';
 export class ReporteAtrasoComponent implements OnInit {
 
   @Input() data: any;
-
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
   existenEmpleados = true;
-
   timbres: any = [];
   count: number = 0;
   formato_fecha: string;
   formato_hora: string;
+  verReporte = false
 
   listadeUno: any = [
     {
@@ -36,6 +35,7 @@ export class ReporteAtrasoComponent implements OnInit {
   atrasos: any = [];
 
   showBtnPdf: boolean = false;
+  showBtnBuscar: boolean = false;
   loading: boolean = true;
 
   constructor(
@@ -115,10 +115,10 @@ export class ReporteAtrasoComponent implements OnInit {
 
 
   consultarDataReporte() {
-    this.showBtnPdf = true;
+    this.showBtnBuscar = true
     this.existenEmpleados = false;
     this.timbres = [];
-    let n = 0; 
+    let n = 0;
     this.reporteService.BuscarAtrasos(this.data, this.fechaInicio, this.fechaFinal).subscribe(res => {
       this.atrasos = res;
       console.log("ver atrasos buscadas", this.atrasos)
@@ -152,13 +152,16 @@ export class ReporteAtrasoComponent implements OnInit {
             this.timbres.push(ele);
           })
         })
-
       })
+      this.showBtnPdf = true;
+      this.existenEmpleados = true;
+      this.verReporte = true;
       this.loading = true;
       if (this.count == 100) {
         this.alertLimiteReporte();
       }
     }, err => {
+      this.existenEmpleados = false;
       console.log("ver el error", err)
       this.showBtnPdf = false;
       this.loading = true;
@@ -229,8 +232,6 @@ export class ReporteAtrasoComponent implements OnInit {
 
 
   DefinirInformacionPDF() {
-    var inicio = this.validar.FormatearFecha(this.fechaInicio, this.formato_fecha, this.validar.dia_completo);
-    var fin = this.validar.FormatearFecha(this.fechaFinal, this.formato_fecha, this.validar.dia_completo);
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -261,7 +262,7 @@ export class ReporteAtrasoComponent implements OnInit {
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         { text: this.empresa.nombre.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 5] },
         { text: `ATRASOS - USUARIOS`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
-        { text: 'PERIODO DEL: ' + inicio + " AL " + fin, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
+        { text: 'PERIODO DEL: ' + this.fechaInicio.split('T')[0] + " AL " + this.fechaFinal.split('T')[0], bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
         ...this.EstructurarDatosPDF(this.atrasos).map((obj: any) => {
           return obj
         })
@@ -327,7 +328,7 @@ export class ReporteAtrasoComponent implements OnInit {
         descripcion = 'LISTA EMPLEADOS';
         establecimiento = '';
       }
-      
+
 
       // DATOS DE RESUMEN GENERAL
       let informacion = {
@@ -541,7 +542,7 @@ export class ReporteAtrasoComponent implements OnInit {
       n.push({
         style: 'tableMarginCabeceraTotal',
         table: {
-          widths: ['*', '*', '*'],
+          widths: ['*', '*', 'auto', 'auto', 'auto', 'auto'],
           headerRows: 1,
           body: [
             [
@@ -553,7 +554,10 @@ export class ReporteAtrasoComponent implements OnInit {
                 colSpan: 2
               },
               {},
-              { text: 'FALTAS', style: 'itemsTableInfoTotal' },
+              { colSpan: 2, text: 'PERMISO', style: 'itemsTableInfoTotal' },
+              {},
+              { colSpan: 2, text: 'ATRASO', style: 'itemsTableInfoTotal' },
+              {},
             ],
             ...general.map((info: any) => {
               let valor = 0;
@@ -574,7 +578,10 @@ export class ReporteAtrasoComponent implements OnInit {
                   text: info.nombre,
                   style: 'itemsTableCentrado',
                 },
-                { text: info.faltas, style: 'itemsTableCentrado' },
+                { text: '', style: 'itemsTableDerecha' },
+                { text: '', style: 'itemsTableCentrado' },
+                { text: info.formato_general, style: 'itemsTableCentrado' },
+                { text: info.formato_decimal, style: 'itemsTableDerecha' },
               ]
             })
           ]

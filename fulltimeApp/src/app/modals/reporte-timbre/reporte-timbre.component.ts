@@ -30,6 +30,7 @@ export class ReporteTimbreComponent implements OnInit {
   timbres: Timbre[];
 
   showBtnPdf: boolean = false;
+  showBtnBuscar: boolean = false;
   loading: boolean = true;
   count: number = 0;
   empresa: any = {
@@ -91,7 +92,7 @@ export class ReporteTimbreComponent implements OnInit {
   data_pdf: any = [];
 
   consultarDataReporte() {
-    this.showBtnPdf = true;
+    this.showBtnBuscar = true
     this.existenEmpleados = false;
     this.data_pdf = [];
 
@@ -110,8 +111,10 @@ export class ReporteTimbreComponent implements OnInit {
       if (this.count == 100) {
         this.alertLimiteReporte();
       }
+      this.showBtnPdf = true;
+
     }, err => {
-      this.existenEmpleados = true
+      this.existenEmpleados = false;
       this.showBtnPdf = false;
       this.loading = true;
       this.plantillaPDF.abrirToas(err.error.message, 'danger', 3000)
@@ -175,8 +178,6 @@ export class ReporteTimbreComponent implements OnInit {
 
   DefinirInformacionPDF() {
     // DEFINIR ORIENTACION DE LA PAGINA
-    var inicio = this.validar.FormatearFecha(this.fechaInicio, this.formato_fecha, this.validar.dia_completo);
-    var fin = this.validar.FormatearFecha(this.fechaFinal, this.formato_fecha, this.validar.dia_completo);
     return {
       pageSize: 'A4',
       pageOrientation: 'landscape',

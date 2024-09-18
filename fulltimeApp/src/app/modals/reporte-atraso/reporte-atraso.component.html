@@ -21,7 +21,8 @@
       <ion-row>
 
         <ion-col size="6">
-          <ion-button color="success" shape="round" expand="full" (click)="consultarDataReporte()" [disabled]="showBtnPdf">
+          <ion-button color="success" shape="round" expand="full" (click)="consultarDataReporte()"
+            [disabled]="showBtnBuscar">
 
             <ng-container *ngIf="loading; then consultar; else spiner"></ng-container>
             <ng-template #consultar>
@@ -43,58 +44,69 @@
       </ion-row>
 
     </ion-grid>
+
+    <div *ngIf="!existenEmpleados">
+      <ion-text color="primary">
+        <span>Obteniendo timbres</span>
+      </ion-text>
+      <ion-progress-bar value="0.5" buffer="0.75"></ion-progress-bar>
+    </div>
+
     <div class="info" *ngIf="count != 0">
       <h5>
         Atrasos encontrados {{count}}
       </h5>
     </div>
-    <table>
-      <thead class="header-table">
+    <div class="table-responsive" *ngIf="verReporte">
+      <table>
+        <thead class="header-table">
           <tr>
-          <td style="text-align: center;" rowspan="2">N°</td>
-          <td style="text-align: center;" rowspan="2">EMPLEADO</td>
-          <td style="text-align: center;" rowspan="2">CÓDIGO</td>
-
-          <td style="text-align: center;" colspan="2">HORARIO</td>
-          <td style="text-align: center;" colspan="2">TIMBRE</td>
-
-          <th class="t_horarios" scope="col" rowspan="2" *ngIf="tolerancia!=='1'">TOLERANCIA</th>
-          <th class="t_horarios" scope="col" rowspan="2" colspan="2">ATRASO</th>
-        </tr>
-        <tr>
-          <td style="text-align: center;">FECHA</td>
-          <td style="text-align: center;">HORA</td>
-          <td style="text-align: center;">FECHA</td>
-          <td style="text-align: center;">HORA</td>
-        </tr>
-      </thead>
-      <tbody class="detail-table">
-        <tr *ngFor="let t of timbres">
-
-          <td>{{t.n }}</td>
-          <td>{{t.empleado }}</td>
-          <td>{{t.codigo}}</td>
-          <td>{{t.fechaHorario}}</td>
-          <td>{{t.horaHorario}}</td>
-          <td>{{t.fechaTimbre}}</td>
-          <td>{{t.horaTimbre}}</td>
-         
-          <td *ngIf="tolerancia!=='1'"> t.tolerancia</td>
-
-          <td class="t_horarios">{{ t.atrasoT }}</td>
-          <td class="t_horarios">{{ t.atrasoM }}</td>
-
-        </tr>
-
-        <tr>
-          <td colspan="8" *ngIf="count != 0">
-            <p>
-              Total atrasos filtrados {{count}}
-            </p>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            <td style="text-align: center;" rowspan="2">N°</td>
+            <td style="text-align: center;" rowspan="2">EMPLEADO</td>
+            <td style="text-align: center;" rowspan="2">CÓDIGO</td>
+  
+            <td style="text-align: center;" colspan="2">HORARIO</td>
+            <td style="text-align: center;" colspan="2">TIMBRE</td>
+  
+            <th class="t_horarios" scope="col" rowspan="2" *ngIf="tolerancia!=='1'">TOLERANCIA</th>
+            <th class="t_horarios" scope="col" rowspan="2" colspan="2">ATRASO</th>
+          </tr>
+          <tr>
+            <td style="text-align: center;">FECHA</td>
+            <td style="text-align: center;">HORA</td>
+            <td style="text-align: center;">FECHA</td>
+            <td style="text-align: center;">HORA</td>
+          </tr>
+        </thead>
+        <tbody class="detail-table">
+          <tr *ngFor="let t of timbres">
+  
+            <td>{{t.n }}</td>
+            <td>{{t.empleado }}</td>
+            <td>{{t.codigo}}</td>
+            <td>{{t.fechaHorario}}</td>
+            <td>{{t.horaHorario}}</td>
+            <td>{{t.fechaTimbre}}</td>
+            <td>{{t.horaTimbre}}</td>
+  
+            <td *ngIf="tolerancia!=='1'"> t.tolerancia</td>
+  
+            <td class="t_horarios">{{ t.atrasoT }}</td>
+            <td class="t_horarios">{{ t.atrasoM }}</td>
+  
+          </tr>
+  
+          <tr>
+            <td colspan="8" *ngIf="count != 0">
+              <p>
+                Total atrasos filtrados {{count}}
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+   
 
   </ng-template>
 

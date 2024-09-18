@@ -22,7 +22,7 @@
 
         <ion-col size="6">
           <ion-button color="success" shape="round" expand="full" (click)="consultarDataReporte()"
-            [disabled]="showBtnPdf">
+            [disabled]="showBtnBuscar">
 
             <ng-container *ngIf="loading; then consultar; else spiner"></ng-container>
             <ng-template #consultar>

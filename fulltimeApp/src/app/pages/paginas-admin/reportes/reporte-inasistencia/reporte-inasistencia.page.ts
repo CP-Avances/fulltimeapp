@@ -30,7 +30,6 @@ export class ReporteInasistenciaPage {
 
   fechaIn: string = "";
   fechaFi: string = "";
-  listLoaded: boolean = false;
   opcion_sucursal: boolean = false;
   opcion_depa: boolean = false;
   opcion_empleado: boolean = false;

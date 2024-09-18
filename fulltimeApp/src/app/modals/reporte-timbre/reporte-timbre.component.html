@@ -23,7 +23,7 @@
 
         <ion-col size="6">
           <ion-button color="success" shape="round" expand="full" (click)="consultarDataReporte()"
-            [disabled]="showBtnPdf">
+            [disabled]="showBtnBuscar">
 
             <ng-container *ngIf="loading; then consultar; else spiner"></ng-container>
             <ng-template #consultar>
@@ -48,7 +48,7 @@
 
     <div *ngIf="!existenEmpleados">
       <ion-text color="primary">
-        <span>Obteniendo empleados</span>
+        <span>Obteniendo timbres</span>
       </ion-text>
       <ion-progress-bar value="0.5" buffer="0.75"></ion-progress-bar>
     </div>

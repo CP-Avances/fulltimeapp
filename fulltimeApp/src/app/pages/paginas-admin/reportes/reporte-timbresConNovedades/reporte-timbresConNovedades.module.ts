@@ -4,9 +4,8 @@ import { FormsModule } from '@angular/forms';
 
 import { ReporteTimbresConNovedadesPageRoutingModule } from './reporte-timbresConNovedades-routing.module';
 import {ReporteTimbresConNovedadesPage } from './reporte-timbresConNovedades.page';
-
+import { NgxPaginationModule } from 'ngx-pagination';
 import { IonicModule } from '@ionic/angular';
-
 import { ComponentesModule } from '../../../../componentes/componentes.module';
 
 @NgModule({
@@ -15,7 +14,8 @@ import { ComponentesModule } from '../../../../componentes/componentes.module';
     FormsModule,
     IonicModule,
     ReporteTimbresConNovedadesPageRoutingModule, 
-    ComponentesModule
+    ComponentesModule,
+    NgxPaginationModule
   ],
   declarations: [ReporteTimbresConNovedadesPage]
 })

@@ -26,8 +26,8 @@ export class ReporteInasistenciaComponent implements OnInit {
   existenEmpleados = true;
 
   faltas: any = [];
-
   showBtnPdf: boolean = false;
+  showBtnBuscar: boolean = false;
   loading: boolean = true;
   count: number = 0;
   timbres: any = [];
@@ -91,7 +91,7 @@ export class ReporteInasistenciaComponent implements OnInit {
 
 
   consultarDataReporte() {
-    this.showBtnPdf = true;
+    this.showBtnBuscar = true
     this.existenEmpleados = false;
     let n = 0;
     this.reporteService.BuscarFaltas(this.data, this.fechaInicio, this.fechaFinal).subscribe(res => {
@@ -124,6 +124,7 @@ export class ReporteInasistenciaComponent implements OnInit {
       this.existenEmpleados = true;
       this.verReporte = true;
       this.loading = true;
+      this.showBtnPdf = true;
       if (this.count == 100) {
         this.alertLimiteReporte();
       }
@@ -403,12 +404,8 @@ export class ReporteInasistenciaComponent implements OnInit {
             },
           },
         });
-
-
       });
     })
-
-console.log("Ver data[0].opcion",data[0].opcion);
     if (data[0].opcion != 3) {
       n.push({
         style: 'tableMarginCabeceraTotal',
@@ -458,7 +455,6 @@ console.log("Ver data[0].opcion",data[0].opcion);
         }
       });
     }
-
     return n;
   }
 
