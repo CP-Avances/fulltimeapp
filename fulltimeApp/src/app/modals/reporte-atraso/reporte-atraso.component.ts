@@ -161,7 +161,7 @@ export class ReporteAtrasoComponent implements OnInit {
         this.alertLimiteReporte();
       }
     }, err => {
-      this.existenEmpleados = false;
+      this.existenEmpleados = true;
       console.log("ver el error", err)
       this.showBtnPdf = false;
       this.loading = true;

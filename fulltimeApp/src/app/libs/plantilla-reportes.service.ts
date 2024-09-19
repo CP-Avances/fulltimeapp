@@ -294,6 +294,7 @@ export class PlantillaReportesService {
       duration: duracion,
       color: color,
       mode: 'ios',
+      position: "middle" ,
     });
     toast.present();
   }

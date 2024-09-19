@@ -129,6 +129,8 @@ export class ReporteInasistenciaComponent implements OnInit {
         this.alertLimiteReporte();
       }
     }, err => {
+      this.existenEmpleados = true;
+
       console.log("ver el error", err)
       this.showBtnPdf = false;
       this.loading = true;

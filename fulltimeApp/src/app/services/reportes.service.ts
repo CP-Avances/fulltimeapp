@@ -38,21 +38,6 @@ export class ReportesService {
     return this.http.post<any>(`${this.api_url}/reportes-asistencias/timbres/${desde}/${hasta}`, data);
   }
 
-  /*
-    getInfoReporteTimbresNovedad(codigo: number | string, fec_inicio: any, fec_final: any, conexion: boolean): Observable<Timbre[]> {
-      const params = new HttpParams()
-        .set('codigo', codigo)
-        .set('fec_inicio', fec_inicio)
-        .set('fec_final', fec_final)
-        .set('conexion', conexion)
-      return this.http.get<Timbre[]>(`${this.api_url}/reporte/timbresConNovedad`, { params })
-        .pipe(
-          tap(console.log),
-          catchError(this.handleError)
-        )
-    }
-    */
-
   // METODO PARA CONSULTAR LISTA DE TIMBRES DEL USUARIO    **USADO
   getInfoReporteTimbresNovedad(data: any, desde: string, hasta: string) {
     return this.http.post<any>(`${this.api_url}/reporte/timbresConNovedad/${desde}/${hasta}`, data);

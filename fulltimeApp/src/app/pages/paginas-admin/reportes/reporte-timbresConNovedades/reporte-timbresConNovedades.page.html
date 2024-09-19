@@ -72,6 +72,11 @@
   </ion-radio-group>
   </ion-list>
 
+  <ion-item>
+    <ion-toggle (ionChange)="toggleChanged($event)" [(ngModel)]="activarOpcion"></ion-toggle>
+    <ion-label>Información del dispositivo</ion-label>
+  </ion-item>
+
   <ion-content *ngIf="!loadingEmpleado">
     <div style="text-align: center;">
       <br>

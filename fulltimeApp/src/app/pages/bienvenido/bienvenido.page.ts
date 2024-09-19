@@ -164,7 +164,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
         }
       };
     }).catch((error) => {
-      this.abrirToas('Ups, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
+      this.abrirToas('Ups!!!, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
     });
   }
 
@@ -231,7 +231,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       }
     })
       .catch((error) => {
-        this.abrirToas('Ups, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
+        this.abrirToas('Ups!!!, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
       })
   }
 
@@ -256,22 +256,21 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       }
     })
       .catch((error) => {
-        this.abrirToas('Ups, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
+        this.abrirToas('Ups!!! al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
       })
 
   }
 
   async mostrarToas(mensaje: string) {
     const toast = await this.toastController.create({
-      message: `<div style="text-align: left;">
-                  <ion-icon name="information-circle-outline"></ion-icon>`
+      message: `<ion-icon name="information-circle-outline"></ion-icon>`
         + mensaje
-        + `<br><br>Te gustaría activarlo? <br> Comunícate con nosotros: www.casapazmino.com.ec
-                </div>`,
+        + `Te gustaría activarlo? <br> Comunícate con nosotros: www.casapazmino.com.ec`,
       duration: 4500,
       position: "top",
       color: "notificacicon",
       mode: "ios",
+      cssClass: 'toast-custom-class',
     });
     await toast.present();
   }

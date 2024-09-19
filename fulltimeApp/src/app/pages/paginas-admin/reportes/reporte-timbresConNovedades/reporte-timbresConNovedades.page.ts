@@ -19,6 +19,19 @@ interface checkOptions {
   styleUrls: ['./reporte-timbresConNovedades.page.scss'],
 })
 export class ReporteTimbresConNovedadesPage {
+
+  // INTERRUPTOR PARA VER LA INFORMACION DEL DISPOSITIVO
+  activarOpcion: boolean = false;
+  toggleChanged(event: any) {
+    this.activarOpcion = event.detail.checked;
+    if (this.activarOpcion) {
+      console.log('El interruptor está activado');
+    } else {
+      console.log('El interruptor está desactivado');
+    }
+  }
+
+  // VARIABLES
   maxDate: string = new Date().toISOString().split('T')[0];
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
@@ -48,10 +61,12 @@ export class ReporteTimbresConNovedadesPage {
 
   ngOnInit() {
     sessionStorage.removeItem('datos_comunicado');
+    this.activarOpcion = false;
     this.radioValue = 0;
   }
 
   ionViewWillEnter() {
+    this.activarOpcion = false;
     sessionStorage.removeItem('datos_comunicado');
     this.radioValue = 0;
   }
@@ -138,6 +153,8 @@ export class ReporteTimbresConNovedadesPage {
       component: ReporteTimbreConNovedadesComponent,
       componentProps: {
         'data': objeto,
+        'activarOpcion': this.activarOpcion
+
       },
       cssClass: 'my-custom-class'
     });

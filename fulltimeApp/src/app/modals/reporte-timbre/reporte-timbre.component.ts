@@ -114,10 +114,10 @@ export class ReporteTimbreComponent implements OnInit {
       this.showBtnPdf = true;
 
     }, err => {
-      this.existenEmpleados = false;
+      this.existenEmpleados = true;
       this.showBtnPdf = false;
       this.loading = true;
-      this.plantillaPDF.abrirToas(err.error.message, 'danger', 3000)
+      this.plantillaPDF.abrirToas('No existen timbres registrados', 'danger', 3000)
     })
   }
 

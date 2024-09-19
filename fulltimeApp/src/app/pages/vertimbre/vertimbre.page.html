@@ -35,7 +35,7 @@
 
 </ion-header>
 
-<ion-header style="color: #000000;"  *ngIf="!isConnected || !serverConnected">
+<ion-header style="color: #000000;" *ngIf="!isConnected || !serverConnected">
   <div style="padding:1%; background: white">
     <br><br>
     <ion-img class="center" style="width:45%;" src="../../../assets/images/C_FTLOGORV.png"></ion-img>
@@ -48,9 +48,8 @@
 
 <ng-container *ngIf="isConnected && serverConnected">
   <!--Contenedor de todos los timbres admin-->
-
+  
   <ion-content *ngIf="!todos">
-    <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
 
     <div *ngIf="timbres.length === 0; else todo" style="text-align: center;">
       <br>
@@ -63,6 +62,7 @@
 
     <ng-template #todo>
       <ion-content>
+        <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
         <ion-list>
           <ion-item-group
             *ngFor="let item of timbres | keyvalue : ordenOriginal | paginate: { itemsPerPage: 7, currentPage: pageTodos }">
@@ -226,7 +226,7 @@
   </ion-content>
 
   <!--Configuracion del Pagination - ngxPaginationModulo-->
-  
+
   <ion-footer style=" width: 100%; padding: 1%;" *ngIf="!filtro">
     <ion-item style="font-size: 80%; margin: 1% 0% 1% 0%;">
       <pagination-controls class="paginacion" (pageChange)="paginafiltro = $event" [maxSize]=maxSize
@@ -275,10 +275,12 @@
       </ion-text>
       <br>
       <br>
-      <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;" *ngIf="serverConnected" >
+      <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;"
+        *ngIf="serverConnected">
         Se podrán visualizar cuando tenga conexión a internet
       </ion-text>
-      <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;" *ngIf="!serverConnected" >
+      <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;"
+        *ngIf="!serverConnected">
         Se podrán visualizar cuando tenga conexión al servidor
       </ion-text>
     </div>

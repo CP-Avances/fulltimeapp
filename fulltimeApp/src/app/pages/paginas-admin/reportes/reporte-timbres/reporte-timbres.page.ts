@@ -79,7 +79,6 @@ export class ReporteTimbresPage {
     private dataUserService: DataUserLoggedService,
     public restN: NotificacionesService,
     public restP: ParametrosService,
-
   ) { }
 
   changeFechaInicio(e) {

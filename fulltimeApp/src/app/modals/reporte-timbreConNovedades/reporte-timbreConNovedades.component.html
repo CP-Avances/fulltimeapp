@@ -23,7 +23,7 @@
 
         <ion-col size="6">
           <ion-button color="success" shape="round" expand="full" (click)="consultarDataReporte()"
-            [disabled]="showBtnPdf">
+            [disabled]="showBtnBuscar">
 
             <ng-container *ngIf="loading; then consultar; else spiner"></ng-container>
             <ng-template #consultar>
@@ -45,67 +45,71 @@
       </ion-row>
 
     </ion-grid>
+    <div *ngIf="!existenEmpleados">
+      <ion-text color="primary">
+        <span>Obteniendo timbres</span>
+      </ion-text>
+      <ion-progress-bar value="0.5" buffer="0.75"></ion-progress-bar>
+    </div>
 
     <div class="info" *ngIf="count != 0">
       <h5>
         Timbres encontrados {{count}}
       </h5>
     </div>
+    <div class="table-responsive" *ngIf="verReporte">
 
-    <table id="tablaReporte" style="color: rgb(0,0,0);">
-      <thead class="header-table">
-        <tr>
-          <td style="text-align: center;" rowspan="2">N#</td>
-          <td style="text-align: center;" colspan="2">Timbre</td>
-          <td style="text-align: center;" colspan="2">Servidor</td>
+      <table *ngIf="verReporte">
+        <thead class="header-table">
+          <tr>
+            <td style="text-align: center;" rowspan="2">N°</td>
+            <td style="text-align: center;" rowspan="2">CÓDIGO</td>
+            <td style="text-align: center;" rowspan="2">EMPLEADO</td>
+            <td style="text-align: center;" colspan="2">TIMBRE</td>
+            <td style="text-align: center;" colspan="2" [ngClass]="{'hidden': !activarOpcion}">DISPOSITIVO</td>
+            <td style="text-align: center;" rowspan="2">RELOJ</td>
+            <td style="text-align: center;" rowspan="2">ACCIÓN</td>
+            <td style="text-align: center;" rowspan="2">OBSERVACION</td>
+            <td style="text-align: center;" rowspan="2">UBICACIÓN</td>
+            <td style="text-align: center;" rowspan="2">NOVEDAD DE CONEXIÓN</td>
+            <td style="text-align: center;" rowspan="2">HORA TIMBRE DIFERENTE</td>
 
-          <td style="text-align: center;" rowspan="2">Descripción</td>
-          <td style="text-align: center;" rowspan="2">Ubicación</td>
-          <td style="text-align: center;" rowspan="2">Novedad de conexión</td>
-          <!--
-          <td>Aut</td>
-          <td>ID dispositivo</td>
-          -->
-        </tr>
-        <tr>
-          <td style="text-align: center;">Fecha</td>
-          <td style="text-align: center;">Hora</td>
-          <td style="text-align: center;">Fecha</td>
-          <td style="text-align: center;">Hora</td>
-        </tr>
-      </thead>
-      <tbody class="detail-table">
-        <tr *ngFor="let timbre of timbres">
-          <td>{{timbre.num}}</td>
-          <td>{{timbre.fecha}}</td>
-          <td>{{timbre.hora}}</td>
-          <td *ngIf="timbre.fecha_subida_servidor != null">{{timbre.sfecha}}</td>
-          <td *ngIf="timbre.fecha_subida_servidor === null"></td>
-          <td *ngIf="timbre.fecha_subida_servidor != null">{{timbre.shora}}</td>
-          <td *ngIf="timbre.fecha_subida_servidor === null"></td>
-          <td [ngSwitch]="timbre.tecla_funcion">
-            <p *ngSwitchCase="1">Inicio de la jornada</p>
-            <p *ngSwitchCase="2">Fin de la jornada</p>
-            <p *ngSwitchCase="3">Inicio almuerzo</p>
-            <p *ngSwitchCase="4">Fin almuerzo</p>
-            <p *ngSwitchCase="5">Inicio permiso</p>
-            <p *ngSwitchCase="6">Fin permiso</p>
-            <p *ngSwitchDefault>Timbre desconocido</p>
-          </td>
-          <td>{{timbre.ubicacion}}</td>
-          <td>{{timbre.novedades_conexion}}</td>
-        </tr>
+          </tr>
+          <tr>
+            <td style="text-align: center;">FECHA</td>
+            <td style="text-align: center;">HORA</td>
+            <td style="text-align: center;" [ngClass]="{'hidden': !activarOpcion}">FECHA</td>
+            <td style="text-align: center;" [ngClass]="{'hidden': !activarOpcion}">HORA</td>
+          </tr>
+        </thead>
+        <tbody class="detail-table">
+          <tr *ngFor="let timbre of timbres">
+            <td>{{timbre.n}}</td>
+            <td>{{timbre.codigo}}</td>
+            <td>{{timbre.empleado}}</td>
+            <td>{{timbre.fechaTimbreServidor}}</td>
+            <td>{{timbre.horaTimbreServidor}}</td>
+            <td *ngIf="activarOpcion">{{timbre.fechaTimbre}}</td>
+            <td *ngIf="activarOpcion">{{timbre.horaTimbre}}</td>
+            <td>{{timbre.reloj}}</td>
+            <td>{{timbre.accion}}</td>
+            <td>{{timbre.observacion}}</td>
+            <td>{{timbre.ubicacion}}</td>
+            <td>{{timbre.novedades_conexion}}</td>
+            <td>{{(timbre.hora_timbre_diferente === true) ? 'Si' : 'No'}}</td>
+          </tr>
 
-        <tr>
-          <td colspan="8" *ngIf="count != 0">
-            <p>
-              Total timbres filtrados {{count}}
-            </p>
-          </td>
-        </tr>
+          <tr>
+            <td colspan="8" *ngIf="count != 0">
+              <p>
+                Total timbres filtrados {{count}}
+              </p>
+            </td>
+          </tr>
 
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
     <br><br>
   </ng-template>
 
