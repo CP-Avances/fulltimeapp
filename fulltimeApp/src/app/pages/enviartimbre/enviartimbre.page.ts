@@ -791,7 +791,7 @@ export class EnviartimbrePage implements OnInit {
       },
       () => {
         this.GuardartimbresinServidor(data);
-        this.abrirToas('Error con la conexión al servidor. El timbre se guardo en memoria del teléfono', "danger", 5000, "middle");
+        this.abrirToas('Error con la conexión al servidor. El timbre se guardo en memoria del teléfono', "danger", 3000, "middle");
       }
     ), error => {
       this.GuardartimbresinServidor(data);

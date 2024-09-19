@@ -344,7 +344,7 @@ export class TimbresPerdidosComponent implements OnInit {
           setTimeout(() => {
             this.dataLocalService.eliminarInfo('timbresPerdidos');
             if (timbres.length > 1) {
-              this.mensage = 'Los ' + timbres.length + ' timbres perdidos se han enviado.';
+              this.mensage = 'Los ' + timbres.length + ' timbres se han enviado.';
             } else {
               this.mensage = 'El timbre ha sido enviado exitosamente.';
             }
