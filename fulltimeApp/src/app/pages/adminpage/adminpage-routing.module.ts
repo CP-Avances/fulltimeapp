@@ -26,6 +26,15 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'informacionEmpleado',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../informacion-empleado/informacion-empleado.module').then(m => m.InformacionEmpleadoPageModule)
+          }
+        ]
+      },
+      {
         path: 'verTimbre',
         children: [
           {

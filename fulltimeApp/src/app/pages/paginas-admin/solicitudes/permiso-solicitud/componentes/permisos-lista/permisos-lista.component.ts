@@ -8,9 +8,9 @@ import { Socket } from 'ngx-socket-io';
 import { Subscription } from 'rxjs';
 
 import { PermisosService } from 'src/app/services/permisos.service';
-import { RegistrarPermisoComponent } from 'src/app/pages/paginas-empleado/solicitar-permisos/componentes/registrar-permiso/registrar-permiso.component';
-import { VerPermisoComponent } from 'src/app/pages/paginas-empleado/solicitar-permisos/componentes/ver-permiso/ver-permiso.component';
-import { EditarPermisoComponent } from 'src/app/pages/paginas-empleado/solicitar-permisos/componentes/editar-permiso/editar-permiso.component';
+import { RegistrarPermisoComponent } from '../registrar-permiso/registrar-permiso.component';
+import { VerPermisoComponent } from '../ver-permiso/ver-permiso.component';
+import { EditarPermisoComponent } from '../editar-permiso/editar-permiso.component';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 

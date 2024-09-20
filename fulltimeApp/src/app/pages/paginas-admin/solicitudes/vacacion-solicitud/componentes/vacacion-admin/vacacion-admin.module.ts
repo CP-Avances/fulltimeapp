@@ -4,15 +4,19 @@ import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { ModulopipesModule } from 'src/app/pipes/modulopipes.module';
 import { ComponentesModule } from 'src/app/componentes/componentes.module';
-
 import { VacacionListaComponent } from '../vacacion-lista/vacacion-lista.component';
-
+import { EditarVacacionComponent } from '../editar-vacacion/editar-vacacion.component';
+import { RegistrarVacacionComponent } from '../registrar-vacacion/registrar-vacacion.component';
+import { VerVacacionComponent } from '../ver-vacacion/ver-vacacion.component';
 //modulo paginacion
 import {NgxPaginationModule} from 'ngx-pagination';
 
 @NgModule({
   declarations: [
-    VacacionListaComponent
+    VacacionListaComponent,
+    EditarVacacionComponent,
+    RegistrarVacacionComponent,
+    VerVacacionComponent
   ],
   exports: [
     VacacionListaComponent,

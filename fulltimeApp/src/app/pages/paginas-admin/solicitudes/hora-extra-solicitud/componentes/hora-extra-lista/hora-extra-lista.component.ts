@@ -8,9 +8,9 @@ import { Socket } from 'ngx-socket-io';
 import { Subscription } from 'rxjs';
 
 import { HorasExtrasService } from 'src/app/services/horas-extras.service';
-import { EditarHoraExtraComponent } from 'src/app/pages/paginas-empleado/solicitar-horas-extras/componentes/editar-hora-extra/editar-hora-extra.component'
-import { RegistrarHoraExtraComponent } from 'src/app/pages/paginas-empleado/solicitar-horas-extras/componentes/registrar-hora-extra/registrar-hora-extra.component';
-import { VerHoraExtraComponent } from 'src/app/pages/paginas-empleado/solicitar-horas-extras/componentes/ver-hora-extra/ver-hora-extra.component';
+import { EditarHoraExtraComponent } from '../editar-hora-extra/editar-hora-extra.component';
+import { RegistrarHoraExtraComponent } from '../registrar-hora-extra/registrar-hora-extra.component';
+import { VerHoraExtraComponent } from '../ver-hora-extra/ver-hora-extra.component';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import moment from 'moment';

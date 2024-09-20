@@ -21,10 +21,6 @@ const routes: Routes = [
     loadChildren: () => import('./pages/adminpage/adminpage.module').then(m => m.AdminpagePageModule), canActivate: [AutenticacionGuard]
   },
   {
-    path: 'empleado',
-    loadChildren: () => import('./pages/empleado/empleado.module').then(m => m.EmpleadoPageModule)
-  },
-  {
     path: 'enviartimbre/:idTimbre',
     loadChildren: () => import('./pages/enviartimbre/enviartimbre.module').then(m => m.EnviartimbrePageModule), canActivate: [AutenticacionGuard]
   },

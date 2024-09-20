@@ -6,17 +6,24 @@ import { ModulopipesModule } from 'src/app/pipes/modulopipes.module';
 import { ComponentesModule } from 'src/app/componentes/componentes.module';
 
 import { PermisosListaComponent } from '../permisos-lista/permisos-lista.component';
-
+import { EditarPermisoComponent } from '../editar-permiso/editar-permiso.component';
+import { RegistrarPermisoComponent } from '../registrar-permiso/registrar-permiso.component';
+import { VerPermisoComponent } from '../ver-permiso/ver-permiso.component';
 //modulo paginacion
 import {NgxPaginationModule} from 'ngx-pagination';
 
 @NgModule({
   declarations: [
-    PermisosListaComponent
+    PermisosListaComponent,
+    EditarPermisoComponent,
+    RegistrarPermisoComponent,
+    VerPermisoComponent
   ],
   exports: [
     PermisosListaComponent,
-    
+    EditarPermisoComponent,
+    RegistrarPermisoComponent,
+    VerPermisoComponent
   ],
   imports: [
     CommonModule,

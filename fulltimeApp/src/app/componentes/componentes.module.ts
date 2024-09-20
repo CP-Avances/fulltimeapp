@@ -6,7 +6,6 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 import { NavegadorAdminComponent } from './navegador-admin/navegador-admin.component';
-import { NavegadorEmpleadoComponent } from './navegador-empleado/navegador-empleado.component';
 
 import { ConstruirPDFComponent } from './construir-pdf/construir-pdf.component';
 import { NotificacionPopoverComponent } from './notificacion-popover/notificacion-popover.component';
@@ -28,7 +27,6 @@ import { AprobacionMultipleComponent } from './aprobacion-multiple/aprobacion-mu
 @NgModule({
     declarations: [
         NavegadorAdminComponent,
-        NavegadorEmpleadoComponent,
         NotificacionPopoverComponent,
         ConstruirPDFComponent,
         CloseModalComponent,
@@ -45,7 +43,6 @@ import { AprobacionMultipleComponent } from './aprobacion-multiple/aprobacion-mu
     ],
     exports: [
         NavegadorAdminComponent,
-        NavegadorEmpleadoComponent,
         NotificacionPopoverComponent,
         ConstruirPDFComponent,
         CloseModalComponent,
