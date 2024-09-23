@@ -89,7 +89,7 @@ import { DataUserLoggedService } from 'src/app/services/data-user-logged.service
       padding:3%;
       margin: 5%;
       border-radius: 2%;
-      background-color:rgb(255, 255, 255);
+      //background-color:rgb(255, 255, 255);
     }
 
     .center {
@@ -198,7 +198,7 @@ export class TimbresPerdidosComponent implements OnInit {
       res => {
         datos = res;
         if (datos.length != 0) {
-          this.rango = ((parseInt(datos[0].descripcion) * (0.0048)) / 500); //0.006719999999999999 - DOMICILIO
+          this.rango = (parseInt(datos[0].descripcion) );
           return this.rango;
         }
       },
@@ -332,15 +332,13 @@ export class TimbresPerdidosComponent implements OnInit {
       this.relojService.obtenerUsuario(this.iduser).subscribe(
         res => {
           console.log('Conectado al servidor')
-
-
           timbres.forEach(t => {
             this.longitud = t.longitud;
             this.latitud = t.latitud;
             this.BuscarUbicacion(this.latitud, this.longitud, this.rango, t);
-          });
+          });       
+           
           this.closeModal();
-
           setTimeout(() => {
             this.dataLocalService.eliminarInfo('timbresPerdidos');
             if (timbres.length > 1) {

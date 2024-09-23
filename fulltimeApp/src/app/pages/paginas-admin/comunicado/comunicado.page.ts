@@ -33,13 +33,15 @@ export class ComunicadoPage implements OnInit {
   ) { }
 
   async ngOnInit() {
+    this.serverConnected = await this.connectivityService.checkServerConnection();
+    this.networkSubscriber();
+
     this.noti.asunto = '';
     this.noti.mensaje = '';
-    this.networkSubscriber();
-    this.serverConnected = await this.connectivityService.checkServerConnection();
   }
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
+    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
   }
 
@@ -60,7 +62,7 @@ export class ComunicadoPage implements OnInit {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
     console.log("Esta conectado: ", this.isConnected)
     if (!this.isConnected) {
-      this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
+      //this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
 
     } else {
       console.log('conectado');

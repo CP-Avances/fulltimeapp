@@ -72,7 +72,7 @@ export class ListaEmpleadosComponent implements OnInit {
         this.loading = true;
         console.log(error);
         this.ver = true;
-        return this.abrirToas('Ups!, No fue posible conectarse con el servidor', 'danger', 3500, 'bottom')
+       // return this.abrirToas('Ups!, No fue posible conectarse con el servidor', 'danger', 3500, 'middle')
       });
     } else {
       this.loading = true;

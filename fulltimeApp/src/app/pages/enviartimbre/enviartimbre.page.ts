@@ -122,15 +122,53 @@ export class EnviartimbrePage implements OnInit {
 
   //UBICACION
   async comprobarGPS() {
-      const permiso = await Geolocation.checkPermissions().then(() => {
+
+    Geolocation.checkPermissions().then(
+      result => this.requestLocationPermission(),
+    ).catch((error) => {
+      this.abrirToas('Ups, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
+    });;
+
+    /*
+      const permiso1 = await Geolocation.checkPermissions().then(() => {
         this.obtenerPosicion();
       })
       .catch((error) => {
         this.abrirToas('Ups, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
       });
-      return permiso;
-  }0
 
+      */
+
+    /*
+  const permiso = await Geolocation.checkPermissions();
+
+  if (permiso.location === 'granted') {
+    this.obtenerPosicion()
+  } else if (permiso.location === 'denied') {
+    this.requestLocationPermission();
+  } else if (permiso.location === 'prompt') {
+    this.requestLocationPermission();
+  }
+
+*/
+  }
+
+  async requestLocationPermission() {
+    try {
+      // Solicitar permiso para acceder a la ubicación
+      const status = await Geolocation.requestPermissions();
+
+      if (status.location === 'granted') {
+
+        this.obtenerPosicion()
+
+      } else {
+        this.abrirToas('Ups!!! Al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.', "danger", 6000, "middle");
+      }
+    } catch (error) {
+      this.abrirToas('Ups!!! Al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.', "danger", 6000, "middle");
+    }
+  }
 
   async obtenerPosicion() {
     this.cargandoPosicion = true;
@@ -143,7 +181,7 @@ export class EnviartimbrePage implements OnInit {
       this.cargandoPosicion = false;
     }).catch((error) => {
       this.cargandoPosicion = false;
-      this.abrirToas('Ups, al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.', "danger", 6000, "middle");
+      this.abrirToas('Ups!!! No se ha obtenido coordenadas de ubicación.', "danger", 6000, "middle");
       console.log('No se pudo obtener la posicion:', error);
     });
   }
@@ -315,23 +353,28 @@ export class EnviartimbrePage implements OnInit {
     this.BuscarParametroTimbreUbicacionDesconocida();
 
     await this.verificarPermisoLocation()
-      .then(() => {
-        if ((this.platform.is('ios')) || (this.platform.is('android')) || (this.platform.is('capacitor'))) {
-          console.log("Entrando en TIMBRES VER")
-
-          //this.identificarUsuario();
-
-          this.BuscarParametroTimbreConFoto();
-          this.iniciarProcesoFoto();
+      .then(async() => {
+        const status = await Geolocation.requestPermissions();
+        if (status.location === 'granted') {
+          if ((this.platform.is('ios')) || (this.platform.is('android')) || (this.platform.is('capacitor'))) {
+            console.log("Entrando en TIMBRES VER")
+  
+            //this.identificarUsuario();
+  
+            this.BuscarParametroTimbreConFoto();
+            this.iniciarProcesoFoto();
+          }
+          else {
+            console.log("Entrando en web")
+            this.abrirToas('No se detecto autenticación, se guardara el timbre con esta observación.', "warning", 2000, "middle");
+            this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
+            this.BuscarParametroTimbreConFoto();
+            this.iniciarProcesoFoto();
+          }
+        } else {
+          this.abrirToas('Ups, al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.', "danger", 6000, "middle");
         }
-        else {
-          console.log("Entrando en web")
-          this.abrirToas('No se detecto autenticación, se guardara el timbre con esta observación.', "warning", 2000, "middle");
-          this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
-          this.BuscarParametroTimbreConFoto();
-          this.iniciarProcesoFoto();
-        }
-
+      
       }).catch((error) => {
         this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "danger", 3000, "middle");
 

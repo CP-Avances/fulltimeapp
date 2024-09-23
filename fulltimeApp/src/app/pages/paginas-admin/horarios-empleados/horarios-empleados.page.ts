@@ -26,11 +26,12 @@ export class HorariosEmpleadosPage implements OnInit {
     ) {}
 
   async ngOnInit() {
-    this.networkSubscriber();
     this.serverConnected = await this.connectivityService.checkServerConnection();
+    this.networkSubscriber();
   }
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
+    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
   }
   isConnected: boolean;
@@ -53,8 +54,7 @@ export class HorariosEmpleadosPage implements OnInit {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
     console.log("Esta conectado: ", this.isConnected)
     if (!this.isConnected) {
-      this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
-
+     // this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
     } else {
       console.log('conectado');
     }

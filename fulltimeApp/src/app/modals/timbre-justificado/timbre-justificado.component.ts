@@ -124,7 +124,8 @@ export class TimbreJustificadoComponent implements OnInit {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: duracion,
-      color: color
+      color: color, 
+      position: "middle"
     });
     toast.present();
   }

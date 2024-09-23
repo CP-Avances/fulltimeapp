@@ -20,7 +20,7 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
           <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/timbres']">
             <div>
               <ion-icon name="alarm-outline"></ion-icon> <br>
-              <ion-text>
+              <ion-text class="text-primario">
                 Timbres
               </ion-text>
             </div>
@@ -30,7 +30,7 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
         <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/timbresConNovedades']">
           <div>
             <ion-icon name="alarm-outline"></ion-icon> <br>
-            <ion-text>
+            <ion-text class="text-primario">
               Timbres <br> con Novedades 
             </ion-text>
           </div>
@@ -43,7 +43,7 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
           <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/inasistencia']">
             <div>
               <ion-icon name="timer-outline"></ion-icon> <br>
-              <ion-text>
+              <ion-text class="text-primario">
                 Faltas
               </ion-text>
             </div>
@@ -53,7 +53,7 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
           <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/atrasos']">
             <div>
               <ion-icon name="time-outline"></ion-icon> <br>
-              <ion-text>
+              <ion-text class="text-primario">
                 Atrasos
               </ion-text>
             </div>
@@ -66,7 +66,7 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
           <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/solicitud']" [disabled]="deshabilitado">
             <div>
               <ion-icon name="mail-unread-outline"></ion-icon> <br>
-              <ion-text>
+              <ion-text class="text-primario">
                 Solicitudes <br> Pendientes
               </ion-text>
             </div>
@@ -76,7 +76,7 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
           <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/vacaciones']" [disabled]="deshabilitado">
             <div>
               <ion-icon name="airplane-outline"></ion-icon> <br>
-              <ion-text>
+              <ion-text class="text-primario">
                 Vacaciones
               </ion-text>
             </div>
@@ -89,7 +89,7 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
           <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/horas-extras']" [disabled]="deshabilitado">
             <div>
               <ion-icon name="hourglass-outline"></ion-icon> <br>
-              <ion-text>
+              <ion-text class="text-primario">
                 Horas Extras
               </ion-text>
             </div>
@@ -99,7 +99,7 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
        <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/alimentacion']" [disabled]="deshabilitado">
          <div>
            <ion-icon name="fast-food-outline"></ion-icon> <br>
-           <ion-text>
+           <ion-text class="text-primario">
              Alimentación
            </ion-text>
          </div>
@@ -169,9 +169,13 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
     }
 
     ion-text{
-      color: rgb(226, 226, 226);;
       font-size: 80%;
     }
+
+    .text-primario {
+      color: rgb(226, 226, 226);;
+      font-weight: bold;
+    }  
   `],
 })
 export class ReportesPage implements OnInit {
@@ -190,11 +194,11 @@ export class ReportesPage implements OnInit {
   isConnected: boolean;
 
   async ngOnInit() {
-    this.networkSubscriber();
     this.serverConnected = await this.connectivityService.checkServerConnection();
-
+    this.networkSubscriber();
   }
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
+    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
   }
 
@@ -202,7 +206,7 @@ export class ReportesPage implements OnInit {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
     console.log("Esta conectado: ", this.isConnected)
     if (!this.isConnected) {
-      this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
+      //this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
 
     } else {
 

@@ -187,7 +187,7 @@
     </ion-col>
   </ion-row>
   <ion-searchbar *ngIf="opcion_empleado" autocomplete="off" showCancelButton="focus"
-    (ionChange)="changeSearch($event)"></ion-searchbar>
+    (ionChange)="changeSearchNombresCompletos($event)"></ion-searchbar>
 
   <ion-list *ngIf="opcion_empleado">
     <ion-text mode="ios" color="dark" style="text-align: center;">

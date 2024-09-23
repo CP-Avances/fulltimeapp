@@ -506,6 +506,21 @@ export class ReporteTimbresPage {
     this.empleados_filtro = filtro
   }
 
+
+  changeSearchNombresCompletos(e: any) {
+    console.log("entra a busqueda", e.detail.value)
+    const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
+    console.log("ver las palabra de busqueda ",palabrasBusqueda )
+    const filtro = this.empleados.filter((o: any) => {
+      const nombreCompleto = `${o.nombre || ''} ${o.apellido || ''}`.toLowerCase();
+
+      console.log("ver el nombre de empleado: ", o.nombre)
+      return palabrasBusqueda.every(palabra => nombreCompleto.includes(palabra))
+    })
+    this.empleados_filtro = filtro
+  }
+
+
   pageActual: number = 1;
   pageActualDepartamento: number = 1;
   pageActualSucursal: number = 1;

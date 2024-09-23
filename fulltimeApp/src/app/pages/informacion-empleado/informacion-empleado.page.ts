@@ -7,6 +7,8 @@ import { AlertController, Platform, ToastController, ModalController } from '@io
 import { DataUserLoggedService } from '../../services/data-user-logged.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
+import { NetworkService } from '../../libs/network.service';
+import { ConnectivityService } from '../../services/conexion-servidor.service'
 
 
 @Component({
@@ -17,10 +19,10 @@ import { ValidacionesService } from 'src/app/libs/validaciones.service';
 export class InformacionEmpleadoPage implements OnInit {
 
   @Input() data: any;
-
-
+  serverConnected: boolean = true;
   pipe = new DatePipe('en-US');
   fecha: any;
+  isConnected: boolean;
 
   empresa: Empresa = {
     nombre: '',
@@ -59,10 +61,14 @@ export class InformacionEmpleadoPage implements OnInit {
     public parametro: ParametrosService,
     public validar: ValidacionesService,
     public modalController: ModalController,
+    private networkService: NetworkService,
+    private connectivityService: ConnectivityService
 
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.serverConnected = await this.connectivityService.checkServerConnection();
+    this.networkSubscriber()
     this.usuario.correo = this.data.correo;
     this.usuario.apellido = this.data.apellido;
     this.usuario.nombre = this.data.nombre;
@@ -72,6 +78,21 @@ export class InformacionEmpleadoPage implements OnInit {
 
     console.log('data vacuna empleado ... ', this.dataUser.dataVacuna)
     this.BuscarFormatos();
+  }
+  async ionViewWillEnter() {
+    this.serverConnected = await this.connectivityService.checkServerConnection();
+    this.networkSubscriber();
+  }
+
+  networkSubscriber() {
+    this.isConnected = this.networkService.getNetworkStatusDispositivo();
+    console.log("Esta conectado: ", this.isConnected)
+    if (!this.isConnected) {
+      //this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
+
+    } else {
+      console.log('conectado');
+    }
   }
 
   closeModal() {
@@ -97,47 +118,6 @@ export class InformacionEmpleadoPage implements OnInit {
       }
     )
   }
-
-  /*asinación de ID de celular a usuario
-  async registrarCelular() {
-    const alert = await this.alertController.create({
-      subHeader: 'Registrar celular',
-      message: 'Se va a registrar este celular como principal para timbrar',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-        }, {
-          text: 'Listo',
-          handler: () => {
-            this.actualizarEnBDD();
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-  actualizarEnBDD() {
-    let id_celular = ""
-    if (this.device.uuid) {
-      id_celular = this.device.uuid;
-    } else {
-      id_celular = "PC"
-    }
-    const id_usuario = localStorage.getItem('Uid');
-    this.relojService.registrarCelularUsuario(id_usuario, id_celular).subscribe(
-      res => {
-        localStorage.setItem('UCedula', id_celular);
-        this.usuario.cedula = id_celular;
-      },
-      err => {
-        this.abrirToas("No se pudo actualizar, intente más tarde", "danger", 2000)
-      }
-    )
-  }
-  */ //fin asinación de ID de celular a usuario
-
 
   async abrirToas(mensaje: string, color: string, duracion: number) {
     const toast = await this.toastController.create({

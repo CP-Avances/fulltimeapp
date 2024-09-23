@@ -136,8 +136,27 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     } else {
       console.log('conectado');
       this.BuscarParametroTimbreSinInternet();
+      this.BuscarParametroTimbreConFoto();
+      this.BuscarParametroTimbreUbicacionDesconocida();
       this.VerificarFunciones();
     }
+  }
+
+
+  BuscarParametroTimbreConFoto() {
+    // id_tipo_parametro PARA TIMBRAR CON FOTO = 14
+    this.parametros.ObtenerDetallesParametros(14).subscribe(
+      res => {
+        localStorage.setItem('timbrarConFoto', res[0].descripcion);
+      });
+  }
+
+  BuscarParametroTimbreUbicacionDesconocida() {
+    // id_tipo_parametro PARA PERMITIR TIMBRE UBICACION DESCONOCIDA = 4
+    this.parametros.ObtenerDetallesParametros(5).subscribe(
+      res => {
+        localStorage.setItem('timbrarUbicacionDesconocida', res[0].descripcion);
+      });
   }
 
   async VerificarTimbresSinInternet(accion: string) {

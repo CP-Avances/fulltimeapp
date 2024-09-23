@@ -388,7 +388,7 @@ export class VerTimbreEmpleadoComponent implements OnInit {
     if (conexion == true) {
       novedad = 'Timbre sin novedad';
       if (hora_timbre_diferente == true) {
-        novedad = 'Hora timbre diferente al del Servidor'
+        novedad = 'Hora del timbre diferente a la hora del servidor'
       }
     }
 

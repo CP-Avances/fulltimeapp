@@ -137,7 +137,7 @@ export class ReporteAtrasoComponent implements OnInit {
               n: n,
               cedula: empl.cedula,
               codigo: empl.codigo,
-              empleado: empl.fullname,
+              empleado: empl.apellido+' '+ empl.nombre,
               ciudad: empl.ciudad,
               sucursal: empl.sucursal,
               regimen: empl.regimen,

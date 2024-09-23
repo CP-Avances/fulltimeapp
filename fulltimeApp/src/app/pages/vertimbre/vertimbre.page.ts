@@ -14,7 +14,7 @@ import { VerImagenModalPage } from 'src/app/modals/ver-timbre-empleado/ver-image
 import { NetworkService } from '../../libs/network.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { ConnectivityService } from '../../services/conexion-servidor.service'  
+import { ConnectivityService } from '../../services/conexion-servidor.service'
 
 @Component({
   selector: 'app-vertimbre',
@@ -64,12 +64,11 @@ export class VertimbrePage implements OnInit {
   ) { }
 
   async ngOnInit() {
-    this.networkSubscriber();
     this.serverConnected = await this.connectivityService.checkServerConnection();
-
+    this.networkSubscriber();
   }
-  ionViewWillEnter() {
- 
+  async ionViewWillEnter() {
+    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
   }
   ionViewWillLeave() {
@@ -80,18 +79,18 @@ export class VertimbrePage implements OnInit {
     this.unsubscribe$.complete();
   }
 
-  isConnected : boolean;
+  isConnected: boolean;
   networkSubscriber() {
-      this.isConnected = this.networkService.getNetworkStatusDispositivo();
-      console.log("Esta conectado: ", this.isConnected)
-      if (!this.isConnected) {
-        this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
-        console.log('Desconectado');
-      } else {
-        this.BuscarFormatos();
-        this.mostrarTimbres();
-        console.log('conectado');
-      }
+    this.isConnected = this.networkService.getNetworkStatusDispositivo();
+    console.log("Esta conectado: ", this.isConnected)
+    if (!this.isConnected) {
+      // this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
+      console.log('Desconectado');
+    } else {
+      this.BuscarFormatos();
+      this.mostrarTimbres();
+      console.log('conectado');
+    }
   }
 
   async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
@@ -328,7 +327,7 @@ export class VertimbrePage implements OnInit {
     if (conexion == true) {
       novedad = 'Timbre sin novedad';
       if (hora_timbre_diferente == true) {
-        novedad = 'Hora timbre diferente al del Servidor'
+        novedad = 'Hora del timbre diferente a la hora del servidor'
       }
     }
     let mensaje = `<b>${obs}</b>`;

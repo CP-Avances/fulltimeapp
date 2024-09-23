@@ -133,7 +133,7 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
     }
 
     ion-text{
-      color: rgb(226, 226, 226);;
+      //color: rgb(226, 226, 226);;
       font-size: 80%;
     }
 
@@ -148,7 +148,7 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
       padding:3%;
       margin: 5%;
       border-radius: 2%;
-      background-color:rgb(255, 255, 255);
+      //background-color:rgb(255, 255, 255);
     }
 
     .center {
@@ -186,15 +186,16 @@ export class SolicitudesPage implements OnInit {
     }, 1500);
   }
 
-  ionViewWillEnter() {
-    this.VerificarFunciones();
+  async ionViewWillEnter() {
+    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
+    this.VerificarFunciones();
   }
 
   async ngOnInit() {
-    this.VerificarFunciones();
-    this.networkSubscriber();
     this.serverConnected = await this.connectivityService.checkServerConnection();
+    this.networkSubscriber();
+    this.VerificarFunciones();
   }
 
   Btn_permisos: boolean;
@@ -216,8 +217,7 @@ export class SolicitudesPage implements OnInit {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
     console.log("Esta conectado: ", this.isConnected)
     if (!this.isConnected) {
-      this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
-
+      //this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
     } else {
 
       console.log('conectado');

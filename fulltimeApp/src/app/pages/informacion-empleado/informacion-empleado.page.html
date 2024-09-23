@@ -17,7 +17,7 @@
   <br>
 </ion-header>
 
-<ion-content fullscreen>
+<ion-content fullscreen *ngIf="isConnected && serverConnected">
 
   <ion-list mode="md" style="margin-top: 2%;">
     <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
@@ -113,4 +113,42 @@
 
     </ion-card>
   </ion-list>
+</ion-content>
+
+<ion-content *ngIf="!isConnected || !serverConnected">
+  <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
+
+  <!-- Ventana de no conexion a internet-->
+  <div style="margin: 2%; padding: 2%; text-align: center; border-radius: 2%;">
+    <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 90%;">
+      En esta vista encontrará información del empleado seleccionado.
+    </ion-text>
+    <br>
+    <br>
+    <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;" *ngIf="serverConnected">
+      Se podrán visualizar cuando tenga conexión a internet
+    </ion-text>
+    <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;"
+      *ngIf="!serverConnected">
+      Se podrán visualizar cuando tenga conexión al servidor
+    </ion-text>
+  </div>
+  <div class="Imagen">
+    <span class="center1">
+      <img src="../../../assets/images/C_FTLOGORV.png">
+      <ion-label style="text-align:center" mode="md" color="medium">
+        <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
+      </ion-label>
+    </span>
+    <img src="../../../assets/images/lost_timee.svg" />
+  </div>
+
+  <div style="margin: 4%; padding: 4%; text-align: center; border-radius: 2%;">
+    <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;" *ngIf="serverConnected">
+      No tiene conexión a internet
+    </ion-text>
+    <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;" *ngIf="!serverConnected">
+      No tiene conexión al servidor
+    </ion-text>
+  </div>
 </ion-content>

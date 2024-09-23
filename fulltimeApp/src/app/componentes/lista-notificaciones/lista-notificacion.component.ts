@@ -7,7 +7,7 @@ import { SkeletonListNotificacionesArray } from '../../interfaces/Skeleton';
 import { Router } from '@angular/router';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
-
+import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
 import { NetworkService } from '../../libs/network.service';
 
 @Component({
@@ -16,6 +16,7 @@ import { NetworkService } from '../../libs/network.service';
   styleUrls: ['./lista-notificacion.component.scss'],
 })
 export class ListaNotificacionComponent implements OnInit {
+  serverConnected: boolean = true;
 
   skeleton = SkeletonListNotificacionesArray;
   loading: boolean = true;
@@ -47,14 +48,14 @@ export class ListaNotificacionComponent implements OnInit {
     private userService: DataUserLoggedService,
     private networkService: NetworkService,
     private toastController: ToastController,
-
+    private connectivityService: ConnectivityService
 
   ) { 
     this.id_noti =this.navParams.get('id')
   }
 
-  ngOnInit() {
-
+  async ngOnInit() {
+    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
     const id_empleado = localStorage.getItem('empleadoID')
     this.notificacionService.getNotificacionesByIdEmpleado(id_empleado + '').subscribe(
@@ -122,6 +123,11 @@ export class ListaNotificacionComponent implements OnInit {
     )
 
   }
+  
+  async ionViewWillEnter(){
+    this.ngOnInit();
+  }
+
 
   isConnected: boolean;
 

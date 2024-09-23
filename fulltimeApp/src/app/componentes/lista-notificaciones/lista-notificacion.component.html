@@ -1,6 +1,6 @@
 <app-close-modal titleModal="Notificaciones"></app-close-modal>
  
-<ion-content mode="md" *ngIf="isConnected">
+<ion-content mode="md" *ngIf="isConnected && serverConnected">
  <ng-container *ngIf="loading; then showSkeletor else showList"></ng-container>
 
  <ng-template #showSkeletor>
@@ -83,7 +83,7 @@
 </ion-content>
  
 
-<ion-content *ngIf="!isConnected">
+<ion-content *ngIf="!isConnected || !serverConnected">
   <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
 
   <!-- Ventana de no conexion a internet-->
@@ -93,8 +93,11 @@
     </ion-text>
     <br>
     <br>
-    <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;">
-      Se podrán visualizar cuando tenga conexión a internet
+    <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;"  *ngIf="serverConnected">
+      Se podrá visualizar cuando tenga conexión a internet
+    </ion-text>
+    <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;" *ngIf="!serverConnected" >
+      Se podrán visualizar cuando tenga conexión al servidor
     </ion-text>
   </div>
   <div class="Imagen">
