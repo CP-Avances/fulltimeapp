@@ -17,7 +17,7 @@ import { RelojServiceService } from "../../services/reloj-service.service";
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
 import { Camera, CameraDirection, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
-
+import { FechaHoraService } from 'src/app/services/fecha-hora.service';
 
 
 @Component({
@@ -31,16 +31,17 @@ export class EnviartimbrePage implements OnInit {
   //Parametros
   timbrarSinInternet: string;
   timbrarConFoto: string;
-
   //variables Foto
   imagen: string;
-
-
   storageUbica: string;
   public isConnected: any;
-
   showFallback = true;
   hasBiometricAuth = false;
+  fechaHora: string;
+  fecha: string = '';
+  hora: string = '';
+  observaciones: string = '';
+  zonaHoraria: string = '';
 
   constructor(
     private activateRoute: ActivatedRoute,
@@ -56,6 +57,7 @@ export class EnviartimbrePage implements OnInit {
     public parametros: ParametrosService,
     private router: Router,
     private userService: DataUserLoggedService,
+    private fechaHoraService: FechaHoraService
   ) { }
 
   ngOnInit() {
@@ -73,6 +75,13 @@ export class EnviartimbrePage implements OnInit {
     this.BuscarParametroTimbreUbicacionDesconocida();
     this.BuscarParametroTimbreConFoto();
     this.BuscarParametroTimbreSinInternet();
+
+    this.fechaHoraService.fechaHora$.subscribe(async (fechaHora) => {
+      this.fechaHora = (await fechaHora).fechaHora;
+      this.fecha = (await fechaHora).fecha;
+      this.hora = (await fechaHora).hora;
+      this.zonaHoraria = (await fechaHora).zonaHoraria;
+    });
   }
 
   private readonly IDENTIFICACION_BIOMETRICA = "B"
@@ -80,7 +89,7 @@ export class EnviartimbrePage implements OnInit {
   private readonly IDENTIFICACION_DESACTIVADA = "D"
 
   cargandoPosicion = false;
-  public nuevoTimbre: Timbre = {
+  public nuevoTimbre: any = {
     tecla_funcion: "",
     codigo: "",
     observacion: "",
@@ -128,29 +137,6 @@ export class EnviartimbrePage implements OnInit {
     ).catch((error) => {
       this.abrirToas('Ups, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
     });;
-
-    /*
-      const permiso1 = await Geolocation.checkPermissions().then(() => {
-        this.obtenerPosicion();
-      })
-      .catch((error) => {
-        this.abrirToas('Ups, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
-      });
-
-      */
-
-    /*
-  const permiso = await Geolocation.checkPermissions();
-
-  if (permiso.location === 'granted') {
-    this.obtenerPosicion()
-  } else if (permiso.location === 'denied') {
-    this.requestLocationPermission();
-  } else if (permiso.location === 'prompt') {
-    this.requestLocationPermission();
-  }
-
-*/
   }
 
   async requestLocationPermission() {
@@ -163,10 +149,10 @@ export class EnviartimbrePage implements OnInit {
         this.obtenerPosicion()
 
       } else {
-        this.abrirToas('Ups!!! Al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.', "danger", 6000, "middle");
+        this.abrirToas('Ups!!! Al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.', "danger", 3000, "middle");
       }
     } catch (error) {
-      this.abrirToas('Ups!!! Al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.', "danger", 6000, "middle");
+      this.abrirToas('Ups!!! Al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.', "danger", 3000, "middle");
     }
   }
 
@@ -206,7 +192,6 @@ export class EnviartimbrePage implements OnInit {
   VerificarFunciones() {
     this.restP.ObtenerFunciones().subscribe(res => {
       this.funciones = res;
-
       console.log("Ver funciones", res)
     });
   }
@@ -352,33 +337,33 @@ export class EnviartimbrePage implements OnInit {
     this.BuscarParametroTimbreSinInternet();
     this.BuscarParametroTimbreUbicacionDesconocida();
 
-    await this.verificarPermisoLocation()
-      .then(async() => {
-        const status = await Geolocation.requestPermissions();
-        if (status.location === 'granted') {
-          if ((this.platform.is('ios')) || (this.platform.is('android')) || (this.platform.is('capacitor'))) {
-            console.log("Entrando en TIMBRES VER")
-  
-            //this.identificarUsuario();
-  
-            this.BuscarParametroTimbreConFoto();
-            this.iniciarProcesoFoto();
-          }
-          else {
-            console.log("Entrando en web")
-            this.abrirToas('No se detecto autenticación, se guardara el timbre con esta observación.', "warning", 2000, "middle");
-            this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
-            this.BuscarParametroTimbreConFoto();
-            this.iniciarProcesoFoto();
-          }
-        } else {
-          this.abrirToas('Ups, al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.', "danger", 6000, "middle");
-        }
-      
-      }).catch((error) => {
-        this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "danger", 3000, "middle");
+    this.BuscarParametroTimbreConFoto();
+    this.iniciarProcesoFoto();
 
-      });
+    /*
+    if ((this.platform.is('ios')) || (this.platform.is('android')) || (this.platform.is('capacitor'))) {
+
+      await this.verificarPermisoLocation()
+        .then(async () => {
+          const status = await Geolocation.requestPermissions();
+          if (status.location === 'granted') {
+            this.BuscarParametroTimbreConFoto();
+            this.iniciarProcesoFoto();
+          } else {
+            this.abrirToas('Ups, al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.', "danger", 6000, "middle");
+          }
+        }).catch((error) => {
+          this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "danger", 3000, "middle");
+        });
+    } else {
+      console.log("Entrando en web")
+      this.abrirToas('No se detecto autenticación, se guardara el timbre con esta observación.', "warning", 2000, "middle");
+      this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
+      this.BuscarParametroTimbreConFoto();
+      this.iniciarProcesoFoto();
+    }
+      */
+
   }
 
   obtenerIdTipo(): string {
@@ -509,11 +494,12 @@ export class EnviartimbrePage implements OnInit {
   }
 
 
-  //Metodo que guarda el timbre en la base de datos en la tabla timbres.
   guardarEnBDD() {
+    //Metodo que guarda el timbre en la base de datos en la tabla timbres.
     this.nuevoTimbre.codigo = this.codigo;
     //this.nuevoTimbre.tecla_funcion = this.obtenerIdTipo();
-    this.nuevoTimbre.fecha_hora_timbre = this.fechaTransformada + " " + this.horaTransformada;
+    this.nuevoTimbre.fecha_hora_timbre = this.fechaHora;
+    this.nuevoTimbre.zona_horaria_dispositivo = this.zonaHoraria;
     this.nuevoTimbre.tecla_funcion = this.obtenerIdTipo();
     this.nuevoTimbre.user_name = this.userService.username;
     this.nuevoTimbre.ip = localStorage.getItem('ip');
@@ -830,7 +816,11 @@ export class EnviartimbrePage implements OnInit {
     this.relojService.enviarTimbre(data).subscribe(
       res => {
         console.log('ver respuesta', res.message);
-        this.navCtroller.navigateForward(['confirmaciontimbre']);
+        this.navCtroller.navigateForward(['confirmaciontimbre'], {
+          queryParams: {
+            data: JSON.stringify(data)
+          }
+        });
       },
       () => {
         this.GuardartimbresinServidor(data);

@@ -23,18 +23,12 @@ export class ParametrosService {
     return this.http.get<any>(this.apiUrl + '/parametrizacion/buscar-formato/fecha_horas');
   }
 
-
-  
   ObtenerCoordenadas(data: any) {
-    //return this.http.post<any>(`${this.apiUrl}/parametros/coordenadas`, data);
     return this.http.post<any>(`${this.apiUrl}/parametrizacion/coordenadas`, data);;
-
   }
 
   ObtenerUbicacionUsuario(id_empl: any) {
-   // return this.http.get<any>(this.apiUrl + '/parametros/ubicacion-usuario/' + codigo);
     return this.http.get<any>(`${this.apiUrl}/ubicacion/coordenadas-usuario/${id_empl}`);
-
   }
 
   ObtenerFunciones() {

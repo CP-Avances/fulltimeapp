@@ -1,6 +1,6 @@
 <ion-app>
   <ion-content fullscreen>
-    
+
     <div style="text-align: center; margin-top: 3%;">
       <img class="center" style="width:78%;" src="../../../assets/images/C_FTLOGORV.png">
       <ion-label mode="md" style="text-align:center; font-size: 7.5vw;" color="medium">
@@ -20,9 +20,9 @@
     <br><br>
     <div>
       <label>Timbre enviado el: </label>
-      <p>{{fechaTransformada}} a las {{horaTransformada}} </p>
-      <p *ngIf="ubicacion != null || ubicacion != undefined"> Ubicación: {{ubicacion}}</p>
-      <p *ngIf="ubicacion == null || ubicacion == undefined"> Ubicación: Sin Ubicación</p>
+      <p style="font-weight: bold; font-size: 1.5em;">{{fecha + " a las " + hora}}</p>
+      <p *ngIf="ubicacion != null && ubicacion != undefined">Ubicación: {{ubicacion}}</p>
+      <p *ngIf="ubicacion == null || ubicacion == undefined">Ubicación: Sin Ubicación</p>
     </div>
 
     <ion-chip outline color="primary" (click)="irABienvenido()">

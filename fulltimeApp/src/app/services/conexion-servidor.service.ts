@@ -14,10 +14,14 @@ export class ConnectivityService {
   async checkServerConnection(): Promise<boolean> {
     try {
       const response = await this.http.get(this.apiUrl, { observe: 'response' }).toPromise();
-      // Verificamos si la respuesta es exitosa (status 200)
       return response.status === 200;
     } catch (error) {
-      return false; // Error en la solicitud o servidor no disponible
+      // Si el error tiene un status (problema del servidor)
+      if (error.status) {
+        return false; // Servidor no disponible o error del servidor
+      } else {
+        return true;
+      }
     }
   }
 }

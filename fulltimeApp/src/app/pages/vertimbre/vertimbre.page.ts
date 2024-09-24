@@ -112,12 +112,9 @@ export class VertimbrePage implements OnInit {
         this.formato_fecha = resp.fecha;
         this.formato_hora = resp.hora;
         this.obtenerTimbres(localStorage.getItem('codigo'));
-
       }
     )
   }
-
-
 
   mostrarTimbres() {
     this.timbres_filtro = [];
