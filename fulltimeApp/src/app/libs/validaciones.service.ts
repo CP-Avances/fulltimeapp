@@ -3,7 +3,9 @@ import { AlertController, ToastController } from '@ionic/angular';
 import { HorarioE } from '../interfaces/Horarios';
 import { Cg_Feriados } from '../interfaces/Catalogos';
 
-import moment from 'moment';
+import moment from 'moment-timezone';
+//import momentzn from 'moment';
+
 import { EmpleadosService } from '../services/empleados.service';
 
 @Injectable({
@@ -1069,8 +1071,21 @@ export class ValidacionesService {
         return valor;
     }
 
+    FormatearFechaZonaHoraria(fecha: string, formato: string, dia: string, zonaHoraria: string) {
+        let valor = moment.tz(fecha, zonaHoraria).format(dia).charAt(0).toUpperCase() +
+            moment.tz(fecha, zonaHoraria).format(dia).slice(1) +
+            ', ' + moment.tz(fecha, zonaHoraria).format(formato);
+        return valor;
+    }
+
     FormatearHora(hora: string, formato: string) {
         let valor = moment(hora, 'HH:mm:ss').format(formato);
+        return valor;
+    }
+
+    FormatearHoraZonaHoraria(fecha: string, formato: string, zonaHoraria: string) {
+        // Convertir la fecha proporcionada desde UTC a la zona horaria especificada
+        let valor = moment.tz(fecha, zonaHoraria).format(formato);
         return valor;
     }
 }

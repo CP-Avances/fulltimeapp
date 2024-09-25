@@ -139,16 +139,41 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       this.BuscarParametroTimbreConFoto();
       this.BuscarParametroTimbreUbicacionDesconocida();
       this.VerificarFunciones();
+      this.BuscarParametroTimbreEspecial();
     }
   }
 
 
   BuscarParametroTimbreConFoto() {
     // id_tipo_parametro PARA TIMBRAR CON FOTO = 14
-    this.parametros.ObtenerDetallesParametros(14).subscribe(
+    this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
       res => {
-        localStorage.setItem('timbrarConFoto', res[0].descripcion);
-      });
+        const timbreFoto = res[0].timbre_foto;
+        console.log("ver parametro de foto", timbreFoto)
+        const resultado = timbreFoto ? 'Si' : 'No';
+        localStorage.setItem('timbrarConFoto', resultado);
+      },
+      error => {
+        console.log('Error 404 Not Found');
+        localStorage.setItem('timbrarConFoto', 'No');
+      }
+    );
+  }
+
+
+  BuscarParametroTimbreEspecial() {
+    this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
+      res => {
+        const timbreFoto = res[0].timbre_especial;
+        console.log("ver parametro de foto", timbreFoto);
+        const resultado = timbreFoto ? 'Si' : 'No';
+        localStorage.setItem('timbrarEspecial', resultado);
+      },
+      error => {
+        console.log('Error 404 Not Found');
+        localStorage.setItem('timbrarEspecial', 'No');
+      }
+    );
   }
 
   BuscarParametroTimbreUbicacionDesconocida() {
@@ -163,16 +188,16 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
     await Geolocation.checkPermissions().then(() => {
       if (this.networkService.getNetworkStatusDispositivo() == true) {
-        this.parametros.ObtenerDetallesParametros(13).subscribe(
+        this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
           res => {
-            localStorage.setItem('timbrarSinInternet', res[0].descripcion);
+            const timbreFoto = res[0].timbre_internet;
+            const resultado = timbreFoto ? 'Si' : 'No';
+            localStorage.setItem('timbrarSinInternet', resultado);
             this.router.navigate(['/enviartimbre', accion]);
+
           }, error => {
-            if (localStorage.getItem("timbrarSinInternet") == "Si") {
-              this.router.navigate(['/enviartimbre', accion]);
-            } else {
-              this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
-            }
+            localStorage.setItem('timbrarSinInternet', 'Si');
+            this.router.navigate(['/enviartimbre', accion]);
           }
         );
       } else {
@@ -188,13 +213,50 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   }
 
 
+  async VerificarTimbreEspecial(accion: string) {
+    this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
+      async res => {
+        const timbreFoto = res[0].timbre_especial;
+        console.log("ver parametro de foto", timbreFoto);
+        const resultado = timbreFoto ? 'Si' : 'No';
+        localStorage.setItem('timbrarEspecial', resultado);
+
+        if (localStorage.getItem("timbrarEspecial") == 'Si') {
+          this.VerificarTimbresSinInternet(accion);
+        } else {
+          this.abrirToas('Ups!!!, al parecer no tiene activado el timbre especial', "warning", 3000, "middle");
+        }
+      },
+      error => {
+        console.log('Error 404 Not Found');
+        if (localStorage.getItem("timbrarEspecial") == 'Si') {
+          this.VerificarTimbresSinInternet(accion);
+        } else {
+          this.abrirToas('Ups!!!, al parecer no tiene activado el timbre especial', "warning", 3000, "middle");
+        }
+      }
+    );
+  }
+
+
   BuscarParametroTimbreSinInternet() {
 
-    this.parametros.ObtenerDetallesParametros(13).subscribe(
+    this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
       res => {
-        console.log("ver parametro sin internet:", res[0])
-        localStorage.setItem('timbrarSinInternet', res[0].descripcion);
+        console.log("ver si hay respuesta de parametros de usuario", res)
+
+        const timbreFoto = res[0].timbre_internet;
+        console.log("ver parametro de internet", timbreFoto)
+
+        const resultado = timbreFoto ? 'Si' : 'No';
+        localStorage.setItem('timbrarSinInternet', resultado);
       },
+      error => {
+        console.log('Error 404 Not Found');
+        localStorage.setItem('timbrarSinInternet', 'Si');
+      }
+
+
     );
   }
 
@@ -226,7 +288,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
         localStorage.setItem("colorIp", "deshabilitado")
         localStorage.setItem("colorFp", "deshabilitado")
       }
-    },error =>{
+    }, error => {
       this.colorIp = localStorage.getItem("colorIp")
       this.colorFp = localStorage.getItem("colorFp")
     }
@@ -235,7 +297,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   async btn_InicioPermisosClick() {
     await Geolocation.checkPermissions().then(() => {
-      if (localStorage.getItem("apro_permisos")== "true") {
+      if (localStorage.getItem("apro_permisos") == "true") {
         if (localStorage.getItem('timbrarSinInternet') == "Si") {
           this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
         } else {
@@ -256,7 +318,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   async btn_FinPermisosClick() {
     await Geolocation.checkPermissions().then(() => {
-      if (localStorage.getItem("apro_permisos")== "true") {
+      if (localStorage.getItem("apro_permisos") == "true") {
         // this.router.navigateByUrl("/reloj/aprobar-permisos");
         //this.closeAdmin()
         if (localStorage.getItem('timbrarSinInternet') == "Si") {

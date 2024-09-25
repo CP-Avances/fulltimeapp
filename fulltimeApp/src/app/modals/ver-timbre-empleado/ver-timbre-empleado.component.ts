@@ -217,28 +217,28 @@ export class VerTimbreEmpleadoComponent implements OnInit {
   }
 
   buscarTimbresEmpleado(codigo) {
-    this.timbresService.getTimbresEmpleadoByCodigo(codigo).subscribe((res: Timbre[]) => {
+    this.timbresService.getTimbresEmpleadoByCodigo(codigo).subscribe((res: any[]) => {
 
       let fechasObjeto = {}
 
 
       res.forEach(data => {
-        data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
-        data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+        data.fecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
+        data.hora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre, this.formato_hora, data.zona_horaria_servidor);
         data.sfecha = '';
         data.shora = '';
 
         if (!data.fecha_hora_timbre_servidor) {
-          data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
-          data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+          data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
+          data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_hora, data.zona_horaria_servidor);
 
           if (data.fecha_subida_servidor != null) {
-            data.sfecha = this.validar.FormatearFecha(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo);
-            data.shora = this.validar.FormatearHora(moment(data.fecha_subida_servidor).format('HH:mm:ss'), this.formato_hora);
+            data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
+            data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_subida_servidor, this.formato_hora, data.zona_horaria_servidor);
           }
         } else {
-          data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo);
-          data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
+          data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
+          data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_hora, data.zona_horaria_servidor);
         }
       })
 
@@ -286,22 +286,21 @@ export class VerTimbreEmpleadoComponent implements OnInit {
           let fechasObjeto_f = {}
 
           ress.forEach(data => {
-
-            data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
-            data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+            data.fecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
+            data.hora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre, this.formato_hora, data.zona_horaria_servidor);
             data.sfecha = '';
             data.shora = '';
             if (!data.fecha_hora_timbre_servidor) {
-              data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
-              data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
-
+              data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
+              data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_hora, data.zona_horaria_servidor);
+    
               if (data.fecha_subida_servidor != null) {
-                data.sfecha = this.validar.FormatearFecha(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo);
-                data.shora = this.validar.FormatearHora(moment(data.fecha_subida_servidor).format('HH:mm:ss'), this.formato_hora);
+                data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
+                data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_subida_servidor, this.formato_hora, data.zona_horaria_servidor);
               }
             } else {
-              data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo);
-              data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
+              data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
+              data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_hora, data.zona_horaria_servidor);
             }
           })
 

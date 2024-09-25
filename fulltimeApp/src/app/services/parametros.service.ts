@@ -18,6 +18,10 @@ export class ParametrosService {
   ObtenerDetallesParametros(id: any) {
     return this.http.get<any>(this.apiUrl + '/parametrizacion/' + id);
   }
+  
+  ObtenerDetalleParametroUsuario(id_empleado: any) {
+    return this.http.get<any>(this.apiUrl + '/parametrizacion/opciones-marcacion/' + id_empleado);
+  }
 
   ObtenerFormatos() {
     return this.http.get<any>(this.apiUrl + '/parametrizacion/buscar-formato/fecha_horas');

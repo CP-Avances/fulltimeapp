@@ -192,17 +192,20 @@ export class VertimbrePage implements OnInit {
         let fechasObjeto = {}
 
         res.forEach(data => {
-          data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
-          data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+          data.fecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor );
+          console.log("ver data.fecha ", data.fecha)
+
+          data.hora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre, this.formato_hora, data.zona_horaria_servidor);
           data.sfecha = '';
           data.shora = '';
 
           if (data.fecha_hora_timbre_servidor != null) {
-            data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo);
-            data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
+            console.log("ver fecha registrada en el servidor", data.fecha_hora_timbre_servidor);
+            data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
+            data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_hora, data.zona_horaria_servidor);
           } else if (data.fecha_subida_servidor != null) {
-            data.sfecha = this.validar.FormatearFecha(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo);
-            data.shora = this.validar.FormatearHora(moment(data.fecha_subida_servidor).format('HH:mm:ss'), this.formato_hora);
+            data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
+            data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_subida_servidor, this.formato_hora, data.zona_horaria_servidor);
           }
         })
 
@@ -244,16 +247,16 @@ export class VertimbrePage implements OnInit {
           var fechasObjeto_f = {};
           ress.forEach(data => {
 
-            data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo);
-            data.hora = this.validar.FormatearHora(moment(data.fecha_hora_timbre).format('HH:mm:ss'), this.formato_hora);
+            data.fecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
+            data.hora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_hora, data.zona_horaria_servidor);
             data.sfecha = '';
             data.shora = '';
             if (data.fecha_hora_timbre_servidor != null) {
-              data.sfecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo);
-              data.shora = this.validar.FormatearHora(moment(data.fecha_hora_timbre_servidor).format('HH:mm:ss'), this.formato_hora);
+              data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
+              data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_hora, data.zona_horaria_servidor);
             } else if (data.fecha_subida_servidor != null) {
-              data.sfecha = this.validar.FormatearFecha(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo);
-              data.shora = this.validar.FormatearHora(moment(data.fecha_subida_servidor).format('HH:mm:ss'), this.formato_hora);
+              data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
+              data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_subida_servidor, this.formato_hora, data.zona_horaria_servidor);
             }
           })
 
@@ -273,14 +276,6 @@ export class VertimbrePage implements OnInit {
             this.filtro = true;
             this.vacio = true;
           }
-          /*
-          else if(Object.keys(fechasObjeto_f).length < 8){
-            this.filtro = true;
-          }else{
-            this.filtro = false;
-          }
-            */
-
         },
         err => {
           return this.mostrarToas('Lo sentimos no fue posible conectar con el servidor', 3000, "danger");

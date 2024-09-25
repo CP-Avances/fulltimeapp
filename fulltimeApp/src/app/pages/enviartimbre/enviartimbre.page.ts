@@ -337,10 +337,6 @@ export class EnviartimbrePage implements OnInit {
     this.BuscarParametroTimbreSinInternet();
     this.BuscarParametroTimbreUbicacionDesconocida();
 
-    this.BuscarParametroTimbreConFoto();
-    this.iniciarProcesoFoto();
-
-    /*
     if ((this.platform.is('ios')) || (this.platform.is('android')) || (this.platform.is('capacitor'))) {
 
       await this.verificarPermisoLocation()
@@ -362,8 +358,6 @@ export class EnviartimbrePage implements OnInit {
       this.BuscarParametroTimbreConFoto();
       this.iniciarProcesoFoto();
     }
-      */
-
   }
 
   obtenerIdTipo(): string {
@@ -588,18 +582,34 @@ export class EnviartimbrePage implements OnInit {
   }
 
   BuscarParametroTimbreSinInternet() {
-
-    this.parametros.ObtenerDetallesParametros(13).subscribe(
+    this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
       res => {
-        localStorage.setItem('timbrarSinInternet', res[0].descripcion);
+        console.log("ver si hay respuesta de parametros de usuario", res)
+
+        const timbreFoto = res[0].timbre_internet;
+        console.log("ver parametro de internet", timbreFoto)
+
+        const resultado = timbreFoto ? 'Si' : 'No';
+        localStorage.setItem('timbrarSinInternet', resultado);
+      },
+      error => {
+        console.log('Error 404 Not Found');
+        localStorage.setItem('timbrarSinInternet', 'Si');
       });
   }
 
   BuscarParametroTimbreConFoto() {
-    // id_tipo_parametro PARA TIMBRAR CON FOTO = 14
-    this.parametros.ObtenerDetallesParametros(14).subscribe(
+    this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
       res => {
-        localStorage.setItem('timbrarConFoto', res[0].descripcion);
+        console.log("metodo BuscarParametroTimbreConFoto ", res)
+        const timbreFoto = res[0].timbre_foto;
+        console.log("ver parametro de foto", timbreFoto)
+        const resultado = timbreFoto ? 'Si' : 'No';
+        localStorage.setItem('timbrarConFoto', resultado);
+      },
+      error => {
+        console.log('Error 404 Not Found');
+        localStorage.setItem('timbrarConFoto', 'No');
       });
   }
 
