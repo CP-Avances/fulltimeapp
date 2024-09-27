@@ -93,11 +93,14 @@ export class ListaEmpleadosComponent implements OnInit {
   }
 
   changeSearch(e: any) {
-    const query = e.detail.value;
-    const filtro = this.empleados.filter((o:any) => {
-      return o.fullname.toLowerCase().indexOf(query.toLowerCase()) > -1 ||
-        o.codigo.toLowerCase().indexOf(query.toLowerCase()) > -1 ||
-        o.cedula.toLowerCase().indexOf(query.toLowerCase()) > -1
+    console.log("entra a busqueda", e.detail.value)
+    const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
+    console.log("ver las palabra de busqueda ",palabrasBusqueda )
+    const filtro = this.empleados.filter((o: any) => {
+      const nombreCompleto = `${o.fullname }`.toLowerCase();
+
+      console.log("ver el nombre de empleado: ", o.nombre)
+      return palabrasBusqueda.every(palabra => nombreCompleto.includes(palabra))
     })
     this.empleados_filtro = filtro
 

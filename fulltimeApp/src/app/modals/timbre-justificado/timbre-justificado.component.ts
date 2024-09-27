@@ -14,6 +14,9 @@ import { Filesystem, Directory } from '@capacitor/filesystem';
 })
 export class TimbreJustificadoComponent implements OnInit {
   @ViewChild('fileInput') fileInput: any; // Accede al input de archivo
+  selectedSecond: string = '00'; // Segundos iniciales como cadena con dos cifras
+  seconds: string[] = Array.from({ length: 60 }, (_, i) => ('0' + i).slice(-2)); // Segundos de "00" a "59"
+
 
   numeroCaracteres = 0;
   mensajeFile: string | null;
@@ -31,7 +34,7 @@ export class TimbreJustificadoComponent implements OnInit {
     { accion: 'E/A', view: 'Fin de almuerzo', teclaFuncion: 3 },
     { accion: 'E/P', view: 'Inicio de permiso', teclaFuncion: 5 },
     { accion: 'S/P', view: 'Fin de permiso', teclaFuncion: 4 },
-    
+
   ]
 
   accion: string = '';
@@ -80,11 +83,54 @@ export class TimbreJustificadoComponent implements OnInit {
     this.tecla_funcion = obj1
   }
 
+  initialDate: string; // Almacena la fecha y hora inicial sin segundos sumados
 
+  versegundos: boolean = false;
+  fechaChange(e) {
+    this.initialDate = e.target.value;
+    this.fec_timbre = this.initialDate; // Guarda la fecha y hora inicial sin segundos
+    this.versegundos = true;
+    console.log("ver fecha timbre ", this.fec_timbre)
+  }
+
+  updateFechaConSegundos() {
+    if (this.initialDate && this.selectedSecond !== undefined) {
+      const fechaSeleccionada = new Date(this.fec_timbre); // Usamos la fecha y hora guardada
+      const segundosSeleccionados = Number(this.selectedSecond); // Convertimos los segundos seleccionados a número
+
+      // Sumamos los segundos seleccionados a la fecha
+      fechaSeleccionada.setSeconds(fechaSeleccionada.getSeconds() + segundosSeleccionados);
+
+      // Convertimos la fecha modificada a cadena o la dejamos como Date, dependiendo de tu lógica
+      this.fec_timbre = fechaSeleccionada.toISOString(); // Formato ISO string
+      this.fec_timbre = this.formatDateLocal(fechaSeleccionada); // Formateamos la fecha como una cadena local
+
+      console.log('Fecha con segundos sumados:', this.fec_timbre);
+    }
+  }
+
+  // Método para formatear la fecha en formato local
+  formatDateLocal(date: Date): string {
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2); // Mes en formato de 2 dígitos
+    const day = ('0' + date.getDate()).slice(-2); // Día en formato de 2 dígitos
+    const hours = ('0' + date.getHours()).slice(-2); // Hora en formato de 2 dígitos
+    const minutes = ('0' + date.getMinutes()).slice(-2); // Minutos en formato de 2 dígitos
+    const seconds = ('0' + date.getSeconds()).slice(-2); // Segundos en formato de 2 dígitos
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`; // Formato: YYYY-MM-DD HH:MM:SS
+  }
+
+  /*
   fechaChange(e) {
     console.log(e.target.value);
-    this.fec_timbre = e.target.value
+    const fechaSeleccionada = e.target.value
+    const segundosSeleccionados = Number(this.selectedSecond); // Convertimos los segundos seleccionados a número
+    fechaSeleccionada.setSeconds(fechaSeleccionada.getSeconds() + segundosSeleccionados);
+    this.fec_timbre = fechaSeleccionada; // Formato ISO string
+    console.log('Fecha con segundos sumados:', this.fec_timbre);
   }
+    */
 
 
   enviarTimbre() {
@@ -124,7 +170,7 @@ export class TimbreJustificadoComponent implements OnInit {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: duracion,
-      color: color, 
+      color: color,
       position: "middle"
     });
     toast.present();
@@ -177,14 +223,14 @@ export class TimbreJustificadoComponent implements OnInit {
 
   async selectImage() {
     console.log("ver imagen");
-  
+
     const image = await Camera.getPhoto({
       quality: 90,
       allowEditing: false,
       resultType: CameraResultType.DataUrl,
       source: CameraSource.Photos
     });
-  
+
     if (image.dataUrl) {
       this.base64Image = image.dataUrl;
 
@@ -195,48 +241,48 @@ export class TimbreJustificadoComponent implements OnInit {
   }
 
 
+
+  /*
+    fileChange(element) {
+      this.archivoSubido = element.target.files;
   
-/*
-  fileChange(element) {
-    this.archivoSubido = element.target.files;
-
-    console.log(this.archivoSubido);
-    const name = this.archivoSubido[0].name;
-    if (this.archivoSubido.length != 0) {
-
-
-      if (this.archivoSubido[0].name.length > 50) {
-        this.archivoSubido = null;
-        this.fileName = ''
-        this.mensajeFile = "El nombre debe tener 50 caracteres como maximo";
-        this.validar.showToast('Ups el nombre del archivo es muy largo', 3500, 'warning');
-
-      } else {
-        console.log(this.archivoSubido[0].name);
-        this.fileName = name;
-       // this.validar.showToast('Archivo valido', 3500, 'success');
+      console.log(this.archivoSubido);
+      const name = this.archivoSubido[0].name;
+      if (this.archivoSubido.length != 0) {
+  
+  
+        if (this.archivoSubido[0].name.length > 50) {
+          this.archivoSubido = null;
+          this.fileName = ''
+          this.mensajeFile = "El nombre debe tener 50 caracteres como maximo";
+          this.validar.showToast('Ups el nombre del archivo es muy largo', 3500, 'warning');
+  
+        } else {
+          console.log(this.archivoSubido[0].name);
+          this.fileName = name;
+         // this.validar.showToast('Archivo valido', 3500, 'success');
+        }
       }
+  
+      // Convert file to Base64
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        this.base64Image = reader.result; // Base64 string
+        console.log("Imagen en Base64: ", this.base64Image); // Aquí ya está disponible
+        //this.showToast("Imagen en Base64 lista", 3000, 'success');
+        this.validar.showToast('Imagen en Base64 lista', 3500, 'success');
+  
+      };
+      reader.onerror = () => {
+        this.uploadError = 'Error al leer el archivo.';
+       // this.showToast('Error al leer el archivo.', 3000, 'danger');
+        this.validar.showToast('Error al leer el archivo.', 3500, 'success');
+  
+      };
+      reader.readAsDataURL(this.archivoSubido[0]);
     }
-
-    // Convert file to Base64
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      this.base64Image = reader.result; // Base64 string
-      console.log("Imagen en Base64: ", this.base64Image); // Aquí ya está disponible
-      //this.showToast("Imagen en Base64 lista", 3000, 'success');
-      this.validar.showToast('Imagen en Base64 lista', 3500, 'success');
-
-    };
-    reader.onerror = () => {
-      this.uploadError = 'Error al leer el archivo.';
-     // this.showToast('Error al leer el archivo.', 3000, 'danger');
-      this.validar.showToast('Error al leer el archivo.', 3500, 'success');
-
-    };
-    reader.readAsDataURL(this.archivoSubido[0]);
-  }
-
-  */
+  
+    */
 
   ionChange() {
     this.numeroCaracteres = this.observacion.length;

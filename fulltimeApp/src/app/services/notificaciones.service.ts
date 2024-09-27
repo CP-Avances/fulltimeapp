@@ -12,17 +12,13 @@ import { Socket } from 'ngx-socket-io';
 export class NotificacionesService {
 
   private apiUrl = environment.url;
-
   private recursoURL = 'http://192.168.0.127:3001';
-  //private recursoURL = 'http://186.4.226.49:3001';
-
-
   constructor(
     private http: HttpClient,
     public socket: Socket,
   ) { }
 
-  // realtime
+  // METODO PARA RECEPCION Y EMISION DE AVISOS
   RecibirNuevosAvisos(data: any) {
     console.log('Socket emite', this.socket.emit('nuevo_aviso', data));
     this.socket.emit('nuevo_aviso', data);
@@ -40,19 +36,18 @@ export class NotificacionesService {
       );
   }
 
+  // METODO PARA BUSCAR LOS EMPLEADOS CON SU INFORMACION GENERAL
   BuscarDatosGenerales() {
-    const estado = 1; // 1 = activo 
-    // return this.http.get<any>(`${this.apiUrl}/generalidades/datos_generales/ver/${estado}`);
+    const estado = 1; 
     return this.http.get<any>(`${this.apiUrl}/generalidades/informacion-data-general/${estado}`);
   }
 
+  // METODOS PARA MARCAR EN VISTO LA NOTIFICACIONES
   PutNotificaVisto(id_realtime: number, data: any) {
-    //return this.http.put<any>(`${this.apiUrl}/notificaciones/notifica_visto/`, datos);
     return this.http.put(`${environment.url}/noti-real-time/vista/${id_realtime}`, data);
   }
 
   PutNotifiTimbreVisto(id_noti_timbre: number, datos: any) {
-    //return this.http.put<any>(`${this.apiUrl}/notificaciones/notifiTimbre_visto/`, datos);
     return this.http.put(`${environment.url}/timbres/noti-timbres/vista/${id_noti_timbre}`, datos);
   }
 
@@ -65,7 +60,6 @@ export class NotificacionesService {
   EnviarMensajeComunicado(data: any) {
     return this.http.post<any>(`${this.apiUrl}/noti-real-time/noti-comunicado-movil/`, data);
   }
-
 
   /** ************************************************************************************ **
    ** **                   MÉTODOS PARA ENVIO DE CORREOS MULTIPLES                      ** ** 

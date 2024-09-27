@@ -45,8 +45,6 @@ export class LoginPage implements OnInit {
     public platform: Platform,
     private userService: DataUserLoggedService,
     private empleadoService: EmpleadosService,
-
-
   ) { }
   mostrarCheckboxInicialmente: boolean;
 
@@ -56,13 +54,8 @@ export class LoginPage implements OnInit {
   }
 
   ngOnInit() {
-
     this.obtenerInfoTerminosCondiciones();
-    this.BuscarParametroTimbreSinInternet();
-    this.BuscarParametroTimbreConFoto();
-
     this.BuscarParametroTimbreUbicacionDesconocida();
-
     if (!this.relojService.esPrimeraVez()) {
       this.navCtroller.navigateForward(['inicio']);
     } else if (this.relojService.estaLogueado() && this.relojService.existeRol()) {
@@ -71,32 +64,13 @@ export class LoginPage implements OnInit {
       this.navCtroller.navigateRoot(['reloj']);
 
     }
-
   }
 
   rango_dispositivos: any;
 
 
-  BuscarParametroTimbreSinInternet() {
-
-    this.parametros.ObtenerDetallesParametros(13).subscribe(
-      res => {
-        console.log("ver parametro sin internet:", res[0])
-        localStorage.setItem('timbrarSinInternet', res[0].descripcion);
-      });
-  }
-
-  BuscarParametroTimbreConFoto() {
-
-    this.parametros.ObtenerDetallesParametros(14).subscribe(
-      res => {
-        console.log("ver parametro sin internet:", res[0])
-        localStorage.setItem('timbrarConFoto', res[0].descripcion);
-      });
-  }
-
+  // METODO PARA OBTNER PARAMETRO DE UBICACION DESCONOCIDA
   BuscarParametroTimbreUbicacionDesconocida() {
-    // id_tipo_parametro PARA PERMITIR TIMBRE UBICACION DESCONOCIDA = 4
     this.parametros.ObtenerDetallesParametros(5).subscribe(
       res => {
 
@@ -104,9 +78,7 @@ export class LoginPage implements OnInit {
       });
   }
 
-
-  //Aqui
-
+  // METODO PARA OBTENER LA INFORMACION DEL DISPOSITIVO
   infoDispositivo() {
     Device.getId().then((id) => {
       this.id_celular = id.identifier;
@@ -116,6 +88,7 @@ export class LoginPage implements OnInit {
     });
   }
 
+  // METODO PARA CONTROLAR LA ACPETACION DE TERMINOS Y CONDICIONES
   obtenerInfoTerminosCondiciones() {
     this.infoDispositivo();
     Device.getId().then((id) => {
@@ -141,8 +114,7 @@ export class LoginPage implements OnInit {
     this.verPassword = !this.verPassword;
   }
 
-
-
+  //METODO PARA VER EL NUMERO DE DISPOSITIVOS QUE PUEDE TENER UN USUARIO 
   BuscarParametroNumeroDispositivos() {
     let datos = [];
     this.parametros.ObtenerDetallesParametros(6).subscribe(
@@ -156,10 +128,9 @@ export class LoginPage implements OnInit {
           return this.rango_dispositivos = 1;
         }
       });
-
-
   }
 
+  // METODO PARA INICIAR SESION
   iniciarSesion1() {
     this.infoDispositivo();
 
@@ -300,25 +271,26 @@ export class LoginPage implements OnInit {
     }
   }
 
+  // METODO PARA OBTENER LA IMAGEN EN BASE 64
   obtenerImagen64() {
     this.empleadoService.ObtenerImagen(localStorage.getItem("empleadoID"), localStorage.getItem("imagen")).subscribe(data => {
       if (!data.imagen) {
         localStorage.setItem('imagen64', '');
-        console.log( localStorage.getItem('imagen64'));
+        console.log(localStorage.getItem('imagen64'));
 
       }
       else {
         let imagen = 'data:image/jpeg;base64,' + data.imagen;
         localStorage.setItem('imagen64', imagen);
-        console.log( localStorage.getItem('imagen64'));
+        console.log(localStorage.getItem('imagen64'));
       }
     });
   }
 
+  // METODO PARA CAMBIAR A LA PANTALLA DE BIENVENIDA
   cambiodepantallas() {
     this.navCtroller.pop();
     this.navCtroller.navigateRoot(['reloj']);
-
     var FormId = 'formulariologin';
     var resetForm = <HTMLFormElement>document.getElementById(FormId);
     resetForm.reset();
@@ -376,6 +348,7 @@ export class LoginPage implements OnInit {
     await alert.present();
   }
 
+  // METODO PARA REGISTRAR EL DISPOSITIVO 
   registrarIdDispositivoenBDD(id_celular: any, model_dispositivo: any) {
     this.obtenerInfoTerminosCondiciones();
     console.log('aceptaTerminos:', this.aceptaTerminos); // Depuración
@@ -405,10 +378,8 @@ export class LoginPage implements OnInit {
       }
     )
   }
-  // fin de registro de dispositivo a usuario
 
-
-  //Crea la ventana de mensaje
+  //METODO PARA CREAR LAS ALERTAS
   async abrirToas(mensaje: string, color: string, duracion: number) {
     const toast = await this.toastController.create({
       message: mensaje,

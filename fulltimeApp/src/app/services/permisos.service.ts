@@ -15,8 +15,6 @@ export class PermisosService {
 
   private apiUrl = environment.url;
   private recursoURL = 'http://186.4.226.49:3001';
-  //private recursoURL = 'http://186.4.226.49:3001';
-
 
   private handleError(error: any) {
     console.log('ERROR CAPTURADO: ', error);
@@ -38,8 +36,6 @@ export class PermisosService {
    * 
    **********************************************************************  
    */
-
-
 
   getPermisoIdyCodigo(codigo: any, id: any): Observable<Permiso[]> {
     const url = `${this.apiUrl}/empleadoPermiso/obtener-permiso`;

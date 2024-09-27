@@ -15,10 +15,7 @@ import { Autorizacion } from '../interfaces/Autorizaciones';
 export class AutorizacionesService {
 
   private apiUrl = environment.url;
-
-  //private recursoURL = 'http://192.168.0.124:3001';
   private recursoURL = 'http://186.4.226.49:3001';
-
   private handleError(error: any) {
     console.log('ERROR CAPTURADO: ', error);
     return throwError(error);
@@ -26,6 +23,73 @@ export class AutorizacionesService {
   constructor(
     private http: HttpClient,
   ) { }
+
+  private subscription: Subscription | null = null;
+  // METODO PARA REALIZAR LA SUBSCRIPCION DE UN METODO 
+  setSubscription(subscription: Subscription) {
+    this.subscription = subscription;
+  }
+  
+  // METODO PARA REALIZAR LA DESUBSCRIBIR UN METODO 
+  unsubscribe() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+      this.subscription = null;
+    }
+  }
+
+  /******************************************************
+    * 
+    *        Notificaciones 
+    *  
+    *******************************************************
+    */
+
+  // METODO PARA OBTENER LAS NOTIFICACIONES
+  getNotificacionesByIdEmpleado(id_empleado: string | number): Observable<Notificacion[]> {
+    const url = `${this.apiUrl}/noti-real-time/all-noti`;
+    const params = new HttpParams()
+      .set('id_empleado', id_empleado)
+    return this.http.get<Notificacion[]>(url, { params })
+      .pipe(
+        tap(console.log)
+      )
+  }
+
+  // METODO PARA CREAR NOTIFICACIONES
+  postNotificacion(datos: any): Observable<any> {
+    return this.http.post<any>(`${environment.url}/noti-real-time`, datos);
+  }
+
+  /******************************************************
+   * 
+   *        Notificaciones Timbres
+   *  
+   *******************************************************
+   */
+  // METODO PARA OBTENER LAS NOTIFICACIONES TIMBRES
+  getNotificacionesTimbreByIdEmpleado(id_empleado: string | number): Observable<NotificacionTimbre[]> {
+    const url = `${this.apiUrl}/noti-real-time/noti-tim/all-noti`;
+    const params = new HttpParams()
+      .set('id_empleado', id_empleado)
+    return this.http.get<Notificacion[]>(url, { params })
+      .pipe(
+        tap(console.log)
+      )
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // METODOS QUE NO ESTAN EN FUNCIONAMIENTO, PERO ESTAN LLAMADOS EN EL CODIGO DE SOLICITUDES Y APROBACIONES //
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // METODO PARA OBTENER LAS NOTIFICACIONES TIMBRES
+  postAvisosGenerales(notificacion: NotificacionTimbre): Observable<any> {
+    const url = `${this.apiUrl}/notificaciones/noti-tim`;
+    return this.http.post<any>(url, notificacion)
+      .pipe(
+        tap(console.log)
+      )
+  }
 
   getAutorizacionPermiso(id_permiso: number): Observable<Autorizacion> {
     const url = `${this.apiUrl}/autorizaciones/`;
@@ -97,14 +161,6 @@ export class AutorizacionesService {
   }
 
   postNuevaAutorizacion(data: Autorizacion): Observable<any> {
-    /*
-    console.log('autorizacion creada: ',data);
-    const url = `${this.apiUrl}/autorizaciones/insert`;
-    return this.http.post<any>(url, data)
-      .pipe(
-        tap(console.log),
-      )
-      */
     return this.http.post(`${environment.url}/autorizaciones`, data);
   }
 
@@ -140,61 +196,6 @@ export class AutorizacionesService {
       )
   }
 
-  /******************************************************
-   * 
-   *        Notificaciones 
-   *  
-   *******************************************************
-   */
-
-  getNotificacionesByIdEmpleado(id_empleado: string | number): Observable<Notificacion[]> {
-    const url = `${this.apiUrl}/noti-real-time/all-noti`;
-    const params = new HttpParams()
-      .set('id_empleado', id_empleado)
-    return this.http.get<Notificacion[]>(url, { params })
-      .pipe(
-        tap(console.log)
-      )
-  }
-
-  postNotificacion(datos: any): Observable<any> {
-    /*
-    console.log("Notificacion enviada: ", datos);
-    const url = `${this.apiUrl}/notificaciones/`;
-    return this.http.post<any>(url, datos)
-      .pipe(
-        tap(console.log)
-      )
-        */
-
-    return this.http.post<any>(`${environment.url}/noti-real-time`, datos);
-
-  }
-
-  /******************************************************
-   * 
-   *        Notificaciones Timbres
-   *  
-   *******************************************************
-   */
-
-  getNotificacionesTimbreByIdEmpleado(id_empleado: string | number): Observable<NotificacionTimbre[]> {
-    const url = `${this.apiUrl}/noti-real-time/noti-tim/all-noti`;
-    const params = new HttpParams()
-      .set('id_empleado', id_empleado)
-    return this.http.get<Notificacion[]>(url, { params })
-      .pipe(
-        tap(console.log)
-      )
-  }
-
-  postAvisosGenerales(notificacion: NotificacionTimbre): Observable<any> {
-    const url = `${this.apiUrl}/notificaciones/noti-tim`;
-    return this.http.post<any>(url, notificacion)
-      .pipe(
-        tap(console.log)
-      )
-  }
 
   /******************************************************
    * 
@@ -286,16 +287,6 @@ export class AutorizacionesService {
       )
   }
 
-  private subscription: Subscription | null = null;
-  setSubscription(subscription: Subscription) {
-    this.subscription = subscription;
-  }
 
-  unsubscribe() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-      this.subscription = null;
-    }
-  }
 
 }

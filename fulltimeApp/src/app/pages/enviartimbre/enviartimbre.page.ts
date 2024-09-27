@@ -118,6 +118,7 @@ export class EnviartimbrePage implements OnInit {
   conexion = true;
   novedades_conexion: string = "";
 
+  // METODO PARA VERIFICAR LA CONEXION A INTERNET
   networkSubscriber() {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
     if (!this.isConnected) {
@@ -129,9 +130,8 @@ export class EnviartimbrePage implements OnInit {
     }
   }
 
-  //UBICACION
+  // METODO PARA VERIFICAR LA UBICACION ACTIVADA
   async comprobarGPS() {
-
     Geolocation.checkPermissions().then(
       result => this.requestLocationPermission(),
     ).catch((error) => {
@@ -139,6 +139,7 @@ export class EnviartimbrePage implements OnInit {
     });;
   }
 
+  // METODO PARA SOLICITAR EL PERMISO DE UBICACION
   async requestLocationPermission() {
     try {
       // Solicitar permiso para acceder a la ubicación
@@ -156,6 +157,7 @@ export class EnviartimbrePage implements OnInit {
     }
   }
 
+  // METODO PARA OBTENER LAS COORDENADAS
   async obtenerPosicion() {
     this.cargandoPosicion = true;
 
@@ -171,9 +173,8 @@ export class EnviartimbrePage implements OnInit {
       console.log('No se pudo obtener la posicion:', error);
     });
   }
-  //FIN UBICACION
 
-  //obtener ID de celular, para identificar en que celular timbró
+  // METODO PARA OBTENER LA INFORMACION DEL DISPOSITIVO
   obtenerIdCelular() {
     Device.getInfo().then((info) => {
       return this.modelo_dispositivo = info.model;
@@ -188,6 +189,7 @@ export class EnviartimbrePage implements OnInit {
     });
   }
 
+  // METODO PARA VERIFICAR LAS FUNCIONES DISPONIBLES
   funciones: any = [];
   VerificarFunciones() {
     this.restP.ObtenerFunciones().subscribe(res => {
@@ -196,7 +198,7 @@ export class EnviartimbrePage implements OnInit {
     });
   }
 
-
+  // METODO PARA INICIAR CO EL PROCESO DE FOTO SEGUN LOS PARAMETROS
   async iniciarProcesoFoto() {
     console.log("ENTRA A iniciarProcesoFoto")
     if (localStorage.getItem('timbrarConFoto') == 'Si') {
@@ -214,7 +216,7 @@ export class EnviartimbrePage implements OnInit {
     }
   }
 
-
+  // METODO PARA ABRIR LA CAMARA Y GUARDAR LA IMAGEN
   async tomarFoto() {
     const cameraPhoto = await Camera.getPhoto({
       quality: 0.9,
@@ -233,7 +235,7 @@ export class EnviartimbrePage implements OnInit {
     }
   }
 
-  //Inicio autenticarse mediante biometrico
+  //METODO PARA VERIFICAR LA AUNTENTICACION POR HUELLA DACTILAR 
   async identificarUsuario() {
     await FingerprintAIO.isAvailable().then(() => {
       console.log(FingerprintAIO.BIOMETRIC_HARDWARE_NOT_SUPPORTED)
@@ -245,6 +247,7 @@ export class EnviartimbrePage implements OnInit {
     });
   }
 
+  // METODO PARA ABRIR EL COMPONENTE DE AUNTENTICACION POR HUELLA DACTILAR
   async openAutenticacion() {
     await FingerprintAIO.show(
       {
@@ -271,9 +274,7 @@ export class EnviartimbrePage implements OnInit {
       }
       );
   }
-  //Fin autenticarse mediante biometrico 
-
-  //mostrar Alerta que pregunta si enviar timbre sin autenticarse
+  // METODO PARA ENVIAR TIMBRES SIN AUNTENTICACION
   async enviarTimbreSinAuth() {
 
     console.log("Entra AQUIII SIN AUNTENTICACION")
@@ -297,9 +298,8 @@ export class EnviartimbrePage implements OnInit {
     });
     await alert.present();
   }
-  //FIN mostrar Alerta
 
-  //mostrar Alerta que pregunta si enviar timbre sin autenticarse porque hay un problema para autenticarse
+  // METODO PARA VERIFICAR LA AUNTENTICACION POR HUELLA DACTILAR
   async enviarTimbreAuthProble() {
     const alert = await this.alertController.create({
       header: 'Problema con la autenticación',
@@ -313,15 +313,14 @@ export class EnviartimbrePage implements OnInit {
           handler: () => {
             this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
             this.guardarEnBDD();
-            //this.BuscarParametroTimbreConFoto()
-            //this.iniciarProcesoFoto();
           }
         }
       ]
     });
     await alert.present();
-  }//fin mostrar Alerta
+  }
 
+  // METODO PARA VERIFICAR LOS PERMISOS 
   async verificarPermisoLocation(): Promise<boolean> {
     const result = await Geolocation.checkPermissions();
     if (result.location === 'granted') {
@@ -331,7 +330,7 @@ export class EnviartimbrePage implements OnInit {
     }
   }
 
-
+  // METODO PARA ENVIAR EL TIMBRE SEGUN LOS PARAMETROS
   async enviarTimbre(ev?: any) {
     //comprueba si estamos en un emulador o PC para envíar el timbre
     this.BuscarParametroTimbreSinInternet();
@@ -360,6 +359,7 @@ export class EnviartimbrePage implements OnInit {
     }
   }
 
+  // METODO PARA OBTENER LA ACCION DEL TIMBRE
   obtenerIdTipo(): string {
     switch (this.nombreInfo_timbre) {
       case "Inicio de jornada laboral":
@@ -416,66 +416,7 @@ export class EnviartimbrePage implements OnInit {
     }
   }
 
-
-
-
-  obtenerIdTipoTresBotones(): string {
-    switch (this.nombreInfo_timbre) {
-      case "Inicio de jornada laboral":
-        {
-          this.nuevoTimbre.accion = "EoS";
-          return "0";
-        }
-        break;
-
-      case "Fin de jornada laboral":
-        {
-          this.nuevoTimbre.accion = "EoS";
-          return "0";
-        }
-        break;
-
-      case "Inicio de almuerzo":
-        {
-          this.nuevoTimbre.accion = "AES";
-          return "1";
-        }
-        break;
-
-      case "Fin de almuerzo":
-        {
-          this.nuevoTimbre.accion = "AES";
-          return "1";
-        }
-        break;
-
-      case "Inicio de permiso":
-        {
-          this.nuevoTimbre.accion = "PES";
-          return "2";
-        }
-        break;
-
-      case "Fin de permiso":
-        {
-          this.nuevoTimbre.accion = "PES";
-          return "2";
-        }
-        break;
-
-      case "Timbre abierto":
-        {
-          this.nuevoTimbre.accion = "HA";
-          return "6";
-        }
-        break;
-
-      default:
-        break;
-    }
-  }
-
-  //refrescar la pagina
+  // METODO PARA REFRESCAR LA PAGINA
   refrescoEspecial() {
     this.cargandoPosicion = false;
     this.geoLatitude = 0;
@@ -483,15 +424,14 @@ export class EnviartimbrePage implements OnInit {
     this.comprobarGPS();
   }
 
+  // METODO PARA VERIFICAR EL NUMERO DE CARACTERES
   ionChange() {
     this.numeroCaracteres = this.nuevoTimbre.observacion.length;
   }
 
-
+  // METODO PARA GUARDA LA INFORMACION DEL TIMBRE EN LA BASE DE DATOS
   guardarEnBDD() {
-    //Metodo que guarda el timbre en la base de datos en la tabla timbres.
     this.nuevoTimbre.codigo = this.codigo;
-    //this.nuevoTimbre.tecla_funcion = this.obtenerIdTipo();
     this.nuevoTimbre.fecha_hora_timbre = this.fechaHora;
     this.nuevoTimbre.zona_horaria_dispositivo = this.zonaHoraria;
     this.nuevoTimbre.tecla_funcion = this.obtenerIdTipo();
@@ -514,10 +454,7 @@ export class EnviartimbrePage implements OnInit {
       this.ValidarModulo(this.geoLatitude, this.geoLongitude, this.rango, this.nuevoTimbre);
       console.log('paso validaciones de horario abierto');
     } else {
-      //SIN INTERNET
-      //Proceso de almacenamiento de informacion del timbre cuendo no tiene conexion al Internet.
-      if (localStorage.getItem('timbrarSinInternet') == 'Si') {
-
+      if (localStorage.getItem('timbrarSinInternet') != 'Si') {
         console.log('entro aqui timbres sin conexion');
         if (this.geoLatitude != 0 || this.geoLongitude != 0) {
           this.nuevoTimbre.latitud = this.geoLatitude + "";
@@ -538,7 +475,6 @@ export class EnviartimbrePage implements OnInit {
         return this.router.navigate(['/login']);
       }
     }
-
   }
 
   //Metodo para guardar los timbres en la memoria del telefono cuando se pierde la conexion al Internet.
@@ -552,7 +488,6 @@ export class EnviartimbrePage implements OnInit {
   //Metodo que valida la tolerancia de la ubicacion, de la tabla tipo de parametro,
   rango: any;
   BuscarParametro() {
-    // id_tipo_parametro PARA RANGO DE UBICACION = 4
     let datos = [];
     this.restP.ObtenerDetallesParametros(4).subscribe(
       res => {
@@ -569,8 +504,8 @@ export class EnviartimbrePage implements OnInit {
 
   timbrarDesconocido: string;
 
+  // METODO PARA VALIDAR EL PARAMETO DE TIMBRE CON UBICACION DESCONOCIDA
   BuscarParametroTimbreUbicacionDesconocida() {
-    // id_tipo_parametro PARA PERMITIR TIMBRE UBICACION DESCONOCIDA = 4
     this.parametros.ObtenerDetallesParametros(5).subscribe(
       res => {
 
@@ -581,6 +516,7 @@ export class EnviartimbrePage implements OnInit {
       });
   }
 
+  // METODO PARA VALIDAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON INTERNET REQUERIDO
   BuscarParametroTimbreSinInternet() {
     this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
       res => {
@@ -594,10 +530,10 @@ export class EnviartimbrePage implements OnInit {
       },
       error => {
         console.log('Error 404 Not Found');
-        localStorage.setItem('timbrarSinInternet', 'Si');
       });
   }
 
+  // METODO PARA VALIDAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON FOTO
   BuscarParametroTimbreConFoto() {
     this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
       res => {
@@ -609,7 +545,6 @@ export class EnviartimbrePage implements OnInit {
       },
       error => {
         console.log('Error 404 Not Found');
-        localStorage.setItem('timbrarConFoto', 'No');
       });
   }
 
@@ -666,8 +601,6 @@ export class EnviartimbrePage implements OnInit {
       lng2: '',
       valor: rango
     }
-
-    //Usa el servicio de buscar coordenadas del usuario
     this.restP.ObtenerUbicacionUsuario(this.id_usuario).subscribe(
       res => {
         console.log('Obteniendo Ubicacion de Usuario ------', res)
@@ -703,25 +636,22 @@ export class EnviartimbrePage implements OnInit {
       });
   }
 
+  // METODO PARA VERIFICAR SI SE TRABAJA CON GEOLOCALIZACION
   ValidarModulo(latitud: any, longitud: any, rango: any, timbre: any) {
     console.log('--------- Validacion Modulo----------')
 
     if (this.funciones[0] === undefined) {
-      //Fallo conexion al Servidor
       console.log('Validad Modulo Funciones: ', this.funciones)
       timbre.ubicacion = 'DESCONOCIDO';
       this.storageUbica = timbre.ubicacion;
       this.EnviarDatos(timbre);
-      //this.navCtroller.navigateForward(['confirmaciontimbre'])
     } else {
       console.log("ver geoloca", this.funciones[0].geolocalizacion)
-      //Sin fallos en el servidor y red
       if (this.funciones[0].geolocalizacion === true) {
         console.log('BuscarUbicacion validar Modulo------')
         this.BuscarUbicacion(latitud, longitud, rango, timbre);
       }
       else {
-        //Fallo conexion al Servidor
         console.log("ver si entra aquiiiiii")
         timbre.ubicacion = 'DESCONOCIDO';
         this.storageUbica = timbre.ubicacion;
@@ -730,6 +660,7 @@ export class EnviartimbrePage implements OnInit {
     }
   }
 
+  //METODO PARA OBTENER LAS COORDENADAS EN CASO DE TENER REGISTRADO EL DOMICILIO
   ValidarDomicilio(informacion: any, timbre: any) {
     console.log('ValidarDomicilio ------')
 
@@ -820,6 +751,7 @@ export class EnviartimbrePage implements OnInit {
 
   }
 
+  // METODO PARA ENVIAR DATOS DEL TIMBRE
   EnviarDatos(data) {
     localStorage.setItem("storageUbicacion", this.storageUbica);
     console.log('Ubicacion storage: ', localStorage.getItem("storageUbicacion"))
@@ -844,6 +776,7 @@ export class EnviartimbrePage implements OnInit {
 
   }
 
+  // METODO PARA ALMACENAR LOS TIMBRES SIN CONEXION AL SERVIDOR
   GuardartimbresinServidor(data) {
     console.log('Error con la conexión al servidor. El timbre se guardó en memoria del teléfono', data);
     data.conexion = false;
@@ -854,7 +787,7 @@ export class EnviartimbrePage implements OnInit {
     this.navCtroller.navigateForward(['confirmaciontimbre']);
   }
 
-
+  // METODO PARA DEFIRNIR LOS TOAST
   async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
     const toast = await this.toastController.create({
       message: mensaje,
@@ -864,5 +797,4 @@ export class EnviartimbrePage implements OnInit {
     });
     toast.present();
   }
-
 }

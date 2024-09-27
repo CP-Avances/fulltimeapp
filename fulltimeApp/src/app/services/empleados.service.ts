@@ -17,31 +17,17 @@ export class EmpleadosService {
 
   ) { }
 
-  /**
-   * Obtiene lista de empleados activos e inactivos.
-   * Campos q trae { id, fullname, codigo, cedula}
-   */
+  // METODO PARA LEER LA LISTA DE EMPLEADOS
   ObtenerListaEmpleados() {
     return this.http.get<any>(`${this.apiUrl}/empleado/todosempleados/lista`)
   }
-
-
 
   // BUSCAR UN REGISTRO DE USUARIO  --**VERIFICADO
   BuscarUnEmpleado(id: number): Observable<any> {
     return this.http.get<any>(`${environment.url}/empleado/${id}`);
   }
 
-
-  ObtenerHorariosEmpleado(codigo: number | string) {
-    const params = new HttpParams()
-      .set('codigo', codigo);
-    return this.http.get<HorarioE[]>(`${this.apiUrl}/empleado/horarios`, { params })
-      .pipe(
-        tap(console.log)
-      )
-  }
-
+  // METODO PARA OBTENER EL HORARIO DE EMPLEADO SEGUN SU CODIGO
   getHorariosEmpleadobyCodigo(datos) {
     const params = new HttpParams()
       .set('codigo', datos.codigo)
@@ -52,6 +38,7 @@ export class EmpleadosService {
       )
   }
 
+  // METODO PARA OBTENER LA PLANIFICACION HORARIA DEL EMPLEADO POR CODIGO
   getPlanificacionHorariosEmplbyCodigo(codigo) {
     const params = new HttpParams()
       .set('codigo', codigo)
@@ -60,23 +47,11 @@ export class EmpleadosService {
         tap(console.log)
       )
   }
-
+  // METODO PARA OBTENER LA PLANIFICACION HORARIA 
   BuscarPlanificacionHorarioEmple(datos: any) {
-    /*
-    const params = new HttpParams()
-      .set('fecha_inicio', datos.fecha_inicio)
-      .set('fecha_final', datos.fecha_final)
-      .set('id_empleado', datos.id_empleado);
-    return this.http.get<HorarioE[]>(`${this.apiUrl}/planificacion_general/horario-general-planificacion`, { params })
-      .pipe(
-        tap(console.log)
-      )
-
-      */
     return this.http.post<any>(`${environment.url}/planificacion_general/horario-general-planificacion`, datos);
-
   }
-
+  // METODO PARA OBTENER EL HORARIO DEL EMPLEADO
   ObtenerUnHorarioEmpleado(codigo: number | string, fecha_hoy: any) {
     const params = new HttpParams()
       .set('codigo', codigo)
@@ -86,10 +61,10 @@ export class EmpleadosService {
         tap(console.log)
       )
   }
-
+  
+  // METODO PARA OBTENER LA UBICACION REGISTRADA DEL EMPLEADO
   ObtenerUbicacion(id: any) {
     return this.http.get<any>(`${environment.url}/empleado/ubicacion/${id}`);
-
   }
 
   // METODO PARA BUSCAR INFORMACION DEL USUARIO QUE APRUEBA SOLICITUDES
@@ -107,17 +82,17 @@ export class EmpleadosService {
     return this.http.post<any>(`${environment.url}/empleado/horario-comida-horas-dias-diferentes/`, datos);
   }
 
-  // METODO PARA MOSTRAR IMAGEN DEL EMPLEADO **USADO
+  // METODO PARA MOSTRAR IMAGEN DEL EMPLEADO
   ObtenerImagen(id: any, imagen: any) {
     return this.http.get<any>(`${this.apiUrl}/empleado/img/codificado/${id}/${imagen}`)
   }
 
-   // BUSCAR DATOS DE UN HORARIO    **USADO
-   BuscarUnHorario(id: number) {
+  // BUSCAR DATOS DE UN HORARIO    **USADO
+  BuscarUnHorario(id: number) {
     return this.http.get(`${this.apiUrl}/horario/${id}`);
   }
 
-  // METODO PARA BUSCAR DATOS GENERALES DE USUARIOS TIMBRE MOVIL    **USADO
+  // METODO PARA VERIFICAR SI EL USUARIO TIENE HABILIOTADA LA APLICACION MOVIL
   accesoMovil(id_epleado: any) {
     return this.http.get<any>(`${environment.url}/usuarios/movil/acceso/activo/${id_epleado}`);
   }

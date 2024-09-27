@@ -17,25 +17,6 @@ export class TokenInterceptorService {
       }
     });
     return next.handle(tokenizeReq);
-
-    /*
-    if (this.relojServiceService.estaLogueado()) {
-      let tokenizeReq = req.clone({
-        setHeaders: {
-          autorizacion: this.relojServiceService.getToken()
-        }
-      });
-      return next.handle(tokenizeReq);
-    } else {
-      let tokenizeReq = req.clone({
-        setHeaders: {
-          autorizacion: "sin token"
-        }
-      });
-      return next.handle(tokenizeReq);
-    }
-
-    */
   }
 
 }

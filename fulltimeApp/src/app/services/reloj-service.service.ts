@@ -11,71 +11,53 @@ export class RelojServiceService {
 
 
   constructor(
-    private http: HttpClient, 
+    private http: HttpClient,
     private navCtroller: NavController,
   ) {
   }
 
-  //USUARIO
-  registrarUsuario(usuario: any) {
-    return this.http.post<any>(this.URL + '/user/usuario', usuario);
-  }
-
-  existeUsuario(username: any) {
-    return this.http.post<any>(this.URL + '/user/existeUsuario', { user_name: username });
-  }
+  //  METODO PARA OBTENER LOS USUARIOS DE LA EMPRESA
   obtenerUsuarioEmpresa() {
     return this.http.get<any>(this.URL + '/usuarios/usuarioEmpresa');
   }
-
+  // METODO PARA OBTENER LA INFORMACION DEL USUARIO 
   obtenerUsuario(idUser: any) {
     return this.http.get<any>(this.URL + '/usuarios/usuario/' + idUser);
   }
 
+  // METODO PARA INICIAR SESION
   iniciarSesion(user: any) {
-    //return this.http.post<any>(this.URL + '/user/loginUsuario', user);
     return this.http.post<any>(`${this.URL}/login`, user);
-
   }
 
-  cambiarPassword(username:any, user_password: any) {
-    return this.http.put<any>(this.URL + '/user/actualizarPass/' + username, { user_password: user_password });
+  // METODO PARA REGISTRAR EL DISPOSITIVO
+  registrarCelularUsuario(id_empleado: any, id_celular: any, modelo_dispositivo: any, user_name: any, ip: any, terminos_condiciones: boolean) {
+    return this.http.post<any>(this.URL + '/usuarios/ingresarIDdispositivo', { id_empleado, id_celular, modelo_dispositivo, user_name, ip, terminos_condiciones });
   }
 
-  actualizarCelularUsuario(id_usuario: string, id_celular: boolean) {
-    return this.http.put<any>(this.URL + '/user/actualizarIDcelular/' + id_usuario, { id_celular });
-  }
-
-  registrarCelularUsuario(id_empleado: any, id_celular: any, modelo_dispositivo: any, user_name : any, ip: any, terminos_condiciones: boolean) {
-    return this.http.post<any>(this.URL + '/usuarios/ingresarIDdispositivo', { id_empleado, id_celular, modelo_dispositivo, user_name,ip, terminos_condiciones  });
-  }
-
+  // BUSCAR EL DISPOSITIVO POR ID DEL EMPLEADO
   obtenerIdDispositivosUsuario(id_empleado: number | string) {
     return this.http.get<any>(this.URL + '/usuarios/IDdispositivos/' + id_empleado);
   }
 
+  // BUSCAR EL DISPOSITIVO POR ID DEL DISPOSITIVO
   obtenerDispositivoPorID(id_dispositivo: number | string) {
-    return this.http.post<any>(this.URL + '/usuarios/dispositivo/idDispositivo' , {id_dispositivo});
+    return this.http.post<any>(this.URL + '/usuarios/dispositivo/idDispositivo', { id_dispositivo });
+  }
+  
+  // METODO PARA OBTENER EL DEPARTAMENTO DEL EMPLEADO POR SU ID
+  ObtenerDepartamentoUsuarios(id_empleado: number) {
+    return this.http.get(this.URL + '/user/dato/' + id_empleado);
   }
 
-
-
-  ObtenerDepartamentoUsuarios(id_empleado: number){
-    return this.http.get(this.URL + '/user/dato/'+ id_empleado);
-  }
-
-  //FIN USUARIO
-
+  // VERIFICAR EXISTENCIA DE INICIO DE SESION
   estaLogueado() {
     return !!localStorage.getItem('token');
   }
-
-  
-
+  // VERIFICAR EXISTENCIA DE ROL
   existeRol() {
     return !!localStorage.getItem('rol');
   }
-
 
   public get rol(): number {
     const r = (localStorage.getItem('rol') === null
@@ -84,68 +66,48 @@ export class RelojServiceService {
     return r
   }
 
+  // OBTENER TOKEN
   getToken() {
     return localStorage.getItem('token');
   }
 
-
-
+  // METODO PARA CERRAR SESION
   cerrarSesion() {
     localStorage.clear();
     sessionStorage.clear();
     localStorage.setItem('primeraVez', 'true');
     this.navCtroller.pop();
-    this.navCtroller.navigateRoot('login');    
+    this.navCtroller.navigateRoot('login');
   }
-
-
 
   //comprobar si es primera vez que abre la app para mostrar sliders y si es administrador 
   yaNoEsPrimeraVez() {
     localStorage.setItem('primeraVez', "true");
   }
   esPrimeraVez() {
-    console.log("esPrimeraVez()",!!localStorage.getItem('primeraVez') )
+    console.log("esPrimeraVez()", !!localStorage.getItem('primeraVez'))
     return !!localStorage.getItem('primeraVez');
   }
-  esAdministrador() {
-    return localStorage.getItem('rol') === "1";
-  }
-
-  esEmpleado() {
-    return localStorage.getItem('rol') === "2" || localStorage.getItem('rol') === "3";
-  }
-  //fin de sliders
-
-
-  // EMPRESA
-  obtenerIdEmpresa(ruc: any) {
-    return this.http.get<any>(this.URL + '/enterprise/empresa/' + ruc);
-  }
-  crearEmpresa(empresa: any) {
-    return this.http.post<any>(this.URL + '/enterprise/empresa', empresa);
-  }
+  
+  // METODO PARA OBTENER LOS DATOS DE LA EMPRESA
   obtenerDatosEmpresa(id: any) {
-   // return this.http.get<any>(this.URL + '/enterprise/empresaId/' + id);
     return this.http.get(`${this.URL}/empresas/buscar/datos/${id}`);
-
   }
-  //fin empresa
 
   // TIMBRE
+  // METODO PARA CREAR UN TIMBRE
   enviarTimbre(timbre) {
-    console.log('dato de timbre a guardar en la base de datos: ',timbre.conexion)
+    console.log('dato de timbre a guardar en la base de datos: ', timbre.conexion)
     return this.http.post<any>(this.URL + '/timbres/timbre', timbre);
   }
-
+  // METODO PARA CREAR UN TIMBRE SIN CONEXION
   enviarTimbreSinConexion(timbre: any) {
-    console.log('dato de timbre a guardar en la base de datos pero con novedades: ',timbre)
+    console.log('dato de timbre a guardar en la base de datos pero con novedades: ', timbre)
     return this.http.post<any>(this.URL + '/timbres/timbreSinConexion', timbre);
   }
-
+  // METODO PARA BUSCAR POR WEL CODIGO DEL EMPLEADO LOS TIMBRES
   obtenerTimbres(codigo: any) {
     return this.http.get<any>(this.URL + '/timbres/timbreEmpleado/' + codigo);
   }
-  //fin timbre
 
 }

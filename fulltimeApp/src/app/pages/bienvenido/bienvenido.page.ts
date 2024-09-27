@@ -25,7 +25,6 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   time: Date = new Date();
   horaTransformada = this.pipe.transform(Date.now(), 'hh:mm a');
   fechaTransformada = this.pipe.transform(Date.now(), 'fullDate');
-
   horarioAbierto: boolean = false;
   valorsol: string = "none";
   valorluna: string = "none";
@@ -65,7 +64,6 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     this.autorizacionesServices.setSubscription(subscription); // Guardar la suscripción en el servicio
     this.networkSubscriber();
     this.refreshNavegadorAdmin();
-
   }
 
   ionViewWillEnter() {
@@ -74,12 +72,14 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     this.refreshNavegadorAdmin();
   }
 
+  // METODO PARA REFRESCAR LA PAGINA
   refreshNavegadorAdmin() {
     if (this.navegadorAdmin) {
       this.navegadorAdmin.ngOnInit(); // O cualquier otro método que necesites ejecutar para refrescar
     }
   }
 
+  // METODO PARA MOSTRAR EL RELOJ
   startClock() {
     setInterval(() => {
       this.horaTransformada = this.pipe.transform(Date.now(), 'hh:mm:ss a');
@@ -87,6 +87,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     }, 1000);
   }
 
+  // METODO DE CONGIGURACION DE TOAST
   async usuarioIncorrectoToas(mensaje: string, duracion: number) {
     const toast = await this.toastController.create({
       message: mensaje,
@@ -96,8 +97,8 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     toast.present();
   }
 
+  // METODO PARA ENTRAL AL MODAL
   async presentModalTimbresPerdidos() {
-
     const modal = await this.modalController.create({
       component: TimbresPerdidosComponent,
       cssClass: 'my-custom-class'
@@ -122,8 +123,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     }, 1000);
   }
 
-
-
+  // METODO PARA VERIFICAR LA CONEXION A INTERNET
   isConnected: boolean;
   networkSubscriber() {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
@@ -135,7 +135,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       this.colorFp = localStorage.getItem("colorFp")
     } else {
       console.log('conectado');
-      this.BuscarParametroTimbreSinInternet();
+      this.BuscarParametroTimbreInternetRequerido();
       this.BuscarParametroTimbreConFoto();
       this.BuscarParametroTimbreUbicacionDesconocida();
       this.VerificarFunciones();
@@ -143,9 +143,8 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     }
   }
 
-
+  // METODO PARA BUSCAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON FOTO
   BuscarParametroTimbreConFoto() {
-    // id_tipo_parametro PARA TIMBRAR CON FOTO = 14
     this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
       res => {
         const timbreFoto = res[0].timbre_foto;
@@ -160,7 +159,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     );
   }
 
-
+  // METODO PARA BUSCAR EL PARAMETRO DEL EMPLEADO DE TIMBRE ESPECIAL
   BuscarParametroTimbreEspecial() {
     this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
       res => {
@@ -176,16 +175,16 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     );
   }
 
+  // METODO PARA BUSCAR EL PARAMETRO DE UBICACION DESCONOCIDA
   BuscarParametroTimbreUbicacionDesconocida() {
-    // id_tipo_parametro PARA PERMITIR TIMBRE UBICACION DESCONOCIDA = 4
     this.parametros.ObtenerDetallesParametros(5).subscribe(
       res => {
         localStorage.setItem('timbrarUbicacionDesconocida', res[0].descripcion);
       });
   }
 
+  // METODO QUE REALIZA VALIDACIONES Y DAN PASO A ENVIAR TIMIBRE
   async VerificarTimbresSinInternet(accion: string) {
-
     await Geolocation.checkPermissions().then(() => {
       if (this.networkService.getNetworkStatusDispositivo() == true) {
         this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
@@ -194,17 +193,15 @@ export class BienvenidoPage implements OnInit, OnDestroy {
             const resultado = timbreFoto ? 'Si' : 'No';
             localStorage.setItem('timbrarSinInternet', resultado);
             this.router.navigate(['/enviartimbre', accion]);
-
           }, error => {
-            localStorage.setItem('timbrarSinInternet', 'Si');
             this.router.navigate(['/enviartimbre', accion]);
           }
         );
       } else {
         if (localStorage.getItem("timbrarSinInternet") == "Si") {
-          this.router.navigate(['/enviartimbre', accion]);
-        } else {
           this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
+        } else {
+          this.router.navigate(['/enviartimbre', accion]);
         }
       };
     }).catch((error) => {
@@ -212,7 +209,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     });
   }
 
-
+  // METODO QUE REALIZA VALIDACIONES Y DAN PASO A ENVIAR TIMIBRE ESPECIAL
   async VerificarTimbreEspecial(accion: string) {
     this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
       async res => {
@@ -238,9 +235,8 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     );
   }
 
-
-  BuscarParametroTimbreSinInternet() {
-
+  // METODO PARA BUSCAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON REQUERIMIENTO A INTERNET
+  BuscarParametroTimbreInternetRequerido() {
     this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
       res => {
         console.log("ver si hay respuesta de parametros de usuario", res)
@@ -255,11 +251,10 @@ export class BienvenidoPage implements OnInit, OnDestroy {
         console.log('Error 404 Not Found');
         localStorage.setItem('timbrarSinInternet', 'Si');
       }
-
-
     );
   }
 
+  // METODO PARA LA CONFIGURACION DEL TOAST
   async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
     const toast = await this.toastController.create({
       message: mensaje,
@@ -270,7 +265,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     toast.present();
   }
 
-
+  // METODO PARA VERIFICAR LAS FUNCIONES
   VerificarFunciones() {
     this.parametros.ObtenerFunciones().subscribe(res => {
       this.funciones = res[0];
@@ -294,18 +289,29 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     }
     );
   }
-
+  // METODO PARA VERIFICAR LAS FUNCIONES, VALIDAR PARAMETROS Y DAR PASO A ENVIAR TIMBRE DE INICIO DE PERMISO
   async btn_InicioPermisosClick() {
     await Geolocation.checkPermissions().then(() => {
       if (localStorage.getItem("apro_permisos") == "true") {
-        if (localStorage.getItem('timbrarSinInternet') == "Si") {
-          this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
-        } else {
-          if (this.networkService.getNetworkStatusDispositivo() == false) {
+
+        if (this.networkService.getNetworkStatusDispositivo() == false) {
+          this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
+          if (localStorage.getItem('timbrarSinInternet') == "Si") {
             this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
           } else {
-            this.router.navigate(['/enviartimbre', 'Fin de permiso']);
+            this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
           }
+        } else {
+          this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
+            res => {
+              const timbreFoto = res[0].timbre_internet;
+              const resultado = timbreFoto ? 'Si' : 'No';
+              localStorage.setItem('timbrarSinInternet', resultado);
+              this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
+            }, error => {
+              this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
+            }
+          );
         }
       } else {
         this.mostrarToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.");
@@ -316,32 +322,40 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       })
   }
 
+  // METODO PARA VERIFICAR LAS FUNCIONES, VALIDAR PARAMETROS Y DAR PASO A ENVIAR TIMBRE DE FIN DE PERMISO
   async btn_FinPermisosClick() {
     await Geolocation.checkPermissions().then(() => {
       if (localStorage.getItem("apro_permisos") == "true") {
-        // this.router.navigateByUrl("/reloj/aprobar-permisos");
-        //this.closeAdmin()
-        if (localStorage.getItem('timbrarSinInternet') == "Si") {
-          this.router.navigate(['/enviartimbre', 'Fin de permiso']);
 
-        } else {
-          if (this.networkService.getNetworkStatusDispositivo() == false) {
+        if (this.networkService.getNetworkStatusDispositivo() == false) {
+          this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
+          if (localStorage.getItem('timbrarSinInternet') == "Si") {
             this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
-
           } else {
             this.router.navigate(['/enviartimbre', 'Fin de permiso']);
           }
+        } else {
+          this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
+            res => {
+              const timbreFoto = res[0].timbre_internet;
+              const resultado = timbreFoto ? 'Si' : 'No';
+              localStorage.setItem('timbrarSinInternet', resultado);
+              this.router.navigate(['/enviartimbre', 'Fin de permiso']);
+            }, error => {
+              this.router.navigate(['/enviartimbre', 'Fin de permiso']);
+            }
+          );
         }
       } else {
         this.mostrarToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.");
       }
     })
       .catch((error) => {
-        this.abrirToas('Ups!!! al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
+        this.abrirToas('Ups!!!, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
       })
-
   }
 
+  // METODO DE CONFIGURACION DE TOAST DE PERMISOS
   async mostrarToas(mensaje: string) {
     const toast = await this.toastController.create({
       message: `<ion-icon name="information-circle-outline"></ion-icon>`
@@ -356,22 +370,19 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     await toast.present();
   }
 
-
+  // METODO DE VALIDACION DE APLICACION MOVIL HABILITADA
   async checkSession(id_empleado) {
     this.empleadoService.accesoMovil(id_empleado).subscribe((x: any) => {
-
       if (x[0].app_habilita == false) {
         console.log('Session invalid. Closing session...');
-
         this.cerrarSesion();
       } else {
         console.log('Session valid');
-
       }
     })
   }
 
-
+  // METODO PARA CERRAR SESION
   cerrarSesion() {
     this.relojService.cerrarSesion();
     this.autorizacionesServices.unsubscribe(); // Desuscribirse usando el servicio

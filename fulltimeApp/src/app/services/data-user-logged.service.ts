@@ -21,12 +21,10 @@ export class DataUserLoggedService {
     return u;
   }
 
-
   public get imagen(): any {
     const u = (localStorage.getItem('imagen') === null) ? '' : localStorage.getItem('imagen');
     return u;
   }
-
 
   public get dataUser(): any {
     return {
@@ -39,17 +37,14 @@ export class DataUserLoggedService {
   public get dataApp(): any {
     const a: any = (localStorage.getItem('app_info') === null) ? '' : localStorage.getItem('app_info');
     if (a === '') return { caducidad_licencia: '', version: '' }
-
     return JSON.parse(a)
   }
 
   public get dataVacuna(): any {
     const v: any = (localStorage.getItem('vacuna_info') === null) ? '' : localStorage.getItem('vacuna_info');
     if (v === '' || v === 'undefined') return { id_tipo_vacuna: '' }
-
     return JSON.parse(v)
   }
-
 
   /**
    * 

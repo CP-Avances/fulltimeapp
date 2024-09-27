@@ -20,7 +20,11 @@
     <br><br>
     <div>
       <label>Timbre enviado el: </label>
-      <p style="font-weight: bold; font-size: 1.6em;">{{fecha + " a las " + hora}}</p>
+      <p style="font-weight: bold; font-size: 1.6em;" *ngIf="isConnected && serverConnected">{{fecha + " a las " +
+        hora}}</p>
+      <p style="font-weight: bold; font-size: 1.6em;" *ngIf="!isConnected || !serverConnected ">{{fechaTransformada}} a
+        las {{horaTransformada}} </p>
+
       <p *ngIf="ubicacion != null && ubicacion != undefined">Ubicación: {{ubicacion}}</p>
       <p *ngIf="ubicacion == null || ubicacion == undefined">Ubicación: Sin Ubicación</p>
     </div>

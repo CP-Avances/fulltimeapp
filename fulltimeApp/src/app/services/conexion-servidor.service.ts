@@ -11,6 +11,7 @@ export class ConnectivityService {
 
   constructor(private http: HttpClient) { }
 
+  // METODO PARA VERIFICAR LA CONEXION AL SERVIDOR
   async checkServerConnection(): Promise<boolean> {
     try {
       const response = await this.http.get(this.apiUrl, { observe: 'response' }).toPromise();
@@ -18,7 +19,7 @@ export class ConnectivityService {
     } catch (error) {
       // Si el error tiene un status (problema del servidor)
       if (error.status) {
-        return false; // Servidor no disponible o error del servidor
+        return false; 
       } else {
         return true;
       }

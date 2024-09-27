@@ -483,30 +483,29 @@ export class ReporteTimbresPage {
   }
 
   changeSearchSucursales(e: any) {
-    const query = e.detail.value;
+    console.log("entra a busqueda", e.detail.value)
+    const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
+    console.log("ver las palabra de busqueda ",palabrasBusqueda )
     const filtro = this.sucursales.filter((o: any) => {
-      return o.sucursal.toLowerCase().indexOf(query.toLowerCase()) > -1
+      const nombreCompleto = `${o.sucursal}`.toLowerCase();
+      console.log("ver el nombre de empleado: ", o.nombre)
+      return palabrasBusqueda.every(palabra => nombreCompleto.includes(palabra))
     })
     this.sucursales_filtro = filtro
   }
 
   changeSearchDepartamento(e: any) {
-    const query = e.detail.value;
+    console.log("entra a busqueda", e.detail.value)
+    const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
+    console.log("ver las palabra de busqueda ",palabrasBusqueda )
     const filtro = this.departamentos.filter((o: any) => {
-      return o.departamento.toLowerCase().indexOf(query.toLowerCase()) > -1
+      const nombreCompleto = `${o.departamento}`.toLowerCase();
+      console.log("ver el nombre de empleado: ", o.nombre)
+      return palabrasBusqueda.every(palabra => nombreCompleto.includes(palabra))
     })
     this.departamentos_filtro = filtro
   }
-
-  changeSearch(e: any) {
-    const query = e.detail.value;
-    const filtro = this.empleados.filter((o: any) => {
-      return o.nombre.toLowerCase().indexOf(query.toLowerCase()) > -1
-    })
-    this.empleados_filtro = filtro
-  }
-
-
+  
   changeSearchNombresCompletos(e: any) {
     console.log("entra a busqueda", e.detail.value)
     const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS

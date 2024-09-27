@@ -21,18 +21,6 @@ export class ReportesService {
     private http: HttpClient
   ) { }
 
-  getInfoReporteTimbres(codigo: number | string, fec_inicio: any, fec_final: any): Observable<Timbre[]> {
-    const params = new HttpParams()
-      .set('codigo', codigo)
-      .set('fec_inicio', fec_inicio)
-      .set('fec_final', fec_final)
-    return this.http.get<Timbre[]>(`${this.api_url}/reporte/timbres`, { params })
-      .pipe(
-        tap(console.log),
-        catchError(this.handleError)
-      )
-  }
-
   // METODO PARA CONSULTAR LISTA DE TIMBRES DEL USUARIO    **USADO
   ReporteTimbresMultiple(data: any, desde: string, hasta: string) {
     return this.http.post<any>(`${this.api_url}/reportes-asistencias/timbres/${desde}/${hasta}`, data);
@@ -43,18 +31,6 @@ export class ReportesService {
     return this.http.post<any>(`${this.api_url}/reporte/timbresConNovedad/${desde}/${hasta}`, data);
   }
 
-  getInfoReporteInasistencia(codigo: number, fec_inicio: any, fec_final: any): Observable<any> {
-    const params = new HttpParams()
-      .set('codigo', codigo)
-      .set('fec_inicio', fec_inicio)
-      .set('fec_final', fec_final)
-    return this.http.get<any>(`${this.api_url}/reportes/inasistencia`, { params })
-      .pipe(
-        tap(console.log),
-        catchError(this.handleError)
-      )
-  }
-
   BuscarFaltas(data: any, inicio: string, fin: string) {
     return this.http.post<any>(`${environment.url}/reporte-faltas/faltas/${inicio}/${fin}`, data);
   }
@@ -62,19 +38,6 @@ export class ReportesService {
   BuscarAtrasos(data: any, desde: string, hasta: string) {
     return this.http.post<any>(`${environment.url}/reporte-atrasos/atrasos-empleados/${desde}/${hasta}`, data);
   }
-
-  getInfoReporteAtrasos(codigo: number, fec_inicio: string, fec_final: string): Observable<any> {
-    const params = new HttpParams()
-      .set('codigo', codigo)
-      .set('fec_inicio', fec_inicio.split('T')[0])
-      .set('fec_final', fec_final.split('T')[0])
-    return this.http.get<any>(`${this.api_url}/reportes/atrasos`, { params })
-      .pipe(
-        tap(console.log),
-        catchError(this.handleError)
-      )
-  }
-
 
   getInfoReporteHorasExtras(id_empleado: number, codigo: number, fec_inicio: any, fec_final: any): Observable<any> {
     const params = new HttpParams()
