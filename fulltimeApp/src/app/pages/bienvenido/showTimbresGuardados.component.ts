@@ -3,9 +3,6 @@ import { ModalController, AlertController, ToastController } from '@ionic/angula
 import { DataLocalService } from '../../libs/data-local.service';
 import { Timbre } from '../../interfaces/Timbre';
 import { RelojServiceService } from '../../services/reloj-service.service';
-import { NetworkService } from 'src/app/libs/network.service';
-import { DatePipe } from '@angular/common';
-import { debounceTime, filter } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
@@ -89,7 +86,6 @@ import { DataUserLoggedService } from 'src/app/services/data-user-logged.service
       padding:3%;
       margin: 5%;
       border-radius: 2%;
-      //background-color:rgb(255, 255, 255);
     }
 
     .center {
@@ -108,10 +104,10 @@ import { DataUserLoggedService } from 'src/app/services/data-user-logged.service
 
   `],
 
-  // styleUrls: ['../reportes.component.scss'],
 })
 export class TimbresPerdidosComponent implements OnInit {
 
+  // METODO PARA LEET LOS timbresPerdidosStorage
   public get timbres(): Timbre[] {
     return this.dataLocalService.timbresPerdidosStorage
   }
@@ -122,7 +118,6 @@ export class TimbresPerdidosComponent implements OnInit {
   iduser: any;
   valor: any;
   ubicacion: string = '';
-
   latitud: any;
   longitud: any;
 
@@ -143,22 +138,22 @@ export class TimbresPerdidosComponent implements OnInit {
 
   ngOnInit() {
     this.iduser = parseInt(localStorage.getItem('empleadoID'))
-    this.ComprovarConexionServidor();
+    this.ComprobarConexionServidor();
     this.BuscarParametroTimbreUbicacionDesconocida()
   }
 
   BuscarParametroTimbreUbicacionDesconocida() {
-    // id_tipo_parametro PARA PERMITIR TIMBRE UBICACION DESCONOCIDA = 4
     this.restP.ObtenerDetallesParametros(5).subscribe(
       res => {
         localStorage.setItem('timbrarUbicacionDesconocida', res[0].descripcion);
       });
   }
-  ComprovarConexionServidor(): any {
+
+
+  ComprobarConexionServidor(): any {
     const timbres = [...this.dataLocalService.timbresPerdidosStorage]
     console.log('timbres: ', timbres);
     if (timbres.length > 0) {
-      //obtener datos de usuario para ver si no hay problemas con el servidor
       this.relojService.obtenerUsuario(this.iduser).subscribe(
         res => {
           this.BuscarParametro();
@@ -191,19 +186,20 @@ export class TimbresPerdidosComponent implements OnInit {
 
 
   rango: any;
+  //PARAMETROS
+  // METODO QUE VALIDA LA TOLERANCIA DE LA UBICACION
   BuscarParametro() {
-    // id_tipo_parametro PARA RANGO DE UBICACION = 4
     let datos = [];
     this.restP.ObtenerDetallesParametros(4).subscribe(
       res => {
         datos = res;
         if (datos.length != 0) {
-          this.rango = (parseInt(datos[0].descripcion) );
+          this.rango = (parseInt(datos[0].descripcion));
           return this.rango;
         }
       },
       err => {
-        return this.rango = 0.00000;//FUERA DE RANGO
+        return this.rango = 0.00;//FUERA DE RANGO
       }
     );
   }
@@ -242,11 +238,9 @@ export class TimbresPerdidosComponent implements OnInit {
     );
   }
 
-  id_usuario: any = parseInt(localStorage.getItem('codigo'));
+  id_usuario: any = parseInt(localStorage.getItem('empleadoID'));
   // MÉTODO QUE PERMITE VALIDACIONES DE UBICACIÓN
   BuscarUbicacion(latitud: any, longitud: any, rango: any, timbre: any) {
-
-    console.log("entrando a BuscarUbicacion ")
     var datosUbicacion: any = [];
     this.contar = 0;
     let informacion = {
@@ -260,8 +254,6 @@ export class TimbresPerdidosComponent implements OnInit {
     //Usa el servicio de buscar coordenadas del usuario
     this.restP.ObtenerUbicacionUsuario(this.id_usuario).subscribe(
       res => {
-        console.log("ENTRANDO A ObtenerUbicacionUsuario");
-
         if (res.length != 0) {
           datosUbicacion = res;
           datosUbicacion.forEach((obj: any) => {
@@ -276,38 +268,25 @@ export class TimbresPerdidosComponent implements OnInit {
         }
       }, () => {
         if (localStorage.getItem('timbrarUbicacionDesconocida') === 'Si') {
-          console.log("entra aqui??? si")
           timbre.ubicacion = 'DESCONOCIDO';
-          //this.storageUbica = timbre.ubicacion;
           this.EnviarTimbres(latitud, longitud, timbre);
         } else {
-
-          console.log("entra aqui??? no")
-
           this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "bottom");
-
           return this.router.navigate(['/login']);
-
-
         }
       }
     );
   }
 
-  //Metodo para Validar las coordenadas del domicilio que esten registradas en la tabla empleados;
+  // METODO PARA VALIDAR LAS COORDENADAD DEL DOMICILIO QUE ESTEN REGISTRADAS EN LA TABLA EMPLEADOS
   ValidarDomicilio(informacion: any, timbre: any) {
-    console.log("entrando a Validar Domicilio")
     this.restE.ObtenerUbicacion(this.id_usuario).subscribe(res => {
-      console.log('ObtenerUbicacion sin servidor ------- ');
-
       if (res[0].longitud != null || res[0].latitud != null) {
         informacion.lat2 = res[0].latitud;
         informacion.lng2 = res[0].longitud;
-
         this.restP.ObtenerCoordenadas(informacion).subscribe(resu => {
           if (resu[0].verificar === 'ok') {
             timbre.ubicacion = "DOMICILIO";
-
             this.EnviarTimbres(this.latitud, this.longitud, timbre);
           }
           else {
@@ -317,27 +296,25 @@ export class TimbresPerdidosComponent implements OnInit {
         })
       }
       else {
-
-        console.log("UBICACION timbre desconocido")
         timbre.ubicacion = "DESCONOCIDO";
         this.EnviarTimbres(this.latitud, this.longitud, timbre);
       }
     })
   }
 
+  // METODO PARA ENVIAR EL TIMBRE ALMACENADO EN STORAGE
   Btn_enviar() {
     const timbres = [...this.dataLocalService.timbresPerdidosStorage];
     if (timbres.length > 0) {
       //obtener datos de usuario para ver si no hay problemas con el servidor
       this.relojService.obtenerUsuario(this.iduser).subscribe(
         res => {
-          console.log('Conectado al servidor')
           timbres.forEach(t => {
             this.longitud = t.longitud;
             this.latitud = t.latitud;
             this.BuscarUbicacion(this.latitud, this.longitud, this.rango, t);
-          });       
-           
+          });
+
           this.closeModal();
           setTimeout(() => {
             this.dataLocalService.eliminarInfo('timbresPerdidos');
@@ -365,7 +342,7 @@ export class TimbresPerdidosComponent implements OnInit {
     }
   }
 
-  //Metodo para enviar timbre perdido
+  //METODO PARA ENVIAR EL TIMBRE
   EnviarTimbres(latitud: any, longitud: any, timbre: any): void {
     console.log("entrando a ver EnviarTimbres")
     timbre.fecha_hora_timbre_servidor = null;
@@ -383,7 +360,7 @@ export class TimbresPerdidosComponent implements OnInit {
     );
   }
 
-
+// METODO PARA CONFIGURAR LAS ALERTAS
   async presentAlert(mensaje: string) {
     const toast = await this.alertController.create({
       cssClass: 'my-custom-class',
@@ -394,6 +371,7 @@ export class TimbresPerdidosComponent implements OnInit {
     toast.present();
   }
 
+  // METODO PARA CONFIGURAR LAS ALERTAS
   async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
     const toast = await this.toastController.create({
       message: mensaje,

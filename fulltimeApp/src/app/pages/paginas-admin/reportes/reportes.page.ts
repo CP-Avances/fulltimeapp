@@ -202,25 +202,11 @@ export class ReportesPage implements OnInit {
     this.networkSubscriber();
   }
 
+  // METODO DE VERIFICACION DE CONEXION A INTERNET
   networkSubscriber() {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
     console.log("Esta conectado: ", this.isConnected)
-    if (!this.isConnected) {
-      //this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
-
-    } else {
-
-      console.log('conectado');
-    }
   }
 
-  async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
-    const toast = await this.toastController.create({
-      message: mensaje,
-      duration: duracion,
-      color: color,
-      position: position
-    });
-    toast.present();
-  }
+
 }

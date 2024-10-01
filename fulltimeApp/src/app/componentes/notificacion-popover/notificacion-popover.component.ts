@@ -56,40 +56,30 @@ export class NotificacionPopoverComponent implements OnInit {
 
                 : -1
         );
-
         this.notificacionService.getNotificacionesTimbreByIdEmpleado(id_empleado + '').subscribe(
           notificaiontim => {
             this.notificaiontimbre = notificaiontim;
             this.notificacionestimbres = this.notificaiontimbre;
-
             this.notificacionesAll = this.notificaciones.concat(this.notificacionestimbres);
-
             this.notificacionesAll.sort(
               (firstObject: NotificacionTimbre, secondObject: NotificacionTimbre) =>
                 (firstObject.visto === true) ? 1 :
                   (firstObject.visto === secondObject.visto) ?
                     ((firstObject.fecha_hora! < secondObject.fecha_hora!) ? 1 : -1)
-
                     : -1
             );
-
             //cuenta las notificaciones que estan sin ver
             this.notificacionesAll.forEach((item: any) => {
-
               if (item.visto === false) {
                 this.countNoti++;
               }
             });
-
           },
           err => { console.log(err) },
           () => { this.loading = false }
         )
-
-
       },
       err => {
-
         this.notificacionService.getNotificacionesTimbreByIdEmpleado(id_empleado + '').subscribe(
           notificaiontim => {
             this.notificacionesAll = notificaiontim;
@@ -98,22 +88,18 @@ export class NotificacionPopoverComponent implements OnInit {
                 (firstObject.visto === true) ? 1 :
                   (firstObject.visto === secondObject.visto) ?
                     ((firstObject.fecha_hora! < secondObject.fecha_hora!) ? 1 : -1)
-
                     : -1
             );
-
             //cuenta las notificaciones que estan sin ver
             this.notificacionesAll.forEach((item: any) => {
               if (item.visto === false) {
                 this.countNoti++;
               }
             });
-
           },
           err => { console.log(err) },
           () => { this.loading = false }
         )
-
         console.log(err)
       },
       () => { this.loading = false }
@@ -121,6 +107,7 @@ export class NotificacionPopoverComponent implements OnInit {
 
   }
 
+  // METODO PARA ASIGNAR EL COLOR DE LA NOTIFICACION
   tiponotificacion(noti: { id_permiso: string; id_vacaciones: string; id_hora_extra: string; visto: boolean; tipo: number; }) {
     if (noti.visto === true) {
       return "reportes";
@@ -150,7 +137,7 @@ export class NotificacionPopoverComponent implements OnInit {
     }
   }
 
-
+  // METODO PARA ABRIR LA NOTIFICACION MARCADA EN LA LISTA DE NOTIFICACIONES
   async AbrirNoti(noti: { id: number, id_permiso: string; id_vacaciones: string; id_hora_extra: string; estado: string; tipo: number; nempleadoreceives: string; id_receives_empl: number; nempleadosend: string; }) {
     this.cambiovistanoti(noti);
     this.cambiovistanotitimbre(noti);
@@ -165,136 +152,12 @@ export class NotificacionPopoverComponent implements OnInit {
       }
     });
     return await modal.present();
-
-
-    if (noti.nempleadoreceives === noti.nempleadosend) {
-
-      console.log(noti.nempleadoreceives, " = ", noti.nempleadosend);
-
-      //if(localStorage.getItem("rol") == "1"){
-      //Solicitudes Admin envia
-      if (noti.id_permiso != null && noti.estado === "Pendiente") {
-        return this.router.navigate(['/reloj/solicitudes/permiso-solicitud']);
-      } else if (noti.id_hora_extra != null && noti.estado === "Pendiente") {
-        return this.router.navigate(['/reloj/solicitudes/hora-extra-solicitud']);
-      } else if (noti.id_vacaciones != null && noti.estado === "Pendiente") {
-        return this.router.navigate(['/reloj/solicitudes/vacacion-solicitud']);
-      }
-
-      if (noti.tipo === 1) {
-        return this.router.navigate(['/reloj/solicitudes/alimentacion-solicitud']);
-      }
-
-      /*
-            }else{
-              //Solicitudes Empleado envia
-              if(noti.id_permiso != null){
-                return this.router.navigate(['/empleado/solicitar-permisos']);
-              }else if(noti.id_vacaciones != null){
-                return this.router.navigate(['/empleado/solicitar-vacaciones']);
-              }else if(noti.id_hora_extra != null && noti.estado === "Pendiente"){
-                return this.router.navigate(['/empleado/solicitar-horas-extras']);
-              }else if(noti.tipo ===  1 ){
-                console.log("Alimentacion Tipo =", noti.tipo);
-                return this.router.navigate(['empleado/solicitar-planificar-alimentacion']);
-              }
-      
-              //Aprobar las solicitudes Admin envia respuesta
-              if(noti.id_permiso != null && noti.estado != "Pendiente"){
-                console.log("Aprobar Permiso ",noti.id_permiso, " = ", noti.estado);
-                return this.router.navigate(['/reloj/aprobar-permisos']);
-              }else if( noti.tipo === 12){
-                console.log("Aprobar Hora Extra ",noti.tipo);
-                console.log("Aprobar Hora Extra ",noti.id_hora_extra, " = ", noti.estado)
-                return this.router.navigate(['/reloj/aprobar-horas-extras']); 
-              }else if(noti.id_vacaciones != null && noti.estado != "Pendiente"){
-                console.log("Aprobar Vacaciones ",noti.id_vacaciones, " = ", noti.estado)
-                return this.router.navigate(['/reloj/aprobar-vacaciones']); 
-              }
-      
-              if( noti.tipo === 2 ){
-                console.log("Aprobar Alimentacion ",noti.tipo, " = ", noti.estado)
-                return this.router.navigate(['/reloj/aprobar-alimentacion']);
-              }
-              
-            }
-      
-            */
-
-    }
-    else {
-
-      console.log(noti.nempleadoreceives, " != ", noti.nempleadosend);
-
-      // if (localStorage.getItem("rol") === "1") {
-      //Solicitudes Admin Respuesta que recibe
-      if (noti.id_permiso != null && noti.estado != "Pendiente") {
-        console.log("Aprobar Permiso ", noti.id_permiso, " = ", noti.estado);
-        return this.router.navigate(['/reloj/solicitudes/permiso-solicitud']);
-      } else if (noti.tipo === 12) {
-        console.log("Aprobar Hora Extra ", noti.tipo);
-        return this.router.navigate(['/reloj/solicitudes/hora-extra-solicitud']);
-      } else if (noti.id_vacaciones != null && noti.estado != "Pendiente") {
-        console.log("Aprobar Vacaciones ", noti.id_vacaciones, " = ", noti.estado)
-        return this.router.navigate(['/reloj/solicitudes/vacacion-solicitud']);
-      }
-
-      if (noti.tipo === 2) {
-        console.log("Aprobar Alimentacion ", noti.tipo, " = ", noti.estado)
-        return this.router.navigate(['/reloj/solicitudes/alimentacion-solicitud']);
-      }
-
-      //Aprobaciones Admin envia
-      if (noti.id_permiso != null && noti.estado === "Pendiente") {
-        return this.router.navigate(['/reloj/aprobar-permisos']);
-      } else if (noti.id_hora_extra != null && noti.estado === "Pendiente") {
-        return this.router.navigate(['/reloj/aprobar-horas-extras']);
-      } else if (noti.id_vacaciones != null && noti.estado === "Pendiente") {
-        return this.router.navigate(['/reloj/aprobar-vacaciones']);
-      }
-
-      if (noti.tipo === 1) {
-        return this.router.navigate(['/reloj/aprobar-alimentacion']);
-      }
-      /*
-            }else{
-              //Solicitudes Empleado Respuesta que recibe
-              if(noti.id_permiso != null){
-                return this.router.navigate(['/empleado/solicitar-permisos']);
-              }else if(noti.id_vacaciones != null){
-                return this.router.navigate(['/empleado/solicitar-vacaciones']);
-              }else if(noti.tipo === 12){
-                return this.router.navigate(['/empleado/solicitar-horas-extras']);
-              }else if(noti.tipo ===  2 ){
-                console.log("Alimentacion Tipo =", noti.tipo);
-                return this.router.navigate(['/empleado/solicitar-planificar-alimentacion']);
-              }
-            
-              //Aprobaciones Admin envia
-              if(noti.tipo === 1 ){
-                return this.router.navigate(['/reloj/aprobar-alimentacion']);
-              }
-      
-              if(noti.id_permiso != null && noti.estado === "Pendiente"){
-                return this.router.navigate(['/reloj/aprobar-permisos']);
-              }else if(noti.id_hora_extra != null && noti.estado === "Pendiente"){
-                return this.router.navigate(['/reloj/aprobar-horas-extras']);
-              }else if(noti.id_vacaciones != null && noti.estado === "Pendiente"){
-                return this.router.navigate(['/reloj/aprobar-vacaciones']);
-              }
-             
-            }
-      
-            */
-    }
-
   }
 
-
+  // METODO PARA CAMBIAR EL ESTADO DE VISTO 
   cambiovistanoti(noti: { id: number }) {
     const vista = true;
     const datos = { id_notificacion: noti.id, visible: vista, user_name: this.userService.username, ip: localStorage.getItem('ip') }
-
     this.vistonotificacion.PutNotificaVisto(noti.id, datos).subscribe(
       (res: any) => {
         res.visto = false;
@@ -304,10 +167,10 @@ export class NotificacionPopoverComponent implements OnInit {
     )
   }
 
+  // METODO PARA CAMBIAR EL ESTADO DE VISTO DE LA NTIFICAION TIMBRE
   cambiovistanotitimbre(noti: { id: number }) {
     const vista = true;
     const datos = { id_notificacion: noti.id, visto: vista, user_name: this.userService.username, ip: localStorage.getItem('ip') }
-
     this.vistonotificacion.PutNotifiTimbreVisto(noti.id, datos).subscribe(
       (res: any) => {
         res.visto = false;
@@ -317,6 +180,7 @@ export class NotificacionPopoverComponent implements OnInit {
     )
   }
 
+  // METODO PARA ABRIR EL MODAL DE LISTA DE NOTICACIONES
   async abrirNotificaciones() {
     this.pooverCtrl.dismiss({});
     this.valor = false;

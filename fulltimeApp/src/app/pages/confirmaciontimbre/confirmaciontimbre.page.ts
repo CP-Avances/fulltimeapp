@@ -57,7 +57,7 @@ export class ConfirmaciontimbrePage implements OnInit {
     this.ngOnInit();
   }
 
-
+  // METODO PARA DIRIGIRSE A LA PAGINA DE BIENVENIDA
   irABienvenido() {
     this.navCtroller.navigateForward(['reloj'])
   }

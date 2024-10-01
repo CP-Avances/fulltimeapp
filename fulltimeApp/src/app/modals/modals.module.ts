@@ -2,14 +2,10 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-
 //modulo paginacion
 import {NgxPaginationModule} from 'ngx-pagination';
-
 import { ComponentesModule } from '../componentes/componentes.module';
 import { ModulopipesModule } from '../pipes/modulopipes.module';
-
-import { AtrasoJustificadoComponent } from './atraso-justificado/atraso-justificado.component';
 import { VerHorariosEmpleadosComponent } from './ver-horarios-empleados/ver-horarios-empleados.component';
 import { TimbreJustificadoComponent } from './timbre-justificado/timbre-justificado.component';
 import { VerTimbreEmpleadoComponent } from './ver-timbre-empleado/ver-timbre-empleado.component';
@@ -42,7 +38,6 @@ import { VerImagenModalPage } from './ver-timbre-empleado/ver-imagen/ver-imagen.
 
 @NgModule({
   declarations: [
-    AtrasoJustificadoComponent,
     VerHorariosEmpleadosComponent,
     TimbreJustificadoComponent,
     VerTimbreEmpleadoComponent,
@@ -66,7 +61,6 @@ import { VerImagenModalPage } from './ver-timbre-empleado/ver-imagen/ver-imagen.
     VerImagenModalPage
   ],
   exports:[
-    AtrasoJustificadoComponent,
     VerHorariosEmpleadosComponent,
     TimbreJustificadoComponent,
     VerTimbreEmpleadoComponent,

@@ -24,11 +24,9 @@ export class ReporteTimbreComponent implements OnInit {
   @Input() activarOpcion: any;
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
-
   existenEmpleados = true;
   verReporte = false
-  timbres: Timbre[];
-
+  timbres: Timbre[]
   showBtnPdf: boolean = false;
   showBtnBuscar: boolean = false;
   loading: boolean = true;
@@ -55,15 +53,13 @@ export class ReporteTimbreComponent implements OnInit {
 
   ngOnInit() {
     console.log('reporte timbre | Data empleado: ', this.data);
-    const id_empresa: string = localStorage.getItem('id_empresa');
-    (id_empresa !== null) ? this.plantillaPDF.ShowColoresLogo(id_empresa) : this.plantillaPDF.abrirToas('No existe codigo de empresa', 'danger', 3000)
     this.BuscarFormatos();
     this.obtenerDatosEmpresa(localStorage.getItem('id_empresa'));
     this.ObtenerLogo();
     this.ObtenerColores();
   }
 
-
+  // METODOS PARA OBTENER LOS DATOS DE LA EMPRESA
   obtenerDatosEmpresa(idEmpresa: any) {
     this.relojService.obtenerDatosEmpresa(idEmpresa).subscribe(
       res => {
@@ -90,29 +86,24 @@ export class ReporteTimbreComponent implements OnInit {
   }
 
   data_pdf: any = [];
-
+  // METODO PARA CONSULTAR LOS REGISTROS DEL REPORTE DE TIMBRES
   consultarDataReporte() {
     this.showBtnBuscar = true
     this.existenEmpleados = false;
     this.data_pdf = [];
-
     const fechaI = new Date(this.fechaInicio);
     const fechaFormateadaInicio = fechaI.toISOString().split('T')[0];
-
     const fechaF = new Date(this.fechaFinal);
     const fechaFormateadaFin = fechaF.toISOString().split('T')[0];
     this.reporteService.ReporteTimbresMultiple(this.data, fechaFormateadaInicio, fechaFormateadaFin).subscribe(res => {
       this.data_pdf = res;
-
       this.ExtraerDatos();
       console.log("ver datos de los timbres ", this.data_pdf)
       this.loading = true;
-
       if (this.count == 100) {
         this.alertLimiteReporte();
       }
       this.showBtnPdf = true;
-
     }, err => {
       this.existenEmpleados = true;
       this.showBtnPdf = false;
@@ -120,9 +111,6 @@ export class ReporteTimbreComponent implements OnInit {
       this.plantillaPDF.abrirToas('No existen timbres registrados', 'danger', 3000)
     })
   }
-
-
-
 
   //mostrar Alerta para notificar el limite del reporte
   async alertLimiteReporte() {
@@ -154,6 +142,7 @@ export class ReporteTimbreComponent implements OnInit {
   p_color: any;
   s_color: any;
   frase: any;
+  // METODO PARA OBTENER LOS COLORES DE LA EMPRESA
   ObtenerColores() {
     this.plantillaPDF.ConsultarDatosEmpresa(parseInt(localStorage.getItem('id_empresa') as string)).subscribe(res => {
       this.p_color = res[0].color_principal;
@@ -163,12 +152,14 @@ export class ReporteTimbreComponent implements OnInit {
   }
 
   logo: any = String;
+  // METODO PARA OBTENER EL LOGO DE LA EMPRESA
   ObtenerLogo() {
     this.plantillaPDF.LogoEmpresaImagenBase64(localStorage.getItem('id_empresa') as string).subscribe(res => {
       this.logo = 'data:image/jpeg;base64,' + res.imagen;
     });
   }
 
+  // METODO PARA GENERAR EL PDF
   GenerarPDF() {
     let documentDefinition: any;
     documentDefinition = this.DefinirInformacionPDF();
@@ -176,6 +167,7 @@ export class ReporteTimbreComponent implements OnInit {
     this.plantillaPDF.generarPdf(documentDefinition, doc_name);
   }
 
+  // METODO PARA DEFINIR LA INFORMACION INICIAL DE LOS PDFS
   DefinirInformacionPDF() {
     // DEFINIR ORIENTACION DE LA PAGINA
     return {
@@ -232,8 +224,6 @@ export class ReporteTimbreComponent implements OnInit {
       }
     };
   }
-
-
 
   // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
   EstructurarDatosPDF(data: any[]): Array<any> {
@@ -431,6 +421,7 @@ export class ReporteTimbreComponent implements OnInit {
     return n;
   }
 
+  // METODO PARA ALMACENAR LA INFORMACION DE LOS TIMBRES PARA QUE SEAN MOSTRADOS EN PANTALLA 
   ExtraerDatos() {
     this.timbres = [];
     let n = 0;
@@ -486,9 +477,6 @@ export class ReporteTimbreComponent implements OnInit {
     })
     this.existenEmpleados = true;
     this.verReporte = true;
-
   }
-
-
 
 }

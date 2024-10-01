@@ -41,6 +41,7 @@ export class HorasExtrasService {
  **********************************************************************  
  */
 
+  // OBTIENE LOS REGISTROS DE SOLICITUDES DE HORAS EXTRAS
   getAllHorasExtras(): Observable<HoraExtra[]> {
     const url = `${this.apiUrl}/horasextras/all-horas-extras`;
     return this.http.get<HoraExtra[]>(url)
@@ -50,6 +51,7 @@ export class HorasExtrasService {
       )
   }
 
+  // OBTIENE LOS REGISTROS DE SOLICITUDES DE HORAS EXTRAS POR FECHAS
   getAllHorasExtrasByFechas(fec_inicio: string, fec_final: string): Observable<HoraExtra[]> {
     const url = `${this.apiUrl}/horasextras/rangofechas`;
     const params = new HttpParams()
@@ -62,6 +64,7 @@ export class HorasExtrasService {
       )
   }
 
+  // OBTIENE LOS REGISTROS DE SOLICITUDES DE HORAS EXTRAS POR CODIGO
   getListaHorasExtrasByCodigo(codigo: number | string): Observable<HoraExtra[]> {
     const url = `${this.apiUrl}/horas-extras-pedidas/horas-extras/lista-horas-extras`;
     const params = new HttpParams().set('codigo', codigo)
@@ -72,6 +75,7 @@ export class HorasExtrasService {
       )
   }
 
+  // OBTIENE LOS REGISTROS DE SOLICITUDES DE HORAS EXTRAS POR FECHAS Y CODIGO
   getlistaHorasExtrasByFechasyCodigo(fec_inicio: string, fec_final: string, codigo: number | string): Observable<HoraExtra[]> {
     const url = `${this.apiUrl}/horas-extras-pedidas/horas-extras/lista-horas-extrasfechas`;
     const params = new HttpParams()
@@ -99,13 +103,13 @@ export class HorasExtrasService {
       )
   }
 
+  // REGISTRA SOLICITUD DE HORAS EXTRAS
   postNuevaHorasExtras(datos: any): Observable<HoraExtra> {
-
     return this.http.post<any>(`${environment.url}/horas-extras-pedidas`, datos);
   }
 
+  // EDITA SOLICITUD DE HORAS EXTRAS
   putHoraExtra(hora_extra: HoraExtra): Observable<any> {
-
     const url = `${this.apiUrl}/horasextras/update-horas-extras`;
     return this.http.put<any>(url, hora_extra)
       .pipe(

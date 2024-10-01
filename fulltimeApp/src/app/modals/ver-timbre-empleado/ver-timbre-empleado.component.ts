@@ -2,16 +2,12 @@ import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import moment from 'moment';
 import { ModalController, AlertController, LoadingController, ToastController, IonDatetime } from '@ionic/angular';
-
-import { Timbre } from '../../interfaces/Timbre';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { TimbresService } from '../../services/timbres.service';
-
 import { VerImagenModalPage } from './ver-imagen/ver-imagen.component';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-
 
 @Component({
   selector: 'app-ver-timbre-empleado',
@@ -22,20 +18,13 @@ export class VerTimbreEmpleadoComponent implements OnInit {
 
   //IMAGEN
   imagenUrl: SafeUrl;
-
-
-
   @Input() data: any;
-
   @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
   @ViewChild(IonDatetime) datetimeFinal: IonDatetime;
-
   timbres: any = [];//esta variable contiene los timbres que se muestran en la lista y se VAN A ENVIAR
   timbres_filtro: any = []; //esta variable contiene los timbres filtrados que se muestran en la lista
-
   pageActual: number;
   pagefiltro: number;
-
   filtro_mensaje: boolean = true;
   todos: boolean = false;
   todosPagina: boolean = true;
@@ -44,13 +33,10 @@ export class VerTimbreEmpleadoComponent implements OnInit {
   vacio: boolean = true;
   btn_filtro: boolean = false;
   btn_todos: boolean = false;
-
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
-
   fechaIn: string = "";
   fechaFi: string = "";
-
   codigo: number | string;
 
   constructor(
@@ -63,7 +49,6 @@ export class VerTimbreEmpleadoComponent implements OnInit {
     private filtimbre: TimbresService,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
-    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit() {
@@ -89,12 +74,13 @@ export class VerTimbreEmpleadoComponent implements OnInit {
   }
   verTipoTimbre: string = '';
 
-
+  // LA VISUALIZACION DE LA FECHA HORA DE LA LISTA DE TIMBRES POR DISPOSITIVO O POR SERVIDOR
   cambioHoraSC(event) {
     console.log(event.target.value);
     this.verTipoTimbre = event.target.value;
   }
 
+  // METODO PARA LEER LOS TIMBRES DEL EMPLEADO SELECCIONADO
   mostrarTimbres() {
     this.timbres_filtro = [];
     this.buscarTimbresEmpleado(this.data.codigo);
@@ -106,8 +92,8 @@ export class VerTimbreEmpleadoComponent implements OnInit {
     this.limpiarRango_fechas();
   }
 
+  // METODO PARA LEER LOS TIMBRES FILTRADOS POR FECHAS DEL EMPLEADO SELECCIONADO
   mostrarfiltro() {
-
     if (this.fechaInicio === "" || this.fechaFinal === "") {
       return this.mostrarToas('Ingrese el rango de fechas', 3000, "warning");
     }
@@ -129,7 +115,7 @@ export class VerTimbreEmpleadoComponent implements OnInit {
   }
 
 
-
+  // METODO PARA MODIFICAR LA FECHA DE INICIO
   changeFechaInicio(e) {
     if (!e.target.value) {
       this.dataUserService.setFechaRangoInicio(moment(new Date()).format('YYYY-MM-DD'));
@@ -145,17 +131,12 @@ export class VerTimbreEmpleadoComponent implements OnInit {
     }
   }
 
+  // METODO PARA MODIFICAR LA FECHA FINAL
   changeFechaFinal(e) {
     if (!e.target.value) {
-      //if (moment(this.fechaInicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')) {
-      //this.dataUserService.setFechaRangoFinal(this.fechaInicio)
-      //return this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
-      //} else {
-
       this.dataUserService.setFechaRangoFinal('');
       this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
       return this.fechaFi = null
-      // }
     } else {
       this.dataUserService.setFechaRangoFinal(e.target.value);
       const f_inicio = new Date(this.fechaInicio);
@@ -174,19 +155,10 @@ export class VerTimbreEmpleadoComponent implements OnInit {
       } else {
         this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');
       }
-
-      /*
-      if (f_final.toJSON() === f_inicio.toJSON()) {
-        this.dataUserService.setFechaRangoFinal('');
-        this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');
-      }
-*/
-    
-
     }
   }
 
-
+  // METODO PARA LIMPIAR LAS FECHAS ELEGIDAS
   limpiarRango_fechas() {
     this.dataUserService.setFechaRangoInicio('');
     this.dataUserService.setFechaRangoFinal('');
@@ -194,9 +166,8 @@ export class VerTimbreEmpleadoComponent implements OnInit {
     this.fechaFi = "";
   }
 
-  //Pestalas de mensajes
+  //METODO PARA CONFIGURAR LOS PARAMETROS DE LOS MENSAJES
   async mostrarToas(mensaje: string, duracion: number, color: string) {
-
     const toast = await this.toastController.create({
       message: mensaje,
       duration: duracion,
@@ -216,22 +187,18 @@ export class VerTimbreEmpleadoComponent implements OnInit {
     return 0;
   }
 
+  // METODO QUE CONSUME EL SERVICIO PARA BUSCAR LOS TIMBRES DEL EMPLEADO POR SU CODIGO
   buscarTimbresEmpleado(codigo) {
     this.timbresService.getTimbresEmpleadoByCodigo(codigo).subscribe((res: any[]) => {
-
       let fechasObjeto = {}
-
-
       res.forEach(data => {
         data.fecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
         data.hora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre, this.formato_hora, data.zona_horaria_servidor);
         data.sfecha = '';
         data.shora = '';
-
         if (!data.fecha_hora_timbre_servidor) {
           data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
           data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_hora, data.zona_horaria_servidor);
-
           if (data.fecha_subida_servidor != null) {
             data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
             data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_subida_servidor, this.formato_hora, data.zona_horaria_servidor);
@@ -241,7 +208,6 @@ export class VerTimbreEmpleadoComponent implements OnInit {
           data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_hora, data.zona_horaria_servidor);
         }
       })
-
       res.forEach(x => {
         if (!fechasObjeto.hasOwnProperty(x.fecha)) {
           fechasObjeto[x.fecha] = []
@@ -254,7 +220,6 @@ export class VerTimbreEmpleadoComponent implements OnInit {
 
       console.log('fechas ver timbres..... ', Object.keys(fechasObjeto).length);
 
-      //si el objeto de los timbres esta vacion oculta las ventanas y muestra la ventana - 'vacio'.
       if (Object.keys(fechasObjeto).length === 0) {
         this.vacio = false;
         this.todos = true;
@@ -265,14 +230,13 @@ export class VerTimbreEmpleadoComponent implements OnInit {
       } else {
         this.todosPagina = false;
         this.filtroPagina = true;
-
       }
-
     }, err => {
       console.log(err); this.todosPagina = true;
     })
   }
 
+  // METODO QUE LEER LOS TIMBRES DEL EMPLEADO FILTRADO POR FECHA
   filtrarFechas(codigo) {
     this.codigo = codigo
     this.timbres_filtro = [];
@@ -293,7 +257,7 @@ export class VerTimbreEmpleadoComponent implements OnInit {
             if (!data.fecha_hora_timbre_servidor) {
               data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
               data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_hora, data.zona_horaria_servidor);
-    
+
               if (data.fecha_subida_servidor != null) {
                 data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
                 data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_subida_servidor, this.formato_hora, data.zona_horaria_servidor);
@@ -326,7 +290,6 @@ export class VerTimbreEmpleadoComponent implements OnInit {
 
             this.todosPagina = true;
           }
-
         },
         err => {
           this.presentLoading("Intentando conectar con el servidor");
@@ -349,7 +312,6 @@ export class VerTimbreEmpleadoComponent implements OnInit {
       });
     });
   }
-  //fin mensaje cargando
 
   closeModal() {
     console.log('CERRAR MODAL TIMBRES');
@@ -358,14 +320,13 @@ export class VerTimbreEmpleadoComponent implements OnInit {
     });
   }
 
+  // METODO PARA ABRIR GOOGLE MAPS SEGUN LAS COORDENADAS DEL TIMBRE
   abrirMapa(latitud, longitud) {
-    //const rutaMapa = "https://www.google.com/maps/search/+" + latitud + "+" + longitud;
     const rutaMapa = "https://maps.google.com/?q=" + latitud + "," + longitud
     window.open(rutaMapa);
-    //aqui codigo ´para abrir el mapa con las cooorden
-
   }
 
+  // METODO PARA VISUALIZAR LA IMAGEN DEL TIMBRE
   async mostrarImagenModal(imagenDataUrl: string) {
     const modal = await this.modalController.create({
       component: VerImagenModalPage, // Nombre de la página modal que mostrará la imagen
@@ -373,15 +334,10 @@ export class VerTimbreEmpleadoComponent implements OnInit {
         imagen: imagenDataUrl // Pasar el DataUrl como propiedad a la modal
       }
     });
-
     return await modal.present();
   }
 
-
-
-
-
-
+  // METODO PARA DEFINIR EL MENSAJE DE LAS NOVEDADES
   async presentAlert(obs: any, hora_timbre_diferente: any, ubicacion: any, novedades_conexion: any, conexion: any) {
     let novedad = novedades_conexion;
     if (conexion == true) {

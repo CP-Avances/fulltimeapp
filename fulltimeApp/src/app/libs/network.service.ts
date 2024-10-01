@@ -25,21 +25,19 @@ export class NetworkService implements OnInit {
   networkStatus: boolean;
 
   public async ngOnInit() {
+    
     this.checkNetworkStatus();
-
+    
     Network.addListener('networkStatusChange', status => {
       console.log('Estado de red cambiado:', status);
       this.networkStatus = status.connected ? true : false;
     });
 
-
     if (this.platform.is('capacitor')) {
-      //on Device
       this.networkListener = await Network.addListener('networkStatusChange', status => {
         this.onConectedNetwork();
       });
     } else {
-      // on Browser
       this.online = merge(
         of(navigator.onLine),
         fromEvent(window, 'online').pipe(mapTo(true)),
@@ -59,6 +57,7 @@ export class NetworkService implements OnInit {
     }
   }
 
+  // METODO PARA VERIFICAR EL ESTADO DE CONEXIÓN
   public async onConectedNetwork() {
     const status = await Network.getStatus();
     if (!status?.connected) {
@@ -73,47 +72,20 @@ export class NetworkService implements OnInit {
     }
   }
 
-  public async getNetworkType() {
-    const status = await Network.getStatus();
-    return status.connectionType;
-  }
-
+  // METODO PARA VERIFICAR ITERATIVAMENTE SI EXISTE CONEXION A INTERNET
   public getNetworkStatus(): Observable<boolean> {
     return this.hasConnection.asObservable();
   }
 
+  // METODO PARA OBTENER INFORMACION DE CONEXION A INTERNET
   public getNetworkStatusDispositivo(): boolean {
     return this.networkStatus;
   }
 
+  // VERIFICA SI EXISTE O NO CONEXION A INTERNET
   async checkNetworkStatus() {
     const status = await Network.getStatus();
     this.networkStatus = status.connected ? true : false;
-    console.log('Estado de red inicial:', status);
-  }
-
-
-  private getNetworkTestRequest(): Observable<any> {
-    return this.http.get('https://jsonplaceholder.typicode.com/todos/1');
-  }
-
-  public async testNetworkConnection() {
-    try {
-      this.getNetworkTestRequest().subscribe(
-        success => {
-          // console.log('Request to Google Test  success', success);
-          this.hasConnection.next(true);
-          return;
-        }, error => {
-          // console.log('Request to Google Test fails', error);
-          this.hasConnection.next(false);
-          return;
-        });
-    } catch (err) {
-      console.log('err testNetworkConnection', err);
-      this.hasConnection.next(false);
-      return;
-    }
   }
 
 }

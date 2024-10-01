@@ -133,7 +133,6 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
     }
 
     ion-text{
-      //color: rgb(226, 226, 226);;
       font-size: 80%;
     }
 
@@ -148,7 +147,6 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
       padding:3%;
       margin: 5%;
       border-radius: 2%;
-      //background-color:rgb(255, 255, 255);
     }
 
     .center {
@@ -162,9 +160,19 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
 })
 export class SolicitudesPage implements OnInit {
   serverConnected: boolean = true;
+  Btn_permisos: boolean;
+  Btn_horasExtras: boolean;
+  Btn_alimentacion: boolean;
+  Btn_vacaciones: boolean;
 
+  colorp: any;
+  colorh: any;
+  colorv: any;
+  colora: any;
+
+  funciones: any = [];
+  isConnected: boolean;
   constructor(
-    private menu: MenuController,
     public platform: Platform,
     private router: Router,
     public toastController: ToastController,
@@ -172,14 +180,12 @@ export class SolicitudesPage implements OnInit {
     public parametros: ParametrosService,
     private networkService: NetworkService,
     private connectivityService: ConnectivityService
-
   ) { }
 
 
-  //refrescar la pagina
+  // METODO PARA REFRESCAR LA PAGINA
   doRefresh(event: any) {
     this.ngOnInit();
-
     setTimeout(() => {
       console.log('Async operation has ended');
       event.target.complete();
@@ -198,41 +204,12 @@ export class SolicitudesPage implements OnInit {
     this.VerificarFunciones();
   }
 
-  Btn_permisos: boolean;
-  Btn_horasExtras: boolean;
-  Btn_alimentacion: boolean;
-  Btn_vacaciones: boolean;
-
-  colorp: any;
-  colorh: any;
-  colorv: any;
-  colora: any;
-
-  funciones: any = [];
-  isConnected: boolean;
-
-
-
+  // METODO PARA VERIFICAR LA CONEXION A INTERNET
   networkSubscriber() {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
-    console.log("Esta conectado: ", this.isConnected)
-    if (!this.isConnected) {
-      //this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
-    } else {
-
-      console.log('conectado');
-    }
   }
 
-  async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
-    const toast = await this.toastController.create({
-      message: mensaje,
-      duration: duracion,
-      color: color,
-      position: position
-    });
-    toast.present();
-  }
+  // METODO PARA VERIFICAR LAS FUNCIONES HABILITADAS
   VerificarFunciones() {
     this.parametros.ObtenerFunciones().subscribe(res => {
       this.funciones = res[0];
@@ -272,6 +249,7 @@ export class SolicitudesPage implements OnInit {
     });
   }
 
+  // METODO PARA REDIRECCIONAR A LA PAGINA DE PERMISOS
   BtnPermisos_click() {
     if (this.Btn_permisos == true) {
       this.router.navigateByUrl("/reloj/solicitudes/permiso-solicitud");
@@ -282,6 +260,7 @@ export class SolicitudesPage implements OnInit {
     }
   }
 
+  // METODO PARA REDIRECCIONAR A LA PAGINA DE HORAS EXTRAS
   BtnHorasExtras_click() {
     if (this.Btn_horasExtras == true) {
       this.router.navigateByUrl("/reloj/solicitudes/hora-extra-solicitud");
@@ -292,6 +271,7 @@ export class SolicitudesPage implements OnInit {
     }
   }
 
+  // METODO PARA REDIRECCIONAR A LA PAGINA DE ALIMENTACION
   BtnAlimentacion_click() {
     if (this.Btn_alimentacion == true) {
       this.router.navigateByUrl("/reloj/solicitudes/alimentacion-solicitud");
@@ -302,6 +282,7 @@ export class SolicitudesPage implements OnInit {
     }
   }
 
+  // METODO PARA REDIRECCIONAR A LA PAGINA DE ALIMENTACION
   BtnVacaciones_click() {
     if (this.Btn_vacaciones == true) {
       this.router.navigateByUrl("/reloj/solicitudes/vacacion-solicitud");
@@ -312,7 +293,7 @@ export class SolicitudesPage implements OnInit {
     }
   }
 
-
+  //METODO PARA CONFIGUAR EL MENSAJE DE NO ACCESO A LOS MODULOS
   async usuarioIncorrectoToas(mensaje: string) {
     const toast = await this.toastController.create({
       message: `<ion-icon name="information-circle-outline"></ion-icon>` + mensaje + `\n Comunicate con nosotros: www.casapazmino.com.ec`,

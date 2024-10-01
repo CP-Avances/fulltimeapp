@@ -1,5 +1,4 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { RelojServiceService } from 'src/app/services/reloj-service.service';
 import { Empresa } from 'src/app/interfaces/Empresa';
 import { Usuario } from 'src/app/interfaces/Usuario';
 import { DatePipe } from '@angular/common';
@@ -53,9 +52,7 @@ export class InformacionEmpleadoPage implements OnInit {
   }
 
   constructor(
-    private relojService: RelojServiceService,
     public alertController: AlertController,
-    private toastController: ToastController,
     private dataUser: DataUserLoggedService,
     public platform: Platform,
     public parametro: ParametrosService,
@@ -79,22 +76,23 @@ export class InformacionEmpleadoPage implements OnInit {
     console.log('data vacuna empleado ... ', this.dataUser.dataVacuna)
     this.BuscarFormatos();
   }
+
   async ionViewWillEnter() {
     this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
   }
 
+  // METODO PARA LA VERIFICACION DE CONEXIONA INTERNET
   networkSubscriber() {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
     console.log("Esta conectado: ", this.isConnected)
     if (!this.isConnected) {
-      //this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
-
     } else {
       console.log('conectado');
     }
   }
 
+  // METODO PARA CERRAR EL MODAL
   closeModal() {
     console.log('CERRAR MODAL USUARIOS');
     this.modalController.dismiss({
@@ -118,14 +116,4 @@ export class InformacionEmpleadoPage implements OnInit {
       }
     )
   }
-
-  async abrirToas(mensaje: string, color: string, duracion: number) {
-    const toast = await this.toastController.create({
-      message: mensaje,
-      duration: duracion,
-      color: color
-    });
-    toast.present();
-  }
-
 }

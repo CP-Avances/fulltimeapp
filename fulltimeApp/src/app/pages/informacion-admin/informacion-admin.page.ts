@@ -36,7 +36,6 @@ export class InformacionAdminPage implements OnInit {
 
   empleados: any = [];
   empleados_filtro: any[] = [];
-
   searchEmpleado: any = [];
 
   usuario: Usuario = {
@@ -78,20 +77,20 @@ export class InformacionAdminPage implements OnInit {
     this.networkSubscriber();
   }
 
+  // METODO PARA VERIFICAR SI EXISTE CONEXION A INTERNET
   networkSubscriber() {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
     console.log("Esta conectado: ", this.isConnected)
     if (!this.isConnected) {
-      //this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
-
     } else {
       this.obtenerDatosEmpresa(localStorage.getItem('id_empresa'));
       this.searchEmpleado = this.empleados;
-      // console.log('data vacuna .. ', this.dataUser.dataVacuna)
       this.BuscarFormatos();
       console.log('conectado');
     }
   }
+
+  // METODO PARA MODIFICAR EL TOAST
   async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
     const toast = await this.toastController.create({
       message: mensaje,
@@ -123,15 +122,14 @@ export class InformacionAdminPage implements OnInit {
     )
   }
 
+  // METODO PARA OBTENER LOS DATOS DE LA EMPRESA
   obtenerDatosEmpresa(idEmpresa: any) {
     this.relojService.obtenerDatosEmpresa(idEmpresa).subscribe(
       res => {
-
         console.log("ver datos empresa", res)
         console.log(res);
         this.empresa = res[0];
         this.obtenerEmpleados();
-        // this.obtenerDatosAdministrador(localStorage.getItem('Uid'));
       },
       err => {
         console.log(err)
@@ -139,6 +137,7 @@ export class InformacionAdminPage implements OnInit {
     );
   }
 
+  // METODO PARA OBTENER LOS EMPLEADOS 
   obtenerEmpleados() {
     this.relojService.obtenerUsuarioEmpresa().subscribe(
       res => {
@@ -159,6 +158,7 @@ export class InformacionAdminPage implements OnInit {
 
   }
 
+  // METODO QUE DEFINE EL COMPORTAMIENTO DEL BUSCADOR
   changeSearch(e: any) {
     const query = e.detail.value;
     const filtro = this.empleados.filter((o: any) => {
@@ -167,20 +167,16 @@ export class InformacionAdminPage implements OnInit {
         o.cedula.toLowerCase().indexOf(query.toLowerCase()) > -1
     })
     this.empleados_filtro = filtro
-
   }
 
-
-  //refrescar la pagina
+  // METODO PARA REFRESCAR LA PAGINA
   doRefresh(event: any) {
     this.ngOnInit();
-
     setTimeout(() => {
       console.log('Async operation has ended');
       event.target.complete();
     }, 1500);
   }
-
 
   //obtener datos de usuario administrador
   obtenerDatosAdministrador(iduser: string) {
@@ -194,9 +190,9 @@ export class InformacionAdminPage implements OnInit {
     );
   }
 
+  // METODO PARA DEFINIR EL CAMBIO DE VISTA AL MODAL IMFORMACIÓN EMPLEADO
   async presentModal(usuario: any) {
     console.log("ver usuario", usuario)
-
     const modal = await this.modalController.create({
       component: InformacionEmpleadoPage,
       componentProps: {
@@ -206,10 +202,7 @@ export class InformacionAdminPage implements OnInit {
     });
     this.modal = modal;
     await modal.present();
-
-
     const { data: { refreshInfo } } = await modal.onDidDismiss()
-
     if (refreshInfo) {
       this.ngOnInit()
     }

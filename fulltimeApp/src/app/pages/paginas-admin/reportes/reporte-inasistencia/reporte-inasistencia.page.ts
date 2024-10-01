@@ -22,18 +22,14 @@ export class ReporteInasistenciaPage {
   maxDate: string = new Date().toISOString().split('T')[0];
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
-
   @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
-  @ViewChild(IonDatetime) datetimeFinal: IonDatetime;
-
+  @ViewChild(IonDatetime) datetimeFinal: IonDatetime
   loadingEmpleado: boolean = true;
-
   fechaIn: string = "";
   fechaFi: string = "";
   opcion_sucursal: boolean = false;
   opcion_depa: boolean = false;
   opcion_empleado: boolean = false;
-
   departamentos: any = [];
   departamentos_filtro: any = [];
   sucursales_filtro: any = [];
@@ -68,9 +64,9 @@ export class ReporteInasistenciaPage {
     private dataUserService: DataUserLoggedService,
     public restN: NotificacionesService,
     public restP: ParametrosService,
-
   ) { }
 
+  // METODO PARA ALMACENAR EN UNA VARIABLE LA FECHA DE INICIO SELECCIONADA
   changeFechaInicio(e) {
     this.dataUserService.setFechaRangoFinal(null);
     this.fechaFi = null
@@ -88,6 +84,7 @@ export class ReporteInasistenciaPage {
     }
   }
 
+  // METODO PARA ALMACENAR EN UNA VARIABLE LA FECHA FIN SELECCIONADA
   changeFechaFinal(e) {
     if (!e.target.value) {
       if (moment(this.fechaInicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')) {
@@ -109,7 +106,7 @@ export class ReporteInasistenciaPage {
     }
   }
 
-
+  // METODO PARA LIMPIAR LAS VARIBLES DE FECHA FINAL E INICIAL
   limpiarRango_fechas() {
     this.dataUserService.setFechaRangoInicio('');
     this.dataUserService.setFechaRangoFinal('');
@@ -117,7 +114,7 @@ export class ReporteInasistenciaPage {
     this.fechaFi = "";
   }
 
-  //Pestalas de mensajes
+  //METODO DE CONFIGURACION DEL TOAST
   async mostrarToas(mensaje: string, duracion: number, color: string) {
 
     const toast = await this.toastController.create({
@@ -136,6 +133,7 @@ export class ReporteInasistenciaPage {
     }
   }
 
+  //METODO PARA ABRIR EL MODAL DEL REPORTE DE TIMBRE 
   async presentModal(objeto: any) {
     console.log('entro a modal...');
 
@@ -155,6 +153,7 @@ export class ReporteInasistenciaPage {
   }
 
   radioValue = 0;
+  // METODO PARA CARGAR LOS REGISTROS DE SUCURSALES, DEPARTAMENTOS O EMPLEADOS SEGUN SEA LA ELECCION DEL ITEM
   showValue() {
     if (this.radioValue === 1) {
       this.loadingEmpleado = false;
@@ -188,7 +187,7 @@ export class ReporteInasistenciaPage {
     }
   }
 
-
+  // METODO PARA CARGAR LOS REGISTROS DE SUCURSALES
   cargarListaSucursales() {
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
       console.log("VER BuscarDatosGenerales ", res)
@@ -226,7 +225,7 @@ export class ReporteInasistenciaPage {
       this.mostrarAlertas("No se ha encontrado información.", 1000, 'danger')
     })
   }
-
+  // METODO PARA CARGAR LOS REGISTROS DE DEPARTAMENTOS
   cargarDepartamentos() {
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
       sessionStorage.setItem('datos_comunicado', JSON.stringify(res))
@@ -269,8 +268,8 @@ export class ReporteInasistenciaPage {
     })
   }
 
+  // METODO PARA OBTENER EL PARAMETRO DE LIMITE DE CORREOS
   BuscarParametro() {
-    // id_tipo_parametro PARA LIMITE DE CORREOS = 13
     let datos = [];
     this.restP.ObtenerDetallesParametros(33).subscribe(
       res => {
@@ -278,7 +277,7 @@ export class ReporteInasistenciaPage {
       });
   }
 
-
+  // METODO PARA CARGAR LOS REGISTROS DE EMPLEADOS
   cargarEmpleados() {
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
       console.log("VER BuscarDatosGenerales ", res)
@@ -321,6 +320,7 @@ export class ReporteInasistenciaPage {
     })
   }
 
+  // METODO DE CONFIGURACION DE LAS ALERTAS
   async mostrarAlertas(mensaje: string, duracion: number, color: string) {
     const toast = await this.toastController.create({
       message: mensaje,
@@ -332,7 +332,7 @@ export class ReporteInasistenciaPage {
     toast.present();
   }
 
-
+  // METODO DE VERIFICACION DE MARCACION DE TODOS LOS REGISTROS DE SUCURSALES
   isAllCheck_sucu: boolean = false;
   checkedAll_sucu(isAllChecked_sucu) {
     this.isAllCheck_sucu = !isAllChecked_sucu;
@@ -342,6 +342,7 @@ export class ReporteInasistenciaPage {
     }
   }
 
+  // METODO DE VERIFICACION DE MARCACION DE TODOS LOS REGISTROS DE DEPARTAMENTOS
   isAllCheck_depa: boolean = false;
   checkedAll_depa(isAllChecked_depa) {
     this.isAllCheck_depa = !isAllChecked_depa;
@@ -353,7 +354,7 @@ export class ReporteInasistenciaPage {
     }
   }
 
-
+  // METODO DE VERIFICACION DE MARCACION DE TODOS LOS REGISTROS DE EMPLEADOS
   isAllCheck_empl: boolean = false;
   checkedAll_empl(isAllChecked_empl) {
     this.isAllCheck_empl = !isAllChecked_empl;
@@ -363,6 +364,7 @@ export class ReporteInasistenciaPage {
     }
   }
 
+  // METODO QUE ALMACENA LOS REGISTROS DE SUCURSALES EN UN ARREGLO
   isChecked_sucu: boolean = true;
   EnviarSucursal() {
     console.log('ver sucu-------', this.sucursales);
@@ -376,6 +378,7 @@ export class ReporteInasistenciaPage {
     this.ModelarSucursal(sucu)
   }
 
+  // METODO QUE OBTIENE LOS EMPLEADOS DE LAS SUCURSALES Y LOS ENVIA EN EL MODAL
   ModelarSucursal(dataSucursal) {
     let seleccionados: any = [];
     dataSucursal.forEach((sucursales: any) => {
@@ -394,7 +397,7 @@ export class ReporteInasistenciaPage {
     this.presentModal(seleccionados)
   }
 
-
+  // METODO QUE ALMACENA LOS REGISTROS DE DEPARTAMENTO EN UN ARREGLO
   isChecked_depa: boolean = true;
   EnviarDepartamento() {
     if (!this.fechaFi || !this.fechaIn) {
@@ -411,7 +414,7 @@ export class ReporteInasistenciaPage {
     }
   }
 
-
+  // METODO QUE OBTIENE LOS EMPLEADOS DE LOS DEPARTAMENTOS Y LOS ENVIA EN EL MODAL
   ModelarDepartamentos(dataDepartamentos) {
     let seleccionados: any = [];
     dataDepartamentos.forEach((departamento: any) => {
@@ -431,6 +434,7 @@ export class ReporteInasistenciaPage {
     this.presentModal(seleccionados)
   }
 
+  // METODO QUE ALMACENA LOS REGISTROS DE EMPLEADOS EN UN ARREGLO
   isChecked_empl: boolean = true;
   EnviarEmpleado() {
     if (!this.fechaFi || !this.fechaIn) {
@@ -447,16 +451,18 @@ export class ReporteInasistenciaPage {
     }
   }
 
+  // METODO QUE OBTIENE LOS EMPLEADOS Y LOS ENVIA EN EL MODAL
   ModelarEmpleados(dataEmpleados) {
     let seleccionados: any = [{ nombre: 'Empleados', opcion: 3 }];
     seleccionados[0].empleados = dataEmpleados;
     this.presentModal(seleccionados)
   }
 
+  // METODOS PARA BUSCAR LOS REGISTROS DE SUCURSALES, DEPARTAMENTOS, EMPLEADOS
   changeSearchSucursales(e: any) {
     console.log("entra a busqueda", e.detail.value)
     const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
-    console.log("ver las palabra de busqueda ",palabrasBusqueda )
+    console.log("ver las palabra de busqueda ", palabrasBusqueda)
     const filtro = this.sucursales.filter((o: any) => {
       const nombreCompleto = `${o.sucursal}`.toLowerCase();
       console.log("ver el nombre de empleado: ", o.nombre)
@@ -468,7 +474,7 @@ export class ReporteInasistenciaPage {
   changeSearchDepartamento(e: any) {
     console.log("entra a busqueda", e.detail.value)
     const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
-    console.log("ver las palabra de busqueda ",palabrasBusqueda )
+    console.log("ver las palabra de busqueda ", palabrasBusqueda)
     const filtro = this.departamentos.filter((o: any) => {
       const nombreCompleto = `${o.departamento}`.toLowerCase();
       console.log("ver el nombre de empleado: ", o.nombre)
@@ -480,7 +486,7 @@ export class ReporteInasistenciaPage {
   changeSearch(e: any) {
     console.log("entra a busqueda", e.detail.value)
     const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
-    console.log("ver las palabra de busqueda ",palabrasBusqueda )
+    console.log("ver las palabra de busqueda ", palabrasBusqueda)
     const filtro = this.empleados.filter((o: any) => {
       const nombreCompleto = `${o.nombre || ''} ${o.apellido || ''}`.toLowerCase();
 
@@ -490,6 +496,7 @@ export class ReporteInasistenciaPage {
     this.empleados_filtro = filtro
   }
 
+  // VARIABLES PARA EL MANEJO DE LA PAGINACION
   pageActual: number = 1;
   pageActualDepartamento: number = 1;
   pageActualSucursal: number = 1;

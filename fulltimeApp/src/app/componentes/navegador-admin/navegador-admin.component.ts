@@ -83,9 +83,7 @@ export class NavegadorAdminComponent implements OnInit {
       console.log("Notificacion: ", data_llega);
       if (data_llega.id_receives_empl === this.idEmpleadoIngresa) {
         this.mensaje = data_llega.usuario;
-
         try {
-          //this.mostrarToasNoti("Notificacion Recibida de "+data_llega+"\n");
           var t = new Date();
           t.setSeconds(t.getSeconds() + 5);
           let id = this.ids.length;
@@ -103,19 +101,11 @@ export class NavegadorAdminComponent implements OnInit {
             }]
           }
           LocalNotifications.schedule(options);
-          /*LocalNotifications.addListener('localNotificationActionPerformed', (notificationAction: ActionPerformed) => void {})
-          .then((value: PluginListenerHandle) => {
-            this.router.navigate(['/empleado/solicitar-permisos']);
-          });*/
-
         } catch (error) {
           this.mostrarToasNoti("No se pudo resibir la notificacion: \n" + error);
           console.log("Problemas en la notificacion: ", error);
         }
       }
-
-
-
     });
 
     this.socket.on('recibir_aviso', (data_llega: any) => {
@@ -163,6 +153,7 @@ export class NavegadorAdminComponent implements OnInit {
     event.target.src = "../../../assets/images/perfildefecto.png";
   }
 
+  // METODO DE VERIFICACION DE CONEXION A INTERNET
   isConnected: boolean;
   networkSubscriber() {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
@@ -177,6 +168,7 @@ export class NavegadorAdminComponent implements OnInit {
     }
   }
 
+  // METODO DE CONFIGURACION DE TOAST
   async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
     const toast = await this.toastController.create({
       message: mensaje,
@@ -187,8 +179,8 @@ export class NavegadorAdminComponent implements OnInit {
     toast.present();
   }
 
+  // METODO PARA LEER LAS NOTIFICACIONES 
   LlamarNotificcaccciones(id_empleado: number) {
-    //Carga y Muestra el numero de notificaciones,   
     this.notificacionService.getNotificacionesByIdEmpleado(id_empleado).subscribe(
       notificacion => {
         console.log("ver todas la notificaciones del empleado: ", notificacion)
@@ -197,14 +189,8 @@ export class NavegadorAdminComponent implements OnInit {
         this.notificacionService.getNotificacionesTimbreByIdEmpleado(id_empleado).subscribe(
           notificaciontim => {
             this.notificacionestimbres = notificaciontim;
-
             this.notificacionesAll = this.notificaciones.concat(this.notificacionestimbres);
-
             this.countNoti = 0;
-
-            //console.log('Notificacaciones: ',this.notificacionesAll)
-
-            //cuenta las notificaciones que estan sin ver
             this.notificacionesAll.forEach((item: any) => {
               if (item.visto === false) {
                 this.countNoti++;
@@ -267,6 +253,7 @@ export class NavegadorAdminComponent implements OnInit {
   colorv: any;
   colora: any;
 
+  // METODO PARA VERIFICAR LOS MODULOS ACTIVOS
   VerificarFunciones() {
     this.parametros.ObtenerFunciones().subscribe(res => {
       this.funciones = res[0];
@@ -303,7 +290,7 @@ export class NavegadorAdminComponent implements OnInit {
   }
 
 
-  //Pestalas de mensajes
+  //METODOS DE CONFIGURACION DE MENSAJES
   async mostrarToas(mensaje: string) {
     const toast = await this.toastController.create({
       message: `<ion-icon name="information-circle-outline"></ion-icon>` + mensaje + "\n\n Te gustaria activarlo? \n Comunicate con nosotros: www.casapazmino.com.ec",
@@ -328,6 +315,7 @@ export class NavegadorAdminComponent implements OnInit {
     await toast.present();
   }
 
+  // METODO PARA MOSTRAR LAS NOTIFICACIONES 
   async Mostrarpopnotificaciones(event: any) {
     this.countNoti = 0;
     this.valor = false;
@@ -341,16 +329,20 @@ export class NavegadorAdminComponent implements OnInit {
     await popover.onDidDismiss();
   }
 
+
+  // METOO PARA ABRIR EL MENU
   openAdmin() {
     this.menu.enable(true, 'admin');
     this.menu.open('admin');
     this.VerificarFunciones();
   }
 
+  // METOO PARA CERRAR EL MENU
   closeAdmin() {
     this.menu.close('admin');
   }
 
+  // METODO PARA CERRAR LA SESION
   cerrarSesion() {
     this.relojService.cerrarSesion();
     this.closeAdmin();
@@ -359,7 +351,7 @@ export class NavegadorAdminComponent implements OnInit {
 
   }
 
-
+  // METODO PARA MOSTRAL EL MODAL DE TIMBRES PERDIDOS 
   async presentModalTimbresPerdidos() {
     this.closeAdmin();
     const modal = await this.modalController.create({

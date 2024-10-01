@@ -21,8 +21,8 @@ export class AlimentacionService {
     private http: HttpClient,
     private socket: Socket
   ) { }
-  
-  // Noti_realtime
+
+  // METODO PARA ENVIAR NOTIFICACIONES MEDIANTE SOCKET
   sendNotiRealTime(data: any) {
     this.socket.emit('nuevo_aviso', data);
   }
@@ -34,6 +34,7 @@ export class AlimentacionService {
    **********************************************************************  
    */
 
+  // OBTIENE LOS REGISTROS DE SOLICITUDES DE ALIMENTACION
   getAllAlimentacion(): Observable<Alimentacion[]> {
     const url = `${this.apiUrl}/alimentacion/all-alimento`;
     return this.http.get<Alimentacion[]>(url)
@@ -43,8 +44,9 @@ export class AlimentacionService {
       )
   }
 
+  // OBTIENE LOS REGISTROS DE SOLICITUDES DE ALIMENTACION POR FECHAS
   getAllAlimentacionByFechas(fec_inicio: string, fec_final: string): Observable<Alimentacion[]> {
-    console.log("rango fechas: ",fec_inicio, " --- ",fec_final);
+    console.log("rango fechas: ", fec_inicio, " --- ", fec_final);
     const url = `${this.apiUrl}/alimentacion/rangofechas`;
     const params = new HttpParams()
       .set('fec_inicio', fec_inicio)
@@ -56,6 +58,7 @@ export class AlimentacionService {
       )
   }
 
+  // OBTIENE LOS REGISTROS DE SOLICITUDES DE ALIMENTACION POR EL ID DEL EMPLEADO
   getListaAlimentacionByIdEmpleado(idEmpleado: number | string): Observable<Alimentacion[]> {
     const url = `${this.apiUrl}/alimentacion/lista-alimento`;
     const params = new HttpParams().set('idEmpleado', idEmpleado)
@@ -66,7 +69,8 @@ export class AlimentacionService {
       )
   }
 
-  getlistaAlimentacionByFechasyCodigo(fec_comida: string, idEmpleado: number | string): Observable <Alimentacion[]>{
+  // OBTIENE LOS REGISTROS DE SOLICITUDES DE ALIMENTACION POR EL ID DEL EMPLEADO Y POR FECHAS
+  getlistaAlimentacionByFechasyCodigo(fec_comida: string, idEmpleado: number | string): Observable<Alimentacion[]> {
     const url = `${this.apiUrl}/alimentacion/lista-alimentacionfechas`;
     const params = new HttpParams()
       .set('fec_comida', fec_comida)
@@ -78,6 +82,7 @@ export class AlimentacionService {
       )
   }
 
+  // REGISTRA UNA NUEVA SOLICITUD DE ALIMENTACION
   postNuevoAlimentacion(alimentacion: Alimentacion): Observable<Alimentacion> {
 
     const cdepar: any = localStorage.getItem('cdepar');
@@ -91,8 +96,8 @@ export class AlimentacionService {
       )
   }
 
+  // EDITA UNA SOLICITUD DE ALIMENTACION
   putAlimentacion(alimentacion: Alimentacion): Observable<Alimentacion> {
-
     const url = `${this.apiUrl}/alimentacion/update-alimento`;
     return this.http.put<Alimentacion>(url, alimentacion)
       .pipe(
@@ -101,6 +106,7 @@ export class AlimentacionService {
       )
   }
 
+    // EDITA EL ESTADO DE LA SOLICITUD DE ALIMENTACION
   putEstadoAlimentacion(alimentacion: Alimentacion): Observable<Alimentacion> {
     const data = {
       id: alimentacion.id,

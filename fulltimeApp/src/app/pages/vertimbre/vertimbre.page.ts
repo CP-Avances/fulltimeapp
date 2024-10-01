@@ -2,8 +2,6 @@ import { LoadingController, ModalController, ToastController, Platform } from '@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { KeyValue } from '@angular/common';
-import moment from 'moment';
-
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
 import { TimbresService } from 'src/app/services/timbres.service';
@@ -23,10 +21,10 @@ import { ConnectivityService } from '../../services/conexion-servidor.service'
 })
 
 export class VertimbrePage implements OnInit {
+
+  // INICIALIZACION DE VARIABLES
   @ViewChild(RangoFechasComponent) rangoFechasComponent: RangoFechasComponent;
   private unsubscribe$ = new Subject<void>();
-
-  // loading: any;
   timbres: any = []; //esta variable contiene los timbres que se muestran en la lista y se VAN A ENVIAR AL 
   timbres_filtro: any = []; //esta variable contiene los timbres filtrados que se muestran en la lista
   pageTodos: number;
@@ -40,10 +38,8 @@ export class VertimbrePage implements OnInit {
   btn_filtro: boolean = false;
   btn_todos: boolean = false;
   serverConnected: boolean = true;
-
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
-
   public get rol_empleado(): number {
     return this.relojService.rol
   }
@@ -67,24 +63,25 @@ export class VertimbrePage implements OnInit {
     this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
   }
+
   async ionViewWillEnter() {
     this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
   }
+
   ionViewWillLeave() {
-    console.log('Sali de Vertimbre');
     this.limpiarRango_fechas();
     this.rangoFechasComponent.closeRangoFecha();
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
 
+  // METODO PARA VERIFICAR LA CONEXION A INTERNET
   isConnected: boolean;
   networkSubscriber() {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
     console.log("Esta conectado: ", this.isConnected)
     if (!this.isConnected) {
-      // this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
       console.log('Desconectado');
     } else {
       this.BuscarFormatos();
@@ -93,6 +90,7 @@ export class VertimbrePage implements OnInit {
     }
   }
 
+  // METODO PARA MODIFICAR EL TOAST
   async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
     const toast = await this.toastController.create({
       message: mensaje,
@@ -116,6 +114,7 @@ export class VertimbrePage implements OnInit {
     )
   }
 
+  // METODO PAR LEER LOS TIMBRES DEL USUARIO
   mostrarTimbres() {
     this.timbres_filtro = [];
     this.obtenerTimbres(localStorage.getItem('codigo'));
@@ -127,6 +126,7 @@ export class VertimbrePage implements OnInit {
     this.limpiarRango_fechas();
   }
 
+  // METODO PAR LEER LOS TIMBRES FILTRADOS POR FECHAS
   mostrarfiltro() {
     if (this.fechaInicio === "" || this.fechaFinal === "") {
       return this.mostrarToas('Ingrese el rango de fechas', 3000, "warning");
@@ -149,19 +149,16 @@ export class VertimbrePage implements OnInit {
     }
     this.rangoFechasComponent.resetFechaInicio();
     this.rangoFechasComponent.resetFechaFinal();
-
   }
 
-
+  // METODO PARA LIMPIAR LOS RANGOS DE FECHAS
   limpiarRango_fechas() {
     this.dataUserService.setFechaRangoInicio('');
     this.dataUserService.setFechaRangoFinal('');
-
   }
 
-  //Pestalas de mensajes
+  // METODO PARA MODIFICACR LOS MENSAJES DE PANTALLA
   async mostrarToas(mensaje: string, duracion: number, color: string) {
-
     const toast = await this.toastController.create({
       message: mensaje,
       duration: duracion,
@@ -183,6 +180,7 @@ export class VertimbrePage implements OnInit {
     return 0;
   }
 
+  // METODO PARA OBTENER LOS TIMBRES Y FORMATEAR FECHAS
   obtenerTimbres(codigo) {
     this.timbres = [];
     this.relojService.obtenerTimbres(codigo).pipe(takeUntil(this.unsubscribe$)).subscribe(
@@ -192,7 +190,7 @@ export class VertimbrePage implements OnInit {
         let fechasObjeto = {}
 
         res.forEach(data => {
-          data.fecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor );
+          data.fecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
           console.log("ver data.fecha ", data.fecha)
 
           data.hora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre, this.formato_hora, data.zona_horaria_servidor);
@@ -217,9 +215,7 @@ export class VertimbrePage implements OnInit {
         })
         console.log('timbres en el objeto', fechasObjeto);
 
-
         this.timbres = fechasObjeto
-
         //si el objeto de los timbres esta vacion oculta las ventanas y muestra la ventana - 'vacio'.
         if (Object.keys(fechasObjeto).length === 0) {
           this.vacio = false;
@@ -227,15 +223,13 @@ export class VertimbrePage implements OnInit {
           this.btn_filtro = true;
           this.btn_todos = true;
         }
-
       },
       err => {
-        //this.presentLoading("Intentando conectar con el servidor");
       }
-
     );
   }
 
+  // METODO PARA OBTENER LOS TIMBRES FILTRADOS Y FORMATEAR LAS FECHAS
   filtrarFechas() {
     console.log("Entra al filtro fechas")
     this.timbres_filtro = [];
@@ -266,11 +260,8 @@ export class VertimbrePage implements OnInit {
             }
             fechasObjeto_f[i.fecha].push(i);
           })
-
           this.timbres_filtro = fechasObjeto_f;
           console.log('timbres filtrados: ', fechasObjeto_f);
-
-          //si el objeto de los timbres esta vacion oculta las ventanas y muestra la ventana - 'mensaje_filtro'.
           if (Object.keys(fechasObjeto_f).length === 0) {
             this.filtro_mensaje = false;
             this.filtro = true;
@@ -284,36 +275,17 @@ export class VertimbrePage implements OnInit {
     }
   }
 
-
-  //mensaje de cargando
-  private async presentLoading(msg: string) {
-    this.loadingController.create({
-      message: msg,
-      duration: 6500,
-    }).then((response) => {
-      response.present();
-      response.onDidDismiss().then((response) => {
-        return this.mostrarToas('Lo sentimos no fue posible conectar con la red', 3000, "danger");
-      }).catch((error) => {
-        console.error('Error showing loader or toast:', error);
-      })
-    });
-  }
-  //fin mensaje cargando
-
   // ABRIR MAPA
   abrirMapa(latitud, longitud) {
     if (latitud != '' && longitud != '') {
-      //codigo ´para abrir el mapa con las coordenadas
-      //const rutaMapa = "https://www.google.com/maps/search/+" + latitud + "+" + longitud;
       const rutaMapa = "https://maps.google.com/?q=" + latitud + " , " + longitud
       window.open(rutaMapa);
     } else {
       return this.mostrarToas('Lo sentimos no tiene las coordenadas de Ubicación registradas', 3000, "danger");
     }
   }
-  // FIN ABRIR MAPA 
 
+  // METODO PARA MODIFICAR LA NOVEDAD DE CADA TIMBRE
   async presentAlert(obs: any, hora_timbre_diferente: any, ubicacion: any, novedades_conexion: string, conexion: boolean) {
     let novedad = novedades_conexion;
     if (conexion == true) {
@@ -330,7 +302,6 @@ export class VertimbrePage implements OnInit {
       mensaje += `<br><br>${novedad}`;
     }
     const alert = await this.alertController.create({
-      //  header: obs,
       message: mensaje,
       cssClass: 'my-custom-class',
       mode: 'ios',
@@ -353,7 +324,7 @@ export class VertimbrePage implements OnInit {
     screenReaderCurrentLabel: `You're on page`
   };
 
-
+  // METODO PARA MOSTRAR LA IMAGEN DEL TIMBRE EN UN MODAL
   async mostrarImagenModal(imagenDataUrl: string) {
     const modal = await this.modalController.create({
       component: VerImagenModalPage, // Nombre de la página modal que mostrará la imagen
@@ -361,11 +332,8 @@ export class VertimbrePage implements OnInit {
         imagen: imagenDataUrl // Pasar el DataUrl como propiedad a la modal
       }
     });
-
     return await modal.present();
   }
-
-
 
 }
 

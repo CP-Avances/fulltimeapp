@@ -65,10 +65,6 @@ const routes: Routes = [
         loadChildren: () => import('../paginas-admin/horarios-empleados/horarios-empleados.module').then(m => m.HorariosEmpleadosPageModule)
       },
       {
-        path: 'justificar-atrasos',
-            loadChildren: () => import('../paginas-admin/justificar-atrasos/justificar-atrasos.module').then(m => m.JustificarAtrasosPageModule)
-      },
-      {
         path: 'justificar-timbres',
         loadChildren: () => import('../paginas-admin/justificar-timbres/justificar-timbres.module').then(m => m.JustificarTimbresPageModule)
       },
@@ -86,7 +82,7 @@ const routes: Routes = [
       },
       {
         path: 'aprobar-alimentacion',
-         loadChildren: () => import('../paginas-admin/aprobar-alimentacion/aprobar-alimentacion.module').then(m => m.AprobarAlimentacionPageModule)
+        loadChildren: () => import('../paginas-admin/aprobar-alimentacion/aprobar-alimentacion.module').then(m => m.AprobarAlimentacionPageModule)
       },
       {
         path: 'reportes',
@@ -110,4 +106,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class AdminpagePageRoutingModule {}
+export class AdminpagePageRoutingModule { }

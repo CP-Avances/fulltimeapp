@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController, PopoverController, NavParams, ToastController } from '@ionic/angular';
+import { ModalController, PopoverController, NavParams } from '@ionic/angular';
 import { AutorizacionesService } from '../../services/autorizaciones.service';
 import { Notificacion } from '../../interfaces/Notificaciones';
 import { NotificacionTimbre } from '../../interfaces/Notificaciones';
@@ -16,26 +16,22 @@ import { NetworkService } from '../../libs/network.service';
   styleUrls: ['./lista-notificacion.component.scss'],
 })
 export class ListaNotificacionComponent implements OnInit {
+ 
+  //INICIO DE VARIABLES
   serverConnected: boolean = true;
-
   skeleton = SkeletonListNotificacionesArray;
   loading: boolean = true;
   notificaciones: Notificacion[] = [];
   notificaiontimbre: NotificacionTimbre[] = [];
   notificacionestimbres: any = [];
-
   notificacionesAll: any = [];
-
   countNoti: any;
-
   pageActual: any = 1;
   valorcolor: string = '';
   noticheck: string = '';
-
   valor: boolean = false;
   paginaccionvista: boolean = false;
   ver: boolean = false;
-
   id_noti :any;
 
   constructor(
@@ -47,13 +43,12 @@ export class ListaNotificacionComponent implements OnInit {
     public modalController: ModalController,
     private userService: DataUserLoggedService,
     private networkService: NetworkService,
-    private toastController: ToastController,
     private connectivityService: ConnectivityService
-
   ) { 
     this.id_noti =this.navParams.get('id')
   }
 
+  // METODO QUE AL INICIARCE MARCA COMO VISTO A TODAS LAS NOTIFICACIONES
   async ngOnInit() {
     this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
@@ -86,21 +81,15 @@ export class ListaNotificacionComponent implements OnInit {
 
                     : -1
             );
-
-            //si el objeto de los timbres esta vacion oculta las ventanas y muestra la ventana - 'vacio'.
             if (Object.keys(this.notificacionesAll).length < 21) {
               this.ver = true;
             }
-
           },
           err => { console.log(err); this.ver = true },
           () => { this.loading = false; }
         )
-
-
       },
       err => {
-
         this.notificacionService.getNotificacionesTimbreByIdEmpleado(id_empleado + '').subscribe(
           notificaiontim => {
             this.notificacionesAll = notificaiontim;
@@ -109,49 +98,29 @@ export class ListaNotificacionComponent implements OnInit {
                 (firstObject.visto === true) ? 1 :
                   (firstObject.visto === secondObject.visto) ?
                     ((firstObject.fecha_hora! < secondObject.fecha_hora!) ? 1 : -1)
-
                     : -1
             );
           },
           err => { console.log(err); this.ver = true },
           () => { this.loading = false; }
         )
-
         console.log(err);
       },
       () => { this.loading = false; }
     )
-
   }
   
   async ionViewWillEnter(){
     this.ngOnInit();
   }
 
-
+  //METODO DE VERIFICACION DE CONEXION A INTERNET
   isConnected: boolean;
-
   networkSubscriber() {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
-    console.log("Esta conectado: ", this.isConnected)
-    if (!this.isConnected) {
-      this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
-
-    } else {
-  
-    }
-  }
-  async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
-    const toast = await this.toastController.create({
-      message: mensaje,
-      duration: duracion,
-      color: color,
-      position: position
-    });
-    toast.present();
   }
 
-
+  // METODO PARA ASIGNAR LOS COLORES POR TIPO DE NOTIFICACION
   tiponotificacion(noti: {id: any,  id_permiso: string; id_vacaciones: string; id_hora_extra: string; visto: boolean, tipo: number }) {
     if (noti.visto === true) {
       return "reportes";
@@ -181,15 +150,12 @@ export class ListaNotificacionComponent implements OnInit {
     }
   }
 
+    // METODO PARA ABRIR LA NOTIFICACION EN LA VISTA DEL MODULO AL QUE PERTENECE
   AbrirNoti(noti: { id: number, id_permiso: string; id_vacaciones: string; id_hora_extra: string; estado: string, tipo: number; nempleadoreceives: string; id_receives_empl: number; nempleadosend: string; }) {
     this.cambiovistanoti(noti);
     this.cambiovistanotitimbre(noti);
     this.modalController.dismiss({});
-
     if (noti.nempleadoreceives === noti.nempleadosend) {
-
-      // if (localStorage.getItem("rol") == "1") {
-      //Solicitudes Admin envia
       if (noti.id_permiso != null && noti.estado === "Pendiente") {
         return this.router.navigate(['/reloj/solicitudes/permiso-solicitud']);
       } else if (noti.id_hora_extra != null && noti.estado === "Pendiente") {
@@ -200,50 +166,8 @@ export class ListaNotificacionComponent implements OnInit {
       if (noti.tipo === 1) {
         return this.router.navigate(['/reloj/solicitudes/alimentacion-solicitud']);
       }
-
-      //} 
-      /*
-      else {
-        //Solicitudes Empleado envia
-        if (noti.id_permiso != null) {
-          this.router.navigate(['/empleado/solicitar-permisos']);
-        } else if (noti.id_vacaciones != null) {
-          this.router.navigate(['/empleado/solicitar-vacaciones']);
-        } else if (noti.id_hora_extra != null && noti.estado === "Pendiente") {
-          this.router.navigate(['/empleado/solicitar-horas-extras']);
-        } else if (noti.tipo === 1) {
-          console.log("Alimentacion Tipo =", noti.tipo);
-          this.router.navigate(['/empleado/solicitar-planificar-alimentacion']);
-        }
-
-        //Aprobar las solicitudes Admin envia respuesta
-        if (noti.id_permiso != null && noti.estado != "Pendiente") {
-          console.log("Aprobar Permiso ", noti.id_permiso, " = ", noti.estado);
-          return this.router.navigate(['/reloj/aprobar-permisos']);
-        } else if (noti.tipo === 12) {
-          console.log("Aprobar Hora Extra ", noti.tipo);
-          console.log("Aprobar Hora Extra ", noti.id_hora_extra, " = ", noti.estado)
-          return this.router.navigate(['/reloj/aprobar-horas-extras']);
-        } else if (noti.id_vacaciones != null && noti.estado != "Pendiente") {
-          console.log("Aprobar Vacaciones ", noti.id_vacaciones, " = ", noti.estado)
-          return this.router.navigate(['/reloj/aprobar-vacaciones']);
-        }
-
-        if (noti.tipo === 2) {
-          console.log("Aprobar Alimentacion ", noti.tipo, " = ", noti.estado)
-          return this.router.navigate(['/reloj/aprobar-alimentacion']);
-        }
-
-        return this.router.navigate(['/reloj/aprobar-alimentacion']);
-
-      }
-        */
-
     }
     else {
-
-      // if (localStorage.getItem("rol") === "1") {
-      //Solicitudes Admin Respuesta que recibe
       if (noti.id_permiso != null && noti.estado != "Pendiente") {
         console.log("Aprobar Permiso ", noti.id_permiso, " = ", noti.estado);
         return this.router.navigate(['/reloj/solicitudes/permiso-solicitud']);
@@ -254,7 +178,6 @@ export class ListaNotificacionComponent implements OnInit {
         console.log("Aprobar Vacaciones ", noti.id_vacaciones, " = ", noti.estado)
         return this.router.navigate(['/relojo/solicitudes/vacacion-solicitud']);
       }
-
       if (noti.tipo === 2) {
         console.log("Aprobar Alimentacion ", noti.tipo, " = ", noti.estado)
         return this.router.navigate(['/reloj/solicitudes/alimentacion-solicitud']);
@@ -272,39 +195,6 @@ export class ListaNotificacionComponent implements OnInit {
       if (noti.tipo === 1) {
         return this.router.navigate(['/reloj/aprobar-alimentacion']);
       }
-
-
-      //} 
-
-      /*
-      else {
-        //Solicitudes Empleado Respuesta que recibe
-        if (noti.id_permiso != null) {
-          return this.router.navigate(['/empleado/solicitar-permisos']);
-        } else if (noti.id_vacaciones != null) {
-          return this.router.navigate(['/empleado/solicitar-vacaciones']);
-        } else if (noti.tipo === 12) {
-          return this.router.navigate(['/empleado/solicitar-horas-extras']);
-        } else if (noti.tipo === 2) {
-          console.log("Alimentacion Tipo =", noti.tipo);
-          return this.router.navigate(['/empleado/solicitar-planificar-alimentacion']);
-        }
-
-
-        //Aprobaciones Admin envia
-        if (noti.id_permiso != null && noti.estado === "Pendiente") {
-          return this.router.navigate(['/reloj/aprobar-permisos']);
-        } else if (noti.id_hora_extra != null && noti.estado === "Pendiente") {
-          return this.router.navigate(['/reloj/aprobar-horas-extras']);
-        } else if (noti.id_vacaciones != null && noti.estado === "Pendiente") {
-          return this.router.navigate(['/reloj/aprobar-vacaciones']);
-        }
-        if (noti.tipo === 1) {
-          return this.router.navigate(['/reloj/aprobar-alimentacion']);
-        }
-
-      }
-        */
     }
 
   }

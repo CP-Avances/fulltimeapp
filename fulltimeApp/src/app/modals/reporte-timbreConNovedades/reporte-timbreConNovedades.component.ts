@@ -54,14 +54,13 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
 
   ngOnInit() {
     console.log('reporte timbreConNovedades | Data empleado: ', this.data);
-    const id_empresa = localStorage.getItem('id_empresa');
-    (id_empresa !== null) ? this.plantillaPDF.ShowColoresLogo(id_empresa) : this.plantillaPDF.abrirToas('No existe codigo de empresa', 'danger', 3000)
     this.BuscarFormatos();
     this.obtenerDatosEmpresa(localStorage.getItem('id_empresa'));
     this.ObtenerLogo();
     this.ObtenerColores();
   }
 
+  // METODOS PARA OBTENER LOS DATOS DE LA EMPRESA
   obtenerDatosEmpresa(idEmpresa: any) {
     this.relojService.obtenerDatosEmpresa(idEmpresa).subscribe(
       res => {
@@ -79,6 +78,8 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
   p_color: any;
   s_color: any;
   frase: any;
+
+  // METODO PARA OBTENER LOS COLORES DE LA EMPRESAf
   ObtenerColores() {
     this.plantillaPDF.ConsultarDatosEmpresa(parseInt(localStorage.getItem('id_empresa') as string)).subscribe(res => {
       this.p_color = res[0].color_principal;
@@ -88,6 +89,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
   }
 
   logo: any = String;
+  // METODO PARA OBTENER EL LOGO DE LA EMPRESA
   ObtenerLogo() {
     this.plantillaPDF.LogoEmpresaImagenBase64(localStorage.getItem('id_empresa') as string).subscribe(res => {
       this.logo = 'data:image/jpeg;base64,' + res.imagen;
@@ -107,7 +109,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
     )
   }
   data_pdf: any = [];
-
+  // METODO PARA CONSULTAR LOS REGISTROS DEL REPORTE DE TIMBRES
   consultarDataReporte() {
     this.showBtnBuscar = true
     this.existenEmpleados = false;
@@ -157,7 +159,6 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
     });
     await alert.present();
   }
-  //FIN mostrar Alerta
 
 
   closeModal() {
@@ -171,6 +172,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
    *                               PARA LA EXPORTACIÓN DE ARCHIVOS PDF
    * ****************************************************************************************************/
 
+  // METODO PARA GENERAR EL PDF
   GenerarPDF() {
     let documentDefinition: any;
     documentDefinition = this.DefinirInformacionPDF();
@@ -178,6 +180,8 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
     this.plantillaPDF.generarPdf(documentDefinition, doc_name)
   }
 
+
+  // METODO PARA DEFINIR LA INFORMACION INICIAL DE LOS PDFS
   DefinirInformacionPDF() {
     // DEFINIR ORIENTACION DE LA PAGINA
 
@@ -236,6 +240,8 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
     };
   }
 
+
+  // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
   EstructurarDatosPDF(data: any): Array<any> {
     let c = 0;
     let n: any = []
@@ -437,7 +443,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
     return n;
   }
 
-
+  // METODO PARA ALMACENAR LA INFORMACION DE LOS TIMBRES PARA QUE SEAN MOSTRADOS EN PANTALLA 
   ExtraerDatos() {
     this.timbres = [];
     let n = 0;

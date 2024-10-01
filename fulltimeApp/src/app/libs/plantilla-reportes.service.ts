@@ -30,23 +30,89 @@ export class PlantillaReportesService {
 
   private apiUrl = environment.url;
 
-  // SERVICIOS DE LA APLICACION WEB PARA REPORTES
+  // SERVICIOS DE LA APLICACION WEB PARA CONSULTAR DATOS DE LA EMPRESA
   ConsultarDatosEmpresa(id: number) {
     return this.http.get(`${this.apiUrl}/empresas/buscar/datos/${id}`);
   }
 
-   // METODO PARA OBTENER LOGO DE EMPRESA              **USADO
-   LogoEmpresaImagenBase64(id_empresa: string) {
+  // METODO PARA OBTENER LOGO DE EMPRESA      
+  LogoEmpresaImagenBase64(id_empresa: string) {
     return this.http.get<any>(`${this.apiUrl}/empresas/logo/codificado/${parseInt(id_empresa)}`)
   }
-  
-  
-  
-  // Método para obtener colores y logotipo empresa
+
+  // METODO PARA GENERAR EL PDF CON LA LIBRERIA PDFMAKE
+  generarPdf(getDocumentDefinicion: any, filename = 'reporte.pdf') {
+    this.presentLoading('Creando archivo PDF...');
+    const documentDefinition = getDocumentDefinicion;
+    const pdfDoc = pdfMake.createPdf(documentDefinition);
+    pdfDoc.getBuffer((uint8Array: Uint8Array) => {
+      let buffer = uint8Array.buffer;
+      if (this.platform.is('capacitor')) {
+        this.descargarDeCelular(buffer, filename.split('.')[0], PDF_TYPE, '.pdf');
+      } else {
+        const data: Blob = new Blob([buffer]);
+        var a = window.document.createElement('a');
+        a.href = window.URL.createObjectURL(data);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    });
+  }
+
+  // METODO PARA DESCARGAR EL REPORTE EN EL DISPOSITIVO
+  private descargarDeCelular(buffer: any, nombreArchivo: string, tipo: string, extencion: string) {
+    const directory = this.file.dataDirectory;
+    console.log(directory);
+    const fileName = nombreArchivo + extencion;
+    let options: IWriteOptions = { replace: true };
+    //Writing File to Device
+    this.file.writeFile(directory, fileName, buffer, options)
+      .then((success) => {
+        console.log("Archivo creado satisfactoriamente" + JSON.stringify(success));
+        this.fileOpener.open(this.file.dataDirectory + fileName, tipo)
+          .then(() => console.log('Archivo abierto'))
+          .catch(e => { console.log('Error abriendo archivo', e); this.mostrarToas('Error abiendo el archivo', 4000) });
+      })
+      .catch((error) => {
+        console.log("No se puede crear el archivo " + JSON.stringify(error));
+      });
+  }
+
+  // MODIFICACION DEL TOAST
+  public async abrirToas(mensaje: string, color: string, duracion: number) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: duracion,
+      color: color,
+      mode: 'ios',
+      position: "middle",
+    });
+    toast.present();
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  //////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////// METODOS PARA DEFINIR LA ESTRUCTURA DEL PDF ////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////
 
   private _imagenBase64: string;
   private _nameEmpresa: string;
-
   get logoBase64(): string { return this._imagenBase64 }
   setLogoBase64(arg: string) { this._imagenBase64 = arg }
 
@@ -61,45 +127,6 @@ export class PlantillaReportesService {
 
   get color_Secundary(): string { return this.s_color }
   setColorSecondary(arg: string) { this.s_color = arg }
-
-  ShowColoresLogo(id_empresa: string) {
-    const logoBase64 = sessionStorage.getItem('logo');
-    const name_empresa = sessionStorage.getItem('name_empresa');
-    const p = sessionStorage.getItem('p_color');
-    const s = sessionStorage.getItem('s_color');
-
-    if (logoBase64 === null || name_empresa === null || p === null || s === null) {
-      localStorage.removeItem('name_empresa');
-      const params = new HttpParams()
-        .set('id_empresa', id_empresa)
-
-      this.http.get<any>(`${environment.url}/reportes/info-plantilla`, { params }).subscribe(
-        res => {
-          this.setLogoBase64('data:image/jpeg;base64,' + res.imagen);
-          this.setNameEmpresa(res.nom_empresa);
-          this.setColorPrimary(res.color_p);
-          this.setColorSecondary(res.color_s);
-
-          sessionStorage.setItem('p_color', res.color_p);
-          sessionStorage.setItem('s_color', res.color_s);
-          sessionStorage.setItem('name_empresa', res.nom_empresa);
-          (res.imagen == '') ? sessionStorage.setItem('logo', '') : sessionStorage.setItem('logo', 'data:image/jpeg;base64,' + res.imagen)
-        }, err => {
-          sessionStorage.removeItem('logo')
-          sessionStorage.removeItem('name_empresa');
-          sessionStorage.removeItem('p_color');
-          sessionStorage.removeItem('s_color');
-          console.log(err);
-        })
-    } else {
-      this.setLogoBase64(logoBase64);
-      this.setNameEmpresa(name_empresa);
-      this.setColorPrimary(p);
-      this.setColorSecondary(s);
-    }
-
-  }
-
   HeaderText() {
     return {
       margin: 10,
@@ -136,43 +163,27 @@ export class PlantillaReportesService {
 
   EncabezadoVertical(titulo: string, fec_inicio: string, fec_final: string) {
     let arrayEncabezado = [
-      // { image: this.logoBase64, width: 100, margin: [10, -25, 0, 5] },
       { text: sessionStorage.getItem('name_empresa'), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
       { text: titulo, bold: true, fontSize: 12, alignment: 'center', margin: [0, 5, 0, 5] },
       { text: 'Periodo del: ' + fec_inicio + " al " + fec_final, bold: true, fontSize: 12, alignment: 'center', margin: [0, 5, 0, 5] },
     ]
-    // if (this.logoBase64.includes('data:image/jpeg;base64,')) {
-    //   arrayEncabezado.shift();
-    // }
-
     return arrayEncabezado
   }
 
   EncabezadoHorizontal(titulo: string, fec_inicio: string, fec_final: string) {
-    // falta cambiar las dimensiones del encabezado
     let arrayEncabezado = [
-      // { image: this.logoBase64, width: 100, margin: [10, -25, 0, 5] },
       { text: sessionStorage.getItem('name_empresa'), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
       { text: titulo, bold: true, fontSize: 12, alignment: 'center', margin: [0, 5, 0, 5] },
       { text: 'Periodo del: ' + fec_inicio + " al " + fec_final, bold: true, fontSize: 12, alignment: 'center', margin: [0, 5, 0, 5] },
     ]
-    // if (this.logoBase64.indexOf('data:image/jpeg;base64,')) {
-    //   arrayEncabezado.shift();
-    // }
-
     return arrayEncabezado
   }
 
   EncabezadoHorizontalAprobacion(titulo: string) {
-    // falta cambiar las dimensiones del encabezado
     let arrayEncabezado = [
-      // { image: this.logoBase64, width: 100, margin: [10, -25, 0, 5] },
       { text: sessionStorage.getItem('name_empresa'), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
       { text: titulo, bold: true, fontSize: 12, alignment: 'center', margin: [0, 5, 0, 5] },
     ]
-    // if (this.logoBase64.indexOf('data:image/jpeg;base64,')) {
-    //   arrayEncabezado.shift();
-    // }
     return arrayEncabezado
   }
 
@@ -188,11 +199,6 @@ export class PlantillaReportesService {
       itemsTable: { fontSize: 8 },
       tableTotal: { fontSize: 13, bold: true, alignment: 'rigth', fillColor: this.p_color },
     }
-    // tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color },
-    // itemsTableCentrado: { fontSize: 10, alignment: 'center' },
-    // itemsTableI: { fontSize: 9, alignment: 'left', margin: [50, 5, 5, 5] },
-    // itemsTableP: { fontSize: 9, alignment: 'left', bold: true, margin: [50, 5, 5, 5] },
-    // centrado: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 10, 0, 10] }
   }
 
   presentarDatosGenerales(empleado: any) {
@@ -225,60 +231,18 @@ export class PlantillaReportesService {
 
   }
 
-  generarPdf(getDocumentDefinicion: any, filename = 'reporte.pdf') {
-    this.presentLoading('Creando archivo PDF...');
-    const documentDefinition = getDocumentDefinicion;
-    const pdfDoc = pdfMake.createPdf(documentDefinition);
-
-    pdfDoc.getBuffer((uint8Array: Uint8Array) => {
-
-      let buffer = uint8Array.buffer;
-      if (this.platform.is('capacitor')) {
-        this.descargarDeCelular(buffer, filename.split('.')[0], PDF_TYPE, '.pdf');
-      } else {
-        const data: Blob = new Blob([buffer]);
-        var a = window.document.createElement('a');
-        a.href = window.URL.createObjectURL(data);
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      }
-    });
-
-  }
-
-  private descargarDeCelular(buffer: any, nombreArchivo: string, tipo: string, extencion: string) {
-
-    const directory = this.file.dataDirectory;
-    console.log(directory);
-    const fileName = nombreArchivo + extencion;
-
-    let options: IWriteOptions = { replace: true };
-    
-    //Writing File to Device
-    this.file.writeFile(directory, fileName, buffer, options)
-      .then((success) => {
-        console.log("Archivo creado satisfactoriamente" + JSON.stringify(success));
-        this.fileOpener.open(this.file.dataDirectory + fileName, tipo)
-          .then(() => console.log('Archivo abierto'))
-          .catch(e => { console.log('Error abriendo archivo', e); this.mostrarToas('Error abiendo el archivo', 4000) });
-      })
-      .catch((error) => {
-        console.log("No se puede crear el archivo " + JSON.stringify(error));
-      });
-  }
-
+  // METODO PARA DEFINIR UN ITEM DE CARGA
   private async presentLoading(msg: string) {
     this.loadingController.create({
       message: msg,
       duration: 1000,
     }).then((response) => {
       response.present();
-      response.onDidDismiss().then((response) => {});
+      response.onDidDismiss().then((response) => { });
     });
   }
 
+  // METODO PARA CONFIGURAR EL TOAST
   private async mostrarToas(mensaje: string, duracion: number) {
     const toast = await this.toastController.create({
       message: mensaje,
@@ -288,15 +252,43 @@ export class PlantillaReportesService {
     toast.present();
   }
 
-  public async abrirToas(mensaje: string, color: string, duracion: number) {
-    const toast = await this.toastController.create({
-      message: mensaje,
-      duration: duracion,
-      color: color,
-      mode: 'ios',
-      position: "middle" ,
-    });
-    toast.present();
+  // METODO PARA ALMACENAR EL LOGO Y LOS COLORES
+  ShowColoresLogo(id_empresa: string) {
+    const logoBase64 = sessionStorage.getItem('logo');
+    const name_empresa = sessionStorage.getItem('name_empresa');
+    const p = sessionStorage.getItem('p_color');
+    const s = sessionStorage.getItem('s_color');
+
+    if (logoBase64 === null || name_empresa === null || p === null || s === null) {
+      localStorage.removeItem('name_empresa');
+      const params = new HttpParams()
+        .set('id_empresa', id_empresa)
+
+      this.http.get<any>(`${environment.url}/reportes/info-plantilla`, { params }).subscribe(
+        res => {
+          this.setLogoBase64('data:image/jpeg;base64,' + res.imagen);
+          this.setNameEmpresa(res.nom_empresa);
+          this.setColorPrimary(res.color_p);
+          this.setColorSecondary(res.color_s);
+
+          sessionStorage.setItem('p_color', res.color_p);
+          sessionStorage.setItem('s_color', res.color_s);
+          sessionStorage.setItem('name_empresa', res.nom_empresa);
+          (res.imagen == '') ? sessionStorage.setItem('logo', '') : sessionStorage.setItem('logo', 'data:image/jpeg;base64,' + res.imagen)
+        }, err => {
+          sessionStorage.removeItem('logo')
+          sessionStorage.removeItem('name_empresa');
+          sessionStorage.removeItem('p_color');
+          sessionStorage.removeItem('s_color');
+          console.log(err);
+        })
+    } else {
+      this.setLogoBase64(logoBase64);
+      this.setNameEmpresa(name_empresa);
+      this.setColorPrimary(p);
+      this.setColorSecondary(s);
+    }
+
   }
 
 }

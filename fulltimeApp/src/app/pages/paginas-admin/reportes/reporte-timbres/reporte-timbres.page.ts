@@ -81,6 +81,7 @@ export class ReporteTimbresPage {
     public restP: ParametrosService,
   ) { }
 
+  // METODO PARA ALMACENAR EN UNA VARIABLE LA FECHA DE INICIO SELECCIONADA
   changeFechaInicio(e) {
     this.dataUserService.setFechaRangoFinal(null);
     this.fechaFi = null
@@ -98,6 +99,7 @@ export class ReporteTimbresPage {
     }
   }
 
+  // METODO PARA ALMACENAR EN UNA VARIABLE LA FECHA FIN SELECCIONADA
   changeFechaFinal(e) {
     if (!e.target.value) {
       if (moment(this.fechaInicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')) {
@@ -119,7 +121,7 @@ export class ReporteTimbresPage {
     }
   }
 
-
+  // METODO PARA LIMPIAR LAS VARIBLES DE FECHA FINAL E INICIAL
   limpiarRango_fechas() {
     this.dataUserService.setFechaRangoInicio('');
     this.dataUserService.setFechaRangoFinal('');
@@ -127,9 +129,8 @@ export class ReporteTimbresPage {
     this.fechaFi = "";
   }
 
-  //Pestalas de mensajes
+  //METODO DE CONFIGURACION DEL TOAST
   async mostrarToas(mensaje: string, duracion: number, color: string) {
-
     const toast = await this.toastController.create({
       message: mensaje,
       duration: duracion,
@@ -146,6 +147,7 @@ export class ReporteTimbresPage {
     }
   }
 
+  //METODO PARA ABRIR EL MODAL DEL REPORTE DE TIMBRE 
   async presentModal(objeto: any) {
     console.log('entro a modal...');
 
@@ -166,11 +168,9 @@ export class ReporteTimbresPage {
   }
 
   radioValue = 0;
+
+  // METODO PARA CARGAR LOS REGISTROS DE SUCURSALES, DEPARTAMENTOS O EMPLEADOS SEGUN SEA LA ELECCION DEL ITEM
   showValue() {
-    // 
-    console.log(this.radioValue);
-
-
     if (this.radioValue === 1) {
       this.loadingEmpleado = false;
       this.opcion_sucursal = true;
@@ -203,8 +203,7 @@ export class ReporteTimbresPage {
     }
   }
 
-
-
+  // METODO PARA CARGAR LOS REGISTROS DE SUCURSALES
   cargarListaSucursales() {
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
       console.log("VER BuscarDatosGenerales ", res)
@@ -247,6 +246,7 @@ export class ReporteTimbresPage {
     })
   }
 
+  // METODO PARA CARGAR LOS REGISTROS DE DEPARTAMENTOS
   cargarDepartamentos() {
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
       sessionStorage.setItem('datos_comunicado', JSON.stringify(res))
@@ -259,7 +259,6 @@ export class ReporteTimbresPage {
           id_suc: obj.id_suc,
           id_regimen: obj.id_regimen,
           ciudad: obj.ciudad,
-          //
           cargo: obj.name_cargo,
           departemento: obj.name_dep,
           regimen: obj.name_regimen,
@@ -295,8 +294,8 @@ export class ReporteTimbresPage {
     })
   }
 
+  // METODO PARA OBTENER EL PARAMETRO DE LIMITE DE CORREOS
   BuscarParametro() {
-    // id_tipo_parametro PARA LIMITE DE CORREOS = 13
     let datos = [];
     this.restP.ObtenerDetallesParametros(33).subscribe(
       res => {
@@ -304,7 +303,7 @@ export class ReporteTimbresPage {
       });
   }
 
-
+  // METODO PARA CARGAR LOS REGISTROS DE EMPLEADOS
   cargarEmpleados() {
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
       console.log("VER BuscarDatosGenerales ", res)
@@ -336,17 +335,16 @@ export class ReporteTimbresPage {
       } else {
         this.ver = false;
       }
-
       this.loadingEmpleado = true;
       this.sucursales = [];
       this.departamentos = [];
-
       this.BuscarParametro();
     }, err => {
       this.mostrarAlertas("No se ha encontrado información.", 1000, 'danger')
     })
   }
 
+  // METODO DE CONFIGURACION DE LAS ALERTAS
   async mostrarAlertas(mensaje: string, duracion: number, color: string) {
     const toast = await this.toastController.create({
       message: mensaje,
@@ -358,17 +356,17 @@ export class ReporteTimbresPage {
     toast.present();
   }
 
-
+  // METODO DE VERIFICACION DE MARCACION DE TODOS LOS REGISTROS DE SUCURSALES
   isAllCheck_sucu: boolean = false;
   checkedAll_sucu(isAllChecked_sucu) {
     this.isAllCheck_sucu = !isAllChecked_sucu;
     if (this.radioValue === 1) {
       this.sucursales.forEach(o => { o.isChecked_sucu = this.isAllCheck_sucu })
-
       return;
     }
   }
 
+  // METODO DE VERIFICACION DE MARCACION DE TODOS LOS REGISTROS DE DEPARTAMENTOS
   isAllCheck_depa: boolean = false;
   checkedAll_depa(isAllChecked_depa) {
     this.isAllCheck_depa = !isAllChecked_depa;
@@ -380,7 +378,7 @@ export class ReporteTimbresPage {
     }
   }
 
-
+  // METODO DE VERIFICACION DE MARCACION DE TODOS LOS REGISTROS DE EMPLEADOS
   isAllCheck_empl: boolean = false;
   checkedAll_empl(isAllChecked_empl) {
     this.isAllCheck_empl = !isAllChecked_empl;
@@ -391,6 +389,7 @@ export class ReporteTimbresPage {
   }
 
   isChecked_sucu: boolean = true;
+  // METODO QUE ALMACENA LOS REGISTROS DE SUCURSALES EN UN ARREGLO
   EnviarSucursal() {
     if (!this.fechaFi || !this.fechaIn) {
       this.mostrarToas('Seleccione Fechas', 3000, "warning");
@@ -408,6 +407,7 @@ export class ReporteTimbresPage {
     }
   }
 
+  // METODO QUE OBTIENE LOS EMPLEADOS DE LAS SUCURSALES Y LOS ENVIA EN EL MODAL
   ModelarSucursal(dataSucursal) {
     let seleccionados: any = [];
     dataSucursal.forEach((sucursales: any) => {
@@ -426,6 +426,7 @@ export class ReporteTimbresPage {
     this.presentModal(seleccionados)
   }
 
+  // METODO QUE ALMACENA LOS REGISTROS DE DEPARTAMENTO EN UN ARREGLO
   isChecked_depa: boolean = true;
   EnviarDepartamento() {
     if (!this.fechaFi || !this.fechaIn) {
@@ -441,6 +442,8 @@ export class ReporteTimbresPage {
       this.ModelarDepartamentos(depa);
     }
   }
+
+  // METODO QUE OBTIENE LOS EMPLEADOS DE LOS DEPARTAMENTOS Y LOS ENVIA EN EL MODAL
   ModelarDepartamentos(dataDepartamentos) {
     let seleccionados: any = [];
     dataDepartamentos.forEach((departamento: any) => {
@@ -460,6 +463,7 @@ export class ReporteTimbresPage {
     this.presentModal(seleccionados)
   }
 
+  // METODO QUE ALMACENA LOS REGISTROS DE EMPLEADOS EN UN ARREGLO
   isChecked_empl: boolean = true;
   EnviarEmpleado() {
     if (!this.fechaFi || !this.fechaIn) {
@@ -476,16 +480,18 @@ export class ReporteTimbresPage {
     }
   }
 
+  // METODO QUE OBTIENE LOS EMPLEADOS Y LOS ENVIA EN EL MODAL
   ModelarEmpleados(dataEmpleados) {
     let seleccionados: any = [{ nombre: 'Empleados', opcion: 3 }];
     seleccionados[0].empleados = dataEmpleados;
     this.presentModal(seleccionados)
   }
 
+  // METODOS PARA BUSCAR LOS REGISTROS DE SUCURSALES, DEPARTAMENTOS, EMPLEADOS
   changeSearchSucursales(e: any) {
     console.log("entra a busqueda", e.detail.value)
     const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
-    console.log("ver las palabra de busqueda ",palabrasBusqueda )
+    console.log("ver las palabra de busqueda ", palabrasBusqueda)
     const filtro = this.sucursales.filter((o: any) => {
       const nombreCompleto = `${o.sucursal}`.toLowerCase();
       console.log("ver el nombre de empleado: ", o.nombre)
@@ -493,11 +499,10 @@ export class ReporteTimbresPage {
     })
     this.sucursales_filtro = filtro
   }
-
   changeSearchDepartamento(e: any) {
     console.log("entra a busqueda", e.detail.value)
     const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
-    console.log("ver las palabra de busqueda ",palabrasBusqueda )
+    console.log("ver las palabra de busqueda ", palabrasBusqueda)
     const filtro = this.departamentos.filter((o: any) => {
       const nombreCompleto = `${o.departamento}`.toLowerCase();
       console.log("ver el nombre de empleado: ", o.nombre)
@@ -505,11 +510,10 @@ export class ReporteTimbresPage {
     })
     this.departamentos_filtro = filtro
   }
-  
   changeSearchNombresCompletos(e: any) {
     console.log("entra a busqueda", e.detail.value)
     const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
-    console.log("ver las palabra de busqueda ",palabrasBusqueda )
+    console.log("ver las palabra de busqueda ", palabrasBusqueda)
     const filtro = this.empleados.filter((o: any) => {
       const nombreCompleto = `${o.nombre || ''} ${o.apellido || ''}`.toLowerCase();
 
@@ -519,7 +523,7 @@ export class ReporteTimbresPage {
     this.empleados_filtro = filtro
   }
 
-
+  // VARIABLES PARA EL MANEJO DE LA PAGINACION
   pageActual: number = 1;
   pageActualDepartamento: number = 1;
   pageActualSucursal: number = 1;

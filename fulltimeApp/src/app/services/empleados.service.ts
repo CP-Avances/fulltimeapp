@@ -14,7 +14,6 @@ export class EmpleadosService {
 
   constructor(
     private http: HttpClient
-
   ) { }
 
   // METODO PARA LEER LA LISTA DE EMPLEADOS

@@ -4,7 +4,6 @@ import { Observable, throwError } from 'rxjs';
 import { Permiso } from '../interfaces/Permisos';
 import { environment } from '../../environments/environment';
 import { catchError, tap } from 'rxjs/operators';
-
 import { Socket } from 'ngx-socket-io';
 
 
@@ -25,7 +24,7 @@ export class PermisosService {
     private socket: Socket
   ) { }
 
-  // Noti_realtime
+  // METODO PARA ENVIAR NOTIFICACIONES MEDIANTE SOCKET 
   sendNotiRealTime(data: any) {
     this.socket.emit('nueva_notificacion', data);
   }
@@ -36,6 +35,8 @@ export class PermisosService {
    * 
    **********************************************************************  
    */
+
+  // OBTIENE LOS REGISTROS DE SOLICITUDES DE PERMISOS POR ID Y CODIGO
 
   getPermisoIdyCodigo(codigo: any, id: any): Observable<Permiso[]> {
     const url = `${this.apiUrl}/empleadoPermiso/obtener-permiso`;
@@ -49,6 +50,8 @@ export class PermisosService {
       )
   }
 
+  // OBTIENE LOS REGISTROS DE SOLICITUDES
+
   getAllPermisos(): Observable<Permiso[]> {
     const url = `${this.apiUrl}/permisos/all-permisos`;
     return this.http.get<Permiso[]>(url)
@@ -57,6 +60,8 @@ export class PermisosService {
         catchError(this.handleError)
       )
   }
+
+  // OBTIENE LOS REGISTROS DE SOLICITUDES DE PERMISOS POR FECHAS
 
   getAllPermisosByFechas(fec_inicio: string, fec_final: string): Observable<Permiso[]> {
     const url = `${this.apiUrl}/permisos/rangofechas`;
@@ -70,6 +75,8 @@ export class PermisosService {
       )
   }
 
+  // OBTIENE LOS REGISTROS DE SOLICITUDES DE PERMISOS POR CODIGO
+
   getListaPermisosByCodigo(codigo: string): Observable<Permiso[]> {
     const url = `${this.apiUrl}/empleadoPermiso/lista-permisos`;
     const params = new HttpParams().set('codigo', codigo)
@@ -80,6 +87,7 @@ export class PermisosService {
       )
   }
 
+  // OBTIENE LOS REGISTROS DE SOLICITUDES DE PERMISOS POR CODIGO Y FECHAS
   getlistaPermisosByFechasyCodigo(fec_inicio: string, fec_final: string, codigo: number | string): Observable<Permiso[]> {
     const url = `${this.apiUrl}/empleadoPermiso/lista-permisosfechas`;
     const params = new HttpParams()
@@ -93,6 +101,7 @@ export class PermisosService {
       )
   }
 
+  // OBTIENE LOS REGISTROS DE SOLICITUDES DE PERMISOS POR CODIGO Y FECHAS
   getlistaPermisosByFechasyCodigoEdit(fec_inicio: string, fec_final: string, codigo: number | string, id: number): Observable<Permiso[]> {
     const url = `${this.apiUrl}/permisos/lista-permisosfechasedit`;
     const params = new HttpParams()
@@ -106,6 +115,8 @@ export class PermisosService {
         catchError(this.handleError)
       )
   }
+
+  // OBTIENE LOS REGISTROS DE SOLICITUDES DE PERMISOS POR HORAS Y CODIGO
 
   getlistaPermisosByHorasyCodigo(fec_inicio: string, fec_final: string, hora_inicio: string, hora_final: string, codigo: number | string): Observable<Permiso[]> {
     const url = `${this.apiUrl}/empleadoPermiso/lista-permisoshoras`;
@@ -140,40 +151,14 @@ export class PermisosService {
       )
   }
 
-
-  /*
-  postNuevoPermiso(permiso: any): Observable<Permiso> {
-    const cdepar: any = localStorage.getItem('cdepar');
-    const url = `${this.apiUrl}/empleadoPermiso/insert-permiso`;
-    const params = new HttpParams()
-      .set('id_departamento', cdepar)
-    return this.http.post<Permiso>(url, permiso, { params })
-      .pipe(
-        tap(console.log),
-        catchError(this.handleError)
-      )
-  }
-
-  */
-
-
   // METODO PARA REGISTRAR SOLICITUD DE PERMISO
   postNuevoPermiso(datos: any) {
     return this.http.post<any>(`${environment.url}/empleadoPermiso`, datos);
   }
 
-
+  // METODO PARA EDITAR SOLICITUD DE PERMISO
   putPermiso(id: number, datos: any) {
-    /*
-    const url = `${this.apiUrl}/permisos/update-permiso`;
-    return this.http.put<any>(url, permiso)
-      .pipe(
-        tap(console.log),
-        catchError(this.handleError)
-      )
-        */
     return this.http.put<any>(`${environment.url}/empleadoPermiso/${id}/permiso-solicitado`, datos);
-
   }
 
   pruebaConsulta(): Observable<any> {

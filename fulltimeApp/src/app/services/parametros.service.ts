@@ -19,7 +19,7 @@ export class ParametrosService {
   ObtenerDetallesParametros(id: any) {
     return this.http.get<any>(this.apiUrl + '/parametrizacion/' + id);
   }
-    
+
   // METODO PARA OBTENER LOS DETALLES DE PARAMETROS POR ID
   ObtenerDetalleParametroUsuario(id_empleado: any) {
     return this.http.get<any>(this.apiUrl + '/parametrizacion/opciones-marcacion/' + id_empleado);
@@ -35,6 +35,7 @@ export class ParametrosService {
     return this.http.post<any>(`${this.apiUrl}/parametrizacion/coordenadas`, data);;
   }
 
+  // METODO PARA OBTENER LA UBICACION REGISTRADA AL EMPLEADO
   ObtenerUbicacionUsuario(id_empl: any) {
     return this.http.get<any>(`${this.apiUrl}/ubicacion/coordenadas-usuario/${id_empl}`);
   }
@@ -44,5 +45,5 @@ export class ParametrosService {
     return this.http.get<any>(this.apiUrl + '/administracion/funcionalidad');
   }
 
- 
+
 }

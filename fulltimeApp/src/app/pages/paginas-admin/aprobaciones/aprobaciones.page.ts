@@ -174,10 +174,10 @@ export class AprobacionesPage implements OnInit {
     private networkService: NetworkService,
     private connectivityService: ConnectivityService
 
-  ) {}
+  ) { }
   isConnected: boolean;
 
-  async ionViewWillEnter(){
+  async ionViewWillEnter() {
     this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
     this.VerificarFunciones();
@@ -199,57 +199,43 @@ export class AprobacionesPage implements OnInit {
   colorv: any;
   colora: any;
 
+  // METODO DE VERIFICACCION DE CONEXION A INTERNET
   networkSubscriber() {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
     console.log("Esta conectado: ", this.isConnected)
-    if (!this.isConnected) {
-      //this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
-
-    } else {
-
-      console.log('conectado');
-    }
   }
 
-  async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
-    const toast = await this.toastController.create({
-      message: mensaje,
-      duration: duracion,
-      color: color,
-      position: position
-    });
-    toast.present();
-  }
+  // METODO DE VERIFICACION DE MODULOS HABILITADOS
   funciones: any = [];
   VerificarFunciones() {
     this.parametros.ObtenerFunciones().subscribe(res => {
-      this.funciones = res[0]; 
+      this.funciones = res[0];
       this.Btn_permisos = this.funciones.permisos;
       this.Btn_horasExtras = this.funciones.hora_extra;
       this.Btn_alimentacion = this.funciones.alimentacion;
       this.Btn_vacaciones = this.funciones.vacaciones
 
-      if(this.Btn_permisos == true){
+      if (this.Btn_permisos == true) {
         this.colorp = "habilitado";
-      }else{
+      } else {
         this.colorp = "deshabilitado";
       }
 
-      if(this.Btn_horasExtras == true){
+      if (this.Btn_horasExtras == true) {
         this.colorh = "habilitado";
-      }else{
+      } else {
         this.colorh = "deshabilitado";
       }
 
-      if(this.Btn_alimentacion == true){
+      if (this.Btn_alimentacion == true) {
         this.colora = "habilitado";
-      }else{
+      } else {
         this.colora = "deshabilitado";
       }
 
-      if(this.Btn_vacaciones == true){
+      if (this.Btn_vacaciones == true) {
         this.colorv = "habilitado";
-      }else{
+      } else {
         this.colorv = "deshabilitado";
       }
     }, error => {
@@ -260,50 +246,54 @@ export class AprobacionesPage implements OnInit {
     });
   }
 
-  BtnPermisos_click(){
-    if(this.Btn_permisos == true){
+  // METODO PARA REDIRECCIONAR A LA PAGINA DE APROBACIONES DE PERMISOS
+  BtnPermisos_click() {
+    if (this.Btn_permisos == true) {
       this.router.navigateByUrl("/reloj/aprobaciones/permiso-aprobacion");
-    }else if(this.Btn_permisos == false){
+    } else if (this.Btn_permisos == false) {
       this.usuarioIncorrectoToas("Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.\n\nTe gustaría activarlo?");
-    }else{
+    } else {
       this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexión. \n Comprueba tu conexión a internet o");
     }
   }
 
-  BtnHorasExtras_click(){
-    if(this.Btn_horasExtras == true){
+  // METODO PARA REDIRECCIONAR A LA PAGINA DE APROBACIONES DE HORAS EXTRA
+  BtnHorasExtras_click() {
+    if (this.Btn_horasExtras == true) {
       this.router.navigateByUrl("/reloj/aprobaciones/hora-extra-aprobacion");
-    }else if(this.Btn_horasExtras == false){
+    } else if (this.Btn_horasExtras == false) {
       this.usuarioIncorrectoToas("Ups!!! al parecer no tienes activado en tu plan el Módulo de Horas Extras.\n\nTe gustaría activarlo?");
-    }else{
+    } else {
       this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexión. \n Comprueba tu conexión a internet o");
     }
   }
 
-  BtnAlimentacion_click(){
-    if(this.Btn_alimentacion == true){
+  // METODO PARA REDIRECCIONAR A LA PAGINA DE APROBACIONES DE ALIMENTACION
+  BtnAlimentacion_click() {
+    if (this.Btn_alimentacion == true) {
       this.router.navigateByUrl("/reloj/aprobaciones/alimentacion-aprobacion");
-    }else if(this.Btn_alimentacion == false){
+    } else if (this.Btn_alimentacion == false) {
       this.usuarioIncorrectoToas("  Ups!!! al parecer no tienes activado en tu plan el Módulo de Alimentación.\n\nTe gustaría activarlo?");
-    }else{
+    } else {
       this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexión.\n Comprueba tu conexión a internet o");
     }
   }
 
-  BtnVacaciones_click(){
-    if(this.Btn_vacaciones == true){
+  // METODO PARA REDIRECCIONAR A LA PAGINA DE APROBACIONES DE VACACIONES
+  BtnVacaciones_click() {
+    if (this.Btn_vacaciones == true) {
       this.router.navigateByUrl("/reloj/aprobaciones/vacacion-aprobacion");
-    }else if(this.Btn_vacaciones == false){
+    } else if (this.Btn_vacaciones == false) {
       this.usuarioIncorrectoToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Vacaciones.\n\nTe gustaría activarlo?");
-    }else{
+    } else {
       this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexión. \n Comprueba tu conexión a internet o");
     }
   }
 
-
+  // METODO DE CONFIGURACION DE NO ACCESO A LOS MODULOS
   async usuarioIncorrectoToas(mensaje: string) {
     const toast = await this.toastController.create({
-      message: `<ion-icon name="information-circle-outline"></ion-icon>`+mensaje+`\n Comunicate con nosotros: www.casapazmino.com.ec`,
+      message: `<ion-icon name="information-circle-outline"></ion-icon>` + mensaje + `\n Comunicate con nosotros: www.casapazmino.com.ec`,
       duration: 4500,
       position: "top",
       color: "notificacicon",

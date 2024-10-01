@@ -10,7 +10,7 @@ import moment from 'moment';
   templateUrl: './ver-horarios-empleados.component.html',
   styleUrls: ['./ver-horarios-empleados.component.scss'],
 })
-export class VerHorariosEmpleadosComponent  implements OnInit {
+export class VerHorariosEmpleadosComponent implements OnInit {
 
   @Input() data: any;
   @ViewChild(IonModal) modal: IonModal;
@@ -31,28 +31,27 @@ export class VerHorariosEmpleadosComponent  implements OnInit {
   ]
 
   listaMeses: any = [
-    {id: 1, mes: 'Enero'},
-    {id: 2, mes: 'febrero'},
-    {id: 3, mes: 'Marzo'},
-    {id: 4, mes: 'Abril'},
-    {id: 5, mes: 'Mayo'},
-    {id: 6, mes: 'Junio'},
-    {id: 7, mes: 'Julio'},
-    {id: 8, mes: 'Agosto'},
-    {id: 9, mes: 'Septiembre'},
-    {id: 10, mes: 'Octubre'},
-    {id: 11, mes: 'Noviembre'},
-    {id: 12, mes: 'Diciembre'},
+    { id: 1, mes: 'Enero' },
+    { id: 2, mes: 'febrero' },
+    { id: 3, mes: 'Marzo' },
+    { id: 4, mes: 'Abril' },
+    { id: 5, mes: 'Mayo' },
+    { id: 6, mes: 'Junio' },
+    { id: 7, mes: 'Julio' },
+    { id: 8, mes: 'Agosto' },
+    { id: 9, mes: 'Septiembre' },
+    { id: 10, mes: 'Octubre' },
+    { id: 11, mes: 'Noviembre' },
+    { id: 12, mes: 'Diciembre' },
   ]
-  mes : any;
+  mes: any;
   anio: any;
 
   ver: boolean = true;
   listaAnios: any = [];
   tablaPlanificacion: boolean = true;
   dateSelect: any;
-  monthSelect: any [] = [];
-
+  monthSelect: any[] = [];
   isModalOpen = false;
 
   constructor(
@@ -62,7 +61,7 @@ export class VerHorariosEmpleadosComponent  implements OnInit {
     public parametro: ParametrosService,
     public validar: ValidacionesService,
     private empleadoService: EmpleadosService,
-  ) {}
+  ) { }
 
   ngOnInit() {
     console.log('CODIGO DEL EMPLEADO: ', this.data);
@@ -82,110 +81,76 @@ export class VerHorariosEmpleadosComponent  implements OnInit {
     )
   }
 
+  // METODO PARA CONSULTAR LOS HORARIOS DE LOS EMPLEADOS 
   obtenerHorariosEmpleado(codigo) {
     var i = 0;
     this.horariocontent = false;
     this.empleadosService.getPlanificacionHorariosEmplbyCodigo(codigo).subscribe(res => {
       this.horarios = res;
-      
-      //Listado para poner en una lista los anios que esten planificado con horarios
       var listaAnios = [];
-      this.horarios.forEach(function(elemento) {
-        if(listaAnios.find(p=>p.anio == elemento.anio) == undefined)
-        {
+      this.horarios.forEach(function (elemento) {
+        if (listaAnios.find(p => p.anio == elemento.anio) == undefined) {
           listaAnios.push(elemento);
         }
       });
 
       this.listaAnios = listaAnios;
-      if(this.listaAnios.length < 2){
+      if (this.listaAnios.length < 2) {
         this.mensajeOcultar = true;
         this.tablaPlanificacion = true;
         this.filtrarMese(this.horarios);
         this.anio = this.listaAnios[0].anio;
-      }else{
+      } else {
         this.mensajeOcultar = true;
         this.tablaPlanificacion = true;
       }
 
-    },error => {
+    }, error => {
       this.mensajeOcultar = false;
       this.horariocontent = true;
       console.log('no hay planificacion')
     });
-
-    /*this.empleadosService.ObtenerHorariosEmpleado(codigo).subscribe(res => {
-      this.horarios = res;
-      console.log('horarios: ',this.horarios);
-
-      this.horarios.forEach(data => {
-        data.fec_inicio_ = this.validar.FormatearFecha(data.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-        data.fec_final_ = this.validar.FormatearFecha(data.fec_final, this.formato_fecha, this.validar.dia_completo);
-      })
-
-      this.horarios.forEach(h => {
-        h.detalle_horario.forEach(data => {
-          data.hora_ = this.validar.FormatearHora(data.hora, this.formato_hora);
-        })
-      })
-
-      console.log('horarios: ',this.horarios.length)
-      if (Object.keys(this.horarios).length == 0) {
-        this.mensajeOcultar = false;
-        this.horariocontent = true;
-      }
-
-      if(this.horarios.length < 11){
-        this.ver = true;
-      }else{
-        this.ver = false;
-      }
-
-      console.log(res);
-
-    }, err => {
-      console.log(err); this.ver = true
-
-    })*/
   }
   meseFiltradosPorAnio: any = [];
-  filtrarMese(horarios: any){
+  filtrarMese(horarios: any) {
     horarios.forEach(elemento => {
       this.listaMeses.forEach(item => {
-        if(elemento.mes == item.id){
+        if (elemento.mes == item.id) {
           this.meseFiltradosPorAnio.push(item);
         }
       })
     });
   }
 
+  // METODO PARA CAMBIAR EL AÑO
   listafiltada: any = [];
-  ChangeAnio(e: any){
+  ChangeAnio(e: any) {
     this.listafiltada = [];
     this.meseFiltradosPorAnio = [];
     this.tablaPlanificacion = true;
     this.mes = undefined;
     this.horarios.forEach(item => {
-      if(e.target.value == item.anio){
+      if (e.target.value == item.anio) {
         this.listafiltada.push(item);
       }
     })
 
     this.filtrarMese(this.listafiltada);
     this.anio = e.target.value;
-    console.log('this.tablaPlanificacion: ',this.tablaPlanificacion);
+    console.log('this.tablaPlanificacion: ', this.tablaPlanificacion);
   }
 
+  // METODO PARA CAMBIAR EL MES
   horarioMes: any = [];
-  ChangeMes(e: any){
-    if(e.target.value){
+  ChangeMes(e: any) {
+    if (e.target.value) {
       this.horarioMes = [];
       this.tablaPlanificacion = false;
-      if(this.listaAnios.length < 2){
+      if (this.listaAnios.length < 2) {
         this.listafiltada = this.horarios;
       }
       this.listafiltada.forEach(item => {
-        if(e.target.value == parseInt(item.mes)){
+        if (e.target.value == parseInt(item.mes)) {
           this.horarioMes = item;
         }
       })
@@ -193,17 +158,13 @@ export class VerHorariosEmpleadosComponent  implements OnInit {
     }
   }
 
-  getDaysFromDate(year: any, month:any){
-
-    console.log('horario: ',this.horarioMes);
-
+  // METODOS PARA OBTENER LOS DIAS DEL MES SEECCIONADO
+  getDaysFromDate(year: any, month: any) {
     const startDay = moment.utc(`${year}/${month}/01`);
     const endDay = startDay.clone().endOf('month')
-    this.dateSelect = startDay; 
-
+    this.dateSelect = startDay;
     const diffDay = endDay.diff(startDay, 'days', true);
     const numberDays = Math.round(diffDay);
-
     const arrayDays = Object.keys([...Array(numberDays)]).map((a: any) => {
       a = parseInt(a) + 1;
       const dayObject = moment(`${year}-${month}-${a}`);
@@ -214,12 +175,11 @@ export class VerHorariosEmpleadosComponent  implements OnInit {
         indexWeek: dayObject.isoWeekday()
       }
     });
-
     this.monthSelect = arrayDays;
-    console.log('this.monthSelect: ',this.monthSelect);
-
+    console.log('this.monthSelect: ', this.monthSelect);
   }
 
+  // METODO PARA CERRAR EL MODAL DE HORARIOS 
   closeModal() {
     console.log('CERRAR MODAL HORARIOS');
     this.modalController.dismiss({
@@ -227,6 +187,7 @@ export class VerHorariosEmpleadosComponent  implements OnInit {
     });
   }
 
+  // METODO PARA MOSTRAR EL MENSAJE DE NO EXISTENCIA DE DETALLE DE HORARIOS
   async messageNoneItems() {
     const alert = await this.alertController.create({
       cssClass: 'my-custom-class',
@@ -246,6 +207,8 @@ export class VerHorariosEmpleadosComponent  implements OnInit {
 
     return await alert.present();
   }
+
+  // METODO PARA VISUALIZAR LA INFORMACION DE DETALLES DE HORARIO
   async messageTwoItems(dh) {
     const [h1, h2] = dh;
     const alert = await this.alertController.create({
@@ -267,12 +230,10 @@ export class VerHorariosEmpleadosComponent  implements OnInit {
       `,
       buttons: ['OK']
     });
-
     return await alert.present();
   }
 
   async messageFourItems(plan_horario) {
-    //const [h1, h2, h3, h4] = dh;
     const alert = await this.alertController.create({
       cssClass: 'my-custom-class',
       header: 'Detalle Horario',
@@ -300,6 +261,7 @@ export class VerHorariosEmpleadosComponent  implements OnInit {
     return await alert.present();
   }
 
+  // METODO PARA VISUALIZAR LA INFORMACION DE DETALLES DE HORARIO
   plan_horario: any = [];
   i: number = 0;
   presentAlert(day) {
@@ -307,31 +269,18 @@ export class VerHorariosEmpleadosComponent  implements OnInit {
     this.i = 0;
     const monthYear = this.dateSelect.format('YYYY-MM');
     const dia = `${monthYear}-${day.value}`
-
-    console.log('dia: ',dia);
-    
     var busqueda = {
-      fecha: moment(dia).format('YYYY-MM-D'), 
+      fecha: moment(dia).format('YYYY-MM-D'),
       codigo: this.data.id
     }
-
-    this.empleadoService.getHorariosEmpleadobyCodigo(busqueda).subscribe(datos => { 
-
-
-      console.log("ver datos present alert ", datos)
+    this.empleadoService.getHorariosEmpleadobyCodigo(busqueda).subscribe(datos => {
       this.plan_horario = this.validar.ObtenerDetallesPlanificacion(datos);
-      //this.
       console.log("ver paln horario", this.plan_horario)
-      this.plan_horario.forEach((x)=>{
-
-        this.empleadoService.BuscarUnHorario(x.horario).subscribe(y =>{
-          x.horario_codigo =y[0].codigo;
-
+      this.plan_horario.forEach((x) => {
+        this.empleadoService.BuscarUnHorario(x.horario).subscribe(y => {
+          x.horario_codigo = y[0].codigo;
         })
       })
-
-
-
       this.isModalOpen = true;
     });
   }
@@ -341,6 +290,7 @@ export class VerHorariosEmpleadosComponent  implements OnInit {
     this.plan_horario = [];
   }
 
+  // METODO PARA LIMPIAR LOS ARREGLOS
   ngOnDestroy() {
     this.plan_horario = [];
     this.horarioMes = [];

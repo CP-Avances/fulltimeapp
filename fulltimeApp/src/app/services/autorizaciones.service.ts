@@ -29,7 +29,7 @@ export class AutorizacionesService {
   setSubscription(subscription: Subscription) {
     this.subscription = subscription;
   }
-  
+
   // METODO PARA REALIZAR LA DESUBSCRIBIR UN METODO 
   unsubscribe() {
     if (this.subscription) {
@@ -77,6 +77,26 @@ export class AutorizacionesService {
         tap(console.log)
       )
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // METODOS QUE NO ESTAN EN FUNCIONAMIENTO, PERO ESTAN LLAMADOS EN EL CODIGO DE SOLICITUDES Y APROBACIONES //
@@ -267,6 +287,8 @@ export class AutorizacionesService {
    *  
    *******************************************************
    */
+  
+  // METODO PARA OBTENER LA INFORMACION GENERAL DEL EMPLEADO POR SU CODIGO
   getInfoEmpleadoByCodigo(codigo: string | number): Observable<SettingsInfoEmpleado> {
     const url = `${this.apiUrl}/noti-real-time/info-empl-recieve`;
     const params = new HttpParams()

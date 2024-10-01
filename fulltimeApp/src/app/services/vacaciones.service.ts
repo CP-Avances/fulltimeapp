@@ -23,10 +23,10 @@ export class VacacionesService {
     private socket: Socket
   ) { }
 
-   // Noti_realtime
-   sendNotiRealTime(data: any) {
+  // Noti_realtime
+  sendNotiRealTime(data: any) {
     console.log("socket emite notificacion enviada", data);
-    this.socket.emit( 'nueva_notificacion', data);
+    this.socket.emit('nueva_notificacion', data);
   }
 
   /*********************************************************************
@@ -35,7 +35,7 @@ export class VacacionesService {
   * 
   **********************************************************************  
   */
-
+  // OBTIENE LOS REGISTROS DE SOLICITUDES DE VACACIONES
   getAllVacaciones(): Observable<Vacacion[]> {
     const url = `${this.apiUrl}/vacaciones/all-vacaciones`;
     return this.http.get<Vacacion[]>(url)
@@ -45,6 +45,7 @@ export class VacacionesService {
       )
   }
 
+  // OBTIENE LOS REGISTROS DE SOLICITUDES DE VACACIONES POR FECHAS
   getAllVacacionesByFechas(fec_inicio: string, fec_final: string): Observable<Vacacion[]> {
     const url = `${this.apiUrl}/vacaciones/rangofechas`;
     const params = new HttpParams()
@@ -57,8 +58,9 @@ export class VacacionesService {
       )
   }
 
+  // OBTIENE LOS REGISTROS DE SOLICITUDES DE VACACIONES POR CODIGO
   getListaVacacionesByCodigo(codigo: any): Observable<Vacacion[]> {
-    console.log('codigo: ',codigo);
+    console.log('codigo: ', codigo);
     const url = `${this.apiUrl}/vacaciones/lista-vacaciones`;
     const params = new HttpParams().set('codigo', codigo)
     return this.http.get<Vacacion[]>(url, { params })
@@ -69,7 +71,7 @@ export class VacacionesService {
   }
 
   getlistarPeriVacacionesByCodigo(codigo: any): Observable<Vacacion[]> {
-    console.log('codigo: ',codigo);
+    console.log('codigo: ', codigo);
     const url = `${this.apiUrl}/vacaciones/listarPeriVacaciones`;
     const params = new HttpParams().set('codigo', codigo)
     return this.http.get<Vacacion[]>(url, { params })
@@ -79,9 +81,9 @@ export class VacacionesService {
       )
   }
 
-  
 
-  getlistaVacacionesByFechasyCodigo(fec_inicio: string, fec_final: string, codigo: number | string): Observable <Vacacion[]>{
+  // OBTIENE LOS REGISTROS DE SOLICITUDES DE VACACIONES POR FECHAS Y CODIGO
+  getlistaVacacionesByFechasyCodigo(fec_inicio: string, fec_final: string, codigo: number | string): Observable<Vacacion[]> {
     const url = `${this.apiUrl}/vacaciones/lista-vacacionesfechas/fechas`;
     const params = new HttpParams()
       .set('fec_inicio', fec_inicio)
@@ -94,7 +96,7 @@ export class VacacionesService {
       )
   }
 
-  getlistaVacacionesByFechasyCodigoEdit(fec_inicio: string, fec_final: string, codigo: number | string, id: number): Observable <Vacacion[]>{
+  getlistaVacacionesByFechasyCodigoEdit(fec_inicio: string, fec_final: string, codigo: number | string, id: number): Observable<Vacacion[]> {
     const url = `${this.apiUrl}/vacaciones/lista-vacacionesfechasedit`;
     const params = new HttpParams()
       .set('fec_inicio', fec_inicio)
@@ -102,10 +104,10 @@ export class VacacionesService {
       .set('codigo', codigo)
       .set('id', id)
 
-      console.log("fec_inicio: ",fec_inicio)
-      console.log('fec_final: ', fec_final)
-      console.log('codigo: ', codigo)
-      console.log('id: ', id)
+    console.log("fec_inicio: ", fec_inicio)
+    console.log('fec_final: ', fec_final)
+    console.log('codigo: ', codigo)
+    console.log('id: ', id)
 
     return this.http.get<Vacacion[]>(url, { params })
       .pipe(
@@ -114,6 +116,7 @@ export class VacacionesService {
       )
   }
 
+  // REGISTRA SOLICITUDES DE VACACION
   postNuevoVacacion(vacacion: Vacacion): Observable<Vacacion> {
     const cdepar: any = localStorage.getItem('cdepar');
     const url = `${this.apiUrl}/vacaciones/insert-vacacion`;
@@ -126,8 +129,8 @@ export class VacacionesService {
       )
   }
 
+  // EDITA SOLICITUDES DE VACACION
   putVacacion(vacacion: Vacacion): Observable<any> {
-
     const url = `${this.apiUrl}/vacaciones/update-vacacion`;
     return this.http.put<any>(url, vacacion)
       .pipe(

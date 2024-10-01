@@ -25,18 +25,19 @@ export class JustificarTimbresPage implements OnInit {
     private networkService: NetworkService,
     private connectivityService: ConnectivityService
 
-    ) {}
+  ) { }
 
-    async ngOnInit() {
-      this.serverConnected = await this.connectivityService.checkServerConnection();
-      this.networkSubscriber();
-    }
-  
-    async ionViewWillEnter() {
-      this.serverConnected = await this.connectivityService.checkServerConnection();
-      this.networkSubscriber();
-    }
+  async ngOnInit() {
+    this.serverConnected = await this.connectivityService.checkServerConnection();
+    this.networkSubscriber();
+  }
 
+  async ionViewWillEnter() {
+    this.serverConnected = await this.connectivityService.checkServerConnection();
+    this.networkSubscriber();
+  }
+
+  // METODO PARA ABIR EL MODAL DE REGISTRAR TIMBRE
   async presentModal(objeto: any) {
     console.log('entro a modal...');
     const modal = await this.modalController.create({
@@ -50,23 +51,10 @@ export class JustificarTimbresPage implements OnInit {
     return await modal.present();
   }
 
+  // METODO PARA VERIFICAR LA CONEXION A INTERNET
   networkSubscriber() {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
     console.log("Esta conectado: ", this.isConnected)
-    if (!this.isConnected) {
-     // this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
-    } else {
-      console.log('conectado');
-    }
-  }
-  async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
-    const toast = await this.toastController.create({
-      message: mensaje,
-      duration: duracion,
-      color: color,
-      position: position
-    });
-    toast.present();
   }
 
 }

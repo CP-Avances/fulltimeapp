@@ -26,16 +26,13 @@ export class EnviarUsuarioComponent implements OnInit {
   opcion_sucursal: boolean = false;
   opcion_depa: boolean = false;
   opcion_empleado: boolean = false;
-
   idEmpleado: number;
   idEmpresa: number;
-
   solicitudes: checkOptions[] = [
     { valor: 1, nombre: 'Sucursal' },
     { valor: 2, nombre: 'Departamento' },
     { valor: 3, nombre: 'Empleado' },
   ];
-
   departamentos: any = [];
   sucursales: any = [];
   respuesta: any[];
@@ -43,7 +40,6 @@ export class EnviarUsuarioComponent implements OnInit {
   empleados_filtro: any = [];
   departamentos_filtro: any = [];
   sucursales_filtro: any = [];
-
   isChecked: boolean = true;
 
   constructor(
@@ -60,17 +56,16 @@ export class EnviarUsuarioComponent implements OnInit {
 
   ngOnInit(): void {
     sessionStorage.removeItem('datos_comunicado');
-    //this.BuscarInformacionGeneral();
     this.loadingEmpleado = true;
     console.log("Ver loadinEmpleado", this.loadingEmpleado)
     this.requestNotificationPermission();
 
   }
 
+  // METODO PARA SOLICITAR EL PERMISO DE NOTIFICACIONES LOCALES AL DISPOSITIVO
   async requestNotificationPermission() {
     // Solicitar permiso para enviar notificaciones locales
     const permission = await LocalNotifications.requestPermissions();
-  
     if (permission.display === 'granted') {
       console.log('Permiso concedido para notificaciones locales');
     } else {
@@ -78,6 +73,7 @@ export class EnviarUsuarioComponent implements OnInit {
     }
   }
 
+  // METODO PARA CARGAR LA LISTA DE SUCURSALES EN UN ARREGLO
   cargarListaSucursales() {
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
       console.log("VER BuscarDatosGenerales ", res)
@@ -102,9 +98,9 @@ export class EnviarUsuarioComponent implements OnInit {
       this.sucursales_filtro = [...this.sucursales]
       if (this.sucursales_filtro.length < 11) {
         this.verSucursal = true;
-     } else {
+      } else {
         this.verSucursal = false;
-     }
+      }
       this.loadingEmpleado = true;
       this.departamentos = [];
       this.empleados = [];
@@ -114,11 +110,10 @@ export class EnviarUsuarioComponent implements OnInit {
     })
   }
 
+  // METODO PARA CARGAR LA LISTA DE DEPARTAMENTOS EN UN ARREGLO
   cargarDepartamentos() {
-
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
       sessionStorage.setItem('datos_comunicado', JSON.stringify(res))
-
       res.forEach(obj => {
         this.departamentos.push({
           id: obj.id_depa,
@@ -128,7 +123,6 @@ export class EnviarUsuarioComponent implements OnInit {
           id_regimen: obj.id_regimen,
         })
       })
-
       // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
       let verificados_dep = this.departamentos.filter((objeto: any, indice: any, valor: any) => {
         // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
@@ -144,9 +138,9 @@ export class EnviarUsuarioComponent implements OnInit {
 
       if (this.departamentos_filtro.length < 11) {
         this.verDepartamento = true;
-     } else {
+      } else {
         this.verDepartamento = false;
-     }
+      }
       this.loadingEmpleado = true;
       this.sucursales = [];
       this.empleados = [];
@@ -156,10 +150,7 @@ export class EnviarUsuarioComponent implements OnInit {
     })
   }
 
-
-
-
-
+  // METODO PARA CARGAR LA LISTA DE EMPLEADOS EN UN ARREGLO
   cargarEmpleados() {
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
       console.log("VER BuscarDatosGenerales ", res)
@@ -183,9 +174,9 @@ export class EnviarUsuarioComponent implements OnInit {
       })
       this.empleados_filtro = [...this.empleados];
       if (this.empleados_filtro.length < 11) {
-         this.ver = true;
+        this.ver = true;
       } else {
-         this.ver = false;
+        this.ver = false;
       }
 
       this.loadingEmpleado = true;
@@ -198,10 +189,11 @@ export class EnviarUsuarioComponent implements OnInit {
     })
   }
 
+  // METODO PARA DEFINIR EL BUSCADOR DE SUCURSALES
   changeSearchSucursales(e: any) {
     console.log("entra a busqueda", e.detail.value)
     const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
-    console.log("ver las palabra de busqueda ",palabrasBusqueda )
+    console.log("ver las palabra de busqueda ", palabrasBusqueda)
     const filtro = this.sucursales.filter((o: any) => {
       const nombreCompleto = `${o.sucursal}`.toLowerCase();
       console.log("ver el nombre de empleado: ", o.nombre)
@@ -210,10 +202,11 @@ export class EnviarUsuarioComponent implements OnInit {
     this.sucursales_filtro = filtro
   }
 
+  // METODO PARA DEFINIR EL BUSCADOR DE DEPARTAMENTOS
   changeSearchDepartamento(e: any) {
     console.log("entra a busqueda", e.detail.value)
     const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
-    console.log("ver las palabra de busqueda ",palabrasBusqueda )
+    console.log("ver las palabra de busqueda ", palabrasBusqueda)
     const filtro = this.departamentos.filter((o: any) => {
       const nombreCompleto = `${o.departamento}`.toLowerCase();
       console.log("ver el nombre de empleado: ", o.nombre)
@@ -222,21 +215,20 @@ export class EnviarUsuarioComponent implements OnInit {
     this.departamentos_filtro = filtro
   }
 
+  // METODO PARA DEFINIR EL BUSCADOR DE EMPLEADOS
   changeSearch(e: any) {
     console.log("entra a busqueda", e.detail.value)
     const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
-    console.log("ver las palabra de busqueda ",palabrasBusqueda )
+    console.log("ver las palabra de busqueda ", palabrasBusqueda)
     const filtro = this.empleados.filter((o: any) => {
       const nombreCompleto = `${o.nombre}`.toLowerCase();
-
       console.log("ver el nombre de empleado: ", o.nombre)
       return palabrasBusqueda.every(palabra => nombreCompleto.includes(palabra))
     })
     this.empleados_filtro = filtro;
-
   }
 
-
+  // METODO PARA CERRAR EL MODAL
   closeModal() {
     console.log('CERRAR MODAL USUARIOS');
     this.modalController.dismiss({
@@ -244,6 +236,7 @@ export class EnviarUsuarioComponent implements OnInit {
     });
   }
 
+  // METODO PARA DEFINIR LOS PARAMETROS DE LAS ALERTAS
   async mostrarAlertas(mensaje: string, duracion: number, color: string) {
     const toast = await this.toastController.create({
       message: mensaje,
@@ -255,9 +248,8 @@ export class EnviarUsuarioComponent implements OnInit {
     toast.present();
   }
 
-
+  // METODOS PARA ELEGIR EL ITEM DE BUSQUEDA
   selectedValue: any;
-
   checkValue(event) {
     console.log('Selected value: ', this.selectedValue);
   }
@@ -267,8 +259,9 @@ export class EnviarUsuarioComponent implements OnInit {
   }
 
   radioValue;
+  // METODO PARA LA CARGA DE DATOS DE ACUERDO AL ITEM SELECCIONADO
   showValue() {
-    // 
+
     console.log(this.radioValue);
 
     if (this.radioValue === 1) {
@@ -294,17 +287,17 @@ export class EnviarUsuarioComponent implements OnInit {
     }
   }
 
-
+  // METODOS PARA VERIFICAR LA SELECCION DE TODOS LOS REGISTROS DE SUCURSALES
   isAllCheck_sucu: boolean = false;
   checkedAll_sucu(isAllChecked_sucu) {
     this.isAllCheck_sucu = !isAllChecked_sucu;
     if (this.radioValue === 1) {
       this.sucursales.forEach(o => { o.isChecked_sucu = this.isAllCheck_sucu })
-
       return;
     }
   }
 
+  // METODOS PARA VERIFICAR LA SELECCION DE TODOS LOS REGISTROS DE DEPARTAMENTOS
   isAllCheck_depa: boolean = false;
   checkedAll_depa(isAllChecked_depa) {
     this.isAllCheck_depa = !isAllChecked_depa;
@@ -316,7 +309,7 @@ export class EnviarUsuarioComponent implements OnInit {
     }
   }
 
-
+  // METODOS PARA VERIFICAR LA SELECCION DE TODOS LOS REGISTROS DE EMPLEADOS
   isAllCheck_empl: boolean = false;
   checkedAll_empl(isAllChecked_empl) {
     this.isAllCheck_empl = !isAllChecked_empl;
@@ -324,15 +317,13 @@ export class EnviarUsuarioComponent implements OnInit {
       this.empleados.forEach(o => { o.isChecked_empl = this.isAllCheck_empl });
       return;
     }
-
   }
 
-
+  // METODO PARA ENVIAR EL COMUNICADO A LOS EMPLEADOS DE LAS SUCURSALES SELECCIONADAS
   isChecked_sucu: boolean = true;
   EnviarSucursal() {
     console.log('ver sucu-------', this.sucursales);
     let sucu = [];
-
     this.sucursales.forEach(o => {
       if (o.isChecked_sucu === true) {
         sucu.push(o);
@@ -342,78 +333,66 @@ export class EnviarUsuarioComponent implements OnInit {
     this.ModelarSucursal(sucu)
   }
 
+  // METODO PARA ENVIAR EL COMUNICADO A LOS EMPLEADOS DE LOS DEPARTAMENTOS SELECCIONADAS
   isChecked_depa: boolean = true;
   EnviarDepartamento() {
     let depa = [];
-
     this.departamentos.forEach(o => {
       if (o.isChecked_depa === true) {
         depa.push(o);
-
       }
-
-
     });
     console.log('ver depa-------', depa);
     this.ModelarDepartamentos(depa);
   }
 
+  // METODO PARA ENVIAR EL COMUNICADO A LOS EMPLEADOS SELECCIONADOS
   isChecked_empl: boolean = true;
   EnviarEmpleado() {
     let empl = [];
-
     this.empleados.forEach(o => {
       if (o.isChecked_empl === true) {
         empl.push(o);
-
       }
-
-
     });
     console.log('ver depa-------', empl);
     this.ModelarEmpleados(empl)
   }
 
-
-
+  // METODO PARA ALMACENAR LOS USUARIOS DE LAS SUCURSALES SELECCIONADAS EN UN ARREGLO
   ModelarSucursal(dataSucursal) {
     let usuarios: any = [];
     let respuesta = JSON.parse(sessionStorage.getItem('datos_comunicado'))
     respuesta.forEach((obj: any) => {
       dataSucursal.find(obj1 => {
         if (obj.id_suc === obj1.id) {
-          //if (obj3.comunicado_mail === true || obj3.comunicado_notificacion === true) {
           usuarios.push(obj)
-          // }
         }
       })
     })
     console.log('ver usuario---------------------------', usuarios);
     this.EnviarNotificaciones(usuarios);
-   this.closeModal();
+    this.closeModal();
   }
 
+  // METODO PARA ALMACENAR LOS USUARIOS DE LAS DEPARTAMENTOS SELECCIONADAS EN UN ARREGLO
   ModelarDepartamentos(dataDepartamentos) {
     let usuarios: any = [];
     let respuesta = JSON.parse(sessionStorage.getItem('datos_comunicado'))
     respuesta.forEach((obj: any) => {
       dataDepartamentos.find(obj2 => {
         if (obj.id_depa === obj2.id) {
-          // if (obj3.comunicado_mail === true || obj3.comunicado_notificacion === true) {
           usuarios.push(obj)
-          // }
         }
       })
-
     })
     console.log('ver usuario---------------------------', usuarios);
     this.EnviarNotificaciones(usuarios);
     this.closeModal();
-
     console.log(' ver empleados de departamentos', respuesta)
-
   }
 
+  // METODO PARA ALMACENAR LOS USUARIOS EN UN ARREGLO
   ModelarEmpleados(dataEmpleados) {
     let respuesta: any = [];
     this.empleados.forEach((obj: any) => {
@@ -434,28 +413,18 @@ export class EnviarUsuarioComponent implements OnInit {
   envios: any = [];
   cont: number = 0;
   boton_enviar = false;
+  // METODO PARA ENVIAR EL COMUNICADO
   EnviarNotificaciones(data: any) {
-
     if (data.length > 0) {
-
-
-
       this.ContarCorreos(data);
       console.log("cont_correo", this.cont_correo)
       console.log("this.correo", this.correos)
-
       if (this.cont_correo <= this.correos) {
         this.cont = 0;
         this.boton_enviar = true;
-
         data.forEach((obj: any) => {
-
           console.log("obj.comunicado_noti ", obj.comunicado_noti);
-          // if (obj.comunicado_notificacion === true) {
-
           this.NotificarSistema(this.idEmpleado, obj.id);
-          // }
-
           this.cont = this.cont + 1;
           if (this.cont === data.length) {
             if (this.info_correo === '') {
@@ -465,7 +434,6 @@ export class EnviarUsuarioComponent implements OnInit {
               this.EnviarCorreo(this.info_correo);
             }
           }
-
         })
       }
       else {
@@ -489,7 +457,6 @@ export class EnviarUsuarioComponent implements OnInit {
       mensaje: this.data.mensaje,
       asunto: this.data.asunto,
     }
-
     this.restN.EnviarCorreoComunicado(this.idEmpresa, datosCorreo).subscribe(envio => {
       if (envio.message === 'error') {
         this.mostrarAlertas("Ups !!! algo salio mal, revisa tu configuración de correo electrónico.",
@@ -500,7 +467,6 @@ export class EnviarUsuarioComponent implements OnInit {
         this.mostrarAlertas("Mensaje enviado exitosamente.", 6000, 'success');
         this.closeModal();
       }
-
     }, error => { });
   }
 
@@ -523,6 +489,7 @@ export class EnviarUsuarioComponent implements OnInit {
     })
   }
 
+  // METODO QUE CONSUME EL SERVICIO DE ENVIAR COMUNICADO
   NotificarSistema(empleado_envia: any, empleado_recive: any) {
     let mensaje = {
       id_empl_envia: empleado_envia,
@@ -542,7 +509,6 @@ export class EnviarUsuarioComponent implements OnInit {
 
   correos: number;
   BuscarParametro() {
-    // id_tipo_parametro PARA LIMITE DE CORREOS = 13
     let datos = [];
     this.restP.ObtenerDetallesParametros(33).subscribe(
       res => {
@@ -557,17 +523,13 @@ export class EnviarUsuarioComponent implements OnInit {
       });
   }
 
-
   //variables de configuracion del componente de paginacion (pagination-controls)
   pageActual: number = 1;
   pageActualDepartamento: number = 1;
   pageActualSucursal: number = 1;
-
   ver: boolean = true;
   verDepartamento: boolean = true;
   verSucursal: boolean = true;
-
-
   public maxSize: number = 5;
   public directionLinks: boolean = true;
   public autoHide: boolean = false;
@@ -579,7 +541,5 @@ export class EnviarUsuarioComponent implements OnInit {
     screenReaderPageLabel: 'page',
     screenReaderCurrentLabel: `You're on page`
   };
-
-
 
 }

@@ -10,6 +10,7 @@ export class TokenInterceptorService {
     private relojServiceService: RelojServiceService
   ) { }
 
+  // INTERCEPTOR HTTP
   intercept(req: any, next: any) {
     const tokenizeReq = req.clone({
       setHeaders: {

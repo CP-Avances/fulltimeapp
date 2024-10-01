@@ -45,10 +45,10 @@ export class ComunicadoPage implements OnInit {
     this.networkSubscriber();
   }
 
+  // METODO PARA LEER EL ASUNTO Y MENSAJE INGRESADO
   EnviarComunicado() {
     this.noti.asunto = this.noti.asunto.trim();
     this.noti.mensaje = this.noti.mensaje.trim();
-
     if (this.noti.asunto === '' || this.noti.mensaje === '') {
       this.mensajeVacioToas("Los campos no pueden estar vacios.", 3000)
     }
@@ -57,33 +57,19 @@ export class ComunicadoPage implements OnInit {
     }
   }
 
-
+  // METODO PARA VERIFICAR LA CONEXION A INTERNET
   networkSubscriber() {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
-    console.log("Esta conectado: ", this.isConnected)
-    if (!this.isConnected) {
-      //this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
-
-    } else {
-      console.log('conectado');
-    }
-  }
-  async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
-    const toast = await this.toastController.create({
-      message: mensaje,
-      duration: duracion,
-      color: color,
-      position: position
-    });
-    toast.present();
   }
 
+  // METODO PARA LIMITAR EL NUMERO DE CARACTERES
   textareaMaxLengthValidation() {
     if (this.noti.mensaje.length > 255) {
       this.noti.mensaje = this.noti.mensaje.slice(0, 5);
     }
   }
 
+  // METOODO PARA CONFIGURAR EL MENSAJE EN EL CASO DE QUE LOS CAMPOS ESTEN VACIOS
   async mensajeVacioToas(mensaje: string, duracion: number) {
     const toast = await this.toastController.create({
       message: mensaje,
@@ -94,6 +80,7 @@ export class ComunicadoPage implements OnInit {
     toast.present();
   }
 
+  // METODO PARA ABRIR EL MODAL DE ENVIAR USUARIO
   async presentModal(asunto: string, mensaje: string) {
     let comunicado = {
       asunto: asunto,

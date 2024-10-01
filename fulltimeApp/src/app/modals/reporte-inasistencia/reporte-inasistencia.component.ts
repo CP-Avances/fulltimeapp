@@ -20,11 +20,9 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 export class ReporteInasistenciaComponent implements OnInit {
 
   @Input() data: any;
-
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
   existenEmpleados = true;
-
   faltas: any = [];
   showBtnPdf: boolean = false;
   showBtnBuscar: boolean = false;
@@ -47,14 +45,13 @@ export class ReporteInasistenciaComponent implements OnInit {
 
   ngOnInit() {
     console.log('reporte inasistencia | Data empleado: ', this.data);
-    const id_empresa: string = localStorage.getItem('id_empresa');
-    (id_empresa !== null) ? this.plantillaPDF.ShowColoresLogo(id_empresa) : this.plantillaPDF.abrirToas('No existe codigo de empresa', 'danger', 3000)
     this.BuscarFormatos();
     this.obtenerDatosEmpresa(localStorage.getItem('id_empresa'));
     this.ObtenerLogo();
     this.ObtenerColores();
   }
 
+  // METODOS PARA OBTENER LOS DATOS DE LA EMPRESA
   obtenerDatosEmpresa(idEmpresa: any) {
     this.relojService.obtenerDatosEmpresa(idEmpresa).subscribe(
       res => {
@@ -89,7 +86,7 @@ export class ReporteInasistenciaComponent implements OnInit {
     representante: '',
   };
 
-
+  // METODO PARA CONSULTAR LOS REGISTROS DEL REPORTE DE FALTAS
   consultarDataReporte() {
     this.showBtnBuscar = true
     this.existenEmpleados = false;
@@ -140,7 +137,7 @@ export class ReporteInasistenciaComponent implements OnInit {
   }
 
 
-
+  // MOSTRAR ALERTA PARA NOTIFICAR EL LIMITE DEL REPORTE
   async alertLimiteReporte() {
     const alert = await this.alertController.create({
       header: 'Notificacion',
@@ -177,7 +174,7 @@ export class ReporteInasistenciaComponent implements OnInit {
     });
   }
 
-
+  // METODO PARA OBTENER EL LOGO DE LA EMPRESA
   logo: any = String;
   ObtenerLogo() {
     this.plantillaPDF.LogoEmpresaImagenBase64(localStorage.getItem('id_empresa') as string).subscribe(res => {
@@ -185,7 +182,7 @@ export class ReporteInasistenciaComponent implements OnInit {
     });
   }
 
-
+  // METODO PARA GENERAR EL PDF
   GenerarPDF() {
     let documentDefinition: any;
     documentDefinition = this.DefinirInformacionPDF();
@@ -193,10 +190,8 @@ export class ReporteInasistenciaComponent implements OnInit {
     this.plantillaPDF.generarPdf(documentDefinition, doc_name);
   }
 
+  // METODO PARA DEFINIR LA INFORMACION INICIAL DE LOS PDFS
   DefinirInformacionPDF() {
-
-    var inicio = this.validar.FormatearFecha(this.fechaInicio, this.formato_fecha, this.validar.dia_completo);
-    var fin = this.validar.FormatearFecha(this.fechaFinal, this.formato_fecha, this.validar.dia_completo);
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -254,6 +249,7 @@ export class ReporteInasistenciaComponent implements OnInit {
     };
   }
 
+  // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
   EstructurarDatosPDF(data: any[]): Array<any> {
     let totalFaltasEmpleado: number = 0;
     let resumen = '';

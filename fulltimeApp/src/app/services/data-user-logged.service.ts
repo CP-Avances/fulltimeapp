@@ -7,7 +7,7 @@ export class DataUserLoggedService {
 
   constructor() { }
 
-
+  // METODO PARA OBTENER NOMBRE COMPLETO DEL EMPLEADO DEL LOCALSTORAGE
   public get UserFullname(): string {
     const nombre = (localStorage.getItem('nom') === null) ? '' : localStorage.getItem('nom');
     const apellido = (localStorage.getItem('ap') === null) ? '' : localStorage.getItem('ap');
@@ -15,55 +15,42 @@ export class DataUserLoggedService {
     return nombre + ' ' + apellido
   }
 
-
+  // METODO PARA OBTENER NOMBRE COMPLETO DEL EMPLEADO DEL LOCALSTORAGE 
   public get username(): any {
     const u = (localStorage.getItem('username') === null) ? '' : localStorage.getItem('username');
     return u;
   }
 
-  public get imagen(): any {
-    const u = (localStorage.getItem('imagen') === null) ? '' : localStorage.getItem('imagen');
-    return u;
-  }
-
-  public get dataUser(): any {
-    return {
-      Udepartamento: localStorage.getItem('ndepartamento'),
-      Ucedula: localStorage.getItem('UCedula'),
-      Ufullname: this.UserFullname
-    }
-  }
-
+  // METODO PARA OBTENER LA INFORMACION DE LA APLICACION
   public get dataApp(): any {
     const a: any = (localStorage.getItem('app_info') === null) ? '' : localStorage.getItem('app_info');
     if (a === '') return { caducidad_licencia: '', version: '' }
     return JSON.parse(a)
   }
 
+  // METODO PARA OBTENER LA INFORMACION DE LA VACUNA DEL EMPLEADO 
   public get dataVacuna(): any {
     const v: any = (localStorage.getItem('vacuna_info') === null) ? '' : localStorage.getItem('vacuna_info');
     if (v === '' || v === 'undefined') return { id_tipo_vacuna: '' }
     return JSON.parse(v)
   }
 
-  /**
-   * 
-   */
-
   private _fechainicio: string = '';
   private _fechafinal: string = '';
 
+  // METODO PARA LLAMAR LA FECHA INICIAL DE LOS CALENDARIOS
   public get fechaRangoInicio(): string {
     return this._fechainicio
   }
 
+  // METODO PARA MODIFICAR LA FECHA INICIAL DE LOS CALENDARIOS
   setFechaRangoInicio(f: any) { this._fechainicio = f }
-
+  
+  // METODO PARA LLAMAR LA FECHA FINAL DE LOS CALENDARIOS
   public get fechaRangoFinal(): string {
     return this._fechafinal
   }
 
-  setFechaRangoFinal(f:any) { this._fechafinal = f }
-
-
+  // METODO PARA MODIFICAR LA FECHA FINAL DE LOS CALENDARIOS
+  setFechaRangoFinal(f: any) { this._fechafinal = f }
 }

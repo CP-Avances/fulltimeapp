@@ -485,7 +485,7 @@ export class EnviartimbrePage implements OnInit {
   }
 
   //PARAMETROS
-  //Metodo que valida la tolerancia de la ubicacion, de la tabla tipo de parametro,
+  // METODO QUE VALIDA LA TOLERANCIA DE LA UBICACION
   rango: any;
   BuscarParametro() {
     let datos = [];
@@ -508,10 +508,8 @@ export class EnviartimbrePage implements OnInit {
   BuscarParametroTimbreUbicacionDesconocida() {
     this.parametros.ObtenerDetallesParametros(5).subscribe(
       res => {
-
         this.timbrarDesconocido = res[0].descripcion;
         localStorage.setItem('timbrarUbicacionDesconocida', res[0].descripcion);
-
         console.log("ver parametro ubicacion desconocidad:", this.timbrarDesconocido)
       });
   }
@@ -603,7 +601,6 @@ export class EnviartimbrePage implements OnInit {
     }
     this.restP.ObtenerUbicacionUsuario(this.id_usuario).subscribe(
       res => {
-        console.log('Obteniendo Ubicacion de Usuario ------', res)
         if (res.length != 0) {
           datosUbicacion = res;
           datosUbicacion.forEach((obj: any) => {
@@ -619,24 +616,17 @@ export class EnviartimbrePage implements OnInit {
         }
       }, () => {
         if (localStorage.getItem('timbrarUbicacionDesconocida') === 'Si') {
-          console.log("entra aqui??? si")
           timbre.ubicacion = 'DESCONOCIDO';
           this.storageUbica = timbre.ubicacion;
           this.EnviarDatos(timbre);
         } else {
-
-          console.log("entra aqui??? no")
-
           this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "middle");
-
           return this.router.navigate(['/login']);
-
-
         }
       });
   }
 
-  // METODO PARA VERIFICAR SI SE TRABAJA CON GEOLOCALIZACION
+  // METODO PARA VERIFICAR SI SE EL MODULO GEOLOCALIZACION
   ValidarModulo(latitud: any, longitud: any, rango: any, timbre: any) {
     console.log('--------- Validacion Modulo----------')
 
@@ -660,36 +650,21 @@ export class EnviartimbrePage implements OnInit {
     }
   }
 
-  //METODO PARA OBTENER LAS COORDENADAS EN CASO DE TENER REGISTRADO EL DOMICILIO
+  // METODO PARA VALIDAR LAS COORDENADAD DEL DOMICILIO QUE ESTEN REGISTRADAS EN LA TABLA EMPLEADOS
   ValidarDomicilio(informacion: any, timbre: any) {
-    console.log('ValidarDomicilio ------')
 
     this.restE.ObtenerUbicacion(this.id_usuario).subscribe(res => {
-      console.log('OBTENER UBICACION ------')
-
       if (res[0].longitud != null) {
-
-        console.log('TIENE LONGITUD ------')
-
         informacion.lat2 = res[0].latitud;
         informacion.lng2 = res[0].longitud;
         this.restP.ObtenerCoordenadas(informacion).subscribe(resu => {
-
-          console.log('COORDENADAS DE DOMICILIO ------')
-
           if (resu[0].verificar === 'ok') {
-
-            console.log('COORDENADAS DE DOMICILIO  OK------')
-
             timbre.ubicacion = 'DOMICILIO';
             this.storageUbica = timbre.ubicacion;
             this.abrirToas('Marcación realizada dentro del perímetro definido como DOMICILIO.', "primary", 3000, "top");
             this.EnviarDatos(timbre);
           }
           else {
-            console.log('COORDENADAS DE DOMICILIO  NOOOOOOOO------')
-
-
             if (localStorage.getItem('timbrarUbicacionDesconocida') == 'Si') {
               timbre.ubicacion = 'DESCONOCIDO';
               this.storageUbica = timbre.ubicacion;
@@ -698,7 +673,6 @@ export class EnviartimbrePage implements OnInit {
             } else {
               this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "middle");
               return this.router.navigate(['/login']);
-
             }
           }
 
@@ -751,7 +725,7 @@ export class EnviartimbrePage implements OnInit {
 
   }
 
-  // METODO PARA ENVIAR DATOS DEL TIMBRE
+  // METODO PARA ENVIAR DATOS DEL TIMBRE MEDIANTE EL SERVICIO
   EnviarDatos(data) {
     localStorage.setItem("storageUbicacion", this.storageUbica);
     console.log('Ubicacion storage: ', localStorage.getItem("storageUbicacion"))
