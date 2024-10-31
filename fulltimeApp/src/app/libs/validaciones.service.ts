@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AlertController, ToastController } from '@ionic/angular';
 import { HorarioE } from '../interfaces/Horarios';
 import { Cg_Feriados } from '../interfaces/Catalogos';
-
+import { DateTime } from 'luxon';
 import moment from 'moment-timezone';
 //import momentzn from 'moment';
 
@@ -21,34 +21,44 @@ export class ValidacionesService {
 
 
 
-    dia_abreviado: string = 'ddd';
-    dia_completo: string = 'dddd';
+    dia_abreviado: string = 'EEE';
+    dia_completo: string = 'EEEE';
 
     // METODO PARA FORMATEAR LA FECHA
     FormatearFecha(fecha: string, formato: string, dia: string) {
-        let valor = moment(fecha).format(dia).charAt(0).toUpperCase() +
-            moment(fecha).format(dia).slice(1) +
-            ', ' + moment(fecha).format(formato);
+        const fechaLuxon = DateTime.fromISO(fecha).setLocale("es");
+        const diaFormateado = fechaLuxon.toFormat(dia);
+
+        // Capitaliza la primera letra del día y combina con el formato de fecha
+        const valor = diaFormateado.charAt(0).toUpperCase() +
+            diaFormateado.slice(1) +
+            ', ' + fechaLuxon.toFormat(formato);
+
         return valor;
     }
     // METODO PARA FORMATEAR LA FECHA CONSIDERANDO LA ZONA HORARIA DEL DISPOSITIVO
     FormatearFechaZonaHoraria(fecha: string, formato: string, dia: string, zonaHoraria: string) {
-        let valor = moment.tz(fecha, zonaHoraria).format(dia).charAt(0).toUpperCase() +
-            moment.tz(fecha, zonaHoraria).format(dia).slice(1) +
-            ', ' + moment.tz(fecha, zonaHoraria).format(formato);
+        const fechaLuxon = DateTime.fromISO(fecha, { zone: zonaHoraria }).setLocale("es");
+        // Formatea el día y la fecha
+        const diaFormateado = fechaLuxon.toFormat(dia);
+        const valor = diaFormateado.charAt(0).toUpperCase() +
+            diaFormateado.slice(1) +
+            ', ' + fechaLuxon.toFormat(formato);
         return valor;
     }
 
     // METODO PARA FORMATEAR LA HORA
     FormatearHora(hora: string, formato: string) {
-        let valor = moment(hora, 'HH:mm:ss').format(formato);
+        const horaLuxon = DateTime.fromFormat(hora, 'HH:mm:ss');
+        const valor = horaLuxon.toFormat(formato);
         return valor;
     }
 
     // METODO PARA FORMATEAR LA HORA CONSIDERANDO LA ZONA HORARIA DEL DISPOSITIVO
     FormatearHoraZonaHoraria(fecha: string, formato: string, zonaHoraria: string) {
-        // Convertir la fecha proporcionada desde UTC a la zona horaria especificada
-        let valor = moment.tz(fecha, zonaHoraria).format(formato);
+        // Convierte la fecha al formato ISO y aplica la zona horaria
+        const fechaLuxon = DateTime.fromISO(fecha, { zone: zonaHoraria });
+        const valor = fechaLuxon.toFormat(formato);
         return valor;
     }
 
@@ -148,8 +158,11 @@ export class ValidacionesService {
     // METODO PARA DEFINIR EL VALOR DE CASA DIA DEL PLAN HORARIO
     ObtenerPlanHorarioPorDia(res: any, dia_ingresa: any, identificador: boolean) {
         let laboral = 1;
-        switch (dia_ingresa) {
-            case '1' || 1:
+
+        const diaComoString = String(dia_ingresa);
+
+        switch (diaComoString) {
+            case '1':
                 if (res.dia1 != 'L' && res.dia1 != '-' && res.dia1 != 'FD' && res.dia1 != 'L, L' && res.dia1 != 'L, L, L') {
 
                     if (res.dia1 == 'DEFAULT-FERIADO') {
@@ -170,7 +183,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '2' || 2:
+            case '2':
                 if (res.dia2 != 'L' && res.dia2 != '-' && res.dia2 != 'FD' && res.dia2 != 'L, L' && res.dia2 != 'L, L, L') {
 
                     if (res.dia2 == 'DEFAULT-FERIADO') {
@@ -191,7 +204,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '3' || 3:
+            case '3':
                 if (res.dia3 != "L" && res.dia3 != "-" && res.dia3 != "FD" && res.dia3 != "L, L" && res.dia3 != "L, L, L") {
 
                     if (res.dia3 == 'DEFAULT-FERIADO') {
@@ -212,7 +225,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '4' || 4:
+            case '4':
                 if (res.dia4 != "L" && res.dia4 != "-" && res.dia4 != 'FD' && res.dia4 != 'L, L' && res.dia4 != 'L, L, L') {
                     if (res.dia4 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -232,7 +245,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '5' || 5:
+            case '5':
                 if (res.dia5 != "L" && res.dia5 != "-" && res.dia5 != 'FD' && res.dia5 != 'L, L' && res.dia5 != 'L, L, L') {
                     if (res.dia5 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -252,7 +265,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '6' || 6:
+            case '6':
                 if (res.dia6 != "L" && res.dia6 != "-" && res.dia6 != 'FD' && res.dia6 != 'L, L' && res.dia6 != 'L, L, L') {
                     if (res.dia6 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -272,7 +285,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '7' || 7:
+            case '7':
                 if (res.dia7 != "L" && res.dia7 != "-" && res.dia7 != 'FD' && res.dia7 != 'L, L' && res.dia7 != 'L, L, L') {
                     if (res.dia7 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -292,7 +305,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '8' || 8:
+            case '8':
                 if (res.dia8 != "L" && res.dia8 != "-" && res.dia8 != 'FD' && res.dia8 != 'L, L' && res.dia8 != 'L, L, L') {
                     if (res.dia8 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -312,7 +325,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '9' || 9:
+            case '9':
                 if (res.dia9 != "L" && res.dia9 != "-" && res.dia9 != 'FD' && res.dia9 != 'L, L' && res.dia9 != 'L, L, L') {
                     if (res.dia9 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -332,7 +345,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '10' || 10:
+            case '10':
                 if (res.dia10 != "L" && res.dia10 != "-" && res.dia10 != 'FD' && res.dia10 != 'L, L' && res.dia10 != 'L, L, L') {
                     if (res.dia10 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -352,7 +365,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '11' || 11:
+            case '11':
                 if (res.dia11 != "L" && res.dia11 != "-" && res.dia11 != 'FD' && res.dia11 != 'L, L' && res.dia11 != 'L, L, L') {
                     if (res.dia11 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -372,7 +385,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '12' || 12:
+            case '12':
                 if (res.dia12 != "L" && res.dia12 != "-" && res.dia12 != 'FD' && res.dia12 != 'L, L' && res.dia12 != 'L, L, L') {
                     if (res.dia12 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -392,7 +405,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '13' || 13:
+            case '13':
                 if (res.dia13 != "L" && res.dia13 != "-" && res.dia13 != 'FD' && res.dia13 != 'L, L' && res.dia13 != 'L, L, L') {
                     if (res.dia13 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -412,7 +425,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '14' || 14:
+            case '14':
                 if (res.dia14 != "L" && res.dia14 != "-" && res.dia14 != 'FD' && res.dia14 != 'L, L' && res.dia14 != 'L, L, L') {
                     if (res.dia14 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -432,7 +445,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '15' || 15:
+            case '15':
                 if (res.dia15 != "L" && res.dia15 != "-" && res.dia15 != 'FD' && res.dia15 != 'L, L' && res.dia15 != 'L, L, L') {
                     if (res.dia15 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -452,7 +465,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '16' || 16:
+            case '16':
                 if (res.dia16 != "L" && res.dia16 != "-" && res.dia16 != 'FD' && res.dia16 != 'L, L' && res.dia16 != 'L, L, L') {
                     if (res.dia15 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -472,7 +485,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '17' || 17:
+            case '17':
                 if (res.dia17 != "L" && res.dia17 != "-" && res.dia17 != 'FD' && res.dia17 != 'L, L' && res.dia17 != 'L, L, L') {
                     if (res.dia17 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -492,7 +505,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '18' || 18:
+            case '18':
                 if (res.dia18 != "L" && res.dia18 != "-" && res.dia18 != 'FD' && res.dia18 != 'L, L' && res.dia18 != 'L, L, L') {
                     if (res.dia18 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -512,7 +525,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '19' || 19:
+            case '19':
                 if (res.dia19 != "L" && res.dia19 != "-" && res.dia19 != 'FD' && res.dia19 != 'L, L' && res.dia19 != 'L, L, L') {
                     if (res.dia19 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -532,7 +545,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '20' || 20:
+            case '20':
                 if (res.dia20 != "L" && res.dia20 != "-" && res.dia20 != 'FD' && res.dia20 != 'L, L' && res.dia20 != 'L, L, L') {
                     if (res.dia20 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -552,7 +565,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '21' || 21:
+            case '21':
                 if (res.dia21 != "L" && res.dia21 != "-" && res.dia21 != 'FD' && res.dia21 != 'L, L' && res.dia21 != 'L, L, L') {
                     if (res.dia21 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -572,7 +585,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '22' || 22:
+            case '22':
                 if (res.dia22 != "L" && res.dia22 != "-" && res.dia22 != 'FD' && res.dia22 != 'L, L' && res.dia22 != 'L, L, L') {
                     if (res.dia22 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -592,7 +605,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '23' || 23:
+            case '23':
                 if (res.dia23 != "L" && res.dia23 != "-" && res.dia23 != 'FD' && res.dia23 != 'L, L' && res.dia23 != 'L, L, L') {
                     if (res.dia23 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -614,7 +627,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '24' || 24:
+            case '24':
                 if (res.dia24 != "L" && res.dia24 != "-" && res.dia24 != 'FD' && res.dia24 != 'L, L' && res.dia24 != 'L, L, L') {
                     if (res.dia24 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -634,7 +647,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '25' || 25:
+            case '25':
                 if (res.dia25 != "L" && res.dia25 != "-" && res.dia25 != 'FD' && res.dia25 != 'L, L' && res.dia25 != 'L, L, L') {
                     if (res.dia25 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -654,7 +667,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '26' || 26:
+            case '26':
                 if (res.dia26 != "L" && res.dia26 != "-" && res.dia26 != 'FD' && res.dia26 != 'L, L' && res.dia26 != 'L, L, L') {
                     if (res.dia26 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -674,7 +687,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '27' || 27:
+            case '27':
                 if (res.dia27 != "L" && res.dia27 != "-" && res.dia27 != 'FD' && res.dia27 != 'L, L' && res.dia27 != 'L, L, L') {
                     if (res.dia27 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -694,7 +707,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '28' || 28:
+            case '28':
                 if (res.dia28 != "L" && res.dia28 != "-" && res.dia38 != 'FD' && res.dia28 != 'L, L' && res.dia28 != 'L, L, L') {
                     if (res.dia28 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -714,7 +727,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '29' || 29:
+            case '29':
                 if (res.dia29 != "L" && res.dia29 != "-" && res.dia29 != 'FD' && res.dia29 != 'L, L' && res.dia29 != 'L, L, L') {
                     if (res.dia29 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -734,7 +747,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '30' || 30:
+            case '30':
                 if (res.dia30 != "L" && res.dia30 != "-" && res.dia30 != 'FD' && res.dia30 != 'L, L' && res.dia30 != 'L, L, L') {
                     if (res.dia30 == 'DEFAULT-FERIADO') {
                         laboral = 2;
@@ -754,7 +767,7 @@ export class ValidacionesService {
                     }
                 }
                 break;
-            case '31' || 31:
+            case '31':
                 if (res.dia31 != "L" && res.dia31 != "-" && res.dia31 != 'FD' && res.dia31 != 'L, L' && res.dia31 != 'L, L, L') {
                     if (res.dia31 == 'DEFAULT-FERIADO') {
                         laboral = 2;

@@ -5,7 +5,6 @@ import { ParametrosService } from 'src/app/services/parametros.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { LocalNotifications } from '@capacitor/local-notifications';
 
-import moment from 'moment';
 
 interface checkOptions {
   valor: number;

@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
-import { Empresa } from 'src/app/interfaces/Empresa';
 import { Usuario } from 'src/app/interfaces/Usuario';
 import { DatePipe } from '@angular/common';
 import { DataUserLoggedService } from '../../services/data-user-logged.service';
@@ -114,6 +113,7 @@ export class InformacionAdminPage implements OnInit {
         this.formato_hora = resp.hora;
         this.fecha_ = this.validar.FormatearFecha(this.dataUser.dataVacuna.fecha, this.formato_fecha, this.validar.dia_completo);
         console.log("ver fecha",localStorage.getItem("caducidad_licencia"))
+        console.log("ver fecha de caducidad licencia", localStorage.getItem("caducidad_licencia"))
         this.caduca_ = this.validar.FormatearFecha(localStorage.getItem("caducidad_licencia"), this.formato_fecha, this.validar.dia_completo);
       },
       err => {
@@ -139,8 +139,10 @@ export class InformacionAdminPage implements OnInit {
 
   // METODO PARA OBTENER LOS EMPLEADOS 
   obtenerEmpleados() {
+    console.log("ver obtenerEmpleados ")
     this.relojService.obtenerUsuarioEmpresa().subscribe(
       res => {
+        console.log("res: ", res)
         this.empleados = res;
         this.existenEmpleados = true;
         this.empleados_filtro = [...this.empleados];

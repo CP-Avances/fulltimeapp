@@ -4,8 +4,7 @@ import { ReporteInasistenciaComponent } from '../../../../modals/reporte-inasist
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
-
-import moment from 'moment';
+import { DateTime } from 'luxon';
 
 interface checkOptions {
   valor: number;
@@ -68,42 +67,28 @@ export class ReporteInasistenciaPage {
 
   // METODO PARA ALMACENAR EN UNA VARIABLE LA FECHA DE INICIO SELECCIONADA
   changeFechaInicio(e) {
-    this.dataUserService.setFechaRangoFinal(null);
-    this.fechaFi = null
-    if (!e.target.value) {
-      this.dataUserService.setFechaRangoInicio((moment(new Date()).format('YYYY-MM-DD')));
-      return this.fechaIn = moment(e.target.value).format('YYYY-MM-DD');
+
+    this.dataUserService.setFechaRangoInicio(e.target.value);
+    this.datetimeInicio.confirm(true);
+    if (this.fechaInicio == null || this.fechaInicio == '') {
+      this.fechaIn = null;
     } else {
-      this.dataUserService.setFechaRangoInicio(e.target.value);
-      this.datetimeInicio.confirm(true);
-      if (this.fechaInicio == null || this.fechaInicio == '') {
-        this.fechaIn = null;
-      } else {
-        this.fechaIn = moment(this.fechaInicio).format('YYYY-MM-DD');
-      }
+      this.fechaIn = DateTime.fromISO(this.fechaInicio).toFormat('yyyy-MM-dd');
     }
+
   }
 
   // METODO PARA ALMACENAR EN UNA VARIABLE LA FECHA FIN SELECCIONADA
   changeFechaFinal(e) {
-    if (!e.target.value) {
-      if (moment(this.fechaInicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')) {
-        this.dataUserService.setFechaRangoFinal(this.fechaInicio);
-        this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
-      } else {
-        this.dataUserService.setFechaRangoFinal(null);
-        this.fechaFi = null
-        this.mostrarToas('Seleccione una Fecha Final', 3000, "warning");
-      }
+
+    this.dataUserService.setFechaRangoFinal(e.target.value);
+    this.datetimeFinal.confirm(true);
+    if (this.fechaFinal == null || this.fechaFinal == '') {
+      this.fechaFi = null;
     } else {
-      this.dataUserService.setFechaRangoFinal(e.target.value);
-      this.datetimeFinal.confirm(true);
-      if (this.fechaFinal == null || this.fechaFinal == '') {
-        this.fechaFi = null;
-      } else {
-        this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');
-      }
+      this.fechaFi =  DateTime.fromISO(this.fechaFinal).toFormat('yyyy-MM-dd');
     }
+
   }
 
   // METODO PARA LIMPIAR LAS VARIBLES DE FECHA FINAL E INICIAL

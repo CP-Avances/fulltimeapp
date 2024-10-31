@@ -4,7 +4,7 @@ import { DataUserLoggedService } from '../../services/data-user-logged.service';
 import { ReportesService } from '../../services/reportes.service';
 import { PlantillaReportesService } from '../../libs/plantilla-reportes.service';
 import { Timbre } from '../../interfaces/Timbre';
-import moment from 'moment';
+import { DateTime } from 'luxon';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
@@ -193,10 +193,10 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
       header: { text: 'Impreso por:  ' + localStorage.getItem('nom') + ' ' + localStorage.getItem('ap'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
-
+        const fechaLuxon = DateTime.local(); // Obtiene la fecha y hora local
+        fecha = fechaLuxon.toFormat('yyyy-MM-dd'); // Formatear la fecha
+        hora = fechaLuxon.toFormat('HH:mm:ss'); // Formatear la hora
+    
         return {
           margin: 10,
           columns: [

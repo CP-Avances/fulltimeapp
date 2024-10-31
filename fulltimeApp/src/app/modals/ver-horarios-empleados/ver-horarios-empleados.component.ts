@@ -3,7 +3,7 @@ import { ModalController, AlertController, IonModal } from '@ionic/angular';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { EmpleadosService } from '../../services/empleados.service';
-import moment from 'moment';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'app-ver-horarios-empleados',
@@ -160,19 +160,31 @@ export class VerHorariosEmpleadosComponent implements OnInit {
 
   // METODOS PARA OBTENER LOS DIAS DEL MES SEECCIONADO
   getDaysFromDate(year: any, month: any) {
-    const startDay = moment.utc(`${year}/${month}/01`);
-    const endDay = startDay.clone().endOf('month')
+    const startDay = DateTime.fromObject({
+      year: parseInt(year),
+      month: parseInt(month),
+      day: 1
+    });
+    // Obtener el último día del mes
+    const endDay = startDay.endOf('month');
+    console.log("startDay: ", startDay);
+    console.log("endDay: ", endDay);
     this.dateSelect = startDay;
-    const diffDay = endDay.diff(startDay, 'days', true);
-    const numberDays = Math.round(diffDay);
+    const numberDays = endDay.day - startDay.day + 1; // +1 para incluir el primer día
+    console.log("numberDays: ", numberDays);
     const arrayDays = Object.keys([...Array(numberDays)]).map((a: any) => {
       a = parseInt(a) + 1;
-      const dayObject = moment(`${year}-${month}-${a}`);
+
+      const dayObject = DateTime.fromObject({
+        year: parseInt(year),
+        month: parseInt(month),
+        day: 1
+      });
       return {
-        name: dayObject.format("dddd"),
+        name: dayObject.toFormat("ccc"),
         value: a,
         labora: this.validar.ObtenerPlanHorarioPorDia(this.horarioMes, a.toString(), true),
-        indexWeek: dayObject.isoWeekday()
+        indexWeek: dayObject.weekday
       }
     });
     this.monthSelect = arrayDays;
@@ -267,10 +279,10 @@ export class VerHorariosEmpleadosComponent implements OnInit {
   presentAlert(day) {
     this.plan_horario = [];
     this.i = 0;
-    const monthYear = this.dateSelect.format('YYYY-MM');
+    const monthYear = this.dateSelect.toFormat('yyyy-MM');
     const dia = `${monthYear}-${day.value}`
     var busqueda = {
-      fecha: moment(dia).format('YYYY-MM-D'),
+      fecha: DateTime.fromFormat(dia, 'yyyy-MM-d').toFormat('yyyy-MM-d'),
       codigo: this.data.id
     }
     this.empleadoService.getHorariosEmpleadobyCodigo(busqueda).subscribe(datos => {

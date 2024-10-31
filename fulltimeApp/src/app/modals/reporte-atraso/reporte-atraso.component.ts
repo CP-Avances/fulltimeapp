@@ -6,8 +6,7 @@ import { PlantillaReportesService } from '../../libs/plantilla-reportes.service'
 import { ValidacionesService } from '../../libs/validaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
-
-import moment from 'moment';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'app-reporte-atraso',
@@ -241,9 +240,11 @@ export class ReporteAtrasoComponent implements OnInit {
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + localStorage.getItem('nom') + ' ' + localStorage.getItem('ap'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       footer: function (currentPage: any, pageCount: any, fecha: any) {
-        let f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        let time = f.format('HH:mm:ss');
+      
+        const fechaLuxon = DateTime.local(); // Obtiene la fecha y hora local
+        fecha = fechaLuxon.toFormat('yyyy-MM-dd'); // Formatear la fecha
+        let time = fechaLuxon.toFormat('HH:mm:ss'); // Formatear la hora
+        
         return {
           margin: 10,
           columns: [

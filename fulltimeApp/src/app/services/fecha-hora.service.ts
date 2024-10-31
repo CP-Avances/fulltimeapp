@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import moment from 'moment-timezone';
+import { DateTime } from 'luxon';
 
 @Injectable({
   providedIn: 'root'
@@ -14,25 +15,29 @@ export class FechaHoraService {
 
   // METODO PARA OBTENER LA FECHA DEL DISPOSITIVO Y LA ZONA HORARIA
   async obtenerFechaActual() {
-    let fechaActual = moment();
-    let zonaHoraria = moment.tz.guess(true);
-    // OBTENER LOS COMPONENTES DE LA FECHA (AÑO, MES Y DÍA)
-    const anio = fechaActual.year();
-    const mes = fechaActual.format('MM');
-    const dia = fechaActual.format('DD');
-    // OBTENER LOS COMPONENTES DE LA HORA (HORA, MINUTOS Y SEGUNDOS)
-    const hora = fechaActual.format('HH');
-    const minutos = fechaActual.format('mm');
-    const segundos = fechaActual.format('ss');
-    // FORMATEAR LA FECHA Y HORA EN EL FORMATO REQUERIDO
+    const fechaActual = DateTime.local();
+    const zonaHoraria = fechaActual.zoneName; // Nombre de la zona horaria
+
+    // Obtener los componentes de la fecha (año, mes y día)
+    const anio = fechaActual.year;
+    const mes = fechaActual.toFormat('MM');
+    const dia = fechaActual.toFormat('dd');
+
+    // Obtener los componentes de la hora (hora, minutos y segundos)
+    const hora = fechaActual.toFormat('HH');
+    const minutos = fechaActual.toFormat('mm');
+    const segundos = fechaActual.toFormat('ss');
+
+    // Formatear la fecha y hora en el formato requerido
     const fechaFormateada = `${anio}-${mes}-${dia}`;
     const horaFormateada = `${hora}:${minutos}:${segundos}`;
-    // DEVOLVER UN OBJETO CON LA FECHA Y HORA Y LA ZONA HORARIA
+
+    // Devolver un objeto con la fecha y hora y la zona horaria
     return {
-        fechaHora: `${fechaFormateada} ${horaFormateada}`,
-        fecha: fechaFormateada,
-        hora: horaFormateada,
-        zonaHoraria: zonaHoraria,
+      fechaHora: `${fechaFormateada} ${horaFormateada}`,
+      fecha: fechaFormateada,
+      hora: horaFormateada,
+      zonaHoraria: zonaHoraria,
     };
   }
 

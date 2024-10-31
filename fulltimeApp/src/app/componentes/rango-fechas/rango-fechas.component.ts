@@ -2,9 +2,9 @@ import { Component, ViewChild } from '@angular/core';
 import { DataUserLoggedService } from '../../services/data-user-logged.service';
 import { ToastController, LoadingController } from '@ionic/angular';
 import { NgForm } from '@angular/forms';
-import moment from 'moment';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { IonDatetime } from '@ionic/angular';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'app-rango-fechas',
@@ -16,7 +16,7 @@ export class RangoFechasComponent {
   @ViewChild('formRegistro', { static: true }) ngForm: NgForm;
   @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
   @ViewChild(IonDatetime) datetimeFinal: IonDatetime;
-  
+
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
 
@@ -28,55 +28,31 @@ export class RangoFechasComponent {
     private toastController: ToastController,
     public loadingController: LoadingController,
     public validar: ValidacionesService,
-  ) {}
+  ) { }
 
   changeFechaInicio(event: any) {
-    if(!event.target.value){
-      this.dataUserService.setFechaRangoInicio(moment(new Date()).format('YYYY-MM-DD'));
-      return this.fechaIn = moment(event.target.value).format('YYYY-MM-DD');
-    }else{
-      this.dataUserService.setFechaRangoFinal('');
-      this.fechaFi = '';
-      this.dataUserService.setFechaRangoInicio(event.target.value);
-      this.fechaIn = moment(this.fechaInicio).format('YYYY-MM-DD');
-      this.datetimeInicio.confirm(true);
-    }
+    this.dataUserService.setFechaRangoFinal('');
+    this.fechaFi = '';
+    this.dataUserService.setFechaRangoInicio(event.target.value);
+    this.fechaIn = DateTime.fromISO(this.fechaInicio).toFormat('yyyy-MM-dd');
+    this.datetimeInicio.confirm(true);
   }
 
   changeFechaFinal(e: any) {
-    if(!e.target.value){
+    this.dataUserService.setFechaRangoFinal(e.target.value);
+    const f_inicio = new Date(this.fechaInicio);
+    const f_final = new Date(e.target.value);
+    this.datetimeFinal.confirm(true);
+    if (f_final < f_inicio) {
       this.dataUserService.setFechaRangoFinal('');
-      this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
-      return this.fechaFi = null
-    }else{
-      console.log(e.target.value);
-      this.dataUserService.setFechaRangoFinal(e.target.value);
-
-      const f_inicio = new Date(this.fechaInicio);
-      const f_final = new Date(e.target.value);
-
-      this.datetimeFinal.confirm(true);
-
-      if (f_final < f_inicio ) {
-        this.dataUserService.setFechaRangoFinal('');
-        this.fechaFi = '';
-        return this.mostrarToas('La fecha de inicio no puede ser mayor a la fecha final de consulta', 3000, "danger");
-      }
-
-      if(this.fechaFinal == null || this.fechaFinal == ''){
-        this.fechaFi = '';
-        return this.dataUserService.setFechaRangoFinal('');
-      }else{
-        this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');
-      }
-      
-      /*
-      if (f_final.toJSON() === f_inicio.toJSON()) {
-        this.dataUserService.setFechaRangoFinal('');
-        this.fechaFi = '';
-        return this.mostrarToas('Las fechas no pueden ser iguales', 3000, "danger");
-      }
-        */
+      this.fechaFi = '';
+      return this.mostrarToas('La fecha de inicio no puede ser mayor a la fecha final de consulta', 3000, "danger");
+    }
+    if (this.fechaFinal == null || this.fechaFinal == '') {
+      this.fechaFi = '';
+      return this.dataUserService.setFechaRangoFinal('');
+    } else {
+      this.fechaFi = DateTime.fromISO(this.fechaFinal).toFormat('yyyy-MM-dd');
     }
   }
 
@@ -90,9 +66,9 @@ export class RangoFechasComponent {
 
   resetFechaInicio() {
     this.fechaIn = ''; // Resetea el valor del modelo
-   // this.datetimeInicio.reset(); // Resetea el componente ion-datetime
+    // this.datetimeInicio.reset(); // Resetea el componente ion-datetime
   }
-  
+
   resetFechaFinal() {
     this.fechaFi = ''; // Resetea el valor del modelo
     //this.datetimeFinal.reset(); // Resetea el componente ion-datetime
