@@ -69,13 +69,11 @@ export class EnviartimbrePage implements OnInit {
     this.apellido_usuario = this.apellido_usuario = localStorage.getItem('ap');
     this.nombreInfo_timbre = this.activateRoute.snapshot.paramMap.get('idTimbre')
     this.nombre_timbre = this.nombreInfo_timbre.toUpperCase();
-
     this.obtenerIdCelular();
     this.BuscarParametro();
     this.BuscarParametroTimbreUbicacionDesconocida();
     this.BuscarParametroTimbreConFoto();
     this.BuscarParametroTimbreSinInternet();
-
     this.fechaHoraService.fechaHora$.subscribe(async (fechaHora) => {
       this.fechaHora = (await fechaHora).fechaHora;
       this.fecha = (await fechaHora).fecha;
@@ -336,7 +334,7 @@ export class EnviartimbrePage implements OnInit {
     this.BuscarParametroTimbreSinInternet();
     this.BuscarParametroTimbreUbicacionDesconocida();
 
-    if ((this.platform.is('ios')) || (this.platform.is('android')) || (this.platform.is('capacitor'))) {
+    if (this.platform.is('hybrid')) {
 
       await this.verificarPermisoLocation()
         .then(async () => {
@@ -348,7 +346,7 @@ export class EnviartimbrePage implements OnInit {
             this.abrirToas('Ups, al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.', "danger", 6000, "middle");
           }
         }).catch((error) => {
-          this.abrirToas('Ups, Debe activar la ubicación para enviar el timbre', "danger", 3000, "middle");
+          this.abrirToas('Ups!!! Debe activar la ubicación para enviar el timbre', "danger", 3000, "middle");
         });
     } else {
       console.log("Entrando en web")
@@ -506,21 +504,36 @@ export class EnviartimbrePage implements OnInit {
 
   // METODO PARA VALIDAR EL PARAMETO DE TIMBRE CON UBICACION DESCONOCIDA
   BuscarParametroTimbreUbicacionDesconocida() {
-    this.parametros.ObtenerDetallesParametros(5).subscribe(
+
+    let buscar = {
+      id_empleado: localStorage.getItem("empleadoID"),
+    };
+
+    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
-        this.timbrarDesconocido = res[0].descripcion;
-        localStorage.setItem('timbrarUbicacionDesconocida', res[0].descripcion);
-        console.log("ver parametro ubicacion desconocidad:", this.timbrarDesconocido)
-      });
+        const timbreFoto = res.respuesta[0].timbre_ubicacion_desconocida;
+        console.log("ver parametro de ubicacion desconocida", timbreFoto);
+        const resultado = timbreFoto ? 'Si' : 'No';
+        localStorage.setItem('timbrarUbicacionDesconocida', resultado);
+      },
+      error => {
+        console.log('Error 404 Not Found');
+        localStorage.setItem('timbrarUbicacionDesconocida', 'No');
+      }
+    );
   }
 
   // METODO PARA VALIDAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON INTERNET REQUERIDO
   BuscarParametroTimbreSinInternet() {
-    this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
+    let buscar = {
+      id_empleado: localStorage.getItem("empleadoID"),
+    };
+
+    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
         console.log("ver si hay respuesta de parametros de usuario", res)
 
-        const timbreFoto = res[0].timbre_internet;
+        const timbreFoto = res.respuesta[0].timbre_internet;
         console.log("ver parametro de internet", timbreFoto)
 
         const resultado = timbreFoto ? 'Si' : 'No';
@@ -533,10 +546,14 @@ export class EnviartimbrePage implements OnInit {
 
   // METODO PARA VALIDAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON FOTO
   BuscarParametroTimbreConFoto() {
-    this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
+    let buscar = {
+      id_empleado: localStorage.getItem("empleadoID"),
+    };
+
+    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
         console.log("metodo BuscarParametroTimbreConFoto ", res)
-        const timbreFoto = res[0].timbre_foto;
+        const timbreFoto = res.respuesta[0].timbre_foto;
         console.log("ver parametro de foto", timbreFoto)
         const resultado = timbreFoto ? 'Si' : 'No';
         localStorage.setItem('timbrarConFoto', resultado);
@@ -728,7 +745,8 @@ export class EnviartimbrePage implements OnInit {
   // METODO PARA ENVIAR DATOS DEL TIMBRE MEDIANTE EL SERVICIO
   EnviarDatos(data) {
     localStorage.setItem("storageUbicacion", this.storageUbica);
-    console.log('Ubicacion storage: ', localStorage.getItem("storageUbicacion"))
+
+    console.log("ver datos de enviarTimbre", data);
     this.relojService.enviarTimbre(data).subscribe(
       res => {
         console.log('ver respuesta', res.message);

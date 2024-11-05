@@ -28,11 +28,8 @@ export class LoginPage implements OnInit {
   }
 
   iddispositivos: IdDispositivos[] = [];
-
   usuarioObtenido: Usuario = UsuarioValueDefault;
-
   verPassword = false;
-
   id_celular: any;
   dispositi: any;
 
@@ -71,11 +68,22 @@ export class LoginPage implements OnInit {
 
   // METODO PARA OBTNER PARAMETRO DE UBICACION DESCONOCIDA
   BuscarParametroTimbreUbicacionDesconocida() {
-    this.parametros.ObtenerDetallesParametros(5).subscribe(
-      res => {
+    let buscar = {
+      id_empleado: localStorage.getItem("empleadoID"),
+    };
 
-        localStorage.setItem('timbrarUbicacionDesconocida', res[0].descripcion);
-      });
+    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
+      res => {
+        const timbreFoto = res.respuesta[0].timbre_ubicacion_desconocida;
+        console.log("ver parametro de ubicacion desconocida", timbreFoto);
+        const resultado = timbreFoto ? 'Si' : 'No';
+        localStorage.setItem('timbrarUbicacionDesconocida', resultado);
+      },
+      error => {
+        console.log('Error 404 Not Found');
+        localStorage.setItem('timbrarUbicacionDesconocida', 'No');
+      }
+    );
   }
 
   // METODO PARA OBTENER LA INFORMACION DEL DISPOSITIVO

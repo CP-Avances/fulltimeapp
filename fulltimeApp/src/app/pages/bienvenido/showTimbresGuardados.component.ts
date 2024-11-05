@@ -143,10 +143,21 @@ export class TimbresPerdidosComponent implements OnInit {
   }
 
   BuscarParametroTimbreUbicacionDesconocida() {
-    this.restP.ObtenerDetallesParametros(5).subscribe(
+    let buscar = {
+      id_empleado: localStorage.getItem("empleadoID"),
+    };
+    this.restP.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
-        localStorage.setItem('timbrarUbicacionDesconocida', res[0].descripcion);
-      });
+        const timbreFoto = res.respuesta[0].timbre_ubicacion_desconocida;
+        console.log("ver parametro de ubicacion desconocida", timbreFoto);
+        const resultado = timbreFoto ? 'Si' : 'No';
+        localStorage.setItem('timbrarUbicacionDesconocida', resultado);
+      },
+      error => {
+        console.log('Error 404 Not Found');
+        localStorage.setItem('timbrarUbicacionDesconocida', 'No');
+      }
+    );
   }
 
 
@@ -360,7 +371,7 @@ export class TimbresPerdidosComponent implements OnInit {
     );
   }
 
-// METODO PARA CONFIGURAR LAS ALERTAS
+  // METODO PARA CONFIGURAR LAS ALERTAS
   async presentAlert(mensaje: string) {
     const toast = await this.alertController.create({
       cssClass: 'my-custom-class',

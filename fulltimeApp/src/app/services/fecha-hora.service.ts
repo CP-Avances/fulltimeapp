@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import moment from 'moment-timezone';
 import { DateTime } from 'luxon';
 
 @Injectable({
@@ -8,11 +7,9 @@ import { DateTime } from 'luxon';
 })
 export class FechaHoraService {
   private fechaHoraSubject = new BehaviorSubject(this.obtenerFechaActual());
-
   constructor() {
       this.actualizarFechaHora();
   }
-
   // METODO PARA OBTENER LA FECHA DEL DISPOSITIVO Y LA ZONA HORARIA
   async obtenerFechaActual() {
     const fechaActual = DateTime.local();
@@ -51,7 +48,5 @@ export class FechaHoraService {
   get fechaHora$() {
     return this.fechaHoraSubject.asObservable();
   }
-
-
 
 }

@@ -43,7 +43,8 @@ export class TimbreJustificadoComponent implements OnInit {
     public modalController: ModalController,
     private timbresService: TimbresService,
     private dataUserService: DataUserLoggedService,
-    private toastController: ToastController
+    private toastController: ToastController,
+
   ) { }
 
   ngOnInit() {
@@ -131,7 +132,8 @@ export class TimbreJustificadoComponent implements OnInit {
       documento: this.base64Image,
       dispositivo_timbre: this.dispositivo_timbre,
       conexion: true,
-      hora_timbre_diferente: false
+      hora_timbre_diferente: false,
+      user_name : this.dataUserService.username
 
     }
     this.timbresService.PostTimbreWebAdmin(dataTimbre).subscribe(res => {

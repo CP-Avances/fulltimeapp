@@ -145,9 +145,13 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   // METODO PARA BUSCAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON FOTO
   BuscarParametroTimbreConFoto() {
-    this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
+    let buscar = {
+      id_empleado: localStorage.getItem("empleadoID"),
+    };
+
+    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
-        const timbreFoto = res[0].timbre_foto;
+        const timbreFoto = res.respuesta[0].timbre_foto;
         console.log("ver parametro de foto", timbreFoto)
         const resultado = timbreFoto ? 'Si' : 'No';
         localStorage.setItem('timbrarConFoto', resultado);
@@ -161,9 +165,12 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   // METODO PARA BUSCAR EL PARAMETRO DEL EMPLEADO DE TIMBRE ESPECIAL
   BuscarParametroTimbreEspecial() {
-    this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
+    let buscar = {
+      id_empleado: localStorage.getItem("empleadoID"),
+    };
+    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
-        const timbreFoto = res[0].timbre_especial;
+        const timbreFoto = res.respuesta[0].timbre_especial;
         console.log("ver parametro de foto", timbreFoto);
         const resultado = timbreFoto ? 'Si' : 'No';
         localStorage.setItem('timbrarEspecial', resultado);
@@ -177,19 +184,33 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   // METODO PARA BUSCAR EL PARAMETRO DE UBICACION DESCONOCIDA
   BuscarParametroTimbreUbicacionDesconocida() {
-    this.parametros.ObtenerDetallesParametros(5).subscribe(
+    let buscar = {
+      id_empleado: localStorage.getItem("empleadoID"),
+    };
+    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
-        localStorage.setItem('timbrarUbicacionDesconocida', res[0].descripcion);
-      });
+        const timbreFoto = res.respuesta[0].timbre_ubicacion_desconocida;
+        console.log("ver parametro de ubicacion desconocida", timbreFoto);
+        const resultado = timbreFoto ? 'Si' : 'No';
+        localStorage.setItem('timbrarUbicacionDesconocida', resultado);
+      },
+      error => {
+        console.log('Error 404 Not Found');
+        localStorage.setItem('timbrarUbicacionDesconocida', 'No');
+      }
+    );
   }
 
   // METODO QUE REALIZA VALIDACIONES Y DAN PASO A ENVIAR TIMIBRE
   async VerificarTimbresSinInternet(accion: string) {
     await Geolocation.checkPermissions().then(() => {
       if (this.networkService.getNetworkStatusDispositivo() == true) {
-        this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
+        let buscar = {
+          id_empleado: localStorage.getItem("empleadoID"),
+        };
+        this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
           res => {
-            const timbreFoto = res[0].timbre_internet;
+            const timbreFoto = res.respuesta[0].timbre_internet;
             const resultado = timbreFoto ? 'Si' : 'No';
             localStorage.setItem('timbrarSinInternet', resultado);
             this.router.navigate(['/enviartimbre', accion]);
@@ -211,9 +232,12 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   // METODO QUE REALIZA VALIDACIONES Y DAN PASO A ENVIAR TIMIBRE ESPECIAL
   async VerificarTimbreEspecial(accion: string) {
-    this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
+    let buscar = {
+      id_empleado: localStorage.getItem("empleadoID"),
+    };
+    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       async res => {
-        const timbreFoto = res[0].timbre_especial;
+        const timbreFoto = res.respuesta[0].timbre_especial;
         console.log("ver parametro de foto", timbreFoto);
         const resultado = timbreFoto ? 'Si' : 'No';
         localStorage.setItem('timbrarEspecial', resultado);
@@ -237,11 +261,14 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   // METODO PARA BUSCAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON REQUERIMIENTO A INTERNET
   BuscarParametroTimbreInternetRequerido() {
-    this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
+    let buscar = {
+      id_empleado: localStorage.getItem("empleadoID"),
+    };
+    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
         console.log("ver si hay respuesta de parametros de usuario", res)
 
-        const timbreFoto = res[0].timbre_internet;
+        const timbreFoto = res.respuesta[0].timbre_internet;
         console.log("ver parametro de internet", timbreFoto)
 
         const resultado = timbreFoto ? 'Si' : 'No';
@@ -302,9 +329,12 @@ export class BienvenidoPage implements OnInit, OnDestroy {
             this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
           }
         } else {
-          this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
+          let buscar = {
+            id_empleado: localStorage.getItem("empleadoID"),
+          };
+          this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
             res => {
-              const timbreFoto = res[0].timbre_internet;
+              const timbreFoto = res.respuesta[0].timbre_internet;
               const resultado = timbreFoto ? 'Si' : 'No';
               localStorage.setItem('timbrarSinInternet', resultado);
               this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
@@ -335,9 +365,12 @@ export class BienvenidoPage implements OnInit, OnDestroy {
             this.router.navigate(['/enviartimbre', 'Fin de permiso']);
           }
         } else {
-          this.parametros.ObtenerDetalleParametroUsuario(localStorage.getItem("empleadoID")).subscribe(
+          let buscar = {
+            id_empleado: localStorage.getItem("empleadoID"),
+          };
+          this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
             res => {
-              const timbreFoto = res[0].timbre_internet;
+              const timbreFoto = res.respuesta[0].timbre_internet;
               const resultado = timbreFoto ? 'Si' : 'No';
               localStorage.setItem('timbrarSinInternet', resultado);
               this.router.navigate(['/enviartimbre', 'Fin de permiso']);
