@@ -10,7 +10,7 @@ import { UpdateAutorizacionMultipleComponent } from '../update-autorizacion-mult
 import { Socket } from 'ngx-socket-io';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
-import moment from 'moment';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'app-all-alimentacion',
@@ -109,17 +109,17 @@ export class ListaAlimentacionAdminComponent implements OnInit, OnDestroy {
             c.hora_fin_ = this.validar.FormatearHora(c.hora_fin, this.formato_hora);
           })
 
-          
+
           if (this.alimentacion_pendientes.length == 0 && this.alimentacion_autorizado.length == 0 && this.alimentacion_negado.length == 0) {
             this.Ver = true;
           } else {
-            if((this.pestaniaEstados == 'pendientes') && (this.alimentacion_pendientes.length < 6)){
+            if ((this.pestaniaEstados == 'pendientes') && (this.alimentacion_pendientes.length < 6)) {
               return this.Ver = true;
-            }else if((this.pestaniaEstados == 'autorizados') && (this.alimentacion_autorizado.length < 6)){
+            } else if ((this.pestaniaEstados == 'autorizados') && (this.alimentacion_autorizado.length < 6)) {
               return this.Ver = true;
-            }else if((this.pestaniaEstados == 'negados') && (this.alimentacion_negado.length < 6)){
+            } else if ((this.pestaniaEstados == 'negados') && (this.alimentacion_negado.length < 6)) {
               return this.Ver = true;
-            }else{
+            } else {
               this.Ver = false;
             }
           }
@@ -166,55 +166,55 @@ export class ListaAlimentacionAdminComponent implements OnInit, OnDestroy {
   }
 
   BuscarByFecha() {
-      this.alimentacion_pendientes = [];
-      this.alimentacion_autorizado = [];
-      this.alimentacion_negado = [];
-      
-      this.subscripted = this.alimentacionService.getAllAlimentacionByFechas(this.fechaInicio.split('T')[0], this.fechaFinal.split('T')[0]).subscribe(
-        alimentacion => {
+    this.alimentacion_pendientes = [];
+    this.alimentacion_autorizado = [];
+    this.alimentacion_negado = [];
 
-          alimentacion.forEach(c => {
-            // TRATAMIENTO DE FECHAS Y HORAS
-            c.fecha_ = this.validar.FormatearFecha(String(c.fecha), this.formato_fecha, this.validar.dia_completo);
-            c.fec_comida_ = this.validar.FormatearFecha(String(c.fecha_comida), this.formato_fecha, this.validar.dia_completo);
-            c.hora_inicio_ = this.validar.FormatearHora(c.hora_inicio, this.formato_hora);
-            c.hora_fin_ = this.validar.FormatearHora(c.hora_fin, this.formato_hora);
-          })
+    this.subscripted = this.alimentacionService.getAllAlimentacionByFechas(this.fechaInicio.split('T')[0], this.fechaFinal.split('T')[0]).subscribe(
+      alimentacion => {
 
-          this.alimentacion_pendientes = alimentacion.filter(o => {
-            if (o.nempleado !== this.username) {
-              return o.aprobada === null
-            }
-          });
+        alimentacion.forEach(c => {
+          // TRATAMIENTO DE FECHAS Y HORAS
+          c.fecha_ = this.validar.FormatearFecha(String(c.fecha), this.formato_fecha, this.validar.dia_completo);
+          c.fec_comida_ = this.validar.FormatearFecha(String(c.fecha_comida), this.formato_fecha, this.validar.dia_completo);
+          c.hora_inicio_ = this.validar.FormatearHora(c.hora_inicio, this.formato_hora);
+          c.hora_fin_ = this.validar.FormatearHora(c.hora_fin, this.formato_hora);
+        })
 
-          this.alimentacion_autorizado = alimentacion.filter(o => {
-            if (o.nempleado !== this.username) {
-              return o.aprobada === true
-            }
-          });
-
-          this.alimentacion_negado = alimentacion.filter(o => {
-            if (o.nempleado !== this.username) {
-              return o.aprobada === false
-            }
-          });
-
-          if((this.pestaniaEstados == 'pendientes') && (this.alimentacion_pendientes.length < 6)){
-            return this.Ver = true;
-          }else if((this.pestaniaEstados == 'autorizados') && (this.alimentacion_autorizado.length < 6)){
-            return this.Ver = true;
-          }else if((this.pestaniaEstados == 'negados') && (this.alimentacion_negado.length < 6)){
-            return this.Ver = true;
-          }else{
-            this.Ver = false;
+        this.alimentacion_pendientes = alimentacion.filter(o => {
+          if (o.nempleado !== this.username) {
+            return o.aprobada === null
           }
+        });
 
-        },
-        err => {
-          console.log(err);
+        this.alimentacion_autorizado = alimentacion.filter(o => {
+          if (o.nempleado !== this.username) {
+            return o.aprobada === true
+          }
+        });
+
+        this.alimentacion_negado = alimentacion.filter(o => {
+          if (o.nempleado !== this.username) {
+            return o.aprobada === false
+          }
+        });
+
+        if ((this.pestaniaEstados == 'pendientes') && (this.alimentacion_pendientes.length < 6)) {
+          return this.Ver = true;
+        } else if ((this.pestaniaEstados == 'autorizados') && (this.alimentacion_autorizado.length < 6)) {
+          return this.Ver = true;
+        } else if ((this.pestaniaEstados == 'negados') && (this.alimentacion_negado.length < 6)) {
+          return this.Ver = true;
+        } else {
+          this.Ver = false;
         }
-      )
-    
+
+      },
+      err => {
+        console.log(err);
+      }
+    )
+
   }
 
   isChecked: boolean = false;
@@ -225,37 +225,37 @@ export class ListaAlimentacionAdminComponent implements OnInit, OnDestroy {
   changeFechaInicio(e) {
     this.fechaFinal = null;
     this.fechaFi = null
-    if(!e.target.value){
-      this.fechaInicio = (moment(new Date()).format('YYYY-MM-DD'));
-      return this.fechaIn = moment(e.target.value).format('YYYY-MM-DD');
-    }else{
+    if (!e.target.value) {
+      this.fechaInicio = DateTime.now().toFormat('yyyy-MM-dd')
+      return this.fechaIn = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');
+    } else {
       this.fechaInicio = e.target.value;
       this.datetimeInicio.confirm(true);
-      if(this.fechaInicio == null || this.fechaInicio == ''){
+      if (this.fechaInicio == null || this.fechaInicio == '') {
         this.fechaIn = null;
-      }else{
-        this.fechaIn = moment(this.fechaInicio).format('YYYY-MM-DD');
+      } else {
+        this.fechaIn = DateTime.fromISO(this.fechaInicio).toFormat('yyyy-MM-dd');
       }
     }
   }
 
   changeFechaFinal(e) {
-    if(!e.target.value){
-      if(moment(this.fechaInicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
+    if (!e.target.value) {
+      if (DateTime.fromISO(this.fechaInicio).toFormat('yyyy-MM-dd') == DateTime.now().toFormat('yyyy-MM-dd')) {
         this.fechaFinal = this.fechaInicio;
-        return this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
-      }else{
+        return this.fechaFi = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd')
+      } else {
         this.fechaFinal = null;
         this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
         return this.fechaFi = null
       }
-    }else{
+    } else {
       this.fechaFinal = e.target.value;
       this.datetimeFinal.confirm(true);
-      if(this.fechaFinal == null || this.fechaFinal == ''){
+      if (this.fechaFinal == null || this.fechaFinal == '') {
         this.fechaFi = null;
-      }else{
-        this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');
+      } else {
+        this.fechaFi = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');
       }
     }
   }

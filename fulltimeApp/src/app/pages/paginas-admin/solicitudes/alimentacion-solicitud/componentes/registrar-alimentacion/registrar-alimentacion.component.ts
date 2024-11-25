@@ -12,10 +12,8 @@ import { CloseModalComponent } from 'src/app/componentes/close-modal/close-modal
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { IonDatetime } from '@ionic/angular'
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
-
-import moment from 'moment';
+import { DateTime } from 'luxon';
 import { ParametrosService } from 'src/app/services/parametros.service';
-moment.locale('es');
 
 @Component({
   selector: 'app-registrar-alimentacion',
@@ -81,7 +79,7 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
   }
   tiempo: any;
   ngOnInit() {
-    this.tiempo = moment();
+    this.tiempo =  DateTime.now()
     this.catalogos.getServicioComida();
     this.catalogos.getDetalleMenu();
     this.catalogos.getMenuServicios();
@@ -90,7 +88,7 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
     this.reg.user_name = this.userService.username;
     this.reg.ip = localStorage.getItem('ip');
     this.fec_actual = new Date();
-    this.fec_actual_formato = moment(this.fec_actual).format('YYYY-MM-DD');
+    this.fec_actual_formato = DateTime.fromISO(this.fec_actual).toFormat('yyyy-MM-dd');
     this.obtenerInformacionEmpleado();
     this.BuscarFormatos();
 
@@ -226,12 +224,12 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
    * ********************************************************************************** */
    mostrarCalculos(e){
     if(!e.target.value){
-      this.reg.fecha_comida = moment(new Date()).format('YYYY-MM-DD');
-      return this.fecha_comida = moment(this.reg.fecha_comida).format('YYYY-MM-DD');
+      this.reg.fecha_comida = DateTime.now().toFormat('yyyy-MM-dd');
+      return this.fecha_comida =  DateTime.fromISO(this.reg.fecha_comida).toFormat('yyyy-MM-dd');
     }else{
       this.reg.fecha_comida = e.target.value;
-      this.fecha_comida = moment(e.target.value).format('YYYY-MM-DD');
-      const fec_comida = (moment(this.reg.fecha_comida).format('YYYY-MM-DD'));
+      this.fecha_comida = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');
+      const fec_comida = DateTime.fromISO(this.reg.fecha_comida).toFormat('yyyy-MM-dd'); 
       const codigo = parseInt(localStorage.getItem('empleadoID'))
       this.datetimeInicio.confirm(true);
       if(this.reg.fecha_comida != null || this.reg.fecha_comida != undefined){

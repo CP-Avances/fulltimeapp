@@ -2,10 +2,9 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ReportesService } from '../../services/reportes.service';
 import { ModalController } from '@ionic/angular';
 import { DataUserLoggedService } from '../../services/data-user-logged.service';
+import { DateTime } from 'luxon';
 
 import { PlantillaReportesService } from '../../libs/plantilla-reportes.service';
-import { ValidacionesService } from '../../libs/validaciones.service';
-import moment from 'moment';
 
 @Component({
   selector: 'app-reporte-hora-extra',
@@ -78,7 +77,7 @@ export class ReporteHoraExtraComponent implements OnInit {
 
       footer: function (currentPage, pageCount, fecha) {
         const h = new Date();
-        const f = moment();
+        const f = DateTime.now();
         fecha = f.format('YYYY-MM-DD');
         h.setUTCHours(h.getHours());
         const time = h.toJSON().split("T")[1].split(".")[0];
@@ -109,23 +108,11 @@ export class ReporteHoraExtraComponent implements OnInit {
       ],
       styles: this.plantillaPDF.estilosPdf()
     };
-    // styles: {
-    //   tableHeaderDetalle: { bold: true, alignment: 'center', fillColor: this.p_color, fontSize: 9, margin: [0, 3, 0, 3] },
-    //   itemsTableDetalle: { fontSize: 8, margin: [0, 3, 0, 3] },
-    //   subtitulos: { fontSize: 16, alignment: 'center', margin: [0, 5, 0, 10] },
-    //   tableTotal: { fontSize: 15, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 5, 0, 8] },
-    //   tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color },
-    //   itemsTable: { fontSize: 8, margin: [0, 3, 0, 3] },
-    //   itemsTableInfo: { fontSize: 10, margin: [0, 5, 0, 5] },
-    //   tableMargin: { margin: [0, 20, 0, 0] },
-    //   MarginTable: { margin: [0, 10, 0, 10] },
-    //   CabeceraTabla: { fontSize: 12, alignment: 'center', margin: [0, 8, 0, 8], fillColor: this.p_color},
-    //   quote: { margin: [5, -2, 0, -2], italics: true },
-    //   small: { fontSize: 8, color: 'blue', opacity: 0.5 }
-    // }
   }
 
   ImpresionInformacion(e: any) {
+    const inicio = DateTime.fromFormat('2020/12/01', 'yyyy/MM/dd').toFormat('dd/MM/yyyy');
+    const final = DateTime.fromFormat('2020/12/31', 'yyyy/MM/dd').toFormat('dd/MM/yyyy');
     return {
       table: {
         widths: ['*', 'auto', 'auto'],
@@ -138,7 +125,7 @@ export class ReporteHoraExtraComponent implements OnInit {
             {
               border: [true, true, false, true],
               bold: true,
-              text: 'PERIODO DEL: ' + String(moment('2020/12/01', "YYYY/MM/DD").format("DD/MM/YYYY")) + ' AL ' + String(moment('2020/12/31', "YYYY/MM/DD").format("DD/MM/YYYY")),
+              text: `PERIODO DEL: ${inicio} AL ${final}`,
               style: 'itemsTableInfo'
             },
             {
@@ -254,85 +241,5 @@ export class ReporteHoraExtraComponent implements OnInit {
 
     return arrayTitulos
   }
-
-  // ImprimirFirmas(e: any) {
-  //   let n: any = [
-  //     {
-  //       columns: []
-  //     }
-  //   ];
-  //   let nombreJefe = this.empleadoD[0].nombre + ' ' + this.empleadoD[0].apellido
-  //   if (this.firma_jefe === true) {
-  //     n[0].columns.push(
-  //       {
-  //         columns: [
-  //           { width: '*', text: '' },
-  //           {
-  //             width: 'auto',
-  //             layout: 'lightHorizontalLines',
-  //             table: {
-  //               widths: ['auto'],
-  //               body: [
-  //                 [{ text: 'AUTORIZADO', style: 'tableHeaderA' }],
-  //                 [{ text: ' ', style: 'itemsTable', margin: [0, 20, 0, 20] }],
-  //                 [{ text: nombreJefe + '\n' + 'GERENTE', style: 'itemsTable' }]
-  //               ]
-  //             }
-  //           },
-  //           { width: '*', text: '' },
-  //         ]
-  //       }
-  //     )
-  //   }
-
-  //   if (this.firma_resp === true) {
-  //     n[0].columns.push(
-  //       {
-  //         columns: [
-  //           { width: '*', text: '' },
-  //           {
-  //             width: 'auto',
-  //             layout: 'lightHorizontalLines',
-  //             table: {
-  //               widths: ['auto'],
-  //               body: [
-  //                 [{ text: 'RESPONSABLE', style: 'tableHeaderA' }],
-  //                 [{ text: ' ', style: 'itemsTable', margin: [0, 20, 0, 20] }],
-  //                 [{ text: 'Alejandra Cortez' + '\n' + 'RRHH', style: 'itemsTable' }]
-  //               ]
-  //             }
-  //           },
-  //           { width: '*', text: '' },
-  //         ]
-  //       }
-  //     )
-  //   }
-
-  //   if(this.firma_empl === true) {
-  //     n[0].columns.push(
-  //       {
-  //         columns: [
-  //           { width: '*', text: '' },
-  //           {
-  //             width: 'auto',
-  //             layout: 'lightHorizontalLines',
-  //             table: {
-  //               widths: ['auto'],
-  //               body: [
-  //                 [{ text: 'EMPLEADO', style: 'tableHeaderA' },],
-  //                 [{ text: ' ', style: 'itemsTable', margin: [0, 20, 0, 20] }],
-  //                 [{ text: e.nombre + '\n' + 'Asistente', style: 'itemsTable' }]
-  //               ]
-  //             }
-  //           },
-  //           { width: '*', text: '' },
-  //         ]
-  //       }
-  //     )
-  //   }
-
-  //   return n
-  // }
-
 
 }

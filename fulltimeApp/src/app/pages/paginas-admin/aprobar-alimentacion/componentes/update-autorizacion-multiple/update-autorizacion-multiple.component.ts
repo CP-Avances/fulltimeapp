@@ -1,8 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { ModalController, LoadingController } from '@ionic/angular';
 import { NgForm } from '@angular/forms';
-import moment from 'moment';
-
+import { DateTime } from 'luxon';
 import { PlantillaReportesService } from '../../../../../libs/plantilla-reportes.service';
 import { DataUserLoggedService } from '../../../../../services/data-user-logged.service';
 import { AutorizacionesService } from '../../../../../services/autorizaciones.service';
@@ -60,7 +59,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
   tiempo: any;
 
   ngOnInit() {
-    this.tiempo = moment();
+    this.tiempo = DateTime.now();
     const id_empresa = localStorage.getItem('id_empresa');
     (id_empresa !== null) ? this.plantillaPDF.ShowColoresLogo(id_empresa) : this.plantillaPDF.abrirToas('No existe codigo de empresa', 'danger', 3000);
     this.BuscarFormatos();
@@ -298,8 +297,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
 
       footer: function (currentPage, pageCount, fecha) {
         const h = new Date();
-        const f = moment();
-        fecha = f.format('YYYY-MM-DD');
+        fecha = DateTime.now().toFormat('yyyy-MM-dd');
         h.setUTCHours(h.getHours());
         const time = h.toJSON().split("T")[1].split(".")[0];
         return {

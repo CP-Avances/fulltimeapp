@@ -2,8 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { LoadingController, ModalController, ToastController, IonDatetime } from '@ionic/angular';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { ReporteSolicitudComponent } from '../../../../modals/reporte-solicitud/reporte-solicitud.component';
-import moment, { min } from 'moment';
-moment.locale('es');
+import { DateTime } from 'luxon';
 
 
 @Component({
@@ -16,8 +15,8 @@ export class ReporteSolicitudesPage {
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
   get fechaFinal(): string { return this.dataUserService.fechaRangoFinal }
 
-  @ViewChild (IonDatetime) datetimeInicio: IonDatetime;
-  @ViewChild (IonDatetime) datetimeFinal: IonDatetime;
+  @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
+  @ViewChild(IonDatetime) datetimeFinal: IonDatetime;
 
   fechaIn: string = "";
   fechaFi: string = "";
@@ -32,37 +31,37 @@ export class ReporteSolicitudesPage {
   changeFechaInicio(e) {
     this.dataUserService.setFechaRangoFinal(null);
     this.fechaFi = null
-    if(!e.target.value){
-      this.dataUserService.setFechaRangoInicio((moment(new Date()).format('YYYY-MM-DD')));
-      return this.fechaIn = moment(e.target.value).format('YYYY-MM-DD');
-    }else{
+    if (!e.target.value) {
+      this.dataUserService.setFechaRangoInicio(DateTime.now().toFormat('yyyy-MM-dd'));
+      return this.fechaIn = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');
+    } else {
       this.dataUserService.setFechaRangoInicio(e.target.value);
       this.datetimeInicio.confirm(true);
-      if(this.fechaInicio == null || this.fechaInicio == ''){
+      if (this.fechaInicio == null || this.fechaInicio == '') {
         this.fechaIn = null;
-      }else{
-        this.fechaIn = moment(this.fechaInicio).format('YYYY-MM-DD');
+      } else {
+        this.fechaIn = DateTime.fromISO(this.fechaInicio).toFormat('yyyy-MM-dd');
       }
     }
   }
 
   changeFechaFinal(e) {
-    if(!e.target.value){
-      if(moment(this.fechaInicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
+    if (!e.target.value) {
+      if (DateTime.fromISO(this.fechaInicio).toFormat('yyyy-MM-dd') == DateTime.now().toFormat('yyyy-MM-dd')) {
         this.dataUserService.setFechaRangoFinal(this.fechaInicio);
-        this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
-      }else{
+        this.fechaFi = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');//Ajustamos el formato de la fecha para mostrar en el input
+      } else {
         this.dataUserService.setFechaRangoFinal(null);
         this.fechaFi = null
         this.mostrarToas('Seleccione una Fecha Final', 3000, "warning");
       }
-    }else{
+    } else {
       this.dataUserService.setFechaRangoFinal(e.target.value);
       this.datetimeInicio.confirm(true);
-      if(this.fechaFinal == null || this.fechaFinal == ''){
+      if (this.fechaFinal == null || this.fechaFinal == '') {
         this.fechaFi = null;
-      }else{
-        this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');
+      } else {
+        this.fechaFi = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');
       }
     }
   }
@@ -107,7 +106,7 @@ export class ReporteSolicitudesPage {
     return await modal.present();
   }
 
-  ionViewWillLeave(){
+  ionViewWillLeave() {
     console.log('Salo de reporte de Solicitudes');
     this.limpiarRango_fechas();
   }

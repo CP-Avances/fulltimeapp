@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Output, Input, ViewChild } from '@angular/core';
 import { AlertController } from '@ionic/angular';
-import moment from 'moment';
-moment.locale('es');
+import { DateTime } from 'luxon';
 
 import { DeleteService } from 'src/app/libs/delete.service';
 import { CatalogosService } from 'src/app/services/catalogos.service';
@@ -70,7 +69,7 @@ export class DeleteRegisterComponent{
   ) {
     this.idEmpresa = parseInt(String(localStorage.getItem('id_empresa')));
     this.catalogos.getCgPermisos();
-    this.tiempo = moment();
+    this.tiempo = DateTime.now();
     this.BuscarFormatos();
   }
 
@@ -361,11 +360,11 @@ export class DeleteRegisterComponent{
   EnviarNotificacionHE(horaExtra: any, nota: string, user: string) {
 
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let desde = this.validar.FormatearFecha(moment(horaExtra.fecha_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(moment(horaExtra.fecha_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(horaExtra.fecha_inicio, this.formato_fecha, this.validar.dia_completo);
+    let hasta = this.validar.FormatearFecha(horaExtra.fecha_final, this.formato_fecha, this.validar.dia_completo);
 
-    let h_inicio = this.validar.FormatearHora(moment(horaExtra.fecha_inicio).format('HH:mm:ss'), this.formato_hora)
-    let h_final = this.validar.FormatearHora(moment(horaExtra.fecha_final).format('HH:mm:ss'), this.formato_hora);
+    let h_inicio = this.validar.FormatearHora(horaExtra.fecha_inicio, this.formato_hora)
+    let h_final = this.validar.FormatearHora(horaExtra.fecha_final, this.formato_hora);
 
     // CAPTURANDO ESTADO DE LA SOLICITUD DE HORA EXTRA
     if (horaExtra.estado === 1) {

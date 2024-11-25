@@ -2,8 +2,7 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { ModalController, IonDatetime } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
-import moment from 'moment';
-moment.locale('es');
+import { DateTime } from 'luxon';
 
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { AlimentacionService } from 'src/app/services/alimentacion.service';
@@ -89,20 +88,20 @@ export class EditarAlimentacionComponent implements OnInit {
   tiempo: any;
 
   ngOnInit() {
-    this.tiempo = moment();
+    this.tiempo = DateTime.now();
     this.catalogos.getDetalleMenu();
     this.catalogos.getServicioComida();
     this.catalogos.getMenuServicios();
     this.reg = this.alimentacion;
     this.fecha_comida = this.alimentacion.fecha_comida;
-    this.fecha_consumo = moment(this.fecha_comida).format('YYYY-MM-DD');
+    this.fecha_consumo = DateTime.fromISO(this.fecha_comida).toFormat('yyyy-MM-dd');
 
     this.LecturaDatos();
     this.obtenerInformacionEmpleado();
     console.log('ver datos', this.reg)
     this.BuscarFormatos();
     this.fec_actual = new Date();
-    this.fec_actual_formato = moment(this.fec_actual).format('YYYY-MM-DD');
+    this.fec_actual_formato =DateTime.fromISO(this.fec_actual).toFormat('yyyy-MM-dd');
   }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
@@ -232,16 +231,16 @@ export class EditarAlimentacionComponent implements OnInit {
    * ********************************************************************************** */
      mostrarCalculos(e){
       if(!e.target.value){
-        this.reg.fecha_comida = moment(new Date()).format('YYYY-MM-DD');
-        return this.fecha_comida = moment(this.reg.fecha_comida).format('YYYY-MM-DD');
+        this.reg.fecha_comida = DateTime.now().toFormat('yyyy-MM-dd');
+        return this.fecha_comida =  DateTime.fromISO(this.reg.fecha_comida).toFormat('yyyy-MM-dd');
       }else{
         this.reg.fecha_comida = e.target.value;
-        const fec_comida = (moment(this.reg.fecha_comida).format('YYYY-MM-DD'));
+        const fec_comida = DateTime.fromISO(this.reg.fecha_comida).toFormat('yyyy-MM-dd');
         this.fecha_consumo = fec_comida;
         const codigo = parseInt(localStorage.getItem('empleadoID'));
         this.datetimeInicio.confirm(true);
 
-        if(fec_comida != moment(this.fecha_comida).format('YYYY-MM-DD')){
+        if(fec_comida != DateTime.fromISO(this.fecha_comida).toFormat('yyyy-MM-dd')){
           this.alimentacionService.getlistaAlimentacionByFechasyCodigo(fec_comida, codigo).subscribe(solicitados => {
             if(solicitados.length != 0){
               this.validar.showToast('Ups! tiene una solicitud de Alimentacion en esa fecha', 3500, 'warning');

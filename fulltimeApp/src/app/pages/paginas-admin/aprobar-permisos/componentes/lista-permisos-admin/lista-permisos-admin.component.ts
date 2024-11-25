@@ -9,9 +9,9 @@ import { DataUserLoggedService } from '../../../../../services/data-user-logged.
 import { Socket } from 'ngx-socket-io';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
-import moment from 'moment';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
 import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
+import { DateTime } from 'luxon';
 
 
 @Component({
@@ -514,24 +514,24 @@ export class ListaPermisosAdminComponent implements OnInit {
     this.fechaFinal = null;
     this.fechaFi = null;
     if(!e.target.value){
-      this.fechaInicio = (moment(new Date()).format('YYYY-MM-DD'));
-      return this.fechaIn = moment(e.target.value).format('YYYY-MM-DD');
+      this.fechaInicio = DateTime.now().toFormat('yyyy-MM-dd');
+      return this.fechaIn =  DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');
     }else{
       this.fechaInicio = e.target.value;
       this.datetimeInicio.confirm(true);
       if(this.fechaInicio == null || this.fechaInicio == ''){
         this.fechaIn = null;
       }else{
-        this.fechaIn = moment(this.fechaInicio).format('YYYY-MM-DD');
+        this.fechaIn = DateTime.fromISO(this.fechaInicio).toFormat('yyyy-MM-dd');
       }
     }
   }
 
   changeFechaFinal(e) {
     if(!e.target.value){
-      if(moment(this.fechaInicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
+      if(DateTime.fromISO(this.fechaInicio).toFormat('yyyy-MM-dd') == DateTime.now().toFormat('yyyy-MM-dd')){
         this.fechaFinal = this.fechaInicio;
-        return this.fechaFi = moment(this.fechaFinal).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
+        return this.fechaFi =DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');//Ajustamos el formato de la fecha para mostrar en el input
       }else{
         this.fechaFinal = null;
         this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
@@ -543,7 +543,7 @@ export class ListaPermisosAdminComponent implements OnInit {
       if(this.fechaFinal == null || this.fechaFinal == ''){
         this.fechaFi = null;
       }else{
-        this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');
+        this.fechaFi = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');
       }
     }
   }

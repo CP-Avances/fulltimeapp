@@ -2,8 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { LoadingController, ModalController, ToastController, IonDatetime } from '@ionic/angular';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { ReporteHoraExtraComponent } from '../../../../modals/reporte-hora-extra/reporte-hora-extra.component';
-import moment, { min } from 'moment';
-moment.locale('es');
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'app-reporte-horas-extras',
@@ -32,24 +31,24 @@ export class ReporteHorasExtrasPage {
     this.dataUserService.setFechaRangoFinal(null);
     this.fechaFi = null
     if(!e.target.value){
-      this.dataUserService.setFechaRangoInicio((moment(new Date()).format('YYYY-MM-DD')));
-      return this.fechaIn = moment(e.target.value).format('YYYY-MM-DD');
+      this.dataUserService.setFechaRangoInicio(DateTime.now().toFormat('yyyy-MM-dd'));
+      return this.fechaIn = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');
     }else{
       this.dataUserService.setFechaRangoInicio(e.target.value);
       this.datetimeInicio.confirm(true);
       if(this.fechaInicio == null || this.fechaInicio == ''){
         this.fechaIn = null;
       }else{
-        this.fechaIn = moment(this.fechaInicio).format('YYYY-MM-DD');
+        this.fechaIn = DateTime.fromISO(this.fechaInicio).toFormat('yyyy-MM-dd');
       }
     }
   }
 
   changeFechaFinal(e) {
     if(!e.target.value){
-      if(moment(this.fechaInicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
+      if(DateTime.fromISO(this.fechaInicio).toFormat('yyyy-MM-dd') == DateTime.now().toFormat('yyyy-MM-dd')){
         this.dataUserService.setFechaRangoFinal(e.target.value);
-        this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
+        this.fechaFi = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');//Ajustamos el formato de la fecha para mostrar en el input
       }else{
         this.dataUserService.setFechaRangoFinal(null);
         this.fechaFi = null
@@ -62,7 +61,7 @@ export class ReporteHorasExtrasPage {
       if(this.fechaFinal == null || this.fechaFinal == ''){
         this.fechaFi = null;
       }else{
-        this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');
+        this.fechaFi = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');
       }
     }
   }

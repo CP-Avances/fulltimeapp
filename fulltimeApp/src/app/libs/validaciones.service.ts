@@ -3,9 +3,6 @@ import { AlertController, ToastController } from '@ionic/angular';
 import { HorarioE } from '../interfaces/Horarios';
 import { Cg_Feriados } from '../interfaces/Catalogos';
 import { DateTime } from 'luxon';
-import moment from 'moment-timezone';
-//import momentzn from 'moment';
-
 import { EmpleadosService } from '../services/empleados.service';
 
 @Injectable({
@@ -850,12 +847,15 @@ export class ValidacionesService {
     }
 
     validarHorasIngresadas(horaInicio: Date, horaFinal: Date, horasIguales = false): Boolean {
-        if (moment(horaInicio).format('YYYY-MM-DDTHH:mm') > moment(horaFinal).format('YYYY-MM-DDTHH:mm')) {
+        const inicio = DateTime.fromJSDate(horaInicio).toFormat('yyyy-MM-dd\'T\'HH:mm');
+        const final = DateTime.fromJSDate(horaFinal).toFormat('yyyy-MM-dd\'T\'HH:mm');
+
+        if (inicio > final) {
             this.showToast('La hora de Inicio no puede ser MAYOR a la hora Final', 3000, "warning")
             return false
         }
         if (horasIguales === false) {
-            if (moment(horaInicio).format('YYYY-MM-DDTHH:mm') === moment(horaFinal).format('YYYY-MM-DDTHH:mm')) {
+            if (inicio === final) {
                 this.showToast('La hora de Inicio no puede ser IGUAL a la hora Final', 3000, "warning")
                 return false
             }
@@ -980,8 +980,8 @@ export class ValidacionesService {
         console.log('final: ', final);
         console.log('feriado: ', feriado);
         const fec_aux = new Date(inicio.split('T')[0])//variable auxiliar de la fecha de inicio, me toma un dia anterior.90p-[=]
-        const fecha1 = moment(inicio);
-        const fecha2 = moment(final);
+        const fecha1 = DateTime.fromISO(inicio);
+        const fecha2 = DateTime.fromISO(final);
         //let diaslibre: any = 0;
         const diasDiferencia = fecha2.diff(fecha1, 'days');//variable de los dias de diferencia que hay entre el dia final y el inicial
 
@@ -994,8 +994,8 @@ export class ValidacionesService {
         for (let i = 0; i <= diasDiferencia; i++) {
             const fec_string = fec_aux.toJSON().split('T')[0];
             const [fer] = feriado.filter(o => { return o.fecha === fec_string })
-            var dia: any = moment(fec_string).format('D');
-            var mes: any = moment(fec_string).format('M');
+            const dia = DateTime.fromISO(fec_string).day; // Obtiene el día del mes
+            const mes = DateTime.fromISO(fec_string).month; 
             console.log('dia: ', dia);
             console.log('mes: ', mes);
             console.log('ver this.lista_plan: ', this.lista_plan);

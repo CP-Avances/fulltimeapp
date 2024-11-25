@@ -3,19 +3,15 @@ import { NgForm } from '@angular/forms';
 import { AutorizacionesService } from '../../services/autorizaciones.service';
 import { ValidacionesService } from '../../libs/validaciones.service';
 import { Cg_TipoPermiso } from 'src/app/interfaces/Catalogos';
-
+import { DateTime } from 'luxon';
 import { estadoSelectItems, EstadoSolicitudes } from '../../interfaces/Estados';
 import { Permiso, cg_permisoValueDefault } from '../../interfaces/Permisos';
 import { Vacacion } from 'src/app/interfaces/Vacacion';
 import { HoraExtra } from 'src/app/interfaces/HoraExtra';
-
 import { Autorizacion, autorizacionValueDefault } from '../../interfaces/Autorizaciones';
 import { Notificacion, NotificacionTimbre, notificacionTimbreValueDefault, notificacionValueDefault } from 'src/app/interfaces/Notificaciones';
 import { CatalogosService } from 'src/app/services/catalogos.service';
-
 import { AlertController, ModalController } from '@ionic/angular';
-import moment from 'moment';
-
 import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { PermisosService } from 'src/app/services/permisos.service';
 import { VacacionesService } from 'src/app/services/vacaciones.service';
@@ -86,7 +82,7 @@ export class UpdateAutorizacionComponent implements OnInit {
   tiempo: any;
   ngOnInit() {
     console.log('pantalla update-autorizacion .. ', this.permiso, ' ', this.vacacion, ' ', this.hora_extra)
-    this.tiempo = moment();
+    this.tiempo = DateTime.now();
     this.BuscarFormatos();
   }
 
@@ -676,7 +672,7 @@ export class UpdateAutorizacionComponent implements OnInit {
     if (estado_p == 'Autorizado' || estado_p === 'Negado') {
       if (estado_p == 'Autorizado') {
         console.log('this.listaEnvioCorreo AUTO: ', this.listaEnvioCorreo);
-       // this.EnviarCorreoPermiso(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
+        // this.EnviarCorreoPermiso(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
         this.EnviarNotificacionPermiso(permiso, this.listaEnvioCorreo, estado_p, infoUsuario, desde, hasta);
       } else {
         //Esta condicion es para enviar el correo a todos los usuraios que autorizan siempre y cuando la solicitud fue negada antes
@@ -694,7 +690,7 @@ export class UpdateAutorizacionComponent implements OnInit {
   }
 
 
- 
+
 
   EnviarNotificacionPermiso(permiso: any, listaEnvioCorreo: any, estado_p: string, infoUsuario: any, desde: any, hasta: any) {
     permiso.EmpleadosSendNotiEmail = [];
@@ -825,7 +821,7 @@ export class UpdateAutorizacionComponent implements OnInit {
                     return this.listaEnvioCorreo.push(item);
                   }
                 })
-              //  this.EnviarCorreoVacacion(vacacion, this.listaEnvioCorreo, estado_v, estado_c);
+                //  this.EnviarCorreoVacacion(vacacion, this.listaEnvioCorreo, estado_v, estado_c);
               });
             } else if (this.estado_auto > 2) {
               this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion.id_departamento).subscribe(res => {
@@ -851,7 +847,7 @@ export class UpdateAutorizacionComponent implements OnInit {
                 return this.listaEnvioCorreo.push(item);
               }
             })
-           // this.EnviarCorreoVacacion(vacacion, this.listaEnvioCorreo, estado_v, estado_c);
+            // this.EnviarCorreoVacacion(vacacion, this.listaEnvioCorreo, estado_v, estado_c);
           });
         }
       })
@@ -994,7 +990,7 @@ export class UpdateAutorizacionComponent implements OnInit {
                     return this.listaEnvioCorreo.push(item);
                   }
                 })
-              //  this.EnviarCorreoHE(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, valor, estado_n);
+                //  this.EnviarCorreoHE(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, valor, estado_n);
               });
             } else if (this.estado_auto > 2) {
               this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion.id_departamento).subscribe(res => {
@@ -1011,7 +1007,7 @@ export class UpdateAutorizacionComponent implements OnInit {
 
 
 
-              //  this.EnviarCorreoHE(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, valor, estado_n);
+                //  this.EnviarCorreoHE(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, valor, estado_n);
               });
             }
           }
@@ -1023,7 +1019,7 @@ export class UpdateAutorizacionComponent implements OnInit {
                 return this.listaEnvioCorreo.push(item);
               }
             })
-           // this.EnviarCorreoHE(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, valor, estado_n);
+            // this.EnviarCorreoHE(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, valor, estado_n);
           });
         }
       })
@@ -1034,16 +1030,16 @@ export class UpdateAutorizacionComponent implements OnInit {
   }
 
 
- 
+
   // METODO PARA ENVIAR NOTIIFICACIONES AL SISTEMA
   EnviarNotificacionHE(horaExtra: any, estado_h: string, valor: any, estado_n: string, infoUsuario: any) {
 
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let desde = this.validar.FormatearFecha(moment(horaExtra.fecha_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(moment(horaExtra.fecha_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(DateTime.fromISO(horaExtra.fecha_inicio).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_completo);
+    let hasta = this.validar.FormatearFecha(DateTime.fromISO(horaExtra.fecha_final).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_completo);
 
-    let h_inicio = this.validar.FormatearHora(moment(horaExtra.fecha_inicio).format('HH:mm:ss'), this.formato_hora)
-    let h_final = this.validar.FormatearHora(moment(horaExtra.fecha_final).format('HH:mm:ss'), this.formato_hora);
+    let h_inicio = this.validar.FormatearHora(DateTime.fromISO(horaExtra.fecha_inicio).toFormat('HH:mm:ss'), this.formato_hora)
+    let h_final = this.validar.FormatearHora(DateTime.fromISO(horaExtra.fecha_final).toFormat('HH:mm:ss'), this.formato_hora);
 
     const noti: NotificacionTimbre = notificacionTimbreValueDefault;
     noti.tipo = 12;
@@ -1054,7 +1050,7 @@ export class UpdateAutorizacionComponent implements OnInit {
       infoUsuario.fullname + ' desde ' +
       desde + ' hasta ' +
       hasta + ' horario de ' + h_inicio + ' a ' + h_final +
-      ' estado ' + estado_n + ' horas ' + moment(valor, 'HH:mm').format('HH:mm');
+      ' estado ' + estado_n + ' horas ' + DateTime.fromFormat(valor, 'HH:mm').toFormat('HH:mm');;
 
     noti.user_name = this.userService.username;
     noti.ip = localStorage.getItem('ip');

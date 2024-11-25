@@ -9,9 +9,9 @@ import { DataUserLoggedService } from '../../../../../services/data-user-logged.
 import { Socket } from 'ngx-socket-io';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
-import moment from 'moment';
 import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'app-all-vacaciones',
@@ -22,8 +22,8 @@ export class ListaVacacionesAdminComponent implements OnInit {
 
   vacaciones: Vacacion[] = [];
 
-  @ViewChild (IonDatetime) datetimeInicio: IonDatetime;
-  @ViewChild (IonDatetime) datetimeFinal: IonDatetime;
+  @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
+  @ViewChild(IonDatetime) datetimeFinal: IonDatetime;
 
   username: any;
   subscripted: Subscription;
@@ -101,7 +101,7 @@ export class ListaVacacionesAdminComponent implements OnInit {
     this.dataUserLoggedService.setFechaRangoFinal('');
   }
 
-  InicializarVariables(){
+  InicializarVariables() {
     this.vacaciones_pendientes = [];
     this.vacaciones_pre_autorizados = [];
     this.vacaciones_autorizado = [];
@@ -142,47 +142,47 @@ export class ListaVacacionesAdminComponent implements OnInit {
           })
 
           let i = 0;
-          this.listaVacacionesFiltradas.filter(item => {   
+          this.listaVacacionesFiltradas.filter(item => {
             this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_contrato).subscribe(
               (usuaDep) => {
-                i = i+1;
+                i = i + 1;
                 this.ArrayAutorizacionTipos.filter(x => {
-                  if((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)){
+                  if ((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)) {
                     this.gerencia = true;
-                    if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
+                    if (item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)) {
                       this.Vacacionlista.push(item);
-                    }else if(item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)){
+                    } else if (item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)) {
                       this.Vacacionlista.push(item);
-                    }else{
+                    } else {
                       this.Vacacionlista.push(item);
                     }
-                  }else if((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
-                    if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true){
+                  } else if ((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)) {
+                    if ((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true) {
                       this.Vacacionlista.push(item);
-                    }else if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true){
+                    } else if ((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true) {
                       this.Vacacionlista.push(item);
-                    }else{
+                    } else {
                       this.Vacacionlista.push(item);
                     }
                   }
                 });
 
                 //Filtra la lista de autorizacion para almacenar en un array
-                if(this.listaVacacionesFiltradas.length === i){
+                if (this.listaVacacionesFiltradas.length === i) {
                   this.listaVacacionDeparta = this.Vacacionlista;
 
                   this.vacaciones_pendientes = this.listaVacacionDeparta.filter(o => {
                     return o.estado === 1
                   });
-        
+
                   this.vacaciones_pre_autorizados = this.listaVacacionDeparta.filter(o => {
                     return o.estado === 2
                   });
-        
+
                   this.vacaciones_autorizado = this.listaVacacionDeparta.filter(o => {
                     return o.estado === 3
                   });
-        
+
                   this.vacaciones_negado = this.listaVacacionDeparta.filter(o => {
                     return o.estado === 4
                   });
@@ -190,65 +190,64 @@ export class ListaVacacionesAdminComponent implements OnInit {
                   //Listado para eliminar el usuario duplicado
                   var ListaSinDuplicadosPendie = [];
                   var cont = 0;
-                  this.vacaciones_pendientes.forEach(function(elemento, indice, array) {
+                  this.vacaciones_pendientes.forEach(function (elemento, indice, array) {
                     cont = cont + 1;
-                    if(ListaSinDuplicadosPendie.find(p=>p.id == elemento.id) == undefined)
-                    {
+                    if (ListaSinDuplicadosPendie.find(p => p.id == elemento.id) == undefined) {
                       ListaSinDuplicadosPendie.push(elemento);
                     }
                   });
 
-                  if(this.vacaciones_pendientes.length == cont){
+                  if (this.vacaciones_pendientes.length == cont) {
                     this.vacaciones_pendientes = ListaSinDuplicadosPendie;
 
                     this.vacaciones_pendientes.sort(
-                      (firstObject: Vacacion, secondObject: Vacacion) =>  
-                        (firstObject.id >  secondObject.id)? -1 : 1
+                      (firstObject: Vacacion, secondObject: Vacacion) =>
+                        (firstObject.id > secondObject.id) ? -1 : 1
                     );
                   }
 
                   this.vacaciones_pre_autorizados.sort(
-                    (firstObject: Vacacion, secondObject: Vacacion) =>  
-                      (firstObject.id >  secondObject.id)? -1 : 1
+                    (firstObject: Vacacion, secondObject: Vacacion) =>
+                      (firstObject.id > secondObject.id) ? -1 : 1
                   );
 
                   this.vacaciones_autorizado.sort(
-                    (firstObject: Vacacion, secondObject: Vacacion) =>  
-                      (firstObject.id >  secondObject.id)? -1 : 1
+                    (firstObject: Vacacion, secondObject: Vacacion) =>
+                      (firstObject.id > secondObject.id) ? -1 : 1
                   );
 
                   this.vacaciones_negado.sort(
-                    (firstObject: Vacacion, secondObject: Vacacion) =>  
-                      (firstObject.id >  secondObject.id)? -1 : 1
+                    (firstObject: Vacacion, secondObject: Vacacion) =>
+                      (firstObject.id > secondObject.id) ? -1 : 1
                   );
 
-                  if(this.vacaciones_pendientes.length == 0){
+                  if (this.vacaciones_pendientes.length == 0) {
                     this.msPendiente = true;
-                  }else if(this.vacaciones_pre_autorizados.length == 0){
+                  } else if (this.vacaciones_pre_autorizados.length == 0) {
                     this.msPreautorizado = true;
-                  }else if(this.vacaciones_autorizado.length == 0){
+                  } else if (this.vacaciones_autorizado.length == 0) {
                     this.msAutorizado = true;
-                  }else if(this.vacaciones_negado.length == 0){
+                  } else if (this.vacaciones_negado.length == 0) {
                     this.msNegado = true;
                   }
-                  
+
                   if (this.vacaciones_pendientes.length == 0 && this.vacaciones_pre_autorizados.length == 0 && this.vacaciones_autorizado.length == 0 && this.vacaciones_negado.length == 0) {
                     this.msPendiente = true;
                     this.msAutorizado = true;
                     this.msPreautorizado = true;
                     this.msNegado = true;
                     this.Ver = true;
-                    
+
                   } else {
-                    if((this.pestaniaEstados == 'pendientes') && (this.vacaciones_pendientes.length < 6)){
+                    if ((this.pestaniaEstados == 'pendientes') && (this.vacaciones_pendientes.length < 6)) {
                       this.Ver = true;
-                    }else if((this.pestaniaEstados == 'pre_autorizados') && (this.vacaciones_pre_autorizados.length < 6)){
+                    } else if ((this.pestaniaEstados == 'pre_autorizados') && (this.vacaciones_pre_autorizados.length < 6)) {
                       this.Ver = true;
-                    }else if((this.pestaniaEstados == 'autorizados') && (this.vacaciones_autorizado.length < 6)){
+                    } else if ((this.pestaniaEstados == 'autorizados') && (this.vacaciones_autorizado.length < 6)) {
                       this.Ver = true;
-                    }else if((this.pestaniaEstados == 'negados') && (this.vacaciones_negado.length < 6)){
+                    } else if ((this.pestaniaEstados == 'negados') && (this.vacaciones_negado.length < 6)) {
                       this.Ver = true;
-                    }else{
+                    } else {
                       this.Ver = false;
                     }
                   }
@@ -256,7 +255,7 @@ export class ListaVacacionesAdminComponent implements OnInit {
                 }
               }
             );
-          });    
+          });
         },
         err => {
           console.log(err);
@@ -266,8 +265,8 @@ export class ListaVacacionesAdminComponent implements OnInit {
           this.msNegado = true;
         },
         () => {
-      this.loading = false;
-    })
+          this.loading = false;
+        })
   }
 
   async presentModalAutorizarVacacion(vacacion: Vacacion) {
@@ -310,18 +309,18 @@ export class ListaVacacionesAdminComponent implements OnInit {
   }
 
   allCheckPendientes(data: Vacacion[]) {
-    console.log("data vacaciones: ",data)
-    if(data.length > 0){
+    console.log("data vacaciones: ", data)
+    if (data.length > 0) {
       this.vacaciones_pendientes = data
-    }else{
+    } else {
       this.vacaciones_pendientes = null;
     }
   }
 
   allCheckPreAutorizados(data: Vacacion[]) {
-    if(data.length > 0){
+    if (data.length > 0) {
       this.vacaciones_pre_autorizados = data
-    }else{
+    } else {
       this.vacaciones_pre_autorizados = null;
     }
   }
@@ -338,175 +337,174 @@ export class ListaVacacionesAdminComponent implements OnInit {
       return this.mostrarToas('La fecha de inicio no puede ser mayor a la fecha final de consulta', 3000, "danger");
     } else {
       this.vacacionService.getAllVacacionesByFechas(this.fechaInicio.split('T')[0], this.fechaFinal.split('T')[0]).subscribe(
-      vacaciones => {
-        this.vacaciones = vacaciones;
+        vacaciones => {
+          this.vacaciones = vacaciones;
 
-        //Filtra la lista de Horas Extras para descartar las solicitudes del mismo usuario y almacena en una nueva lista
-        this.listaVacacionesFiltradas = this.vacaciones.filter(o => {
-          if (o.nempleado !== this.username) { // condicion para no mostrar las solicitudes del mismo admin
-            return this.listaVacacionesFiltradas.push(o)
-          }
-        });
-
-        this.listaVacacionesFiltradas.forEach(v => {
-          // TRATAMIENTO DE FECHAS Y HORAS 
-          v.fec_ingreso_ = this.validar.FormatearFecha(String(v.fec_ingreso), this.formato_fecha, this.validar.dia_completo);
-          v.fec_inicio_ = this.validar.FormatearFecha(String(v.fec_inicio), this.formato_fecha, this.validar.dia_completo);
-          v.fec_final_ = this.validar.FormatearFecha(String(v.fec_final), this.formato_fecha, this.validar.dia_completo);
-        })
-
-        let i = 0;
-        this.listaVacacionesFiltradas.filter(item => {   
-          this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_contrato).subscribe(
-            (usuaDep) => {
-              i = i+1;
-              this.ArrayAutorizacionTipos.filter(x => {
-                if((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)){
-                  this.gerencia = true;
-                  if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
-                    this.Vacacionlista.push(item);
-                  }else if(item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)){
-                    this.Vacacionlista.push(item);
-                  }else{
-                    this.Vacacionlista.push(item);
-                  }
-                }else if((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
-                  if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true){
-                    this.Vacacionlista.push(item);
-                  }else if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true){
-                    this.Vacacionlista.push(item);
-                  }else{
-                    this.Vacacionlista.push(item);
-                  }
-                }
-              });
-
-              //Filtra la lista de autorizacion para almacenar en un array
-              if(this.listaVacacionesFiltradas.length === i){
-                this.listaVacacionDeparta = this.Vacacionlista;
-
-                this.vacaciones_pendientes = vacaciones.filter(o => {
-                  return o.estado === 1
-                });
-        
-                this.vacaciones_pre_autorizados = vacaciones.filter(o => {
-                  return o.estado === 2
-                });
-        
-                this.vacaciones_autorizado = vacaciones.filter(o => {
-                  return o.estado === 3
-                });
-        
-                this.vacaciones_negado = vacaciones.filter(o => {
-                    return o.estado === 4
-                });
-
-                 //Listado para eliminar el usuario duplicado
-                 var ListaSinDuplicadosPendie = [];
-                 var cont = 0;
-                 this.vacaciones_pendientes.forEach(function(elemento, indice, array) {
-                   cont = cont + 1;
-                   if(ListaSinDuplicadosPendie.find(p=>p.id == elemento.id) == undefined)
-                   {
-                     ListaSinDuplicadosPendie.push(elemento);
-                   }
-                 });
-
-                this.vacaciones_pendientes.sort(
-                  (firstObject: Vacacion, secondObject: Vacacion) =>  
-                    (firstObject.id >  secondObject.id)? -1 : 1
-                );
-
-                this.vacaciones_pre_autorizados.sort(
-                  (firstObject: Vacacion, secondObject: Vacacion) =>  
-                    (firstObject.id >  secondObject.id)? -1 : 1
-                );
-
-                this.vacaciones_autorizado.sort(
-                  (firstObject: Vacacion, secondObject: Vacacion) =>  
-                    (firstObject.id >  secondObject.id)? -1 : 1
-                );
-
-                this.vacaciones_negado.sort(
-                  (firstObject: Vacacion, secondObject: Vacacion) =>  
-                    (firstObject.id >  secondObject.id)? -1 : 1
-                );
-
-                if(this.vacaciones_pendientes.length == 0){
-                  this.msPendiente = true;
-                }else if(this.vacaciones_pre_autorizados.length == 0){
-                  this.msPreautorizado = true;
-                }else if(this.vacaciones_autorizado.length == 0){
-                  this.msAutorizado = true;
-                }else if(this.vacaciones_negado.length == 0){
-                  this.msNegado = true;
-                }
-        
-                if((this.pestaniaEstados == 'pendientes') && (this.vacaciones_pendientes.length < 6)){
-                  this.Ver = true;
-                }else if((this.pestaniaEstados == 'pre_autorizados') && (this.vacaciones_pre_autorizados.length < 6)){
-                  this.Ver = true;
-                }else if((this.pestaniaEstados == 'autorizados') && (this.vacaciones_autorizado.length < 6)){
-                  this.Ver = true;
-                }else if((this.pestaniaEstados == 'negados') && (this.vacaciones_negado.length < 6)){
-                  this.Ver = true;
-                }else{
-                  this.Ver = false;
-                }
-
-
-              }
+          //Filtra la lista de Horas Extras para descartar las solicitudes del mismo usuario y almacena en una nueva lista
+          this.listaVacacionesFiltradas = this.vacaciones.filter(o => {
+            if (o.nempleado !== this.username) { // condicion para no mostrar las solicitudes del mismo admin
+              return this.listaVacacionesFiltradas.push(o)
             }
-          );
-        });
-      },
-      err => {
-        this.msPendiente = true;
-        this.msAutorizado = true;
-        this.msPreautorizado = true;
-        this.msNegado = true;
-        console.log(err);
-      }
+          });
+
+          this.listaVacacionesFiltradas.forEach(v => {
+            // TRATAMIENTO DE FECHAS Y HORAS 
+            v.fec_ingreso_ = this.validar.FormatearFecha(String(v.fec_ingreso), this.formato_fecha, this.validar.dia_completo);
+            v.fec_inicio_ = this.validar.FormatearFecha(String(v.fec_inicio), this.formato_fecha, this.validar.dia_completo);
+            v.fec_final_ = this.validar.FormatearFecha(String(v.fec_final), this.formato_fecha, this.validar.dia_completo);
+          })
+
+          let i = 0;
+          this.listaVacacionesFiltradas.filter(item => {
+            this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_contrato).subscribe(
+              (usuaDep) => {
+                i = i + 1;
+                this.ArrayAutorizacionTipos.filter(x => {
+                  if ((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)) {
+                    this.gerencia = true;
+                    if (item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)) {
+                      this.Vacacionlista.push(item);
+                    } else if (item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)) {
+                      this.Vacacionlista.push(item);
+                    } else {
+                      this.Vacacionlista.push(item);
+                    }
+                  } else if ((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)) {
+                    if ((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true) {
+                      this.Vacacionlista.push(item);
+                    } else if ((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true) {
+                      this.Vacacionlista.push(item);
+                    } else {
+                      this.Vacacionlista.push(item);
+                    }
+                  }
+                });
+
+                //Filtra la lista de autorizacion para almacenar en un array
+                if (this.listaVacacionesFiltradas.length === i) {
+                  this.listaVacacionDeparta = this.Vacacionlista;
+
+                  this.vacaciones_pendientes = vacaciones.filter(o => {
+                    return o.estado === 1
+                  });
+
+                  this.vacaciones_pre_autorizados = vacaciones.filter(o => {
+                    return o.estado === 2
+                  });
+
+                  this.vacaciones_autorizado = vacaciones.filter(o => {
+                    return o.estado === 3
+                  });
+
+                  this.vacaciones_negado = vacaciones.filter(o => {
+                    return o.estado === 4
+                  });
+
+                  //Listado para eliminar el usuario duplicado
+                  var ListaSinDuplicadosPendie = [];
+                  var cont = 0;
+                  this.vacaciones_pendientes.forEach(function (elemento, indice, array) {
+                    cont = cont + 1;
+                    if (ListaSinDuplicadosPendie.find(p => p.id == elemento.id) == undefined) {
+                      ListaSinDuplicadosPendie.push(elemento);
+                    }
+                  });
+
+                  this.vacaciones_pendientes.sort(
+                    (firstObject: Vacacion, secondObject: Vacacion) =>
+                      (firstObject.id > secondObject.id) ? -1 : 1
+                  );
+
+                  this.vacaciones_pre_autorizados.sort(
+                    (firstObject: Vacacion, secondObject: Vacacion) =>
+                      (firstObject.id > secondObject.id) ? -1 : 1
+                  );
+
+                  this.vacaciones_autorizado.sort(
+                    (firstObject: Vacacion, secondObject: Vacacion) =>
+                      (firstObject.id > secondObject.id) ? -1 : 1
+                  );
+
+                  this.vacaciones_negado.sort(
+                    (firstObject: Vacacion, secondObject: Vacacion) =>
+                      (firstObject.id > secondObject.id) ? -1 : 1
+                  );
+
+                  if (this.vacaciones_pendientes.length == 0) {
+                    this.msPendiente = true;
+                  } else if (this.vacaciones_pre_autorizados.length == 0) {
+                    this.msPreautorizado = true;
+                  } else if (this.vacaciones_autorizado.length == 0) {
+                    this.msAutorizado = true;
+                  } else if (this.vacaciones_negado.length == 0) {
+                    this.msNegado = true;
+                  }
+
+                  if ((this.pestaniaEstados == 'pendientes') && (this.vacaciones_pendientes.length < 6)) {
+                    this.Ver = true;
+                  } else if ((this.pestaniaEstados == 'pre_autorizados') && (this.vacaciones_pre_autorizados.length < 6)) {
+                    this.Ver = true;
+                  } else if ((this.pestaniaEstados == 'autorizados') && (this.vacaciones_autorizado.length < 6)) {
+                    this.Ver = true;
+                  } else if ((this.pestaniaEstados == 'negados') && (this.vacaciones_negado.length < 6)) {
+                    this.Ver = true;
+                  } else {
+                    this.Ver = false;
+                  }
+
+
+                }
+              }
+            );
+          });
+        },
+        err => {
+          this.msPendiente = true;
+          this.msAutorizado = true;
+          this.msPreautorizado = true;
+          this.msNegado = true;
+          console.log(err);
+        }
       )
     }
   }
 
 
   //Metodos para cambiar de manera automatica el rango de fechas a filtrar
-   changeFechaInicio(e) {
+  changeFechaInicio(e) {
     this.fechaFinal = null;
     this.fechaFi = null;
-    if(!e.target.value){
-      this.fechaInicio = (moment(new Date()).format('YYYY-MM-DD'));
-      return this.fechaIn = moment(e.target.value).format('YYYY-MM-DD');
-    }else{
+    if (!e.target.value) {
+      this.fechaInicio = DateTime.now().toFormat('yyyy-MM-dd')
+      return this.fechaIn = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');;
+    } else {
       this.fechaInicio = e.target.value;
       this.datetimeInicio.confirm(true);
-      if(this.fechaInicio == null || this.fechaInicio == ''){
+      if (this.fechaInicio == null || this.fechaInicio == '') {
         this.fechaIn = null;
-      }else{
-        this.fechaIn = moment(this.fechaInicio).format('YYYY-MM-DD');
+      } else {
+        this.fechaIn = DateTime.fromISO(this.fechaInicio).toFormat('yyyy-MM-dd');
       }
     }
   }
 
   changeFechaFinal(e) {
-    if(!e.target.value){
-      if(moment(this.fechaInicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
+    if (!e.target.value) {
+      if (DateTime.fromISO(this.fechaInicio).toFormat('yyyy-MM-dd') == DateTime.now().toFormat('yyyy-MM-dd')) {
         this.fechaFinal = this.fechaInicio;
-        return this.fechaFi = moment(this.fechaFinal).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
-      }else{
+        return this.fechaFi = DateTime.fromISO(this.fechaFinal).toFormat('yyyy-MM-dd');//Ajustamos el formato de la fecha para mostrar en el input
+      } else {
         this.fechaFinal = null;
         this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
         return this.fechaFi = null
       }
-    }else{
+    } else {
       this.fechaFinal = e.target.value;
       this.datetimeFinal.confirm(true);
-      if(this.fechaFinal == null || this.fechaFinal == ''){
+      if (this.fechaFinal == null || this.fechaFinal == '') {
         this.fechaFi = null;
-      }else{
-        this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');
+      } else {
+        this.fechaFi = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');
       }
     }
   }

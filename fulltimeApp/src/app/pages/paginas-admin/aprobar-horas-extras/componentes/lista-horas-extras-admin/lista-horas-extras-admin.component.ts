@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { LoadingController, ModalController, ToastController, IonDatetime } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { Socket } from 'ngx-socket-io';
-import moment from 'moment';
 import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { HoraExtra } from 'src/app/interfaces/HoraExtra';
 import { UpdateAutorizacionComponent } from 'src/app/modals/update-autorizacion/update-autorizacion.component';
@@ -12,6 +11,7 @@ import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'app-all-horas-extras',
@@ -21,10 +21,10 @@ import { RelojServiceService } from 'src/app/services/reloj-service.service';
 
 export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
 
-  @ViewChild (IonDatetime) datetimeInicio: IonDatetime;
-  @ViewChild (IonDatetime) datetimeFinal: IonDatetime;
+  @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
+  @ViewChild(IonDatetime) datetimeFinal: IonDatetime;
 
-  public horasExtras : any = [];
+  public horasExtras: any = [];
 
   username: any;
   subscripted: Subscription;
@@ -40,8 +40,8 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
   horasExtras_autorizado: HoraExtra[] = [];
   horasExtras_negado: HoraExtra[] = [];
 
-  get fechaInicio(): string { return this.dataUserLoggedService.fechaRangoInicio}
-  get fechaFinal(): string { return this.dataUserLoggedService.fechaRangoFinal}
+  get fechaInicio(): string { return this.dataUserLoggedService.fechaRangoInicio }
+  get fechaFinal(): string { return this.dataUserLoggedService.fechaRangoFinal }
 
   fechaIn: string = "";
   fechaFi: string = "";
@@ -103,7 +103,7 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
     this.subscripted.unsubscribe();
   }
 
-  EncerarListas(){
+  EncerarListas() {
     this.horasExtras_pendientes = [];
     this.horasExtras_pre_autorizados = [];
     this.horasExtras_autorizado = [];
@@ -137,42 +137,46 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
           });
 
           this.listaHorasFiltradas.forEach(h => {
-            h.fecha_inicio_ = this.validar.FormatearFecha(moment(h.fecha_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-            h.hora_inicio_ = this.validar.FormatearHora(moment(h.fecha_inicio).format('HH:mm:ss'), this.formato_hora);
-            h.fecha_fin_ = this.validar.FormatearFecha(moment(h.fecha_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);;
-            h.hora_fin_ = this.validar.FormatearHora(moment(h.fecha_final).format('HH:mm:ss'), this.formato_hora);
+            h.fecha_inicio_ = this.validar.FormatearFecha(
+              DateTime.fromISO(h.fecha_inicio).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_completo);
+            h.hora_inicio_ = this.validar.FormatearHora(
+              DateTime.fromISO(h.fecha_inicio).toFormat('HH:mm:ss'), this.formato_hora);
+            h.fecha_fin_ = this.validar.FormatearFecha(
+              DateTime.fromISO(h.fecha_final).toFormat('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);;
+            h.hora_fin_ = this.validar.FormatearHora(
+              DateTime.fromISO(h.fecha_final).toFormat('HH:mm:ss'), this.formato_hora);
             h.fecha_solicita_ = this.validar.FormatearFecha(String(h.fecha_solicita), this.formato_fecha, this.validar.dia_completo);
           })
 
 
           let i = 0;
-          this.listaHorasFiltradas.filter(item => {   
+          this.listaHorasFiltradas.filter(item => {
             this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_contrato).subscribe(
               (usuaDep) => {
-                i = i+1;
+                i = i + 1;
                 this.ArrayAutorizacionTipos.filter(x => {
-                  if((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)){
+                  if ((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)) {
                     this.gerencia = true;
-                    if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
+                    if (item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)) {
                       this.horalista.push(item);
-                    }else if(item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)){
+                    } else if (item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)) {
                       this.horalista.push(item);
-                    }else{
+                    } else {
                       this.horalista.push(item);
                     }
-                  }else if((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
-                    if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true){
+                  } else if ((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)) {
+                    if ((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true) {
                       this.horalista.push(item);
-                    }else if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true){
+                    } else if ((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true) {
                       this.horalista.push(item);
-                    }else{
+                    } else {
                       this.horalista.push(item);
                     }
                   }
                 });
 
                 //Filtra la lista de autorizacion para almacenar en un array
-                if(this.listaHorasFiltradas.length === i){
+                if (this.listaHorasFiltradas.length === i) {
                   this.listaHorasDeparta = this.horalista;
 
                   this.horasExtras_pendientes = this.listaHorasDeparta.filter(o => {
@@ -180,59 +184,58 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
                   });
 
                   this.horasExtras_pre_autorizados = this.listaHorasDeparta.filter(o => {
-                      return o.estado === 2
+                    return o.estado === 2
                   });
-        
+
                   this.horasExtras_autorizado = this.listaHorasDeparta.filter(o => {
-                      return o.estado === 3
+                    return o.estado === 3
                   });
-        
+
                   this.horasExtras_negado = this.listaHorasDeparta.filter(o => {
-                      return o.estado === 4
+                    return o.estado === 4
                   });
 
                   //Listado para eliminar el usuario duplicado
                   var ListaSinDuplicadosPendie = [];
                   var cont = 0;
-                  this.horasExtras_pendientes.forEach(function(elemento, indice, array) {
+                  this.horasExtras_pendientes.forEach(function (elemento, indice, array) {
                     cont = cont + 1;
-                    if(ListaSinDuplicadosPendie.find(p=>p.id == elemento.id) == undefined)
-                    {
+                    if (ListaSinDuplicadosPendie.find(p => p.id == elemento.id) == undefined) {
                       ListaSinDuplicadosPendie.push(elemento);
                     }
                   });
 
-                  if(this.horasExtras_pendientes.length == cont){
+                  if (this.horasExtras_pendientes.length == cont) {
                     this.horasExtras_pendientes = ListaSinDuplicadosPendie;
 
                     this.horasExtras_pendientes.sort(
-                      (firstObject: HoraExtra, secondObject: HoraExtra) =>  
-                        (firstObject.id >  secondObject.id)? -1 : 1
+                      (firstObject: HoraExtra, secondObject: HoraExtra) =>
+                        (firstObject.id > secondObject.id) ? -1 : 1
                     );
                   }
 
                   this.horasExtras_pre_autorizados.sort(
-                    (firstObject: HoraExtra, secondObject: HoraExtra) =>  
-                      (firstObject.id >  secondObject.id)? -1 : 1
+                    (firstObject: HoraExtra, secondObject: HoraExtra) =>
+                      (firstObject.id > secondObject.id) ? -1 : 1
                   );
 
                   this.horasExtras_autorizado.sort(
-                    (firstObject: HoraExtra, secondObject: HoraExtra) =>  
-                      (firstObject.id >  secondObject.id)? -1 : 1
+                    (firstObject: HoraExtra, secondObject: HoraExtra) =>
+                      (firstObject.id > secondObject.id) ? -1 : 1
                   );
 
                   this.horasExtras_negado.sort(
-                    (firstObject: HoraExtra, secondObject: HoraExtra) =>  
-                      (firstObject.id >  secondObject.id)? -1 : 1
+                    (firstObject: HoraExtra, secondObject: HoraExtra) =>
+                      (firstObject.id > secondObject.id) ? -1 : 1
                   );
 
-                  if(this.horasExtras_pendientes.length == 0){
+                  if (this.horasExtras_pendientes.length == 0) {
                     this.msPendiente = true;
-                  }else if(this.horasExtras_pre_autorizados.length == 0){
+                  } else if (this.horasExtras_pre_autorizados.length == 0) {
                     this.msPreautorizado = true;
-                  }else if(this.horasExtras_autorizado.length == 0){
+                  } else if (this.horasExtras_autorizado.length == 0) {
                     this.msAutorizado = true;
-                  }else if(this.horasExtras_negado.length == 0){
+                  } else if (this.horasExtras_negado.length == 0) {
                     this.msNegado = true;
                   }
 
@@ -243,18 +246,18 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
                     this.msNegado = true;
                     this.Ver = true;
                   } else {
-                    if((this.pestaniaEstados == 'pendientes') && (this.horasExtras_pendientes.length < 6)){
+                    if ((this.pestaniaEstados == 'pendientes') && (this.horasExtras_pendientes.length < 6)) {
                       return this.Ver = true;
-                    }else if((this.pestaniaEstados == 'pre_autorizados') && (this.horasExtras_pre_autorizados.length < 6)){
+                    } else if ((this.pestaniaEstados == 'pre_autorizados') && (this.horasExtras_pre_autorizados.length < 6)) {
                       return this.Ver = true;
-                    }else if((this.pestaniaEstados == 'autorizados') && (this.horasExtras_autorizado.length < 6)){
+                    } else if ((this.pestaniaEstados == 'autorizados') && (this.horasExtras_autorizado.length < 6)) {
                       return this.Ver = true;
-                    }else if((this.pestaniaEstados == 'negados') && (this.horasExtras_negado.length < 6)){
+                    } else if ((this.pestaniaEstados == 'negados') && (this.horasExtras_negado.length < 6)) {
                       return this.Ver = true;
-                    }else{
+                    } else {
                       this.Ver = false;
                     }
-                  }        
+                  }
                 }
               }
             );
@@ -339,41 +342,42 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
           });
 
           this.listaHorasFiltradas.forEach(h => {
-            h.fecha_inicio_ = this.validar.FormatearFecha(moment(h.fecha_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-            h.hora_inicio_ = this.validar.FormatearHora(moment(h.fecha_inicio).format('HH:mm:ss'), this.formato_hora);
-            h.fecha_fin_ = this.validar.FormatearFecha(moment(h.fecha_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);;
-            h.hora_fin_ = this.validar.FormatearHora(moment(h.fecha_final).format('HH:mm:ss'), this.formato_hora);
+
+            h.fecha_inicio_ = this.validar.FormatearFecha(DateTime.fromISO(h.fecha_inicio).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_completo);
+            h.hora_inicio_ = this.validar.FormatearHora(DateTime.fromISO(h.fecha_inicio).toFormat('HH:mm:ss'), this.formato_hora);
+            h.fecha_fin_ = this.validar.FormatearFecha(DateTime.fromISO(h.fecha_final).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_completo);;
+            h.hora_fin_ = this.validar.FormatearHora(DateTime.fromISO(h.fecha_final).toFormat('HH:mm:ss'), this.formato_hora);
             h.fecha_solicita_ = this.validar.FormatearFecha(String(h.fecha_solicita), this.formato_fecha, this.validar.dia_completo);
           })
 
           let i = 0;
-          this.listaHorasFiltradas.filter(item => {   
+          this.listaHorasFiltradas.filter(item => {
             this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_contrato).subscribe(
               (usuaDep) => {
-                i = i+1;
+                i = i + 1;
                 this.ArrayAutorizacionTipos.filter(x => {
-                  if((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)){
+                  if ((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)) {
                     this.gerencia = true;
-                    if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
+                    if (item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)) {
                       this.horalista.push(item);
-                    }else if(item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)){
+                    } else if (item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)) {
                       this.horalista.push(item);
-                    }else{
+                    } else {
                       this.horalista.push(item);
                     }
-                  }else if((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
-                    if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true){
+                  } else if ((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)) {
+                    if ((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true) {
                       this.horalista.push(item);
-                    }else if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true){
+                    } else if ((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true) {
                       this.horalista.push(item);
-                    }else{
+                    } else {
                       this.horalista.push(item);
                     }
                   }
                 });
 
                 //Filtra la lista de autorizacion para almacenar en un array
-                if(this.listaHorasFiltradas.length === i){
+                if (this.listaHorasFiltradas.length === i) {
                   this.listaHorasDeparta = this.horalista;
 
                   this.horasExtras_pendientes = this.listaHorasDeparta.filter(o => {
@@ -381,53 +385,53 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
                   });
 
                   this.horasExtras_pre_autorizados = this.listaHorasDeparta.filter(o => {
-                      return o.estado === 2
+                    return o.estado === 2
                   });
-        
+
                   this.horasExtras_autorizado = this.listaHorasDeparta.filter(o => {
-                      return o.estado === 3
+                    return o.estado === 3
                   });
-        
+
                   this.horasExtras_negado = this.listaHorasDeparta.filter(o => {
-                      return o.estado === 4
+                    return o.estado === 4
                   });
-                  
+
                   this.horasExtras_pendientes.sort(
-                    (firstObject: HoraExtra, secondObject: HoraExtra) =>  
-                      (firstObject.id >  secondObject.id)? -1 : 1
+                    (firstObject: HoraExtra, secondObject: HoraExtra) =>
+                      (firstObject.id > secondObject.id) ? -1 : 1
                   );
 
                   this.horasExtras_pre_autorizados.sort(
-                    (firstObject: HoraExtra, secondObject: HoraExtra) =>  
-                      (firstObject.id >  secondObject.id)? -1 : 1
+                    (firstObject: HoraExtra, secondObject: HoraExtra) =>
+                      (firstObject.id > secondObject.id) ? -1 : 1
                   );
 
                   this.horasExtras_autorizado.sort(
-                    (firstObject: HoraExtra, secondObject: HoraExtra) =>  
-                      (firstObject.id >  secondObject.id)? -1 : 1
+                    (firstObject: HoraExtra, secondObject: HoraExtra) =>
+                      (firstObject.id > secondObject.id) ? -1 : 1
                   );
 
                   this.horasExtras_negado.sort(
-                    (firstObject: HoraExtra, secondObject: HoraExtra) =>  
-                      (firstObject.id >  secondObject.id)? -1 : 1
+                    (firstObject: HoraExtra, secondObject: HoraExtra) =>
+                      (firstObject.id > secondObject.id) ? -1 : 1
                   );
-                  
+
 
                   if (this.horasExtras_pendientes.length == 0 && this.horasExtras_pre_autorizados.length == 0 && this.horasExtras_autorizado.length == 0 && this.horasExtras_negado.length == 0) {
                     this.Ver = true;
                   } else {
-                    if((this.pestaniaEstados == 'pendientes') && (this.horasExtras_pendientes.length < 6)){
+                    if ((this.pestaniaEstados == 'pendientes') && (this.horasExtras_pendientes.length < 6)) {
                       return this.Ver = true;
-                    }else if((this.pestaniaEstados == 'pre_autorizados') && (this.horasExtras_pre_autorizados.length < 6)){
+                    } else if ((this.pestaniaEstados == 'pre_autorizados') && (this.horasExtras_pre_autorizados.length < 6)) {
                       return this.Ver = true;
-                    }else if((this.pestaniaEstados == 'autorizados') && (this.horasExtras_autorizado.length < 6)){
+                    } else if ((this.pestaniaEstados == 'autorizados') && (this.horasExtras_autorizado.length < 6)) {
                       return this.Ver = true;
-                    }else if((this.pestaniaEstados == 'negados') && (this.horasExtras_negado.length < 6)){
+                    } else if ((this.pestaniaEstados == 'negados') && (this.horasExtras_negado.length < 6)) {
                       return this.Ver = true;
-                    }else{
+                    } else {
                       this.Ver = false;
                     }
-                  }        
+                  }
                 }
               }
             );
@@ -444,38 +448,38 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
   changeFechaInicio(e) {
     this.dataUserLoggedService.setFechaRangoFinal(null);
     this.fechaFi = null
-    if(!e.target.value){
-      this.dataUserLoggedService.setFechaRangoInicio((moment(new Date()).format('YYYY-MM-DD')));
-      return this.fechaIn = moment(e.target.value).format('YYYY-MM-DD');
-    }else{
+    if (!e.target.value) {
+      this.dataUserLoggedService.setFechaRangoInicio(DateTime.now().toFormat('yyyy-MM-dd'));
+      return this.fechaIn = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');
+    } else {
       this.dataUserLoggedService.setFechaRangoInicio(e.target.value);
       this.datetimeInicio.confirm(true);
-      if(this.fechaInicio == null || this.fechaInicio == ''){
+      if (this.fechaInicio == null || this.fechaInicio == '') {
         this.fechaIn = null;
-      }else{
-        this.fechaIn = moment(this.fechaInicio).format('YYYY-MM-DD');
+      } else {
+        this.fechaIn = DateTime.fromISO(this.fechaInicio).toFormat('yyyy-MM-dd');
       }
     }
   }
 
   changeFechaFinal(e) {
-    if(!e.target.value){
-      if(moment(this.fechaInicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
+    if (!e.target.value) {
+      if (DateTime.fromISO(this.fechaInicio).toFormat('yyyy-MM-dd') == DateTime.now().toFormat('yyyy-MM-dd')) {
         this.dataUserLoggedService.setFechaRangoFinal(this.fechaInicio);
-        return this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
-      }else{
+        return this.fechaFi = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');//Ajustamos el formato de la fecha para mostrar en el input
+      } else {
         this.dataUserLoggedService.setFechaRangoFinal(null);
         this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
         return this.fechaFi = null
       }
-    }else{
+    } else {
       this.dataUserLoggedService.setFechaRangoInicio(this.fechaInicio);
       this.dataUserLoggedService.setFechaRangoFinal(e.target.value);
       this.datetimeFinal.confirm(true);
-      if(this.fechaFinal == null || this.fechaFinal == ''){
+      if (this.fechaFinal == null || this.fechaFinal == '') {
         this.fechaFi = null;
-      }else{
-        this.fechaFi = moment(e.target.value).format('YYYY-MM-DD');
+      } else {
+        this.fechaFi = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');
       }
     }
   }

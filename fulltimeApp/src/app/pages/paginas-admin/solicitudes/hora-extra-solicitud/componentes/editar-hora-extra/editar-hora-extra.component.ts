@@ -2,8 +2,7 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { ModalController, IonDatetime } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
-import moment from 'moment';
-moment.locale('es');
+import { DateTime } from 'luxon';
 
 import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
@@ -63,27 +62,27 @@ export class EditarHoraExtraComponent implements OnInit {
   tiempo: any;
 
   ngOnInit() {
-    this.tiempo = moment();
+    this.tiempo = DateTime.now();
     this.reg = this.hora_extra;
-    this.reg.fecha_inicio = moment(this.hora_extra.fecha_inicio).format();
-    this.reg.fecha_final = moment(this.hora_extra.fecha_final).format();
-    this.dia_inicio = moment(this.reg.fecha_inicio).format('YYYY-MM-DD');
-    this.dia_fianl = moment(this.reg.fecha_final).format('YYYY-MM-DD');
-    this.reg.hora_salida = moment(this.hora_extra.fecha_inicio).format();
-    this.reg.hora_ingreso = moment(this.hora_extra.fecha_final).format();
-    this.hora_inicio = moment(this.reg.hora_salida).format('h:mm a');
-    this.hora_final = moment(this.reg.hora_ingreso).format('h:mm a');
+    this.reg.fecha_inicio = DateTime.fromISO(this.hora_extra.fecha_inicio).
+      this.reg.fecha_final = DateTime.fromISO(this.hora_extra.fecha_final).toISO();
+    this.dia_inicio = DateTime.fromISO(this.hora_extra.fecha_final).toFormat('yyyy-MM-dd');
+    this.dia_fianl = DateTime.fromISO(this.reg.fecha_final).toFormat('yyyy-MM-dd');
+    this.reg.hora_salida = DateTime.fromISO(this.hora_extra.fecha_inicio).toISO();
+    this.reg.hora_ingreso = DateTime.fromISO(this.hora_extra.fecha_final).toISO();
+    this.hora_inicio = DateTime.fromISO(this.reg.hora_salida).toFormat('h:mm a');
+    this.hora_final = DateTime.fromISO(this.reg.hora_ingreso).toFormat('h:mm a');
 
-    if(this.reg.docu_nombre == null){
+    if (this.reg.docu_nombre == null) {
       this.mensajeFile = "No hay archivo subido";
     }
 
-    if(this.reg.hora_ingreso == null || this.reg.hora_salida == null ){
+    if (this.reg.hora_ingreso == null || this.reg.hora_salida == null) {
       this.btnBloq = true;
     }
 
-    console.log('documento: ',this.reg.documento);
-    console.log('documento nombre: ',this.reg.docu_nombre);
+    console.log('documento: ', this.reg.documento);
+    console.log('documento nombre: ', this.reg.docu_nombre);
     this.obtenerInformacionEmpleado();
     this.BuscarFormatos();
   }
@@ -139,14 +138,14 @@ export class EditarHoraExtraComponent implements OnInit {
     return false
   }
 
-  valoresDefectoValidacionResultados(){
+  valoresDefectoValidacionResultados() {
     this.reg.horas_solicitud = null;
     this.reg.tiempo_autorizado = null;
     this.btnBloq = false;
     this.btnBloqueadoGuardar = true;
   }
 
-  ChangeDiaInicio(e){
+  ChangeDiaInicio(e) {
     this.btnBloqueadoGuardar = true;
     //Enceramos el resto de los Inputs
     this.reg.horas_solicitud = null;
@@ -154,39 +153,39 @@ export class EditarHoraExtraComponent implements OnInit {
     this.valoresDefectoValidacionHoras();
     this.valoresDefectoValidacionFechas();
     //Validamos si hay un cambio en el ingreso de la Fecha.
-    if(!e.target.value){//Si no cambia nada en el ingreso de la fecha y pone ok directamente, se ingresa la hora actual que indica el componente
+    if (!e.target.value) {//Si no cambia nada en el ingreso de la fecha y pone ok directamente, se ingresa la hora actual que indica el componente
       this.reg.fecha_inicio = e.target.value;
-      this.dia_inicio = moment(this.reg.fecha_inicio).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
-      console.log("fecha Inicio: ",this.reg.fecha_inicio)
-    }else{
+      this.dia_inicio = DateTime.fromISO(this.reg.fecha_inicio).toFormat('yyyy-MM-dd'); //Ajustamos el formato de la fecha para mostrar en el input
+      console.log("fecha Inicio: ", this.reg.fecha_inicio)
+    } else {
       this.reg.fecha_inicio = e.target.value;//Igualamos la variable a la fecha ingresada
-      this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
+      this.dia_inicio = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd'); //Ajustamos el formato de la fecha para mostrar en el input
       return this.datetimeInicio.confirm(true);
     }
   }
 
-  ChangeDiaFinal(e){
+  ChangeDiaFinal(e) {
     this.btnBloqueadoGuardar = true;
     //Enceramos el resto de los Inputs
     this.valoresDefectoValidacionHoras();
     this.reg.horas_solicitud = null;
     this.reg.tiempo_autorizado = null;
-     //Validamos si hay un cambio en el ingreso de la Fecha.
-     if(!e.target.value){//Si no cambia nada en el ingreso de la fecha y pone ok directamente, se ingresa la hora actual que indica el componente      
-      if(moment(this.reg.fecha_inicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')){
+    //Validamos si hay un cambio en el ingreso de la Fecha.
+    if (!e.target.value) {//Si no cambia nada en el ingreso de la fecha y pone ok directamente, se ingresa la hora actual que indica el componente      
+      if (DateTime.fromISO(this.reg.fecha_inicio).toFormat('yyyy-MM-dd') == DateTime.now().toFormat('yyyy-MM-dd')) {
         this.reg.fecha_final = this.reg.fecha_inicio;
-        this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
-      }else{
+        this.dia_fianl = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');//Ajustamos el formato de la fecha para mostrar en el input
+      } else {
         this.reg.fecha_final = null;
         this.dia_fianl = null
         return this.validar.showToast('Seleccione una Fecha Final', 3000, "warning");
       }
 
-    }else{
+    } else {
       this.reg.fecha_final = e.target.value; //Igualamos la variable a la fecha ingresada
-      this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
+      this.dia_fianl = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');//Ajustamos el formato de la fecha para mostrar en el input
       //Validamos el ingreso de las fechas en los inputs
-      if (moment(this.reg.fecha_final).format('YYYY-MM-DD') < moment(this.reg.fecha_inicio).format('YYYY-MM-DD')) {
+      if (DateTime.fromISO(this.reg.fecha_final).toFormat('yyyy-MM-dd') < DateTime.fromISO(this.reg.fecha_inicio).toFormat('yyyy-MM-dd')) {
         this.dia_inicio = '';
         this.dia_fianl = '';
         this.validar.showToast('La fecha Final no puede ser MENOR a la fecha de Inicio', 3000, "warning");
@@ -195,32 +194,32 @@ export class EditarHoraExtraComponent implements OnInit {
     }
   }
 
-  ChangeHoraInicio(e){
+  ChangeHoraInicio(e) {
     this.reg.hora_ingreso = null;
     this.hora_final = null;
     //Enceramos el resto de los Inputs
     this.valoresDefectoValidacionResultados();
     this.btnBloq = true;
     //Validamos si hay un cambio en el ingreso de la Hora.
-    if(!e.target.value){//Si no cambia nada en el ingreso de la hora y pone ok directamente, se ingresa la hora actual que indica el componente
-      this.reg.hora_salida = moment(new Date()).format();
-      this.hora_inicio = moment(this.reg.hora_salida).format('h:mm a');
-    }else{//Si hay un cambion en la seleccion de la hora en el componente ingresa la hora seleccionada
+    if (!e.target.value) {//Si no cambia nada en el ingreso de la hora y pone ok directamente, se ingresa la hora actual que indica el componente
+      this.reg.hora_salida = DateTime.now().toISO();
+      this.hora_inicio = DateTime.fromISO(this.reg.hora_salida).toFormat('h:mm a')
+    } else {//Si hay un cambion en la seleccion de la hora en el componente ingresa la hora seleccionada
       this.reg.hora_salida = e.target.value;//Igualamos la variable a la hora ingresada
-      this.hora_inicio = moment(e.target.value).format('h:mm a');//Ajustamos el formato de la Hora para mostrar en el input
+      this.hora_inicio = DateTime.fromISO(e.target.value).toFormat('h:mm a');//Ajustamos el formato de la Hora para mostrar en el input
     }
   }
 
-  ChangeHoraFinal(e){
+  ChangeHoraFinal(e) {
     //Enceramos el resto de los Inputs
     this.valoresDefectoValidacionResultados();
     //Validamos si hay un cambio en el ingreso de la Hora.
-    if(!e.target.value){//Si no cambia nada en el ingreso de la hora y pone ok directamente, se ingresa la hora actual que indica el componente
-      this.reg.hora_ingreso = moment(new Date()).format();
-      this.hora_final = moment(this.reg.hora_ingreso).format('h:mm a');
-    }else{//Si hay un cambion en la seleccion de la hora en el componente ingresa la hora seleccionada
+    if (!e.target.value) {//Si no cambia nada en el ingreso de la hora y pone ok directamente, se ingresa la hora actual que indica el componente
+      this.reg.hora_ingreso = DateTime.now().toISO();
+      this.hora_final = DateTime.fromISO(this.reg.hora_ingreso).toFormat('h:mm a');
+    } else {//Si hay un cambion en la seleccion de la hora en el componente ingresa la hora seleccionada
       this.reg.hora_ingreso = e.target.value;//Igualamos la variable a la hora ingresada
-      this.hora_final = moment(e.target.value).format('h:mm a');//Ajustamos el formato de la Hora para mostrar en el input
+      this.hora_final = DateTime.fromISO(e.target.value).toFormat('h:mm a');//Ajustamos el formato de la Hora para mostrar en el input
     }
     this.validar.showToast('Calcule el tiempo para actualizar.', 3000, 'warning')
   }
@@ -229,35 +228,35 @@ export class EditarHoraExtraComponent implements OnInit {
   /* ********************************************************************************** *
      *                 METODO PARA MOSTRAR EL CALCULO EN LOS INPUTS                   *
    * ********************************************************************************** */
-  mostrarCalculos(){
+  mostrarCalculos() {
     //variables para validar el dia de inicio completo y el dia final completo y buscar duplicidad.
-    const minutosinicio = moment(this.reg.hora_salida).format('HH:mm');
-    const minutosfinal = moment(this.reg.hora_ingreso).format('HH:mm');
-    const fec_inicio = (moment(this.reg.fecha_inicio).format('YYYY-MM-DD')) + ' ' + minutosinicio;
-    const fec_final = (moment(this.reg.fecha_final).format('YYYY-MM-DD')) + ' ' + minutosfinal;
+    const minutosinicio = DateTime.fromISO(this.reg.hora_salida).toFormat('HH:mm');
+    const minutosfinal = DateTime.fromISO(this.reg.hora_ingreso).toFormat('HH:mm');
+    const fec_inicio = (DateTime.fromISO(this.reg.fecha_inicio).toFormat('yyyy-MM-dd')) + ' ' + minutosinicio;
+    const fec_final = (DateTime.fromISO(this.reg.fecha_final).toFormat('yyyy-MM-dd')) + ' ' + minutosfinal;
     const codigo = parseInt(localStorage.getItem('codigo'));
     const id_solicitud = this.reg.id;
 
     this.horasExtrasService.getlistaHorasExtrasByFechasyCodigoEdit(fec_inicio, fec_final, codigo, id_solicitud).subscribe(solicitados => {
-      if(solicitados.length != 0){
+      if (solicitados.length != 0) {
         this.reg.horas_solicitud = null;
         this.reg.tiempo_autorizado = null;
         this.validar.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
         return false
-      }else{
+      } else {
         this.permisoService.getlistaPermisosByHorasyCodigo(fec_inicio, fec_final, minutosinicio, minutosfinal, codigo).subscribe(solicitados => {
-          if(solicitados.length != 0){
+          if (solicitados.length != 0) {
             this.reg.horas_solicitud = null;
             this.reg.tiempo_autorizado = null;
             this.validar.showToast('Ups! Ya existe permisos en esas fecha y hora ', 3500, 'warning');
             return false
           }
-          else{
+          else {
             this.calcularTiempo();
           }
-        },err => {
+        }, err => {
           this.validar.showToast('Lo sentimos tenemos problemas para verificar su solicitud\n Contactese con el administrador', 3500, 'warning');
-        }); 
+        });
       }
     }, error => {
       this.validar.showToast('Lo sentimos tenemos problemas para verificar su Solicitud\n Contactese con el administrador', 3500, 'danger');
@@ -282,12 +281,12 @@ export class EditarHoraExtraComponent implements OnInit {
     const horasValidas = this.validar.validarHorasIngresadas(fec_comp_inicio, fec_comp_final) // evaluacion de fechas completas 
     if (!horasValidas) return this.valoresDefectoValidacionResultados();
 
-    const total = this.validar.MilisegToSegundos( fec_comp_final.valueOf() - fec_comp_inicio.valueOf());
-    console.log('total: ',total);
+    const total = this.validar.MilisegToSegundos(fec_comp_final.valueOf() - fec_comp_inicio.valueOf());
+    console.log('total: ', total);
     const { tiempo_transcurrido } = this.validar.CalcularHorasExtrasTotales(total)
 
     //Condicion que valida el tiempo calculado de horas con la jornada laboral la cual es el numero de horas en segundos que trabaja el empleado
-    if(total > 86400){
+    if (total > 86400) {
       this.validar.showToast('Ups!, lo sentimos el rango de horas excede el día completo', 3500, 'warning');
       return false;
     }
@@ -296,8 +295,8 @@ export class EditarHoraExtraComponent implements OnInit {
     this.reg.tiempo_autorizado = '00:00:00';
 
     if (registrarFechas) {
-      this.reg.fecha_inicio = moment(fec_comp_inicio).format('YYYY-MM-DD HH:mm:ss');
-      this.reg.fecha_final = moment(fec_comp_final).format('YYYY-MM-DD HH:mm:ss');
+      this.reg.fecha_inicio = DateTime.fromISO(fec_comp_inicio).toFormat('yyyy-MM-dd HH:mm:ss');
+      this.reg.fecha_final = DateTime.fromISO(fec_comp_final).toFormat('yyyy-MM-dd HH:mm:ss');
     }
 
     this.btnBloqueadoGuardar = false;
@@ -311,15 +310,15 @@ export class EditarHoraExtraComponent implements OnInit {
 
     console.log('PASO validar DE FECHAS Y HORAS');
 
-    if(this.reg.docu_nombre != null){
-      if(this.archivoSubido != null){
+    if (this.reg.docu_nombre != null) {
+      if (this.archivoSubido != null) {
         this.reg.docu_nombre = this.archivoSubido[0].name; // Inserta el nombre del archivo al subir
       }
-    }else{
-      if(this.archivoSubido != null){
+    } else {
+      if (this.archivoSubido != null) {
         this.reg.docu_nombre = this.archivoSubido[0].name; // Inserta el nombre del archivo al subir
-      }else{
-        this.horasExtrasService.EliminarArchivoRespaldo(this.reg.documento).subscribe(res => {})//elimina el archivo si se quita 
+      } else {
+        this.horasExtrasService.EliminarArchivoRespaldo(this.reg.documento).subscribe(res => { })//elimina el archivo si se quita 
         this.reg.docu_nombre = null;
         this.reg.documento = null;
       }
@@ -327,11 +326,11 @@ export class EditarHoraExtraComponent implements OnInit {
 
     this.reg.user_name = this.userService.username;
     this.reg.ip = localStorage.getItem('ip');
-    
+
 
     this.subscripted = this.horasExtrasService.putHoraExtra(this.reg).subscribe(
       resp => {
-        if(this.archivoSubido != null){this.updataArchivo(resp)}
+        if (this.archivoSubido != null) { this.updataArchivo(resp) }
         this.NotificarEdicionHE(resp);
         this.validar.abrirToas('Solicitud registrada exitosamente.', 4000, 'success', 'top');
         this.closeModal(true)
@@ -347,21 +346,21 @@ export class EditarHoraExtraComponent implements OnInit {
      *                       SUBIR ARCHIVO DE SOLICITUD DE PERMISO                    *
    * ********************************************************************************** */
   //Metodo para ingresar el archivo
-  fileChange(element){
+  fileChange(element) {
     this.archivoSubido = element.target.files;
     const name = this.archivoSubido[0].name;
-    if(this.archivoSubido.length != 0){
-      if(this.archivoSubido[0].size >= 2e+6){
+    if (this.archivoSubido.length != 0) {
+      if (this.archivoSubido[0].size >= 2e+6) {
         this.archivoSubido = null;
         this.reg.docu_nombre = '';
         this.mensajeFile = "Ingrese un archivo máximo de 2Mb";
-        this.validar.showToast('Ups el archivo pesa más de 2Mb',3500, 'danger');
-      }else if(this.archivoSubido[0].name.length > 50){
+        this.validar.showToast('Ups el archivo pesa más de 2Mb', 3500, 'danger');
+      } else if (this.archivoSubido[0].name.length > 50) {
         this.archivoSubido = null;
         this.reg.docu_nombre = '';
         this.mensajeFile = "El nombre debe tener 50 caracteres como máximo";
         this.validar.showToast('Ups el nombre del archivo es muy largo', 3500, 'warning');
-      }else{
+      } else {
         console.log(this.archivoSubido[0].name);
         this.reg.docu_nombre = name;
         this.validar.showToast('Archivo valido', 3500, 'success');
@@ -370,23 +369,23 @@ export class EditarHoraExtraComponent implements OnInit {
   }
 
   //Metodo para actualizar un archivo
-  updataArchivo(horaExtra: any){
+  updataArchivo(horaExtra: any) {
     this.horasExtrasService.EliminarArchivoRespaldo(this.reg.documento).subscribe(res => {
       this.subirRespaldo(horaExtra);
     })
   }
 
   //Metodo para subir (cargar) el archivo al servidor
-  subirRespaldo(horaExtra: any){
+  subirRespaldo(horaExtra: any) {
     var id = horaExtra.id;
     let formData = new FormData();
     console.log("tamaño: ", this.archivoSubido[0].size);
 
-    if(this.archivoSubido == undefined){
+    if (this.archivoSubido == undefined) {
       return this.archivoSubido = null;
     }
 
-    for(var i = 0; i < this.archivoSubido.length; i++){
+    for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
     this.horasExtrasService.SubirArchivoRespaldo(formData, id, this.archivoSubido[0].name, null).subscribe(res => {
@@ -394,14 +393,14 @@ export class EditarHoraExtraComponent implements OnInit {
       this.reg.docu_nombre = '';
 
     }, err => {
-        console.log(formData)
-        return this.validar.showToast('El archivo no se pudo Cargar al Servidor', 3500, 'danger');
-        
+      console.log(formData)
+      return this.validar.showToast('El archivo no se pudo Cargar al Servidor', 3500, 'danger');
+
     });
   }
 
   //Metodo para eliminar el archivo de permiso
-  deleteDocumentohorasExtras(){
+  deleteDocumentohorasExtras() {
     console.log('El archivo ', this.reg.docu_nombre, ' Se quito Correctamente')
     this.validar.showToast('El archivo se quito correctamente', 3500, 'success');
     this.reg.docu_nombre = null;
@@ -429,16 +428,16 @@ export class EditarHoraExtraComponent implements OnInit {
     });
   }
 
- 
+
   // METODO PARA ENVIAR NOTIIFICACIONES AL SISTEMA
   EnviarNotificacionHE(horaExtra: any) {
 
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let desde = this.validar.FormatearFecha(moment(horaExtra.fecha_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(moment(horaExtra.fecha_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(DateTime.fromISO(horaExtra.fecha_iniciol).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_completo);
+    let hasta = this.validar.FormatearFecha(DateTime.fromISO(horaExtra.fecha_final).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_completo);
 
-    let h_inicio = this.validar.FormatearHora(moment(horaExtra.fecha_inicio).format('HH:mm:ss'), this.formato_hora)
-    let h_final = this.validar.FormatearHora(moment(horaExtra.fecha_final).format('HH:mm:ss'), this.formato_hora);
+    let h_inicio = this.validar.FormatearHora(DateTime.fromISO(horaExtra.fecha_iniciol).toFormat('HH:mm:ss'), this.formato_hora)
+    let h_final = this.validar.FormatearHora(DateTime.fromISO(horaExtra.fecha_final).toFormat('HH:mm:ss'), this.formato_hora);
 
     const noti: Notificacion = notificacionValueDefault;
     noti.id_hora_extra = horaExtra.id;
@@ -456,10 +455,9 @@ export class EditarHoraExtraComponent implements OnInit {
     //Listado para eliminar el usuario duplicado
     var allNotificaciones = [];
     //Ciclo por cada elemento del listado
-    horaExtra.EmpleadosSendNotiEmail.forEach(function(elemento, indice, array) {
+    horaExtra.EmpleadosSendNotiEmail.forEach(function (elemento, indice, array) {
       // Discriminación de elementos iguales
-      if(allNotificaciones.find(p=>p.empleado == elemento.empleado) == undefined)
-      {
+      if (allNotificaciones.find(p => p.empleado == elemento.empleado) == undefined) {
         // Nueva lista de empleados que reciben la notificacion
         allNotificaciones.push(elemento);
       }
