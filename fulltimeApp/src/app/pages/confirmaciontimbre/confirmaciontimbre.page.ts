@@ -35,9 +35,10 @@ export class ConfirmaciontimbrePage implements OnInit {
   isConnected: boolean;
 
   async ngOnInit() {
+    this.isConnected = this.networkService.getNetworkStatusDispositivo();
+
     this.serverConnected = await this.connectivityService.checkServerConnection();
 
-    this.isConnected = this.networkService.getNetworkStatusDispositivo();
 
     this.nombre_usuario = localStorage.getItem('nom');
     this.apellido_usuario = localStorage.getItem('ap');

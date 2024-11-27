@@ -50,8 +50,9 @@ export class ListaNotificacionComponent implements OnInit {
 
   // METODO QUE AL INICIARCE MARCA COMO VISTO A TODAS LAS NOTIFICACIONES
   async ngOnInit() {
-    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
+
+    this.serverConnected = await this.connectivityService.checkServerConnection();
     const id_empleado = localStorage.getItem('empleadoID')
     this.notificacionService.getNotificacionesByIdEmpleado(id_empleado + '').subscribe(
       notificacion => {

@@ -28,13 +28,13 @@ export class JustificarTimbresPage implements OnInit {
   ) { }
 
   async ngOnInit() {
-    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
+    this.serverConnected = await this.connectivityService.checkServerConnection();
   }
 
   async ionViewWillEnter() {
-    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
+    this.serverConnected = await this.connectivityService.checkServerConnection();
   }
 
   // METODO PARA ABIR EL MODAL DE REGISTRAR TIMBRE

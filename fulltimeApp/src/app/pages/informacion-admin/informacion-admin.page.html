@@ -105,14 +105,14 @@
         <ion-label *ngIf="e.id_rol==1 || e.id_rol==2">
           <h2> {{e.fullname}}</h2>
           <ion-text color="success">
-            <p  color="success"> {{e.name_rol}} </p>
+            <p color="success"> {{e.name_rol}} </p>
           </ion-text>
-       
+
         </ion-label>
         <ion-label *ngIf="e.id_rol>2 ">
           <h2> {{e.fullname}}</h2>
           <ion-text color="theme">
-            <p  color="theme"> {{e.name_rol}} </p>
+            <p color="theme"> {{e.name_rol}} </p>
           </ion-text>
         </ion-label>
 
@@ -145,10 +145,12 @@
       </ion-text>
       <br>
       <br>
-      <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;" *ngIf="serverConnected">
+      <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;" *ngIf="!isConnected">
         Se podrán visualizar cuando tenga conexión a internet
       </ion-text>
-      <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;" *ngIf="!serverConnected" >
+      <br>
+      <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;"
+        *ngIf="!serverConnected">
         Se podrán visualizar cuando tenga conexión al servidor
       </ion-text>
     </div>
@@ -163,13 +165,16 @@
     </div>
 
     <div style="margin: 4%; padding: 4%; text-align: center; border-radius: 2%;">
-      <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;" *ngIf="serverConnected">
+      <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;" *ngIf="!isConnected">
         No tiene conexión a internet
       </ion-text>
-      <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;" *ngIf="!serverConnected">
+      <br>
+      <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;"  *ngIf="!serverConnected">
         No tiene conexión al servidor
       </ion-text>
     </div>
+
   </ion-content>
+
 
 </ion-content>

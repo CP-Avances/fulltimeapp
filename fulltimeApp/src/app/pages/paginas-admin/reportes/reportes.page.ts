@@ -120,9 +120,11 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
           </ion-text>
           <br>
           <br>
-          <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;"  *ngIf="serverConnected">
+          <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;"  *ngIf="!isConnected">
             Se podrá visualizar cuando tenga conexión a internet
           </ion-text>
+          <br>
+
           <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;" *ngIf="!serverConnected" >
             Se podrán visualizar cuando tenga conexión al servidor
           </ion-text>
@@ -138,9 +140,11 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
         </div>
 
         <div style="margin: 4%; padding: 4%; text-align: center; border-radius: 2%;">
-        <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;" *ngIf="serverConnected">
+        <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;" *ngIf="!isConnected">
           No tiene conexión a internet
         </ion-text>
+        <br>
+
         <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;" *ngIf="!serverConnected">
           No tiene conexión al servidor
         </ion-text>
@@ -194,12 +198,12 @@ export class ReportesPage implements OnInit {
   isConnected: boolean;
 
   async ngOnInit() {
-    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
+    this.serverConnected = await this.connectivityService.checkServerConnection();
   }
   async ionViewWillEnter() {
-    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
+    this.serverConnected = await this.connectivityService.checkServerConnection();
   }
 
   // METODO DE VERIFICACION DE CONEXION A INTERNET

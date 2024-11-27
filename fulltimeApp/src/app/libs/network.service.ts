@@ -25,36 +25,39 @@ export class NetworkService implements OnInit {
   networkStatus: boolean;
 
   public async ngOnInit() {
-    
-    this.checkNetworkStatus();
-    
-    Network.addListener('networkStatusChange', status => {
-      console.log('Estado de red cambiado:', status);
-      this.networkStatus = status.connected ? true : false;
-    });
 
-    if (this.platform.is('capacitor')) {
-      this.networkListener = await Network.addListener('networkStatusChange', status => {
-        this.onConectedNetwork();
-      });
-    } else {
-      this.online = merge(
-        of(navigator.onLine),
-        fromEvent(window, 'online').pipe(mapTo(true)),
-        fromEvent(window, 'offline').pipe(mapTo(false))
-      );
-      this.online.subscribe((isOnline) => {
-        if (isOnline) {
-          this.hasConnection.next(true);
-          console.log('network is Connected');
+    this.checkNetworkStatus();
+    /*
+        Network.addListener('networkStatusChange', status => {
+          console.log('Estado de red cambiado:', status);
+          this.networkStatus = status.connected ? true : false;
+          console.log('Estado de red cambiado:', this.networkStatus);
+    
+        });
+    
+        if (this.platform.is('capacitor')) {
+          this.networkListener = await Network.addListener('networkStatusChange', status => {
+            this.onConectedNetwork();
+          });
         } else {
-          console.log('network is Disconnected');;
-          this.hasConnection.next(false);
-          console.log(isOnline);
+          this.online = merge(
+            of(navigator.onLine),
+            fromEvent(window, 'online').pipe(mapTo(true)),
+            fromEvent(window, 'offline').pipe(mapTo(false))
+          );
+          this.online.subscribe((isOnline) => {
+            if (isOnline) {
+              this.hasConnection.next(true);
+              console.log('network is Connected');
+            } else {
+              console.log('network is Disconnected');;
+              this.hasConnection.next(false);
+              console.log(isOnline);
+            }
+          }
+          );
         }
-      }
-      );
-    }
+          */
   }
 
   // METODO PARA VERIFICAR EL ESTADO DE CONEXIÓN
@@ -79,6 +82,7 @@ export class NetworkService implements OnInit {
 
   // METODO PARA OBTENER INFORMACION DE CONEXION A INTERNET
   public getNetworkStatusDispositivo(): boolean {
+    this.checkNetworkStatus()
     return this.networkStatus;
   }
 

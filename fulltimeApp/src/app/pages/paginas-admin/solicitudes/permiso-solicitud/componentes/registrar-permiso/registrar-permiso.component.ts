@@ -1,8 +1,7 @@
 import { Component, Input, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { NgForm, FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { DatePipe } from '@angular/common';
-import moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { cg_permisoValueDefault, diasHoras, Permiso, permisoValueDefault } from 'src/app/interfaces/Permisos';
 import { Autorizacion, autorizacionValueDefault } from 'src/app/interfaces/Autorizaciones';
@@ -126,9 +125,9 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   tiempo: any;
   ngOnInit() {
     this.peri_vacaciones = [];
-    this.tiempo = moment();
+    this.tiempo = DateTime.now();
     this.catalogos.getCgPermisos();
-    this.reg.fecha_creacion = this.tiempo.format('YYYY-MM-DD');
+    this.reg.fecha_creacion = this.tiempo.toFormat('yyyy-MM-dd');
     this.reg.numero_permiso = this.num_permiso;
     this.reg.estado = 1;
     this.reg.id_empleado = localStorage.getItem('empleadoID');
@@ -163,10 +162,10 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
   //TODO obtenerInformacionEmpleado
   solInfo: any;
-  
+
   obtenerInformacionEmpleado() {
 
-    console.log("ve id empleado",this.reg.id_empleado);
+    console.log("ve id empleado", this.reg.id_empleado);
 
     this.autorizaciones.getInfoEmpleadoByCodigo(this.reg.id_empleado).subscribe(
       res => {
@@ -188,7 +187,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       }
     );
   }
-  
+
 
   /** ******************************************************************************************* **
     ** **                            MANEJO DE VARIABLES INPUT                                 ** **
@@ -335,7 +334,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.cont_tipo_dia_libre = 0;
     if (this.reg.fecha_inicio != null) {
       var busqueda = {
-        fecha: moment(this.reg.fecha_inicio).format('YYYY-MM-D'),
+        fecha: DateTime.fromISO(this.reg.fecha_inicio).toFormat('yyyy-MM-dd'),
         codigo: this.reg.id_empleado
       }
 
@@ -361,7 +360,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
           //Validación fechas reservadas
           if (this.cg_permiso.fecha_restriccion == true) {
-            if ((this.dia_inicio >= moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD')) && (this.dia_inicio <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'))) {
+            if ((this.dia_inicio >= DateTime.fromISO(this.cg_permiso.fecha_inicio).toFormat('yyyy-MM-dd')) && (this.dia_inicio <= DateTime.fromISO(this.cg_permiso.fecha_fin).toFormat('yyyy-MM-dd'))) {
               this.validaciones.showToast('Lo Sentimos la fecha ' + this.dia_inicio + ' esta dentro del rango de los días reservados', 3500, 'warning');
               this.valoresDefectoValidacionHoras();
               this.readonly = true
@@ -374,7 +373,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
           var fechasiguiente = new Date(this.reg.fecha_inicio);
           fechasiguiente.setDate(fechasiguiente.getDate() + 1);
           if (this.selectItemDiasHoras == 'Horas') {
-            this.dia_siguiente = moment(fechasiguiente).format('YYYY-MM-DD');
+            this.dia_siguiente = DateTime.fromISO(fechasiguiente).toFormat('yyyy-MM-dd');
             this.reg.horas_permiso = null;
             this.readonly = false;
             this.fech_bloqu = false;
@@ -405,7 +404,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.cont_tipo_dia_libre = 0;
     if (this.reg.fecha_final != null) {
       var busqueda = {
-        fecha: moment(this.reg.fecha_final).format('YYYY-MM-DD'),
+        fecha: DateTime.fromISO(this.reg.fecha_final).toFormat('yyyy-MM-dd'),
         codigo: this.reg.id_empleado
       }
 
@@ -428,14 +427,14 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         } else {
           //Validación fechas reservadas
           if (this.cg_permiso.fecha_restriccion == true) {
-            if ((this.dia_fianl >= moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD')) && (this.dia_fianl <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'))) {
+            if ((this.dia_fianl >= DateTime.fromISO(this.cg_permiso.fecha_inicio).toFormat('yyyy-MM-dd')) && (this.dia_fianl <= DateTime.fromISO(this.cg_permiso.fecha_fin).toFormat('yyyy-MM-dd'))) {
               this.validaciones.showToast('Lo Sentimos la fecha ' + this.dia_fianl + ' esta dentro del rango de los días reservados', 3500, 'warning');
               this.valoresDefectoValidacionHoras();
               this.btnOculto = true;
               this.readonly = false;
               return this.dia_validado;
-            } else if ((this.dia_inicio <= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD') && (this.dia_fianl >= moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD')))) {
-              this.validaciones.showToast('El rango de días de permiso estan reservados, no puede pedir en el rango de ' + moment(this.cg_permiso.fecha_inicio).format('YYYY-MM-DD') + ' - ' + moment(this.cg_permiso.fecha_fin).format('YYYY-MM-DD'), 4000, 'warning');
+            } else if ((this.dia_inicio <= DateTime.fromISO(this.cg_permiso.fecha_fin).toFormat('yyyy-MM-dd') && (this.dia_fianl >= DateTime.fromISO(this.cg_permiso.fecha_fin).toFormat('yyyy-MM-dd')))) {
+              this.validaciones.showToast('El rango de días de permiso estan reservados, no puede pedir en el rango de ' + DateTime.fromISO(this.cg_permiso.fecha_inicio).toFormat('yyyy-MM-dd') + ' - ' + DateTime.fromISO(this.cg_permiso.fecha_fin).toFormat('yyyy-MM-dd'), 4000, 'warning');
               this.valoresDefectoValidacionHoras();
               this.btnOculto = true;
               this.readonly = false;
@@ -498,16 +497,16 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       this.reg.fecha_final = null;
       this.dia_fianl = '';
       this.reg.fecha_inicio = e.target.value;
-      this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
+      this.dia_inicio = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');
       this.valoresDefectoValidacionHoras();
       this.dia_siguiente = '2050-12-31';
 
       if (this.reg.fecha_inicio != '' || this.reg.fecha_inicio != null) {
         //conteo de días para validar el num de dias de anticipacion para pedir el permiso
-        this.dia1 = moment(this.dia_inicio).format('D');
-        this.dia2 = moment(this.reg.fecha_creacion).format('D');
-        this.mes1 = moment(this.dia_inicio).format('MM');
-        this.mes2 = moment(this.reg.fecha_creacion).format('MM');
+        this.dia1 = DateTime.fromISO(this.dia_inicio).toFormat('d');
+        this.dia2 = DateTime.fromISO(this.reg.fecha_creacion).toFormat('d');
+        this.mes1 = DateTime.fromISO(this.dia_inicio).toFormat('MM');
+        this.mes2 = DateTime.fromISO(this.reg.fecha_creacion).toFormat('MM');
 
         if (this.cg_permiso.dias_anticipar_permiso != null && this.cg_permiso.dias_anticipar_permiso != 0) {
           if (this.mes1 == this.mes2) {
@@ -532,8 +531,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     if (e.target.value) {
       this.horario_ingreso = '23:59:59'
       this.reg.fecha_final = e.target.value;
-      this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');
-      const hoy = moment(this.reg.fecha_inicio).format("DD/MM/YYYY, HH:mm:ss")
+      this.dia_fianl = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');
+      const hoy = DateTime.fromISO(this.reg.fecha_inicio).toFormat("yyyy-MM-dd, HH:mm:ss")
       this.valoresDefectoValidacionHoras();
       this.DiaFinalLibre();
     }
@@ -547,14 +546,14 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.valoresDefectoValidacionResultados();
     if (!e.target.value) {
       var hora = new Date().setSeconds(0);
-      this.reg.hora_salida = moment(hora).format();
-      return this.hora_inicio = moment(this.reg.hora_salida).format('h:mm a');
+      this.reg.hora_salida = DateTime.fromISO(hora).toISO();
+      return this.hora_inicio = DateTime.fromISO(this.reg.hora_salida).toFormat('h:mm a');
     } else {
       this.btnOculto = true;
       this.hora_final = '';
       this.reg.hora_ingreso = null;
       this.reg.hora_salida = e.target.value;
-      this.hora_inicio = moment(e.target.value).format('h:mm a');
+      this.hora_inicio = DateTime.fromISO(e.target.value).toFormat('h:mm a');
 
       const hora_salida = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_salida);
       const fec_comp_inicio = this.validaciones.Unir_Fecha_Hora(this.reg.fecha_inicio, hora_salida);
@@ -603,11 +602,11 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.btnOculto = true;
     if (!e.target.value) {
       var hora = new Date().setSeconds(0);
-      this.reg.hora_ingreso = moment(hora).format();
-      return this.hora_final = moment(this.reg.hora_ingreso).format('h:mm a');
+      this.reg.hora_ingreso = DateTime.fromISO(hora).toISO();
+      return this.hora_final = DateTime.fromISO(this.reg.hora_ingreso).toFormat('h:mm a');
     } else {
       this.reg.hora_ingreso = e.target.value;
-      this.hora_final = moment(e.target.value).format('h:mm a');
+      this.hora_final = DateTime.fromISO(e.target.value).toFormat('h:mm a');
 
 
       const hora_salida = this.validaciones.TiempoFormatoHHMMSS(this.reg.hora_salida);
@@ -671,8 +670,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     let horario = {
       codigo: this.reg.id_empleado,
       fecha_inicio: fecha_inicio,
-      hora_inicio: moment(this.reg.hora_salida).format('HH:mm:ss'),
-      hora_final: moment(this.reg.hora_ingreso).format('HH:mm:ss'),
+      hora_inicio: DateTime.fromISO(this.reg.hora_salida).toFormat('HH:mm:ss'),
+      hora_final: DateTime.fromISO(this.reg.hora_ingreso).toFormat('HH:mm:ss'),
     }
 
     this.empleadoService.BuscarComidaHorarioHorasMD(horario).subscribe(informacion => {
@@ -703,8 +702,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     let horario = {
       fecha_inicio: fecha_inicio,
       fecha_final: fecha_final,
-      hora_inicio: moment(this.reg.hora_salida).format('HH:mm:ss'),
-      hora_final: moment(this.reg.hora_ingreso).format('HH:mm:ss'),
+      hora_inicio: DateTime.fromISO(this.reg.hora_salida).toFormat('HH:mm:ss'),
+      hora_final: DateTime.fromISO(this.reg.hora_ingreso).toFormat('HH:mm:ss'),
       codigo: this.reg.id_empleado
     }
 
@@ -741,8 +740,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     }
 
     var data = {
-      fecha_inicio: moment(this.reg.fecha_inicio).format('YYYY-MM-D'),
-      fecha_final: moment(this.reg.fecha_final).format('YYYY-MM-D'),
+      fecha_inicio:  DateTime.fromISO(this.reg.fecha_inicio).toFormat('yyyy-MM-d'),
+      fecha_final:  DateTime.fromISO(this.reg.fecha_final).toFormat('yyyy-MM-d'),
       id_empleado: this.reg.id_empleado
     }
 
@@ -753,12 +752,12 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
       if (this.selectItemDiasHoras === 'Horas') {
         this.AlmuerzoIncluidoCalculo();
-        minutosinicio = moment(this.reg.hora_salida).format('HH:mm:ss');
-        minutosfinal = moment(this.reg.hora_ingreso).format('HH:mm:ss');
+        minutosinicio = DateTime.fromISO(this.reg.hora_salida).toFormat('HH:mm:ss');
+        minutosfinal = DateTime.fromISO(this.reg.hora_ingreso).toFormat('HH:mm:ss');
       }
 
-      const fec_inicio = (moment(this.reg.fecha_inicio).format('YYYY-MM-DD')) + ' ' + minutosinicio;
-      const fec_final = (moment(this.reg.fecha_final).format('YYYY-MM-DD')) + ' ' + minutosfinal;
+      const fec_inicio = (DateTime.fromISO(this.reg.fecha_inicio).toFormat('yyyy-MM-dd')) + ' ' + minutosinicio;
+      const fec_final = (DateTime.fromISO(this.reg.fecha_final).toFormat('yyyy-MM-dd')) + ' ' + minutosfinal;
       const codigo = parseInt(localStorage.getItem('codigo')!)
 
       if (this.selectItemDiasHoras === 'Días') {
@@ -873,8 +872,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         dia = 1;
       }
 
-      this.fecha_inicio = moment(fec_comp_inicio).format();
-      this.fecha_final = moment(fec_comp_final).format();
+      this.fecha_inicio = DateTime.fromISO(fec_comp_inicio).toISO();
+      this.fecha_final = DateTime.fromISO(fec_comp_final).toISO();
       this.reg.hora_salida = this.horario_salida;
       this.reg.hora_ingreso = this.horario_ingreso;
       this.reg.dias_permiso = dia
@@ -893,8 +892,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
 
 
-      this.fecha_inicio = moment(fec_comp_inicio).format();
-      this.fecha_final = moment(fec_comp_final).format();
+      this.fecha_inicio = DateTime.fromISO(fec_comp_inicio).toFormat();
+      this.fecha_final = DateTime.fromISO(fec_comp_final).toFormat();
 
       const horasValidas = this.validaciones.validarHorasIngresadas(fec_comp_inicio, fec_comp_final) // evaluacion de fechas completas 
       if (!horasValidas) { return this.valoresDefectoValidacionHoras(), this.reg.horas_permiso = null, this.reg.dias_permiso = null, this.validacion = false }
@@ -922,18 +921,18 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
       }
 
       // 86400 seg ==> es un dia de 24 horas
-      console.log("ver cg_feriado",this.cg_feriados)
-      console.log("ver this.reg.fecha_inicio!.toString()",this.reg.fecha_inicio!.toString())
-      console.log("ver  this.reg.fecha_final!.toString()",this.reg.fecha_final!.toString())
-      console.log("ver  total",total)
+      console.log("ver cg_feriado", this.cg_feriados)
+      console.log("ver this.reg.fecha_inicio!.toString()", this.reg.fecha_inicio!.toString())
+      console.log("ver  this.reg.fecha_final!.toString()", this.reg.fecha_final!.toString())
+      console.log("ver  total", total)
       console.log("ver this.totalhoras", this.totalhoras)
-      console.log("ver this.horarioEmpleado",  this.horarioEmpleado)
-      console.log("ver this.horas_trabaja_seg",  this.horas_trabaja_seg)
+      console.log("ver this.horarioEmpleado", this.horarioEmpleado)
+      console.log("ver this.horas_trabaja_seg", this.horas_trabaja_seg)
       const { dia, tiempo_transcurrido, dia_libre } =
         this.validaciones.SegundosTransformDiaLaboral(this.reg.fecha_inicio!.toString(), this.reg.fecha_final!.toString(), total, this.totalhoras, this.horarioEmpleado, this.horas_trabaja_seg, this.cg_feriados)
-      
+
       console.log("ver timpo trascurrido", tiempo_transcurrido)
-        this.reg.dias_permiso = dia
+      this.reg.dias_permiso = dia
       this.reg.horas_permiso = tiempo_transcurrido
       this.reg.dia_libre = dia_libre;
 
@@ -976,8 +975,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
     console.log('PASO VALIDACIONES DE FECHAS Y HORAS');
 
-    const f = moment();
-    this.reg.fecha_creacion = moment(f).format('YYYY-MM-DD HH:mm:ss');
+    const f = DateTime.now();
+    this.reg.fecha_creacion = DateTime.fromISO(f).format('yyyy-MM-dd HH:mm:ss');
 
     if (this.selectItemDiasHoras != 'Días') {
       this.reg.hora_salida = this.validar.TiempoFormatoHHMMSS(this.reg.hora_salida!);
@@ -999,8 +998,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     this.reg.ip = localStorage.getItem('ip')
 
 
-    console.log('this.reg: ', this.reg);  
-    console.log('ver subir Documento: ', subir_documento);  
+    console.log('this.reg: ', this.reg);
+    console.log('ver subir Documento: ', subir_documento);
 
     formData.append('id_empl_contrato', this.reg.id_empleado_contrato as any);
     formData.append('id_peri_vacacion', this.reg.id_periodo_vacacion as any);
@@ -1026,7 +1025,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     formData.append('codigo', localStorage.getItem('codigo') as string);
     formData.append('documento', this.reg.documento as string);
 
-   
+
     this.subscripted = this.permisoService.postNuevoPermiso(formData).subscribe(
       x => {
         console.log("Ver permiso insertado: ", x.permiso)
@@ -1034,7 +1033,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         permiso.EmpleadosSendNotiEmail = []
         permiso.EmpleadosSendNotiEmail.push(this.solInfo);
 
-        console.log("ver informacion de solicitud: ", permiso.EmpleadosSendNotiEmail )
+        console.log("ver informacion de solicitud: ", permiso.EmpleadosSendNotiEmail)
         this.CrearNuevaAutorizacion(permiso);
         this.num_permiso = this.num_permiso + 1;
         this.closeModalComponent.closeModal(true);
@@ -1160,7 +1159,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         id_send_empl: parseInt(localStorage.getItem('empleadoID')),
         id_receives_empl: item.id_empleado,
         id_receives_depa: item.id_dep,
-        fecha_hora: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
+        fecha_hora: this.tiempo.format('yyyy-MM-dd') + ' ' + this.tiempo.format('HH:mm:ss'),
         estado: 'Pendiente',
         id_permiso: permiso.id,
         id_vacaciones: null,

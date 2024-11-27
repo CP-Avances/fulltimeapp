@@ -18,6 +18,7 @@ import { ParametrosService } from 'src/app/services/parametros.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
 import { Camera, CameraDirection, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
 import { FechaHoraService } from 'src/app/services/fecha-hora.service';
+import { timeout } from 'rxjs/operators';
 
 
 @Component({
@@ -506,7 +507,7 @@ export class EnviartimbrePage implements OnInit {
   BuscarParametroTimbreUbicacionDesconocida() {
 
     let buscar = {
-      id_empleado: localStorage.getItem("empleadoID"),
+      ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
     };
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
@@ -526,7 +527,7 @@ export class EnviartimbrePage implements OnInit {
   // METODO PARA VALIDAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON INTERNET REQUERIDO
   BuscarParametroTimbreSinInternet() {
     let buscar = {
-      id_empleado: localStorage.getItem("empleadoID"),
+      ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
     };
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
@@ -547,7 +548,7 @@ export class EnviartimbrePage implements OnInit {
   // METODO PARA VALIDAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON FOTO
   BuscarParametroTimbreConFoto() {
     let buscar = {
-      id_empleado: localStorage.getItem("empleadoID"),
+      ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
     };
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
@@ -747,7 +748,7 @@ export class EnviartimbrePage implements OnInit {
     localStorage.setItem("storageUbicacion", this.storageUbica);
 
     console.log("ver datos de enviarTimbre", data);
-    this.relojService.enviarTimbre(data).subscribe(
+    this.relojService.enviarTimbre(data).pipe(timeout(5000)).subscribe(
       res => {
         console.log('ver respuesta', res.message);
         this.navCtroller.navigateForward(['confirmaciontimbre'], {

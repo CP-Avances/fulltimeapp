@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AutenticacionGuard } from './guards/autenticacion.guard';
 import { TokenInterceptorService } from './services/token-interceptor.service';
-
+import { ErrorTimeoutInterceptor } from './services/error-time-interceptor';
 import { ComponentesModule } from './componentes/componentes.module';
 import { ModalsPageModule } from './modals/modals.module';
 import { Drivers } from '@ionic/storage';
@@ -54,6 +54,11 @@ const config: SocketIoConfig = { url: "http://186.4.226.49:3002", options: {}};
     AutenticacionGuard,{
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptorService,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorTimeoutInterceptor, // Nuevo interceptor para manejar timeout
       multi: true
     },
     {

@@ -69,7 +69,7 @@ export class LoginPage implements OnInit {
   // METODO PARA OBTNER PARAMETRO DE UBICACION DESCONOCIDA
   BuscarParametroTimbreUbicacionDesconocida() {
     let buscar = {
-      id_empleado: localStorage.getItem("empleadoID"),
+      ids_empleados:[parseInt( localStorage.getItem("empleadoID"), 10)],
     };
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(

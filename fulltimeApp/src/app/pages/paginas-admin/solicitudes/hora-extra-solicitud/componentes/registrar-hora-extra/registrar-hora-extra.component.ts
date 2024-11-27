@@ -2,7 +2,6 @@ import { Component, Input, OnInit, ViewChild, OnDestroy, } from '@angular/core';
 import { NgForm, FormControl } from '@angular/forms';
 import { IonDatetime } from '@ionic/angular';
 import { Subscription } from 'rxjs';
-import moment from 'moment';
 
 import { Autorizacion, autorizacionValueDefault } from 'src/app/interfaces/Autorizaciones';
 import { Notificacion, notificacionValueDefault } from 'src/app/interfaces/Notificaciones';
@@ -16,6 +15,7 @@ import { PermisosService } from 'src/app/services/permisos.service';
 import { CloseModalComponent } from 'src/app/componentes/close-modal/close-modal.component';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'app-registrar-hora-extra',
@@ -70,9 +70,9 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
 
   tiempo: any;
   ngOnInit() {
-    this.tiempo = moment();
+    this.tiempo = DateTime.now();
     this.reg.estado = 1;
-    this.reg.fecha_solicita = this.tiempo.format('YYYY-MM-DD');
+    this.reg.fecha_solicita = this.tiempo.format('yyyy-MM-dd');
     this.reg.id_empleado_cargo = parseInt(localStorage.getItem('ccargo'));
     this.reg.id_empleado_solicita = parseInt(localStorage.getItem('empleadoID'));
     this.reg.tipo_funcion = 1;
@@ -152,7 +152,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
       return this.validar.showToast('Selecciones una fecha', 3500, 'warning');
     } else {
       this.reg.fecha_inicio = e.target.value;//Igualamos la variable a la fecha ingresada
-      this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
+      this.dia_inicio = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd'); //Ajustamos el formato de la fecha para mostrar en el input
       return this.datetimeInicio.confirm(true);
     }
   }
@@ -166,7 +166,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
       return this.validar.showToast('Selecciones una fecha', 3500, 'warning');
     } else {
       this.reg.fecha_final = e.target.value; //Igualamos la variable a la fecha ingresada
-      this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
+      this.dia_fianl = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd'); //Ajustamos el formato de la fecha para mostrar en el input
       return this.datetimeFinal.confirm(true);
     }
   }
@@ -176,12 +176,11 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     this.valoresDefectoValidacionResultados();
     //Validamos si hay un cambio en el ingreso de la Hora.
     if (!e.target.value) {//Si no cambia nada en el ingreso de la hora y pone ok directamente, se ingresa la hora actual que indica el componente
-      this.reg.hora_salida = moment(new Date()).format();
-      this.hora_inicio = moment(this.reg.hora_salida).format('h:mm a');
+      this.reg.hora_salida = DateTime.now().toISO();
+      this.hora_inicio = DateTime.fromISO(this.reg.hora_salida).toFormat('h:mm a');
     } else {//Si hay un cambion en la seleccion de la hora en el componente ingresa la hora seleccionada
       this.reg.hora_salida = e.target.value;
-      this.hora_inicio = moment(e.target.value).format('h:mm a');
-
+      this.hora_inicio = DateTime.fromISO(e.target.value).toFormat('h:mm a');
     }
   }
 
@@ -189,12 +188,11 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     this.valoresDefectoValidacionResultados();
     //Validamos si hay un cambio en el ingreso de la Hora.
     if (!e.target.value) {//Si no cambia nada en el ingreso de la hora y pone ok directamente, se ingresa la hora actual que indica el componente
-      this.reg.hora_ingreso = moment(new Date()).format();
-      this.hora_final = moment(this.reg.hora_ingreso).format('h:mm a');
+      this.reg.hora_ingreso = DateTime.now().toISO();
+      this.hora_final = DateTime.fromISO(this.reg.hora_ingreso).toFormat('h:mm a');
     } else {//Si hay un cambion en la seleccion de la hora en el componente ingresa la hora seleccionada
       this.reg.hora_ingreso = e.target.value;
-      this.hora_final = moment(e.target.value).format('h:mm a');
-
+      this.hora_final = DateTime.fromISO(e.target.value).toFormat('h:mm a');
     }
   }
 
@@ -204,10 +202,10 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
   * ********************************************************************************** */
   mostrarCalculos() {
     //variables para validar el dia de inicio completo y el dia final completo y buscar duplicidad.
-    const minutosinicio = moment(this.reg.hora_salida).format('HH:mm');
-    const minutosfinal = moment(this.reg.hora_ingreso).format('HH:mm');
-    const fec_inicio = (moment(this.reg.fecha_inicio).format('YYYY-MM-DD')) + ' ' + minutosinicio;
-    const fec_final = (moment(this.reg.fecha_final).format('YYYY-MM-DD')) + ' ' + minutosfinal;
+    const minutosinicio = DateTime.fromISO(this.reg.hora_salida).toFormat('HH:mm');
+    const minutosfinal = DateTime.fromISO(this.reg.hora_ingreso).toFormat('HH:mm');
+    const fec_inicio = DateTime.fromISO(this.reg.fecha_inicio).toFormat('yyyy-MM-dd') + ' ' + minutosinicio;
+    const fec_final = DateTime.fromISO(this.reg.fecha_final).toFormat('yyyy-MM-dd') + ' ' + minutosfinal;
     const codigo = localStorage.getItem('codigo');
 
     this.horasExtrasService.getlistaHorasExtrasByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
@@ -257,17 +255,14 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
       this.validar.showToast('Ups!, lo sentimos el rango de horas excede el día completo', 3500, 'warning');
       return false;
     }
-
     const { tiempo_transcurrido } = this.validar.CalcularHorasExtrasTotales(total)
     this.reg.horas_solicitud = tiempo_transcurrido;
     this.reg.tiempo_autorizado = tiempo_transcurrido;
-
     if (registrarFechas) {
-      this.reg.fecha_inicio = moment(fec_comp_inicio).format('YYYY-MM-DD HH:mm:ss');
-      this.reg.fecha_final = moment(fec_comp_final).format('YYYY-MM-DD HH:mm:ss');
+      this.reg.fecha_inicio = DateTime.fromISO(fec_comp_inicio).toFormat('yyyy-MM-dd HH:mm:ss');
+      this.reg.fecha_final = DateTime.fromISO(fec_comp_final).toFormat('yyyy-MM-dd HH:mm:ss');
       console.log('data h...', this.reg)
     }
-
     return true
   }
 
@@ -443,18 +438,18 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
   CrearNuevaNotificacion(horaExtra: HoraExtra) {
 
     // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let desde = this.validar.FormatearFecha(moment(horaExtra.fecha_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(moment(horaExtra.fecha_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(DateTime.fromISO(horaExtra.fecha_inicio).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_completo);
+    let hasta = this.validar.FormatearFecha(DateTime.fromISO(horaExtra.fecha_final).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_completo);
 
-    let h_inicio = this.validar.FormatearHora(moment(horaExtra.fecha_inicio).format('HH:mm:ss'), this.formato_hora)
-    let h_final = this.validar.FormatearHora(moment(horaExtra.fecha_final).format('HH:mm:ss'), this.formato_hora);
+    let h_inicio = this.validar.FormatearHora(DateTime.fromISO(horaExtra.fecha_inicio).toFormat('HH:mm:ss'), this.formato_hora)
+    let h_final = this.validar.FormatearHora( DateTime.fromISO(horaExtra.fecha_final).toFormat('HH:mm:ss'), this.formato_hora);
 
     const noti: Notificacion = notificacionValueDefault;
 
     noti.id_hora_extra = horaExtra.id;
     noti.id_send_empl = parseInt(localStorage.getItem('empleadoID'));
     noti.id_permiso = noti.id_vacaciones = null;
-    noti.fecha_hora = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
+    noti.fecha_hora = this.tiempo.toFormat('yyyy-MM-dd') + ' ' + this.tiempo.toFormat('HH:mm:ss');
     noti.estado = 'Pendiente';
     noti.tipo = 1;
     noti.mensaje = 'Ha realizado una solicitud de horas extras desde ' +
@@ -490,85 +485,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
       }
 
     })
-
   }
-
-  /*
-  SendEmailsEmpleados(horaExtra: HoraExtra) {
-
-    console.log('ver horas extras ....   ', horaExtra)
-
-    var cont = 0;
-    var correo_usuarios = '';
-
-    // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let solicitud = this.validar.FormatearFecha(String(horaExtra.fecha_solicita), this.formato_fecha, this.validar.dia_completo);
-    let desde = this.validar.FormatearFecha(moment(horaExtra.fecha_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(moment(horaExtra.fecha_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-
-    // CAPTURANDO ESTADO DE LA SOLICITUD DE HORA EXTRA
-    if (horaExtra.estado === 1) {
-      var estado_h = 'Pendiente';
-    }
-
-    horaExtra.EmpleadosSendNotiEmail.forEach(e => {
-
-      // LECTURA DE DATOS LEIDOS
-      cont = cont + 1;
-
-      if (e.hora_extra_mail) {
-        if (e.estado === true) {
-          if (correo_usuarios === '') {
-            correo_usuarios = e.correo;
-          }
-          else {
-            correo_usuarios = correo_usuarios + ', ' + e.correo
-          }
-        }
-      }
-
-      if (cont === horaExtra.EmpleadosSendNotiEmail.length) {
-
-        let datosHoraExtraCreada = {
-          id_empl_contrato: parseInt(localStorage.getItem('ccontr')),
-          tipo_solicitud: 'Realización de Horas Extras solicitadas por',
-          observacion: horaExtra.descripcion,
-          num_horas: moment(horaExtra.horas_solicitud, 'HH:mm').format('HH:mm'),
-          estado_h: estado_h,
-          solicitud: solicitud,
-          desde: desde,
-          hasta: hasta,
-          h_inicio: this.validar.FormatearHora(moment(horaExtra.fecha_inicio).format('HH:mm:ss'), this.formato_hora),
-          h_final: this.validar.FormatearHora(moment(horaExtra.fecha_final).format('HH:mm:ss'), this.formato_hora),
-          proceso: 'creado',
-          asunto: 'SOLICITUD DE REALIZACION DE HORAS EXTRAS',
-          id_dep: e.id_dep,
-          id_suc: e.id_suc,
-          correo: correo_usuarios,
-          solicitado_por: (localStorage.getItem('nom')) + ' ' + (localStorage.getItem('ap')),
-        }
-        console.log('ver horas extras ....   ', datosHoraExtraCreada)
-        
-        if (correo_usuarios != '') {
-          this.autorizaciones.EnviarCorreoHoraExtra(this.idEmpresa, datosHoraExtraCreada).subscribe(
-            resp => {
-              if (resp.message === 'ok') {
-                this.validar.showToast('Correo de solicitud enviado exitosamente.', 4000, 'success');
-              }
-              else {
-                this.validar.showToast('Ups algo salio mal !!! No fue posible enviar correo de solicitud.', 4000, 'warning');
-              }
-            },
-            err => { this.validar.showToast(err.error.message, 3000, 'danger'); },
-            () => { },
-          )
-        }
-        
-      }
-    })
-  }
-
-  */
 
   ngOnDestroy() {
     if (this.subs_bool) {

@@ -144,7 +144,7 @@ export class TimbresPerdidosComponent implements OnInit {
 
   BuscarParametroTimbreUbicacionDesconocida() {
     let buscar = {
-      id_empleado: localStorage.getItem("empleadoID"),
+      ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
     };
     this.restP.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {

@@ -64,8 +64,8 @@ export class InformacionEmpleadoPage implements OnInit {
   ) { }
 
   async ngOnInit() {
-    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber()
+    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.usuario.correo = this.data.correo;
     this.usuario.apellido = this.data.apellido;
     this.usuario.nombre = this.data.nombre;
@@ -78,8 +78,8 @@ export class InformacionEmpleadoPage implements OnInit {
   }
 
   async ionViewWillEnter() {
-    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
+    this.serverConnected = await this.connectivityService.checkServerConnection();
   }
 
   // METODO PARA LA VERIFICACION DE CONEXIONA INTERNET

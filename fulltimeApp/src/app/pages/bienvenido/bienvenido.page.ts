@@ -12,6 +12,7 @@ import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { NetworkService } from '../../libs/network.service';
 import { NavegadorAdminComponent } from 'src/app/componentes/navegador-admin/navegador-admin.component';
 import { Geolocation } from '@capacitor/geolocation';
+import { timeout } from 'rxjs/operators';
 
 @Component({
   selector: 'app-bienvenido',
@@ -146,7 +147,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   // METODO PARA BUSCAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON FOTO
   BuscarParametroTimbreConFoto() {
     let buscar = {
-      id_empleado: localStorage.getItem("empleadoID"),
+      ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
     };
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
@@ -166,7 +167,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   // METODO PARA BUSCAR EL PARAMETRO DEL EMPLEADO DE TIMBRE ESPECIAL
   BuscarParametroTimbreEspecial() {
     let buscar = {
-      id_empleado: localStorage.getItem("empleadoID"),
+      ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
     };
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
@@ -185,7 +186,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   // METODO PARA BUSCAR EL PARAMETRO DE UBICACION DESCONOCIDA
   BuscarParametroTimbreUbicacionDesconocida() {
     let buscar = {
-      id_empleado: localStorage.getItem("empleadoID"),
+      ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
     };
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
@@ -203,19 +204,35 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   // METODO QUE REALIZA VALIDACIONES Y DAN PASO A ENVIAR TIMIBRE
   async VerificarTimbresSinInternet(accion: string) {
+    console.log('Estado de la red: ', this.networkService.getNetworkStatusDispositivo());
+
     await Geolocation.checkPermissions().then(() => {
       if (this.networkService.getNetworkStatusDispositivo() == true) {
         let buscar = {
-          id_empleado: localStorage.getItem("empleadoID"),
+          ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
         };
-        this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
+        this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(3000)).subscribe(
           res => {
             const timbreFoto = res.respuesta[0].timbre_internet;
             const resultado = timbreFoto ? 'Si' : 'No';
             localStorage.setItem('timbrarSinInternet', resultado);
             this.router.navigate(['/enviartimbre', accion]);
           }, error => {
-            this.router.navigate(['/enviartimbre', accion]);
+            console.log('Código de error:', error.status); // Verifica el código de error
+            if (error.status === 0) {
+              // Error de red, servidor no disponible
+              this.router.navigate(['/enviartimbre', accion]);
+            } else if (error.status === 503) {
+              // Error 503: Servicio no disponible
+              this.router.navigate(['/enviartimbre', accion]);
+            } else if (error.status === 404) {
+              // Error 404: Recurso no encontrado
+              this.router.navigate(['/enviartimbre', accion]);
+            } else {
+              // Manejo de otros errores
+              this.router.navigate(['/enviartimbre', accion]);
+            }
+            
           }
         );
       } else {
@@ -233,9 +250,9 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   // METODO QUE REALIZA VALIDACIONES Y DAN PASO A ENVIAR TIMIBRE ESPECIAL
   async VerificarTimbreEspecial(accion: string) {
     let buscar = {
-      id_empleado: localStorage.getItem("empleadoID"),
+      ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
     };
-    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
+    this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(3000)).subscribe(
       async res => {
         const timbreFoto = res.respuesta[0].timbre_especial;
         console.log("ver parametro de foto", timbreFoto);
@@ -262,7 +279,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   // METODO PARA BUSCAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON REQUERIMIENTO A INTERNET
   BuscarParametroTimbreInternetRequerido() {
     let buscar = {
-      id_empleado: localStorage.getItem("empleadoID"),
+      ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
     };
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
@@ -294,7 +311,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   // METODO PARA VERIFICAR LAS FUNCIONES
   VerificarFunciones() {
-    this.parametros.ObtenerFunciones().subscribe(res => {
+    this.parametros.ObtenerFunciones().pipe(timeout(3000)).subscribe(res => {
       this.funciones = res[0];
       this.apro_permisos = this.funciones.permisos;
       localStorage.setItem("apro_permisos", JSON.stringify(this.funciones.permisos));
@@ -311,8 +328,27 @@ export class BienvenidoPage implements OnInit, OnDestroy {
         localStorage.setItem("colorFp", "deshabilitado")
       }
     }, error => {
-      this.colorIp = localStorage.getItem("colorIp")
-      this.colorFp = localStorage.getItem("colorFp")
+
+      if (error.status === 0) {
+        // Error de red, servidor no disponible
+        this.colorIp = localStorage.getItem("colorIp")
+        this.colorFp = localStorage.getItem("colorFp")
+
+      } else if (error.status === 503) {
+        // Error 503: Servicio no disponible
+        this.colorIp = localStorage.getItem("colorIp")
+        this.colorFp = localStorage.getItem("colorFp")
+      } else if (error.status === 404) {
+        // Error 404: Recurso no encontrado
+        this.colorIp = localStorage.getItem("colorIp")
+        this.colorFp = localStorage.getItem("colorFp")
+      } else {
+        // Manejo de otros errores
+        this.colorIp = localStorage.getItem("colorIp")
+        this.colorFp = localStorage.getItem("colorFp")
+      }
+
+    
     }
     );
   }
@@ -330,9 +366,9 @@ export class BienvenidoPage implements OnInit, OnDestroy {
           }
         } else {
           let buscar = {
-            id_empleado: localStorage.getItem("empleadoID"),
+            ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
           };
-          this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
+          this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(3000)).subscribe(
             res => {
               const timbreFoto = res.respuesta[0].timbre_internet;
               const resultado = timbreFoto ? 'Si' : 'No';
@@ -366,9 +402,9 @@ export class BienvenidoPage implements OnInit, OnDestroy {
           }
         } else {
           let buscar = {
-            id_empleado: localStorage.getItem("empleadoID"),
+            ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
           };
-          this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
+          this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(3000)).subscribe(
             res => {
               const timbreFoto = res.respuesta[0].timbre_internet;
               const resultado = timbreFoto ? 'Si' : 'No';

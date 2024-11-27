@@ -33,16 +33,15 @@ export class ComunicadoPage implements OnInit {
   ) { }
 
   async ngOnInit() {
-    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
-
+    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.noti.asunto = '';
     this.noti.mensaje = '';
   }
 
   async ionViewWillEnter() {
-    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
+    this.serverConnected = await this.connectivityService.checkServerConnection();
   }
 
   // METODO PARA LEER EL ASUNTO Y MENSAJE INGRESADO

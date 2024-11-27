@@ -68,12 +68,14 @@ export class InformacionAdminPage implements OnInit {
   ) { }
 
   async ngOnInit() {
-    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
+
+    this.serverConnected = await this.connectivityService.checkServerConnection();
+    console.log("serverConnected ", this.serverConnected);
   }
   async ionViewWillEnter() {
-    this.serverConnected = await this.connectivityService.checkServerConnection();
     this.networkSubscriber();
+    this.serverConnected = await this.connectivityService.checkServerConnection();
   }
 
   // METODO PARA VERIFICAR SI EXISTE CONEXION A INTERNET

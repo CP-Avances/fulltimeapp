@@ -4,17 +4,14 @@ import { ModalController } from '@ionic/angular';
 import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { LoadingController, IonInfiniteScroll } from '@ionic/angular';
 import { Socket } from 'ngx-socket-io';
-
 import { Subscription } from 'rxjs';
-
 import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { EditarHoraExtraComponent } from '../editar-hora-extra/editar-hora-extra.component';
 import { RegistrarHoraExtraComponent } from '../registrar-hora-extra/registrar-hora-extra.component';
 import { VerHoraExtraComponent } from '../ver-hora-extra/ver-hora-extra.component';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
-import moment from 'moment';
-
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'app-hora-extra-lista',
@@ -43,7 +40,7 @@ export class HoraExtraListaComponent implements OnInit, OnDestroy {
     public parametro: ParametrosService,
     public validar: ValidacionesService,
     public socket: Socket,
-  ) { 
+  ) {
     this.socket.on('recibir_notificacion', (data_llega: any) => {
       this.obtenerListaHoraExtra();
     });
@@ -100,11 +97,11 @@ export class HoraExtraListaComponent implements OnInit, OnDestroy {
 
           this.horas_extras.forEach(h => {
             // TRATAMIENTO DE FECHAS Y HORAS
-            h.fecha_inicio_ = this.validar.FormatearFecha(moment(h.fecha_inicio).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);
-            h.hora_inicio_ = this.validar.FormatearHora(moment(h.fecha_inicio).format('HH:mm:ss'), this.formato_hora);
+            h.fecha_inicio_ = this.validar.FormatearFecha(DateTime.fromISO(h.fecha_inicio).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_completo);
+            h.hora_inicio_ = this.validar.FormatearHora(DateTime.fromISO(h.fecha_inicio).toFormat('HH:mm:ss'), this.formato_hora);
 
-            h.fecha_fin_ = this.validar.FormatearFecha(moment(h.fecha_final).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_completo);;
-            h.hora_fin_ = this.validar.FormatearHora(moment(h.fecha_final).format('HH:mm:ss'), this.formato_hora);
+            h.fecha_fin_ = this.validar.FormatearFecha(DateTime.fromISO(h.fecha_final).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_completo);;
+            h.hora_fin_ = this.validar.FormatearHora(DateTime.fromISO(h.fecha_final).toFormat('HH:mm:ss'), this.formato_hora);
 
             h.fecha_solicita_ = this.validar.FormatearFecha(String(h.fecha_solicita), this.formato_fecha, this.validar.dia_completo);
           })

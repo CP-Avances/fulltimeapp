@@ -3,8 +3,7 @@ import { AlertController, ModalController, IonDatetime } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { Vacacion } from 'src/app/interfaces/Vacacion';
 import { NgForm } from '@angular/forms';
-import moment from 'moment';
-moment.locale('es');
+import { DateTime } from 'luxon';
 
 import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
@@ -85,17 +84,15 @@ export class EditarVacacionComponent implements OnInit {
 
   tiempo: any;
   ngOnInit() {
-    this.tiempo = moment();
+    this.tiempo = DateTime.now();
     this.reg = this.vacacion;
     this.fecha_inicio = this.vacacion.fecha_inicio;
     this.fecha_final = this.vacacion.fecha_final;
-    this.dia_inicio = moment(this.fecha_inicio).format('YYYY-MM-DD');
-    this.dia_fianl = moment(this.fecha_final).format('YYYY-MM-DD');
-    this.dia_ingreso = moment(this.vacacion.fecha_ingreso).format('YYYY-MM-DD');
+    this.dia_inicio = DateTime.fromISO(this.fecha_inicio).toFormat('yyyy-MM-dd');
+    this.dia_fianl = DateTime.fromISO(this.fecha_final).toFormat('yyyy-MM-dd');
+    this.dia_ingreso = DateTime.fromISO(this.vacacion.fecha_ingreso).toFormat('yyyy-MM-dd');
     this.catalogoService.getFeriadosAnual()
-
     this.btnOcultoguardar = true;
-
     this.obtenerInformacionEmpleado();
     this.BuscarFormatos();
   }
@@ -177,8 +174,8 @@ export class EditarVacacionComponent implements OnInit {
   // METODO VALIDAR EL INPUT DE DIA INICIAL, FINAL y INGRESO
   ChangeDiaInicio(e) {
     if (!e.target.value) {
-      this.reg.fecha_inicio = moment(new Date()).format('YYYY-MM-DD');
-      const hoy = moment(this.reg.fecha_inicio).format("DD/MM/YYYY, HH:mm:ss")
+      this.reg.fecha_inicio = DateTime.now().toFormat('yyyy-MM-dd');
+      const hoy = DateTime.fromISO(this.reg.fecha_inicio).toFormat("DD/MM/YYYY, HH:mm:ss")
       this.datetimeInicio.confirm(true);
       this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
         horario => {
@@ -189,7 +186,7 @@ export class EditarVacacionComponent implements OnInit {
           } else {
             this.disabled_dia_fianl = false, this.disabled_dia_ingreso = false;
           }
-          return this.dia_inicio = moment(this.reg.fecha_inicio).format('YYYY-MM-DD');
+          return this.dia_inicio = DateTime.fromISO(this.reg.fecha_inicio).toFormat('yyyy-MM-dd');
         },
         err => {
           this.validar.showToast(err.error.message, 3000, 'danger')
@@ -200,7 +197,7 @@ export class EditarVacacionComponent implements OnInit {
 
     } else {
 
-      if (!(moment(e.target.value).format('YYYY-MM-DD') == moment(this.dia_inicio).format('YYYY-MM-DD'))) {
+      if (!(DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd') ==  DateTime.fromISO(this.dia_inicio).toFormat('yyyy-MM-dd'))) {
         this.reg.fecha_final = null;
         this.reg.fecha_ingreso = null;
         this.reg.dia_laborable = null;
@@ -211,11 +208,11 @@ export class EditarVacacionComponent implements OnInit {
       }
 
       this.reg.fecha_inicio = e.target.value;
-      this.dia_inicio = moment(e.target.value).format('YYYY-MM-DD');
+      this.dia_inicio = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');
       this.datetimeInicio.confirm(true);
       if (this.reg.fecha_inicio != '' || this.reg.fecha_inicio != null) {
 
-        const hoy = moment(this.reg.fecha_inicio).format("DD/MM/YYYY, HH:mm:ss")
+        const hoy = DateTime.fromISO(this.reg.fecha_inicio).format("dd/MM/yyyy, HH:mm:ss")
         this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
           horario => {
             this.horarioEmpleado = horario
@@ -238,10 +235,10 @@ export class EditarVacacionComponent implements OnInit {
   ChangeDiaFinal(e) {
     this.valoresPorDefectoResultado();
     if (!e.target.value) {
-      if (moment(this.reg.fecha_inicio).format('YYYY-MM-DD') == moment(new Date()).format('YYYY-MM-DD')) {
+      if (DateTime.fromISO(this.reg.fecha_inicio).toFormat('yyyy-MM-dd') == DateTime.now().toFormat('yyyy-MM-dd')) {
         this.reg.fecha_final = this.reg.fecha_inicio;
-        const hoy = moment(this.reg.fecha_final).format("DD/MM/YYYY, HH:mm:ss")
-        this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');//Ajustamos el formato de la fecha para mostrar en el input
+        const hoy = DateTime.fromISO(this.reg.fecha_final).format("dd/MM/yyyy, HH:mm:ss")
+        this.dia_fianl = DateTime.fromISO(e.target.value).format('yyyy-MM-dd');//Ajustamos el formato de la fecha para mostrar en el input
 
         this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
           horario => {
@@ -267,11 +264,11 @@ export class EditarVacacionComponent implements OnInit {
       }
     } else {
       this.dia_ingreso = "";
-      this.dia_fianl = moment(e.target.value).format('YYYY-MM-DD');
+      this.dia_fianl = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');
       this.reg.fecha_final = e.target.value;
-      const hoy = moment(this.reg.fecha_final).format("DD/MM/YYYY, HH:mm:ss")
+      const hoy = DateTime.fromISO(this.reg.fecha_final).toFormat("dd/MM/yyyy, HH:mm:ss")
       this.datetimeFinal.confirm(true);
-      if (moment(this.reg.fecha_final).format('YYYY-MM-DD') == moment(this.reg.fecha_inicio).format('YYYY-MM-DD')) {
+      if (DateTime.fromISO(this.reg.fecha_final).toFormat('yyyy-MM-dd') == DateTime.fromISO(this.reg.fecha_inicio).toFormat('yyyy-MM-dd')) {
         this.validar.showToast('Las fechas no pueden ser iguales', 3000, "warning");
         return this.disabled_dia_ingreso = true;
       }
@@ -305,9 +302,9 @@ export class EditarVacacionComponent implements OnInit {
     } else {
       this.validar.showToast('Calcule el tiempo para actualizar.', 3000, 'warning')
       this.reg.fecha_ingreso = e.target.value;
-      this.dia_ingreso = moment(e.target.value).format('YYYY-MM-DD');
+      this.dia_ingreso = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');
       this.datetimeIngreso.confirm(true);
-      const hoy = moment(this.reg.fecha_ingreso).format("DD/MM/YYYY, HH:mm:ss")
+      const hoy = DateTime.fromISO(this.reg.fecha_ingreso).toFormat("dd/MM/yyyy, HH:mm:ss")
       this.empleadoService.ObtenerUnHorarioEmpleado(this.reg.id_empleado, hoy).subscribe(
         horario => {
           this.horarioEmpleado = horario;
@@ -331,14 +328,14 @@ export class EditarVacacionComponent implements OnInit {
     //variables para validar el dia de inicio completo y el dia final completo y buscar duplicidad.
     const minutosinicio = '00:00:00';
     const minutosfinal = '23:00:00';
-    const fec_inicio = (moment(this.reg.fecha_inicio).format('YYYY-MM-DD')) + ' ' + minutosinicio;
-    const fec_final = (moment(this.reg.fecha_final).format('YYYY-MM-DD')) + ' ' + minutosfinal;
+    const fec_inicio = (DateTime.fromISO(this.reg.fecha_inicio).toFormat('yyyy-MM-dd')) + ' ' + minutosinicio;
+    const fec_final = (DateTime.fromISO(this.reg.fecha_final).toFormat('yyyy-MM-dd')) + ' ' + minutosfinal;
     const codigo = parseInt(localStorage.getItem('empleadoID'));
     const id_solicitud = this.reg.id;
 
 
-    if (moment(fec_inicio).format('YYYY-MM-DD') != moment(this.fecha_inicio).format('YYYY-MM-DD') ||
-      moment(fec_final).format('YYYY-MM-DD') != moment(this.fecha_final).format('YYYY-MM-DD')) {
+    if (DateTime.fromISO(fec_inicio).toFormat('yyyy-MM-dd') != DateTime.fromISO(this.fecha_inicio).toFormat('yyyy-MM-dd') ||
+    DateTime.fromISO(fec_final).toFormat('yyyy-MM-dd') != DateTime.fromISO(this.fecha_final).toFormat('yyyy-MM-dd')) {
 
       this.permisoService.getlistaPermisosByFechasyCodigoEdit(fec_inicio, fec_final, codigo, id_solicitud).subscribe(solicitados => {
         if (solicitados.length != 0) {
@@ -471,7 +468,7 @@ export class EditarVacacionComponent implements OnInit {
     noti.id_vacaciones = vacaciones.id;
     noti.id_send_empl = parseInt(localStorage.getItem('empleadoID'));
     noti.id_permiso = noti.id_hora_extra = null;
-    noti.fecha_hora = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
+    noti.fecha_hora = this.tiempo.format('yyyy-MM-dd') + ' ' + this.tiempo.format('HH:mm:ss');
     noti.estado = 'Pendiente'
     noti.tipo = 1;
     noti.mensaje = 'Ha actualizado su solicitud de vacaciones desde ' +
