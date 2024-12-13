@@ -211,7 +211,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
         let buscar = {
           ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
         };
-        this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(3000)).subscribe(
+        this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(2000)).subscribe(
           res => {
             const timbreFoto = res.respuesta[0].timbre_internet;
             const resultado = timbreFoto ? 'Si' : 'No';
@@ -252,7 +252,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     let buscar = {
       ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
     };
-    this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(3000)).subscribe(
+    this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(2000)).subscribe(
       async res => {
         const timbreFoto = res.respuesta[0].timbre_especial;
         console.log("ver parametro de foto", timbreFoto);
@@ -311,7 +311,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   // METODO PARA VERIFICAR LAS FUNCIONES
   VerificarFunciones() {
-    this.parametros.ObtenerFunciones().pipe(timeout(3000)).subscribe(res => {
+    this.parametros.ObtenerFunciones().pipe(timeout(2000)).subscribe(res => {
       this.funciones = res[0];
       this.apro_permisos = this.funciones.permisos;
       localStorage.setItem("apro_permisos", JSON.stringify(this.funciones.permisos));
@@ -368,7 +368,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
           let buscar = {
             ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
           };
-          this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(3000)).subscribe(
+          this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(2000)).subscribe(
             res => {
               const timbreFoto = res.respuesta[0].timbre_internet;
               const resultado = timbreFoto ? 'Si' : 'No';
@@ -404,7 +404,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
           let buscar = {
             ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
           };
-          this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(3000)).subscribe(
+          this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(2000)).subscribe(
             res => {
               const timbreFoto = res.respuesta[0].timbre_internet;
               const resultado = timbreFoto ? 'Si' : 'No';

@@ -414,11 +414,12 @@ export class EnviarUsuarioComponent implements OnInit {
   boton_enviar = false;
   // METODO PARA ENVIAR EL COMUNICADO
   EnviarNotificaciones(data: any) {
+    console.log("ver data: ", data )
     if (data.length > 0) {
       this.ContarCorreos(data);
       console.log("cont_correo", this.cont_correo)
       console.log("this.correo", this.correos)
-      if (this.cont_correo <= this.correos) {
+    //  if (this.cont_correo <= this.correos) {
         this.cont = 0;
         this.boton_enviar = true;
         data.forEach((obj: any) => {
@@ -434,12 +435,12 @@ export class EnviarUsuarioComponent implements OnInit {
             }
           }
         })
-      }
-      else {
-        this.mostrarAlertas('Trata de enviar un total de ' + this.cont_correo +
-          ' correos, sin embargo solo tiene permitido enviar un total de ' + this.correos +
-          ' correos.', 3000, 'danger')
-      }
+    //  }
+     // else {
+     //   this.mostrarAlertas('Trata de enviar un total de ' + this.cont_correo +
+     //     ' correos, sin embargo solo tiene permitido enviar un total de ' + this.correos +
+     //     ' correos.', 3000, 'danger')
+     // }
     }
     else {
       this.mostrarAlertas("No ha seleccionado usuarios.", 3000, 'danger')

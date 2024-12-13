@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
+import { timeout } from 'rxjs/operators';
 
 @Component({
   template: `
@@ -146,7 +147,7 @@ export class TimbresPerdidosComponent implements OnInit {
     let buscar = {
       ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
     };
-    this.restP.ObtenerDetalleParametroUsuario(buscar).subscribe(
+    this.restP.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(3000)).subscribe(
       res => {
         const timbreFoto = res.respuesta[0].timbre_ubicacion_desconocida;
         console.log("ver parametro de ubicacion desconocida", timbreFoto);
@@ -201,7 +202,7 @@ export class TimbresPerdidosComponent implements OnInit {
   // METODO QUE VALIDA LA TOLERANCIA DE LA UBICACION
   BuscarParametro() {
     let datos = [];
-    this.restP.ObtenerDetallesParametros(4).subscribe(
+    this.restP.ObtenerDetallesParametros(4).pipe(timeout(3000)).subscribe(
       res => {
         datos = res;
         if (datos.length != 0) {
@@ -219,7 +220,7 @@ export class TimbresPerdidosComponent implements OnInit {
   sin_ubicacion: number = 0;
   // MÉTODO QUE VERIFICAR SI EL TIMBRE FUE REALIZADO EN UN PERíMETRO DEFINIDO
   CompararCoordenadas(informacion: any, timbre: any, descripcion: any, data: any) {
-    this.restP.ObtenerCoordenadas(informacion).subscribe(
+    this.restP.ObtenerCoordenadas(informacion).pipe(timeout(3000)).subscribe(
       res => {
         console.log("entrando a ObtenerCoordenadas en CompararCoordenadas ");
         if (res[0].verificar === 'ok') {
@@ -263,7 +264,7 @@ export class TimbresPerdidosComponent implements OnInit {
     }
 
     //Usa el servicio de buscar coordenadas del usuario
-    this.restP.ObtenerUbicacionUsuario(this.id_usuario).subscribe(
+    this.restP.ObtenerUbicacionUsuario(this.id_usuario).pipe(timeout(3000)).subscribe(
       res => {
         if (res.length != 0) {
           datosUbicacion = res;
@@ -318,7 +319,7 @@ export class TimbresPerdidosComponent implements OnInit {
     const timbres = [...this.dataLocalService.timbresPerdidosStorage];
     if (timbres.length > 0) {
       //obtener datos de usuario para ver si no hay problemas con el servidor
-      this.relojService.obtenerUsuario(this.iduser).subscribe(
+      this.relojService.obtenerUsuario(this.iduser).pipe(timeout(3000)).subscribe(
         res => {
           timbres.forEach(t => {
             this.longitud = t.longitud;
@@ -363,7 +364,7 @@ export class TimbresPerdidosComponent implements OnInit {
     timbre.user_name = this.dataUserServices.username,
       timbre.ip = localStorage.getItem('ip')
 
-    this.relojService.enviarTimbreSinConexion(timbre).subscribe(
+    this.relojService.enviarTimbreSinConexion(timbre).pipe(timeout(3000)).subscribe(
       res => { },
       err => {
         this.dataLocalService.guardarTimbresPerdidos(timbre);
