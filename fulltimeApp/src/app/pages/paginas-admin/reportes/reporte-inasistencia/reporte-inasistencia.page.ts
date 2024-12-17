@@ -286,6 +286,8 @@ export class ReporteInasistenciaPage {
           name_cargo: obj.name_cargo,
           name_dep: obj.name_dep,
           name_regimen: obj.name_regimen,
+          ciudad: obj.ciudad,
+          name_suc: obj.name_suc
         })
       })
       this.empleados_filtro = [...this.empleados];
@@ -352,15 +354,18 @@ export class ReporteInasistenciaPage {
   // METODO QUE ALMACENA LOS REGISTROS DE SUCURSALES EN UN ARREGLO
   isChecked_sucu: boolean = true;
   EnviarSucursal() {
-    console.log('ver sucu-------', this.sucursales);
-    let sucu = [];
-    this.sucursales.forEach(o => {
-      if (o.isChecked_sucu === true) {
-        sucu.push(o);
-      }
-    });
-    console.log('ver depa-------', sucu);
-    this.ModelarSucursal(sucu)
+    if (!this.fechaFi || !this.fechaIn) {
+      this.mostrarToas('Seleccione Fechas', 3000, "warning");
+    } else {
+      let sucu = [];
+      this.sucursales.forEach(o => {
+        if (o.isChecked_sucu === true) {
+          sucu.push(o);
+        }
+      });
+      console.log('ver depa-------', sucu);
+      this.ModelarSucursal(sucu)
+    }
   }
 
   // METODO QUE OBTIENE LOS EMPLEADOS DE LAS SUCURSALES Y LOS ENVIA EN EL MODAL

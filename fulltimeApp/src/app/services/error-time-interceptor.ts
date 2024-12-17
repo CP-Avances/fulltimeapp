@@ -9,14 +9,8 @@ export class ErrorTimeoutInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
-      catchError((error) => {
-        console.error('Error detectado:', error);
-        // Solo aplicamos timeout si hay un error
-        return of(null).pipe(timeout(this.ERROR_TIMEOUT));
-      }),
-      catchError((finalError) => {
-        console.error('Timeout o error final:', finalError);
-        return throwError(finalError);
+      catchError((error: any) => {
+        return throwError(() => error);
       })
     );
   }

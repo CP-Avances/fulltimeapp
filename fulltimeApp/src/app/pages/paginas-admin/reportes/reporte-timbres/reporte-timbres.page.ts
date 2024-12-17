@@ -81,7 +81,7 @@ export class ReporteTimbresPage {
 
   // METODO PARA ALMACENAR EN UNA VARIABLE LA FECHA DE INICIO SELECCIONADA
   changeFechaInicio(e) {
-    
+
     this.dataUserService.setFechaRangoInicio(e.target.value);
     this.datetimeInicio.confirm(true);
     if (this.fechaInicio == null || this.fechaInicio == '') {
@@ -99,7 +99,7 @@ export class ReporteTimbresPage {
     if (this.fechaFinal == null || this.fechaFinal == '') {
       this.fechaFi = null;
     } else {
-      this.fechaFi =  DateTime.fromISO(this.fechaFinal).toFormat('yyyy-MM-dd');
+      this.fechaFi = DateTime.fromISO(this.fechaFinal).toFormat('yyyy-MM-dd');
     }
   }
 
@@ -288,23 +288,25 @@ export class ReporteTimbresPage {
   // METODO PARA CARGAR LOS REGISTROS DE EMPLEADOS
   cargarEmpleados() {
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
-      console.log("VER BuscarDatosGenerales ", res)
       sessionStorage.setItem('datos_comunicado', JSON.stringify(res))
+
       res.forEach(obj => {
         this.empleados.push({
-          id: obj.id,
+          id: obj.id ?? obj.id_empleado, // VERIFICA SI obj.id existe, SI NO, TOMA obj.id_empleado
           nombre: obj.nombre,
           apellido: obj.apellido,
           codigo: obj.codigo,
           cedula: obj.cedula,
           correo: obj.correo,
+          genero: obj.genero,
           id_cargo: obj.id_cargo,
           id_contrato: obj.id_contrato,
-          sucursal: obj.name_suc,
+          name_suc: obj.name_suc,
           id_suc: obj.id_suc,
           id_regimen: obj.id_regimen,
           id_depa: obj.id_depa,
           id_cargo_: obj.id_cargo_, // TIPO DE CARGO
+          ciudad: obj.ciudad,
           hora_trabaja: obj.hora_trabaja,
           name_cargo: obj.name_cargo,
           name_dep: obj.name_dep,
@@ -392,9 +394,11 @@ export class ReporteTimbresPage {
   // METODO QUE OBTIENE LOS EMPLEADOS DE LAS SUCURSALES Y LOS ENVIA EN EL MODAL
   ModelarSucursal(dataSucursal) {
     let seleccionados: any = [];
+
     dataSucursal.forEach((sucursales: any) => {
       seleccionados.push(sucursales);
     })
+
     let respuesta = JSON.parse(sessionStorage.getItem('datos_comunicado'))
     seleccionados.forEach((sucursales: any) => {
       sucursales.opcion = 1
@@ -435,7 +439,6 @@ export class ReporteTimbresPage {
     seleccionados.forEach((departamentos: any) => {
       departamentos.opcion = 2
       departamentos.empleados = respuesta.filter((selec: any) => {
-
         if (selec.id_depa === departamentos.id) {
           return true;
         }

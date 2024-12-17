@@ -290,13 +290,16 @@ export class ReporteTimbresConNovedadesPage {
           codigo: obj.codigo,
           cedula: obj.cedula,
           correo: obj.correo,
+          genero: obj.genero,
+
           id_cargo: obj.id_cargo,
           id_contrato: obj.id_contrato,
-          sucursal: obj.name_suc,
+          name_suc: obj.name_suc,
           id_suc: obj.id_suc,
           id_regimen: obj.id_regimen,
           id_depa: obj.id_depa,
           id_cargo_: obj.id_cargo_, // TIPO DE CARGO
+          ciudad: obj.ciudad,
           hora_trabaja: obj.hora_trabaja,
           name_cargo: obj.name_cargo,
           name_dep: obj.name_dep,

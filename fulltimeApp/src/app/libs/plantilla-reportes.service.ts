@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { ToastController, LoadingController, Platform } from '@ionic/angular';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 
 import { environment } from 'src/environments/environment';
 import { DataUserLoggedService } from '../services/data-user-logged.service';
@@ -12,6 +13,8 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const PDF_TYPE = 'application/pdf';
+const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8';
+const EXCEL_EXTENSION = '.xlsx';
 
 @Injectable({
   providedIn: 'root'
@@ -61,6 +64,30 @@ export class PlantillaReportesService {
     });
   }
 
+
+
+  async generarExcel(buffer: any, filename = 'reporte.pdf') {
+    this.presentLoading('Creando archivo Excel...');
+
+    if (this.platform.is('capacitor')) {
+      this.descargarExcelDeCelular(buffer, filename.split('.')[0], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', '.xlsx');
+    } else {
+      this.descargarDeExplorador(buffer, filename);
+    }
+  }
+
+  //INICIO metodos para guardar archivo desde explorador o desde celular
+  descargarDeExplorador(excelBuffer: any, nombreArchivoExcel: string) {
+    const data: Blob = new Blob([excelBuffer], { type: EXCEL_TYPE });
+    var a = window.document.createElement('a');
+    a.href = window.URL.createObjectURL(data);
+    a.download = nombreArchivoExcel + EXCEL_EXTENSION;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+
   // METODO PARA DESCARGAR EL REPORTE EN EL DISPOSITIVO
   private descargarDeCelular(buffer: any, nombreArchivo: string, tipo: string, extencion: string) {
     const directory = this.file.dataDirectory;
@@ -69,6 +96,26 @@ export class PlantillaReportesService {
     let options: IWriteOptions = { replace: true };
     //Writing File to Device
     this.file.writeFile(directory, fileName, buffer, options)
+      .then((success) => {
+        console.log("Archivo creado satisfactoriamente" + JSON.stringify(success));
+        this.fileOpener.open(this.file.dataDirectory + fileName, tipo)
+          .then(() => console.log('Archivo abierto'))
+          .catch(e => { console.log('Error abriendo archivo', e); this.mostrarToas('Error abiendo el archivo', 4000) });
+      })
+      .catch((error) => {
+        console.log("No se puede crear el archivo " + JSON.stringify(error));
+      });
+  }
+
+  private descargarExcelDeCelular(buffer: any, nombreArchivo: string, tipo: string, extencion: string) {
+    const directory = this.file.dataDirectory;
+    console.log(directory);
+    const fileName = nombreArchivo + extencion;
+    let options: IWriteOptions = { replace: true };
+    const blob = new Blob([buffer], { type: tipo });
+
+    //Writing File to Device
+    this.file.writeFile(directory, fileName, blob, options)
       .then((success) => {
         console.log("Archivo creado satisfactoriamente" + JSON.stringify(success));
         this.fileOpener.open(this.file.dataDirectory + fileName, tipo)

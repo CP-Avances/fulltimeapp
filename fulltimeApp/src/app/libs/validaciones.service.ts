@@ -18,8 +18,8 @@ export class ValidacionesService {
 
 
 
-    dia_abreviado: string = 'EEE';
-    dia_completo: string = 'EEEE';
+    dia_abreviado: string = 'ccc';
+    dia_completo: string = 'cccc';
 
     // METODO PARA FORMATEAR LA FECHA
     FormatearFecha(fecha: string, formato: string, dia: string) {
@@ -30,7 +30,6 @@ export class ValidacionesService {
         const valor = diaFormateado.charAt(0).toUpperCase() +
             diaFormateado.slice(1) +
             ', ' + fechaLuxon.toFormat(formato);
-
         return valor;
     }
     // METODO PARA FORMATEAR LA FECHA CONSIDERANDO LA ZONA HORARIA DEL DISPOSITIVO
@@ -995,7 +994,7 @@ export class ValidacionesService {
             const fec_string = fec_aux.toJSON().split('T')[0];
             const [fer] = feriado.filter(o => { return o.fecha === fec_string })
             const dia = DateTime.fromISO(fec_string).day; // Obtiene el día del mes
-            const mes = DateTime.fromISO(fec_string).month; 
+            const mes = DateTime.fromISO(fec_string).month;
             console.log('dia: ', dia);
             console.log('mes: ', mes);
             console.log('ver this.lista_plan: ', this.lista_plan);

@@ -49,6 +49,7 @@
     "cordova-plugin-file-opener2": "^4.0.0",
     "cordova-plugin-fingerprint-aio": "^6.0.0",
     "dom-to-image": "^2.6.0",
+    "exceljs": "^4.4.0",
     "ionicons": "^7.4.0",
     "luxon": "^3.5.0",
     "ngx-pagination": "^6.0.3",

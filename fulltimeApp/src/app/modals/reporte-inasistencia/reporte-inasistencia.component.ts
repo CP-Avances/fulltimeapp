@@ -9,6 +9,7 @@ import { ParametrosService } from 'src/app/services/parametros.service';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
+import ExcelJS, { FillPattern } from "exceljs";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -18,6 +19,17 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
   styleUrls: ['../reportes.component.scss'],
 })
 export class ReporteInasistenciaComponent implements OnInit {
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   @Input() data: any;
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
@@ -43,12 +55,40 @@ export class ReporteInasistenciaComponent implements OnInit {
 
   ) { }
 
+  ionViewWillEnter() {
+    this.ngOnInit();
+    this.consultarDataReporte();
+
+  }
+
   ngOnInit() {
     console.log('reporte inasistencia | Data empleado: ', this.data);
     this.BuscarFormatos();
+   // this.consultarDataReporte();
     this.obtenerDatosEmpresa(localStorage.getItem('id_empresa'));
     this.ObtenerLogo();
     this.ObtenerColores();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // METODOS PARA OBTENER LOS DATOS DE LA EMPRESA
@@ -454,6 +494,139 @@ export class ReporteInasistenciaComponent implements OnInit {
       });
     }
     return n;
+  }
+
+  async generarExcel() {
+    let datos: any[] = [];
+    let n: number = 1;
+
+    this.faltas.forEach((suc) => {
+      suc.empleados.map((empl: any) => {
+        empl.faltas.map((obj3: any) => {
+          const fecha = this.validar.FormatearFecha(obj3.fecha_horario, this.formato_fecha, this.validar.dia_abreviado);
+          datos.push([
+            n++,
+            empl.cedula,
+            empl.codigo,
+            empl.apellido + ' ' + empl.nombre,
+            empl.ciudad,
+            empl.sucursal,
+            empl.name_regimen,
+            empl.name_dep,
+            empl.name_cargo,
+            fecha,
+          ])
+        });
+      })
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Faltas");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:J1");
+    worksheet.mergeCells("B2:J2");
+    worksheet.mergeCells("B3:J3");
+    worksheet.mergeCells("B4:J4");
+    worksheet.mergeCells("B5:J5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = this.empresa.nombre.toUpperCase();
+    worksheet.getCell("B2").value = 'Lista de Faltas'.toUpperCase();
+    worksheet.getCell(
+      "B3"
+    ).value = 'PERIODO DEL: ' + this.fechaInicio.split('T')[0] + " AL " + this.fechaFinal.split('T')[0];
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2", "B3"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "cedula", width: 20 },
+      { key: "codigo", width: 20 },
+      { key: "apenombre", width: 20 },
+      { key: "ciudad", width: 20 },
+      { key: "sucursal", width: 20 },
+      { key: "regimen", width: 20 },
+      { key: "departamento", width: 20 },
+      { key: "cargo", width: 20 },
+      { key: "fecha", width: 20 },
+    ]
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+      { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
+      { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
+      { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
+      { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },
+      { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+      { name: "CARGO", totalsRowLabel: "", filterButton: true },
+      { name: "FECHA", totalsRowLabel: "", filterButton: true },
+    ]
+
+    worksheet.addTable({
+      name: "FaltasReporteTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 10; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+
+      const buffer: ArrayBuffer = await workbook.xlsx.writeBuffer();
+      this.plantillaPDF.generarExcel(buffer, 'Faltas_usuarios_activos');
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  private obtenerAlineacionHorizontal(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
 }

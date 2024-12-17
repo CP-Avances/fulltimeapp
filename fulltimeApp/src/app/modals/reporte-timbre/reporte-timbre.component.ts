@@ -10,15 +10,27 @@ import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import ExcelJS, { FillPattern } from "exceljs";
+
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
-
 @Component({
   selector: 'app-reporte-timbre',
   templateUrl: './reporte-timbre.component.html',
   styleUrls: ['../reportes.component.scss'],
 })
 export class ReporteTimbreComponent implements OnInit {
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
+
 
   @Input() data: any;
   @Input() activarOpcion: any;
@@ -51,12 +63,40 @@ export class ReporteTimbreComponent implements OnInit {
     private relojService: RelojServiceService,
   ) { }
 
+  
+  ionViewWillEnter() {
+    this.ngOnInit();
+    this.consultarDataReporte();
+  }
+
   ngOnInit() {
-    console.log('reporte timbre | Data empleado: ', this.data);
+    this.data.fullname = localStorage.getItem('nom') + ' ' + localStorage.getItem('ap')
     this.BuscarFormatos();
+   // this.consultarDataReporte();
     this.obtenerDatosEmpresa(localStorage.getItem('id_empresa'));
     this.ObtenerLogo();
     this.ObtenerColores();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // METODOS PARA OBTENER LOS DATOS DE LA EMPRESA
@@ -78,6 +118,7 @@ export class ReporteTimbreComponent implements OnInit {
   formato_hora: string;
   BuscarFormatos() {
     this.parametro.ObtenerFormatos().subscribe(
+      
       resp => {
         this.formato_fecha = resp.fecha;
         this.formato_hora = resp.hora;
@@ -105,6 +146,7 @@ export class ReporteTimbreComponent implements OnInit {
       }
       this.showBtnPdf = true;
     }, err => {
+      console.error("no existen resultados")
       this.existenEmpleados = true;
       this.showBtnPdf = false;
       this.loading = true;
@@ -164,6 +206,7 @@ export class ReporteTimbreComponent implements OnInit {
     let documentDefinition: any;
     documentDefinition = this.DefinirInformacionPDF();
     let doc_name = `Timbres_usuario.pdf`;
+
     this.plantillaPDF.generarPdf(documentDefinition, doc_name);
   }
 
@@ -180,7 +223,7 @@ export class ReporteTimbreComponent implements OnInit {
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         const fechaLuxon = DateTime.local(); // Obtiene la fecha y hora local
         fecha = fechaLuxon.toFormat('yyyy-MM-dd'); // Formatear la fecha
-         hora = fechaLuxon.toFormat('HH:mm:ss'); // Formatear la hora
+        hora = fechaLuxon.toFormat('HH:mm:ss'); // Formatear la hora
 
         return {
           margin: 10,
@@ -421,24 +464,327 @@ export class ReporteTimbreComponent implements OnInit {
     return n;
   }
 
+
+  async generarExcel() {
+    let datos: any[] = [];
+    let n: number = 1;
+    let accionT = '';
+    console.log("ver datos data_pdf: ", this.data_pdf)
+    this.data_pdf.forEach((data: any) => {
+      data.empleados.forEach((usu: any) => {
+        usu.timbres.forEach((t: any) => {
+          n++;
+          let servidor_fecha: any = '';
+          let servidor_hora = '';
+          if (t.fecha_hora_timbre_validado != '' && t.fecha_hora_timbre_validado != null) {
+            servidor_fecha = new Date(t.fecha_hora_timbre_validado);
+            servidor_hora = this.validar.FormatearHora(t.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora);
+          };
+          const horaTimbre = this.validar.FormatearHora(t.fecha_hora_timbre.split(' ')[1], this.formato_hora);
+          switch (t.accion) {
+            case 'EoS': accionT = 'Entrada o salida'; break;
+            case 'AES': accionT = 'Inicio o fin alimentación'; break;
+            case 'PES': accionT = 'Inicio o fin permiso'; break;
+            case 'E': accionT = 'Entrada'; break;
+            case 'S': accionT = 'Salida'; break;
+            case 'I/A': accionT = 'Inicio alimentación'; break;
+            case 'F/A': accionT = 'Fin alimentación'; break;
+            case 'I/P': accionT = 'Inicio permiso'; break;
+            case 'F/P': accionT = 'Fin permiso'; break;
+            case 'HA': accionT = 'Timbre libre'; break;
+            default: accionT = 'Desconocido'; break;
+          }
+          if (this.activarOpcion) {
+            datos.push([
+              n++,
+              usu.cedula,
+              usu.codigo,
+              `${usu.apellido} ${usu.nombre}`,
+              usu.ciudad,
+              usu.name_suc,
+              usu.name_regimen,
+              usu.name_dep,
+              usu.name_cargo,
+              servidor_fecha,
+              servidor_hora,
+              t.id_reloj,
+              accionT,
+              t.observacion,
+              t.latitud,
+              t.longitud,
+              t.fecha_hora_timbre,
+              horaTimbre
+            ])
+
+          } else {
+            datos.push([
+              n++,
+              usu.cedula,
+              usu.codigo,
+              `${usu.apellido} ${usu.nombre}`,
+              usu.ciudad,
+              usu.name_suc,
+              usu.name_regimen,
+              usu.name_dep,
+              usu.name_cargo,
+              servidor_fecha,
+              servidor_hora,
+              t.id_reloj,
+              accionT,
+              t.observacion,
+              t.latitud,
+              t.longitud,
+            ])
+          }
+        });
+      })
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Timbres");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+
+
+    if (this.activarOpcion) {
+      worksheet.mergeCells("B1:R1");
+      worksheet.mergeCells("B2:R2");
+      worksheet.mergeCells("B3:R3");
+      worksheet.mergeCells("B4:R4");
+      worksheet.mergeCells("B5:R5");
+
+      // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+      worksheet.getCell("B1").value = this.empresa.nombre.toUpperCase();
+      worksheet.getCell("B2").value = 'Lista de Timbres'.toUpperCase();
+      worksheet.getCell(
+        "B3"
+      ).value = 'PERIODO DEL: ' + this.fechaInicio.split('T')[0] + " AL " + this.fechaFinal.split('T')[0];
+      // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+      ["B1", "B2", "B3"].forEach((cell) => {
+        worksheet.getCell(cell).alignment = {
+          horizontal: "center",
+          vertical: "middle",
+        };
+        worksheet.getCell(cell).font = { bold: true, size: 14 };
+      });
+      worksheet.columns = [
+        { key: "n", width: 10 },
+        { key: "cedula", width: 20 },
+        { key: "codigo", width: 20 },
+        { key: "apenombre", width: 20 },
+        { key: "ciudad", width: 20 },
+        { key: "sucursal", width: 20 },
+        { key: "regimen", width: 20 },
+        { key: "departamento", width: 20 },
+        { key: "cargo", width: 20 },
+        { key: "servidor_fecha", width: 20 },
+        { key: "servidor_hora", width: 20 },
+        { key: "id_reloj", width: 20 },
+        { key: "accionT", width: 20 },
+        { key: "observacion", width: 20 },
+        { key: "latitud", width: 20 },
+        { key: "longitud", width: 20 },
+        { key: "fechatimbredispositivo", width: 40 },
+        { key: "horatimbredispositivo", width: 40 },
+
+      ]
+
+      const columnas = [
+        { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+        { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+        { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
+        { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
+        { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
+        { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
+        { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },
+        { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+        { name: "CARGO", totalsRowLabel: "", filterButton: true },
+        { name: "FECHA TIMBRE", totalsRowLabel: "", filterButton: true },
+        { name: "HORA TIMBRE", totalsRowLabel: "", filterButton: true },
+        { name: "RELOJ", totalsRowLabel: "", filterButton: true },
+        { name: "ACCIÓN", totalsRowLabel: "", filterButton: true },
+        { name: "OBSERVACIÓN", totalsRowLabel: "", filterButton: true },
+        { name: "LATITUD", totalsRowLabel: "", filterButton: true },
+        { name: "LONGITUD", totalsRowLabel: "", filterButton: true },
+        { name: "FECHA TIMBRE DISPOSITIVO", totalsRowLabel: "", filterButton: true },
+        { name: "HORA TIMBRE DISPOSITIVO", totalsRowLabel: "", filterButton: true },
+      ]
+
+      worksheet.addTable({
+        name: "TimbresReporteTabla",
+        ref: "A6",
+        headerRow: true,
+        totalsRow: false,
+        style: {
+          theme: "TableStyleMedium16",
+          showRowStripes: true,
+        },
+        columns: columnas,
+        rows: datos,
+      });
+
+
+      const numeroFilas = datos.length;
+      for (let i = 0; i <= numeroFilas; i++) {
+        for (let j = 1; j <= 18; j++) {
+          const cell = worksheet.getRow(i + 6).getCell(j);
+          if (i === 0) {
+            cell.alignment = { vertical: "middle", horizontal: "center" };
+          } else {
+            cell.alignment = {
+              vertical: "middle",
+              horizontal: this.obtenerAlineacionHorizontal(j),
+            };
+          }
+          cell.border = this.bordeCompleto;
+        }
+      }
+
+    } else {
+      worksheet.mergeCells("B1:P1");
+      worksheet.mergeCells("B2:P2");
+      worksheet.mergeCells("B3:P3");
+      worksheet.mergeCells("B4:P4");
+      worksheet.mergeCells("B5:P5");
+
+      // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+      worksheet.getCell("B1").value = this.empresa.nombre.toUpperCase();
+      worksheet.getCell("B2").value = 'Lista de Timbres'.toUpperCase();
+      worksheet.getCell(
+        "B3"
+      ).value = 'PERIODO DEL: ' + this.fechaInicio.split('T')[0] + " AL " + this.fechaFinal.split('T')[0];
+      // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+      ["B1", "B2", "B3"].forEach((cell) => {
+        worksheet.getCell(cell).alignment = {
+          horizontal: "center",
+          vertical: "middle",
+        };
+        worksheet.getCell(cell).font = { bold: true, size: 14 };
+      });
+      worksheet.columns = [
+        { key: "n", width: 10 },
+        { key: "cedula", width: 20 },
+        { key: "codigo", width: 20 },
+        { key: "apenombre", width: 20 },
+        { key: "ciudad", width: 20 },
+        { key: "sucursal", width: 20 },
+        { key: "regimen", width: 20 },
+        { key: "departamento", width: 20 },
+        { key: "cargo", width: 20 },
+        { key: "servidor_fecha", width: 20 },
+        { key: "servidor_hora", width: 20 },
+        { key: "id_reloj", width: 20 },
+        { key: "accionT", width: 20 },
+        { key: "observacion", width: 20 },
+        { key: "latitud", width: 20 },
+        { key: "longitud", width: 20 },
+      ]
+
+      const columnas = [
+        { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+        { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+        { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
+        { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
+        { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
+        { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
+        { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },
+        { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+        { name: "CARGO", totalsRowLabel: "", filterButton: true },
+        { name: "FECHA TIMBRE", totalsRowLabel: "", filterButton: true },
+        { name: "HORA TIMBRE", totalsRowLabel: "", filterButton: true },
+        { name: "RELOJ", totalsRowLabel: "", filterButton: true },
+        { name: "ACCIÓN", totalsRowLabel: "", filterButton: true },
+        { name: "OBSERVACIÓN", totalsRowLabel: "", filterButton: true },
+        { name: "LATITUD", totalsRowLabel: "", filterButton: true },
+        { name: "LONGITUD", totalsRowLabel: "", filterButton: true },
+      ]
+
+      worksheet.addTable({
+        name: "TimbresReporteTabla",
+        ref: "A6",
+        headerRow: true,
+        totalsRow: false,
+        style: {
+          theme: "TableStyleMedium16",
+          showRowStripes: true,
+        },
+        columns: columnas,
+        rows: datos,
+      });
+
+      const numeroFilas = datos.length;
+      for (let i = 0; i <= numeroFilas; i++) {
+        for (let j = 1; j <= 16; j++) {
+          const cell = worksheet.getRow(i + 6).getCell(j);
+          if (i === 0) {
+            cell.alignment = { vertical: "middle", horizontal: "center" };
+          } else {
+            cell.alignment = {
+              vertical: "middle",
+              horizontal: this.obtenerAlineacionHorizontal(j),
+            };
+          }
+          cell.border = this.bordeCompleto;
+        }
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer: ArrayBuffer = await workbook.xlsx.writeBuffer();
+      this.plantillaPDF.generarExcel(buffer, 'Timbres_usuarios_activos');
+
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  private obtenerAlineacionHorizontal(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
+  }
+
   // METODO PARA ALMACENAR LA INFORMACION DE LOS TIMBRES PARA QUE SEAN MOSTRADOS EN PANTALLA 
-  ExtraerDatos() {
+   ExtraerDatos() {
     this.timbres = [];
     let n = 0;
     let accionT = '';
     this.data_pdf.forEach((data: any) => {
       data.empleados.forEach((usu: any) => {
-        usu.timbres.forEach((t: any) => {
+        usu.timbres.forEach( (t: any) => {
           n = n + 1;
           this.count = n;
           let servidor_fecha = '';
           let servidor_hora = '';
+
           if (t.fecha_hora_timbre_validado != '' && t.fecha_hora_timbre_validado != null) {
-            servidor_fecha = this.validar.FormatearFecha(t.fecha_hora_timbre_validado.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
-            servidor_hora = this.validar.FormatearHora(t.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora);
+            "entra a existe fecha_hora_timbre_validado"
+            servidor_fecha =  this.validar.FormatearFecha(t.fecha_hora_timbre_validado.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+            servidor_hora =  this.validar.FormatearHora(t.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora);
           };
-          const fechaTimbre = this.validar.FormatearFecha(t.fecha_hora_timbre.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
-          const horaTimbre = this.validar.FormatearHora(t.fecha_hora_timbre.split(' ')[1], this.formato_hora);
+
+          var fechaTimbre = ''
+          var horaTimbre = ''
+          if(this.activarOpcion){
+            fechaTimbre = this.validar.FormatearFecha(t.fecha_hora_timbre.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+            horaTimbre = this.validar.FormatearHora(t.fecha_hora_timbre.split(' ')[1], this.formato_hora);
+          }
+          
+         
+         
           switch (t.accion) {
             case 'EoS': accionT = 'Entrada o salida'; break;
             case 'AES': accionT = 'Inicio o fin alimentación'; break;

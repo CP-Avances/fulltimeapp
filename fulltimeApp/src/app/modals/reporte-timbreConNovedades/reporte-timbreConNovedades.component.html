@@ -20,24 +20,14 @@
       </ion-row>
 
       <ion-row>
-
         <ion-col size="6">
-          <ion-button color="success" shape="round" expand="full" (click)="consultarDataReporte()"
-            [disabled]="showBtnBuscar">
-
-            <ng-container *ngIf="loading; then consultar; else spiner"></ng-container>
-            <ng-template #consultar>
-              <ion-icon name="search-outline"></ion-icon> Buscar
-            </ng-template>
-            <ng-template #spiner>
-              <ion-spinner name="circles"></ion-spinner>
-            </ng-template>
-
+          <ion-button color="success" shape="round" expand="full" (click)="generarExcel()" [disabled]="!showBtnPdf">
+            <ion-icon name="grid"></ion-icon>EXCEL
           </ion-button>
         </ion-col>
 
         <ion-col size="6">
-          <ion-button color="secondary" shape="round" expand="full" (click)="GenerarPDF()" [disabled]="!showBtnPdf">
+          <ion-button color="danger" shape="round" expand="full" (click)="GenerarPDF()" [disabled]="!showBtnPdf">
             <ion-icon name="document-text-outline"></ion-icon>PDF
           </ion-button>
         </ion-col>

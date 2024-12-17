@@ -7,6 +7,7 @@ import { ValidacionesService } from '../../libs/validaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
 import { DateTime } from 'luxon';
+import ExcelJS, { FillPattern } from "exceljs";
 
 @Component({
   selector: 'app-reporte-atraso',
@@ -14,6 +15,13 @@ import { DateTime } from 'luxon';
   styleUrls: ['../reportes.component.scss'],
 })
 export class ReporteAtrasoComponent implements OnInit {
+
+  private imagen: any;
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+  private fillAzul!: FillPattern;
+  private fontTitulo!: Partial<ExcelJS.Font>;
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   @Input() data: any;
   get fechaInicio(): string { return this.dataUserService.fechaRangoInicio }
@@ -50,12 +58,40 @@ export class ReporteAtrasoComponent implements OnInit {
 
   ) { }
 
+  ionViewWillEnter() {
+    this.ngOnInit();
+    this.consultarDataReporte();
+  }
+
+
   ngOnInit() {
+    this.data.fullname = localStorage.getItem('nom') + ' ' + localStorage.getItem('ap')
     console.log('reporte atraso | Data empleado: ', this.data);
     this.BuscarFormatos();
     this.obtenerDatosEmpresa(localStorage.getItem('id_empresa'));
     this.ObtenerLogo();
     this.ObtenerColores();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   empresa: any = {
@@ -240,11 +276,11 @@ export class ReporteAtrasoComponent implements OnInit {
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + localStorage.getItem('nom') + ' ' + localStorage.getItem('ap'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       footer: function (currentPage: any, pageCount: any, fecha: any) {
-      
+
         const fechaLuxon = DateTime.local(); // Obtiene la fecha y hora local
         fecha = fechaLuxon.toFormat('yyyy-MM-dd'); // Formatear la fecha
         let time = fechaLuxon.toFormat('HH:mm:ss'); // Formatear la hora
-        
+
         return {
           margin: 10,
           columns: [
@@ -600,6 +636,167 @@ export class ReporteAtrasoComponent implements OnInit {
     // RESUMEN TOTALES DE REGISTROS
     return n;
   }
+
+  async generarExcel() {
+    let datos: any[] = [];
+    let n: number = 1;
+    console.log("ver datos del excel: ", this.atrasos);
+
+    this.atrasos.forEach((suc) => {
+      suc.empleados.map((empl: any) => {
+        empl.atrasos.map((usu: any) => {
+          const horaHorario = this.validar.FormatearHora(usu.fecha_hora_horario.split(' ')[1], this.formato_hora);
+          const horaTimbre = this.validar.FormatearHora(usu.fecha_hora_timbre.split(' ')[1], this.formato_hora);
+          const minutos = this.SegundosAMinutosConDecimales(Number(usu.diferencia));
+          const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
+          var tolerancia = '00:00:00';
+          if (this.tolerancia !== '1') {
+            tolerancia = this.MinutosAHorasMinutosSegundos(Number(usu.tolerancia));
+          }
+          datos.push([
+            n++,
+            empl.cedula,
+            empl.codigo,
+            empl.apellido + ' ' + empl.nombre,
+            empl.ciudad,
+            empl.name_suc,
+            empl.name_regimen,
+            empl.name_dep,
+            empl.name_cargo,
+            new Date(usu.fecha_hora_horario),
+            horaHorario,
+            new Date(usu.fecha_hora_timbre),
+            horaTimbre,
+            tolerancia,
+            tiempo,
+            minutos.toFixed(2),
+          ])
+        });
+      })
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Atrasos");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:P1");
+    worksheet.mergeCells("B2:P2");
+    worksheet.mergeCells("B3:P3");
+    worksheet.mergeCells("B4:P4");
+    worksheet.mergeCells("B5:P5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = this.empresa.nombre.toUpperCase();
+    worksheet.getCell("B2").value = 'Lista de Atrasos'.toUpperCase();
+    worksheet.getCell(
+      "B3"
+    ).value = `PERIODO DEL REPORTE: ${this.fechaInicio.split('T')[0]} AL ${this.fechaFinal.split('T')[0]}`;
+
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2", "B3"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "cedula", width: 20 },
+      { key: "codigo", width: 20 },
+      { key: "apenombre", width: 20 },
+      { key: "ciudad", width: 20 },
+      { key: "sucursal", width: 20 },
+      { key: "regimen", width: 20 },
+      { key: "departamento", width: 20 },
+      { key: "cargo", width: 20 },
+      { key: "fechahorario", width: 20 },
+      { key: "horahorario", width: 20 },
+      { key: "fechatimbre", width: 20 },
+      { key: "horatimbre", width: 20 },
+      { key: "tolerancia", width: 20 },
+      { key: "atraso", width: 20 },
+      { key: "atrasoMinutos", width: 20 },
+    ]
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+      { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
+      { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
+      { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
+      { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },
+      { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+      { name: "CARGO", totalsRowLabel: "", filterButton: true },
+      { name: "FECHA HORARIO", totalsRowLabel: "", filterButton: true },
+      { name: "HORA HORARIO", totalsRowLabel: "", filterButton: true },
+      { name: "FECHA TIMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "HORA TIMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "TOLERANCIA", totalsRowLabel: "", filterButton: true },
+      { name: "ATRASO", totalsRowLabel: "", filterButton: true },
+      { name: "ATRASO MINUTOS", totalsRowLabel: "", filterButton: true },
+    ]
+
+    worksheet.addTable({
+      name: "AtrasosReporteTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 16; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer: ArrayBuffer = await workbook.xlsx.writeBuffer();
+      this.plantillaPDF.generarExcel(buffer, 'Atrasos_usuarios_activos');
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  private obtenerAlineacionHorizontal(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
+  }
+
 
 
 }
