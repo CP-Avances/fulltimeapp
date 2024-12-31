@@ -9,14 +9,15 @@ import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
 import { NetworkService } from '../../libs/network.service';
-
+import { ValidacionesService } from 'src/app/libs/validaciones.service';
 @Component({
   selector: 'app-lista-notificacion',
   templateUrl: './lista-notificacion.component.html',
   styleUrls: ['./lista-notificacion.component.scss'],
 })
 export class ListaNotificacionComponent implements OnInit {
- 
+  ips_locales: any = '';
+
   //INICIO DE VARIABLES
   serverConnected: boolean = true;
   skeleton = SkeletonListNotificacionesArray;
@@ -32,7 +33,7 @@ export class ListaNotificacionComponent implements OnInit {
   valor: boolean = false;
   paginaccionvista: boolean = false;
   ver: boolean = false;
-  id_noti :any;
+  id_noti: any;
 
   constructor(
     private navParams: NavParams,
@@ -43,14 +44,19 @@ export class ListaNotificacionComponent implements OnInit {
     public modalController: ModalController,
     private userService: DataUserLoggedService,
     private networkService: NetworkService,
-    private connectivityService: ConnectivityService
-  ) { 
-    this.id_noti =this.navParams.get('id')
+    private connectivityService: ConnectivityService,
+    public validar: ValidacionesService,
+  ) {
+    this.id_noti = this.navParams.get('id')
   }
 
   // METODO QUE AL INICIARCE MARCA COMO VISTO A TODAS LAS NOTIFICACIONES
   async ngOnInit() {
     this.networkSubscriber();
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
+
 
     this.serverConnected = await this.connectivityService.checkServerConnection();
     const id_empleado = localStorage.getItem('empleadoID')
@@ -110,8 +116,8 @@ export class ListaNotificacionComponent implements OnInit {
       () => { this.loading = false; }
     )
   }
-  
-  async ionViewWillEnter(){
+
+  async ionViewWillEnter() {
     this.ngOnInit();
   }
 
@@ -122,7 +128,7 @@ export class ListaNotificacionComponent implements OnInit {
   }
 
   // METODO PARA ASIGNAR LOS COLORES POR TIPO DE NOTIFICACION
-  tiponotificacion(noti: {id: any,  id_permiso: string; id_vacaciones: string; id_hora_extra: string; visto: boolean, tipo: number }) {
+  tiponotificacion(noti: { id: any, id_permiso: string; id_vacaciones: string; id_hora_extra: string; visto: boolean, tipo: number }) {
     if (noti.visto === true) {
       return "reportes";
     }
@@ -151,7 +157,7 @@ export class ListaNotificacionComponent implements OnInit {
     }
   }
 
-    // METODO PARA ABRIR LA NOTIFICACION EN LA VISTA DEL MODULO AL QUE PERTENECE
+  // METODO PARA ABRIR LA NOTIFICACION EN LA VISTA DEL MODULO AL QUE PERTENECE
   AbrirNoti(noti: { id: number, id_permiso: string; id_vacaciones: string; id_hora_extra: string; estado: string, tipo: number; nempleadoreceives: string; id_receives_empl: number; nempleadosend: string; }) {
     this.cambiovistanoti(noti);
     this.cambiovistanotitimbre(noti);
@@ -203,7 +209,7 @@ export class ListaNotificacionComponent implements OnInit {
   //cambia el estado de la columna visto de la tabla realtime_noti de true a false.
   cambiovistanoti(noti: { id: number }) {
     const vista = true;
-    const datos = { id_notificacion: noti.id, visto: vista, user_name: this.userService.username, ip: localStorage.getItem('ip') }
+    const datos = { id_notificacion: noti.id, visto: vista, user_name: this.userService.username, ip: localStorage.getItem('ip') , ip_local: this.ips_locales}
 
     this.vistonotificacion.PutNotificaVisto(noti.id, datos).subscribe(
       (res: any) => {
@@ -217,7 +223,7 @@ export class ListaNotificacionComponent implements OnInit {
   //cambia el estado de la columna visto de la tabla realtime_notitimbre de true a false.
   cambiovistanotitimbre(noti: { id: number }) {
     const vista = true;
-    const datos = { id_notificacion: noti.id, vista: vista, user_name: this.userService.username, ip: localStorage.getItem('ip') }
+    const datos = { id_notificacion: noti.id, vista: vista, user_name: this.userService.username, ip: localStorage.getItem('ip'), ip_local: this.ips_locales }
 
     this.vistonotificacion.PutNotifiTimbreVisto(noti.id, datos).subscribe(
       (res: any) => {
@@ -231,7 +237,7 @@ export class ListaNotificacionComponent implements OnInit {
   //Poner todas las notificaciones como vistas
   notificacionesvistanoti(noti: any) {
     const vista = true;
-    var datos = { id_notificacion: 0, visto: vista, user_name: this.userService.username, ip: localStorage.getItem('ip') }
+    var datos = { id_notificacion: 0, visto: vista, user_name: this.userService.username, ip: localStorage.getItem('ip'), ip_local: this.ips_locales }
     var allNotificaciones = [];
     allNotificaciones = noti;
 

@@ -15,7 +15,8 @@ export interface Notificacion {
     mensaje: string;
     tipo?: number | undefined;
     user_name?: string;
-    ip?: string
+    ip?: string;
+    ip_local?: any
 }
 
 export const notificacionValueDefault = {
@@ -32,7 +33,8 @@ export const notificacionValueDefault = {
     mensaje: '',
     tipo: undefined, 
     user_name:null,
-    ip: null
+    ip: null,
+    ip_local: null
 
 }
 
@@ -77,6 +79,7 @@ export interface NotificacionTimbre {
 
     user_name?: string;
     ip?: string
+    ip_local?: any
 }
 
 export const notificacionTimbreValueDefault = {

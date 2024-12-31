@@ -27,6 +27,7 @@ import { DataUserLoggedService } from 'src/app/services/data-user-logged.service
 })
 
 export class EditarVacacionComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() vacacion!: Vacacion;
   reg: Vacacion;
@@ -84,6 +85,9 @@ export class EditarVacacionComponent implements OnInit {
 
   tiempo: any;
   ngOnInit() {
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.tiempo = DateTime.now();
     this.reg = this.vacacion;
     this.fecha_inicio = this.vacacion.fecha_inicio;
@@ -423,6 +427,7 @@ export class EditarVacacionComponent implements OnInit {
     console.log('PASO VALIDACIONES DE FECHAS Y HORAS');
     this.reg.user_name = this.userService.username;
     this.reg.ip = localStorage.getItem('ip');
+    this.reg.ip_local= this.ips_locales;
 
     this.subscripted = this.vacacionService.putVacacion(this.reg).subscribe(
       resp => {
@@ -475,6 +480,7 @@ export class EditarVacacionComponent implements OnInit {
       desde + ' hasta ' + hasta;
 
       noti.ip = localStorage.getItem("ip");
+      noti.ip_local = this.ips_locales;
       noti.user_name = this.userService.username;
 
     //Listado para eliminar el usuario duplicado

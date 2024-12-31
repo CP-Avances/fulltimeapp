@@ -28,6 +28,7 @@ import { DataUserLoggedService } from 'src/app/services/data-user-logged.service
 })
 
 export class EditarPermisoComponent implements OnInit {
+  ips_locales: any = '';
 
   @ViewChild('formRegistro', { static: true }) ngForm: NgForm;
   @ViewChild(IonDatetime) datetimeInicio: IonDatetime;
@@ -118,6 +119,9 @@ export class EditarPermisoComponent implements OnInit {
   tipo_permiso_anterior: string = ''
 
   ngOnInit() {
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.btnOcultoguardar = true;
     this.plan_horario = [];
     this.tiempo = DateTime.now();
@@ -1081,7 +1085,8 @@ export class EditarPermisoComponent implements OnInit {
 
     this.reg.fecha_edicion = DateTime.now().toFormat('yyyy-MM-dd');
     this.reg.user_name = this.userService.username;
-    this.reg.ip = localStorage.getItem('ip')
+    this.reg.ip = localStorage.getItem('ip');
+    this.reg.ip_local = this.ips_locales;
 
     console.log("ver permiso que se editara", this.reg)
 
@@ -1116,6 +1121,8 @@ export class EditarPermisoComponent implements OnInit {
     formData.append('dia', this.reg.dias_permiso as any);
     formData.append('user_name', this.reg.user_name as string);
     formData.append('ip', localStorage.getItem('ip') as string);
+    formData.append('ip_local', this.ips_locales as any);
+
     formData.append('subir_documento', subir_documento as any);
     formData.append('codigo', localStorage.getItem('codigo') as string);
     formData.append('documento', this.reg.documento as string);
@@ -1266,6 +1273,8 @@ export class EditarPermisoComponent implements OnInit {
 
     this.reg.ip = localStorage.getItem("ip");
     this.reg.user_name = this.userService.username;
+    this.reg.ip_local = this.ips_locales;
+
 
     //Listado para eliminar el usuario duplicado
     var allNotificaciones: any = [];

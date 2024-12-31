@@ -21,6 +21,7 @@ import { ParametrosService } from 'src/app/services/parametros.service';
   styleUrls: ['../solicitar-planificar-alimentacion.page.scss'],
 })
 export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
+  ips_locales: any = '';
 
   @ViewChild('formRegistro', { static: true }) formRegistro: NgForm;
   @ViewChild(CloseModalComponent, { static: true })
@@ -41,8 +42,8 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
 
   plato_selected: any = [];
 
-   //variable para ocultar el boton de guardar
-   btnOcultoguardar: boolean = true;
+  //variable para ocultar el boton de guardar
+  btnOcultoguardar: boolean = true;
 
   public get cg_detalle_menu(): Cg_DetalleMenu[] {
     return this.catalogos.detalle_menu;
@@ -79,7 +80,10 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
   }
   tiempo: any;
   ngOnInit() {
-    this.tiempo =  DateTime.now()
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
+    this.tiempo = DateTime.now()
     this.catalogos.getServicioComida();
     this.catalogos.getDetalleMenu();
     this.catalogos.getMenuServicios();
@@ -87,12 +91,11 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
     this.reg.id_empleado = localStorage.getItem('empleadoID');
     this.reg.user_name = this.userService.username;
     this.reg.ip = localStorage.getItem('ip');
+    this.reg.ip_local = this.ips_locales;
     this.fec_actual = new Date();
     this.fec_actual_formato = DateTime.fromISO(this.fec_actual).toFormat('yyyy-MM-dd');
     this.obtenerInformacionEmpleado();
     this.BuscarFormatos();
-
-    
   }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
@@ -219,31 +222,31 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
 
   }
 
-   /* ********************************************************************************** *
-     *               METODO PARA VALIDAR DUPLICIDAD EN LA SOLICITUD                    *
-   * ********************************************************************************** */
-   mostrarCalculos(e){
-    if(!e.target.value){
+  /* ********************************************************************************** *
+    *               METODO PARA VALIDAR DUPLICIDAD EN LA SOLICITUD                    *
+  * ********************************************************************************** */
+  mostrarCalculos(e) {
+    if (!e.target.value) {
       this.reg.fecha_comida = DateTime.now().toFormat('yyyy-MM-dd');
-      return this.fecha_comida =  DateTime.fromISO(this.reg.fecha_comida).toFormat('yyyy-MM-dd');
-    }else{
+      return this.fecha_comida = DateTime.fromISO(this.reg.fecha_comida).toFormat('yyyy-MM-dd');
+    } else {
       this.reg.fecha_comida = e.target.value;
       this.fecha_comida = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');
-      const fec_comida = DateTime.fromISO(this.reg.fecha_comida).toFormat('yyyy-MM-dd'); 
+      const fec_comida = DateTime.fromISO(this.reg.fecha_comida).toFormat('yyyy-MM-dd');
       const codigo = parseInt(localStorage.getItem('empleadoID'))
       this.datetimeInicio.confirm(true);
-      if(this.reg.fecha_comida != null || this.reg.fecha_comida != undefined){
+      if (this.reg.fecha_comida != null || this.reg.fecha_comida != undefined) {
         this.alimentacionService.getlistaAlimentacionByFechasyCodigo(fec_comida, codigo).subscribe(solicitados => {
-          if(solicitados.length != 0){
+          if (solicitados.length != 0) {
             this.validar.showToast('Ups! tiene una solicitud de Alimentacion en esa fecha', 3500, 'warning');
             return this.btnOcultoguardar = true;
           }
-          else{
+          else {
             this.btnOcultoguardar = false;
           }
         }, err => {
-        this.validar.showToast('Lo sentimos tenemos problemas para verificar su solicitud', 3500, 'warning');
-        }); 
+          this.validar.showToast('Lo sentimos tenemos problemas para verificar su solicitud', 3500, 'warning');
+        });
       }
     }
   }
@@ -264,7 +267,7 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
         alimentacion.EmpleadosSendNotiEmail = [];
         alimentacion.EmpleadosSendNotiEmail.push(this.solInfo);
         this.CrearNuevaNotificacion(alimentacion);
-       // this.SendEmailsEmpleados(alimentacion);
+        // this.SendEmailsEmpleados(alimentacion);
         this.detalle_menu_selected = { valor: '', nombre: '' };
         this.validar.abrirToas('Solicitud registrada exitosamente.', 5000, 'success', 'top');
         this.closeModalComponent.closeModal(true);
@@ -292,23 +295,23 @@ export class RegistrarAlimentacionComponent implements OnInit, OnDestroy {
         desde +
         ' horario de ' + inicio + ' a ' + final + ' servicio ',
       id_comida: alimentacion.id_detalle_comida,
-      user_name : this.userService.username,
-      ip: localStorage.getItem('ip')
+      user_name: this.userService.username,
+      ip: localStorage.getItem('ip'),
+      ip_local: this.ips_locales
     }
 
     //Listado para eliminar el usuario duplicado
     var allNotificaciones = [];
     //Ciclo por cada elemento del listado
-    alimentacion.EmpleadosSendNotiEmail.forEach(function(elemento, indice, array) {
+    alimentacion.EmpleadosSendNotiEmail.forEach(function (elemento, indice, array) {
       // Discriminación de elementos iguales
-      if(allNotificaciones.find(p=>p.empleado == elemento.empleado) == undefined)
-      {
+      if (allNotificaciones.find(p => p.empleado == elemento.empleado) == undefined) {
         // Nueva lista de empleados que reciben la notificacion
         allNotificaciones.push(elemento);
       }
     });
 
-    console.log("Usuarios que reciben la notificacion: ",allNotificaciones);
+    console.log("Usuarios que reciben la notificacion: ", allNotificaciones);
 
     allNotificaciones.forEach(e => {
       mensaje.id_empleado_recibe = e.empleado;

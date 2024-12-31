@@ -8,7 +8,7 @@ import { ParametrosService } from 'src/app/services/parametros.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { timeout } from 'rxjs/operators';
-
+import { ValidacionesService } from 'src/app/libs/validaciones.service';
 @Component({
   template: `
   <app-close-modal titleModal="Timbres no enviados"></app-close-modal>
@@ -107,6 +107,7 @@ import { timeout } from 'rxjs/operators';
 
 })
 export class TimbresPerdidosComponent implements OnInit {
+  ips_locales: any = '';
 
   // METODO PARA LEET LOS timbresPerdidosStorage
   public get timbres(): Timbre[] {
@@ -133,19 +134,21 @@ export class TimbresPerdidosComponent implements OnInit {
     private restE: EmpleadosService,
     private dataUserServices: DataUserLoggedService,
     private router: Router,
-
-
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit() {
     this.iduser = parseInt(localStorage.getItem('empleadoID'))
     this.ComprobarConexionServidor();
-    this.BuscarParametroTimbreUbicacionDesconocida()
+    this.BuscarParametroTimbreUbicacionDesconocida();
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
   }
 
   BuscarParametroTimbreUbicacionDesconocida() {
     let buscar = {
-      ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
+      ids_empleados: [parseInt(localStorage.getItem("empleadoID"), 10)],
     };
     this.restP.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(3000)).subscribe(
       res => {
@@ -362,7 +365,9 @@ export class TimbresPerdidosComponent implements OnInit {
     timbre.longitud = longitud + "";
     timbre.novedades_conexion = "Falló conexión al servidor";
     timbre.user_name = this.dataUserServices.username,
-      timbre.ip = localStorage.getItem('ip')
+      timbre.ip = localStorage.getItem('ip'),
+      timbre.ip_local = this.ips_locales;
+
 
     this.relojService.enviarTimbreSinConexion(timbre).pipe(timeout(3000)).subscribe(
       res => { },

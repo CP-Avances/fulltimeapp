@@ -30,6 +30,7 @@ export interface HoraExtra {
     id_departamento?: number;
     ip?: string;
     user_name?: string;
+    ip_local?: string
 }
 
 export const horaExtraDefaultValue = {

@@ -32,6 +32,7 @@ import { DataUserLoggedService } from 'src/app/services/data-user-logged.service
 })
 
 export class RegistrarPermisoComponent implements OnInit, OnDestroy {
+  ips_locales: any = '';
 
   @ViewChild('formRegistro', { static: false }) formRegistro: NgForm;
   @ViewChild(CloseModalComponent, { static: false })
@@ -124,6 +125,9 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   vacaciones: Vacacion[] = [];
   tiempo: any;
   ngOnInit() {
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.peri_vacaciones = [];
     this.tiempo = DateTime.now();
     this.catalogos.getCgPermisos();
@@ -996,6 +1000,7 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
 
     this.reg.user_name = this.userService.username;
     this.reg.ip = localStorage.getItem('ip')
+    this.reg.ip_local = this.ips_locales
 
 
     console.log('this.reg: ', this.reg);
@@ -1021,6 +1026,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     formData.append('dia', this.reg.dias_permiso as any);
     formData.append('user_name', this.reg.user_name as string);
     formData.append('ip', localStorage.getItem('ip') as string);
+    formData.append('ip', this.ips_locales as any);
+
     formData.append('subir_documento', subir_documento as any);
     formData.append('codigo', localStorage.getItem('codigo') as string);
     formData.append('documento', this.reg.documento as string);
@@ -1108,6 +1115,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     autorizacion.id_documento = ''
     autorizacion.user_name = this.userService.username;
     autorizacion.ip = localStorage.getItem('ip');
+    autorizacion.ip_local = this.ips_locales
+
 
     this.autorizaciones.postNuevaAutorizacion(autorizacion).subscribe(
       resp => {
@@ -1167,7 +1176,9 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
         mensaje: 'Ha realizado una solicitud de permiso desde ' + permiso.fecha_inicio + ' ' + h_inicio + ' hasta ' + permiso.fecha_final + ' ' + h_fin,
         tipo: 1,
         user_name: this.userService.username,
-        ip: localStorage.getItem('ip')
+        ip: localStorage.getItem('ip'),
+        ip_local: this.ips_locales
+
       }
 
       console.log("ver datos de la notificacion", notificacion)

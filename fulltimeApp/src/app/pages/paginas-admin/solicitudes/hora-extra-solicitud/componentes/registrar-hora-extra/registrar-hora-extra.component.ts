@@ -2,16 +2,13 @@ import { Component, Input, OnInit, ViewChild, OnDestroy, } from '@angular/core';
 import { NgForm, FormControl } from '@angular/forms';
 import { IonDatetime } from '@ionic/angular';
 import { Subscription } from 'rxjs';
-
 import { Autorizacion, autorizacionValueDefault } from 'src/app/interfaces/Autorizaciones';
 import { Notificacion, notificacionValueDefault } from 'src/app/interfaces/Notificaciones';
 import { HoraExtra, horaExtraDefaultValue } from 'src/app/interfaces/HoraExtra';
-
 import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { PermisosService } from 'src/app/services/permisos.service';
-
 import { CloseModalComponent } from 'src/app/componentes/close-modal/close-modal.component';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
@@ -24,6 +21,7 @@ import { DateTime } from 'luxon';
 })
 
 export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
+  ips_locales: any = '';
 
   @ViewChild('formRegistro', { static: true }) formRegistro: NgForm;
   @ViewChild(CloseModalComponent, { static: true })
@@ -70,6 +68,9 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
 
   tiempo: any;
   ngOnInit() {
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.tiempo = DateTime.now();
     this.reg.estado = 1;
     this.reg.fecha_solicita = this.tiempo.format('yyyy-MM-dd');
@@ -278,6 +279,8 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     this.reg.hora_ingreso = this.validar.TiempoFormatoHHMMSS(this.reg.hora_ingreso);
 
     this.reg.ip = localStorage.getItem("ip");
+    this.reg.ip_local = this.ips_locales;
+
     this.reg.user_name = this.userService.username;
     let formData = new FormData();
 
@@ -308,6 +311,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     formData.append('subir_documento', this.reg.observacion as any);
     formData.append('codigo', localStorage.getItem('codigo') as string);
     formData.append('documento', this.reg.documento as any);
+    formData.append('ip_local', this.ips_locales as any);
 
     this.subscripted = this.horasExtrasService.postNuevaHorasExtras(formData).subscribe(
       horaExtra => {
@@ -425,6 +429,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
     autorizacion.id_documento = '';
     autorizacion.user_name = this.userService.username;
     autorizacion.ip = localStorage.getItem('ip');
+    autorizacion.ip_local = this.ips_locales;
 
 
     this.autorizaciones.postNuevaAutorizacion(autorizacion).subscribe(
@@ -458,6 +463,7 @@ export class RegistrarHoraExtraComponent implements OnInit, OnDestroy {
 
     noti.user_name = this.userService.username
     noti.ip = localStorage.getItem('ip')
+    noti.ip_local = this.ips_locales
 
     //Listado para eliminar el usuario duplicado
     var allNotificaciones = [];

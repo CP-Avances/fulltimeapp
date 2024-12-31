@@ -64,8 +64,6 @@ export class PlantillaReportesService {
     });
   }
 
-
-
   async generarExcel(buffer: any, filename = 'reporte.pdf') {
     this.presentLoading('Creando archivo Excel...');
 

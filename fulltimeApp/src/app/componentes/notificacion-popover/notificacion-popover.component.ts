@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { ListaNotificacionComponent } from '../lista-notificaciones/lista-notificacion.component';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
-
+import { ValidacionesService } from 'src/app/libs/validaciones.service';
 
 @Component({
   selector: 'app-notificacion-popover',
@@ -16,6 +16,7 @@ import { DataUserLoggedService } from 'src/app/services/data-user-logged.service
   styleUrls: ['./notificacion-popover.component.scss'],
 })
 export class NotificacionPopoverComponent implements OnInit {
+  ips_locales: any = '';
 
   skeleton = SkeletonListNotificacionesArray;
   loading: boolean = true;
@@ -40,10 +41,16 @@ export class NotificacionPopoverComponent implements OnInit {
     private vistonotificacion: NotificacionesService,
     public modalController: ModalController,
     private userService: DataUserLoggedService,
+    public validar: ValidacionesService,
+
   ) { }
+
 
   ngOnInit() {
     const id_empleado = localStorage.getItem('empleadoID');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     this.notificacionService.getNotificacionesByIdEmpleado(id_empleado + '').subscribe(
       notificacion => {
@@ -157,7 +164,7 @@ export class NotificacionPopoverComponent implements OnInit {
   // METODO PARA CAMBIAR EL ESTADO DE VISTO 
   cambiovistanoti(noti: { id: number }) {
     const vista = true;
-    const datos = { id_notificacion: noti.id, visible: vista, user_name: this.userService.username, ip: localStorage.getItem('ip') }
+    const datos = { id_notificacion: noti.id, visible: vista, user_name: this.userService.username, ip: localStorage.getItem('ip'), ip_local: this.ips_locales }
     this.vistonotificacion.PutNotificaVisto(noti.id, datos).subscribe(
       (res: any) => {
         res.visto = false;
@@ -170,7 +177,7 @@ export class NotificacionPopoverComponent implements OnInit {
   // METODO PARA CAMBIAR EL ESTADO DE VISTO DE LA NTIFICAION TIMBRE
   cambiovistanotitimbre(noti: { id: number }) {
     const vista = true;
-    const datos = { id_notificacion: noti.id, visto: vista, user_name: this.userService.username, ip: localStorage.getItem('ip') }
+    const datos = { id_notificacion: noti.id, visto: vista, user_name: this.userService.username, ip: localStorage.getItem('ip'), ip_local: this.ips_locales }
     this.vistonotificacion.PutNotifiTimbreVisto(noti.id, datos).subscribe(
       (res: any) => {
         res.visto = false;

@@ -23,6 +23,7 @@ export interface Vacacion {
     id_departamento?: number;
     user_name?: string;
     ip?: string;
+    ip_local?: any
 
 
 }
@@ -43,6 +44,8 @@ export const vacacionValueDefault = {
     fec_ingreso_: null,
     id_departamento: null,
     user_name: null,
-    ip: null
+    ip: null,
+    ip_local:null
+
 
 }

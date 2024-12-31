@@ -23,12 +23,13 @@ export class DeleteService {
     ) { }
 
     // METODO PARA ELIMINAR LAS SOLICITUDES
-    EliminarRegistro(idreg: string, nametable: string,user_name:  string, ip:  string) {
+    EliminarRegistro(idreg: string, nametable: string,user_name:  string, ip:  string, ip_local: any) {
         const params = new HttpParams()
             .set('nametable', nametable)
             .set('idreg', idreg)
             .set('user_name', user_name)
             .set('ip', ip)
+            .set('ip_local', ip_local)
 
         return this.http.delete<any>(`${this.apiUrl}/delete/registro`, { params })
             .pipe(

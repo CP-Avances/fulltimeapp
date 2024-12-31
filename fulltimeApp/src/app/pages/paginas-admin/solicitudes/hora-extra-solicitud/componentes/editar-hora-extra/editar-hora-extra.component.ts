@@ -3,11 +3,9 @@ import { ModalController, IonDatetime } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { DateTime } from 'luxon';
-
 import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { HorasExtrasService } from 'src/app/services/horas-extras.service';
-
 import { Notificacion, notificacionValueDefault } from 'src/app/interfaces/Notificaciones';
 import { HoraExtra } from 'src/app/interfaces/HoraExtra';
 import { ParametrosService } from 'src/app/services/parametros.service';
@@ -20,6 +18,7 @@ import { DataUserLoggedService } from 'src/app/services/data-user-logged.service
   styleUrls: ['../solicitar-horas-extras.page.scss']
 })
 export class EditarHoraExtraComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() hora_extra!: HoraExtra;
   @ViewChild('formRegistro', { static: true }) ngForm: NgForm;
@@ -62,6 +61,9 @@ export class EditarHoraExtraComponent implements OnInit {
   tiempo: any;
 
   ngOnInit() {
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.tiempo = DateTime.now();
     this.reg = this.hora_extra;
     this.reg.fecha_inicio = DateTime.fromISO(this.hora_extra.fecha_inicio).
@@ -326,6 +328,8 @@ export class EditarHoraExtraComponent implements OnInit {
 
     this.reg.user_name = this.userService.username;
     this.reg.ip = localStorage.getItem('ip');
+    this.reg.ip_local = this.ips_locales;
+
 
 
     this.subscripted = this.horasExtrasService.putHoraExtra(this.reg).subscribe(
@@ -451,6 +455,8 @@ export class EditarHoraExtraComponent implements OnInit {
       ' horario de ' + h_inicio + ' a ' + h_final;
     noti.user_name = this.userService.username;
     noti.ip = localStorage.getItem('ip')
+    noti.ip_local = this.ips_locales;
+
 
     //Listado para eliminar el usuario duplicado
     var allNotificaciones = [];

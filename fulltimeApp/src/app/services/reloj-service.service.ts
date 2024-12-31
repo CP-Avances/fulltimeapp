@@ -31,8 +31,8 @@ export class RelojServiceService {
   }
 
   // METODO PARA REGISTRAR EL DISPOSITIVO
-  registrarCelularUsuario(id_empleado: any, id_celular: any, modelo_dispositivo: any, user_name: any, ip: any, terminos_condiciones: boolean) {
-    return this.http.post<any>(this.URL + '/usuarios/ingresarIDdispositivo', { id_empleado, id_celular, modelo_dispositivo, user_name, ip, terminos_condiciones });
+  registrarCelularUsuario(id_empleado: any, id_celular: any, modelo_dispositivo: any, user_name: any, ip: any, terminos_condiciones: boolean, ip_local: any) {
+    return this.http.post<any>(this.URL + '/usuarios/ingresarIDdispositivo', { id_empleado, id_celular, modelo_dispositivo, user_name, ip, terminos_condiciones, ip_local });
   }
 
   // BUSCAR EL DISPOSITIVO POR ID DEL EMPLEADO
@@ -44,7 +44,7 @@ export class RelojServiceService {
   obtenerDispositivoPorID(id_dispositivo: number | string) {
     return this.http.post<any>(this.URL + '/usuarios/dispositivo/idDispositivo', { id_dispositivo });
   }
-  
+
   // METODO PARA OBTENER EL DEPARTAMENTO DEL EMPLEADO POR SU ID
   ObtenerDepartamentoUsuarios(id_empleado: number) {
     return this.http.get(this.URL + '/user/dato/' + id_empleado);
@@ -88,7 +88,7 @@ export class RelojServiceService {
     console.log("esPrimeraVez()", !!localStorage.getItem('primeraVez'))
     return !!localStorage.getItem('primeraVez');
   }
-  
+
   // METODO PARA OBTENER LOS DATOS DE LA EMPRESA
   obtenerDatosEmpresa(id: any) {
     return this.http.get(`${this.URL}/empresas/buscar/datos/${id}`);

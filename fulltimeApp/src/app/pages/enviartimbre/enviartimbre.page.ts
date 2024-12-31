@@ -19,7 +19,7 @@ import { EmpleadosService } from 'src/app/services/empleados.service';
 import { Camera, CameraDirection, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
 import { FechaHoraService } from 'src/app/services/fecha-hora.service';
 import { timeout } from 'rxjs/operators';
-
+import { ValidacionesService } from 'src/app/libs/validaciones.service';
 
 @Component({
   selector: 'app-enviartimbre',
@@ -27,7 +27,7 @@ import { timeout } from 'rxjs/operators';
   styleUrls: ['./enviartimbre.page.scss'],
 })
 export class EnviartimbrePage implements OnInit {
-
+  ips_locales: any = '';
 
   //Parametros
   timbrarSinInternet: string;
@@ -58,12 +58,18 @@ export class EnviartimbrePage implements OnInit {
     public parametros: ParametrosService,
     private router: Router,
     private userService: DataUserLoggedService,
-    private fechaHoraService: FechaHoraService
+    private fechaHoraService: FechaHoraService,
+    public validar: ValidacionesService,
+
   ) { }
 
   ngOnInit() {
     this.VerificarFunciones();
     this.networkSubscriber();
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
+
     this.id_usuario = localStorage.getItem('empleadoID');
     this.codigo = localStorage.getItem('codigo');
     this.nombre_usuario = localStorage.getItem('nom');
@@ -97,6 +103,7 @@ export class EnviartimbrePage implements OnInit {
     id_reloj: 97,
     ubicacion: "",
     ip: "",
+    ip_local: "",
     user_name: ""
   };
 
@@ -436,6 +443,8 @@ export class EnviartimbrePage implements OnInit {
     this.nuevoTimbre.tecla_funcion = this.obtenerIdTipo();
     this.nuevoTimbre.user_name = this.userService.username;
     this.nuevoTimbre.ip = localStorage.getItem('ip');
+    this.nuevoTimbre.ip_local = this.ips_locales;
+    
     this.nuevoTimbre.imagen = this.imagen;
 
     if (this.nuevoTimbre.accion === "HA" && this.nuevoTimbre.observacion === null) return this.abrirToas('Lo siento! Debes ingresar una observación antes de enviar un timbre abierto 😅', "danger", 5000, "middle");

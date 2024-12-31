@@ -25,6 +25,7 @@ import { DataUserLoggedService } from 'src/app/services/data-user-logged.service
   styleUrls: ['../solicitar-vacaciones.page.scss'],
 })
 export class RegistrarVacacionComponent implements OnInit, OnDestroy {
+  ips_locales: any = '';
 
   @ViewChild('formRegistro', { static: false }) formRegistro: NgForm;
   @ViewChild(CloseModalComponent, { static: true })
@@ -81,6 +82,9 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.catalogoService.getFeriadosAnual()
     this.reg.estado = 1;
     this.reg.id_empleado = parseInt(localStorage.getItem('empleadoID'));
@@ -91,6 +95,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
 
     this.reg.user_name = this.userService.username;
     this.reg.ip = localStorage.getItem('ip');
+    this.reg.ip_local = this.ips_locales;
 
     console.log('peri_vacaciones: ', this.reg.id_periodo_vacacion);
     console.log('id_empleado_cargo: ', this.reg.id_empleado_cargo);
@@ -425,6 +430,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
     autorizacion.id_documento = ''
     autorizacion.user_name = this.userService.username;
     autorizacion.ip = localStorage.getItem('ip');
+    autorizacion.ip_local = this.ips_locales;
+
     this.autorizaciones.postNuevaAutorizacion(autorizacion).subscribe(
       resp => { //this.validar.showToast(resp.message, 3000, 'success') 
       },
@@ -450,7 +457,8 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
       desde + ' hasta ' + hasta;
 
     noti.user_name = this.userService.username;
-    noti.ip = localStorage.getItem('ip')
+    noti.ip = localStorage.getItem('ip');
+    noti.ip_local= this.ips_locales;
 
     //Listado para eliminar el usuario duplicado
     var allNotificaciones = [];

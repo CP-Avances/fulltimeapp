@@ -12,7 +12,8 @@ export interface Autorizacion {
 
     id_depa_confi?: number;
     ip:string
-    user_name: string
+    user_name: string;
+    ip_local: any
 }
 
 export const autorizacionValueDefault = {
@@ -26,5 +27,6 @@ export const autorizacionValueDefault = {
     id_plan_hora_extra: null,
     id_documento: null,
     ip:null,
-    user_name: null
+    user_name: null,
+    ip_local: null
 }

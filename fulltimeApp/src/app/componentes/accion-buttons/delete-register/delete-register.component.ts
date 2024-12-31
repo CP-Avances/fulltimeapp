@@ -1,23 +1,20 @@
 import { Component, EventEmitter, Output, Input, ViewChild } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { DateTime } from 'luxon';
-
 import { DeleteService } from 'src/app/libs/delete.service';
 import { CatalogosService } from 'src/app/services/catalogos.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
-
 import { Notificacion, notificacionValueDefault } from 'src/app/interfaces/Notificaciones';
 import { cg_permisoValueDefault } from 'src/app/interfaces/Permisos';
 import { Cg_TipoPermiso } from 'src/app/interfaces/Catalogos';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
-
 import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { PermisosService } from 'src/app/services/permisos.service';
 import { VacacionesService } from 'src/app/services/vacaciones.service';
 import { AlimentacionService } from 'src/app/services/alimentacion.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
-import { DataUserLoggedService } from 'src/app/services/data-user-logged.service'; 
+import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 @Component({
   selector: 'btn-delete',
   templateUrl: './delete-register.component.html',
@@ -28,7 +25,10 @@ import { DataUserLoggedService } from 'src/app/services/data-user-logged.service
   `],
 })
 
-export class DeleteRegisterComponent{
+
+
+export class DeleteRegisterComponent {
+  ips_locales: any = '';
 
   // @Input() formRegistro: NgForm;
   @Input() loadingBtn: boolean;
@@ -72,6 +72,11 @@ export class DeleteRegisterComponent{
     this.tiempo = DateTime.now();
     this.BuscarFormatos();
   }
+  ngOnInit() {
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
+  }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
   formato_fecha: string;
@@ -99,7 +104,7 @@ export class DeleteRegisterComponent{
         }, {
           text: 'Confirmar',
           handler: () => {
-            this.deleteSevice.EliminarRegistro(this.idreg, this.nameTable,this.dataUserServices.username, localStorage.getItem('ip') ).subscribe(
+            this.deleteSevice.EliminarRegistro(this.idreg, this.nameTable, this.dataUserServices.username, localStorage.getItem('ip'), this.ips_locales).subscribe(
               data => {
                 console.log('Datos a eliminar -> ', this.nameTable, ' id: ', this.idreg, ' codigo: ', this.userCodigo)
                 this.obtenerInformacionEmpleado(data, this.nameTable, parseInt(this.userCodigo));
@@ -168,11 +173,11 @@ export class DeleteRegisterComponent{
       data.EmpleadosSendNotiEmail.push(infoUsuario);
       if (tabla === 'mp_solicitud_permiso') {
         this.EliminarDocumentoPermiso(data);
-       // this.EnviarCorreoPermiso(data); 
+        // this.EnviarCorreoPermiso(data); 
         this.EnviarNotificacionPermiso(data, nota, user);
       }
       else if (tabla === 'mv_solicitud_vacacion') {
-       // this.EnviarCorreoVacacion(data, infoUsuario);
+        // this.EnviarCorreoVacacion(data, infoUsuario);
         this.EnviarNotificacionVacacion(data, nota, user);
       }
       else if (tabla === 'mhe_solicitud_hora_extra') {
@@ -191,7 +196,7 @@ export class DeleteRegisterComponent{
    ** **                           MANEJO DE NOTIFICACIONES DE PERMISOS                          ** **
    ** ******************************************************************************************* **/
 
-  
+
 
   EnviarNotificacionPermiso(permiso: any, nota: string, user: string) {
 
@@ -238,25 +243,25 @@ export class DeleteRegisterComponent{
     //Listado para eliminar el usuario duplicado
     var NotificacionesPermisoFiltrados: any = [];
     //Ciclo por cada elemento del listado
-    permiso.EmpleadosSendNotiEmail.forEach(function(elemento: any, indice: any, array: any) {
+    permiso.EmpleadosSendNotiEmail.forEach(function (elemento: any, indice: any, array: any) {
       // Discriminación de elementos iguales
-      if(NotificacionesPermisoFiltrados.find((p: any) =>p.empleado == elemento.empleado) == undefined)
-      {
+      if (NotificacionesPermisoFiltrados.find((p: any) => p.empleado == elemento.empleado) == undefined) {
         // Nueva lista de empleados que reciben la notificacion
         NotificacionesPermisoFiltrados.push(elemento);
       }
     });
 
-    console.log("Usuarios que reciben la notificacion Permiso: ",NotificacionesPermisoFiltrados);
+    console.log("Usuarios que reciben la notificacion Permiso: ", NotificacionesPermisoFiltrados);
 
     NotificacionesPermisoFiltrados.forEach((e: any) => {
       noti.id_receives_depa = e.id_dep;
       noti.id_receives_empl = e.empleado;
-      noti.user_name =this.dataUserServices.username;
-      noti.ip =localStorage.getItem('ip');
+      noti.user_name = this.dataUserServices.username;
+      noti.ip = localStorage.getItem('ip');
+      noti.ip_local = this.ips_locales;
 
 
-      
+
       if (e.permiso_noti) {
         this.autoriza.postNotificacion(noti).subscribe(
           resp => {
@@ -272,7 +277,7 @@ export class DeleteRegisterComponent{
 
   // ELIMINAR ARCHIVO DE PERMISO
   EliminarDocumentoPermiso(data: any) {
-    if(data.documento != null && data.documento != undefined && data.documento != ''){
+    if (data.documento != null && data.documento != undefined && data.documento != '') {
       this.permisoService.EliminarArchivo(data.documento, parseInt(this.userCodigo)).subscribe(
         resp => { })
     }
@@ -319,23 +324,23 @@ export class DeleteRegisterComponent{
     //Listado para eliminar el usuario duplicado
     var NotificacionesVacacionesFiltrados: any = [];
     //Ciclo por cada elemento del listado
-    vacaciones.EmpleadosSendNotiEmail.forEach(function(elemento: any, indice: any, array: any) {
+    vacaciones.EmpleadosSendNotiEmail.forEach(function (elemento: any, indice: any, array: any) {
       // Discriminación de elementos iguales
-      if(NotificacionesVacacionesFiltrados.find((p: any)=>p.empleado == elemento.empleado) == undefined)
-      {
+      if (NotificacionesVacacionesFiltrados.find((p: any) => p.empleado == elemento.empleado) == undefined) {
         // Nueva lista de empleados que reciben la notificacion
         NotificacionesVacacionesFiltrados.push(elemento);
       }
     });
 
-    console.log("Usuarios que reciben la notificacion Vacaci: ",NotificacionesVacacionesFiltrados);
+    console.log("Usuarios que reciben la notificacion Vacaci: ", NotificacionesVacacionesFiltrados);
 
 
     NotificacionesVacacionesFiltrados.forEach((e: any) => {
       noti.id_receives_depa = e.id_dep;
       noti.id_receives_empl = e.empleado;
-      noti.user_name =this.dataUserServices.username;
-      noti.ip =localStorage.getItem('ip');
+      noti.user_name = this.dataUserServices.username;
+      noti.ip = localStorage.getItem('ip');
+      noti.ip_local = this.ips_locales;
       if (e.vaca_noti) {
         this.autoriza.postNotificacion(noti).subscribe(
           resp => {
@@ -354,7 +359,7 @@ export class DeleteRegisterComponent{
    ** **                METODO DE ENVIO DE NOTIFICACIONES DE HORAS EXTRAS                      ** **
    ** ******************************************************************************************* **/
 
-  
+
 
   // METODO PARA ENVIAR NOTIIFICACIONES AL SISTEMA
   EnviarNotificacionHE(horaExtra: any, nota: string, user: string) {
@@ -394,22 +399,22 @@ export class DeleteRegisterComponent{
     //Listado para eliminar el usuario duplicado
     var NotificacionesHorasExtrasFiltrados: any = [];
     //Ciclo por cada elemento del listado
-    horaExtra.EmpleadosSendNotiEmail.forEach(function(elemento: any, indice: any, array: any) {
+    horaExtra.EmpleadosSendNotiEmail.forEach(function (elemento: any, indice: any, array: any) {
       // Discriminación de elementos iguales
-      if(NotificacionesHorasExtrasFiltrados.find((p: any) =>p.empleado == elemento.empleado) == undefined)
-      {
+      if (NotificacionesHorasExtrasFiltrados.find((p: any) => p.empleado == elemento.empleado) == undefined) {
         // Nueva lista de empleados que reciben la notificacion
         NotificacionesHorasExtrasFiltrados.push(elemento);
       }
     });
 
-    console.log("Usuarios que reciben la notificacion Horas: ",NotificacionesHorasExtrasFiltrados);
+    console.log("Usuarios que reciben la notificacion Horas: ", NotificacionesHorasExtrasFiltrados);
 
     NotificacionesHorasExtrasFiltrados.forEach((e: any) => {
       noti.id_receives_empl = e.empleado;
 
-      noti.user_name =this.dataUserServices.username;
-      noti.ip =localStorage.getItem('ip');
+      noti.user_name = this.dataUserServices.username;
+      noti.ip = localStorage.getItem('ip');
+      noti.ip_local = this.ips_locales;
       if (e.hora_extra_noti) {
         this.autoriza.postNotificacion(noti).subscribe(
           resp => {
@@ -433,7 +438,7 @@ export class DeleteRegisterComponent{
    ** **                METODO DE ENVIO DE NOTIFICACIONES DE ALIMENTACION                      ** **
    ** ******************************************************************************************* **/
 
-  
+
 
   // METODO PARA ENVIO DE NOTIFICACION
   NotificarEventoComida(alimentacion: any, nota: string, user: string) {
@@ -453,26 +458,25 @@ export class DeleteRegisterComponent{
         desde +
         ' horario de ' + inicio + ' a ' + final + ' servicio ',
       id_comida: alimentacion.id_comida,
-      user_name : this.dataUserServices.username,
+      user_name: this.dataUserServices.username,
       ip: localStorage.getItem('ip')
 
     }
 
-        //Listado para eliminar el usuario duplicado
-        var NotificacionesAlimentacionFiltrados: any = [];
-        //Ciclo por cada elemento del listado
-        alimentacion.EmpleadosSendNotiEmail.forEach(function(elemento: any, indice: any, array: any) {
-          // Discriminación de elementos iguales
-          if(NotificacionesAlimentacionFiltrados.find((p: any) =>p.empleado == elemento.empleado) == undefined)
-          {
-            // Nueva lista de empleados que reciben la notificacion
-            NotificacionesAlimentacionFiltrados.push(elemento);
-          }
-        });
-    
-        console.log("Usuarios que reciben la notificacion Alimen: ",NotificacionesAlimentacionFiltrados);
+    //Listado para eliminar el usuario duplicado
+    var NotificacionesAlimentacionFiltrados: any = [];
+    //Ciclo por cada elemento del listado
+    alimentacion.EmpleadosSendNotiEmail.forEach(function (elemento: any, indice: any, array: any) {
+      // Discriminación de elementos iguales
+      if (NotificacionesAlimentacionFiltrados.find((p: any) => p.empleado == elemento.empleado) == undefined) {
+        // Nueva lista de empleados que reciben la notificacion
+        NotificacionesAlimentacionFiltrados.push(elemento);
+      }
+    });
 
-      NotificacionesAlimentacionFiltrados.forEach((e: any) => {
+    console.log("Usuarios que reciben la notificacion Alimen: ", NotificacionesAlimentacionFiltrados);
+
+    NotificacionesAlimentacionFiltrados.forEach((e: any) => {
       mensaje.id_empleado_recibe = e.empleado;
       if (e.comida_noti) {
         this.notifica.EnviarMensajePlanComida(mensaje).subscribe(res => {

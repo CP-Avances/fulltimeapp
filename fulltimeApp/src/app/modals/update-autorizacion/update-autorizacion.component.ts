@@ -26,6 +26,7 @@ import { DataUserLoggedService } from 'src/app/services/data-user-logged.service
   styleUrls: ['./update-autorizacion.component.scss'],
 })
 export class UpdateAutorizacionComponent implements OnInit {
+  ips_locales: any = '';
 
   @ViewChild('formRegistro', { static: true }) ngForm: NgForm;
   showForm: boolean = true;
@@ -57,6 +58,7 @@ export class UpdateAutorizacionComponent implements OnInit {
   }
 
   constructor(
+
     private catalogos: CatalogosService,
     private autoService: AutorizacionesService,
     private validaciones: ValidacionesService,
@@ -84,6 +86,9 @@ export class UpdateAutorizacionComponent implements OnInit {
     console.log('pantalla update-autorizacion .. ', this.permiso, ' ', this.vacacion, ' ', this.hora_extra)
     this.tiempo = DateTime.now();
     this.BuscarFormatos();
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
   }
 
   public ArrayAutorizacionTipos: any = []
@@ -486,7 +491,8 @@ export class UpdateAutorizacionComponent implements OnInit {
       id_documento: data.id_autoriza_estado,
       id_plan_hora_extra: null,
       user_name: null,
-      ip: null
+      ip: null,
+      ip_local: null
     }
 
     if (solicitud === 'permiso') {
@@ -504,7 +510,7 @@ export class UpdateAutorizacionComponent implements OnInit {
     }
     newAutorizaciones.user_name = this.userService.username;
     newAutorizaciones.ip = localStorage.getItem('ip');
-
+    newAutorizaciones.ip_local = this.ips_locales;
 
     this.autoService.postNuevaAutorizacion(newAutorizaciones).subscribe(autorizacion => {
       this.successResponse(autorizacion, solicitud, this.autorizacion.estado);
@@ -529,7 +535,8 @@ export class UpdateAutorizacionComponent implements OnInit {
         estado: this.estadoChange.id,
         id_autoriza_estado: this.autorizacion.id_documento + `${localStorage.getItem("empleadoID")}_${this.estadoChange.id},`,
         user_name: this.userService.username,
-        ip: localStorage.getItem('ip')
+        ip: localStorage.getItem('ip'),
+        ip_local: this.ips_locales
       }
 
       if (this.permiso) {
@@ -578,7 +585,7 @@ export class UpdateAutorizacionComponent implements OnInit {
 
     switch (solicitud) {
       case 'permiso':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.permiso.id, user_name: this.userService.username, ip: localStorage.getItem('ip') }, 'mp_solicitud_permiso').subscribe(
+        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.permiso.id, user_name: this.userService.username, ip: localStorage.getItem('ip'), ip_local: this.ips_locales }, 'mp_solicitud_permiso').subscribe(
           resp => {
             this.validaciones.showToast(resp.message, 3000, 'success');
             console.log('ver autoriza permiso.... ', this.permiso, 'INFO.. ', this.infoEmpleadoRecibe);
@@ -590,7 +597,7 @@ export class UpdateAutorizacionComponent implements OnInit {
         break;
 
       case 'vacacion':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.vacacion.id, user_name: this.userService.username, ip: localStorage.getItem('ip') }, 'mv_solicitud_vacacion').subscribe(
+        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.vacacion.id, user_name: this.userService.username, ip: localStorage.getItem('ip'), ip_local: this.ips_locales }, 'mv_solicitud_vacacion').subscribe(
           resp => { this.validaciones.showToast(resp.message, 3000, 'success') },
           err => { this.validaciones.showToast(err.error.message, 3000, 'danger') },
         )
@@ -601,7 +608,7 @@ export class UpdateAutorizacionComponent implements OnInit {
         break;
 
       case 'hora_extra':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.hora_extra.id, user_name: this.userService.username, ip: localStorage.getItem('ip') }, 'mhe_solicitud_hora_extra').subscribe(
+        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.hora_extra.id, user_name: this.userService.username, ip: localStorage.getItem('ip'), ip_local: this.ips_locales }, 'mhe_solicitud_hora_extra').subscribe(
           resp => { this.validaciones.showToast(resp.message, 3000, 'success') },
           err => { this.validaciones.showToast(err.error.message, 3000, 'danger') },
         )
@@ -726,7 +733,8 @@ export class UpdateAutorizacionComponent implements OnInit {
         mensaje: 'Ha ' + estado_p.toLowerCase() + ' la solicitud de permiso para ' + infoUsuario.fullname + ' desde ' + desde + ' ' + h_inicio + ' hasta ' + hasta + ' ' + h_fin,
         tipo: 2,
         user_name: this.userService.username,
-        ip: localStorage.getItem('ip')
+        ip: localStorage.getItem('ip'),
+        ip_local: this.ips_locales
 
       }
 
@@ -875,7 +883,8 @@ export class UpdateAutorizacionComponent implements OnInit {
       desde + ' hasta ' + hasta;
 
     noti.user_name = this.userService.username;
-    noti.ip = localStorage.getItem('ip')
+    noti.ip = localStorage.getItem('ip');
+    noti.ip_local =this.ips_locales;
 
     //Listado para eliminar el usuario duplicado
     var allNotificacionesVacaciones = [];
@@ -1054,7 +1063,7 @@ export class UpdateAutorizacionComponent implements OnInit {
 
     noti.user_name = this.userService.username;
     noti.ip = localStorage.getItem('ip');
-
+    noti.ip_local = this.ips_locales
     //Listado para eliminar el usuario duplicado
     var allNotificacionesHorasExtras = [];
     //Ciclo por cada elemento del listado

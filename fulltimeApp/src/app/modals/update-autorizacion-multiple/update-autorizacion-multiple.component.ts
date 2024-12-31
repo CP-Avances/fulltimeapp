@@ -31,6 +31,7 @@ import { NotificacionesService } from 'src/app/services/notificaciones.service';
   styleUrls: ['./update-autorizacion-multiple.component.scss'],
 })
 export class UpdateAutorizacionMultipleComponent implements OnInit {
+  ips_locales: any = '';
 
   @ViewChild('formRegistro', { static: true }) ngForm: NgForm;
   showForm: boolean = true;
@@ -101,6 +102,9 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
     const id_empresa = localStorage.getItem('id_empresa');
     (id_empresa !== null) ? this.plantillaPDF.ShowColoresLogo(id_empresa) : this.plantillaPDF.abrirToas('No existe codigo de empresa', 'danger', 3000)
     this.BuscarFormatos();
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
   }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
@@ -588,7 +592,8 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
               estado: a.estado,
               id_autoriza_estados: a.id_documento + `${localStorage.getItem("empleadoID")}_${this.estadoChange.id},`,
               user_name: this.dataUserServices.username,
-              ip: localStorage.getItem('ip')
+              ip: localStorage.getItem('ip'),
+              ip_local: this.ips_locales
             }
 
             if (this.ListaPermisos) {
@@ -667,7 +672,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
 
     switch (solicitud) {
       case 'permiso':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: dataSolicitud.id, user_name: this.dataUserServices.username, ip: localStorage.getItem('ip') }, 'mp_solicitud_permiso').subscribe(
+        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: dataSolicitud.id, user_name: this.dataUserServices.username, ip: localStorage.getItem('ip'), ip_local: this.ips_locales }, 'mp_solicitud_permiso').subscribe(
           resp => {
             this.validar.showToast(resp.message + ' - ' + this.listaSolicitudesValidadas.length, 3000, 'success');
             console.log('ver datos de permisos multiples...', dataSolicitud,
@@ -685,7 +690,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
 
         break;
       case 'vacacion':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: dataSolicitud.id, user_name: this.dataUserServices.username, ip: localStorage.getItem('ip') }, 'mv_solicitud_vacacion').subscribe(
+        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: dataSolicitud.id, user_name: this.dataUserServices.username, ip: localStorage.getItem('ip'), ip_local: this.ips_locales }, 'mv_solicitud_vacacion').subscribe(
           resp => { this.validar.showToast(resp.message, 3000, 'success') },
           err => { this.validar.showToast(err.error.message, 3000, 'danger') },
         )
@@ -700,7 +705,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
         this.NotificarAprobacionVacacion(dataSolicitud, infoEmpleadoRecibe, this.estadoChange.id);
         break;
       case 'hora_extra':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: dataSolicitud.id, user_name: this.dataUserServices.username, ip: localStorage.getItem('ip') }, 'mhe_solicitud_hora_extra').subscribe(
+        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: dataSolicitud.id, user_name: this.dataUserServices.username, ip: localStorage.getItem('ip'), ip_local: this.ips_locales }, 'mhe_solicitud_hora_extra').subscribe(
           resp => { this.validar.showToast(resp.message, 3000, 'success') },
           err => { this.validar.showToast(err.error.message, 3000, 'danger') },
         )
@@ -919,7 +924,8 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
       mensaje: 'Ha ' + dataSolicitud.estado.toLowerCase() + ' la solicitud de permiso para ' + infoUsuario.fullname + ' desde ' + desde + ' ' + h_inicio + ' hasta ' + hasta + ' ' + h_fin,
       tipo: 2,
       user_name: this.dataUserServices.username,
-      ip: localStorage.getItem('ip')
+      ip: localStorage.getItem('ip'),
+      ip_local: this.ips_locales
     }
 
     console.log('envioi notificacion permiso 111111: ', noti);
@@ -957,7 +963,8 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
         descripcion: 'Ha realizado una ' + estado_letras.toLowerCase() + ' multiple de permisos, revise su correo para más información. ',
         tipo: 6,  // ES EL TIPO DE AVISOS
         user_name: this.dataUserServices.username,
-        ip: localStorage.getItem('ip')
+        ip: localStorage.getItem('ip'),
+        ip_local: this.ips_locales
       }
 
       console.log('mensaje aviso: ', mensaje);
@@ -1106,6 +1113,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
       desde + ' hasta ' + hasta;
     noti.user_name = this.dataUserServices.username;
     noti.ip = localStorage.getItem('ip');
+    noti.ip_local = this.ips_locales;
 
 
 
@@ -1283,6 +1291,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
 
     noti.user_name = this.dataUserServices.username;
     noti.ip = localStorage.getItem('ip');
+    noti.ip_local = this.ips_locales;
 
 
 

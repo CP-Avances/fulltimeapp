@@ -3,11 +3,9 @@ import { ModalController, IonDatetime } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { DateTime } from 'luxon';
-
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { AlimentacionService } from 'src/app/services/alimentacion.service';
 import { CatalogosService } from 'src/app/services/catalogos.service';
-
 import { Cg_DetalleMenu, Servicios_Comida, Menu_Servicios } from 'src/app/interfaces/Catalogos';
 import { estadoBoolean } from 'src/app/interfaces/Estados';
 import { Alimentacion } from 'src/app/interfaces/Alimentacion';
@@ -24,6 +22,7 @@ import { DataUserLoggedService } from 'src/app/services/data-user-logged.service
 })
 
 export class EditarAlimentacionComponent implements OnInit {
+  ips_locales: any = '';
 
   @ViewChild('formRegistro', { static: true }) ngForm: NgForm;
   @Input() alimentacion!: Alimentacion;
@@ -41,11 +40,11 @@ export class EditarAlimentacionComponent implements OnInit {
 
   plato_selected: any = [];
 
-   //Variables para almacenar la fecha y la hora que se ingresa en el Form
-   fecha_comida: any;
+  //Variables para almacenar la fecha y la hora que se ingresa en el Form
+  fecha_comida: any;
 
-   //Variable para mostrar la fecha en el input de fecha de consumo
-   fecha_consumo: string = "";
+  //Variable para mostrar la fecha en el input de fecha de consumo
+  fecha_consumo: string = "";
 
   //variable para ocultar el boton de guardar
   btnOcultoguardar: boolean = false;
@@ -88,6 +87,9 @@ export class EditarAlimentacionComponent implements OnInit {
   tiempo: any;
 
   ngOnInit() {
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.tiempo = DateTime.now();
     this.catalogos.getDetalleMenu();
     this.catalogos.getServicioComida();
@@ -101,7 +103,7 @@ export class EditarAlimentacionComponent implements OnInit {
     console.log('ver datos', this.reg)
     this.BuscarFormatos();
     this.fec_actual = new Date();
-    this.fec_actual_formato =DateTime.fromISO(this.fec_actual).toFormat('yyyy-MM-dd');
+    this.fec_actual_formato = DateTime.fromISO(this.fec_actual).toFormat('yyyy-MM-dd');
   }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
@@ -226,37 +228,37 @@ export class EditarAlimentacionComponent implements OnInit {
 
   }
 
-     /* ********************************************************************************** *
-     *                 METODO PARA VALIDAR DUPLICIDAD EN LA SOLICITUD                  *
-   * ********************************************************************************** */
-     mostrarCalculos(e){
-      if(!e.target.value){
-        this.reg.fecha_comida = DateTime.now().toFormat('yyyy-MM-dd');
-        return this.fecha_comida =  DateTime.fromISO(this.reg.fecha_comida).toFormat('yyyy-MM-dd');
-      }else{
-        this.reg.fecha_comida = e.target.value;
-        const fec_comida = DateTime.fromISO(this.reg.fecha_comida).toFormat('yyyy-MM-dd');
-        this.fecha_consumo = fec_comida;
-        const codigo = parseInt(localStorage.getItem('empleadoID'));
-        this.datetimeInicio.confirm(true);
+  /* ********************************************************************************** *
+  *                 METODO PARA VALIDAR DUPLICIDAD EN LA SOLICITUD                  *
+* ********************************************************************************** */
+  mostrarCalculos(e) {
+    if (!e.target.value) {
+      this.reg.fecha_comida = DateTime.now().toFormat('yyyy-MM-dd');
+      return this.fecha_comida = DateTime.fromISO(this.reg.fecha_comida).toFormat('yyyy-MM-dd');
+    } else {
+      this.reg.fecha_comida = e.target.value;
+      const fec_comida = DateTime.fromISO(this.reg.fecha_comida).toFormat('yyyy-MM-dd');
+      this.fecha_consumo = fec_comida;
+      const codigo = parseInt(localStorage.getItem('empleadoID'));
+      this.datetimeInicio.confirm(true);
 
-        if(fec_comida != DateTime.fromISO(this.fecha_comida).toFormat('yyyy-MM-dd')){
-          this.alimentacionService.getlistaAlimentacionByFechasyCodigo(fec_comida, codigo).subscribe(solicitados => {
-            if(solicitados.length != 0){
-              this.validar.showToast('Ups! tiene una solicitud de Alimentacion en esa fecha', 3500, 'warning');
-              return this.btnOcultoguardar = true;
-            }
-            else{
-              return this.btnOcultoguardar = false;
-            }
-            }, err => {
-            this.validar.showToast('Lo sentimos tenemos problemas para verificar su solicitud', 3500, 'warning');
+      if (fec_comida != DateTime.fromISO(this.fecha_comida).toFormat('yyyy-MM-dd')) {
+        this.alimentacionService.getlistaAlimentacionByFechasyCodigo(fec_comida, codigo).subscribe(solicitados => {
+          if (solicitados.length != 0) {
+            this.validar.showToast('Ups! tiene una solicitud de Alimentacion en esa fecha', 3500, 'warning');
             return this.btnOcultoguardar = true;
-          }); 
-        }
-
+          }
+          else {
+            return this.btnOcultoguardar = false;
+          }
+        }, err => {
+          this.validar.showToast('Lo sentimos tenemos problemas para verificar su solicitud', 3500, 'warning');
+          return this.btnOcultoguardar = true;
+        });
       }
+
     }
+  }
 
   UpdateRegister() {
     this.loadingBtn = true;
@@ -269,6 +271,7 @@ export class EditarAlimentacionComponent implements OnInit {
     this.reg.hora_fin = this.validar.TiempoFormatoHHMMSS(this.reg.hora_fin);
     this.reg.user_name = this.userService.username;
     this.reg.ip = localStorage.getItem('ip');
+    this.reg.ip_local = this.ips_locales;
     this.subscripted = this.alimentacionService.putAlimentacion(this.reg).subscribe(
       resp => {
         this.NotificarEdicionComida(resp);
@@ -315,23 +318,23 @@ export class EditarAlimentacionComponent implements OnInit {
         desde +
         ' horario de ' + inicio + ' a ' + final + ' servicio ',
       id_comida: alimentacion.id_comida,
-      user_name : this.userService.username,
-      ip: localStorage.getItem('ip')
+      user_name: this.userService.username,
+      ip: localStorage.getItem('ip'),
+      ip_local: this.ips_locales
     }
 
     //Listado para eliminar el usuario duplicado
     var allNotificaciones = [];
     //Ciclo por cada elemento del listado
-    alimentacion.EmpleadosSendNotiEmail.forEach(function(elemento, indice, array) {
+    alimentacion.EmpleadosSendNotiEmail.forEach(function (elemento, indice, array) {
       // Discriminación de elementos iguales
-      if(allNotificaciones.find(p=>p.empleado == elemento.empleado) == undefined)
-      {
+      if (allNotificaciones.find(p => p.empleado == elemento.empleado) == undefined) {
         // Nueva lista de empleados que reciben la notificacion
         allNotificaciones.push(elemento);
       }
     });
 
-    console.log("Usuarios que reciben la notificacion: ",allNotificaciones);
+    console.log("Usuarios que reciben la notificacion: ", allNotificaciones);
 
     allNotificaciones.forEach(e => {
       mensaje.id_empleado_recibe = e.empleado;

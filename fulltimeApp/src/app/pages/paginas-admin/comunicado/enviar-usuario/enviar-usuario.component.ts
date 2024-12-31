@@ -4,7 +4,7 @@ import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { LocalNotifications } from '@capacitor/local-notifications';
-
+import { ValidacionesService } from 'src/app/libs/validaciones.service';
 
 interface checkOptions {
   valor: number;
@@ -17,6 +17,7 @@ interface checkOptions {
   styleUrls: ['./enviar-usuario.component.scss'],
 })
 export class EnviarUsuarioComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() data: any;
 
@@ -47,6 +48,7 @@ export class EnviarUsuarioComponent implements OnInit {
     public toastController: ToastController,
     public restP: ParametrosService,
     private dataUserServices: DataUserLoggedService,
+    public validar: ValidacionesService,
 
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleadoID'));
@@ -54,6 +56,9 @@ export class EnviarUsuarioComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     sessionStorage.removeItem('datos_comunicado');
     this.loadingEmpleado = true;
     console.log("Ver loadinEmpleado", this.loadingEmpleado)
@@ -74,9 +79,32 @@ export class EnviarUsuarioComponent implements OnInit {
 
   // METODO PARA CARGAR LA LISTA DE SUCURSALES EN UN ARREGLO
   cargarListaSucursales() {
+
+
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
       console.log("VER BuscarDatosGenerales ", res)
-      sessionStorage.setItem('datos_comunicado', JSON.stringify(res))
+      res.forEach(obj => {
+        this.empleados.push({
+          id: obj.id,
+          nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
+          codigo: obj.codigo,
+          cedula: obj.cedula,
+          correo: obj.correo,
+          id_cargo: obj.id_cargo,
+          id_contrato: obj.id_contrato,
+          sucursal: obj.name_suc,
+          id_suc: obj.id_suc,
+          id_regimen: obj.id_regimen,
+          id_depa: obj.id_depa,
+          id_cargo_: obj.id_cargo_, // TIPO DE CARGO
+          hora_trabaja: obj.hora_trabaja,
+          app_habilita: obj.app_habilita,
+          web_habilita: obj.web_habilita,
+          comunicado_mail: obj.comunicado_mail,
+          comunicado_noti: obj.comunicado_notificacion
+        })
+      })
+      sessionStorage.setItem('datos_comunicado', this.empleados)
       res.forEach(obj => {
         this.sucursales.push({
           id: obj.id_suc,
@@ -112,8 +140,30 @@ export class EnviarUsuarioComponent implements OnInit {
   // METODO PARA CARGAR LA LISTA DE DEPARTAMENTOS EN UN ARREGLO
   cargarDepartamentos() {
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
-      sessionStorage.setItem('datos_comunicado', JSON.stringify(res))
+      console.log("VER BuscarDatosGenerales ", res)
       res.forEach(obj => {
+        this.empleados.push({
+          id: obj.id,
+          nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
+          codigo: obj.codigo,
+          cedula: obj.cedula,
+          correo: obj.correo,
+          id_cargo: obj.id_cargo,
+          id_contrato: obj.id_contrato,
+          sucursal: obj.name_suc,
+          id_suc: obj.id_suc,
+          id_regimen: obj.id_regimen,
+          id_depa: obj.id_depa,
+          id_cargo_: obj.id_cargo_, // TIPO DE CARGO
+          hora_trabaja: obj.hora_trabaja,
+          app_habilita: obj.app_habilita,
+          web_habilita: obj.web_habilita,
+          comunicado_mail: obj.comunicado_mail,
+          comunicado_noti: obj.comunicado_notificacion
+        })
+
+        sessionStorage.setItem('datos_comunicado', this.empleados)
+
         this.departamentos.push({
           id: obj.id_depa,
           departamento: obj.name_dep,
@@ -153,7 +203,6 @@ export class EnviarUsuarioComponent implements OnInit {
   cargarEmpleados() {
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
       console.log("VER BuscarDatosGenerales ", res)
-      sessionStorage.setItem('datos_comunicado', JSON.stringify(res))
       res.forEach(obj => {
         this.empleados.push({
           id: obj.id,
@@ -169,8 +218,15 @@ export class EnviarUsuarioComponent implements OnInit {
           id_depa: obj.id_depa,
           id_cargo_: obj.id_cargo_, // TIPO DE CARGO
           hora_trabaja: obj.hora_trabaja,
+          app_habilita: obj.app_habilita,
+          web_habilita: obj.web_habilita,
+          comunicado_mail: obj.comunicado_mail,
+          comunicado_noti: obj.comunicado_notificacion
         })
       })
+      sessionStorage.setItem('datos_comunicado', this.empleados)
+
+
       this.empleados_filtro = [...this.empleados];
       if (this.empleados_filtro.length < 11) {
         this.ver = true;
@@ -405,7 +461,6 @@ export class EnviarUsuarioComponent implements OnInit {
     console.log('ver usuario---------------------------', respuesta);
     this.EnviarNotificaciones(respuesta);
     this.closeModal();
-    console.log(' ver donde falla', respuesta)
   }
 
 
@@ -414,33 +469,15 @@ export class EnviarUsuarioComponent implements OnInit {
   boton_enviar = false;
   // METODO PARA ENVIAR EL COMUNICADO
   EnviarNotificaciones(data: any) {
-    console.log("ver data: ", data )
+    console.log("ver data: ", data)
     if (data.length > 0) {
-      this.ContarCorreos(data);
-      console.log("cont_correo", this.cont_correo)
-      console.log("this.correo", this.correos)
-    //  if (this.cont_correo <= this.correos) {
-        this.cont = 0;
-        this.boton_enviar = true;
-        data.forEach((obj: any) => {
-          console.log("obj.comunicado_noti ", obj.comunicado_noti);
-          this.NotificarSistema(this.idEmpleado, obj.id);
-          this.cont = this.cont + 1;
-          if (this.cont === data.length) {
-            if (this.info_correo === '') {
-              this.mostrarAlertas("Mensaje enviado exitosamente.", 4000, 'success');
-            }
-            else {
-              this.EnviarCorreo(this.info_correo);
-            }
-          }
-        })
-    //  }
-     // else {
-     //   this.mostrarAlertas('Trata de enviar un total de ' + this.cont_correo +
-     //     ' correos, sin embargo solo tiene permitido enviar un total de ' + this.correos +
-     //     ' correos.', 3000, 'danger')
-     // }
+      this.LeerCorreos(data);
+      this.cont = 0;
+      this.boton_enviar = true;
+      let ids = data.filter((obj: any) => obj.comunicado_noti === true)
+        .map((obj: any) => obj.id);
+      this.NotificarSistema(this.idEmpleado, ids);
+
     }
     else {
       this.mostrarAlertas("No ha seleccionado usuarios.", 3000, 'danger')
@@ -472,12 +509,10 @@ export class EnviarUsuarioComponent implements OnInit {
 
   cont_correo: number = 0;
   info_correo: string = '';
-  ContarCorreos(data: any) {
-    this.cont_correo = 0;
+  LeerCorreos(data: any) {
     this.info_correo = '';
     data.forEach((obj: any) => {
       if (obj.comunicado_mail === true) {
-        this.cont_correo = this.cont_correo + 1
         if (this.info_correo === '') {
           this.info_correo = obj.correo;
         }
@@ -498,12 +533,28 @@ export class EnviarUsuarioComponent implements OnInit {
       mensaje: this.data.mensaje,
       tipo: 6,
       user_name: this.dataUserServices.username,
-      ip: localStorage.getItem('ip')
+      ip: localStorage.getItem('ip'),
+      ip_local: this.ips_locales
     }
     console.log(mensaje);
-    this.restN.EnviarMensajeComunicado(mensaje).subscribe(res => {
-      console.log(res.respuesta);
-      this.restN.RecibirNuevosAvisos(res.respuesta);
+
+    this.restN.EnviarMensajeGeneralMultiple(mensaje).subscribe(res => {
+      res.respuesta.forEach((notificaciones: any) => {
+        this.restN.RecibirNuevosAvisos(notificaciones);
+      })
+
+      if (this.info_correo === '') {
+        this.mostrarAlertas("Mensaje enviado exitosamente.", 4000, 'success');
+
+      }
+      else {
+        this.EnviarCorreo(this.info_correo);
+        this.mostrarAlertas("Mensaje enviado exitosamente.", 4000, 'success');
+      }
+
+
+    }, error => {
+      console.log("Error al enviar mensaje general")
     })
   }
 

@@ -21,7 +21,7 @@ import { ParametrosService } from 'src/app/services/parametros.service';
 })
 
 export class UpdateAutorizacionMultipleComponent implements OnInit {
-
+  ips_locales: any = '';
   @ViewChild('formRegistro', { static: true }) ngForm: NgForm;
   showForm: boolean = true;
   @Input() alimentacion: Alimentacion[];
@@ -59,6 +59,9 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
   tiempo: any;
 
   ngOnInit() {
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.tiempo = DateTime.now();
     const id_empresa = localStorage.getItem('id_empresa');
     (id_empresa !== null) ? this.plantillaPDF.ShowColoresLogo(id_empresa) : this.plantillaPDF.abrirToas('No existe codigo de empresa', 'danger', 3000);
@@ -124,6 +127,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
         a.aprobada = this.estadoChange.id;
         a.user_name = this.dataUserServices.username;
         a.ip = localStorage.getItem('ip');
+        a.ip_local = this.ips_locales;
 
         var [info] = this.infoEmpleadoRecibe.filter(o => { return o.id_empleado === a.id_empleado; });
         this.alimentacionService.putEstadoAlimentacion(a).subscribe(
@@ -209,7 +213,7 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
     });
   }
 
-  
+
 
   // METODO PARA ENVIO DE NOTIFICACION
   NotificarEvento(alimentacion: any, estado_a: string, infoUsuario: any) {
@@ -231,8 +235,9 @@ export class UpdateAutorizacionMultipleComponent implements OnInit {
         desde +
         ' horario de ' + inicio + ' a ' + final + ' servicio ',
       id_comida: alimentacion.id_comida,
-      user_name : this.dataUserServices.username,
-      ip: localStorage.getItem('ip')
+      user_name: this.dataUserServices.username,
+      ip: localStorage.getItem('ip'),
+      ip_local: this.ips_locales
     }
 
     //Listado para eliminar el usuario duplicado

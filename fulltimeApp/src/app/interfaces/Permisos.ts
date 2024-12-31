@@ -41,6 +41,7 @@ export interface Permiso {
 
     user_name: string;
     ip: string;
+    ip_local: any;
 }
 
 export const permisoValueDefault: Permiso = {
@@ -74,7 +75,8 @@ export const permisoValueDefault: Permiso = {
     hora_salida_: '',
     hora_ingreso_: '',
     user_name: ' ',
-    ip: ' '
+    ip: ' ',
+    ip_local: []
 }
 
 export const cg_permisoValueDefault: Cg_TipoPermiso = {

@@ -13,6 +13,8 @@ import { Filesystem, Directory } from '@capacitor/filesystem';
   styleUrls: ['./timbre-justificado.component.scss'],
 })
 export class TimbreJustificadoComponent implements OnInit {
+  ips_locales: any = '';
+
   @ViewChild('fileInput') fileInput: any; // Accede al input de archivo
   selectedSecond: string = '00'; // Segundos iniciales como cadena con dos cifras
   seconds: string[] = Array.from({ length: 60 }, (_, i) => ('0' + i).slice(-2)); // Segundos de "00" a "59"
@@ -48,7 +50,10 @@ export class TimbreJustificadoComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    console.log('Timbre CODIGO DEL EMPLEADO: ', this.data);
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
+    
     this.obtenerIdCelular();
   }
   modelo_dispositivo: string = "";
@@ -82,14 +87,19 @@ export class TimbreJustificadoComponent implements OnInit {
   fechaChange(e) {
     this.initialDate = e.target.value;
     this.fec_timbre = this.initialDate; // Guarda la fecha y hora inicial sin segundos
+    const fechaSeleccionada = new Date(this.fec_timbre); // Usamos la fecha y hora guardada
+    fechaSeleccionada.setSeconds(fechaSeleccionada.getSeconds() + 0);
+    this.fec_timbre = fechaSeleccionada.toISOString(); // Formato ISO string
+    this.fec_timbre = this.formatDateLocal(fechaSeleccionada); // Formateamos la fecha como una cadena local
+
     this.versegundos = true;
     console.log("ver fecha timbre ", this.fec_timbre)
   }
 
-  // METODO PARA SUMAR LA FECAH CON LOS SEGUNDOS SELECCIONADOS
+  // METODO PARA SUMAR LA FECHA CON LOS SEGUNDOS SELECCIONADOS
   updateFechaConSegundos() {
     if (this.initialDate && this.selectedSecond !== undefined) {
-      const fechaSeleccionada = new Date(this.fec_timbre); // Usamos la fecha y hora guardada
+      const fechaSeleccionada = new Date(this.initialDate); // Usamos la fecha y hora guardada
       const segundosSeleccionados = Number(this.selectedSecond); // Convertimos los segundos seleccionados a número
 
       // Sumamos los segundos seleccionados a la fecha
@@ -129,11 +139,12 @@ export class TimbreJustificadoComponent implements OnInit {
       id_reloj: 97,
       id: this.data.id,
       ip: localStorage.getItem('ip'),
+      ip_local: this.ips_locales,
       documento: this.base64Image,
       dispositivo_timbre: this.dispositivo_timbre,
       conexion: true,
       hora_timbre_diferente: false,
-      user_name : this.dataUserService.username
+      user_name: this.dataUserService.username
 
     }
     this.timbresService.PostTimbreWebAdmin(dataTimbre).subscribe(res => {

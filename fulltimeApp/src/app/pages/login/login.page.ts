@@ -9,13 +9,14 @@ import { DataUserLoggedService } from 'src/app/services/data-user-logged.service
 import { Md5 } from 'ts-md5/dist/md5';
 import { environment } from 'src/environments/environment';
 import { EmpleadosService } from 'src/app/services/empleados.service';
-
+import { ValidacionesService } from 'src/app/libs/validaciones.service';
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
+  ips_locales: any = '';
 
   private URL = environment.url
 
@@ -42,6 +43,8 @@ export class LoginPage implements OnInit {
     public platform: Platform,
     private userService: DataUserLoggedService,
     private empleadoService: EmpleadosService,
+    public validar: ValidacionesService,
+
   ) { }
   mostrarCheckboxInicialmente: boolean;
 
@@ -51,6 +54,9 @@ export class LoginPage implements OnInit {
   }
 
   ngOnInit() {
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.obtenerInfoTerminosCondiciones();
     this.BuscarParametroTimbreUbicacionDesconocida();
     if (!this.relojService.esPrimeraVez()) {
@@ -69,7 +75,7 @@ export class LoginPage implements OnInit {
   // METODO PARA OBTNER PARAMETRO DE UBICACION DESCONOCIDA
   BuscarParametroTimbreUbicacionDesconocida() {
     let buscar = {
-      ids_empleados:[parseInt( localStorage.getItem("empleadoID"), 10)],
+      ids_empleados: [parseInt(localStorage.getItem("empleadoID"), 10)],
     };
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
@@ -363,9 +369,11 @@ export class LoginPage implements OnInit {
 
     const id_usuario = localStorage.getItem('empleadoID');
     var ip = localStorage.getItem('ip');
-    var user_name = this.userService.username;
 
-    this.relojService.registrarCelularUsuario(id_usuario, id_celular, model_dispositivo, user_name, ip, true).subscribe(
+    var user_name = this.userService.username;
+    var ip_local = this.ips_locales;
+
+    this.relojService.registrarCelularUsuario(id_usuario, id_celular, model_dispositivo, user_name, ip, true, ip_local).subscribe(
       res => {
         localStorage.setItem('UidDispositivo', id_celular);
         res.id_empleado = id_usuario

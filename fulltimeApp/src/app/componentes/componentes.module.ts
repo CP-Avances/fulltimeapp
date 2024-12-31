@@ -7,7 +7,6 @@ import { RouterModule } from '@angular/router';
 
 import { NavegadorAdminComponent } from './navegador-admin/navegador-admin.component';
 
-import { ConstruirPDFComponent } from './construir-pdf/construir-pdf.component';
 import { NotificacionPopoverComponent } from './notificacion-popover/notificacion-popover.component';
 import { ListaEmpleadosComponent } from './lista-empleados/lista-empleados.component';
 import { DataUserLoggedService } from '../services/data-user-logged.service';
@@ -28,7 +27,6 @@ import { AprobacionMultipleComponent } from './aprobacion-multiple/aprobacion-mu
     declarations: [
         NavegadorAdminComponent,
         NotificacionPopoverComponent,
-        ConstruirPDFComponent,
         CloseModalComponent,
         SaveRegisterComponent,
         SearchRegisterComponent,
@@ -44,7 +42,6 @@ import { AprobacionMultipleComponent } from './aprobacion-multiple/aprobacion-mu
     exports: [
         NavegadorAdminComponent,
         NotificacionPopoverComponent,
-        ConstruirPDFComponent,
         CloseModalComponent,
         SaveRegisterComponent,
         SearchRegisterComponent,

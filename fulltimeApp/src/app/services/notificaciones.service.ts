@@ -38,7 +38,7 @@ export class NotificacionesService {
 
   // METODO PARA BUSCAR LOS EMPLEADOS CON SU INFORMACION GENERAL
   BuscarDatosGenerales() {
-    const estado = 1; 
+    const estado = 1;
     return this.http.get<any>(`${this.apiUrl}/generalidades/informacion-data-general/${estado}`);
   }
 
@@ -59,6 +59,10 @@ export class NotificacionesService {
   // ALERTAS DE NOTIFICACIÓN DE COMUNICADOS
   EnviarMensajeComunicado(data: any) {
     return this.http.post<any>(`${this.apiUrl}/noti-real-time/noti-comunicado-movil/`, data);
+  }
+  // ALERTAS DE NOTIFICACIÓN DE COMUNICADOS -MULTIPLES
+  EnviarMensajeGeneralMultiple(data: any) {
+    return this.http.post<any>(`${environment.url}/noti-real-time/noti-comunicado-multiplador-movil/`, data);
   }
 
   /** ************************************************************************************ **
