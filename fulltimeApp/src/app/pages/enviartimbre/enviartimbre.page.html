@@ -11,8 +11,8 @@
 </ion-header>
 
 <ion-content fullscreen>
-
   <div style="padding:2%; background: white; margin-bottom: 2%;">
+
     <ion-img class="center" style="width:40%;" src="../../../assets/images/C_FTLOGORV.png"></ion-img>
     <ion-label mode="md" color="medium" style="text-align:center">
       <h1 style="font-size: 4vw"><b>Reloj Virtual</b></h1>
@@ -85,6 +85,11 @@
       <p class="letraPeque">{{numeroCaracteres}}/299</p>
     </ion-item>
   </ion-card>
+
+  <ion-item *ngIf="timbreFotoObligatoria !='Si' && timbrarConFoto =='Si'">
+    <ion-label>Mostrar cámara:</ion-label>
+    <ion-toggle (ionChange)="toggleChanged($event)" [(ngModel)]="activarOpcion"></ion-toggle>
+  </ion-item>
 
   <div style="margin: 5% 3% 2% 3%;" *ngIf="!cargandoPosicion; else elseBlock">
     <ion-button shape="round" expand="block" (click)="enviarTimbre()"><ion-icon

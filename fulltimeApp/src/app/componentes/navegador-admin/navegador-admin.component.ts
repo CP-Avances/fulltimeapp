@@ -135,6 +135,21 @@ export class NavegadorAdminComponent implements OnInit {
               }
             }]
           }
+          if(data_llega.mensaje.split(" ")[0] =='NOTIFICACIÓN'){
+             options = {
+              notifications: [{
+                id: data_llega.id,
+                title: data_llega.mensaje,
+                body: this.mensaje,
+                largeBody: this.mensaje + "\n" + data_llega.descripcion,
+                schedule: {
+                  allowWhileIdle: true,
+                }
+              }]
+            }
+          }
+
+        
           console.log("ver options", options)
 
           LocalNotifications.schedule(options).then(() => { });

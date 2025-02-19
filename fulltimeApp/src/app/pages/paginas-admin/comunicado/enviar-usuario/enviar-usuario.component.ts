@@ -79,8 +79,6 @@ export class EnviarUsuarioComponent implements OnInit {
 
   // METODO PARA CARGAR LA LISTA DE SUCURSALES EN UN ARREGLO
   cargarListaSucursales() {
-
-
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
       console.log("VER BuscarDatosGenerales ", res)
       res.forEach(obj => {
@@ -494,7 +492,8 @@ export class EnviarUsuarioComponent implements OnInit {
       mensaje: this.data.mensaje,
       asunto: this.data.asunto,
     }
-    this.restN.EnviarCorreoComunicado(this.idEmpresa, datosCorreo).subscribe(envio => {
+    
+    this.restN.EnviarCorreoComunicado(datosCorreo).subscribe(envio => {
       if (envio.message === 'error') {
         this.mostrarAlertas("Ups !!! algo salio mal, revisa tu configuración de correo electrónico.",
           6000, 'danger');
@@ -519,7 +518,6 @@ export class EnviarUsuarioComponent implements OnInit {
         else {
           this.info_correo = this.info_correo + ', ' + obj.correo;
         }
-
       }
     })
   }
@@ -542,17 +540,12 @@ export class EnviarUsuarioComponent implements OnInit {
       res.respuesta.forEach((notificaciones: any) => {
         this.restN.RecibirNuevosAvisos(notificaciones);
       })
-
       if (this.info_correo === '') {
         this.mostrarAlertas("Mensaje enviado exitosamente.", 4000, 'success');
-
       }
       else {
         this.EnviarCorreo(this.info_correo);
-        this.mostrarAlertas("Mensaje enviado exitosamente.", 4000, 'success');
       }
-
-
     }, error => {
       console.log("Error al enviar mensaje general")
     })

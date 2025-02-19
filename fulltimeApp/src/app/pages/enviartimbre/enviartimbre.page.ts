@@ -28,10 +28,10 @@ import { ValidacionesService } from 'src/app/libs/validaciones.service';
 })
 export class EnviartimbrePage implements OnInit {
   ips_locales: any = '';
-
   //Parametros
   timbrarSinInternet: string;
-  timbrarConFoto: string;
+  timbrarConFoto: string = localStorage.getItem('timbrarConFoto');
+  timbreFotoObligatoria: string = localStorage.getItem('opcional_obligatorio');
   //variables Foto
   imagen: string;
   storageUbica: string;
@@ -204,18 +204,33 @@ export class EnviartimbrePage implements OnInit {
     });
   }
 
-  // METODO PARA INICIAR CO EL PROCESO DE FOTO SEGUN LOS PARAMETROS
+  //FIX ME
+  // METODO PARA INICIAR CON EL PROCESO DE FOTO SEGUN LOS PARAMETROS
   async iniciarProcesoFoto() {
-    console.log("ENTRA A iniciarProcesoFoto")
+
     if (localStorage.getItem('timbrarConFoto') == 'Si') {
-      console.log("ENTRA CON SI")
-      await this.tomarFoto()
-        .then(() => {
+
+      if (localStorage.getItem('opcional_obligatorio') == 'Si') {
+        await this.tomarFoto()
+          .then(() => {
+            this.identificarUsuario();
+          })
+          .catch((error) => {
+            this.abrirToas('No se pudo obtener la foto, timbre cancelado.', "warning", 2000, "middle");
+          });
+      } else {
+        if (this.activarOpcion) {
+          await this.tomarFoto()
+            .then(() => {
+              this.identificarUsuario();
+            })
+            .catch((error) => {
+              this.abrirToas('No se pudo obtener la foto, timbre cancelado.', "warning", 2000, "middle");
+            });
+        } else {
           this.identificarUsuario();
-        })
-        .catch((error) => {
-          this.abrirToas('No se pudo obtener la foto, timbre cancelado.', "warning", 2000, "middle");
-        });
+        }
+      }
     } else {
       console.log("ENTRA CON NO")
       this.identificarUsuario();
@@ -296,8 +311,6 @@ export class EnviartimbrePage implements OnInit {
           handler: () => {
             this.nuevoTimbre.tipo_autenticacion = this.IDENTIFICACION_DESACTIVADA;
             this.guardarEnBDD();
-            //this.BuscarParametroTimbreConFoto();
-            //this.iniciarProcesoFoto();
           }
         }
       ]
@@ -338,12 +351,11 @@ export class EnviartimbrePage implements OnInit {
 
   // METODO PARA ENVIAR EL TIMBRE SEGUN LOS PARAMETROS
   async enviarTimbre(ev?: any) {
-    //comprueba si estamos en un emulador o PC para envíar el timbre
     this.BuscarParametroTimbreSinInternet();
     this.BuscarParametroTimbreUbicacionDesconocida();
-
+    //Comprobación de movil o navegador
     if (this.platform.is('hybrid')) {
-
+      // Verificación del permiso de Ubicación
       await this.verificarPermisoLocation()
         .then(async () => {
           const status = await Geolocation.requestPermissions();
@@ -357,7 +369,7 @@ export class EnviartimbrePage implements OnInit {
           this.abrirToas('Ups!!! Debe activar la ubicación para enviar el timbre', "danger", 3000, "middle");
         });
     } else {
-      console.log("Entrando en web")
+      //Navegador
       this.abrirToas('No se detecto autenticación, se guardara el timbre con esta observación.', "warning", 2000, "middle");
       this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
       this.BuscarParametroTimbreConFoto();
@@ -435,7 +447,7 @@ export class EnviartimbrePage implements OnInit {
     this.numeroCaracteres = this.nuevoTimbre.observacion.length;
   }
 
-  // METODO PARA GUARDA LA INFORMACION DEL TIMBRE EN LA BASE DE DATOS
+  // METODO PARA GUARDA LA INFORMACION DEL TIMBRE EN LA BASE DE DATOS 
   guardarEnBDD() {
     this.nuevoTimbre.codigo = this.codigo;
     this.nuevoTimbre.fecha_hora_timbre = this.fechaHora;
@@ -444,7 +456,7 @@ export class EnviartimbrePage implements OnInit {
     this.nuevoTimbre.user_name = this.userService.username;
     this.nuevoTimbre.ip = localStorage.getItem('ip');
     this.nuevoTimbre.ip_local = this.ips_locales;
-    
+
     this.nuevoTimbre.imagen = this.imagen;
 
     if (this.nuevoTimbre.accion === "HA" && this.nuevoTimbre.observacion === null) return this.abrirToas('Lo siento! Debes ingresar una observación antes de enviar un timbre abierto 😅', "danger", 5000, "middle");
@@ -516,7 +528,7 @@ export class EnviartimbrePage implements OnInit {
   BuscarParametroTimbreUbicacionDesconocida() {
 
     let buscar = {
-      ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
+      ids_empleados: [parseInt(localStorage.getItem("empleadoID"), 10)],
     };
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
@@ -536,7 +548,7 @@ export class EnviartimbrePage implements OnInit {
   // METODO PARA VALIDAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON INTERNET REQUERIDO
   BuscarParametroTimbreSinInternet() {
     let buscar = {
-      ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
+      ids_empleados: [parseInt(localStorage.getItem("empleadoID"), 10)],
     };
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
@@ -557,16 +569,19 @@ export class EnviartimbrePage implements OnInit {
   // METODO PARA VALIDAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON FOTO
   BuscarParametroTimbreConFoto() {
     let buscar = {
-      ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
+      ids_empleados: [parseInt(localStorage.getItem("empleadoID"), 10)],
     };
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
-        console.log("metodo BuscarParametroTimbreConFoto ", res)
         const timbreFoto = res.respuesta[0].timbre_foto;
-        console.log("ver parametro de foto", timbreFoto)
         const resultado = timbreFoto ? 'Si' : 'No';
         localStorage.setItem('timbrarConFoto', resultado);
+        const resultado_opcional = res.respuesta[0].opcional_obligatorio ? 'Si' : 'No';
+        this.timbrarConFoto = localStorage.getItem('timbrarConFoto')
+        localStorage.setItem('opcional_obligatorio', resultado_opcional);
+        this.timbreFotoObligatoria = localStorage.getItem('opcional_obligatorio');
+
       },
       error => {
         console.log('Error 404 Not Found');
@@ -799,4 +814,15 @@ export class EnviartimbrePage implements OnInit {
     });
     toast.present();
   }
+
+  activarOpcion: boolean = false;
+  toggleChanged(event: any) {
+    this.activarOpcion = event.detail.checked;
+    if (this.activarOpcion) {
+      console.log('El interruptor está activado');
+    } else {
+      console.log('El interruptor está desactivado');
+    }
+  }
+
 }

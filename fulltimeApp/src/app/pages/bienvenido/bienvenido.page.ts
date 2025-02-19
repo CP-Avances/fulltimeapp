@@ -156,10 +156,13 @@ export class BienvenidoPage implements OnInit, OnDestroy {
         console.log("ver parametro de foto", timbreFoto)
         const resultado = timbreFoto ? 'Si' : 'No';
         localStorage.setItem('timbrarConFoto', resultado);
+
+        const resultado_opcional = res.respuesta[0].opcional_obligatorio ? 'Si' : 'No';
+        localStorage.setItem('opcional_obligatorio', resultado_opcional);
+
       },
       error => {
         console.log('Error 404 Not Found');
-        localStorage.setItem('timbrarConFoto', 'No');
       }
     );
   }
@@ -178,7 +181,6 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       },
       error => {
         console.log('Error 404 Not Found');
-        localStorage.setItem('timbrarEspecial', 'No');
       }
     );
   }
@@ -197,7 +199,6 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       },
       error => {
         console.log('Error 404 Not Found');
-        localStorage.setItem('timbrarUbicacionDesconocida', 'No');
       }
     );
   }
@@ -293,7 +294,6 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       },
       error => {
         console.log('Error 404 Not Found');
-        localStorage.setItem('timbrarSinInternet', 'Si');
       }
     );
   }

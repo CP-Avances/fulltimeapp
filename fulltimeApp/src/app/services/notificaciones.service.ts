@@ -28,18 +28,14 @@ export class NotificacionesService {
    ** **                 MÉTODOS DE CONSULTA DE DATOS DE COMUNICADOS                    ** ** 
    ** ************************************************************************************ **/
 
-  EnviarCorreoComunicado(id_empresa: number, datos: any): Observable<any> {
-    const path = `${this.recursoURL}/noti-real-time/mail-comunicado-movil/${id_empresa}`;
-    return this.http.post<any>(path, datos)
-      .pipe(
-        tap(console.log)
-      );
+  EnviarCorreoComunicado( datos: any): Observable<any> {
+    return this.http.post<any>(`${environment.url}/noti-real-time/mail-comunicado`, datos);
   }
 
   // METODO PARA BUSCAR LOS EMPLEADOS CON SU INFORMACION GENERAL
   BuscarDatosGenerales() {
     const estado = 1;
-    return this.http.get<any>(`${this.apiUrl}/generalidades/informacion-data-general/${estado}`);
+    return this.http.get<any>(`${this.apiUrl}/generalidades/datos_generales_comunicados/${estado}`);
   }
 
   // METODOS PARA MARCAR EN VISTO LA NOTIFICACIONES
