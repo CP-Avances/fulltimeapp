@@ -1,28 +1,39 @@
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { environment } from '../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { HoraExtra } from '../interfaces/HoraExtra';
 import { catchError, tap } from 'rxjs/operators';
-import { Socket } from 'ngx-socket-io';
+
+
+// SERVICIOS
+import { StorageService } from './storage.service';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HorasExtrasService {
 
-  private apiUrl = environment.url;
-  private recursoURL = 'http://186.4.226.49:3001';
-  //private recursoURL = 'http://186.4.226.49:3001';
+  private apiUrl = '';
+  private socket: any;
 
   private handleError(error: any) {
     console.log('ERROR CAPTURADO: ', error);
     return throwError(error);
   }
+
   constructor(
     private http: HttpClient,
-    private socket: Socket
-  ) { }
+    private socketService: SocketService,
+    private storageService: StorageService,
+  ) {
+    this.obtenerUrlEmpresa();
+    this.socket = this.socketService.getSocket();
+  }
+
+  async obtenerUrlEmpresa() {
+    this.apiUrl = await this.storageService.get('urlEmpresa');
+  }
 
   // Noti_realtime
   sendNotiRealTime(data: any) {
@@ -35,10 +46,10 @@ export class HorasExtrasService {
   }
 
   /*********************************************************************
- * 
+ *
  *            Metodos para conexion a la RUTA DE Horas Extras
- * 
- **********************************************************************  
+ *
+ **********************************************************************
  */
 
   // OBTIENE LOS REGISTROS DE SOLICITUDES DE HORAS EXTRAS
@@ -105,7 +116,7 @@ export class HorasExtrasService {
 
   // REGISTRA SOLICITUD DE HORAS EXTRAS
   postNuevaHorasExtras(datos: any): Observable<HoraExtra> {
-    return this.http.post<any>(`${environment.url}/horas-extras-pedidas`, datos);
+    return this.http.post<any>(`${this.apiUrl}/horas-extras-pedidas`, datos);
   }
 
   // EDITA SOLICITUD DE HORAS EXTRAS
@@ -120,11 +131,11 @@ export class HorasExtrasService {
 
   // SUBIR RESPALDOS DE HORAS EXTRAS
   SubirArchivoRespaldo(formData: any, id: number, nombre: string, archivo: any) {
-    return this.http.put(`${this.recursoURL}/horas-extras-pedidas/${id}/documento-movil/${nombre}/archivo/${archivo}`, formData)
+    return this.http.put(`${this.apiUrl}/horas-extras-pedidas/${id}/documento-movil/${nombre}/archivo/${archivo}`, formData)
   }
 
   // ELIMINAR RESPALDOS DE HORAS EXTRAS
   EliminarArchivoRespaldo(documento: string) {
-    return this.http.delete(`${this.recursoURL}/horas-extras-pedidas/eliminar-documento-movil/${documento}`,)
+    return this.http.delete(`${this.apiUrl}/horas-extras-pedidas/eliminar-documento-movil/${documento}`,)
   }
 }

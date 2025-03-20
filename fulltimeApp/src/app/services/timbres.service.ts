@@ -1,19 +1,28 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+
+// SERVICIOS
+import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TimbresService {
 
-  private api_url = environment.url;
+  private api_url = '';
 
   constructor(
-    private http: HttpClient
-  ) { }
+    private http: HttpClient,
+    private storageService: StorageService,
+  ) {
+    this.obtenerUrlEmpresa();
+  }
 
-  // METODO PARA BUSCAR LOS TIMBRES DE LOS EMPLEADOS POR SU CODIGO 
+  async obtenerUrlEmpresa() {
+    this.api_url = await this.storageService.get('urlEmpresa');
+  }
+
+  // METODO PARA BUSCAR LOS TIMBRES DE LOS EMPLEADOS POR SU CODIGO
   getTimbresEmpleadoByCodigo(codigo: number | string) {
     return this.http.get<any>(`${this.api_url}/timbres/timbreEmpleado/${codigo}`)
   }

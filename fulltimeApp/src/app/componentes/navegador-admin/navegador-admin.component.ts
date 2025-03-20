@@ -14,9 +14,8 @@ import { ActionPerformed, LocalNotifications, ScheduleOptions } from '@capacitor
 import { Router } from '@angular/router';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
-import { Socket } from 'ngx-socket-io';
 import { NetworkService } from '../../libs/network.service';
-
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-navegador-admin',
@@ -46,6 +45,8 @@ export class NavegadorAdminComponent implements OnInit {
 
   colorNOtifi: string = '';
 
+  socket: any;
+
   constructor(
     private userService: DataUserLoggedService,
     private relojService: RelojServiceService,
@@ -60,9 +61,8 @@ export class NavegadorAdminComponent implements OnInit {
     public loadingController: LoadingController,
     private toastController: ToastController,
     public parametros: ParametrosService,
-    private socket: Socket,
     private networkService: NetworkService,
-
+    private socketService: SocketService,
   ) { }
 
   ionViewWillEnter() {
@@ -75,71 +75,61 @@ export class NavegadorAdminComponent implements OnInit {
   ngOnInit() {
     this.username = this.userService.username;
     this.idEmpleadoIngresa = parseInt(localStorage.getItem('empleadoID'));
-    console.log
     this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
 
-    this.socket.on('recibir_notificacion', (data_llega: any) => {
-      this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
-      console.log("Notificacion: ", data_llega);
-      if (data_llega.id_receives_empl === this.idEmpleadoIngresa) {
-        this.mensaje = data_llega.usuario;
-        try {
-          var t = new Date();
-          t.setSeconds(t.getSeconds() + 5);
-          let id = this.ids.length;
-          this.ids.push(id);
+    this.socket = this.socketService.getSocket();
 
-          let options: ScheduleOptions = {
-            notifications: [{
-              id: data_llega.id,
-              title: "Fulltime Notificacion",
-              body: this.mensaje,
-              schedule: {
-                allowWhileIdle: false,
-              },
-              largeBody: this.mensaje + "\n" + data_llega.mensaje,
-            }]
-          }
-          LocalNotifications.schedule(options);
-        } catch (error) {
-          this.mostrarToasNoti("No se pudo resibir la notificacion: \n" + error);
-          console.log("Problemas en la notificacion: ", error);
-        }
-      }
-    });
+    if (this.socket) {
+      this.socket.on('recibir_notificacion', (data_llega: any) => {
+        this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
+        console.log("Notificacion: ", data_llega);
+        if (data_llega.id_receives_empl === this.idEmpleadoIngresa) {
+          this.mensaje = data_llega.usuario;
+          try {
+            var t = new Date();
+            t.setSeconds(t.getSeconds() + 5);
+            let id = this.ids.length;
+            this.ids.push(id);
 
-    this.socket.on('recibir_aviso', (data_llega: any) => {
-      console.log(" entrando al proceso de notificaciones")
-      this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
-      console.log("Aviso recibido", data_llega.id);
-
-      if (data_llega.id_receives_empl === this.idEmpleadoIngresa) {
-        this.mensaje = data_llega.usuario;
-        console.log("Usuario envio", this.empleEnvia);
-
-        try {
-          this.mostrarToasNoti("Notificacion Recibida de " + data_llega + "\n");
-          var t = new Date();
-          t.setSeconds(t.getSeconds() + 5);
-          let id = this.ids.length;
-          this.ids.push(id);
-
-          let options: ScheduleOptions = {
-            notifications: [{
-              id: data_llega.id,
-              title: "Fulltime Aviso",
-              body: this.mensaje,
-              largeBody: this.mensaje + "\n" + data_llega.descripcion,
-              schedule: {
-                allowWhileIdle: true,
-              }
-            }]
-          }
-          if(data_llega.mensaje.split(" ")[0] =='NOTIFICACIÓN'){
-             options = {
+            let options: ScheduleOptions = {
               notifications: [{
                 id: data_llega.id,
-                title: data_llega.mensaje,
+                title: "Fulltime Notificacion",
+                body: this.mensaje,
+                schedule: {
+                  allowWhileIdle: false,
+                },
+                largeBody: this.mensaje + "\n" + data_llega.mensaje,
+              }]
+            }
+            LocalNotifications.schedule(options);
+          } catch (error) {
+            this.mostrarToasNoti("No se pudo resibir la notificacion: \n" + error);
+            console.log("Problemas en la notificacion: ", error);
+          }
+        }
+      });
+
+      this.socket.on('recibir_aviso', (data_llega: any) => {
+        console.log(" entrando al proceso de notificaciones")
+        this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
+        console.log("Aviso recibido", data_llega.id);
+
+        if (data_llega.id_receives_empl === this.idEmpleadoIngresa) {
+          this.mensaje = data_llega.usuario;
+          console.log("Usuario envio", this.empleEnvia);
+
+          try {
+            this.mostrarToasNoti("Notificacion Recibida de " + data_llega + "\n");
+            var t = new Date();
+            t.setSeconds(t.getSeconds() + 5);
+            let id = this.ids.length;
+            this.ids.push(id);
+
+            let options: ScheduleOptions = {
+              notifications: [{
+                id: data_llega.id,
+                title: "Fulltime Aviso",
                 body: this.mensaje,
                 largeBody: this.mensaje + "\n" + data_llega.descripcion,
                 schedule: {
@@ -147,20 +137,34 @@ export class NavegadorAdminComponent implements OnInit {
                 }
               }]
             }
+            if(data_llega.mensaje.split(" ")[0] =='NOTIFICACIÓN'){
+               options = {
+                notifications: [{
+                  id: data_llega.id,
+                  title: data_llega.mensaje,
+                  body: this.mensaje,
+                  largeBody: this.mensaje + "\n" + data_llega.descripcion,
+                  schedule: {
+                    allowWhileIdle: true,
+                  }
+                }]
+              }
+            }
+
+
+            console.log("ver options", options)
+
+            LocalNotifications.schedule(options).then(() => { });
+
+          } catch (error) {
+            this.mostrarToasNoti("No se pudo resibir el Aviso: \n" + error);
+            console.log("Problemas en el Aviso: ", error);
           }
-
-        
-          console.log("ver options", options)
-
-          LocalNotifications.schedule(options).then(() => { });
-
-        } catch (error) {
-          this.mostrarToasNoti("No se pudo resibir el Aviso: \n" + error);
-          console.log("Problemas en el Aviso: ", error);
         }
-      }
 
-    });
+      });
+    }
+
     this.networkSubscriber()
   }
 
@@ -194,7 +198,7 @@ export class NavegadorAdminComponent implements OnInit {
     toast.present();
   }
 
-  // METODO PARA LEER LAS NOTIFICACIONES 
+  // METODO PARA LEER LAS NOTIFICACIONES
   LlamarNotificcaccciones(id_empleado: number) {
     this.notificacionService.getNotificacionesByIdEmpleado(id_empleado).subscribe(
       notificacion => {
@@ -330,7 +334,7 @@ export class NavegadorAdminComponent implements OnInit {
     await toast.present();
   }
 
-  // METODO PARA MOSTRAR LAS NOTIFICACIONES 
+  // METODO PARA MOSTRAR LAS NOTIFICACIONES
   async Mostrarpopnotificaciones(event: any) {
     this.countNoti = 0;
     this.valor = false;
@@ -366,7 +370,7 @@ export class NavegadorAdminComponent implements OnInit {
 
   }
 
-  // METODO PARA MOSTRAL EL MODAL DE TIMBRES PERDIDOS 
+  // METODO PARA MOSTRAL EL MODAL DE TIMBRES PERDIDOS
   async presentModalTimbresPerdidos() {
     this.closeAdmin();
     const modal = await this.modalController.create({

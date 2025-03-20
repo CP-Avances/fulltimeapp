@@ -4,12 +4,12 @@ import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { Vacacion } from '../../../../../../interfaces/Vacacion';
 import { Subscription } from 'rxjs';
 import { VacacionesService } from 'src/app/services/vacaciones.service';
-import { RegistrarVacacionComponent } from '../registrar-vacacion/registrar-vacacion.component'; 
+import { RegistrarVacacionComponent } from '../registrar-vacacion/registrar-vacacion.component';
 import { VerVacacionComponent } from '../ver-vacacion/ver-vacacion.component';
 import { EditarVacacionComponent } from '../editar-vacacion/editar-vacacion.component';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
-import { Socket } from 'ngx-socket-io';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-vacacion-lista',
@@ -29,21 +29,29 @@ export class VacacionListaComponent implements OnInit, OnDestroy {
   ver: boolean = true;
   codigo: any;
 
+  socket: any;
+
   constructor(
     private vacacionesService: VacacionesService,
     public modalController: ModalController,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
-    public socket: Socket
-  ) { 
-    this.socket.on('recibir_notificacion', (data_llega: any) => {
-      this.obtenerListaVacaciones();
-    });
+    private socketService: SocketService,
+  ) {
+
   }
 
   ngOnInit() {
     this.codigo = localStorage.getItem('codigo')
     this.BuscarFormatos();
+
+    this.socket = this.socketService.getSocket();
+
+    if (this.socket) {
+      this.socket.on('recibir_notificacion', (data_llega: any) => {
+        this.obtenerListaVacaciones();
+      });
+    }
   }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
@@ -91,7 +99,7 @@ export class VacacionListaComponent implements OnInit, OnDestroy {
           });
 
           this.vacaciones.forEach(v => {
-            // TRATAMIENTO DE FECHAS Y HORAS 
+            // TRATAMIENTO DE FECHAS Y HORAS
             v.fec_ingreso_ = this.validar.FormatearFecha(String(v.fecha_ingreso), this.formato_fecha, this.validar.dia_completo);
             v.fec_inicio_ = this.validar.FormatearFecha(String(v.fecha_inicio), this.formato_fecha, this.validar.dia_completo);
             v.fec_final_ = this.validar.FormatearFecha(String(v.fecha_final), this.formato_fecha, this.validar.dia_completo);

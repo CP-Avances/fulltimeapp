@@ -2,18 +2,19 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { Permiso } from '../interfaces/Permisos';
-import { environment } from '../../environments/environment';
 import { catchError, tap } from 'rxjs/operators';
-import { Socket } from 'ngx-socket-io';
 
+// SERVICIOS
+import { StorageService } from './storage.service';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PermisosService {
 
-  private apiUrl = environment.url;
-  private recursoURL = 'http://186.4.226.49:3001';
+  private apiUrl = '';
+  private socket: any;
 
   private handleError(error: any) {
     console.log('ERROR CAPTURADO: ', error);
@@ -21,19 +22,27 @@ export class PermisosService {
   }
   constructor(
     private http: HttpClient,
-    private socket: Socket
-  ) { }
+    private socketService: SocketService,
+    private storageService: StorageService,
+  ) {
+    this.obtenerUrlEmpresa();
+    this.socket = this.socketService.getSocket();
+  }
 
-  // METODO PARA ENVIAR NOTIFICACIONES MEDIANTE SOCKET 
+  async obtenerUrlEmpresa() {
+    this.apiUrl = await this.storageService.get('urlEmpresa');
+  }
+
+  // METODO PARA ENVIAR NOTIFICACIONES MEDIANTE SOCKET
   sendNotiRealTime(data: any) {
     this.socket.emit('nueva_notificacion', data);
   }
 
   /*********************************************************************
-   * 
+   *
    *            Metodos para conexion a la RUTA DE PERMISOS
-   * 
-   **********************************************************************  
+   *
+   **********************************************************************
    */
 
   // OBTIENE LOS REGISTROS DE SOLICITUDES DE PERMISOS POR ID Y CODIGO
@@ -153,12 +162,12 @@ export class PermisosService {
 
   // METODO PARA REGISTRAR SOLICITUD DE PERMISO
   postNuevoPermiso(datos: any) {
-    return this.http.post<any>(`${environment.url}/empleadoPermiso`, datos);
+    return this.http.post<any>(`${this.apiUrl}/empleadoPermiso`, datos);
   }
 
   // METODO PARA EDITAR SOLICITUD DE PERMISO
   putPermiso(id: number, datos: any) {
-    return this.http.put<any>(`${environment.url}/empleadoPermiso/${id}/permiso-solicitado`, datos);
+    return this.http.put<any>(`${this.apiUrl}/empleadoPermiso/${id}/permiso-solicitado`, datos);
   }
 
   pruebaConsulta(): Observable<any> {
@@ -171,15 +180,15 @@ export class PermisosService {
   }
 
   BuscarPermisosSolicitados(datos: any) {
-    return this.http.post<any>(`${this.recursoURL}/empleadoPermiso/permisos-solicitados/movil`, datos);
+    return this.http.post<any>(`${this.apiUrl}/empleadoPermiso/permisos-solicitados/movil`, datos);
   }
   // METODO PARA SUBIR ARCHIVOS DE PERMISOS
   SubirArchivoRespaldo(formData: any, id: number, codigo: any, archivo: any) {
-    return this.http.put(`${this.recursoURL}/empleadoPermiso/${id}/archivo/${archivo}/validar/${codigo}`, formData)
+    return this.http.put(`${this.apiUrl}/empleadoPermiso/${id}/archivo/${archivo}/validar/${codigo}`, formData)
   }
   // METODO PARA ELIMINAR ARCHIVOS DE PERMISOS
   EliminarArchivo(documento: string, codigo: any) {
-    return this.http.delete(`${this.recursoURL}/empleadoPermiso/eliminar-movil/${documento}/validar/${codigo}`);
+    return this.http.delete(`${this.apiUrl}/empleadoPermiso/eliminar-movil/${documento}/validar/${codigo}`);
   }
 
 }

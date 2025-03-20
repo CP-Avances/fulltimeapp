@@ -10,6 +10,9 @@ import { Md5 } from 'ts-md5/dist/md5';
 import { environment } from 'src/environments/environment';
 import { EmpleadosService } from 'src/app/services/empleados.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
+import { StorageService } from 'src/app/services/storage.service';
+
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -25,7 +28,8 @@ export class LoginPage implements OnInit {
 
   user = {
     nombre_usuario: "",
-    pass: ""
+    pass: "",
+    codigo_empresa: "",
   }
 
   iddispositivos: IdDispositivos[] = [];
@@ -44,7 +48,7 @@ export class LoginPage implements OnInit {
     private userService: DataUserLoggedService,
     private empleadoService: EmpleadosService,
     public validar: ValidacionesService,
-
+    private storageService: StorageService,
   ) { }
   mostrarCheckboxInicialmente: boolean;
 
@@ -128,7 +132,7 @@ export class LoginPage implements OnInit {
     this.verPassword = !this.verPassword;
   }
 
-  //METODO PARA VER EL NUMERO DE DISPOSITIVOS QUE PUEDE TENER UN USUARIO 
+  //METODO PARA VER EL NUMERO DE DISPOSITIVOS QUE PUEDE TENER UN USUARIO
   BuscarParametroNumeroDispositivos() {
     let datos = [];
     this.parametros.ObtenerDetallesParametros(6).subscribe(
@@ -285,6 +289,40 @@ export class LoginPage implements OnInit {
     }
   }
 
+  validarEmpresa(){
+
+    try {
+      if (this.user.codigo_empresa == null) {
+        this.usuarioIncorrectoToas("Ingrese el código de la empresa.", 2000);
+      } else {
+        console.log('codigo empresa', this.user.codigo_empresa);
+        this.relojService.validarEmpresa(this.user.codigo_empresa).subscribe(
+          {
+            next: async (res) => {
+              console.log('res', res);
+              if (res.message === 'ok') {
+                await this.storageService.set('urlEmpresa', res.empresas[0].empresa_direccion);
+                await this.storageService.set('urlSocketEmpresa', res.empresas[0].movil_socket_direccion);
+                this.iniciarSesion1();
+              }
+              else if (res.message === 'vacio') {
+                this.usuarioIncorrectoToas("Verifique código empresarial", 2000);
+              }
+            },
+            error: (err) => {
+              console.log(err);
+              this.usuarioIncorrectoToas("Error en la conexión con el servidor", 3000);
+            }
+          }
+        );
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+
+  }
+
   // METODO PARA OBTENER LA IMAGEN EN BASE 64
   obtenerImagen64() {
     this.empleadoService.ObtenerImagen(localStorage.getItem("empleadoID"), localStorage.getItem("imagen")).subscribe(data => {
@@ -362,7 +400,7 @@ export class LoginPage implements OnInit {
     await alert.present();
   }
 
-  // METODO PARA REGISTRAR EL DISPOSITIVO 
+  // METODO PARA REGISTRAR EL DISPOSITIVO
   registrarIdDispositivoenBDD(id_celular: any, model_dispositivo: any) {
     this.obtenerInfoTerminosCondiciones();
     console.log('aceptaTerminos:', this.aceptaTerminos); // Depuración

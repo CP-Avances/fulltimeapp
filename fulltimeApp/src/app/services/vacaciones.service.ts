@@ -1,18 +1,20 @@
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { Vacacion } from '../interfaces/Vacacion';
-import { environment } from '../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
 
-import { Socket } from 'ngx-socket-io';
+// SERVICIOS
+import { StorageService } from './storage.service';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class VacacionesService {
 
-  private apiUrl = environment.url;
+  private apiUrl = '';
+  private socket: any;
 
   private handleError(error: any) {
     console.log('ERROR CAPTURADO: ', error);
@@ -20,8 +22,16 @@ export class VacacionesService {
   }
   constructor(
     private http: HttpClient,
-    private socket: Socket
-  ) { }
+    private socketService: SocketService,
+    private storageService: StorageService,
+  ) {
+    this.obtenerUrlEmpresa();
+  }
+
+  async obtenerUrlEmpresa() {
+    this.apiUrl = await this.storageService.get('urlEmpresa');
+    this.socket = this.socketService.getSocket();
+  }
 
   // Noti_realtime
   sendNotiRealTime(data: any) {
@@ -30,10 +40,10 @@ export class VacacionesService {
   }
 
   /*********************************************************************
-  * 
+  *
   *            Metodos para conexion a la RUTA DE VACACIONES
-  * 
-  **********************************************************************  
+  *
+  **********************************************************************
   */
   // OBTIENE LOS REGISTROS DE SOLICITUDES DE VACACIONES
   getAllVacaciones(): Observable<Vacacion[]> {

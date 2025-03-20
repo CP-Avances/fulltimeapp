@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { LoadingController, ModalController, ToastController, IonDatetime } from '@ionic/angular';
 import { Subscription } from 'rxjs';
-import { Socket } from 'ngx-socket-io';
 import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { HoraExtra } from 'src/app/interfaces/HoraExtra';
 import { UpdateAutorizacionComponent } from 'src/app/modals/update-autorizacion/update-autorizacion.component';
@@ -12,6 +11,7 @@ import { ParametrosService } from 'src/app/services/parametros.service';
 import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
 import { DateTime } from 'luxon';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-all-horas-extras',
@@ -53,30 +53,35 @@ export class ListaHorasExtrasAdminComponent implements OnInit, OnDestroy {
   msAutorizado: boolean = false;
   msNegado: boolean = false;
 
+  socket: any;
+
   constructor(
     private dataUserLoggedService: DataUserLoggedService,
     private horasExtrasService: HorasExtrasService,
     private loadingController: LoadingController,
     private toastController: ToastController,
     private userService: DataUserLoggedService,
-    private socket: Socket,
     public modalController: ModalController,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
     public restAutoriza: AutorizacionesService,
     public usuarioDepa: RelojServiceService,
-  ) {
-
-    this.socket.on('recibir_aviso', (data_llega: any) => {
-      this.obtenerAllHorasExtras();
-    });
-
-  }
+    private socketService: SocketService,
+  ) { }
 
   ngOnInit() {
     this.username = this.userService.UserFullname;
     this.idEmpleado = parseInt(localStorage.getItem('empleadoID'));
     this.BuscarFormatos();
+
+    this.socket = this.socketService.getSocket();
+
+    if (this.socket) {
+      this.socket.on('recibir_aviso', (data_llega: any) => {
+        this.obtenerAllHorasExtras();
+      });
+
+    }
   }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS

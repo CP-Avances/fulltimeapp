@@ -3,7 +3,6 @@ import { Permiso } from 'src/app/interfaces/Permisos';
 import { ModalController } from '@ionic/angular';
 import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { LoadingController, IonInfiniteScroll } from '@ionic/angular';
-import { Socket } from 'ngx-socket-io';
 
 import { Subscription } from 'rxjs';
 
@@ -13,7 +12,7 @@ import { VerPermisoComponent } from '../ver-permiso/ver-permiso.component';
 import { EditarPermisoComponent } from '../editar-permiso/editar-permiso.component';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
-
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-permisos-lista',
@@ -34,6 +33,8 @@ export class PermisosListaComponent implements OnInit, OnDestroy {
   ver: boolean = true;
   codigo: any;
 
+  socket: any;
+
   @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
 
   constructor(
@@ -42,17 +43,23 @@ export class PermisosListaComponent implements OnInit, OnDestroy {
     public modalController: ModalController,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
-    public socket: Socket,
-  ) { 
-    this.socket.on('recibir_notificacion', (data_llega: any) => {
-      this.obtenerListaPermisos();
-    });
+    private socketService: SocketService,
+  ) {
+
   }
 
   ngOnInit() {
     this.codigo = String(localStorage.getItem('empleadoID'));
     this.BuscarFormatos();
     this.cambioPaginaActual();
+
+    this.socket = this.socketService.getSocket();
+
+    if (this.socket) {
+      this.socket.on('recibir_notificacion', (data_llega: any) => {
+        this.obtenerListaPermisos();
+      });
+    }
   }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS

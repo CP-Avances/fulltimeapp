@@ -1,26 +1,38 @@
 import { Injectable } from '@angular/core';
-import { environment } from 'src/environments/environment';
 import { throwError, Observable } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Alimentacion } from '../interfaces/Alimentacion';
 import { tap, catchError } from 'rxjs/operators';
-import { Socket } from 'ngx-socket-io';
+
+// SERVICIOS
+import { StorageService } from './storage.service';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AlimentacionService {
 
-  private apiUrl = environment.url;
+  private apiUrl = '';
+  private socket: any;
 
   private handleError(error: any) {
     console.log('ERROR CAPTURADO: ', error);
     return throwError(error);
   }
+
   constructor(
     private http: HttpClient,
-    private socket: Socket
-  ) { }
+    private socketService: SocketService,
+    private storageService: StorageService,
+  ) {
+    this.obtenerUrlEmpresa();
+    this.socket = this.socketService.getSocket();
+  }
+
+  async obtenerUrlEmpresa() {
+    this.apiUrl = await this.storageService.get('urlEmpresa');
+  }
 
   // METODO PARA ENVIAR NOTIFICACIONES MEDIANTE SOCKET
   sendNotiRealTime(data: any) {
@@ -28,10 +40,10 @@ export class AlimentacionService {
   }
 
   /*********************************************************************
-   * 
+   *
    *            Metodos para conexion a la RUTA DE ALIMENTACION
-   * 
-   **********************************************************************  
+   *
+   **********************************************************************
    */
 
   // OBTIENE LOS REGISTROS DE SOLICITUDES DE ALIMENTACION

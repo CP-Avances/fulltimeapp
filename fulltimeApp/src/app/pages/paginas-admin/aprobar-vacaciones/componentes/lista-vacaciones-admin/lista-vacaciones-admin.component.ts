@@ -6,12 +6,12 @@ import { UpdateAutorizacionComponent } from 'src/app/modals/update-autorizacion/
 import { Vacacion } from 'src/app/interfaces/Vacacion';
 import { VacacionesService } from 'src/app/services/vacaciones.service';
 import { DataUserLoggedService } from '../../../../../services/data-user-logged.service';
-import { Socket } from 'ngx-socket-io';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
 import { DateTime } from 'luxon';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-all-vacaciones',
@@ -51,6 +51,7 @@ export class ListaVacacionesAdminComponent implements OnInit {
   msAutorizado: boolean = false;
   msNegado: boolean = false;
 
+  socket: any;
 
   constructor(
     private dataUserLoggedService: DataUserLoggedService,
@@ -58,22 +59,26 @@ export class ListaVacacionesAdminComponent implements OnInit {
     private vacacionService: VacacionesService,
     private toastController: ToastController,
     private userService: DataUserLoggedService,
-    private socket: Socket,
     public modalController: ModalController,
     public validar: ValidacionesService,
     public parametro: ParametrosService,
     public restAutoriza: AutorizacionesService,
     public usuarioDepa: RelojServiceService,
-  ) {
-    this.socket.on('recibir_notificacion', (data_llega: any) => {
-      this.obtenerAllVacaciones();
-    });
-  }
+    private socketService: SocketService,
+  ) { }
 
   ngOnInit() {
     this.username = this.userService.UserFullname;
     this.idEmpleado = parseInt(localStorage.getItem('empleadoID'));
     this.BuscarFormatos();
+
+    this.socket = this.socketService.getSocket();
+
+    if (this.socket) {
+      this.socket.on('recibir_notificacion', (data_llega: any) => {
+        this.obtenerAllVacaciones();
+      });
+    }
   }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
@@ -135,7 +140,7 @@ export class ListaVacacionesAdminComponent implements OnInit {
           });
 
           this.listaVacacionesFiltradas.forEach(v => {
-            // TRATAMIENTO DE FECHAS Y HORAS 
+            // TRATAMIENTO DE FECHAS Y HORAS
             v.fec_ingreso_ = this.validar.FormatearFecha(String(v.fec_ingreso), this.formato_fecha, this.validar.dia_completo);
             v.fec_inicio_ = this.validar.FormatearFecha(String(v.fec_inicio), this.formato_fecha, this.validar.dia_completo);
             v.fec_final_ = this.validar.FormatearFecha(String(v.fec_final), this.formato_fecha, this.validar.dia_completo);
@@ -348,7 +353,7 @@ export class ListaVacacionesAdminComponent implements OnInit {
           });
 
           this.listaVacacionesFiltradas.forEach(v => {
-            // TRATAMIENTO DE FECHAS Y HORAS 
+            // TRATAMIENTO DE FECHAS Y HORAS
             v.fec_ingreso_ = this.validar.FormatearFecha(String(v.fec_ingreso), this.formato_fecha, this.validar.dia_completo);
             v.fec_inicio_ = this.validar.FormatearFecha(String(v.fec_inicio), this.formato_fecha, this.validar.dia_completo);
             v.fec_final_ = this.validar.FormatearFecha(String(v.fec_final), this.formato_fecha, this.validar.dia_completo);

@@ -11,7 +11,8 @@
       </ion-card-header>
 
       <ion-card-content>
-        <form (submit)="iniciarSesion1()" mode="md" id="formulariologin">
+        <form (submit)="validarEmpresa
+        ()" mode="md" id="formulariologin">
           <ion-item style="font-size: 20px;">
             <ion-label position="floating" mode="md" color="medium">
               <ion-icon name="person-outline" color="medium"></ion-icon> Usuario <ion-text color="danger">*</ion-text>
@@ -30,12 +31,20 @@
             <ion-icon class="posicionOjo" slot="end" [name]="verPassword ? 'eye' : 'eye-off-outline'"
               (click)="mostrarPassword()"></ion-icon>
           </ion-item>
+
+          <ion-item style="font-size: 20px;">
+            <ion-label position="floating" mode="md" color="medium">
+              <ion-icon name="business" color="medium"></ion-icon> Código Empresarial <ion-text color="danger">*</ion-text>
+            </ion-label>
+            <ion-input required type="text" mode="md" [(ngModel)]="user.codigo_empresa" name="empresa"
+              class="form-control" minlength="3"></ion-input>
+          </ion-item>
           <br>
           <!-- Checkbox para aceptar términos y condiciones -->
           <ion-item lines="none" *ngIf="!mostrarCheckboxInicialmente">
             <ion-checkbox slot="start" [(ngModel)]="aceptaTerminos" name="aceptaTerminos" required></ion-checkbox>
             <p class="paragraph-text">
-              He leído y presto mi consentimiento a los términos de uso de la aplicación, al procesamiento y tratamiento de mis datos personales conforme a lo dispuesto en la 
+              He leído y presto mi consentimiento a los términos de uso de la aplicación, al procesamiento y tratamiento de mis datos personales conforme a lo dispuesto en la
               <a href="https://casapazmino.com.ec/politicas-de-privacidad-reloj-virtual-ft/"> Política de privacidad Reloj Virtual Fulltime</a>.
             </p>
           </ion-item>

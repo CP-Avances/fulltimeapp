@@ -1,12 +1,14 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
 import { catchError, tap } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import { Notificacion, NotificacionTimbre, SettingsInfoEmpleado } from '../interfaces/Notificaciones';
 import { Autorizacion } from '../interfaces/Autorizaciones';
+
+// SERVICIOS
+import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,23 +16,30 @@ import { Autorizacion } from '../interfaces/Autorizaciones';
 
 export class AutorizacionesService {
 
-  private apiUrl = environment.url;
-  private recursoURL = 'http://186.4.226.49:3001';
+  private apiUrl = '';
+
   private handleError(error: any) {
     console.log('ERROR CAPTURADO: ', error);
     return throwError(error);
   }
   constructor(
     private http: HttpClient,
-  ) { }
+    private storageService: StorageService,
+  ) {
+    this.obtenerUrlEmpresa();
+  }
+
+  async obtenerUrlEmpresa() {
+    this.apiUrl = await this.storageService.get('urlEmpresa');
+  }
 
   private subscription: Subscription | null = null;
-  // METODO PARA REALIZAR LA SUBSCRIPCION DE UN METODO 
+  // METODO PARA REALIZAR LA SUBSCRIPCION DE UN METODO
   setSubscription(subscription: Subscription) {
     this.subscription = subscription;
   }
 
-  // METODO PARA REALIZAR LA DESUBSCRIBIR UN METODO 
+  // METODO PARA REALIZAR LA DESUBSCRIBIR UN METODO
   unsubscribe() {
     if (this.subscription) {
       this.subscription.unsubscribe();
@@ -39,9 +48,9 @@ export class AutorizacionesService {
   }
 
   /******************************************************
-    * 
-    *        Notificaciones 
-    *  
+    *
+    *        Notificaciones
+    *
     *******************************************************
     */
 
@@ -58,13 +67,13 @@ export class AutorizacionesService {
 
   // METODO PARA CREAR NOTIFICACIONES
   postNotificacion(datos: any): Observable<any> {
-    return this.http.post<any>(`${environment.url}/noti-real-time`, datos);
+    return this.http.post<any>(`${this.apiUrl}/noti-real-time`, datos);
   }
 
   /******************************************************
-   * 
+   *
    *        Notificaciones Timbres
-   *  
+   *
    *******************************************************
    */
   // METODO PARA OBTENER LAS NOTIFICACIONES TIMBRES
@@ -162,7 +171,7 @@ export class AutorizacionesService {
   }
 
   postNuevaAutorizacion(data: Autorizacion): Observable<any> {
-    return this.http.post(`${environment.url}/autorizaciones`, data);
+    return this.http.post(`${this.apiUrl}/autorizaciones`, data);
   }
 
   // METODO PARA BUSCAR USUARIO AUTORIZA
@@ -179,13 +188,13 @@ export class AutorizacionesService {
   }
 
   BuscarListaAutorizaDepa(id_depar: any) {
-    return this.http.get(`${environment.url}/autorizaciones/listaDepaAutoriza/${id_depar}`);
+    return this.http.get(`${this.apiUrl}/autorizaciones/listaDepaAutoriza/${id_depar}`);
   }
 
   /******************************************************
-   * 
+   *
    *        BUSQUEDA DE JEFES DE DEPARTAMENTOS
-   *  
+   *
    *******************************************************
    */
 
@@ -199,9 +208,9 @@ export class AutorizacionesService {
 
 
   /******************************************************
-   * 
-   *        ENDPOINT PARA ENVIAR CORREOS ELECTRONICOS 
-   *  
+   *
+   *        ENDPOINT PARA ENVIAR CORREOS ELECTRONICOS
+   *
    *******************************************************
    */
 
@@ -214,7 +223,7 @@ export class AutorizacionesService {
   }
 
   EnviarCorreoPermiso(id_empresa: number, data: any): Observable<any> {
-    const url = `${this.recursoURL}/empleadoPermiso/mail-noti-permiso-movil/${id_empresa}`;
+    const url = `${this.apiUrl}/empleadoPermiso/mail-noti-permiso-movil/${id_empresa}`;
     return this.http.post<any>(url, data)
       .pipe(
         tap(console.log)
@@ -222,7 +231,7 @@ export class AutorizacionesService {
   }
 
   EnviarCorreoVacacion(id_empresa: number, data: any): Observable<any> {
-    const url = `${this.recursoURL}/vacaciones/mail-noti-vacacion-movil/${id_empresa}`;
+    const url = `${this.apiUrl}/vacaciones/mail-noti-vacacion-movil/${id_empresa}`;
     return this.http.post<any>(url, data)
       .pipe(
         tap(console.log)
@@ -230,7 +239,7 @@ export class AutorizacionesService {
   }
 
   EnviarCorreoHoraExtra(id_empresa: number, data: any): Observable<any> {
-    const url = `${this.recursoURL}/horas-extras-pedidas/mail-noti-horas-extras-movil/${id_empresa}`;
+    const url = `${this.apiUrl}/horas-extras-pedidas/mail-noti-horas-extras-movil/${id_empresa}`;
     return this.http.post<any>(url, data)
       .pipe(
         tap(console.log)
@@ -238,7 +247,7 @@ export class AutorizacionesService {
   }
 
   EnviarCorreoSolAlimentacion(id_empresa: number, data: any): Observable<any> {
-    const url = `${this.recursoURL}/planComidas/mail-noti-solicitud-comida-movil/${id_empresa}`;
+    const url = `${this.apiUrl}/planComidas/mail-noti-solicitud-comida-movil/${id_empresa}`;
     return this.http.post<any>(url, data)
       .pipe(
         tap(console.log)
@@ -246,9 +255,9 @@ export class AutorizacionesService {
   }
 
   /******************************************************
-   * 
-   *        Endpoint para CAMBIAR ESTADOS DE SOLICITUDES 
-   *  
+   *
+   *        Endpoint para CAMBIAR ESTADOS DE SOLICITUDES
+   *
    *******************************************************
    */
 
@@ -263,12 +272,12 @@ export class AutorizacionesService {
   }
 
   /******************************************************
-   * 
-   *        Informacion extra para las notificaciones 
-   *  
+   *
+   *        Informacion extra para las notificaciones
+   *
    *******************************************************
    */
-  
+
   // METODO PARA OBTENER LA INFORMACION GENERAL DEL EMPLEADO POR SU CODIGO
   getInfoEmpleadoByCodigo(codigo: string | number): Observable<SettingsInfoEmpleado> {
     const url = `${this.apiUrl}/noti-real-time/info-empl-recieve`;

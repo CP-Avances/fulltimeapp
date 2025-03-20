@@ -1,15 +1,17 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
+
+// SERVICIOS
+import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReportesService {
 
-  private api_url = environment.url;
+  private api_url = '';
 
   private handleError(error: any) {
     console.log('ERROR CAPTURADO: ', error);
@@ -17,8 +19,15 @@ export class ReportesService {
   }
 
   constructor(
-    private http: HttpClient
-  ) { }
+    private http: HttpClient,
+    private storageService: StorageService,
+  ) {
+    this.obtenerUrlEmpresa();
+  }
+
+  async obtenerUrlEmpresa() {
+    this.api_url = await this.storageService.get('urlEmpresa');
+  }
 
   // METODO PARA CONSULTAR LISTA DE TIMBRES DEL USUARIO
   ReporteTimbresMultiple(data: any, desde: string, hasta: string) {
@@ -32,12 +41,12 @@ export class ReportesService {
 
   // METODO PARA OBTENER LOS REGISTROS DE FALTAS
   BuscarFaltas(data: any, inicio: string, fin: string) {
-    return this.http.post<any>(`${environment.url}/reporte-faltas/faltas/${inicio}/${fin}`, data);
+    return this.http.post<any>(`${this.api_url}/reporte-faltas/faltas/${inicio}/${fin}`, data);
   }
 
   // METODO PARA OBTENER LOS REGISTROS DE ATRASOS
   BuscarAtrasos(data: any, desde: string, hasta: string) {
-    return this.http.post<any>(`${environment.url}/reporte-atrasos/atrasos-empleados/${desde}/${hasta}`, data);
+    return this.http.post<any>(`${this.api_url}/reporte-atrasos/atrasos-empleados/${desde}/${hasta}`, data);
   }
 
   // METODO PARA OBTENER EL TOTAL DE REGISTROS

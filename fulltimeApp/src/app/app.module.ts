@@ -25,22 +25,22 @@ import localEsEC from '@angular/common/locales/es-EC';
 import { registerLocaleData } from '@angular/common';
 registerLocaleData(localEsEC);
 
-// Configuracion del Socket.io
-import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
-const config: SocketIoConfig = { url: "http://10.1.0.21:3001", options: {}};
+import { SocketIoModule } from 'ngx-socket-io';
+
+import { importProvidersFrom } from '@angular/core';
 
 @NgModule({
   declarations: [AppComponent],
   imports: [
-    BrowserModule, 
-    IonicModule.forRoot(), 
+    BrowserModule,
+    IonicModule.forRoot(),
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
     ComponentesModule,
     ModalsPageModule,
     NgxPaginationModule,
-    SocketIoModule.forRoot(config),
+    SocketIoModule,
     IonicStorageModule.forRoot({
       name: '__fulltime',
       driverOrder: [Drivers.IndexedDB, Drivers.LocalStorage]
@@ -64,7 +64,7 @@ const config: SocketIoConfig = { url: "http://10.1.0.21:3001", options: {}};
     {
       provide: LOCALE_ID, useValue: "es-EC"
     },
-    
+    importProvidersFrom(IonicStorageModule.forRoot()),
   ],
   bootstrap: [AppComponent],
 })

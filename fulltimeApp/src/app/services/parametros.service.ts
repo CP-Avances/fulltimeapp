@@ -1,19 +1,26 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment';
 
+// SERVICIOS
+import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ParametrosService {
 
-  private apiUrl = environment.url
+  private apiUrl = '';
 
   constructor(
-    private http: HttpClient
-  ) { }
+    private http: HttpClient,
+    private storageService: StorageService,
+  ) {
+    this.obtenerUrlEmpresa();
+  }
 
+  async obtenerUrlEmpresa() {
+    this.apiUrl = await this.storageService.get('urlEmpresa');
+  }
 
   // METODO PARA OBTENER LOS DETALLES DE PARAMETROS POR ID
   ObtenerDetallesParametros(id: any) {
@@ -22,7 +29,7 @@ export class ParametrosService {
 
   // METODO PARA OBTENER LOS DETALLES DE PARAMETROS POR ID
   ObtenerDetalleParametroUsuario(datos: any) {
-    return this.http.post<any>(`${environment.url}/timbres/listar-opciones-timbre`, datos);
+    return this.http.post<any>(`${this.apiUrl}/timbres/listar-opciones-timbre`, datos);
   }
 
   // METODO PARA OBTENER LOS FORMATOS DE LAS FECHAS

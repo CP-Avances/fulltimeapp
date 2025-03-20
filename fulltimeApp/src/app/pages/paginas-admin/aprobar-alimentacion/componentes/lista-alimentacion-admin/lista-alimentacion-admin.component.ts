@@ -2,15 +2,14 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { LoadingController, ModalController, ToastController, IonDatetime } from '@ionic/angular';
 import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { Subscription } from 'rxjs';
-import { UpdateAutorizacionComponent } from 'src/app//modals/update-autorizacion/update-autorizacion.component';
 import { Alimentacion } from 'src/app/interfaces/Alimentacion';
 import { AlimentacionService } from 'src/app/services/alimentacion.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { UpdateAutorizacionMultipleComponent } from '../update-autorizacion-multiple/update-autorizacion-multiple.component';
-import { Socket } from 'ngx-socket-io';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { DateTime } from 'luxon';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-all-alimentacion',
@@ -39,23 +38,30 @@ export class ListaAlimentacionAdminComponent implements OnInit, OnDestroy {
   fechaIn: string = "";
   fechaFi: string = "";
 
+  socket: any;
+
   constructor(
     private alimentacionService: AlimentacionService,
     private dataUserLoggedService: DataUserLoggedService,
     private loadingController: LoadingController,
     private toastController: ToastController,
     private userService: DataUserLoggedService,
-    private socket: Socket,
     public modalController: ModalController,
     public validar: ValidacionesService,
     public parametro: ParametrosService,
-  ) {
-    this.socket.on('recibir_aviso', (data_llega: any) => {
-      this.obtenerAllAlimentacion();
-    });
-  }
+    private socketService: SocketService,
+  ) { }
 
   ngOnInit() {
+
+    this.socket = this.socketService.getSocket();
+
+    if (this.socket) {
+      this.socket.on('recibir_aviso', (data_llega: any) => {
+        this.obtenerAllAlimentacion();
+      });
+    }
+
     this.username = this.userService.UserFullname;
     this.BuscarFormatos();
   }

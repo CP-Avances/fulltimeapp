@@ -3,30 +3,39 @@ import { HttpClient } from "@angular/common/http";
 import { NavController } from "@ionic/angular";
 import { environment } from '../../environments/environment';
 
+// SERVICIOS
+import { StorageService } from './storage.service';
+
 @Injectable({
   providedIn: 'root'
 })
 export class RelojServiceService {
-  private URL = environment.url
-
+  private URL = '';
 
   constructor(
     private http: HttpClient,
     private navCtroller: NavController,
+    private storageService: StorageService,
   ) {
+    this.obtenerUrlEmpresa();
+  }
+
+  async obtenerUrlEmpresa() {
+    this.URL = await this.storageService.get('urlEmpresa');
   }
 
   //  METODO PARA OBTENER LOS USUARIOS DE LA EMPRESA
   obtenerUsuarioEmpresa() {
     return this.http.get<any>(this.URL + '/usuarios/usuarioEmpresa');
   }
-  // METODO PARA OBTENER LA INFORMACION DEL USUARIO 
+  // METODO PARA OBTENER LA INFORMACION DEL USUARIO
   obtenerUsuario(idUser: any) {
     return this.http.get<any>(this.URL + '/usuarios/usuario/' + idUser);
   }
 
   // METODO PARA INICIAR SESION
   iniciarSesion(user: any) {
+    console.log('URL cconsultada: ', this.URL);
     return this.http.post<any>(`${this.URL}/login`, user);
   }
 
@@ -75,12 +84,13 @@ export class RelojServiceService {
   cerrarSesion() {
     localStorage.clear();
     sessionStorage.clear();
+    this.storageService.clear();
     localStorage.setItem('primeraVez', 'true');
     this.navCtroller.pop();
     this.navCtroller.navigateRoot('login');
   }
 
-  //comprobar si es primera vez que abre la app para mostrar sliders y si es administrador 
+  //comprobar si es primera vez que abre la app para mostrar sliders y si es administrador
   yaNoEsPrimeraVez() {
     localStorage.setItem('primeraVez', "true");
   }
@@ -108,6 +118,14 @@ export class RelojServiceService {
   // METODO PARA BUSCAR POR WEL CODIGO DEL EMPLEADO LOS TIMBRES
   obtenerTimbres(codigo: any) {
     return this.http.get<any>(this.URL + '/timbres/timbreEmpleado/' + codigo);
+  }
+
+  //SELECTOR DE EMPRESAS
+  validarEmpresa(codigoEmpresa: string){
+    const empresa = {
+      codigo_empresa: codigoEmpresa,
+    }
+    return this.http.post<any>(`${environment.url}/fulltime`, empresa);
   }
 
 }

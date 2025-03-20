@@ -3,7 +3,6 @@ import { HoraExtra } from 'src/app/interfaces/HoraExtra';
 import { ModalController } from '@ionic/angular';
 import { SkeletonListPermisoArray } from 'src/app/interfaces/Skeleton';
 import { LoadingController, IonInfiniteScroll } from '@ionic/angular';
-import { Socket } from 'ngx-socket-io';
 import { Subscription } from 'rxjs';
 import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { EditarHoraExtraComponent } from '../editar-hora-extra/editar-hora-extra.component';
@@ -12,6 +11,7 @@ import { VerHoraExtraComponent } from '../ver-hora-extra/ver-hora-extra.componen
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { DateTime } from 'luxon';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-hora-extra-lista',
@@ -31,6 +31,8 @@ export class HoraExtraListaComponent implements OnInit, OnDestroy {
   ver: boolean = true;
   codigo: any;
 
+  socket: any;
+
   @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
 
   constructor(
@@ -39,16 +41,22 @@ export class HoraExtraListaComponent implements OnInit, OnDestroy {
     public modalController: ModalController,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
-    public socket: Socket,
+    private socketService: SocketService,
   ) {
-    this.socket.on('recibir_notificacion', (data_llega: any) => {
-      this.obtenerListaHoraExtra();
-    });
+
   }
 
   ngOnInit() {
     this.codigo = localStorage.getItem('empleadoID')
     this.BuscarFormatos();
+
+    this.socket = this.socketService.getSocket();
+
+    if (this.socket) {
+      this.socket.on('recibir_notificacion', (data_llega: any) => {
+        this.obtenerListaHoraExtra();
+      });
+    }
   }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS

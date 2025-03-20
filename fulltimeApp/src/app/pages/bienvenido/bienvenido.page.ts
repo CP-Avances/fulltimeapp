@@ -13,6 +13,7 @@ import { NetworkService } from '../../libs/network.service';
 import { NavegadorAdminComponent } from 'src/app/componentes/navegador-admin/navegador-admin.component';
 import { Geolocation } from '@capacitor/geolocation';
 import { timeout } from 'rxjs/operators';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-bienvenido',
@@ -233,7 +234,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
               // Manejo de otros errores
               this.router.navigate(['/enviartimbre', accion]);
             }
-            
+
           }
         );
       } else {
@@ -348,7 +349,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
         this.colorFp = localStorage.getItem("colorFp")
       }
 
-    
+
     }
     );
   }

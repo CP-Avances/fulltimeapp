@@ -6,13 +6,12 @@ import { PermisosService } from 'src/app/services/permisos.service';
 import { Subscription } from 'rxjs';
 import { UpdateAutorizacionComponent } from 'src/app/modals/update-autorizacion/update-autorizacion.component';
 import { DataUserLoggedService } from '../../../../../services/data-user-logged.service';
-import { Socket } from 'ngx-socket-io';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
 import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { DateTime } from 'luxon';
-
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-all-permisos',
@@ -49,27 +48,33 @@ export class ListaPermisosAdminComponent implements OnInit {
   msAutorizado: boolean = false;
   msNegado: boolean = false;
 
+  socket: any;
+
   constructor(
     private permisosService: PermisosService,
     private modalController: ModalController,
     private toastController: ToastController,
     private loadingController: LoadingController,
     private userService: DataUserLoggedService,
-    private socket: Socket,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
     public restAutoriza: AutorizacionesService,
     public usuarioDepa: RelojServiceService,
-  ) {
-    this.socket.on('recibir_notificacion', (data_llega: any) => {
-      this.BuscarFormatos();
-    });
-  }
+    private socketService: SocketService,
+  ) { }
 
   ngOnInit() {
     this.idEmpleado = parseInt(localStorage.getItem('empleadoID'));
     this.username = this.userService.UserFullname;
     this.BuscarFormatos();
+
+    this.socket = this.socketService.getSocket();
+
+    if (this.socket) {
+      this.socket.on('recibir_notificacion', (data_llega: any) => {
+        this.BuscarFormatos();
+      });
+    }
   }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
@@ -157,7 +162,7 @@ export class ListaPermisosAdminComponent implements OnInit {
 
 
           let i = 0;
-          this.listaPermisosFiltradas.filter(item => {   
+          this.listaPermisosFiltradas.filter(item => {
             this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_empleado_contrato).subscribe(
               (usuaDep) => {
                 i = i+1;
@@ -199,15 +204,15 @@ export class ListaPermisosAdminComponent implements OnInit {
                   });
 
                   console.log("ver permiso final", this.permisos_pendientes);
-        
+
                   this.permisos_pre_autorizados = this.listaPermisosDeparta.filter(o => {
                       return o.estado === 2;
                   });
-        
+
                   this.permisos_autorizado = this.listaPermisosDeparta.filter(o => {
                     return o.estado === 3
                   });
-        
+
                   this.permisos_negado = this.listaPermisosDeparta.filter(o => {
                     return o.estado === 4
                   });
@@ -227,23 +232,23 @@ export class ListaPermisosAdminComponent implements OnInit {
                     this.permisos_pendientes = ListaSinDuplicadosPendie;
 
                     this.permisos_pendientes.sort(
-                      (firstObject: Permiso, secondObject: Permiso) =>  
+                      (firstObject: Permiso, secondObject: Permiso) =>
                         (firstObject.numero_permiso >  secondObject.numero_permiso)? -1 : 1
                     );
                   }
-                  
+
                   this.permisos_pre_autorizados.sort(
-                    (firstObject: Permiso, secondObject: Permiso) =>  
+                    (firstObject: Permiso, secondObject: Permiso) =>
                       (firstObject.numero_permiso >  secondObject.numero_permiso)? -1 : 1
                   );
 
                   this.permisos_autorizado.sort(
-                    (firstObject: Permiso, secondObject: Permiso) =>  
+                    (firstObject: Permiso, secondObject: Permiso) =>
                       (firstObject.numero_permiso >  secondObject.numero_permiso)? -1 : 1
                   );
 
                   this.permisos_negado.sort(
-                    (firstObject: Permiso, secondObject: Permiso) =>  
+                    (firstObject: Permiso, secondObject: Permiso) =>
                       (firstObject.numero_permiso >  secondObject.numero_permiso)? -1 : 1
                   );
 
@@ -279,11 +284,11 @@ export class ListaPermisosAdminComponent implements OnInit {
 
                 }
             });
-            
+
           });
 
-          
-          
+
+
         },
         err => {
           this.msPendiente = true;
@@ -384,7 +389,7 @@ export class ListaPermisosAdminComponent implements OnInit {
           })
 
           let i = 0;
-          this.listaPermisosFiltradas.filter(item => {   
+          this.listaPermisosFiltradas.filter(item => {
             this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_empl_contrato).subscribe(
               (usuaDep) => {
                 i = i+1;
@@ -417,15 +422,15 @@ export class ListaPermisosAdminComponent implements OnInit {
                   this.permisos_pendientes = this.listaPermisosDeparta.filter(o => {
                     return o.estado === 1;
                   });
-        
+
                   this.permisos_pre_autorizados = this.listaPermisosDeparta.filter(o => {
                       return o.estado === 2;
                   });
-        
+
                   this.permisos_autorizado = this.listaPermisosDeparta.filter(o => {
                     return o.estado === 3
                   });
-        
+
                   this.permisos_negado = this.listaPermisosDeparta.filter(o => {
                     return o.estado === 4
                   });
@@ -445,23 +450,23 @@ export class ListaPermisosAdminComponent implements OnInit {
                     this.permisos_pendientes = ListaSinDuplicadosPendie;
 
                     this.permisos_pendientes.sort(
-                      (firstObject: Permiso, secondObject: Permiso) =>  
+                      (firstObject: Permiso, secondObject: Permiso) =>
                         (firstObject.numero_permiso >  secondObject.numero_permiso)? -1 : 1
                     );
                   }
 
                   this.permisos_pre_autorizados.sort(
-                    (firstObject: Permiso, secondObject: Permiso) =>  
+                    (firstObject: Permiso, secondObject: Permiso) =>
                       (firstObject.numero_permiso >  secondObject.numero_permiso)? -1 : 1
                   );
 
                   this.permisos_autorizado.sort(
-                    (firstObject: Permiso, secondObject: Permiso) =>  
+                    (firstObject: Permiso, secondObject: Permiso) =>
                       (firstObject.numero_permiso >  secondObject.numero_permiso)? -1 : 1
                   );
 
                   this.permisos_negado.sort(
-                    (firstObject: Permiso, secondObject: Permiso) =>  
+                    (firstObject: Permiso, secondObject: Permiso) =>
                       (firstObject.numero_permiso >  secondObject.numero_permiso)? -1 : 1
                   );
 
@@ -496,7 +501,7 @@ export class ListaPermisosAdminComponent implements OnInit {
                   }
 
                 }
-            }); 
+            });
           });
         },
         err => {

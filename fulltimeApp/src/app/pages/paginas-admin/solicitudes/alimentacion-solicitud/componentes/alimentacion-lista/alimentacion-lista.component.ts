@@ -9,8 +9,7 @@ import { RegistrarAlimentacionComponent } from '../registrar-alimentacion/regist
 import { VerAlimentacionComponent } from '../ver-alimentacion/ver-alimentacion.component';
 import { AlimentacionService } from 'src/app/services/alimentacion.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
-import { Socket } from 'ngx-socket-io';
-
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-alimentacion-lista',
@@ -24,7 +23,7 @@ export class AlimentacionListaComponent implements OnInit, OnDestroy {
   loading: boolean = true;
   pageActual: number = 1;
 
-  ver: boolean = true; 
+  ver: boolean = true;
 
   colorfondo: any;
 
@@ -33,21 +32,27 @@ export class AlimentacionListaComponent implements OnInit, OnDestroy {
 
   idEmpleado: any;
 
+  socket: any;
+
   constructor(
     private alimentacionService: AlimentacionService,
     public modalController: ModalController,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
-    public socket: Socket,
-  ) { 
-    this.socket.on('recibir_aviso', (data_llega: any) => {
-      this.obtenerListaAlimentacion();
-    });
-  }
+    private socketService: SocketService,
+  ) { }
 
   ngOnInit() {
     this.idEmpleado = localStorage.getItem('empleadoID')
     this.BuscarFormatos();
+
+    this.socket = this.socketService.getSocket();
+
+    if (this.socket) {
+      this.socket.on('recibir_aviso', (data_llega: any) => {
+        this.obtenerListaAlimentacion();
+      });
+    }
   }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
@@ -97,7 +102,7 @@ export class AlimentacionListaComponent implements OnInit, OnDestroy {
             c.fec_comida_ = this.validar.FormatearFecha(String(c.fecha_comida), this.formato_fecha, this.validar.dia_completo);
             c.hora_inicio_ = this.validar.FormatearHora(c.hora_inicio, this.formato_hora);
             c.hora_fin_ = this.validar.FormatearHora(c.hora_fin, this.formato_hora);
-      
+
           })
 
           if(this.alimentacion.length < 6){

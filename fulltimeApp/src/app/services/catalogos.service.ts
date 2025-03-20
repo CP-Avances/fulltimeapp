@@ -2,28 +2,37 @@ import { Injectable } from '@angular/core';
 import { Cg_DetalleMenu, Cg_Feriados, Cg_TipoPermiso, Servicios_Comida, Menu_Servicios } from '../interfaces/Catalogos';
 import { HttpClient } from '@angular/common/http';
 import { throwError } from 'rxjs';
-import { environment } from '../../environments/environment';
 import { catchError, tap } from 'rxjs/operators';
+
+// SERVICIOS
+import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CatalogosService {
 
-  private apiUrl = environment.url;
+  private apiUrl = '';
 
   private handleError(error: any) {
     console.log('ERROR CAPTURADO: ', error);
     return throwError(error);
   }
   constructor(
-    private http: HttpClient
-  ) { }
+    private http: HttpClient,
+    private storageService: StorageService,
+  ) {
+    this.obtenerUrlEmpresa();
+  }
+
+  async obtenerUrlEmpresa() {
+    this.apiUrl = await this.storageService.get('urlEmpresa');
+  }
 
   /*********************************************************************
-  * 
+  *
   *            Informacion de catalogo de tipo de permiso.
-  * 
+  *
   **********************************************************************/
 
   private lista_tipos_permisos: Cg_TipoPermiso[] = [];
@@ -61,9 +70,9 @@ export class CatalogosService {
   }
 
   /*********************************************************************
-  * 
+  *
   *            Informacion de catalogo de feriados.
-  * 
+  *
   **********************************************************************/
   private lista_feriados: Cg_Feriados[] = [];
 
@@ -90,9 +99,9 @@ export class CatalogosService {
   }
 
   /*********************************************************************
-  * 
+  *
   *            INFORMACION DE CATALOGO DE DETALLE COMIDA.
-  * 
+  *
   **********************************************************************/
   private lista_detalle_menu: Cg_DetalleMenu[] = [];
 
