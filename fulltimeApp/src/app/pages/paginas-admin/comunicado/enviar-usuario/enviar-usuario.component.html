@@ -147,4 +147,92 @@
             [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
         </pagination-controls>
     </ion-item>
+
+        <!-- LISTAR DEPARTAMENTOS -->
+
+    <ion-row *ngIf="opcion_depa">
+        <ion-col *ngIf="isChecked_depa" size="2">
+            <ion-button color="secondary" (click)="checkedAll_depa( isAllCheck_depa )">
+                <ion-icon name="checkmark-done-outline"></ion-icon>
+            </ion-button>
+        </ion-col>
+        <ion-col [size]="isChecked_depa ? 10: 12">
+            <ion-button (click)="EnviarDepartamento()" shape="round" [disabled]="boton_enviar">
+                ENVIAR
+            </ion-button>
+        </ion-col>
+    </ion-row>
+    <ion-searchbar *ngIf="opcion_depa" autocomplete="off" showCancelButton="focus"
+        (ionChange)="changeSearchDepartamento($event)"></ion-searchbar>
+
+    <ion-list *ngIf="opcion_depa">
+        <ion-text mode="ios" color="dark" style="text-align: center;">
+            <h3>Resultado Departamentos</h3>
+        </ion-text>
+        <ion-item style="margin: 2.5%; padding: -2%; border-radius: 3%;"
+            *ngFor="let d of departamentos_filtro | paginate: { itemsPerPage: 10, currentPage: pageActualDepartamento }"
+            class="item-color" mode="md" lines="full">
+            <ion-checkbox *ngIf="isChecked_depa" slot="start" [(ngModel)]="d.isChecked_depa"></ion-checkbox>
+            <ion-label>
+                <h2> {{ d.sucursal }}</h2>
+                <p>Departamento: {{d.departamento}} </p>
+            </ion-label>
+        </ion-item>
+    </ion-list>
+
+    <!--Configuracion del Pagination - ngxPaginationModulo-->
+    <ion-item style="font-size: 80%; margin: 0% 0% 1% 0%; display: flex; justify-content: center;"
+        [hidden]="verDepartamento" *ngIf="opcion_depa">
+        <pagination-controls class="paginacion" (pageChange)="pageActualDepartamento = $event" [maxSize]=maxSize
+            [directionLinks]=directionLinks [responsive]=responsive [autoHide]="autoHide"
+            [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
+            [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+            [screenReaderPageLabel]="labels.screenReaderPageLabel"
+            [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+        </pagination-controls>
+    </ion-item>
+
+    <!-- LISTAR ROLES -->
+
+    <ion-row *ngIf="opcion_rol">
+        <ion-col *ngIf="isChecked_rol" size="2">
+            <ion-button color="secondary" (click)="checkedAll_rol( isAllCheck_rol )">
+                <ion-icon name="checkmark-done-outline"></ion-icon>
+            </ion-button>
+        </ion-col>
+        <ion-col [size]="isChecked_rol ? 10: 12">
+            <ion-button (click)="EnviarRoles()" shape="round" [disabled]="boton_enviar">
+                ENVIAR
+            </ion-button>
+        </ion-col>
+    </ion-row>
+    <ion-searchbar *ngIf="opcion_rol" autocomplete="off" showCancelButton="focus"
+        (ionChange)="changeSearchRoles($event)"></ion-searchbar>
+
+    <ion-list *ngIf="opcion_rol">
+        <ion-text mode="ios" color="dark" style="text-align: center;">
+            <h3>Resultado Roles</h3>
+        </ion-text>
+        <ion-item style="margin: 2.5%; padding: -2%; border-radius: 3%;"
+            *ngFor="let r of roles_filtro | paginate: { itemsPerPage: 10, currentPage: pageActualRol }"
+            class="item-color" mode="md" lines="full">
+            <ion-checkbox *ngIf="isChecked_rol" slot="start" [(ngModel)]="r.isChecked_rol"></ion-checkbox>
+            <ion-label>
+                {{ r.rol }}
+            </ion-label>
+        </ion-item>
+    </ion-list>
+
+    <!--Configuracion del Pagination - ngxPaginationModulo-->
+    <ion-item style="font-size: 80%; margin: 0% 0% 1% 0%; display: flex; justify-content: center;"
+        [hidden]="verRol" *ngIf="opcion_rol">
+        <pagination-controls class="paginacion" (pageChange)="pageActualRol = $event" [maxSize]=maxSize
+            [directionLinks]=directionLinks [responsive]=responsive [autoHide]="autoHide"
+            [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
+            [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+            [screenReaderPageLabel]="labels.screenReaderPageLabel"
+            [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+        </pagination-controls>
+    </ion-item>    
+
 </ion-content>

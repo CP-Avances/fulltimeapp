@@ -40,7 +40,15 @@ export class InformacionEmpleadoPage implements OnInit {
     correo: "",
     id_rol: 0,
     codigo: "",
-    telefono: ""
+    telefono: "",
+    genero: "",
+    ciudad: "",
+    domicilio: "",
+    name_suc: "",
+    name_dep: "",
+    name_rol: "",
+    name_regimen: "",
+    nombre_nacionalidad:"",
   }
 
   public get app_info(): any {
@@ -72,8 +80,17 @@ export class InformacionEmpleadoPage implements OnInit {
     this.usuario.cedula = this.data.cedula;
     this.usuario.usuario = this.data.usuario;
     this.usuario.telefono = this.data.telefono;
+    this.usuario.genero=this.data.nombre_genero;
+    this.usuario.domicilio=this.data.domicilio;
+    this.usuario.ciudad=this.data.ciudad;
+    this.usuario.name_suc=this.data.name_suc;
+    this.usuario.name_dep=this.data.name_dep;
+    this.usuario.name_rol=this.data.name_rol;
+    this.usuario.name_regimen=this.data.name_regimen;
+    this.usuario.nombre_nacionalidad=this.data.nombre_nacionalidad;
 
     console.log('data vacuna empleado ... ', this.dataUser.dataVacuna)
+    console.log(this.usuario)
     this.BuscarFormatos();
   }
 

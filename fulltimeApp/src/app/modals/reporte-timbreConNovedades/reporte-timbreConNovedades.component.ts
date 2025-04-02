@@ -302,6 +302,10 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
         descripcion = 'LISTA EMPLEADOS';
         establecimiento = '';
       }
+      else if (selec.opcion == 4) {
+        descripcion = 'ROL: '+ selec.rol;
+        establecimiento = '';
+      }
 
 
       n.push({
@@ -520,6 +524,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
             cedula: usu.cedula,
             codigo: usu.codigo,
             empleado: usu.apellido + ' ' + usu.nombre,
+            rol: usu.rol,
             ciudad: usu.ciudad,
             sucursal: usu.sucursal,
             departamento: usu.departamento,
@@ -578,6 +583,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
               usu.cedula,
               usu.codigo,
               `${usu.apellido} ${usu.nombre}`,
+              usu.name_rol,
               usu.ciudad,
               usu.name_suc,
               usu.name_regimen,
@@ -603,6 +609,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
               usu.cedula,
               usu.codigo,
               `${usu.apellido} ${usu.nombre}`,
+              usu.name_rol,
               usu.ciudad,
               usu.name_suc,
               usu.name_regimen,
@@ -664,6 +671,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
         { key: "cedula", width: 20 },
         { key: "codigo", width: 20 },
         { key: "apenombre", width: 20 },
+        { key: "rol", width: 20 },
         { key: "ciudad", width: 20 },
         { key: "sucursal", width: 20 },
         { key: "regimen", width: 20 },
@@ -689,6 +697,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
         { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
         { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
         { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
+        { name: "ROL", totalsRowLabel: "", filterButton: true },
         { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
         { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
         { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },
@@ -764,6 +773,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
         { key: "cedula", width: 20 },
         { key: "codigo", width: 20 },
         { key: "apenombre", width: 20 },
+        { key: "rol", width: 20 },
         { key: "ciudad", width: 20 },
         { key: "sucursal", width: 20 },
         { key: "regimen", width: 20 },
@@ -786,6 +796,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
         { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
         { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
         { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
+        { name: "ROL", totalsRowLabel: "", filterButton: true },
         { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
         { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
         { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },

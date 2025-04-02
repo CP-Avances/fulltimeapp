@@ -43,7 +43,15 @@ export class InformacionAdminPage implements OnInit {
     cedula: "",
     usuario: "",
     id_rol: 0,
-    codigo: ''
+    codigo: '',
+    ciudad: "",
+    domicilio: "",
+    name_suc: "",
+    name_dep: "",
+    name_rol: "",
+    name_regimen: "",
+    genero: "",
+    nombre_nacionalidad: "",
   }
 
   public get app_info(): any {
