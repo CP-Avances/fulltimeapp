@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 
 import { StorageService } from './storage.service';
+import { UrlService } from './url.service';
+
 
 @Injectable({
   providedIn: 'root'
@@ -12,11 +14,15 @@ export class SocketService {
 
   constructor(
     private storaService: StorageService,
+    private urlService: UrlService,
   ) {
     console.log('SocketService inicializado');
   }
 
   async obtenerUrlEmpresa() {
+    this.urlService.getSocketUrl().subscribe(url => {
+      if (url) this.serverUrl = url; // Se actualiza automáticamente cuando cambia la URL
+    });
     this.serverUrl = await this.storaService.get('urlSocketEmpresa');
     console.log('URL del servidor socket:', this.serverUrl);
   }

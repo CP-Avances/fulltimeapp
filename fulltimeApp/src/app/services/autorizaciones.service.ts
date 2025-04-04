@@ -79,6 +79,7 @@ export class AutorizacionesService {
   // METODO PARA OBTENER LAS NOTIFICACIONES TIMBRES
   getNotificacionesTimbreByIdEmpleado(id_empleado: string | number): Observable<NotificacionTimbre[]> {
     const url = `${this.apiUrl}/noti-real-time/noti-tim/all-noti`;
+    console.log('url: notificaciones: ', url)
     const params = new HttpParams()
       .set('id_empleado', id_empleado)
     return this.http.get<Notificacion[]>(url, { params })

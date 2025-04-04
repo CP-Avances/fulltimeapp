@@ -2,9 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { NavController } from "@ionic/angular";
 import { environment } from '../../environments/environment';
+import { firstValueFrom } from 'rxjs';
 
 // SERVICIOS
 import { StorageService } from './storage.service';
+import { UrlService } from './url.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +18,12 @@ export class RelojServiceService {
     private http: HttpClient,
     private navCtroller: NavController,
     private storageService: StorageService,
+    private urlService: UrlService,
   ) {
+    this.urlService.getUrl().subscribe(url => {
+      if (url) this.URL = url; // Se actualiza automáticamente cuando cambia la URL
+      console.log('url cambiada')
+    });
     this.obtenerUrlEmpresa();
   }
 
@@ -34,9 +41,9 @@ export class RelojServiceService {
   }
 
   // METODO PARA INICIAR SESION
-  iniciarSesion(user: any) {
-    console.log('URL cconsultada: ', this.URL);
-    return this.http.post<any>(`${this.URL}/login`, user);
+  async iniciarSesion(user: any) {
+    const response = await firstValueFrom( this.http.post<any>(`${this.URL}/login`, user))
+    return response;
   }
 
   // METODO PARA REGISTRAR EL DISPOSITIVO

@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 
 // SERVICIOS
 import { StorageService } from './storage.service';
+import { UrlService } from './url.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,12 +18,17 @@ export class EmpleadosService {
   constructor(
     private http: HttpClient,
     private storageService: StorageService,
+    private urlService: UrlService,
   ) {
+    this.urlService.getUrl().subscribe(url => {
+      if (url) this.apiUrl = url; // Se actualiza automáticamente cuando cambia la URL
+    });
     this.obtenerUrlEmpresa();
   }
 
   async obtenerUrlEmpresa() {
     this.apiUrl = await this.storageService.get('urlEmpresa');
+    console.log('URL Empresa service empleados: ', this.apiUrl);
   }
 
   // METODO PARA LEER LA LISTA DE EMPLEADOS

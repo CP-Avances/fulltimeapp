@@ -11,6 +11,7 @@ import { environment } from 'src/environments/environment';
 import { EmpleadosService } from 'src/app/services/empleados.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { StorageService } from 'src/app/services/storage.service';
+import { UrlService } from 'src/app/services/url.service';
 
 
 @Component({
@@ -38,6 +39,9 @@ export class LoginPage implements OnInit {
   id_celular: any;
   dispositi: any;
 
+  existeId_Dispositivo: boolean;
+  mostrarCheckboxInicialmente: boolean;
+
   constructor(
     private relojService: RelojServiceService,
     private navCtroller: NavController,
@@ -49,8 +53,8 @@ export class LoginPage implements OnInit {
     private empleadoService: EmpleadosService,
     public validar: ValidacionesService,
     private storageService: StorageService,
+    private urlService: UrlService,
   ) { }
-  mostrarCheckboxInicialmente: boolean;
 
   ionViewWillEnter() {
     this.infoDispositivo();
@@ -61,7 +65,7 @@ export class LoginPage implements OnInit {
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
-    this.obtenerInfoTerminosCondiciones();
+    // this.obtenerInfoTerminosCondiciones();
     this.BuscarParametroTimbreUbicacionDesconocida();
     if (!this.relojService.esPrimeraVez()) {
       this.navCtroller.navigateForward(['inicio']);
@@ -107,224 +111,230 @@ export class LoginPage implements OnInit {
   }
 
   // METODO PARA CONTROLAR LA ACPETACION DE TERMINOS Y CONDICIONES
-  obtenerInfoTerminosCondiciones() {
-    this.infoDispositivo();
-    Device.getId().then((id) => {
-      this.relojService.obtenerDispositivoPorID(id.identifier).subscribe(
-        dispositivos => {
-          if (dispositivos.terminos_condiciones != null) {
-            this.aceptaTerminos = dispositivos.terminos_condiciones;
-            this.mostrarCheckboxInicialmente = this.aceptaTerminos;
-          } else {
-            this.aceptaTerminos = false;
-          }
-          console.log("TERMINOS Y CONDICIONES", this.aceptaTerminos);
-        }, error => {
-          this.aceptaTerminos = false;
-          console.log("TERMINOS Y CONDICIONES", this.aceptaTerminos);
-        }
-      )
-    });
+  // obtenerInfoTerminosCondiciones() {
+  //   this.infoDispositivo();
+  //   Device.getId().then((id) => {
+  //     this.relojService.obtenerDispositivoPorID(id.identifier).subscribe(
+  //       dispositivos => {
+  //         if (dispositivos.terminos_condiciones != null) {
+  //           this.aceptaTerminos = dispositivos.terminos_condiciones;
+  //           this.mostrarCheckboxInicialmente = this.aceptaTerminos;
+  //         } else {
+  //           this.aceptaTerminos = false;
+  //         }
+  //         console.log("TERMINOS Y CONDICIONES", this.aceptaTerminos);
+  //       }, error => {
+  //         this.aceptaTerminos = false;
+  //         console.log("TERMINOS Y CONDICIONES", this.aceptaTerminos);
+  //       }
+  //     )
+  //   });
 
-  }
+  // }
 
   mostrarPassword(): void {
     this.verPassword = !this.verPassword;
   }
 
   //METODO PARA VER EL NUMERO DE DISPOSITIVOS QUE PUEDE TENER UN USUARIO
-  BuscarParametroNumeroDispositivos() {
-    let datos = [];
-    this.parametros.ObtenerDetallesParametros(6).subscribe(
-      res => {
+  // async BuscarParametroNumeroDispositivos() {
+  //   let datos = [];
+  //   this.parametros.ObtenerDetallesParametros(6).subscribe(
+  //     res => {
+  //       console.log("ver parametro BuscarParametroNumeroDispositivos:", res)
+  //       datos = res;
+  //       if (datos.length != 0) {
+  //         return this.rango_dispositivos = (parseInt(datos[0].descripcion));
+  //       } else {
+  //         return this.rango_dispositivos = 1;
+  //       }
+  //     });
+  // }
 
-        console.log("ver parametro:", res)
-        datos = res;
-        if (datos.length != 0) {
-          return this.rango_dispositivos = (parseInt(datos[0].descripcion));
-        } else {
-          return this.rango_dispositivos = 1;
+
+  validarEmpresa() {
+    try {
+      if (!this.user.codigo_empresa) {
+        this.usuarioIncorrectoToas("Ingrese el código de la empresa.", 2000);
+        return;
+      }
+
+      console.log('Código empresa:', this.user.codigo_empresa);
+
+      this.relojService.validarEmpresa(this.user.codigo_empresa).subscribe({
+        next: async (res) => {
+          console.log('Respuesta del servidor:', res);
+
+          if (res.message === 'ok') {
+            const nuevaUrl = res.empresas[0].empresa_direccion;
+            const nuevaUrlSocket = res.empresas[0].movil_socket_direccion;
+
+            // GUARDAR EN EL STORAGE
+            await this.storageService.set('urlEmpresa', nuevaUrl);
+            await this.storageService.set('urlSocketEmpresa', nuevaUrlSocket);
+
+            // ACTUALIZAR EL SERVICIO DE URL
+            this.urlService.updateUrl(nuevaUrl);
+            this.urlService.updateSocketUrl(nuevaUrlSocket);
+
+            // INICIAR SESIÓN
+            this.iniciarSesion1();
+          }
+          else if (res.message === 'vacio') {
+            this.usuarioIncorrectoToas("Verifique código empresarial", 2000);
+          }
+        },
+        error: (err) => {
+          console.error('Error en la conexión:', err);
+          console.error('Error en la conexión:', JSON.stringify(err));
+          this.usuarioIncorrectoToas("Error en la conexión con el servidor", 3000);
         }
       });
+
+    } catch (error) {
+      console.error('Error en validarEmpresa:', error);
+    }
   }
 
+
   // METODO PARA INICIAR SESION
-  iniciarSesion1() {
+  async iniciarSesion1() {
     this.infoDispositivo();
 
     const md5 = new Md5();
-    let clave = md5.appendStr(this.user.pass).end();
+    const clave = md5.appendStr(this.user.pass).end();
 
-    let credenciales = {
+    const credenciales = {
       nombre_usuario: this.user.nombre_usuario,
       pass: clave,
-      movil: true
-    }
+      movil: true,
+    };
 
-    if (credenciales.nombre_usuario == null && credenciales.pass == null) {
+    if (!credenciales.nombre_usuario || !credenciales.pass) {
       this.iniciandoSesion = false;
-      this.usuarioIncorrectoToas("Ups! Ingrese sus datos.", 2000);
-    } else {
-      console.log('ingresa ', credenciales)
-      this.relojService.iniciarSesion(credenciales).subscribe(datos => {
-        console.log("ver datos del usuario", datos);
-        let existeId_Dispositivo: boolean;
-        if (datos.message === 'error') {
-          this.usuarioIncorrectoToas("Usuario y contraseña incorrecta", 3000)
-        }
-        else if (datos.message === 'error_') {
-          this.usuarioIncorrectoToas("Usuario no cumple con todos los requerimientos necesarios para acceder al sistema.", 3000)
-        }
-
-        else if (datos.message === 'inactivo') {
-          this.usuarioIncorrectoToas("Usuario no se encuentra activo en el sistema.", 3000)
-        }
-
-        else if (datos.message === 'licencia_expirada') {
-          this.usuarioIncorrectoToas("Licencia del sistema ha expirado.", 3000)
-        }
-
-        else if (datos.message === 'sin_permiso_acceso') {
-          this.usuarioIncorrectoToas("Usuario no tiene permisos de acceso al sistema.", 3000)
-        }
-
-        else if (datos.message === 'licencia_no_existe') {
-          this.usuarioIncorrectoToas("No se ha encontrado registro de licencia del sistema.", 3000)
-        }
-        else if (datos.message === 'sin_permiso_acces_movil') {
-          this.usuarioIncorrectoToas("Usuario no habilitado para usar la aplicación móvil.", 3000)
-        }
-
-        else {
-
-
-
-          localStorage.setItem('rol', datos.rol);
-          localStorage.setItem('token', datos.token);
-          localStorage.setItem('ip', datos.ip_adress);
-          localStorage.setItem('username', datos.usuario);
-          localStorage.setItem('imagen', datos.imagen);
-
-          localStorage.setItem('id_empresa', datos.empresa);
-          // localStorage.setItem('autoriza', datos.estado);
-          localStorage.setItem('csucur', datos.sucursal);
-          localStorage.setItem('ccargo', datos.cargo);
-          localStorage.setItem('empleadoID', datos.empleado);
-          localStorage.setItem('cdepar', datos.departamento);
-          localStorage.setItem('ccontr', datos.id_contrato);
-          //INFORMACION USUARIO
-          localStorage.setItem('nom', datos.nombre);
-          localStorage.setItem('ap', datos.apellido);
-          localStorage.setItem('UCedula', datos.cedula);
-          localStorage.setItem('codigo', datos.codigo);
-          localStorage.setItem('caducidad_licencia', datos.caducidad_licencia);
-          //APP INFORMACION
-          localStorage.setItem('ruc', datos.ruc);
-          localStorage.setItem('version', datos.version);
-          //LOOK ME
-          // localStorage.setItem('horas_trabaja', res.body.empresa.hora_trabaja);
-          // localStorage.setItem('bool_timbres', datos.acciones_timbres);
-          // localStorage.setItem('fec_caducidad_licencia', datos.caducidad_licencia);
-          this.obtenerImagen64();
-
-          console.log("datos de ingreso ", datos)
-          this.parametros.ObtenerDetallesParametros(6).subscribe(
-            res => {
-              console.log("ver parametro:", res)
-              datos = res;
-              if (datos.length != 0) {
-                return this.rango_dispositivos = (parseInt(datos[0].descripcion));
-              } else {
-                return this.rango_dispositivos = 1;
-              }
-            });
-
-          this.relojService.obtenerIdDispositivosUsuario(datos.empleado).subscribe(
-            dispositivos => {
-              console.log("ver dispositivos", dispositivos)
-
-              //Buscar el id_dispositivo y el id_celular si son el mismo
-              dispositivos.forEach((item: any) => {
-                if (item.id_dispositivo == this.id_celular) {
-                  this.iddispositivos = dispositivos
-                  existeId_Dispositivo = true;
-                }
-              });
-              if (existeId_Dispositivo == true) {
-                this.usuarioSuccessToas("Ingreso exitoso", 2000);
-                this.cambiodepantallas();
-              } else {
-                this.BuscarParametroNumeroDispositivos();
-                console.log("ver rango_dispositivos", this.rango_dispositivos)
-                if (dispositivos.length >= this.rango_dispositivos) {
-                  this.usuarioIncorrectoToas("Ups! El usuario llego al limite de dispositivos permitidos", 3000);
-                  var FormId = 'formulariologin';
-                  var resetForm = <HTMLFormElement>document.getElementById(FormId);
-                  resetForm.reset();
-                } else {
-                  this.registrarCelular();
-                  this.usuarioSuccessToas("Ingreso exitoso", 2000);
-                  this.cambiodepantallas();
-                }
-              }
-            },
-            err => {
-              this.iniciandoSesion = false;
-              if (err.status == 0) {
-                console.log(err.url + "|" + err.message + "|" + err.statusText + "|" + err.name);
-                this.usuarioIncorrectoToas("Halgo ha salido mal. COMPRUEBA TU CONEXION A INTERNET o PONGASE EN CONTACTO CON EL ADMINISTRADOR", 3000);
-              } else {
-                console.log(err.url + "|" + err.message + "|" + err.statusText + "|" + err.name);
-                this.usuarioIncorrectoToas(err.error.message, 3000),
-                  console.log(err)
-              }
-            }
-          );
-
-        }
-      }, err => {
-        this.usuarioIncorrectoToas("Error en la conexión con el servidor", 3000)
-      }
-      )
+      return this.usuarioIncorrectoToas("Ups! Ingrese sus datos.", 2000);
     }
-  }
 
-  validarEmpresa(){
+    console.log('ingresa ', credenciales);
 
     try {
-      if (this.user.codigo_empresa == null) {
-        this.usuarioIncorrectoToas("Ingrese el código de la empresa.", 2000);
-      } else {
-        console.log('codigo empresa', this.user.codigo_empresa);
-        this.relojService.validarEmpresa(this.user.codigo_empresa).subscribe(
-          {
-            next: async (res) => {
-              console.log('res', res);
-              if (res.message === 'ok') {
-                await this.storageService.set('urlEmpresa', res.empresas[0].empresa_direccion);
-                await this.storageService.set('urlSocketEmpresa', res.empresas[0].movil_socket_direccion);
-                this.iniciarSesion1();
-              }
-              else if (res.message === 'vacio') {
-                this.usuarioIncorrectoToas("Verifique código empresarial", 2000);
-              }
-            },
-            error: (err) => {
-              console.log(err);
-              this.usuarioIncorrectoToas("Error en la conexión con el servidor", 3000);
-            }
-          }
-        );
+      const datos = await this.relojService.iniciarSesion(credenciales);
+      console.log("ver datos del usuario", datos);
+
+      const mensajesError: { [key: string]: string } = {
+        error: "Usuario y contraseña incorrecta",
+        error_: "Usuario no cumple con todos los requerimientos necesarios para acceder al sistema.",
+        inactivo: "Usuario no se encuentra activo en el sistema.",
+        licencia_expirada: "Licencia del sistema ha expirado.",
+        sin_permiso_acceso: "Usuario no tiene permisos de acceso al sistema.",
+        licencia_no_existe: "No se ha encontrado registro de licencia del sistema.",
+        sin_permiso_acces_movil: "Usuario no habilitado para usar la aplicación móvil.",
+      };
+
+      if (mensajesError[datos.message]) {
+        return this.usuarioIncorrectoToas(mensajesError[datos.message], 3000);
       }
 
+      console.log("datos de ingreso ", datos);
+      await this.registrarDatosLocales(datos);
+      await this.obtenerImagen64();
+      await this.obtenerParametros();
+      await this.obtenerIdDispositivosUsuario(datos);
     } catch (error) {
-      console.log(error);
+      this.usuarioIncorrectoToas("Error en la conexión con el servidor", 3000);
     }
-
   }
 
+  async registrarDatosLocales(datos: any){
+    localStorage.setItem('rol', datos.rol);
+    localStorage.setItem('token', datos.token);
+    localStorage.setItem('ip', datos.ip_adress);
+    localStorage.setItem('username', datos.usuario);
+    localStorage.setItem('imagen', datos.imagen);
+
+    localStorage.setItem('id_empresa', datos.empresa);
+    // localStorage.setItem('autoriza', datos.estado);
+    localStorage.setItem('csucur', datos.sucursal);
+    localStorage.setItem('ccargo', datos.cargo);
+    localStorage.setItem('empleadoID', datos.empleado);
+    localStorage.setItem('cdepar', datos.departamento);
+    localStorage.setItem('ccontr', datos.id_contrato);
+    //INFORMACION USUARIO
+    localStorage.setItem('nom', datos.nombre);
+    localStorage.setItem('ap', datos.apellido);
+    localStorage.setItem('UCedula', datos.cedula);
+    localStorage.setItem('codigo', datos.codigo);
+    localStorage.setItem('caducidad_licencia', datos.caducidad_licencia);
+    //APP INFORMACION
+    localStorage.setItem('ruc', datos.ruc);
+    localStorage.setItem('version', datos.version);
+
+     // LOOK ME
+     // localStorage.setItem('horas_trabaja', res.body.empresa.hora_trabaja);
+     // localStorage.setItem('bool_timbres', datos.acciones_timbres);
+     // localStorage.setItem('fec_caducidad_licencia', datos.caducidad_licencia);
+  }
+
+  async obtenerParametros(){
+    const res = await this.parametros.ObtenerParametroDispositivos(6);
+    console.log("ver parametro obtenerParametros:", res)
+    // datos = res;
+    if (res.length != 0) {
+      return this.rango_dispositivos = (parseInt(res[0].descripcion));
+    } else {
+      return this.rango_dispositivos = 1;
+    }
+  }
+
+  async obtenerIdDispositivosUsuario(datos: any){
+    this.relojService.obtenerIdDispositivosUsuario(datos.empleado).subscribe({
+      next: async (dispositivos) =>{
+        console.log("ver dispositivos", dispositivos)
+
+        //Buscar el id_dispositivo y el id_celular si son el mismo
+        dispositivos.forEach((item: any) => {
+          if (item.id_dispositivo == this.id_celular) {
+            this.iddispositivos = dispositivos
+            this.existeId_Dispositivo = true;
+          }
+        });
+
+        if (this.existeId_Dispositivo) {
+          console.log('existe id ', this.iddispositivos);
+          this.usuarioSuccessToas("Ingreso exitoso", 2000);
+          this.cambiodepantallas();
+        } else {
+          // await this.BuscarParametroNumeroDispositivos();
+          console.log("ver rango_dispositivos", this.rango_dispositivos)
+          if (dispositivos.length >= this.rango_dispositivos) {
+            this.usuarioIncorrectoToas("Ups! El usuario llego al limite de dispositivos permitidos", 3000);
+            var FormId = 'formulariologin';
+            var resetForm = <HTMLFormElement>document.getElementById(FormId);
+            resetForm.reset();
+          } else {
+            this.registrarCelular();
+            this.usuarioSuccessToas("Ingreso exitoso", 2000);
+            this.cambiodepantallas();
+          }
+        }
+      },
+      error: (err) =>{
+        this.iniciandoSesion = false;
+        if (err.status == 0) {
+          console.log(err.url + "|" + err.message + "|" + err.statusText + "|" + err.name);
+          this.usuarioIncorrectoToas("Halgo ha salido mal. COMPRUEBA TU CONEXION A INTERNET o PONGASE EN CONTACTO CON EL ADMINISTRADOR", 3000);
+        } else {
+          console.log(err.url + "|" + err.message + "|" + err.statusText + "|" + err.name);
+          this.usuarioIncorrectoToas(err.error.message, 3000),
+            console.log(err)
+        }
+      }
+    });
+  }
+
+
   // METODO PARA OBTENER LA IMAGEN EN BASE 64
-  obtenerImagen64() {
+  async obtenerImagen64() {
     this.empleadoService.ObtenerImagen(localStorage.getItem("empleadoID"), localStorage.getItem("imagen")).subscribe(data => {
       if (!data.imagen) {
         localStorage.setItem('imagen64', '');
@@ -402,7 +412,7 @@ export class LoginPage implements OnInit {
 
   // METODO PARA REGISTRAR EL DISPOSITIVO
   registrarIdDispositivoenBDD(id_celular: any, model_dispositivo: any) {
-    this.obtenerInfoTerminosCondiciones();
+    // this.obtenerInfoTerminosCondiciones();
     console.log('aceptaTerminos:', this.aceptaTerminos); // Depuración
 
     const id_usuario = localStorage.getItem('empleadoID');

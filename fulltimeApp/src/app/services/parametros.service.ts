@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 
 // SERVICIOS
 import { StorageService } from './storage.service';
+import { UrlService } from './url.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,9 +16,13 @@ export class ParametrosService {
   constructor(
     private http: HttpClient,
     private storageService: StorageService,
-  ) {
-    this.obtenerUrlEmpresa();
-  }
+    private urlService: UrlService,
+    ) {
+      this.urlService.getUrl().subscribe(url => {
+        if (url) this.apiUrl = url; // Se actualiza automáticamente cuando cambia la URL
+      });
+      this.obtenerUrlEmpresa();
+    }
 
   async obtenerUrlEmpresa() {
     this.apiUrl = await this.storageService.get('urlEmpresa');
@@ -25,6 +31,12 @@ export class ParametrosService {
   // METODO PARA OBTENER LOS DETALLES DE PARAMETROS POR ID
   ObtenerDetallesParametros(id: any) {
     return this.http.get<any>(this.apiUrl + '/parametrizacion/' + id);
+  }
+
+  // METODO PARA OBTENER EL PARAMETRO DE DISPOSITIVOS
+  async ObtenerParametroDispositivos(id: any) {
+    const response = await firstValueFrom(this.http.get<any>(this.apiUrl + '/parametrizacion/' + id));
+    return response;
   }
 
   // METODO PARA OBTENER LOS DETALLES DE PARAMETROS POR ID
