@@ -6,13 +6,10 @@ import { IdDispositivos } from 'src/app/interfaces/Usuario';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { Device } from '@capacitor/device';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
-import { Md5 } from 'ts-md5/dist/md5';
-import { environment } from 'src/environments/environment';
 import { EmpleadosService } from 'src/app/services/empleados.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { UrlService } from 'src/app/services/url.service';
-
 
 @Component({
   selector: 'app-login',
@@ -21,8 +18,6 @@ import { UrlService } from 'src/app/services/url.service';
 })
 export class LoginPage implements OnInit {
   ips_locales: any = '';
-
-  private URL = environment.url
 
   iniciandoSesion = false;
   aceptaTerminos: boolean = false; // Inicialización predeterminada
@@ -200,13 +195,9 @@ export class LoginPage implements OnInit {
   // METODO PARA INICIAR SESION
   async iniciarSesion1() {
     this.infoDispositivo();
-
-    const md5 = new Md5();
-    const clave = md5.appendStr(this.user.pass).end();
-
     const credenciales = {
       nombre_usuario: this.user.nombre_usuario,
-      pass: clave,
+      pass: this.user.pass,
       movil: true,
     };
 
