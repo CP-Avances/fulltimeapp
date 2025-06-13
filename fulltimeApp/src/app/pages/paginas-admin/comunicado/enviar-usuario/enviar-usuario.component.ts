@@ -26,20 +26,24 @@ export class EnviarUsuarioComponent implements OnInit {
   opcion_sucursal: boolean = false;
   opcion_depa: boolean = false;
   opcion_empleado: boolean = false;
+  opcion_rol: boolean = false;
   idEmpleado: number;
   idEmpresa: number;
   solicitudes: checkOptions[] = [
     { valor: 1, nombre: 'Sucursal' },
     { valor: 2, nombre: 'Departamento' },
     { valor: 3, nombre: 'Empleado' },
+    { valor: 4, nombre: 'Rol' },
   ];
   departamentos: any = [];
   sucursales: any = [];
   respuesta: any[];
   empleados: any = [];
+  roles: any = [];
   empleados_filtro: any = [];
   departamentos_filtro: any = [];
   sucursales_filtro: any = [];
+  roles_filtro: any = [];
   isChecked: boolean = true;
 
   constructor(
@@ -102,7 +106,7 @@ export class EnviarUsuarioComponent implements OnInit {
           comunicado_noti: obj.comunicado_notificacion
         })
       })
-      sessionStorage.setItem('datos_comunicado', this.empleados)
+      sessionStorage.setItem('datos_comunicado', JSON.stringify(this.empleados));
       res.forEach(obj => {
         this.sucursales.push({
           id: obj.id_suc,
@@ -128,7 +132,7 @@ export class EnviarUsuarioComponent implements OnInit {
       }
       this.loadingEmpleado = true;
       this.departamentos = [];
-      this.empleados = [];
+      this.roles= [];
       this.BuscarParametro();
     }, err => {
       this.mostrarAlertas("No se ha encontrado información.", 1000, 'danger')
@@ -160,7 +164,7 @@ export class EnviarUsuarioComponent implements OnInit {
           comunicado_noti: obj.comunicado_notificacion
         })
 
-        sessionStorage.setItem('datos_comunicado', this.empleados)
+        sessionStorage.setItem('datos_comunicado', JSON.stringify(this.empleados));
 
         this.departamentos.push({
           id: obj.id_depa,
@@ -190,12 +194,77 @@ export class EnviarUsuarioComponent implements OnInit {
       }
       this.loadingEmpleado = true;
       this.sucursales = [];
-      this.empleados = [];
+      this.roles = [];
       this.BuscarParametro();
     }, err => {
       this.mostrarAlertas("No se ha encontrado información.", 1000, 'danger')
     })
   }
+
+    // METODO PARA CARGAR LA LISTA DE ROLES EN UN ARREGLO
+    cargarRoles() {
+      this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
+        res.forEach(obj => {
+          this.empleados.push({
+            id: obj.id,
+            nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
+            codigo: obj.codigo,
+            cedula: obj.cedula,
+            correo: obj.correo,
+            id_cargo: obj.id_cargo,
+            id_contrato: obj.id_contrato,
+            sucursal: obj.name_suc,
+            rol: obj.name_rol,
+            id_rol: obj.id_rol,
+            id_suc: obj.id_suc,
+            id_regimen: obj.id_regimen,
+            id_depa: obj.id_depa,
+            id_cargo_: obj.id_cargo_, // TIPO DE CARGO
+            hora_trabaja: obj.hora_trabaja,
+            app_habilita: obj.app_habilita,
+            web_habilita: obj.web_habilita,
+            comunicado_mail: obj.comunicado_mail,
+            comunicado_noti: obj.comunicado_notificacion
+          })
+        })
+  
+        sessionStorage.setItem('datos_comunicado', JSON.stringify(this.empleados));
+          
+          res.forEach(obj => {
+            this.roles.push({
+              id: obj.id_rol,
+              rol: obj.name_rol
+            })
+          })
+        // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
+        let verificados_rol = this.roles.filter((objeto: any, indice: any, valor: any) => {
+          // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+          for (let i = 0; i < indice; i++) {
+            if (valor[i].id === objeto.id) {
+              return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+            }
+          }
+          return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+        });
+        this.roles = verificados_rol;
+        this.roles_filtro = [...this.roles]
+  
+        if (this.roles_filtro.length < 11) {
+          this.verRol = true;
+        } else {
+          this.verRol = false;
+        }
+        this.loadingEmpleado = true;
+        this.sucursales = [];
+        this.departamentos = [];
+        this.BuscarParametro();
+      }, err => {
+        this.mostrarAlertas("No se ha encontrado información.", 1000, 'danger')
+      })
+    }
+  
+
+
 
   // METODO PARA CARGAR LA LISTA DE EMPLEADOS EN UN ARREGLO
   cargarEmpleados() {
@@ -235,6 +304,7 @@ export class EnviarUsuarioComponent implements OnInit {
       this.loadingEmpleado = true;
       this.sucursales = [];
       this.departamentos = [];
+      this.roles = [];
 
       this.BuscarParametro();
     }, err => {
@@ -281,6 +351,19 @@ export class EnviarUsuarioComponent implements OnInit {
     this.empleados_filtro = filtro;
   }
 
+  // METODO PARA DEFINIR EL BUSCADOR DE ROLES
+  changeSearchRoles(e: any) {
+    console.log("entra a busqueda", e.detail.value)
+    const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
+    console.log("ver las palabra de busqueda ", palabrasBusqueda)
+    const filtro = this.roles.filter((o: any) => {
+      const nombreCompleto = `${o.rol}`.toLowerCase();
+      console.log("ver el nombre de empleado: ", o.nombre)
+      return palabrasBusqueda.every(palabra => nombreCompleto.includes(palabra))
+    })
+    this.roles_filtro = filtro
+  }  
+
   // METODO PARA CERRAR EL MODAL
   closeModal() {
     console.log('CERRAR MODAL USUARIOS');
@@ -322,6 +405,7 @@ export class EnviarUsuarioComponent implements OnInit {
       this.opcion_sucursal = true;
       this.opcion_depa = false;
       this.opcion_empleado = false;
+      this.opcion_rol = false;
       this.cargarListaSucursales();
     }
     else if (this.radioValue === 2) {
@@ -329,6 +413,7 @@ export class EnviarUsuarioComponent implements OnInit {
       this.opcion_sucursal = false;
       this.opcion_depa = true;
       this.opcion_empleado = false;
+      this.opcion_rol = false;
       this.cargarDepartamentos();
     }
     else if (this.radioValue === 3) {
@@ -336,7 +421,16 @@ export class EnviarUsuarioComponent implements OnInit {
       this.opcion_sucursal = false;
       this.opcion_depa = false;
       this.opcion_empleado = true;
+      this.opcion_rol = false;
       this.cargarEmpleados();
+    }
+    else if (this.radioValue === 4) {
+      this.loadingEmpleado = false;
+      this.opcion_sucursal = false;
+      this.opcion_depa = false;
+      this.opcion_empleado = false;
+      this.opcion_rol = true;
+      this.cargarRoles();
     }
   }
 
@@ -371,6 +465,17 @@ export class EnviarUsuarioComponent implements OnInit {
       return;
     }
   }
+
+  // METODOS PARA VERIFICAR LA SELECCION DE TODOS LOS REGISTROS DE ROLES
+  isAllCheck_rol: boolean = false;
+  checkedAll_rol(isAllChecked_rol) {
+    this.isAllCheck_rol = !isAllChecked_rol;
+    if (this.radioValue === 1) {
+      this.roles.forEach(o => { o.isChecked_rol = this.isAllCheck_rol })
+      return;
+    }
+  }  
+
 
   // METODO PARA ENVIAR EL COMUNICADO A LOS EMPLEADOS DE LAS SUCURSALES SELECCIONADAS
   isChecked_sucu: boolean = true;
@@ -412,10 +517,24 @@ export class EnviarUsuarioComponent implements OnInit {
     this.ModelarEmpleados(empl)
   }
 
+  // METODO PARA ENVIAR EL COMUNICADO A LOS EMPLEADOS DE LOS ROLES SELECCIONADAS
+  isChecked_rol: boolean = true;
+  EnviarRoles() {
+    console.log('ver roles-------', this.roles);
+    let role = [];
+    this.roles.forEach(o => {
+      if (o.isChecked_rol === true) {
+        role.push(o);
+      }
+    });
+    console.log('ver rol-------', role);
+    this.ModelarRoles(role)
+  }  
+
   // METODO PARA ALMACENAR LOS USUARIOS DE LAS SUCURSALES SELECCIONADAS EN UN ARREGLO
   ModelarSucursal(dataSucursal) {
     let usuarios: any = [];
-    let respuesta = JSON.parse(sessionStorage.getItem('datos_comunicado'))
+    let respuesta = JSON.parse(sessionStorage.getItem('datos_comunicado') || '[]');
     respuesta.forEach((obj: any) => {
       dataSucursal.find(obj1 => {
         if (obj.id_suc === obj1.id) {
@@ -460,6 +579,22 @@ export class EnviarUsuarioComponent implements OnInit {
     this.EnviarNotificaciones(respuesta);
     this.closeModal();
   }
+
+  // METODO PARA ALMACENAR LOS USUARIOS DE LOS ROLES SELECCIONADOS EN UN ARREGLO
+  ModelarRoles(dataRoles) {
+    let usuarios: any = [];
+    let respuesta = JSON.parse(sessionStorage.getItem('datos_comunicado') || '[]');
+    respuesta.forEach((obj: any) => {
+      dataRoles.find(obj1 => {
+        if (obj.id_rol === obj1.id) {
+          usuarios.push(obj)
+        }
+      })
+    })
+    console.log('ver usuario---------------------------', usuarios);
+    this.EnviarNotificaciones(usuarios);
+    this.closeModal();
+  }  
 
 
   envios: any = [];
@@ -571,9 +706,11 @@ export class EnviarUsuarioComponent implements OnInit {
   pageActual: number = 1;
   pageActualDepartamento: number = 1;
   pageActualSucursal: number = 1;
+  pageActualRol: number = 1;
   ver: boolean = true;
   verDepartamento: boolean = true;
   verSucursal: boolean = true;
+  verRol: boolean = true;
   public maxSize: number = 5;
   public directionLinks: boolean = true;
   public autoHide: boolean = false;

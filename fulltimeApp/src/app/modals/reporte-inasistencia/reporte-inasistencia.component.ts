@@ -148,6 +148,7 @@ export class ReporteInasistenciaComponent implements OnInit {
               cedula: empl.cedula,
               codigo: empl.codigo,
               empleado: empl.apellido + ' ' + empl.nombre,
+              rol: empl.name_rol,
               ciudad: empl.ciudad,
               sucursal: empl.sucursal,
               departamento: empl.name_dep,
@@ -304,6 +305,7 @@ export class ReporteInasistenciaComponent implements OnInit {
       let reg = this.reporteService.SumarRegistros(arr_reg);
       let descripcion = '';
       let establecimiento = 'SUCURSAL: ' + selec.sucursal;
+      let nombreGeneral = selec.sucursal;
       let opcion = selec.nombre;
 
       if (selec.opcion == 2) {
@@ -319,10 +321,16 @@ export class ReporteInasistenciaComponent implements OnInit {
         descripcion = 'LISTA EMPLEADOS';
         establecimiento = '';
       }
+      else if (selec.opcion == 4) {
+        descripcion = 'ROL: '+ selec.rol;
+        establecimiento = '';
+        resumen = 'TOTAL ROLES';
+        nombreGeneral = selec.rol;
+      }
 
       // DATOS DE RESUMEN GENERAL
       let informacion = {
-        sucursal: selec.sucursal,
+        sucursal: nombreGeneral,
         nombre: opcion,
         faltas: reg,
       }
@@ -465,7 +473,7 @@ export class ReporteInasistenciaComponent implements OnInit {
             ],
             ...general.map((info: any) => {
               let valor = 0;
-              if (data[0].opcion == 1) {
+              if (data[0].opcion == 1 || data[0].opcion == 4) {
                 valor = 2;
               }
               return [
@@ -510,6 +518,7 @@ export class ReporteInasistenciaComponent implements OnInit {
             empl.cedula,
             empl.codigo,
             empl.apellido + ' ' + empl.nombre,
+            empl.name_rol,
             empl.ciudad,
             empl.sucursal,
             empl.name_regimen,
@@ -559,6 +568,7 @@ export class ReporteInasistenciaComponent implements OnInit {
       { key: "cedula", width: 20 },
       { key: "codigo", width: 20 },
       { key: "apenombre", width: 20 },
+      { key: "rol", width: 20 },
       { key: "ciudad", width: 20 },
       { key: "sucursal", width: 20 },
       { key: "regimen", width: 20 },
@@ -572,6 +582,7 @@ export class ReporteInasistenciaComponent implements OnInit {
       { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
       { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
       { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "ROL", totalsRowLabel: "", filterButton: true },
       { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
       { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
       { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },

@@ -204,4 +204,46 @@
       [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
     </pagination-controls>
   </ion-item>
+
+     <!-- LISTAR ROLES -->
+     <ion-row *ngIf="opcion_rol">
+      <ion-col *ngIf="isChecked_rol" size="2">
+          <ion-button color="secondary" (click)="checkedAll_rol( isAllCheck_rol )">
+              <ion-icon name="checkmark-done-outline"></ion-icon>
+          </ion-button>
+      </ion-col>
+      <ion-col [size]="isChecked_rol ? 10: 12">
+          <ion-button (click)="EnviarRoles()" shape="round">
+              BUSCAR
+          </ion-button>
+      </ion-col>
+  </ion-row>
+  <ion-searchbar *ngIf="opcion_rol" autocomplete="off" showCancelButton="focus"
+      (ionChange)="changeSearchRoles($event)"></ion-searchbar>
+
+  <ion-list *ngIf="opcion_rol">
+      <ion-text mode="ios" color="dark" style="text-align: center;">
+          <h3>Resultado Roles</h3>
+      </ion-text>
+      <ion-item *ngFor="let r of roles_filtro | paginate: { itemsPerPage: 10, currentPage: pageActualRol }"
+          class="item-color" mode="md" lines="full">
+          <ion-checkbox *ngIf="isChecked_rol" slot="start" [(ngModel)]="r.isChecked_rol"></ion-checkbox>
+          <ion-label>
+              {{ r.rol }}
+          </ion-label>
+      </ion-item>
+  </ion-list>
+
+  <!--Configuracion del Pagination - ngxPaginationModulo-->
+  <ion-item style="font-size: 80%; margin: 0% 0% 1% 0%; display: flex; justify-content: center;"
+      [hidden]="verRol" *ngIf="opcion_rol">
+      <pagination-controls class="paginacion" (pageChange)="pageActualRol = $event" [maxSize]=maxSize
+          [directionLinks]=directionLinks [responsive]=responsive [autoHide]="autoHide"
+          [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
+          [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+          [screenReaderPageLabel]="labels.screenReaderPageLabel"
+          [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+      </pagination-controls>
+  </ion-item>   
+
 </ion-content>

@@ -15,7 +15,7 @@ export interface Usuario {
     apellido?: string,
     nombre?: string,
     esta_civil?: number,
-    genero?: number,
+    genero?: string,
     correo?: string,
     fec_nacimiento?: Date,
     eestado?: number,
@@ -30,6 +30,13 @@ export interface Usuario {
     id_celular?: boolean
     id_celulardb?: boolean
     ip?: string
+    ciudad?: string
+    name_suc?: string
+    name_dep?: string
+    name_rol?: string
+    name_regimen?: string
+    nombre_nacionalidad?: string
+    
 }
 
 export const UsuarioValueDefault = {
@@ -49,7 +56,7 @@ export const UsuarioValueDefault = {
     apellido: '',
     nombre: '',
     esta_civil: undefined,
-    genero: undefined,
+    genero: '',
     correo: '',
     fec_nacimiento: undefined,
     eestado: undefined,
@@ -63,7 +70,13 @@ export const UsuarioValueDefault = {
     latitud: '',
     id_celular: false,
     id_celulardb: false,
-    ip:''
+    ip:'',
+    ciudad:'',
+    name_suc:'' ,
+    name_dep:'' ,
+    name_rol:'' ,
+    name_regimen:'' ,
+    nombre_nacionalidad: '' ,
 }
 
 export interface Empleado {

@@ -30,7 +30,6 @@ export class NotificacionesService {
 
   // METODO PARA RECEPCION Y EMISION DE AVISOS
   RecibirNuevosAvisos(data: any) {
-    console.log('Socket emite', this.socket.emit('nuevo_aviso', data));
     this.socket.emit('nuevo_aviso', data);
   }
 
