@@ -35,7 +35,7 @@ export class InformacionEmpleadoPage implements OnInit {
   usuario: Usuario = {
     nombre: "",
     apellido: "",
-    cedula: "",
+    identificacion: "",
     usuario: "",
     correo: "",
     id_rol: 0,
@@ -69,7 +69,7 @@ export class InformacionEmpleadoPage implements OnInit {
     this.usuario.correo = this.data.correo;
     this.usuario.apellido = this.data.apellido;
     this.usuario.nombre = this.data.nombre;
-    this.usuario.cedula = this.data.cedula;
+    this.usuario.identificacion = this.data.identificacion;
     this.usuario.usuario = this.data.usuario;
     this.usuario.telefono = this.data.telefono;
 

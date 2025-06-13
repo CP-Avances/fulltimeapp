@@ -8,11 +8,13 @@ import { RelojServiceService } from 'src/app/services/reloj-service.service';
 import { DateTime } from 'luxon';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-import ExcelJS, { FillPattern } from "exceljs";
+import * as pdfMake from 'pdfmake/build/pdfmake';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+import * as ExcelJS from 'exceljs';
 
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
+(pdfMake as any).vfs = (pdfFonts as any).vfs;
+
 @Component({
   selector: 'app-reporte-timbre',
   templateUrl: './reporte-timbre.component.html',
@@ -25,7 +27,7 @@ export class ReporteTimbreComponent implements OnInit {
 
   private bordeGrueso!: Partial<ExcelJS.Borders>;
 
-  private fillAzul!: FillPattern;
+  private fillAzul!: ExcelJS.FillPattern;
 
   private fontTitulo!: Partial<ExcelJS.Font>;
 

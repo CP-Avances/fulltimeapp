@@ -40,7 +40,7 @@ export class InformacionAdminPage implements OnInit {
   usuario: Usuario = {
     nombre: "",
     apellido: "",
-    cedula: "",
+    identificacion: "",
     usuario: "",
     id_rol: 0,
     codigo: ''

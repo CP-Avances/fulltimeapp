@@ -11,7 +11,7 @@ export interface Usuario {
     uLatitud?: string,
     frase?: string,
     idempleado?: number,
-    cedula: string,
+    identificacion: string,
     apellido?: string,
     nombre?: string,
     esta_civil?: number,
@@ -45,7 +45,7 @@ export const UsuarioValueDefault = {
     uLatitud: '',
     frase: '',
     idempleado: undefined,
-    cedula: '',
+    identificacion: '',
     apellido: '',
     nombre: '',
     esta_civil: undefined,
@@ -68,7 +68,7 @@ export const UsuarioValueDefault = {
 
 export interface Empleado {
     id: number,
-    cedula: string,
+    identificacion: string,
     codigo: string,
     fullname?: string,
 }

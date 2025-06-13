@@ -6,12 +6,13 @@ import { PlantillaReportesService } from 'src/app/libs/plantilla-reportes.servic
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { DateTime } from 'luxon';
 import { ParametrosService } from 'src/app/services/parametros.service';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
 import ExcelJS, { FillPattern } from "exceljs";
 
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as pdfMake from 'pdfmake/build/pdfmake';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+(pdfMake as any).vfs = (pdfFonts as any).vfs;
+
 
 @Component({
   selector: 'app-reporte-inasistencia',
