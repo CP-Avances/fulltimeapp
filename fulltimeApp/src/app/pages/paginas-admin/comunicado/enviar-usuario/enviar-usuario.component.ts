@@ -90,7 +90,7 @@ export class EnviarUsuarioComponent implements OnInit {
           id: obj.id,
           nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
           codigo: obj.codigo,
-          cedula: obj.cedula,
+          identificacion: obj.identificacion,
           correo: obj.correo,
           id_cargo: obj.id_cargo,
           id_contrato: obj.id_contrato,
@@ -148,7 +148,7 @@ export class EnviarUsuarioComponent implements OnInit {
           id: obj.id,
           nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
           codigo: obj.codigo,
-          cedula: obj.cedula,
+          identificacion: obj.identificacion,
           correo: obj.correo,
           id_cargo: obj.id_cargo,
           id_contrato: obj.id_contrato,
@@ -205,11 +205,12 @@ export class EnviarUsuarioComponent implements OnInit {
     cargarRoles() {
       this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
         res.forEach(obj => {
+          console.log("ROLES", res)
           this.empleados.push({
             id: obj.id,
             nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
             codigo: obj.codigo,
-            cedula: obj.cedula,
+            identificacion: obj.identificacion,
             correo: obj.correo,
             id_cargo: obj.id_cargo,
             id_contrato: obj.id_contrato,
@@ -275,7 +276,7 @@ export class EnviarUsuarioComponent implements OnInit {
           id: obj.id,
           nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
           codigo: obj.codigo,
-          cedula: obj.cedula,
+          identificacion: obj.identificacion,
           correo: obj.correo,
           id_cargo: obj.id_cargo,
           id_contrato: obj.id_contrato,
