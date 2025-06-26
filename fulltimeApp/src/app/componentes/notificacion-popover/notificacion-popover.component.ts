@@ -33,6 +33,8 @@ export class NotificacionPopoverComponent implements OnInit {
   noticheck: string = '';
 
   valor: boolean = false;
+  formato_fecha: string = 'dd/MM/yyyy';
+  formato_hora: string = 'HH:mm:ss';
 
   constructor(
     private notificacionService: AutorizacionesService,
@@ -45,74 +47,40 @@ export class NotificacionPopoverComponent implements OnInit {
 
   ) { }
 
-
   ngOnInit() {
     const id_empleado = localStorage.getItem('empleadoID');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
+    this.loading = true;
+    this.countNoti = 0;
+    this.notificacionService.getNotificacionesFulltime(id_empleado + '').subscribe(
+      (res: any[]) => {
+        this.notificacionesAll = this.formatearNotificaciones(res, this.formato_fecha, this.formato_hora);
+        console.log("AVISOS", this.notificacionesAll);
+        this.notificacionesAll.sort((a, b) => {
+          if (a.visto === b.visto) {
+            return a.create_at < b.create_at ? 1 : -1;
+          }
+          return a.visto ? 1 : -1;
+        });
 
-    this.notificacionService.getNotificacionesByIdEmpleado(id_empleado + '').subscribe(
-      notificacion => {
-        this.notificaciones = notificacion;
-        this.notificaciones.sort(
-          (firstObject: Notificacion, secondObject: Notificacion) =>
-            (firstObject.visto === true) ? 1 :
-              (firstObject.visto === secondObject.visto) ?
-                ((firstObject.fecha_hora < secondObject.fecha_hora) ? 1 : -1)
+        this.notificacionesAll.forEach((item) => {
+          if (item.visto === false) {
+            this.countNoti++;
+          }
+        });
 
-                : -1
-        );
-        this.notificacionService.getNotificacionesTimbreByIdEmpleado(id_empleado + '').subscribe(
-          notificaiontim => {
-            this.notificaiontimbre = notificaiontim;
-            this.notificacionestimbres = this.notificaiontimbre;
-            this.notificacionesAll = this.notificaciones.concat(this.notificacionestimbres);
-            this.notificacionesAll.sort(
-              (firstObject: NotificacionTimbre, secondObject: NotificacionTimbre) =>
-                (firstObject.visto === true) ? 1 :
-                  (firstObject.visto === secondObject.visto) ?
-                    ((firstObject.fecha_hora! < secondObject.fecha_hora!) ? 1 : -1)
-                    : -1
-            );
-            //cuenta las notificaciones que estan sin ver
-            this.notificacionesAll.forEach((item: any) => {
-              if (item.visto === false) {
-                this.countNoti++;
-              }
-            });
-          },
-          err => { console.log(err) },
-          () => { this.loading = false }
-        )
       },
-      err => {
-        this.notificacionService.getNotificacionesTimbreByIdEmpleado(id_empleado + '').subscribe(
-          notificaiontim => {
-            this.notificacionesAll = notificaiontim;
-            this.notificacionesAll.sort(
-              (firstObject: NotificacionTimbre, secondObject: NotificacionTimbre) =>
-                (firstObject.visto === true) ? 1 :
-                  (firstObject.visto === secondObject.visto) ?
-                    ((firstObject.fecha_hora! < secondObject.fecha_hora!) ? 1 : -1)
-                    : -1
-            );
-            //cuenta las notificaciones que estan sin ver
-            this.notificacionesAll.forEach((item: any) => {
-              if (item.visto === false) {
-                this.countNoti++;
-              }
-            });
-          },
-          err => { console.log(err) },
-          () => { this.loading = false }
-        )
-        console.log(err)
+      (error) => {
+        console.error('Error al cargar notificaciones:', error);
       },
-      () => { this.loading = false }
-    )
-
+      () => {
+        this.loading = false;
+      }
+    );
   }
+
 
   // METODO PARA ASIGNAR EL COLOR DE LA NOTIFICACION
   tiponotificacion(noti: { id_permiso: string; id_vacaciones: string; id_hora_extra: string; visto: boolean; tipo: number; }) {
@@ -164,7 +132,7 @@ export class NotificacionPopoverComponent implements OnInit {
   // METODO PARA CAMBIAR EL ESTADO DE VISTO 
   cambiovistanoti(noti: { id: number }) {
     const vista = true;
-    const datos = { id_notificacion: noti.id, visible: vista, user_name: this.userService.username, ip: localStorage.getItem('ip'), ip_local: this.ips_locales }
+    const datos = { id_notificacion: noti.id, visto: vista, user_name: this.userService.username, ip: localStorage.getItem('ip'), ip_local: this.ips_locales }
     this.vistonotificacion.PutNotificaVisto(noti.id, datos).subscribe(
       (res: any) => {
         res.visto = false;
@@ -197,4 +165,57 @@ export class NotificacionPopoverComponent implements OnInit {
     });
     return await modal.present();
   }
+
+  //METODO PARA FORMATEAR NOTIFICACIONES
+  formatearNotificaciones(lista: any[], formato_fecha: string, formato_hora: string): any[] {
+    return lista.map((aviso: any) => {
+      const [fechaStr, horaStr] = aviso.create_at.split(' ');
+      const fecha_registro = this.validar.DarFormatoFecha(fechaStr, 'yyyy-MM-dd');
+      aviso.fecha_ = this.validar.FormatearFecha(fecha_registro || '', formato_fecha, this.validar.dia_abreviado);
+      aviso.hora_ = this.validar.FormatearHora(horaStr, formato_hora);
+
+      if (aviso.tipo === 100) {
+        const partes = aviso.mensaje.split('//');
+        aviso.notificacion = partes[4];
+        aviso.horario_fecha = this.validar.FormatearFecha(partes[0].split(' ')[0], formato_fecha, this.validar.dia_completo);
+        aviso.horario_hora = this.validar.FormatearHora(partes[0].split(' ')[1], formato_hora);
+        aviso.timbre_fecha = this.validar.FormatearFecha(partes[1].split(' ')[0], formato_fecha, this.validar.dia_completo);
+        aviso.timbre_hora = this.validar.FormatearHora(partes[1].split(' ')[1], formato_hora);
+        aviso.tolerancia = partes[2];
+        aviso.atraso = partes[3];
+      } else if (aviso.tipo === 101) {
+        const partes = aviso.mensaje.split('//');
+        aviso.notificacion = partes[1];
+        aviso.horario_fecha = this.validar.FormatearFecha(partes[0], formato_fecha, this.validar.dia_completo);
+      } else if (aviso.tipo === 102) {
+        const partes = aviso.mensaje.split('//');
+        aviso.notificacion = partes[3];
+        aviso.horario_fecha = this.validar.FormatearFecha(partes[0].split(' ')[0], formato_fecha, this.validar.dia_completo);
+        aviso.horario_hora = this.validar.FormatearHora(partes[0].split(' ')[1], formato_hora);
+        aviso.timbre_fecha = this.validar.FormatearFecha(partes[1].split(' ')[0], formato_fecha, this.validar.dia_completo);
+        aviso.timbre_hora = this.validar.FormatearHora(partes[1].split(' ')[1], formato_hora);
+        aviso.salida = partes[2];
+      } else if (aviso.tipo === 6) {
+        aviso.notificacion = aviso.mensaje;
+      } else {
+        if (aviso.descripcion?.includes('para') && aviso.descripcion?.includes('desde')) {
+          aviso.aviso = aviso.descripcion.split('para')[0];
+          aviso.usuario = 'del usuario ' + aviso.descripcion.split('para')[1].split('desde')[0];
+        } else if (aviso.descripcion?.includes('desde')) {
+          aviso.aviso = aviso.descripcion.split('desde')[0];
+          aviso.usuario = '';
+        }
+      }
+
+      return aviso;
+    });
+  }
+
+  //METODO PARA CAMBIAR ESTILOS
+  CambiarEstiloNotificacion = {
+    100: { color: '#fff9c4', icon: 'time-outline', iconColor: '#260DE6' },
+    101: { color: '#f8d7da', icon: 'person-remove-outline', iconColor: '#260DE6' },
+    102: { color: '#bbdefb', icon: 'log-out-outline', iconColor: '#260DE6' },
+    6:   { color: '#f5cafc', icon: 'mail-outline', iconColor: '#260DE6' },
+  };
 }

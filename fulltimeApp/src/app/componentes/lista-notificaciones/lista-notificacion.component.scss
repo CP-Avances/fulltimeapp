@@ -1,15 +1,15 @@
 ion-label {
-    white-space: pre-line !important;
+  white-space: pre-line !important;
 }
 
-.btnleerTodas{
-  margin-top: 0.5%; 
-  margin-left: 4%;  
-  position: relative; 
+.btnleerTodas {
+  margin-top: 0.5%;
+  margin-left: 4%;
+  position: relative;
   font-size: 30px;
 }
 
-.paginacion{
+.paginacion {
   margin: auto;
   padding-top: 2%;
   padding-bottom: 2%;
@@ -26,17 +26,49 @@ ion-label {
   font-weight: bold;
   border-radius: 5px;
 }
-  
+
 .paginacion :host ::ng-deep .ngx-pagination span {
   color: rgb(177, 221, 255);
-  font-family:monospace;
+  font-family: monospace;
 }
 
-.paginacion ::ng-deep .ngx-pagination a{
+.paginacion ::ng-deep .ngx-pagination a {
   background-color: transparent;
   color: rgb(67, 149, 226);
 }
 
-  .refresh ::ng-deep app-refresh-info .cargar{
-    font-size: 2.3vw;
-  }
+.refresh ::ng-deep app-refresh-info .cargar {
+  font-size: 2.3vw;
+}
+
+.comunicado-color {
+  color: #f62cde !important;
+}
+
+.atraso-color {
+  color: #ffff00 !important;
+}
+
+.falta-color {
+  color: #b13026 !important;
+}
+
+.salida-color {
+  color: #104acf !important;
+}
+
+.default-color {
+  color: gray !important;
+}
+
+ion-item {
+  --border-width: 0 !important;
+  --inner-border-width: 0 !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+ion-item .item-inner {
+  border-bottom: none !important;
+  box-shadow: none !important;
+}

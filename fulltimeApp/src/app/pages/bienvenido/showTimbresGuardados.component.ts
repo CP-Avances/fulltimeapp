@@ -109,10 +109,14 @@ import { ValidacionesService } from 'src/app/libs/validaciones.service';
 export class TimbresPerdidosComponent implements OnInit {
   ips_locales: any = '';
 
-  // METODO PARA LEET LOS timbresPerdidosStorage
-  public get timbres(): Timbre[] {
-    return this.dataLocalService.timbresPerdidosStorage
-  }
+  // METODO PARA LEER LOS timbresPerdidosStorage
+public get timbres(): Timbre[] {
+  return [
+    ...this.dataLocalService.timbresPerdidosStorage,
+    ...this.dataLocalService.timbresStorage
+  ];
+}
+
 
   loadingBtn: boolean = false;
   btn_Enviar: boolean = true;

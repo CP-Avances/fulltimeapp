@@ -54,6 +54,20 @@ export class AutorizacionesService {
     *******************************************************
     */
 
+
+  //METODO PARA OBTENER LAS NOTIFICACIONES CON DATOS COMPLETOS
+  getNotificacionesFulltime(id_empleado: string | number): Observable<any> {
+    const url = `${this.apiUrl}/timbres/avisos-generales/${id_empleado}`;
+    return this.http.get<any>(url);
+  }
+
+  //METODO PARA LISTAR AVISOS
+  ListarAvisos(id_empleado: string | number): Observable<any> {
+    const url = `${this.apiUrl}/timbres/noti-timbres/avisos/${id_empleado}`;
+    return this.http.get<any>(url);
+  }
+
+
   // METODO PARA OBTENER LAS NOTIFICACIONES
   getNotificacionesByIdEmpleado(id_empleado: string | number): Observable<Notificacion[]> {
     const url = `${this.apiUrl}/noti-real-time/all-noti`;

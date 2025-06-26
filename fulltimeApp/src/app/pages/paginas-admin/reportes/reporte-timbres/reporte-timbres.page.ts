@@ -308,6 +308,7 @@ export class ReporteTimbresPage {
   cargarEmpleados() {
     this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
       sessionStorage.setItem('datos_comunicado', JSON.stringify(res))
+      console.log("DATOS GENERALES", res);
 
       res.forEach(obj => {
         this.empleados.push({
@@ -315,10 +316,11 @@ export class ReporteTimbresPage {
           nombre: obj.nombre,
           apellido: obj.apellido,
           codigo: obj.codigo,
-          cedula: obj.cedula,
+          identificacion: obj.identificacion,
           correo: obj.correo,
           genero: obj.genero,
           id_cargo: obj.id_cargo,
+          name_rol:obj.name_rol,
           id_contrato: obj.id_contrato,
           name_suc: obj.name_suc,
           id_suc: obj.id_suc,
@@ -356,10 +358,11 @@ export class ReporteTimbresPage {
         this.roles.push({
           id: obj.id_rol,
           rol: obj.name_rol,
-          cedula: obj.cedula,
+          identificacion: obj.identificacion,
           correo: obj.correo,
           id_cargo: obj.id_cargo,
           id_contrato: obj.id_contrato,
+          name_rol:obj.name_rol,
           ciudad: obj.ciudad,
           sucursal: obj.name_suc,
           departemento: obj.name_dep,

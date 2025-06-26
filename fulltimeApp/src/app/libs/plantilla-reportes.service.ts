@@ -10,6 +10,7 @@ import { File, IWriteOptions } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+import { StorageService } from '../services/storage.service';
 
 // Asignar vfs correctamente
 (pdfMake as any).vfs = (pdfFonts as any).vfs;
@@ -24,6 +25,8 @@ const EXCEL_EXTENSION = '.xlsx';
 })
 export class PlantillaReportesService {
 
+  private api_url = '';
+
   constructor(
     private file: File,
     private fileOpener: FileOpener,
@@ -32,18 +35,22 @@ export class PlantillaReportesService {
     private http: HttpClient,
     private toastController: ToastController,
     private dataUser: DataUserLoggedService,
-  ) { }
+    private storageService: StorageService,
+  ) { this.obtenerUrlEmpresa();}
 
-  private apiUrl = environment.url;
+
+    async obtenerUrlEmpresa() {
+    this.api_url = await this.storageService.get('urlEmpresa');
+  }
 
   // SERVICIOS DE LA APLICACION WEB PARA CONSULTAR DATOS DE LA EMPRESA
   ConsultarDatosEmpresa(id: number) {
-    return this.http.get(`${this.apiUrl}/empresas/buscar/datos/${id}`);
+    return this.http.get(`${this.api_url}/empresas/buscar/datos/${id}`);
   }
 
   // METODO PARA OBTENER LOGO DE EMPRESA      
   LogoEmpresaImagenBase64(id_empresa: string) {
-    return this.http.get<any>(`${this.apiUrl}/empresas/logo/codificado/${parseInt(id_empresa)}`)
+    return this.http.get<any>(`${this.api_url}/empresas/logo/codificado/${parseInt(id_empresa)}`)
   }
 
   // METODO PARA GENERAR EL PDF CON LA LIBRERIA PDFMAKE
@@ -139,20 +146,6 @@ export class PlantillaReportesService {
     });
     toast.present();
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
   //////////////////////////////////////////////////////////////////////////////////////////

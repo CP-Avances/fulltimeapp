@@ -343,6 +343,7 @@ export class NavegadorAdminComponent implements OnInit {
       event: event,
       mode: "md",
       translucent: true,
+      cssClass: 'noti-popover',
     });
     await popover.present();
     await popover.onDidDismiss();

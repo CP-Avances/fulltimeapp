@@ -57,64 +57,35 @@ export class ListaNotificacionComponent implements OnInit {
       this.ips_locales = ips;
     });
 
-
     this.serverConnected = await this.connectivityService.checkServerConnection();
-    const id_empleado = localStorage.getItem('empleadoID')
-    this.notificacionService.getNotificacionesByIdEmpleado(id_empleado + '').subscribe(
-      notificacion => {
-        this.notificaciones = notificacion;
+    const id_empleado = localStorage.getItem('empleadoID');
 
-        this.notificacionesAll.sort(
-          (firstObject: Notificacion, secondObject: Notificacion) =>
-            (firstObject.visto === true) ? 1 :
-              (firstObject.visto === secondObject.visto) ?
-                ((firstObject.fecha_hora < secondObject.fecha_hora) ? 1 : -1)
+    this.notificacionService.ListarAvisos(id_empleado + '').subscribe(
+      res => {
+        this.notificacionesAll = res;
 
-                : -1
+        this.FormatearInformacionAvisos(this.notificacionesAll);
+        console.log("AVISOS FORMATEADOS", this.notificacionesAll);
+        //Ordenar por visto y fecha
+        this.notificacionesAll.sort((a, b) =>
+          a.visto === b.visto
+            ? (a.fecha_hora > b.fecha_hora ? -1 : 1)
+            : a.visto ? 1 : -1
         );
 
-        this.notificacionService.getNotificacionesTimbreByIdEmpleado(id_empleado + '').subscribe(
-          notificaiontim => {
-            this.notificaiontimbre = notificaiontim;
-            this.notificacionestimbres = this.notificaiontimbre;
 
-            this.notificacionesAll = this.notificaciones.concat(this.notificacionestimbres);
+        if (this.notificacionesAll.length < 21) {
+          this.ver = true;
+        }
 
-            this.notificacionesAll.sort(
-              (firstObject: NotificacionTimbre, secondObject: NotificacionTimbre) =>
-                (firstObject.visto === true) ? 1 :
-                  (firstObject.visto === secondObject.visto) ?
-                    ((firstObject.fecha_hora! < secondObject.fecha_hora!) ? 1 : -1)
-
-                    : -1
-            );
-            if (Object.keys(this.notificacionesAll).length < 21) {
-              this.ver = true;
-            }
-          },
-          err => { console.log(err); this.ver = true },
-          () => { this.loading = false; }
-        )
+        this.loading = false;
       },
       err => {
-        this.notificacionService.getNotificacionesTimbreByIdEmpleado(id_empleado + '').subscribe(
-          notificaiontim => {
-            this.notificacionesAll = notificaiontim;
-            this.notificacionesAll.sort(
-              (firstObject: NotificacionTimbre, secondObject: NotificacionTimbre) =>
-                (firstObject.visto === true) ? 1 :
-                  (firstObject.visto === secondObject.visto) ?
-                    ((firstObject.fecha_hora! < secondObject.fecha_hora!) ? 1 : -1)
-                    : -1
-            );
-          },
-          err => { console.log(err); this.ver = true },
-          () => { this.loading = false; }
-        )
-        console.log(err);
-      },
-      () => { this.loading = false; }
-    )
+        console.error(err);
+        this.ver = true;
+        this.loading = false;
+      }
+    );
   }
 
   async ionViewWillEnter() {
@@ -209,7 +180,7 @@ export class ListaNotificacionComponent implements OnInit {
   //cambia el estado de la columna visto de la tabla realtime_noti de true a false.
   cambiovistanoti(noti: { id: number }) {
     const vista = true;
-    const datos = { id_notificacion: noti.id, visto: vista, user_name: this.userService.username, ip: localStorage.getItem('ip') , ip_local: this.ips_locales}
+    const datos = { id_notificacion: noti.id, visto: vista, user_name: this.userService.username, ip: localStorage.getItem('ip'), ip_local: this.ips_locales }
 
     this.vistonotificacion.PutNotificaVisto(noti.id, datos).subscribe(
       (res: any) => {
@@ -282,4 +253,111 @@ export class ListaNotificacionComponent implements OnInit {
     screenReaderCurrentLabel: `You're on page`
   };
 
+  //METODO PARA FORMATEAR LOS DATOS DE LOS AVISOS
+  FormatearInformacionAvisos(lista: any[]) {
+    const formato_fecha = 'dd/MM/yyyy';
+    const formato_hora = 'HH:mm:ss';
+    const idioma = 'es';
+
+    lista.forEach((aviso: any) => {
+      if (!aviso.create_at) return;
+
+      const partesFecha = aviso.create_at.split(' ');
+      const fechaFormateada = this.validar.DarFormatoFecha(partesFecha[0], 'yyyy-MM-dd');
+
+      aviso.fecha = this.validar.FormatearFecha(
+        fechaFormateada || '',
+        formato_fecha,
+        this.validar.dia_completo
+      );
+
+      aviso.hora_registro = this.validar.FormatearHora(
+        partesFecha[1],
+        formato_hora
+      );
+
+      if (aviso.tipo === 100) {
+        const partes = aviso.mensaje.split('//');
+        aviso.notificacion = partes[4];
+
+        const horario = partes[0].split(' ');
+        const timbre = partes[1].split(' ');
+
+        aviso.horario_fecha = this.validar.FormatearFecha(
+          this.validar.DarFormatoFecha(horario[0], 'yyyy-MM-dd') || '',
+          formato_fecha,
+          this.validar.dia_completo
+        );
+        aviso.horario_hora = this.validar.FormatearHora(horario[1], formato_hora);
+
+        aviso.timbre_fecha = this.validar.FormatearFecha(
+          this.validar.DarFormatoFecha(timbre[0], 'yyyy-MM-dd') || '',
+          formato_fecha,
+          this.validar.dia_completo
+        );
+        aviso.timbre_hora = this.validar.FormatearHora(timbre[1], formato_hora);
+
+        aviso.tolerancia = partes[2];
+        aviso.atraso = partes[3];
+      }
+
+      else if (aviso.tipo === 101) {
+        const partes = aviso.mensaje.split('//');
+        aviso.notificacion = partes[1];
+        aviso.horario_fecha = this.validar.FormatearFecha(
+          this.validar.DarFormatoFecha(partes[0], 'yyyy-MM-dd') || '',
+          formato_fecha,
+          this.validar.dia_completo
+        );
+      }
+
+      else if (aviso.tipo === 102) {
+        const partes = aviso.mensaje.split('//');
+        aviso.notificacion = partes[3];
+
+        const horario = partes[0].split(' ');
+        const timbre = partes[1].split(' ');
+
+        aviso.horario_fecha = this.validar.FormatearFecha(
+          this.validar.DarFormatoFecha(horario[0], 'yyyy-MM-dd') || '',
+          formato_fecha,
+          this.validar.dia_completo
+        );
+        aviso.horario_hora = this.validar.FormatearHora(horario[1], formato_hora);
+
+        aviso.timbre_fecha = this.validar.FormatearFecha(
+          this.validar.DarFormatoFecha(timbre[0], 'yyyy-MM-dd') || '',
+          formato_fecha,
+          this.validar.dia_completo
+        );
+        aviso.timbre_hora = this.validar.FormatearHora(timbre[1], formato_hora);
+
+        aviso.salida = partes[2];
+      }
+
+      else if (aviso.tipo === 6) {
+        aviso.notificacion = aviso.mensaje;
+      }
+    });
+  }
+
+  CambiarIcono(tipo: number): string {
+    switch (tipo) {
+      case 6: return 'mail-unread-outline';        
+      case 100: return 'alarm-outline';            
+      case 101: return 'remove-circle-outline';    
+      case 102: return 'exit-outline';              
+      default: return 'help-outline';              
+    }
+  }
+
+  CambiarEstiloIcono(tipo: number): string {
+    switch (tipo) {
+      case 6: return 'comunicado-color';        
+      case 100: return 'atraso-color';          
+      case 101: return 'falta-color';      
+      case 102: return 'salida-color';          
+      default: return 'default-color';         
+    }
+  }
 }

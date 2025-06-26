@@ -1,57 +1,173 @@
 <ion-content>
   <h6 style="text-align: center; font-size: 90%;">
     <ion-icon name="notifications-outline" style="margin-left: 1%; margin-right: 2%;"></ion-icon>
-    Notificaciones <b *ngIf="countNoti != 0" style="text-align: center; font-size: 80%; color: rgb(39, 224, 36); margin-left: 3%"> {{countNoti}}</b>
+    Notificaciones <b *ngIf="countNoti != 0"
+      style="text-align: center; font-size: 80%; color: rgb(39, 224, 36); margin-left: 3%"> {{countNoti}}</b>
   </h6>
-  
+
   <ng-container *ngIf="loading; then showSkeletor else showList"></ng-container>
 
   <ng-template #showList>
-
     <ion-card *ngIf="countNoti == 0" style="margin-top: 6%; margin-bottom: -5%; padding: 5%;">
-      <ion-label >
+      <ion-label>
         <h4 style="text-align: center; font-size: 90%;">No tiene nuevas notificaciones</h4>
       </ion-label>
     </ion-card>
 
-    <ion-card *ngFor="let noti of notificacionesAll | paginate: { itemsPerPage: 3, currentPage: pageActual} " style="margin-bottom: 2%;">
-      <ng-container *ngIf="noti.visto === true else shownotific"></ng-container>
-      <ng-template #shownotific>
-        <div>
-        <ion-item (click)="AbrirNoti(noti)" class="ion-activated" [color]='tiponotificacion(noti)'>
+    <ng-container *ngFor="let noti of notificacionesAll">
+
+      <!-- COMUNICADO (tipo 6) -->
+      <ion-card *ngIf="noti.tipo === 6" (click)="AbrirNoti(noti)"
+        [style.background]="noti.visto ? 'rgb(226,226,226)' : 'rgb(245, 202, 252)'">
+        <ion-item lines="none" style="--background: transparent;">
           <ion-label>
-
-            <small> 
-              <h4 style="font-size: 85%;"><b>Colaborador: {{ noti.nempleadosend }} </b> 
-                <strong *ngIf="noti.id_permiso != null" style="font-size: 90%; float: right;"> Per. {{noti.id_permiso}} </strong> 
-                <strong *ngIf="noti.id_vacaciones != null" style="font-size: 90%; float: right;"> Vac. {{noti.id_vacaciones}} </strong> 
-                <strong *ngIf="noti.id_hora_extra != null" style="font-size: 90%; float: right;"> Hor. {{noti.id_hora_extra}} </strong> 
-              </h4>  
-              <p style="font-size: 80%;">
-                  {{ noti.mensaje}}
-              </p>
-              <h5 style="font-size: 85%;"> <b>Fecha: </b> {{noti.fecha_hora | date:'dd MMM y '}}   <b> Hora: </b> {{noti.fecha_hora | date:'h:mm:ss a'}} </h5>
-            </small>
-
+            <p><ion-icon name="mail-outline"
+                style="color: rgb(38, 13, 230); font-size: 18px; margin-right: 5px;"></ion-icon><strong>COMUNICADO</strong>
+            </p>
+            <p><strong>Enviado por:</strong> {{ noti.empleado }}</p>
+            <p><strong>Notificación:</strong> <em>{{ noti.descripcion }}</em></p>
+            <p><strong>Fecha:</strong> {{ noti.fecha_ }} &nbsp;&nbsp;<strong>Hora:</strong> {{ noti.hora_ }}</p>
           </ion-label>
         </ion-item>
-        </div>
-      </ng-template>
-    </ion-card>
+      </ion-card>
 
+      <!-- DESCRIPCIONES CON COLOR ROJO -->
+      <ion-card *ngIf="!noti.visto && (
+        noti.descripcion === 'Te falta timbre de entrada' ||
+        noti.descripcion === 'Te falta timbre de salida' ||
+        noti.descripcion === 'Salio antes al almuerzo' ||
+        noti.descripcion === 'Se tomo mucho tiempo de almuerzo')" (click)="AbrirNoti(noti)"
+        style="background: rgb(201,79,78); margin-bottom: 8px;">
+        <ion-item lines="none" style="--background: transparent;">
+          <ion-label>
+            <p><strong>{{ noti.empleado }}</strong></p>
+            <p><strong>{{ noti.descripcion }}</strong></p>
+            <p><strong>Fecha:</strong> {{ noti.fecha_ }} &nbsp;&nbsp;<strong>Hora:</strong> {{ noti.hora_ }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-card>
+
+      <!-- ALIMENTACIÓN tipo 1 y 2 -->
+      <ion-card *ngIf="noti.tipo === 1 || noti.tipo === 2" (click)="AbrirNoti(noti)"
+        [style.background]="noti.visto ? 'rgb(226,226,226)' : (noti.tipo === 1 ? 'rgb(251, 212, 166)' : 'rgb(252, 227, 206)')">
+        <ion-item lines="none" style="--background: transparent;">
+          <ion-label>
+            <p><strong>Colaborador:</strong> {{ noti.empleado }}</p>
+            <p><strong>{{ noti.aviso }}</strong></p>
+            <p><strong>{{ noti.usuario }}</strong></p>
+            <p><strong>Tipo de servicio:</strong> {{
+              noti.descripcion.split('desde')[1].split('horario')[1].split('servicio')[1] }}</p>
+            <p><strong>Para el día:</strong> {{ noti.descripcion.split('desde')[1].split('horario')[0] }}</p>
+            <p><strong>Horario:</strong> {{
+              noti.descripcion.split('desde')[1].split('horario')[1].split('servicio')[0] }}</p>
+            <p><strong>Fecha:</strong> {{ noti.fecha_ }} &nbsp;&nbsp;<strong>Hora:</strong> {{ noti.hora_ }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-card>
+
+      <!-- PLANIFICACIÓN ALIMENTACIÓN tipo 20 -->
+      <ion-card *ngIf="noti.tipo === 20" (click)="AbrirNoti(noti)"
+        [style.background]="noti.visto ? 'rgb(226,226,226)' : 'rgb(251, 212, 169)'">
+        <ion-item lines="none" style="--background: transparent;">
+          <ion-label>
+            <p><strong>Enviado por:</strong> {{ noti.empleado }}</p>
+            <p><strong>{{ noti.aviso }}</strong></p>
+            <p><strong>{{ noti.usuario }}</strong></p>
+            <p><strong>Tipo de servicio:</strong> {{
+              noti.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('servicio')[1] }}</p>
+            <p><strong>Inicia:</strong> {{ noti.descripcion.split('desde')[1].split('hasta')[0] }}</p>
+            <p><strong>Finaliza:</strong> {{
+              noti.descripcion.split('desde')[1].split('hasta')[1].split('horario')[0] }}</p>
+            <p><strong>Horario:</strong> {{
+              noti.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('servicio')[0] }}</p>
+            <p><strong>Fecha:</strong> {{ noti.fecha_ }} &nbsp;&nbsp;<strong>Hora:</strong> {{ noti.hora_ }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-card>
+
+      <!-- HORAS EXTRAS tipo 10, 11, 12 -->
+      <ion-card *ngIf="noti.tipo === 10 || noti.tipo === 11 || noti.tipo === 12" (click)="AbrirNoti(noti)"
+        [style.background]="noti.visto ? 'rgb(226,226,226)' : 'rgb(187, 246, 250)'">
+        <ion-item lines="none" style="--background: transparent;">
+          <ion-label>
+            <p><strong>Enviado por:</strong> {{ noti.empleado }}</p>
+            <p><strong>{{ noti.aviso }}</strong></p>
+            <p><strong>{{ noti.usuario }}</strong></p>
+            <p><strong>Inicia:</strong> {{ noti.descripcion.split('desde')[1].split('hasta')[0] }}</p>
+            <p><strong>Finaliza:</strong> {{
+              noti.descripcion.split('desde')[1].split('hasta')[1].split('horario')[0] }}</p>
+            <p><strong>Horario:</strong> {{
+              noti.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1] }}</p>
+
+            <!-- Solo para tipo 11 -->
+            <p *ngIf="noti.tipo === 11">
+              <strong>Num. horas solicitadas:</strong>
+              {{
+              noti.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('horas')[1]
+              }}
+            </p>
+
+            <!-- 🔽 Solo para tipo 12 -->
+            <p *ngIf="noti.tipo === 12">
+              <strong>Num. horas {{
+                noti.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('estado')[1].split('horas')[0]
+              }}:</strong>
+              {{
+                noti.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('estado')[1].split('horas')[1]
+              }}
+            </p>
+
+            <p><strong>Fecha:</strong> {{ noti.fecha_ }} &nbsp;&nbsp;<strong>Hora:</strong> {{ noti.hora_ }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-card>
+
+
+      <!-- PERMISOS MULTIPLES tipo 7 -->
+      <ion-card *ngIf="noti.tipo === 7" (click)="AbrirNoti(noti)"
+        [style.background]="noti.visto ? 'rgb(226,226,226)' : 'rgb(172, 251, 254)'">
+        <ion-item lines="none" style="--background: transparent;">
+          <ion-label>
+            <p><strong>Colaborador:</strong> {{ noti.empleado }}</p>
+            <p><strong>Comunicado:</strong></p>
+            <p>{{ noti.descripcion }}</p>
+            <p><strong>Fecha:</strong> {{ noti.fecha_ }} &nbsp;&nbsp;<strong>Hora:</strong> {{ noti.hora_ }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-card>
+
+      <!-- GENÉRICO para otros tipos no cubiertos -->
+      <ion-card *ngIf="![1,2,6,7,10,11,12,20].includes(noti.tipo) && !noti.descripcion.includes('timbre')"
+        (click)="AbrirNoti(noti)"
+        [style.background]="noti.visto ? 'rgb(226,226,226)' : (CambiarEstiloNotificacion[noti.tipo]?.color || 'rgb(201,79,78)')">
+        <ion-item lines="none" style="--background: transparent;">
+          <ion-label>
+            <p>
+              <ion-icon [name]="CambiarEstiloNotificacion[noti.tipo]?.icon"
+                [style.color]="CambiarEstiloNotificacion[noti.tipo]?.iconColor" style="margin-right: 4px;"></ion-icon>
+              <strong>{{ noti.descripcion }}</strong>
+            </p>
+            <p><strong>Enviado por:</strong> {{ noti.empleado }}</p>
+            <p><strong>Notificación:</strong> <em>{{ noti.notificacion }}</em></p>
+            <p><strong>Horario:</strong> {{ noti.horario_fecha }} {{ noti.horario_hora }}</p>
+            <p><strong>Fecha:</strong> {{ noti.fecha_ }} &nbsp;&nbsp;<strong>Hora:</strong> {{ noti.hora_ }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-card>
+
+    </ng-container>
   </ng-template>
 
   <ng-template #showSkeletor>
     <ion-card style="margin-top: 6%; margin-bottom: 3%; padding: 5%;">
-      <ion-label >
+      <ion-label>
         <h4 style="text-align: center; font-size: 90%;"> Sin Conexion </h4>
       </ion-label>
     </ion-card>
   </ng-template>
 
-    <ion-item (click)="abrirNotificaciones()" style="background-color: rgb(20, 21, 21); font-size: 70%; align-items: center; margin-top: 2%;">
-      <p style="margin: auto;"> Mostrar todas las notificaciones </p>
-    </ion-item>
-
-  <ion-content>
-
+  <ion-item (click)="abrirNotificaciones()"
+    style="background-color: rgb(20, 21, 21); font-size: 70%; align-items: center; margin-top: 2%;">
+    <p style="margin: auto;"> Mostrar todas las notificaciones </p>
+  </ion-item>
+</ion-content>

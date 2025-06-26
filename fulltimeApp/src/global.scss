@@ -247,3 +247,10 @@ ion-modal{
   }
 }
 
+ion-popover.noti-popover {
+  --width: 75vw;
+  --min-width: unset;
+  --max-width: unset;
+}
+
+

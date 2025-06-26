@@ -84,12 +84,10 @@ export class LoginPage implements OnInit {
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
         const timbreFoto = res.respuesta[0].timbre_ubicacion_desconocida;
-        console.log("ver parametro de ubicacion desconocida", timbreFoto);
         const resultado = timbreFoto ? 'Si' : 'No';
         localStorage.setItem('timbrarUbicacionDesconocida', resultado);
       },
       error => {
-        console.log('Error 404 Not Found');
         localStorage.setItem('timbrarUbicacionDesconocida', 'No');
       }
     );
@@ -154,11 +152,8 @@ export class LoginPage implements OnInit {
         return;
       }
 
-      console.log('Código empresa:', this.user.codigo_empresa);
-
       this.relojService.validarEmpresa(this.user.codigo_empresa).subscribe({
         next: async (res) => {
-          console.log('Respuesta del servidor:', res);
 
           if (res.message === 'ok') {
             const nuevaUrl = res.empresas[0].empresa_direccion;
@@ -167,7 +162,6 @@ export class LoginPage implements OnInit {
             // GUARDAR EN EL STORAGE
             await this.storageService.set('urlEmpresa', nuevaUrl);
             await this.storageService.set('urlSocketEmpresa', nuevaUrlSocket);
-
             // ACTUALIZAR EL SERVICIO DE URL
             this.urlService.updateUrl(nuevaUrl);
             this.urlService.updateSocketUrl(nuevaUrlSocket);
@@ -206,11 +200,8 @@ export class LoginPage implements OnInit {
       return this.usuarioIncorrectoToas("Ups! Ingrese sus datos.", 2000);
     }
 
-    console.log('ingresa ', credenciales);
-
     try {
       const datos = await this.relojService.iniciarSesion(credenciales);
-      console.log("ver datos del usuario", datos);
 
       const mensajesError: { [key: string]: string } = {
         error: "Usuario y contraseña incorrecta",
@@ -226,7 +217,6 @@ export class LoginPage implements OnInit {
         return this.usuarioIncorrectoToas(mensajesError[datos.message], 3000);
       }
 
-      console.log("datos de ingreso ", datos);
       await this.registrarDatosLocales(datos);
       await this.obtenerImagen64();
       await this.obtenerParametros();
@@ -236,7 +226,7 @@ export class LoginPage implements OnInit {
     }
   }
 
-  async registrarDatosLocales(datos: any){
+  async registrarDatosLocales(datos: any) {
     localStorage.setItem('rol', datos.rol);
     localStorage.setItem('token', datos.token);
     localStorage.setItem('ip', datos.ip_adress);
@@ -260,15 +250,14 @@ export class LoginPage implements OnInit {
     localStorage.setItem('ruc', datos.ruc);
     localStorage.setItem('version', datos.version);
 
-     // LOOK ME
-     // localStorage.setItem('horas_trabaja', res.body.empresa.hora_trabaja);
-     // localStorage.setItem('bool_timbres', datos.acciones_timbres);
-     // localStorage.setItem('fec_caducidad_licencia', datos.caducidad_licencia);
+    // LOOK ME
+    // localStorage.setItem('horas_trabaja', res.body.empresa.hora_trabaja);
+    // localStorage.setItem('bool_timbres', datos.acciones_timbres);
+    // localStorage.setItem('fec_caducidad_licencia', datos.caducidad_licencia);
   }
 
-  async obtenerParametros(){
+  async obtenerParametros() {
     const res = await this.parametros.ObtenerParametroDispositivos(6);
-    console.log("ver parametro obtenerParametros:", res)
     // datos = res;
     if (res.length != 0) {
       return this.rango_dispositivos = (parseInt(res[0].descripcion));
@@ -277,10 +266,9 @@ export class LoginPage implements OnInit {
     }
   }
 
-  async obtenerIdDispositivosUsuario(datos: any){
+  async obtenerIdDispositivosUsuario(datos: any) {
     this.relojService.obtenerIdDispositivosUsuario(datos.empleado).subscribe({
-      next: async (dispositivos) =>{
-        console.log("ver dispositivos", dispositivos)
+      next: async (dispositivos) => {
 
         //Buscar el id_dispositivo y el id_celular si son el mismo
         dispositivos.forEach((item: any) => {
@@ -291,12 +279,10 @@ export class LoginPage implements OnInit {
         });
 
         if (this.existeId_Dispositivo) {
-          console.log('existe id ', this.iddispositivos);
           this.usuarioSuccessToas("Ingreso exitoso", 2000);
           this.cambiodepantallas();
         } else {
           // await this.BuscarParametroNumeroDispositivos();
-          console.log("ver rango_dispositivos", this.rango_dispositivos)
           if (dispositivos.length >= this.rango_dispositivos) {
             this.usuarioIncorrectoToas("Ups! El usuario llego al limite de dispositivos permitidos", 3000);
             var FormId = 'formulariologin';
@@ -309,7 +295,7 @@ export class LoginPage implements OnInit {
           }
         }
       },
-      error: (err) =>{
+      error: (err) => {
         this.iniciandoSesion = false;
         if (err.status == 0) {
           console.log(err.url + "|" + err.message + "|" + err.statusText + "|" + err.name);
@@ -329,13 +315,11 @@ export class LoginPage implements OnInit {
     this.empleadoService.ObtenerImagen(localStorage.getItem("empleadoID"), localStorage.getItem("imagen")).subscribe(data => {
       if (!data.imagen) {
         localStorage.setItem('imagen64', '');
-        console.log(localStorage.getItem('imagen64'));
 
       }
       else {
         let imagen = 'data:image/jpeg;base64,' + data.imagen;
         localStorage.setItem('imagen64', imagen);
-        console.log(localStorage.getItem('imagen64'));
       }
     });
   }
@@ -426,8 +410,7 @@ export class LoginPage implements OnInit {
           this.usuarioIncorrectoToas("Ups! halgo ha salido mal. COMPRUEBA TU CONEXION A INTERNET o PONGASE EN CONTACTO CON EL ADMINISTRADOR", 3000);
         } else {
           console.log(err.url + "|" + err.message + "|" + err.statusText + "|" + err.name);
-          this.usuarioIncorrectoToas(err.error.message, 3000),
-            console.log(err)
+          this.usuarioIncorrectoToas(err.error.message, 3000)
 
         }
       }

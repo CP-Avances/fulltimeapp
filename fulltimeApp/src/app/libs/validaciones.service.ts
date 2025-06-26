@@ -16,8 +16,6 @@ export class ValidacionesService {
         public alertCrtl: AlertController,
     ) { }
 
-
-
     dia_abreviado: string = 'ccc';
     dia_completo: string = 'cccc';
 
@@ -58,6 +56,24 @@ export class ValidacionesService {
         return valor;
     }
 
+    // METODO PARA FORMATEAR DIFERENTES FORMATOS DE FECHA
+    DarFormatoFecha(fechaString: string, formatoSalida: string): string | null {
+        const formatos = ['yyyy-MM-dd', 'dd/MM/yyyy', 'MM/dd/yyyy', 'yyyy/MM/dd'];
+        let fecha: DateTime;
+
+        fecha = DateTime.fromISO(fechaString);
+        if (fecha.isValid) {
+            return fecha.toFormat(formatoSalida);
+        }
+
+        for (const formato of formatos) {
+            fecha = DateTime.fromFormat(fechaString, formato);
+            if (fecha.isValid) {
+                return fecha.toFormat(formatoSalida);
+            }
+        }
+        return null;
+    }
 
     // METODO PARA OBTENER DETALLE DE PLANIFICACION
     ver_detalle: boolean = false;

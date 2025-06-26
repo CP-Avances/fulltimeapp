@@ -53,6 +53,9 @@ export class ReporteTimbreComponent implements OnInit {
     correo: '',
     representante: '',
   };
+  cargaFormatosCompleta = false;
+  cargaEmpresaCompleta = false;
+  cargaLogoCompleta = false;
 
   constructor(
     private dataUserService: DataUserLoggedService,
@@ -65,16 +68,15 @@ export class ReporteTimbreComponent implements OnInit {
     private relojService: RelojServiceService,
   ) { }
 
-  
+
   ionViewWillEnter() {
     this.ngOnInit();
-    this.consultarDataReporte();
   }
 
   ngOnInit() {
     this.data.fullname = localStorage.getItem('nom') + ' ' + localStorage.getItem('ap')
     this.BuscarFormatos();
-   // this.consultarDataReporte();
+
     this.obtenerDatosEmpresa(localStorage.getItem('id_empresa'));
     this.ObtenerLogo();
     this.ObtenerColores();
@@ -95,22 +97,28 @@ export class ReporteTimbreComponent implements OnInit {
     this.fillAzul = {
       type: "pattern",
       pattern: "solid",
-      fgColor: { argb: "4F81BD" }, // Azul claro
+      fgColor: { argb: "4F81BD" },
     };
     this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
     this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
+  }
+
+  verificarCargaCompleta() {
+    if (this.cargaFormatosCompleta && this.cargaEmpresaCompleta && this.cargaLogoCompleta) {
+      this.consultarDataReporte();
+    }
   }
 
   // METODOS PARA OBTENER LOS DATOS DE LA EMPRESA
   obtenerDatosEmpresa(idEmpresa: any) {
     this.relojService.obtenerDatosEmpresa(idEmpresa).subscribe(
       res => {
-        console.log("ver datos empresa", res)
-        console.log(res);
         this.empresa = res[0];
+        this.cargaEmpresaCompleta = true;
+        this.verificarCargaCompleta();
       },
       err => {
-        console.log(err)
+        console.log(err);
       }
     );
   }
@@ -120,53 +128,50 @@ export class ReporteTimbreComponent implements OnInit {
   formato_hora: string;
   BuscarFormatos() {
     this.parametro.ObtenerFormatos().subscribe(
-      
       resp => {
         this.formato_fecha = resp.fecha;
         this.formato_hora = resp.hora;
+        this.cargaFormatosCompleta = true;
+        this.verificarCargaCompleta();
       }
-    )
+    );
   }
 
   data_pdf: any = [];
   // METODO PARA CONSULTAR LOS REGISTROS DEL REPORTE DE TIMBRES
   consultarDataReporte() {
-    this.showBtnBuscar = true
+    this.showBtnBuscar = true;
     this.existenEmpleados = false;
     this.data_pdf = [];
+
     const fechaI = new Date(this.fechaInicio);
     const fechaFormateadaInicio = fechaI.toISOString().split('T')[0];
     const fechaF = new Date(this.fechaFinal);
     const fechaFormateadaFin = fechaF.toISOString().split('T')[0];
+
     this.reporteService.ReporteTimbresMultiple(this.data, fechaFormateadaInicio, fechaFormateadaFin).subscribe(res => {
       this.data_pdf = res;
       this.ExtraerDatos();
-      console.log("ver datos de los timbres ", this.data_pdf)
       this.loading = true;
-      if (this.count == 100) {
+      if (this.count === 100) {
         this.alertLimiteReporte();
       }
       this.showBtnPdf = true;
     }, err => {
-      console.error("no existen resultados")
+      console.error("no existen resultados");
       this.existenEmpleados = true;
       this.showBtnPdf = false;
       this.loading = true;
-      this.plantillaPDF.abrirToas('No existen timbres registrados', 'danger', 3000)
-    })
+      this.plantillaPDF.abrirToas('No existen timbres registrados', 'danger', 3000);
+    });
   }
 
   //mostrar Alerta para notificar el limite del reporte
   async alertLimiteReporte() {
     const alert = await this.alertController.create({
-      header: 'Notificacion',
-      message: 'El limite de timbres de reporte son 100.',
-      buttons: [
-        {
-          text: 'OK',
-          role: 'aceptar',
-        }
-      ],
+      header: 'Notificación',
+      message: 'El límite de timbres del reporte es 100.',
+      buttons: [{ text: 'OK', role: 'aceptar' }],
       mode: 'ios'
     });
     await alert.present();
@@ -198,19 +203,37 @@ export class ReporteTimbreComponent implements OnInit {
   logo: any = String;
   // METODO PARA OBTENER EL LOGO DE LA EMPRESA
   ObtenerLogo() {
-    this.plantillaPDF.LogoEmpresaImagenBase64(localStorage.getItem('id_empresa') as string).subscribe(res => {
-      this.logo = 'data:image/jpeg;base64,' + res.imagen;
-    });
+    const idEmpresa = localStorage.getItem('id_empresa');
+    if (!idEmpresa || idEmpresa === 'null') {
+      return;
+    }
+
+    this.plantillaPDF.LogoEmpresaImagenBase64(idEmpresa).subscribe(
+      res => {
+        this.logo = 'data:image/jpeg;base64,' + res.imagen;
+        this.cargaLogoCompleta = true;
+        this.verificarCargaCompleta();
+      },
+      err => {
+        this.cargaLogoCompleta = true; 
+        this.verificarCargaCompleta();
+      }
+    );
   }
+
 
   // METODO PARA GENERAR EL PDF
   GenerarPDF() {
-    let documentDefinition: any;
-    documentDefinition = this.DefinirInformacionPDF();
-    let doc_name = `Timbres_usuario.pdf`;
+    if (!this.logo || !this.logo.startsWith('data:image')) {
+      console.error('Logo no cargado correctamente.');
+      return;
+    }
 
+    const documentDefinition = this.DefinirInformacionPDF();
+    const doc_name = `Timbres_usuario.pdf`;
     this.plantillaPDF.generarPdf(documentDefinition, doc_name);
   }
+
 
   // METODO PARA DEFINIR LA INFORMACION INICIAL DE LOS PDFS
   DefinirInformacionPDF() {
@@ -291,7 +314,7 @@ export class ReporteTimbreComponent implements OnInit {
         establecimiento = '';
       }
       else if (selec.opcion == 4) {
-        descripcion = 'ROL: '+ selec.rol;
+        descripcion = 'ROL: ' + selec.rol;
         establecimiento = '';
       }
       //}
@@ -335,7 +358,7 @@ export class ReporteTimbreComponent implements OnInit {
               [
                 {
                   border: [true, true, false, false],
-                  text: 'C.C.: ' + empl.cedula,
+                  text: 'C.C.: ' + empl.identificacion,
                   style: 'itemsTableInfoEmpleado',
                 },
                 {
@@ -482,7 +505,7 @@ export class ReporteTimbreComponent implements OnInit {
           let servidor_fecha: any = '';
           let servidor_hora = '';
           if (t.fecha_hora_timbre_validado != '' && t.fecha_hora_timbre_validado != null) {
-            servidor_fecha = new Date(t.fecha_hora_timbre_validado);
+            servidor_fecha = t.fecha_hora_timbre_validado?.split(' ')[0] ?? '';
             servidor_hora = this.validar.FormatearHora(t.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora);
           };
           const horaTimbre = this.validar.FormatearHora(t.fecha_hora_timbre.split(' ')[1], this.formato_hora);
@@ -502,7 +525,7 @@ export class ReporteTimbreComponent implements OnInit {
           if (this.activarOpcion) {
             datos.push([
               n++,
-              usu.cedula,
+              usu.identificacion,
               usu.codigo,
               `${usu.apellido} ${usu.nombre}`,
               usu.name_rol,
@@ -521,11 +544,17 @@ export class ReporteTimbreComponent implements OnInit {
               t.fecha_hora_timbre,
               horaTimbre
             ])
+            console.log("✅ Datos generados para Excel:");
+            console.log("Fila 1:", datos[0]);
+            datos[0].forEach((celda, index) => {
+              console.log(`Columna ${index + 1}:`, celda, "→ tipo:", typeof celda);
+            });
+
 
           } else {
             datos.push([
               n++,
-              usu.cedula,
+              usu.identificacion,
               usu.codigo,
               `${usu.apellido} ${usu.nombre}`,
               usu.name_rol,
@@ -546,6 +575,16 @@ export class ReporteTimbreComponent implements OnInit {
         });
       })
     });
+
+    console.log("📋 Total de filas generadas:", datos.length);
+
+    if (datos.length > 0) {
+      console.log("🧪 Inspección detallada de la primera fila:");
+      datos[0].forEach((valor, index) => {
+        console.log(`Columna ${index + 1}:`, valor, "→ tipo:", typeof valor);
+      });
+    }
+
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Timbres");
@@ -584,7 +623,7 @@ export class ReporteTimbreComponent implements OnInit {
       });
       worksheet.columns = [
         { key: "n", width: 10 },
-        { key: "cedula", width: 20 },
+        { key: "identificacion", width: 20 },
         { key: "codigo", width: 20 },
         { key: "apenombre", width: 20 },
         { key: "rol", width: 20 },
@@ -607,7 +646,7 @@ export class ReporteTimbreComponent implements OnInit {
 
       const columnas = [
         { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-        { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+        { name: "IDENTIFICACIÓN", totalsRowLabel: "Total:", filterButton: true },
         { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
         { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
         { name: "ROL", totalsRowLabel: "", filterButton: true },
@@ -626,6 +665,12 @@ export class ReporteTimbreComponent implements OnInit {
         { name: "FECHA TIMBRE DISPOSITIVO", totalsRowLabel: "", filterButton: true },
         { name: "HORA TIMBRE DISPOSITIVO", totalsRowLabel: "", filterButton: true },
       ]
+
+      console.log("🔍 Columnas:", columnas);
+      columnas.forEach((col, i) => {
+        console.log(`Columna ${i + 1}:`, col, "→ tipo:", typeof col.name);
+      });
+
 
       worksheet.addTable({
         name: "TimbresReporteTabla",
@@ -680,7 +725,7 @@ export class ReporteTimbreComponent implements OnInit {
       });
       worksheet.columns = [
         { key: "n", width: 10 },
-        { key: "cedula", width: 20 },
+        { key: "identificacion", width: 20 },
         { key: "codigo", width: 20 },
         { key: "apenombre", width: 20 },
         { key: "rol", width: 20 },
@@ -700,7 +745,7 @@ export class ReporteTimbreComponent implements OnInit {
 
       const columnas = [
         { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-        { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+        { name: "IDENTIFICACIÓN", totalsRowLabel: "Total:", filterButton: true },
         { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
         { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
         { name: "ROL", totalsRowLabel: "", filterButton: true },
@@ -769,13 +814,13 @@ export class ReporteTimbreComponent implements OnInit {
   }
 
   // METODO PARA ALMACENAR LA INFORMACION DE LOS TIMBRES PARA QUE SEAN MOSTRADOS EN PANTALLA 
-   ExtraerDatos() {
+  ExtraerDatos() {
     this.timbres = [];
     let n = 0;
     let accionT = '';
     this.data_pdf.forEach((data: any) => {
       data.empleados.forEach((usu: any) => {
-        usu.timbres.forEach( (t: any) => {
+        usu.timbres.forEach((t: any) => {
           n = n + 1;
           this.count = n;
           let servidor_fecha = '';
@@ -783,19 +828,19 @@ export class ReporteTimbreComponent implements OnInit {
 
           if (t.fecha_hora_timbre_validado != '' && t.fecha_hora_timbre_validado != null) {
             "entra a existe fecha_hora_timbre_validado"
-            servidor_fecha =  this.validar.FormatearFecha(t.fecha_hora_timbre_validado.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
-            servidor_hora =  this.validar.FormatearHora(t.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora);
+            servidor_fecha = this.validar.FormatearFecha(t.fecha_hora_timbre_validado.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
+            servidor_hora = this.validar.FormatearHora(t.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora);
           };
 
           var fechaTimbre = ''
           var horaTimbre = ''
-          if(this.activarOpcion){
+          if (this.activarOpcion) {
             fechaTimbre = this.validar.FormatearFecha(t.fecha_hora_timbre.split(' ')[0], this.formato_fecha, this.validar.dia_abreviado);
             horaTimbre = this.validar.FormatearHora(t.fecha_hora_timbre.split(' ')[1], this.formato_hora);
           }
-          
-         
-         
+
+
+
           switch (t.accion) {
             case 'EoS': accionT = 'Entrada o salida'; break;
             case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -811,7 +856,7 @@ export class ReporteTimbreComponent implements OnInit {
           }
           let ele = {
             n: n,
-            cedula: usu.cedula,
+            identificacion: usu.identificacion,
             codigo: usu.codigo,
             empleado: usu.apellido + ' ' + usu.nombre,
             rol: usu.rol,
