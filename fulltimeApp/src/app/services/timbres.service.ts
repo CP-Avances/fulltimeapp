@@ -22,6 +22,7 @@ export class TimbresService {
     this.api_url = await this.storageService.get('urlEmpresa');
   }
 
+  // TODO: REVISAR SI ESTE DEVUELVE IMAGEN
   // METODO PARA BUSCAR LOS TIMBRES DE LOS EMPLEADOS POR SU CODIGO
   getTimbresEmpleadoByCodigo(codigo: number | string) {
     return this.http.get<any>(`${this.api_url}/timbres/timbreEmpleado/${codigo}`)

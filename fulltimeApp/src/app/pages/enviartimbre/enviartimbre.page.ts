@@ -246,8 +246,8 @@ export class EnviartimbrePage implements OnInit {
       correctOrientation: true, // CORREGIR ORIENTACIÓN DE LA IMAGEN
       source: CameraSource.Camera, // FUENTE DE LA IMAGEN (CÁMARA)
       direction: CameraDirection.Front, // DIRECCIÓN DE LA CÁMARA (FRONTAL) SOLO PARA IOS
-      width: 1200, // ANCHO DE LA IMAGEN
-      height: 1200, // ALTO DE LA IMAGEN
+      width: 600, // ANCHO DE LA IMAGEN
+      height: 600, // ALTO DE LA IMAGEN
     });
 
     if (cameraPhoto.dataUrl) {

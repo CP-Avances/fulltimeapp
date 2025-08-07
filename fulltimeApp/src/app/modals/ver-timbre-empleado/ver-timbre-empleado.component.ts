@@ -23,6 +23,7 @@ export class VerTimbreEmpleadoComponent implements OnInit {
   @ViewChild(IonDatetime) datetimeFinal: IonDatetime;
   timbres: any = [];//esta variable contiene los timbres que se muestran en la lista y se VAN A ENVIAR
   timbres_filtro: any = []; //esta variable contiene los timbres filtrados que se muestran en la lista
+  imageUrls: string[] = [];
   pageActual: number;
   pagefiltro: number;
   filtro_mensaje: boolean = true;
@@ -59,6 +60,9 @@ export class VerTimbreEmpleadoComponent implements OnInit {
     this.mostrarTimbres();
   }
 
+  ngOnDestroy() {
+    this.limpiarImagenesAnteriores();
+  }
 
   // BUSQUEDA DE PARAMETROS DE FECHAS Y HORAS
   formato_fecha: string;
@@ -181,53 +185,95 @@ export class VerTimbreEmpleadoComponent implements OnInit {
   }
 
   // METODO QUE CONSUME EL SERVICIO PARA BUSCAR LOS TIMBRES DEL EMPLEADO POR SU CODIGO
-  buscarTimbresEmpleado(codigo) {
+  buscarTimbresEmpleado(codigo: any) {
+    this.limpiarImagenesAnteriores();
     this.timbresService.getTimbresEmpleadoByCodigo(codigo).subscribe((res: any[]) => {
-      let fechasObjeto = {}
+      let fechasObjeto = {};
+      this.imageUrls = []; // Asegura que esté limpio antes de llenarlo
+
       res.forEach(data => {
-        data.fecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
-        data.hora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre, this.formato_hora, data.zona_horaria_servidor);
+        // Formateo de fecha y hora
+        data.fecha = this.validar.FormatearFechaZonaHoraria(
+          data.fecha_hora_timbre,
+          this.formato_fecha,
+          this.validar.dia_completo,
+          data.zona_horaria_servidor
+        );
+
+        data.hora = this.validar.FormatearHoraZonaHoraria(
+          data.fecha_hora_timbre,
+          this.formato_hora,
+          data.zona_horaria_servidor
+        );
+
         data.sfecha = '';
         data.shora = '';
-        if (!data.fecha_hora_timbre_servidor) {
-          data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
-          data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_hora, data.zona_horaria_servidor);
-          if (data.fecha_subida_servidor != null) {
-            data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
-            data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_subida_servidor, this.formato_hora, data.zona_horaria_servidor);
-          }
-        } else {
-          data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
-          data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_hora, data.zona_horaria_servidor);
+
+        if (data.fecha_hora_timbre_servidor) {
+          data.sfecha = this.validar.FormatearFechaZonaHoraria(
+            data.fecha_hora_timbre_servidor,
+            this.formato_fecha,
+            this.validar.dia_completo,
+            data.zona_horaria_servidor
+          );
+          data.shora = this.validar.FormatearHoraZonaHoraria(
+            data.fecha_hora_timbre_servidor,
+            this.formato_hora,
+            data.zona_horaria_servidor
+          );
+        } else if (data.fecha_subida_servidor != null) {
+          data.sfecha = this.validar.FormatearFechaZonaHoraria(
+            data.fecha_subida_servidor,
+            this.formato_fecha,
+            this.validar.dia_completo,
+            data.zona_horaria_servidor
+          );
+          data.shora = this.validar.FormatearHoraZonaHoraria(
+            data.fecha_subida_servidor,
+            this.formato_hora,
+            data.zona_horaria_servidor
+          );
         }
-      })
-      res.forEach(x => {
-        if (!fechasObjeto.hasOwnProperty(x.fecha)) {
-          fechasObjeto[x.fecha] = []
+
+        // Conversión de imagen
+        if (data.imagen && data.imagen.data) {
+          const blob = new Blob([new Uint8Array(data.imagen.data)], { type: "image/webp" });
+          const imageUrl = URL.createObjectURL(blob);
+          this.imageUrls.push(imageUrl);
+          data.imagen = imageUrl;
         }
-        fechasObjeto[x.fecha].push(x)
-      })
+
+        // Agrupación por fecha
+        if (!fechasObjeto.hasOwnProperty(data.fecha)) {
+          fechasObjeto[data.fecha] = [];
+        }
+        fechasObjeto[data.fecha].push(data);
+      });
 
       console.log('fechas ver ..... ', fechasObjeto);
       this.timbres = fechasObjeto;
 
-      console.log('fechas ver timbres..... ', Object.keys(fechasObjeto).length);
+      const cantidadFechas = Object.keys(fechasObjeto).length;
+      console.log('fechas ver timbres..... ', cantidadFechas);
 
-      if (Object.keys(fechasObjeto).length === 0) {
+      // Lógica de visibilidad de UI según cantidad de fechas
+      if (cantidadFechas === 0) {
         this.vacio = false;
         this.todos = true;
         this.btn_filtro = true;
         this.btn_todos = true;
-      } else if (Object.keys(fechasObjeto).length < 8) {
+      } else if (cantidadFechas < 8) {
         this.todosPagina = true;
       } else {
         this.todosPagina = false;
         this.filtroPagina = true;
       }
     }, err => {
-      console.log(err); this.todosPagina = true;
-    })
+      console.log(err);
+      this.todosPagina = true;
+    });
   }
+
 
   // METODO QUE LEER LOS TIMBRES DEL EMPLEADO FILTRADO POR FECHA
   filtrarFechas(codigo) {
@@ -372,5 +418,12 @@ export class VerTimbreEmpleadoComponent implements OnInit {
     screenReaderPageLabel: 'page',
     screenReaderCurrentLabel: `You're on page`
   };
+
+  limpiarImagenesAnteriores() {
+    this.imageUrls.forEach(url => {
+      URL.revokeObjectURL(url);
+    });
+    this.imageUrls = [];
+  }
 
 }
