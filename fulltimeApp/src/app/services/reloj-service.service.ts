@@ -113,14 +113,48 @@ export class RelojServiceService {
 
   // TIMBRE
   // METODO PARA CREAR UN TIMBRE
-  enviarTimbre(timbre) {
+  enviarTimbre(timbre: any) {
+
+    const formData = new FormData();
+
+    const datosTimbre = {
+      ...timbre,
+      imagen: null,
+    }
+
+    if (timbre.imagen) {
+      const arr = timbre.imagen.split(",");
+      const mime = arr[0].match(/:(.*?);/)?.[1] ?? "image/webp";
+      const blob = this.base64ABlob(arr[1], mime);
+      formData.append("imagen", blob, "timbre.webp");
+    }
+
+    formData.append('timbre', JSON.stringify(datosTimbre));
+
     console.log('dato de timbre a guardar en la base de datos: ', timbre.conexion)
-    return this.http.post<any>(this.URL + '/timbres/timbre', timbre);
+    return this.http.post<any>(this.URL + '/timbres/timbre', formData);
   }
   // METODO PARA CREAR UN TIMBRE SIN CONEXION
   enviarTimbreSinConexion(timbre: any) {
+
+    const formData = new FormData();
+
+    const datosTimbre = {
+      ...timbre,
+      imagen: null,
+    }
+
+    if (timbre.imagen) {
+      const arr = timbre.imagen.split(",");
+      const mime = arr[0].match(/:(.*?);/)?.[1] ?? "image/webp";
+      const blob = this.base64ABlob(arr[1], mime);
+      formData.append("imagen", blob, "timbre.webp");
+    }
+
+    formData.append('timbre', JSON.stringify(datosTimbre));
+
     console.log('dato de timbre a guardar en la base de datos pero con novedades: ', timbre)
-    return this.http.post<any>(this.URL + '/timbres/timbreSinConexion', timbre);
+    return this.http.post<any>(this.URL + '/timbres/timbreSinConexion', formData);
   }
   // METODO PARA BUSCAR POR WEL CODIGO DEL EMPLEADO LOS TIMBRES
   obtenerTimbres(codigo: any) {
@@ -134,5 +168,17 @@ export class RelojServiceService {
     }
     return this.http.post<any>(`${environment.url}/fulltime`, empresa);
   }
+
+  private base64ABlob(base64: string, mime: string): Blob {
+    const bstr = atob(base64);
+    const u8arr = new Uint8Array(bstr.length);
+
+    for (let i = 0; i < bstr.length; i++) {
+      u8arr[i] = bstr.charCodeAt(i);
+    }
+
+    return new Blob([u8arr], { type: mime });
+  }
+
 
 }

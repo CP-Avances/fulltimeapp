@@ -240,20 +240,39 @@ export class EnviartimbrePage implements OnInit {
   // METODO PARA ABRIR LA CAMARA Y GUARDAR LA IMAGEN
   async tomarFoto() {
     const cameraPhoto = await Camera.getPhoto({
-      quality: 0.9,
-      allowEditing: false,
-      resultType: CameraResultType.DataUrl,
-      correctOrientation: true,
-      source: CameraSource.Camera,
-      direction: CameraDirection.Front,
-      width: 1200,
-      height: 1200,
+      quality: 100, // CALIDAD DE LA IMAGEN
+      allowEditing: false, // PERMITE EDITAR LA IMAGEN
+      resultType: CameraResultType.DataUrl, // TIPO DE RESULTADO (BASE64)
+      correctOrientation: true, // CORREGIR ORIENTACIÓN DE LA IMAGEN
+      source: CameraSource.Camera, // FUENTE DE LA IMAGEN (CÁMARA)
+      direction: CameraDirection.Front, // DIRECCIÓN DE LA CÁMARA (FRONTAL) SOLO PARA IOS
+      width: 1200, // ANCHO DE LA IMAGEN
+      height: 1200, // ALTO DE LA IMAGEN
     });
+
     if (cameraPhoto.dataUrl) {
-      this.imagen = cameraPhoto.dataUrl;
+      this.imagen = await this.convertirBase64AWebP(cameraPhoto.dataUrl);
     } else {
-      this.imagen = "";
+      this.imagen = '';
     }
+  }
+
+  async convertirBase64AWebP(base64: string): Promise<string> {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d")!;
+
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        const webpBase64 = canvas.toDataURL("image/webp", 0.9);
+        resolve(webpBase64);
+      };
+      img.onerror = reject;
+      img.src = base64;
+    });
   }
 
   //METODO PARA VERIFICAR LA AUNTENTICACION POR HUELLA DACTILAR 
