@@ -191,11 +191,14 @@ export class VertimbrePage implements OnInit {
   obtenerTimbres(codigo) {
     this.limpiarImagenesAnteriores();
     this.timbres = [];
-    this.relojService.obtenerTimbres(codigo).pipe(takeUntil(this.unsubscribe$)).subscribe(
-      res => {
+    this.relojService.obtenerTimbres(codigo)
+    .pipe(takeUntil(this.unsubscribe$))
+    .subscribe({
+      next: (res: any[]) => {
         console.log("ver timbres ", res);
 
         let fechasObjeto = {};
+        this.imageUrls = [];
 
         res.forEach(data => {
           // Formatear fecha y hora
@@ -246,7 +249,7 @@ export class VertimbrePage implements OnInit {
           if (data.imagen && data.imagen.data) {
             const blob = new Blob([new Uint8Array(data.imagen.data)], { type: "image/webp" });
             const imageUrl = URL.createObjectURL(blob);
-            this.imageUrls.push(imageUrl); 
+            this.imageUrls.push(imageUrl);
             data.imagen = imageUrl;
           }
 
@@ -268,54 +271,103 @@ export class VertimbrePage implements OnInit {
           this.btn_todos = true;
         }
       },
-      err => {
+      error: (err) => {
+        console.error('Error al obtener timbres:', err);
       }
-    );
+    });
+
   }
 
   // METODO PARA OBTENER LOS TIMBRES FILTRADOS Y FORMATEAR LAS FECHAS
   filtrarFechas() {
-    console.log("Entra al filtro fechas")
+    this.limpiarImagenesAnteriores();
     this.timbres_filtro = [];
     if (this.fechaInicio <= this.fechaFinal) {
-      var datos = { fecInicio: this.fechaInicio, fecFinal: this.fechaFinal, codigo: localStorage.getItem('codigo') }
-      this.filtimbre.PostFiltrotimbres(datos).subscribe(
-        ress => {
-          console.log("ver timbres filtrados", ress)
-          var fechasObjeto_f = {};
-          ress.forEach(data => {
+      const datos = { fecInicio: this.fechaInicio, fecFinal: this.fechaFinal, codigo: localStorage.getItem('codigo') }
 
-            data.fecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
-            data.hora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_hora, data.zona_horaria_servidor);
+      this.filtimbre.PostFiltrotimbres(datos)
+      .subscribe({
+        next: (res: any[]) => {
+          console.log("ver timbres ", res);
+  
+          let fechasObjeto = {};
+          this.imageUrls = [];
+  
+          res.forEach(data => {
+            // Formatear fecha y hora
+            data.fecha = this.validar.FormatearFechaZonaHoraria(
+              data.fecha_hora_timbre,
+              this.formato_fecha,
+              this.validar.dia_completo,
+              data.zona_horaria_servidor
+            );
+  
+            data.hora = this.validar.FormatearHoraZonaHoraria(
+              data.fecha_hora_timbre,
+              this.formato_hora,
+              data.zona_horaria_servidor
+            );
+  
             data.sfecha = '';
             data.shora = '';
+  
             if (data.fecha_hora_timbre_servidor != null) {
-              data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
-              data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_hora, data.zona_horaria_servidor);
+              console.log("ver fecha registrada en el servidor", data.fecha_hora_timbre_servidor);
+              data.sfecha = this.validar.FormatearFechaZonaHoraria(
+                data.fecha_hora_timbre_servidor,
+                this.formato_fecha,
+                this.validar.dia_completo,
+                data.zona_horaria_servidor
+              );
+              data.shora = this.validar.FormatearHoraZonaHoraria(
+                data.fecha_hora_timbre_servidor,
+                this.formato_hora,
+                data.zona_horaria_servidor
+              );
             } else if (data.fecha_subida_servidor != null) {
-              data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
-              data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_subida_servidor, this.formato_hora, data.zona_horaria_servidor);
+              data.sfecha = this.validar.FormatearFechaZonaHoraria(
+                data.fecha_subida_servidor,
+                this.formato_fecha,
+                this.validar.dia_completo,
+                data.zona_horaria_servidor
+              );
+              data.shora = this.validar.FormatearHoraZonaHoraria(
+                data.fecha_subida_servidor,
+                this.formato_hora,
+                data.zona_horaria_servidor
+              );
             }
-          })
-
-          ress.forEach(i => {
-            if (!fechasObjeto_f.hasOwnProperty(i.fecha)) {
-              fechasObjeto_f[i.fecha] = [];
+  
+            // Convertir imagen
+            if (data.imagen && data.imagen.data) {
+              const blob = new Blob([new Uint8Array(data.imagen.data)], { type: "image/webp" });
+              const imageUrl = URL.createObjectURL(blob);
+              this.imageUrls.push(imageUrl);
+              data.imagen = imageUrl;
             }
-            fechasObjeto_f[i.fecha].push(i);
-          })
-          this.timbres_filtro = fechasObjeto_f;
-          console.log('timbres filtrados: ', fechasObjeto_f);
-          if (Object.keys(fechasObjeto_f).length === 0) {
+  
+            // Agrupar por fecha
+            if (!fechasObjeto.hasOwnProperty(data.fecha)) {
+              fechasObjeto[data.fecha] = [];
+            }
+            fechasObjeto[data.fecha].push(data);
+          });
+  
+          console.log('timbres en el objeto', fechasObjeto);
+          this.timbres_filtro = fechasObjeto;
+  
+          // Si no hay datos
+          if (Object.keys(fechasObjeto).length === 0) {
             this.filtro_mensaje = false;
             this.filtro = true;
             this.vacio = true;
           }
         },
-        err => {
+        error: (err) => {
+          console.error('Error al obtener timbres:', err);
           return this.mostrarToas('Lo sentimos no fue posible conectar con el servidor', 3000, "danger");
         }
-      );
+      });
     }
   }
 

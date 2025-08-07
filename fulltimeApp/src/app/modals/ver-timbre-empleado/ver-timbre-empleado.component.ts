@@ -187,12 +187,13 @@ export class VerTimbreEmpleadoComponent implements OnInit {
   // METODO QUE CONSUME EL SERVICIO PARA BUSCAR LOS TIMBRES DEL EMPLEADO POR SU CODIGO
   buscarTimbresEmpleado(codigo: any) {
     this.limpiarImagenesAnteriores();
-    this.timbresService.getTimbresEmpleadoByCodigo(codigo).subscribe((res: any[]) => {
+    this.timbresService.getTimbresEmpleadoByCodigo(codigo).subscribe({
+    next: (res: any[]) => {
       let fechasObjeto = {};
-      this.imageUrls = []; // Asegura que esté limpio antes de llenarlo
+      this.imageUrls = []; // Limpiar antes de llenar
 
       res.forEach(data => {
-        // Formateo de fecha y hora
+        // Formatear fecha y hora
         data.fecha = this.validar.FormatearFechaZonaHoraria(
           data.fecha_hora_timbre,
           this.formato_fecha,
@@ -268,74 +269,120 @@ export class VerTimbreEmpleadoComponent implements OnInit {
         this.todosPagina = false;
         this.filtroPagina = true;
       }
-    }, err => {
-      console.log(err);
+    },
+
+    error: (err) => {
+      console.error('Error al obtener timbres del empleado:', err);
       this.todosPagina = true;
-    });
+    }
+  });
+
   }
 
 
   // METODO QUE LEER LOS TIMBRES DEL EMPLEADO FILTRADO POR FECHA
-  filtrarFechas(codigo) {
-    this.codigo = codigo
+  filtrarFechas(codigo: any) {
+    this.codigo = codigo;
     this.timbres_filtro = [];
-    if (this.fechaInicio <= this.fechaFinal) {
-      var datos = { fecInicio: this.fechaInicio, fecFinal: this.fechaFinal, codigo: this.codigo }
+    this.limpiarImagenesAnteriores();
 
-      console.log("ver fechas a filtrar", datos)
-      this.filtimbre.PostFiltrotimbres(datos).subscribe(
-        ress => {
-          console.log("ver timbres filtrados", ress)
-          let fechasObjeto_f = {}
+    if (this.fechaInicio <= this.fechaFinal) {
+      const datos = {
+        fecInicio: this.fechaInicio,
+        fecFinal: this.fechaFinal,
+        codigo: this.codigo
+      };
+
+      console.log("ver fechas a filtrar", datos);
+
+      this.filtimbre.PostFiltrotimbres(datos).subscribe({
+        next: (ress: any[]) => {
+          console.log("ver timbres filtrados", ress);
+
+          const fechasObjeto_f = {};
+          this.imageUrls = [];
 
           ress.forEach(data => {
-            data.fecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
-            data.hora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre, this.formato_hora, data.zona_horaria_servidor);
+            // Formatear fecha y hora
+            data.fecha = this.validar.FormatearFechaZonaHoraria(
+              data.fecha_hora_timbre,
+              this.formato_fecha,
+              this.validar.dia_completo,
+              data.zona_horaria_servidor
+            );
+            data.hora = this.validar.FormatearHoraZonaHoraria(
+              data.fecha_hora_timbre,
+              this.formato_hora,
+              data.zona_horaria_servidor
+            );
+
             data.sfecha = '';
             data.shora = '';
-            if (!data.fecha_hora_timbre_servidor) {
-              data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
-              data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_hora, data.zona_horaria_servidor);
 
-              if (data.fecha_subida_servidor != null) {
-                data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_subida_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
-                data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_subida_servidor, this.formato_hora, data.zona_horaria_servidor);
-              }
-            } else {
-              data.sfecha = this.validar.FormatearFechaZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_completo, data.zona_horaria_servidor);
-              data.shora = this.validar.FormatearHoraZonaHoraria(data.fecha_hora_timbre_servidor, this.formato_hora, data.zona_horaria_servidor);
+            if (data.fecha_hora_timbre_servidor) {
+              data.sfecha = this.validar.FormatearFechaZonaHoraria(
+                data.fecha_hora_timbre_servidor,
+                this.formato_fecha,
+                this.validar.dia_completo,
+                data.zona_horaria_servidor
+              );
+              data.shora = this.validar.FormatearHoraZonaHoraria(
+                data.fecha_hora_timbre_servidor,
+                this.formato_hora,
+                data.zona_horaria_servidor
+              );
+            } else if (data.fecha_subida_servidor != null) {
+              data.sfecha = this.validar.FormatearFechaZonaHoraria(
+                data.fecha_subida_servidor,
+                this.formato_fecha,
+                this.validar.dia_completo,
+                data.zona_horaria_servidor
+              );
+              data.shora = this.validar.FormatearHoraZonaHoraria(
+                data.fecha_subida_servidor,
+                this.formato_hora,
+                data.zona_horaria_servidor
+              );
             }
-          })
 
-          ress.forEach(i => {
-            if (!fechasObjeto_f.hasOwnProperty(i.fecha)) {
-              fechasObjeto_f[i.fecha] = [];
+            // Convertir imagen
+            if (data.imagen && data.imagen.data) {
+              const blob = new Blob([new Uint8Array(data.imagen.data)], { type: "image/webp" });
+              const imageUrl = URL.createObjectURL(blob);
+              this.imageUrls.push(imageUrl);
+              data.imagen = imageUrl;
             }
-            fechasObjeto_f[i.fecha].push(i);
-          })
 
-          this.timbres_filtro = fechasObjeto_f
+            // Agrupar por fecha
+            if (!fechasObjeto_f.hasOwnProperty(data.fecha)) {
+              fechasObjeto_f[data.fecha] = [];
+            }
+            fechasObjeto_f[data.fecha].push(data);
+          });
+
+          this.timbres_filtro = fechasObjeto_f;
           console.log("timbre filtrado por fechas ", this.timbres_filtro);
 
-          if (Object.keys(fechasObjeto_f).length === 0) {
+          const cantidadFechas = Object.keys(fechasObjeto_f).length;
+
+          if (cantidadFechas === 0) {
             this.filtro_mensaje = false;
             this.filtro = true;
             this.vacio = true;
-          } else if (Object.keys(fechasObjeto_f).length < 8) {
+          } else if (cantidadFechas < 8) {
             this.filtroPagina = true;
-
           } else {
             this.filtroPagina = false;
-
             this.todosPagina = true;
           }
         },
-        err => {
+
+        error: (err) => {
+          console.error("Error al filtrar timbres:", err);
           this.presentLoading("Intentando conectar con el servidor");
+          this.filtroPagina = true;
         }
-      ), err => {
-        console.log(err); this.filtroPagina = true;
-      };
+      });
     }
   }
 
