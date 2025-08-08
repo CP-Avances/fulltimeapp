@@ -55,15 +55,15 @@
         </ion-label>
 
         <!-- Mesaje que tiene el nombre del archivo a subir -->
-        <ion-text *ngIf="base64Image != '' && base64Image !== null && base64Image !== undefined"
+        <ion-text *ngIf="documento != '' && documento !== null && documento !== undefined"
           style="font-size: 82%; margin:2% 0% 3% 0%; " color="success">Archivo subido correctamente</ion-text>
 
         <!-- Mesaje que indica el error en subir el archivo -->
 
       </ion-item>
 
-      <div *ngIf="base64Image != '' && base64Image !== null && base64Image !== undefined">
-        <ion-button [disabled]=" !base64Image" color="medium" shape="round" expand="block" (click)="deleteImagen()">
+      <div *ngIf="documento != '' && documento !== null && documento !== undefined">
+        <ion-button [disabled]=" !documento" color="medium" shape="round" expand="block" (click)="deleteImagen()">
           <ion-text style="font-size: 90%;"> <ion-icon color="danger" name="trash-outline"></ion-icon> Quitar documento
           </ion-text>
         </ion-button>

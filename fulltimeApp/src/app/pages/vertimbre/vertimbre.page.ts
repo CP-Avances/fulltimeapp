@@ -253,6 +253,13 @@ export class VertimbrePage implements OnInit {
             data.imagen = imageUrl;
           }
 
+          if (data.documento && data.documento.data) {
+            const blob = new Blob([new Uint8Array(data.documento.data)], { type: "image/webp" });
+            const imageUrl = URL.createObjectURL(blob);
+            this.imageUrls.push(imageUrl);
+            data.documento = imageUrl;
+          }
+
           // Agrupar por fecha
           if (!fechasObjeto.hasOwnProperty(data.fecha)) {
             fechasObjeto[data.fecha] = [];
@@ -345,7 +352,14 @@ export class VertimbrePage implements OnInit {
               this.imageUrls.push(imageUrl);
               data.imagen = imageUrl;
             }
-  
+
+            if (data.documento && data.documento.data) {
+              const blob = new Blob([new Uint8Array(data.documento.data)], { type: "image/webp" });
+              const imageUrl = URL.createObjectURL(blob);
+              this.imageUrls.push(imageUrl);
+              data.documento = imageUrl;
+            }
+    
             // Agrupar por fecha
             if (!fechasObjeto.hasOwnProperty(data.fecha)) {
               fechasObjeto[data.fecha] = [];

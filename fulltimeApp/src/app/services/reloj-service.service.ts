@@ -157,7 +157,6 @@ export class RelojServiceService {
     return this.http.post<any>(this.URL + '/timbres/timbreSinConexion', formData);
   }
 
-  // TODO: VERIFICAR COMO SE RETORNA LA IMAGEN
   // METODO PARA BUSCAR POR WEL CODIGO DEL EMPLEADO LOS TIMBRES
   obtenerTimbres(codigo: any) {
     return this.http.get<any>(this.URL + '/timbres/timbreEmpleado/' + codigo);

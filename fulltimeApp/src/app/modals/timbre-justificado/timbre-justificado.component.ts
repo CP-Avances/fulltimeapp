@@ -36,6 +36,10 @@ export class TimbreJustificadoComponent implements OnInit {
   fec_timbre: string = '';
   observacion: string = '';
 
+  fileName: string = '';
+  uploadError: string = '';
+  documento: string;
+
   private get fullnameAdmin(): string {
     return this.dataUserService.UserFullname
   }
@@ -140,7 +144,7 @@ export class TimbreJustificadoComponent implements OnInit {
       id: this.data.id,
       ip: localStorage.getItem('ip'),
       ip_local: this.ips_locales,
-      documento: this.base64Image,
+      documento: this.documento,
       dispositivo_timbre: this.dispositivo_timbre,
       conexion: true,
       hora_timbre_diferente: false,
@@ -174,27 +178,24 @@ export class TimbreJustificadoComponent implements OnInit {
       'refreshInfo': refreshInfo
     });
   }
-  fileName: string = '';
-  uploadError: string = '';
-  base64Image: string | ArrayBuffer | null = null;
 
   // METODO PARA ABRIR LA GALERIA Y SELECCIONAR UNA IMAGEN
   async selectImage() {
     console.log("ver imagen");
 
     const image = await Camera.getPhoto({
-      quality: 90,
+      quality: 100,
       allowEditing: false,
       resultType: CameraResultType.DataUrl,
-      source: CameraSource.Photos
+      source: CameraSource.Photos,
+      width: 1200, // ANCHO DE LA IMAGEN
+      height: 1200, // ALTO DE LA IMAGEN
     });
 
     if (image.dataUrl) {
-      this.base64Image = image.dataUrl;
-
+      this.documento = await this.convertirBase64AWebP(image.dataUrl);
     } else {
-      this.base64Image = "";
-      this.fileName = "";
+      this.documento = '';
     }
   }
 
@@ -214,7 +215,25 @@ export class TimbreJustificadoComponent implements OnInit {
 
     this.fileName = null;
     this.mensajeFile = null;
-    this.base64Image = null;
+    this.documento = null;
+  }
+
+  async convertirBase64AWebP(base64: string): Promise<string> {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d")!;
+
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        const webpBase64 = canvas.toDataURL("image/webp", 0.9);
+        resolve(webpBase64);
+      };
+      img.onerror = reject;
+      img.src = base64;
+    });
   }
 
 } 
