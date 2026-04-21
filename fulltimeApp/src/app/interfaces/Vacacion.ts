@@ -49,3 +49,39 @@ export const vacacionValueDefault = {
 
 
 }
+
+export interface SaldoDisponible {
+  dias: number;
+  horas: number;
+  minutos: number;
+}
+
+export interface SaldoEmpleadoResponse {
+  ok?: boolean;
+  data: {
+    id_empleado: number;
+    saldo_disponible: SaldoDisponible;
+  };
+}
+
+export interface ResultVerificacion {
+  idEmpleado: number;
+  observacion: string;
+  [key: string]: any;
+}
+
+export interface VerificarVacacionesRequest {
+  empleados: number[];
+  incluirFeriados: boolean;
+  permiteHoras: boolean;
+  verificarProgramacion: boolean;
+  fechaInicio: string;
+  fechaFin: string;
+  numHoras: string;
+}
+
+export interface VerificarSolicitudResponse {
+  ok: boolean;
+  message?: string;
+  data?: any;
+}

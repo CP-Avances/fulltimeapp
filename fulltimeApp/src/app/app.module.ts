@@ -16,9 +16,9 @@ import { ModalsPageModule } from './modals/modals.module';
 import { Drivers } from '@ionic/storage';
 import { NgxPaginationModule } from 'ngx-pagination';
 
-import { FileOpener } from '@ionic-native/file-opener/ngx';
-import { File } from '@ionic-native/file/ngx';
-import { Diagnostic } from '@ionic-native/diagnostic/ngx';
+import { FileOpener } from '@awesome-cordova-plugins/file-opener/ngx';
+import { File } from '@awesome-cordova-plugins/file/ngx';
+import { Diagnostic } from '@awesome-cordova-plugins/diagnostic/ngx';
 
 // Cambiar el local de la APP
 import localEsEC from '@angular/common/locales/es-EC';

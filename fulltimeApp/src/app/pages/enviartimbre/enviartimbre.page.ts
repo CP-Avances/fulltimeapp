@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { DataUserLoggedService } from '../../services/data-user-logged.service';
-import { FingerprintAIO } from '@ionic-native/fingerprint-aio';
+import { FingerprintAIO } from '@awesome-cordova-plugins/fingerprint-aio/ngx';
 import { Geolocation } from '@capacitor/geolocation';
 import { Device } from '@capacitor/device';
 import { BiometricAuth } from 'capacitor-biometric-auth';
@@ -60,6 +60,7 @@ export class EnviartimbrePage implements OnInit {
     private userService: DataUserLoggedService,
     private fechaHoraService: FechaHoraService,
     public validar: ValidacionesService,
+    private fingerprintAIO: FingerprintAIO
 
   ) { }
 
@@ -277,10 +278,9 @@ export class EnviartimbrePage implements OnInit {
 
   //METODO PARA VERIFICAR LA AUNTENTICACION POR HUELLA DACTILAR 
   async identificarUsuario() {
-    await FingerprintAIO.isAvailable().then(() => {
-      console.log(FingerprintAIO.BIOMETRIC_HARDWARE_NOT_SUPPORTED)
-
-      //FIXME
+    await this.fingerprintAIO.isAvailable({
+      requireStrongBiometrics: false
+    }).then(() => {
       this.openAutenticacion();
     }).catch(() => {
       this.enviarTimbreSinAuth();
@@ -289,31 +289,30 @@ export class EnviartimbrePage implements OnInit {
 
   // METODO PARA ABRIR EL COMPONENTE DE AUNTENTICACION POR HUELLA DACTILAR
   async openAutenticacion() {
-    await FingerprintAIO.show(
-      {
-        disableBackup: false,
-        title: 'Comprobando',
-        fallbackButtonTitle: 'PIN',
-        subtitle: 'Es necesario autenticarse para enviar el timbre',
-        description: 'Casa Pazmiño S.A'
-      }).then((resul: any) => {
-        if (resul) {
-          console.log('verified: ', resul.verified);
-          this.nuevoTimbre.tipo_autenticacion = this.IDENTIFICACION_BIOMETRICA;
-          this.guardarEnBDD();
-        }
-      }).catch((error: any) => {
-        console.log(error);
-        this.abrirToas('Ocurrió un error al autenticar del usuario. El timbre no se envió', "danger", 1000, "middle");
-        this.intentos = this.intentos + 1;
-        if (this.intentos == 2) {
-          this.enviarTimbreAuthProble();
-
-          this.intentos = 0;
-        }
+    await this.fingerprintAIO.show({
+      disableBackup: false,
+      title: 'Comprobando',
+      fallbackButtonTitle: 'PIN',
+      subtitle: 'Es necesario autenticarse para enviar el timbre',
+      description: 'Casa Pazmiño S.A'
+    }).then((resul: any) => {
+      if (resul) {
+        console.log('verified: ', resul.verified);
+        this.nuevoTimbre.tipo_autenticacion = this.IDENTIFICACION_BIOMETRICA;
+        this.guardarEnBDD();
       }
-      );
+    }).catch((error: any) => {
+      console.log(error);
+      this.abrirToas('Ocurrió un error al autenticar del usuario. El timbre no se envió', "danger", 1000, "middle");
+      this.intentos = this.intentos + 1;
+      if (this.intentos == 2) {
+        this.enviarTimbreAuthProble();
+        this.intentos = 0;
+      }
+    });
   }
+
+
   // METODO PARA ENVIAR TIMBRES SIN AUNTENTICACION
   async enviarTimbreSinAuth() {
 

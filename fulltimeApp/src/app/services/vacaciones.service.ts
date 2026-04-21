@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { Vacacion } from '../interfaces/Vacacion';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { catchError, tap } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse,  HttpParams } from '@angular/common/http';
+import { catchError, map, retry, tap } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
 // SERVICIOS
 import { StorageService } from './storage.service';
@@ -13,24 +14,25 @@ import { SocketService } from 'src/app/services/socket.service';
 })
 export class VacacionesService {
 
-  private apiUrl = '';
+  private readonly apiUrl = `${environment.urlMultitenant}/solicitud-vacacion`;
   private socket: any;
 
-  private handleError(error: any) {
-    console.log('ERROR CAPTURADO: ', error);
-    return throwError(error);
-  }
   constructor(
     private http: HttpClient,
-    private socketService: SocketService,
-    private storageService: StorageService,
-  ) {
-    this.obtenerUrlEmpresa();
-  }
+  ) { }
 
-  async obtenerUrlEmpresa() {
-    this.apiUrl = await this.storageService.get('urlEmpresa');
-    this.socket = this.socketService.getSocket();
+  private handleError(error: HttpErrorResponse) {
+    console.error('ERROR CAPTURADO EN VACACIONES SERVICE:', error);
+
+    let mensaje = 'Error desconocido en vacaciones';
+
+    if (error.error instanceof ErrorEvent) {
+      mensaje = error.error.message;
+    } else {
+      mensaje = error.error?.message || error.message || 'Error del servidor';
+    }
+
+    return throwError(() => new Error(mensaje));
   }
 
   // Noti_realtime

@@ -6,8 +6,8 @@ import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { environment } from 'src/environments/environment';
 import { DataUserLoggedService } from '../services/data-user-logged.service';
 
-import { File, IWriteOptions } from '@ionic-native/file/ngx';
-import { FileOpener } from '@ionic-native/file-opener/ngx';
+import { File, IWriteOptions } from '@awesome-cordova-plugins/file/ngx';
+import { FileOpener } from '@awesome-cordova-plugins/file-opener/ngx';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import { StorageService } from '../services/storage.service';
