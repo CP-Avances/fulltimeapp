@@ -1,0 +1,176 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button
+        defaultHref="/reloj/solicitudes/vacacion-solicitud"
+      ></ion-back-button>
+    </ion-buttons>
+    <ion-title>Mis solicitudes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="contenedor-formulario">
+    <ion-card class="form-card" *ngIf="mostrarFormularioBusqueda">
+      <ion-card-header>
+        <ion-card-title>Consultar solicitudes</ion-card-title>
+        <ion-card-subtitle>
+          Seleccione los criterios de búsqueda
+        </ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <ion-item class="input-item">
+          <ion-label position="stacked">Fecha desde *</ion-label>
+          <ion-input type="date" [(ngModel)]="fechaDesde"> </ion-input>
+        </ion-item>
+
+        <ion-item class="input-item">
+          <ion-label position="stacked">Estado *</ion-label>
+          <ion-select
+            [(ngModel)]="estadoSeleccionado"
+            interface="popover"
+            placeholder="Seleccione el estado"
+          >
+            <ion-select-option
+              *ngFor="let estado of estados"
+              [value]="estado.valor"
+            >
+              {{ estado.etiqueta }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <div class="acciones-formulario">
+          <ion-button
+            expand="block"
+            color="primary"
+            [disabled]="cargando"
+            (click)="buscarSolicitudes()"
+          >
+            <ion-spinner *ngIf="cargando" name="crescent" slot="start">
+            </ion-spinner>
+            Buscar
+          </ion-button>
+
+          <ion-button
+            expand="block"
+            color="medium"
+            fill="outline"
+            [disabled]="cargando"
+            (click)="limpiarFormulario()"
+          >
+            Cancelar
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card
+      class="resultado-card"
+      *ngIf="busquedaRealizada && !mostrarFormularioBusqueda"
+    >
+      <ion-card-header>
+        <div class="resultado-header">
+          <div>
+            <ion-card-title>Resultado de solicitudes</ion-card-title>
+            <ion-card-subtitle>
+              {{ totalSolicitudes }} solicitud(es) encontrada(s)
+            </ion-card-subtitle>
+          </div>
+
+          <ion-button
+            size="small"
+            fill="clear"
+            color="primary"
+            (click)="volverABusqueda()"
+          >
+            Limpiar
+          </ion-button>
+        </div>
+      </ion-card-header>
+    </ion-card>
+
+    <div class="estado-carga" *ngIf="cargando">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Consultando solicitudes...</p>
+    </div>
+
+    <div
+      class="sin-resultados"
+      *ngIf="busquedaRealizada && !cargando && solicitudes.length === 0"
+    >
+      <ion-icon name="document-text-outline"></ion-icon>
+      <p>No se encontraron solicitudes con los criterios seleccionados.</p>
+    </div>
+
+    <ion-card class="solicitud-card" *ngFor="let solicitud of solicitudes">
+      <ion-card-content>
+        <div class="cabecera-solicitud">
+          <div>
+            <h2>Solicitud de vacación</h2>
+            <p>{{ solicitud.nombre_departamento || 'Sin departamento' }}</p>
+          </div>
+
+          <ion-badge [color]="estadoColor(solicitud.estado)">
+            {{ estadoTexto(solicitud.estado) }}
+          </ion-badge>
+        </div>
+
+        <div class="detalle-grid">
+          <div class="detalle-item">
+            <span>Fecha inicio</span>
+            <strong>{{ formatearFecha(solicitud.fecha_inicio) }}</strong>
+          </div>
+
+          <div class="detalle-item">
+            <span>Fecha fin</span>
+            <strong>{{ formatearFecha(solicitud.fecha_final) }}</strong>
+          </div>
+
+          <div class="detalle-item">
+            <span>Días</span>
+            <strong>{{ solicitud.numero_dias_totales || 0 }}</strong>
+          </div>
+
+          <div class="detalle-item">
+            <span>Registro</span>
+            <strong>{{ formatearFecha(solicitud.fecha_registro) }}</strong>
+          </div>
+        </div>
+
+        <div class="acciones-solicitud">
+          <ion-button
+            size="small"
+            fill="clear"
+            color="primary"
+            (click)="verSolicitud(solicitud)"
+          >
+            <ion-icon name="eye-outline" slot="start"></ion-icon>
+            Ver
+          </ion-button>
+
+          <ion-button
+            size="small"
+            fill="clear"
+            color="success"
+            (click)="editarSolicitud(solicitud)"
+          >
+            <ion-icon name="create-outline" slot="start"></ion-icon>
+            Editar
+          </ion-button>
+
+          <ion-button
+            size="small"
+            fill="clear"
+            color="danger"
+            (click)="eliminarSolicitud(solicitud)"
+          >
+            <ion-icon name="trash-outline" slot="start"></ion-icon>
+            Eliminar
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

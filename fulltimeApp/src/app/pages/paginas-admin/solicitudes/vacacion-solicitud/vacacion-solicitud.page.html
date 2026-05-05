@@ -1,14 +1,41 @@
 <ion-header>
-  <div style="padding:10% 1% 4% 1%; background: white">
-    <img class="center" style="width:45%;" src="../../../assets/images/C_FTLOGORV.png"/>
+  <div class="header-logo">
+    <img class="center" src="../../../assets/images/C_FTLOGORV.png" />
   </div>
 </ion-header>
 
-<ion-content> 
-  
-  <h5 style="text-align:center">
-    <ion-icon name="airplane-outline" slot="start"></ion-icon> Solicitar Vacaciones
-  </h5>
+<ion-content [fullscreen]="true">
+  <div class="titulo-contenedor">
+    <h5>
+      <ion-icon name="airplane-outline"></ion-icon>
+      Vacaciones
+    </h5>
+    <p>Seleccione una opción</p>
+  </div>
 
-  <app-vacacion-lista></app-vacacion-lista>
-</ion-content>
+  <div class="opciones-contenedor">
+    <ion-card class="opcion-card" button="true" (click)="irSolicitarVacacion()">
+      <ion-card-content>
+        <div class="opcion-icono">
+          <ion-icon name="add-circle-outline"></ion-icon>
+        </div>
+        <div class="opcion-texto">
+          <h2>Solicitar vacación</h2>
+          <p>Registrar una solicitud de vacación</p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="opcion-card" button="true" (click)="irMisSolicitudes()">
+      <ion-card-content>
+        <div class="opcion-icono">
+          <ion-icon name="list-outline"></ion-icon>
+        </div>
+        <div class="opcion-texto">
+          <h2>Mis solicitudes</h2>
+          <p>Consultar, editar o eliminar solicitudes</p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content> 

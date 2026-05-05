@@ -287,13 +287,7 @@ export class SolicitudesPage implements OnInit {
 
   // METODO PARA REDIRECCIONAR A LA PAGINA DE ALIMENTACION
   BtnVacaciones_click() {
-    if (this.Btn_vacaciones == true) {
-      this.router.navigateByUrl("/reloj/solicitudes/vacacion-solicitud");
-    } else if (this.Btn_vacaciones == false) {
-      this.usuarioIncorrectoToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Vacaciones.\n\nTe gustaría activarlo?");
-    } else {
-      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion. \n Comprueba tu conexion a internet o");
-    }
+    this.router.navigateByUrl("/reloj/solicitudes/vacacion-solicitud");
   }
 
   //METODO PARA CONFIGUAR EL MENSAJE DE NO ACCESO A LOS MODULOS

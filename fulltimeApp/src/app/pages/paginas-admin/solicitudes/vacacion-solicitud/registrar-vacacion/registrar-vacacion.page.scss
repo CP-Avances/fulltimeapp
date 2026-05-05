@@ -1,0 +1,160 @@
+ion-content {
+  --background: #111111;
+}
+
+.contenedor-formulario {
+  padding: 1rem;
+}
+
+.form-card {
+  border-radius: 16px;
+  background: #2b2b2b;
+  color: white;
+  box-shadow: none;
+}
+
+.form-card ion-card-title {
+  color: white;
+  font-size: 1rem;
+}
+
+.input-item {
+  --background: #3a3a3a;
+  --color: white;
+  --border-radius: 12px;
+  margin-bottom: 0.9rem;
+  border-radius: 12px;
+}
+
+ion-label {
+  color: #e8e8e8 !important;
+}
+
+ion-input,
+ion-select {
+  color: white;
+}
+
+.nota-feriados {
+  margin: 0.75rem 0 1rem 0;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  font-size: 0.85rem;
+  color: #d9d9d9;
+}
+
+.bloque-archivo {
+  margin: 1rem 0;
+}
+
+.btn-archivo {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  background: #7ee081;
+  color: white;
+  font-weight: 700;
+}
+
+.archivo-info {
+  margin-top: 0.6rem;
+  padding: 0.8rem;
+  background: #3a3a3a;
+  border-radius: 12px;
+  color: #d9d9d9;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.resumen-titulo {
+  margin: 1.2rem 0 0.7rem 0;
+  text-align: center;
+  color: #d9d9d9;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.tabla-resumen {
+  overflow-x: auto;
+  border-radius: 12px;
+  background: #3a3a3a;
+  margin-bottom: 1rem;
+}
+
+.fila {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  min-width: 560px;
+}
+
+.fila div {
+  padding: 0.8rem 0.35rem;
+  text-align: center;
+  font-size: 0.82rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cabecera div {
+  font-weight: 700;
+  color: white;
+}
+
+.total {
+  background: #2d8cff;
+  color: white;
+  font-weight: 700;
+}
+
+.seleccionado {
+  background: rgba(45, 140, 255, 0.18);
+  font-weight: 700;
+}
+
+.acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.resultado-card {
+  margin-top: 1rem;
+  background: #3a3a3a;
+  color: white;
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+.resultado-card ion-card-title {
+  color: white;
+  font-size: 0.95rem;
+}
+
+.resultado-verificacion {
+  padding: 0.9rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.resultado-verificacion.ok {
+  background: rgba(59, 179, 92, 0.18);
+  color: #8ff0a4;
+}
+
+.resultado-verificacion.error {
+  background: rgba(229, 72, 77, 0.18);
+  color: #ffb3b3;
+}
+
+.detalle-verificacion {
+  margin-top: 0.75rem;
+  color: #d9d9d9;
+  font-size: 0.85rem;
+}

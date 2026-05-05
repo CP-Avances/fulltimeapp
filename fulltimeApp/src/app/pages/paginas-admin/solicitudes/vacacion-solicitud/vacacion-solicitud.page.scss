@@ -1,70 +1,91 @@
-.radio-buttoms {
-    display: inline-flex;
-    width: 130px;
-    align-items: center;
+.header-logo {
+  padding: 10% 1% 4% 1%;
+  background: white;
 }
 
-ion-icon {
-    margin: 0px 5px
-}
-
-.center{
+.center {
   display: block;
-  margin: auto;
+  margin-left: auto;
+  margin-right: auto;
+  width: 45%;
 }
 
-.paginacion{
-  margin: auto;
-  padding-top: 2%;
-  padding-bottom: 2%;
+ion-content {
+  --background: #111111;
 }
 
-.paginacion ::ng-deep .ngx-pagination {
-  padding: 0%;
-  margin: auto;
+.titulo-contenedor {
+  text-align: center;
+  padding: 1rem 1rem 0.5rem 1rem;
+  color: white;
 }
 
-.paginacion ::ng-deep .ngx-pagination .current {
-  background: rgb(28, 133, 219);
-  color: rgb(255, 255, 255);
-  font-weight: bold;
-  border-radius: 5px;
-  padding: 0% -3% 0% -3%;
-  margin: 0% -1% 0% -1%;
-}
-  
-.paginacion :host ::ng-deep .ngx-pagination span {
-  color: rgb(177, 221, 255);
-  font-family:monospace;
-  margin: 0% -3% 0% -3%;
+.titulo-contenedor h5 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
-.paginacion ::ng-deep .ngx-pagination a{
-  background-color: transparent;
-  color: rgb(177, 221, 255);
-  margin: 0% -3% 0% -3%;
+.titulo-contenedor ion-icon {
+  margin-right: 0.35rem;
+  vertical-align: middle;
 }
 
-.icono_texto{
-  font-size: 68%;
+.titulo-contenedor p {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+  color: #cfcfcf;
+  font-size: 0.9rem;
 }
 
-.icono_texto .servicio{
-  margin-bottom: 5%;
+.opciones-contenedor {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.info{
-  margin: 0% 2% 0% 0%; 
-  font-size: 76%;
+.opcion-card {
+  margin: 0;
+  border-radius: 16px;
+  background: #2f2f2f;
+  color: white;
+  box-shadow: none;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.icono{
-  font-size: 25px; 
-  margin-bottom: -6px;
+.opcion-card ion-card-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1rem;
 }
 
-.etiqueta{
-  text-align: center; 
-  margin-top: 5%; 
-  margin-right: 4%;
+.opcion-icono {
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.opcion-icono ion-icon {
+  font-size: 1.7rem;
+  color: #ffffff;
+}
+
+.opcion-texto h2 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.opcion-texto p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #d5d5d5;
+  line-height: 1.3;
 }

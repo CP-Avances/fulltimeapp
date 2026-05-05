@@ -14,7 +14,8 @@ export class TokenInterceptorService {
   intercept(req: any, next: any) {
     const tokenizeReq = req.clone({
       setHeaders: {
-        Authorization: `Bearer ${this.relojServiceService.getToken()}`
+        Authorization: `Bearer ${this.relojServiceService.getToken()}`,
+        'x-codigo-empresa': "Prueba123"
       }
     });
     return next.handle(tokenizeReq);
