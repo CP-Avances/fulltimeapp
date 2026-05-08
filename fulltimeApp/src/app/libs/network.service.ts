@@ -17,8 +17,7 @@ export class NetworkService implements OnInit {
   private hasConnection = new BehaviorSubject(false);
 
   constructor(
-    private platform: Platform,
-    private http: HttpClient,
+    private platform: Platform
   ) {
     this.ngOnInit();
   }

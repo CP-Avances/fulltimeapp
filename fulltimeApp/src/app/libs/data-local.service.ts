@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
 import { Timbre } from '../interfaces/Timbre';
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +26,6 @@ export class DataLocalService {
 
   constructor(
     private storage: Storage,
-    private toastController: ToastController,
     public alertCrtl: AlertController,
   ) {
     this.init();

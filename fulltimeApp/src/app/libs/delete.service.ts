@@ -1,42 +1,16 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { environment } from '../../environments/environment';
-import { catchError, tap } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { ToastController } from '@ionic/angular';
 
 @Injectable({
     providedIn: 'root'
 })
+
 export class DeleteService {
 
-    private apiUrl = environment.url
-
-    private handleError(error: any) {
-        console.log('ERROR CAPTURADO: ', error);
-        return throwError(error);
-    }
-
     constructor(
-        private http: HttpClient,
         private toastController: ToastController,
     ) { }
 
-    // METODO PARA ELIMINAR LAS SOLICITUDES
-    EliminarRegistro(idreg: string, nametable: string,user_name:  string, ip:  string, ip_local: any) {
-        const params = new HttpParams()
-            .set('nametable', nametable)
-            .set('idreg', idreg)
-            .set('user_name', user_name)
-            .set('ip', ip)
-            .set('ip_local', ip_local)
-
-        return this.http.delete<any>(`${this.apiUrl}/delete/registro`, { params })
-            .pipe(
-                tap(console.log),
-                catchError(this.handleError)
-            )
-    }
 
     async showToast(mensaje: string, duracion: number, color: string) {
 

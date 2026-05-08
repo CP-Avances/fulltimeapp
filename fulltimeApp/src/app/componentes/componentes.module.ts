@@ -14,12 +14,8 @@ import { EmpleadosService } from '../services/empleados.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { RangoFechasComponent } from './rango-fechas/rango-fechas.component';
 import { CloseModalComponent } from './close-modal/close-modal.component';
-import { SaveRegisterComponent } from './accion-buttons/save-register/save-register.component';
-import { SearchRegisterComponent } from './accion-buttons/search-register/search-register.component';
-import { UpdateRegisterComponent } from './accion-buttons/update-register/update-register.component';
 import { RefreshInfoComponent } from './refresh-info/refresh-info.component';
 import { ListaNotificacionComponent } from './lista-notificaciones/lista-notificacion.component';
-import { PestaniasEstadosComponent } from './pestaniasEstados/pestaniasEstados.component';
 
 
 @NgModule({
@@ -27,26 +23,18 @@ import { PestaniasEstadosComponent } from './pestaniasEstados/pestaniasEstados.c
         NavegadorAdminComponent,
         NotificacionPopoverComponent,
         CloseModalComponent,
-        SaveRegisterComponent,
-        SearchRegisterComponent,
-        UpdateRegisterComponent,
         RefreshInfoComponent,
         ListaEmpleadosComponent,
         ListaNotificacionComponent,
-        PestaniasEstadosComponent,
         RangoFechasComponent,
     ],
     exports: [
         NavegadorAdminComponent,
         NotificacionPopoverComponent,
         CloseModalComponent,
-        SaveRegisterComponent,
-        SearchRegisterComponent,
-        UpdateRegisterComponent,
         RefreshInfoComponent,
         ListaEmpleadosComponent,
         ListaNotificacionComponent,
-        PestaniasEstadosComponent,
         RangoFechasComponent,
     ],
     imports: [

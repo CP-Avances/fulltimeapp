@@ -20,11 +20,7 @@ const routes: Routes = [
   {
     path: 'timbresConNovedades',
     loadChildren: () => import('./reporte-timbresConNovedades/reporte-timbresConNovedades.module').then(m => m.ReporteTimbresConNovedadesPageModule)
-  },
-  {
-    path: 'vacaciones',
-    loadChildren: () => import('./reporte-vacaciones/reporte-vacaciones.module').then(m => m.ReporteVacacionesPageModule)
-  },
+  }
 ];
 
 @NgModule({

@@ -5,7 +5,6 @@ import { IonicModule } from '@ionic/angular';
 //modulo paginacion
 import {NgxPaginationModule} from 'ngx-pagination';
 import { ComponentesModule } from '../componentes/componentes.module';
-import { ModulopipesModule } from '../pipes/modulopipes.module';
 import { VerHorariosEmpleadosComponent } from './ver-horarios-empleados/ver-horarios-empleados.component';
 import { TimbreJustificadoComponent } from './timbre-justificado/timbre-justificado.component';
 import { VerTimbreEmpleadoComponent } from './ver-timbre-empleado/ver-timbre-empleado.component';
@@ -14,7 +13,6 @@ import { EnviarUsuarioComponent } from '../pages/paginas-admin/comunicado/enviar
 // componente modals Reporteria
 import { ReporteTimbreComponent } from './reporte-timbre/reporte-timbre.component';
 import { ReporteTimbreConNovedadesComponent } from './reporte-timbreConNovedades/reporte-timbreConNovedades.component';
-import { ReporteVacacionComponent } from './reporte-vacacion/reporte-vacacion.component';
 import { VerImagenModalPage } from './ver-timbre-empleado/ver-imagen/ver-imagen.component';
 
 
@@ -27,7 +25,6 @@ import { VerImagenModalPage } from './ver-timbre-empleado/ver-imagen/ver-imagen.
     EnviarUsuarioComponent,
     ReporteTimbreComponent,
     ReporteTimbreConNovedadesComponent,
-    ReporteVacacionComponent,
     VerImagenModalPage
   ],
   exports:[
@@ -37,7 +34,6 @@ import { VerImagenModalPage } from './ver-timbre-empleado/ver-imagen/ver-imagen.
     EnviarUsuarioComponent,
     ReporteTimbreComponent,
     ReporteTimbreConNovedadesComponent,
-    ReporteVacacionComponent,
     VerImagenModalPage
   ],
   imports: [
@@ -45,7 +41,6 @@ import { VerImagenModalPage } from './ver-timbre-empleado/ver-imagen/ver-imagen.
     FormsModule,
     IonicModule,
     ComponentesModule,
-    ModulopipesModule,
     NgxPaginationModule
   ],
 })

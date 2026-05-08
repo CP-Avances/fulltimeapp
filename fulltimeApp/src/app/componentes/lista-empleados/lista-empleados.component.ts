@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { EmpleadosService } from '../../services/empleados.service';
 import { ModalController, ToastController } from '@ionic/angular';
-import { Empleado } from 'src/app/interfaces/Usuario';
 
 import { LoadingController, IonInfiniteScroll } from '@ionic/angular';
 
