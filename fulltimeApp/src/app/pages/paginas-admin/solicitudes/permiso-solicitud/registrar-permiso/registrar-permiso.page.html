@@ -98,15 +98,15 @@
 
         <ion-item class="input-item">
           <ion-label position="stacked">Tipo de descuento</ion-label>
-          <ion-input [value]="obtenerTipoSeleccionado()?.tipo_descuento || '—'" readonly></ion-input>
+          <ion-input [value]="obtenerTipoSeleccionado()?.tipo_descuento || 'NINGUNO'" readonly></ion-input>
         </ion-item>
 
         <ion-item
           class="input-item"
-          *ngIf="obtenerTipoSeleccionado()?.tipo_descuento === 'VACACIONES'">
+          *ngIf="esDescuentoVacaciones(obtenerTipoSeleccionado())">
 
           <ion-label position="stacked">Saldo de vacaciones</ion-label>
-          <ion-input [value]="saldoVacacionesVisible" readonly></ion-input>
+          <ion-input [value]="cargandoSaldo ? 'Cargando...' : saldoVacacionesVisible" readonly></ion-input>
         </ion-item>
 
         <div class="nota-feriados" *ngIf="tipoPermisoSeleccionado">
