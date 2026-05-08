@@ -114,14 +114,8 @@ interface opcionesDiasHoras {
     message: string
 }
 
-interface opcionesTipoPermiso {
-    label: string,
-    id: number,
-    message: string,
-}
 
 export const diasHoras: opcionesDiasHoras[] = [
     { label: 'Días', value: 'Días', message: 'Ingrese el rango de días a Solicitar' },
     { label: 'Horas', value: 'Horas', message: 'Ingrese el rango de horas y minutos a Solicitar' },
-    //{ label: 'Días y Horas', value: 'Días y Horas', message: 'Ingrese el rango de días y horas a Solicitar' },
 ];

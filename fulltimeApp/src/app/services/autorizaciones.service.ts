@@ -22,6 +22,7 @@ export class AutorizacionesService {
     console.log('ERROR CAPTURADO: ', error);
     return throwError(error);
   }
+  
   constructor(
     private http: HttpClient,
     private storageService: StorageService,
@@ -140,29 +141,6 @@ export class AutorizacionesService {
       )
   }
 
-  getAutorizacionHoraExtra(id_hora_extra: number): Observable<Autorizacion> {
-    const url = `${this.apiUrl}/autorizaciones/`;
-    const params = new HttpParams()
-      .set('id_auto', id_hora_extra)
-      .set('campo', 'id_hora_extra')
-    return this.http.get<Autorizacion>(url, { params })
-      .pipe(
-        tap(console.log),
-        catchError(this.handleError)
-      )
-  }
-
-  putAutorizacionHoraExtra(id_hora_extra: number, data: any): Observable<Autorizacion> {
-    const url = `${this.apiUrl}/autorizaciones/estado`;
-    const params = new HttpParams()
-      .set('id_auto', id_hora_extra)
-      .set('campo', 'id_hora_extra')
-    return this.http.put<Autorizacion>(url, data, { params })
-      .pipe(
-        tap(console.log),
-      )
-  }
-
   putAutorizacionVacacion(id_vacacion: number, data: any): Observable<Autorizacion> {
     const url = `${this.apiUrl}/autorizaciones/estado`;
     const params = new HttpParams()
@@ -253,21 +231,6 @@ export class AutorizacionesService {
       )
   }
 
-  EnviarCorreoHoraExtra(id_empresa: number, data: any): Observable<any> {
-    const url = `${this.apiUrl}/horas-extras-pedidas/mail-noti-horas-extras-movil/${id_empresa}`;
-    return this.http.post<any>(url, data)
-      .pipe(
-        tap(console.log)
-      )
-  }
-
-  EnviarCorreoSolAlimentacion(id_empresa: number, data: any): Observable<any> {
-    const url = `${this.apiUrl}/planComidas/mail-noti-solicitud-comida-movil/${id_empresa}`;
-    return this.http.post<any>(url, data)
-      .pipe(
-        tap(console.log)
-      )
-  }
 
   /******************************************************
    *

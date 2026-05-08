@@ -14,6 +14,8 @@ import { UrlService } from './url.service';
 export class RelojServiceService {
   private URL = '';
 
+  private readonly apiUrl = `${environment.urlMultitenant}`;
+
   constructor(
     private http: HttpClient,
     private navCtroller: NavController,
@@ -33,38 +35,35 @@ export class RelojServiceService {
 
   //  METODO PARA OBTENER LOS USUARIOS DE LA EMPRESA
   obtenerUsuarioEmpresa() {
-    return this.http.get<any>(this.URL + '/usuarios/usuarioEmpresa');
+    return this.http.get<any>(this.apiUrl + '/usuarios/usuarioEmpresa');
   }
+
   // METODO PARA OBTENER LA INFORMACION DEL USUARIO
   obtenerUsuario(idUser: any) {
-    return this.http.get<any>(this.URL + '/usuarios/usuario/' + idUser);
+    return this.http.get<any>(this.apiUrl + '/usuarios/usuario/' + idUser);
   }
 
   // METODO PARA INICIAR SESION
   async iniciarSesion(user: any) {
-    const response = await firstValueFrom( this.http.post<any>(`${this.URL}/login`, user))
+    const response = await firstValueFrom(this.http.post<any>(`${this.URL}/login`, user))
     return response;
   }
 
   // METODO PARA REGISTRAR EL DISPOSITIVO
-  registrarCelularUsuario(id_empleado: any, id_celular: any, modelo_dispositivo: any, user_name: any, ip: any, terminos_condiciones: boolean, ip_local: any) {
-    return this.http.post<any>(this.URL + '/usuarios/ingresarIDdispositivo', { id_empleado, id_celular, modelo_dispositivo, user_name, ip, terminos_condiciones, ip_local });
+  registrarCelularUsuario(id_empleado: any, id_celular: any, modelo_dispositivo: any, terminos_condiciones: boolean) {
+    return this.http.post<any>(this.apiUrl + '/api/movil-dispositivos/ingresarIDdispositivo', { id_empleado, id_celular, modelo_dispositivo, terminos_condiciones });
   }
 
   // BUSCAR EL DISPOSITIVO POR ID DEL EMPLEADO
   obtenerIdDispositivosUsuario(id_empleado: number | string) {
-    return this.http.get<any>(this.URL + '/usuarios/IDdispositivos/' + id_empleado);
+    return this.http.get<any>(this.apiUrl + '/api/movil-dispositivos/IDdispositivos/' + id_empleado);
   }
 
   // BUSCAR EL DISPOSITIVO POR ID DEL DISPOSITIVO
   obtenerDispositivoPorID(id_dispositivo: number | string) {
-    return this.http.post<any>(this.URL + '/usuarios/dispositivo/idDispositivo', { id_dispositivo });
+    return this.http.post<any>(this.apiUrl + '/api/movil-dispositivos/dispositivo/idDispositivo', { id_dispositivo });
   }
 
-  // METODO PARA OBTENER EL DEPARTAMENTO DEL EMPLEADO POR SU ID
-  ObtenerDepartamentoUsuarios(id_empleado: number) {
-    return this.http.get(this.URL + '/user/dato/' + id_empleado);
-  }
 
   // VERIFICAR EXISTENCIA DE INICIO DE SESION
   estaLogueado() {
@@ -107,8 +106,8 @@ export class RelojServiceService {
   }
 
   // METODO PARA OBTENER LOS DATOS DE LA EMPRESA
-  obtenerDatosEmpresa(id: any) {
-    return this.http.get(`${this.URL}/empresas/buscar/datos/${id}`);
+  obtenerDatosEmpresa() {
+    return this.http.get<any>(`${this.apiUrl}/api/empresa/buscar/datos`);
   }
 
   // TIMBRE
@@ -163,7 +162,7 @@ export class RelojServiceService {
   }
 
   //SELECTOR DE EMPRESAS
-  validarEmpresa(codigoEmpresa: string){
+  validarEmpresa(codigoEmpresa: string) {
     const empresa = {
       codigo_empresa: codigoEmpresa,
     }

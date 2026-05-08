@@ -48,40 +48,7 @@
       </ion-card>
     </ion-list>
 
-    <ion-list mode="md" *ngIf="app_vacuna.id_tipo_vacuna != ''" style="background-color: transparent;">
-      <ion-list-header>
-        <ion-label>
-          <h1 style="font-size: 120%"><b> HISTORIAL DE VACUNAS </b></h1>
-        </ion-label>
-      </ion-list-header>
-      <ion-card>
-        <ion-list>
-          <ion-item>
-            <ion-label>Descripción: </ion-label>
-            <ion-label slot="end">{{app_vacuna.descripcion}}</ion-label>
-          </ion-item>
-          <ion-item>
-            <ion-label>Fecha:</ion-label>
-            <ion-label slot="end">{{fecha_}}</ion-label>
-          </ion-item>
-          <ion-item>
-            <ion-label>Vacuna:</ion-label>
-            <ion-label slot="end">{{app_vacuna.nombre}}</ion-label>
-          </ion-item>
-          <ion-item
-            *ngIf="app_vacuna.nom_carnet != null && app_vacuna.nom_carnet != '' && app_vacuna.nom_carnet != undefined">
-            <ion-label>Carnet:</ion-label>
-            <ion-label slot="end">
-              <a href="http://186.71.19.82:3001/vacunas/documentos/{{app_vacuna.carnet}}"> {{app_vacuna.nom_carnet}}
-              </a>
-            </ion-label>
-          </ion-item>
-        </ion-list>
-
-      </ion-card>
-    </ion-list>
-
-
+    
     <ion-list mode="md" style="margin-bottom: 1%; background-color: transparent;">
       <ion-list-header>
         <ion-label>
@@ -102,14 +69,14 @@
         <ion-avatar slot="start">
           <ion-icon name="person-circle-outline" color="theme" style="font-size: 30px;"></ion-icon>
         </ion-avatar>
-        <ion-label *ngIf="e.id_rol==1 || e.id_rol==2">
+        <ion-label *ngIf="e.id_rol==1">
           <h2> {{e.fullname}}</h2>
           <ion-text color="success">
             <p color="success"> {{e.name_rol}} </p>
           </ion-text>
 
         </ion-label>
-        <ion-label *ngIf="e.id_rol>2 ">
+        <ion-label *ngIf="e.id_rol>1 ">
           <h2> {{e.fullname}}</h2>
           <ion-text color="theme">
             <p color="theme"> {{e.name_rol}} </p>
@@ -169,7 +136,7 @@
         No tiene conexión a internet
       </ion-text>
       <br>
-      <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;"  *ngIf="!serverConnected">
+      <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;" *ngIf="!serverConnected">
         No tiene conexión al servidor
       </ion-text>
     </div>

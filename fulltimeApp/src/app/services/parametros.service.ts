@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 // SERVICIOS
 import { StorageService } from './storage.service';
 import { UrlService } from './url.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -12,17 +13,18 @@ import { UrlService } from './url.service';
 export class ParametrosService {
 
   private apiUrl = '';
+  private readonly apiUrlM = `${environment.urlMultitenant}`;
 
   constructor(
     private http: HttpClient,
     private storageService: StorageService,
     private urlService: UrlService,
-    ) {
-      this.urlService.getUrl().subscribe(url => {
-        if (url) this.apiUrl = url; // Se actualiza automáticamente cuando cambia la URL
-      });
-      this.obtenerUrlEmpresa();
-    }
+  ) {
+    this.urlService.getUrl().subscribe(url => {
+      if (url) this.apiUrl = url; // Se actualiza automáticamente cuando cambia la URL
+    });
+    this.obtenerUrlEmpresa();
+  }
 
   async obtenerUrlEmpresa() {
     this.apiUrl = await this.storageService.get('urlEmpresa');
@@ -41,7 +43,7 @@ export class ParametrosService {
 
   // METODO PARA OBTENER LOS DETALLES DE PARAMETROS POR ID
   ObtenerDetalleParametroUsuario(datos: any) {
-    return this.http.post<any>(`${this.apiUrl}/timbres/listar-opciones-timbre`, datos);
+    return this.http.post<any>(`${this.apiUrlM}/timbres/listar-opciones-timbre`, datos);
   }
 
   // METODO PARA OBTENER LOS FORMATOS DE LAS FECHAS
@@ -51,7 +53,7 @@ export class ParametrosService {
 
   // METODO PARA OBTENER LAS COORDENADAS DE UNA UBICACION REGISTRADA
   ObtenerCoordenadas(data: any) {
-    return this.http.post<any>(`${this.apiUrl}/parametrizacion/coordenadas`, data);;
+    return this.http.post<any>(`${this.apiUrlM}/parametrizacion/coordenadas`, data);;
   }
 
   // METODO PARA OBTENER LA UBICACION REGISTRADA AL EMPLEADO

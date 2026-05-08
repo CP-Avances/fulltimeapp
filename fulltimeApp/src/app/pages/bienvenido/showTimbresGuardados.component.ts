@@ -110,12 +110,12 @@ export class TimbresPerdidosComponent implements OnInit {
   ips_locales: any = '';
 
   // METODO PARA LEER LOS timbresPerdidosStorage
-public get timbres(): Timbre[] {
-  return [
-    ...this.dataLocalService.timbresPerdidosStorage,
-    ...this.dataLocalService.timbresStorage
-  ];
-}
+  public get timbres(): Timbre[] {
+    return [
+      ...this.dataLocalService.timbresPerdidosStorage,
+      ...this.dataLocalService.timbresStorage
+    ];
+  }
 
 
   loadingBtn: boolean = false;
@@ -151,21 +151,45 @@ public get timbres(): Timbre[] {
   }
 
   BuscarParametroTimbreUbicacionDesconocida() {
-    let buscar = {
-      ids_empleados: [parseInt(localStorage.getItem("empleadoID"), 10)],
+    const empleadoID = parseInt(localStorage.getItem("empleadoID") ?? "0", 10);
+
+    const buscar = {
+      ids_empleados: [empleadoID],
     };
-    this.restP.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(3000)).subscribe(
-      res => {
-        const timbreFoto = res.respuesta[0].timbre_ubicacion_desconocida;
-        console.log("ver parametro de ubicacion desconocida", timbreFoto);
-        const resultado = timbreFoto ? 'Si' : 'No';
-        localStorage.setItem('timbrarUbicacionDesconocida', resultado);
-      },
-      error => {
-        console.log('Error 404 Not Found');
-        localStorage.setItem('timbrarUbicacionDesconocida', 'No');
-      }
-    );
+
+    this.restP.ObtenerDetalleParametroUsuario(buscar)
+      .pipe(timeout(3000))
+      .subscribe(
+        res => {
+          console.log('res ubicación desconocida', res);
+
+          const parametro = res.data?.[0];
+
+          if (!parametro) {
+            console.warn(
+              'No existen parámetros de ubicación desconocida para el empleado:',
+              empleadoID
+            );
+
+            localStorage.setItem('timbrarUbicacionDesconocida', 'No');
+            return;
+          }
+
+          const timbreUbicacionDesconocida = parametro.timbre_ubicacion_desconocida;
+
+          console.log(
+            "ver parametro de ubicacion desconocida",
+            timbreUbicacionDesconocida
+          );
+
+          const resultado = timbreUbicacionDesconocida ? 'Si' : 'No';
+          localStorage.setItem('timbrarUbicacionDesconocida', resultado);
+        },
+        error => {
+          console.log('Error al obtener parámetro de ubicación desconocida', error);
+          localStorage.setItem('timbrarUbicacionDesconocida', 'No');
+        }
+      );
   }
 
 
@@ -230,7 +254,7 @@ public get timbres(): Timbre[] {
     this.restP.ObtenerCoordenadas(informacion).pipe(timeout(3000)).subscribe(
       res => {
         console.log("entrando a ObtenerCoordenadas en CompararCoordenadas ");
-        if (res[0].verificar === 'ok') {
+        if (res.data[0].verificar === 'ok') {
           console.log("CON COORDENADAS");
 
           this.contar = this.contar + 1;
@@ -304,7 +328,7 @@ public get timbres(): Timbre[] {
         informacion.lat2 = res[0].latitud;
         informacion.lng2 = res[0].longitud;
         this.restP.ObtenerCoordenadas(informacion).subscribe(resu => {
-          if (resu[0].verificar === 'ok') {
+          if (resu.data[0].verificar === 'ok') {
             timbre.ubicacion = "DOMICILIO";
             this.EnviarTimbres(this.latitud, this.longitud, timbre);
           }

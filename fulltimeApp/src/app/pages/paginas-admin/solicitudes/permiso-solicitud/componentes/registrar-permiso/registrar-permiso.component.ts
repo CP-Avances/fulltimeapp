@@ -15,7 +15,6 @@ import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
 import { CatalogosService } from 'src/app/services/catalogos.service';
 import { PermisosService } from 'src/app/services/permisos.service';
-import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { VacacionesService } from 'src/app/services/vacaciones.service';
 import { Vacacion } from 'src/app/interfaces/Vacacion';
 import { ParametrosService } from 'src/app/services/parametros.service';
@@ -106,7 +105,6 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
   constructor(
     private validaciones: ValidacionesService,
     private permisoService: PermisosService,
-    private horasExtrasService: HorasExtrasService,
     private vacacionService: VacacionesService,
     private empleadoService: EmpleadosService,
     private autorizaciones: AutorizacionesService,
@@ -744,8 +742,8 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
     }
 
     var data = {
-      fecha_inicio:  DateTime.fromISO(this.reg.fecha_inicio).toFormat('yyyy-MM-d'),
-      fecha_final:  DateTime.fromISO(this.reg.fecha_final).toFormat('yyyy-MM-d'),
+      fecha_inicio: DateTime.fromISO(this.reg.fecha_inicio).toFormat('yyyy-MM-d'),
+      fecha_final: DateTime.fromISO(this.reg.fecha_final).toFormat('yyyy-MM-d'),
       id_empleado: this.reg.id_empleado
     }
 
@@ -774,30 +772,16 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
             return false
           }
           else {
-            this.horasExtrasService.getlistaHorasExtrasByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
+            this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
               if (solicitados.length != 0) {
                 this.reg.dias_permiso = null;
                 this.reg.dia_libre = null;
                 this.reg.horas_permiso = null;
-                this.validaciones.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
+                this.validaciones.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
                 return false
               }
               else {
-                this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
-                  if (solicitados.length != 0) {
-                    this.reg.dias_permiso = null;
-                    this.reg.dia_libre = null;
-                    this.reg.horas_permiso = null;
-                    this.validaciones.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
-                    return false
-                  }
-                  else {
-                    this.calcularhoras();
-                  }
-                }, err => {
-                  this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
-                });
-
+                this.calcularhoras();
               }
             }, err => {
               this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
@@ -816,30 +800,16 @@ export class RegistrarPermisoComponent implements OnInit, OnDestroy {
             return false
           }
           else {
-            this.horasExtrasService.getlistaHorasExtrasByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
+            this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
               if (solicitados.length != 0) {
                 this.reg.dias_permiso = null;
                 this.reg.dia_libre = null;
                 this.reg.horas_permiso = null;
-                this.validaciones.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
+                this.validaciones.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
                 return false
               }
               else {
-                this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
-                  if (solicitados.length != 0) {
-                    this.reg.dias_permiso = null;
-                    this.reg.dia_libre = null;
-                    this.reg.horas_permiso = null;
-                    this.validaciones.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
-                    return false
-                  }
-                  else {
-                    this.calcularhoras();
-                  }
-                }, err => {
-                  this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
-                });
-
+                this.calcularhoras();
               }
             }, err => {
               this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');

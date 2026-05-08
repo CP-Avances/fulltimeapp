@@ -77,7 +77,7 @@ export class ReporteTimbreComponent implements OnInit {
     this.data.fullname = localStorage.getItem('nom') + ' ' + localStorage.getItem('ap')
     this.BuscarFormatos();
 
-    this.obtenerDatosEmpresa(localStorage.getItem('id_empresa'));
+    this.obtenerDatosEmpresa();
     this.ObtenerLogo();
     this.ObtenerColores();
     this.bordeCompleto = {
@@ -110,15 +110,17 @@ export class ReporteTimbreComponent implements OnInit {
   }
 
   // METODOS PARA OBTENER LOS DATOS DE LA EMPRESA
-  obtenerDatosEmpresa(idEmpresa: any) {
-    this.relojService.obtenerDatosEmpresa(idEmpresa).subscribe(
-      res => {
-        this.empresa = res[0];
-        this.cargaEmpresaCompleta = true;
-        this.verificarCargaCompleta();
-      },
-      err => {
-        console.log(err);
+  obtenerDatosEmpresa() {
+    this.relojService.obtenerDatosEmpresa().subscribe(
+      {
+        next: res => {
+          this.empresa = res.data;
+          this.cargaEmpresaCompleta = true;
+          this.verificarCargaCompleta();
+        },
+        error: err => {
+          console.log(err);
+        }
       }
     );
   }
@@ -215,7 +217,7 @@ export class ReporteTimbreComponent implements OnInit {
         this.verificarCargaCompleta();
       },
       err => {
-        this.cargaLogoCompleta = true; 
+        this.cargaLogoCompleta = true;
         this.verificarCargaCompleta();
       }
     );

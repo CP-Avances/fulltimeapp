@@ -56,10 +56,6 @@ export class NotificacionesService {
     return this.http.put(`${this.apiUrl}/timbres/noti-timbres/vista/${id_noti_timbre}`, datos);
   }
 
-  // ALERTAS DE NOTIFICACIÓN DE SOLICITUD DE SERVICIO DE ALIMENTACIÓN
-  EnviarMensajePlanComida(data: any) {
-    return this.http.post<any>(`${this.apiUrl}/notificaciones/send/comida/`, data);
-  }
 
   // ALERTAS DE NOTIFICACIÓN DE COMUNICADOS
   EnviarMensajeComunicado(data: any) {

@@ -10,17 +10,6 @@ export const estadoSelectItems: EstadoSolicitudes[] = [
     { id: 4, nombre: 'Negado' },
 ];
 
-export interface EstadoAlimentacionSol {
-    id: boolean,
-    nombre: string
-}
-
-export const estadosAlimentacionSelectItems: EstadoAlimentacionSol[] = [
-   // { id: null, nombre: 'Pendiente' },
-    { id: true, nombre: 'Autorizado' },
-    { id: false, nombre: 'Negado' },
-];
-
 interface EstadoBoolean {
     label: string,
     value: boolean

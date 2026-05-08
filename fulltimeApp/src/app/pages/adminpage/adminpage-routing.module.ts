@@ -77,14 +77,6 @@ const routes: Routes = [
         loadChildren: () => import('../paginas-admin/aprobar-vacaciones/aprobar-vacaciones.module').then(m => m.AprobarVacacionesPageModule)
       },
       {
-        path: 'aprobar-horas-extras',
-        loadChildren: () => import('../paginas-admin/aprobar-horas-extras/aprobar-horas-extras.module').then(m => m.AprobarHorasExtrasPageModule)
-      },
-      {
-        path: 'aprobar-alimentacion',
-        loadChildren: () => import('../paginas-admin/aprobar-alimentacion/aprobar-alimentacion.module').then(m => m.AprobarAlimentacionPageModule)
-      },
-      {
         path: 'reportes',
         loadChildren: () => import('../paginas-admin/reportes/reportes.module').then(m => m.ReportesPageModule)
       },

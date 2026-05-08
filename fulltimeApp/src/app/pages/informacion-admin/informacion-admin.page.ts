@@ -8,7 +8,7 @@ import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ModalController, Platform, ToastController } from '@ionic/angular';
 import { InformacionEmpleadoPage } from '../informacion-empleado/informacion-empleado.page';
 import { NetworkService } from '../../libs/network.service';
-import { ConnectivityService } from '../../services/conexion-servidor.service'  
+import { ConnectivityService } from '../../services/conexion-servidor.service'
 
 @Component({
   selector: 'app-informacion-admin',
@@ -58,10 +58,6 @@ export class InformacionAdminPage implements OnInit {
     return localStorage.getItem("version")
   }
 
-  public get app_vacuna(): any {
-    return this.dataUser.dataVacuna
-  }
-
   ver: boolean = true;
 
   constructor(
@@ -92,7 +88,7 @@ export class InformacionAdminPage implements OnInit {
     console.log("Esta conectado: ", this.isConnected)
     if (!this.isConnected) {
     } else {
-      this.obtenerDatosEmpresa(localStorage.getItem('id_empresa'));
+      this.obtenerDatosEmpresa();
       this.searchEmpleado = this.empleados;
       this.BuscarFormatos();
       console.log('conectado');
@@ -121,8 +117,7 @@ export class InformacionAdminPage implements OnInit {
       resp => {
         this.formato_fecha = resp.fecha;
         this.formato_hora = resp.hora;
-        this.fecha_ = this.validar.FormatearFecha(this.dataUser.dataVacuna.fecha, this.formato_fecha, this.validar.dia_completo);
-        console.log("ver fecha",localStorage.getItem("caducidad_licencia"))
+        console.log("ver fecha", localStorage.getItem("caducidad_licencia"))
         console.log("ver fecha de caducidad licencia", localStorage.getItem("caducidad_licencia"))
         this.caduca_ = this.validar.FormatearFecha(localStorage.getItem("caducidad_licencia"), this.formato_fecha, this.validar.dia_completo);
       },
@@ -133,16 +128,18 @@ export class InformacionAdminPage implements OnInit {
   }
 
   // METODO PARA OBTENER LOS DATOS DE LA EMPRESA
-  obtenerDatosEmpresa(idEmpresa: any) {
-    this.relojService.obtenerDatosEmpresa(idEmpresa).subscribe(
-      res => {
-        console.log("ver datos empresa", res)
-        console.log(res);
-        this.empresa = res[0];
-        this.obtenerEmpleados();
-      },
-      err => {
-        console.log(err)
+  obtenerDatosEmpresa() {
+    this.relojService.obtenerDatosEmpresa().subscribe(
+      {
+        next: res => {
+          console.log("ver datos empresa", res.data)
+          console.log(res);
+          this.empresa = res.data;
+          this.obtenerEmpleados();
+        },
+        error: err => {
+          console.log(err)
+        }
       }
     );
   }

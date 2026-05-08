@@ -13,16 +13,8 @@ const routes: Routes = [
     loadChildren: () => import('../aprobar-permisos/aprobar-permisos.module').then( m => m.AprobarPermisosPageModule)
   },
   {
-    path: 'hora-extra-aprobacion',
-    loadChildren: () => import('../aprobar-horas-extras/aprobar-horas-extras.module').then( m => m.AprobarHorasExtrasPageModule)
-  },
-  {
     path: 'vacacion-aprobacion',
     loadChildren: () => import('../aprobar-vacaciones/aprobar-vacaciones.module').then( m => m.AprobarVacacionesPageModule)
-  },
-  {
-    path: 'alimentacion-aprobacion',
-    loadChildren: () => import('../aprobar-alimentacion/aprobar-alimentacion.module').then( m => m.AprobarAlimentacionPageModule)
   },
   {
     path: '',

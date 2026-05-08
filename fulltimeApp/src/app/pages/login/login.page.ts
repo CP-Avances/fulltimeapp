@@ -60,7 +60,7 @@ export class LoginPage implements OnInit {
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
-    // this.obtenerInfoTerminosCondiciones();
+    this.obtenerInfoTerminosCondiciones();
     this.BuscarParametroTimbreUbicacionDesconocida();
     if (!this.relojService.esPrimeraVez()) {
       this.navCtroller.navigateForward(['inicio']);
@@ -75,20 +75,30 @@ export class LoginPage implements OnInit {
   rango_dispositivos: any;
 
 
-  // METODO PARA OBTNER PARAMETRO DE UBICACION DESCONOCIDA
+  // METODO PARA OBTENER PARAMETRO DE UBICACION DESCONOCIDA
   BuscarParametroTimbreUbicacionDesconocida() {
-    let buscar = {
-      ids_empleados: [parseInt(localStorage.getItem("empleadoID"), 10)],
+    const empleadoID = parseInt(localStorage.getItem("empleadoID") ?? "0", 10);
+
+    const buscar = {
+      ids_empleados: [empleadoID],
     };
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
-        const timbreFoto = res.respuesta[0].timbre_ubicacion_desconocida;
-        const resultado = timbreFoto ? 'Si' : 'No';
-        localStorage.setItem('timbrarUbicacionDesconocida', resultado);
+        const parametro = res.data?.[0];
+
+        if (!parametro) {
+          localStorage.setItem("timbrarUbicacionDesconocida", "No");
+          return;
+        }
+
+        const timbreUbicacionDesconocida = parametro.timbre_ubicacion_desconocida;
+        const resultado = timbreUbicacionDesconocida ? "Si" : "No";
+
+        localStorage.setItem("timbrarUbicacionDesconocida", resultado);
       },
       error => {
-        localStorage.setItem('timbrarUbicacionDesconocida', 'No');
+        localStorage.setItem("timbrarUbicacionDesconocida", "No");
       }
     );
   }
@@ -104,26 +114,27 @@ export class LoginPage implements OnInit {
   }
 
   // METODO PARA CONTROLAR LA ACPETACION DE TERMINOS Y CONDICIONES
-  // obtenerInfoTerminosCondiciones() {
-  //   this.infoDispositivo();
-  //   Device.getId().then((id) => {
-  //     this.relojService.obtenerDispositivoPorID(id.identifier).subscribe(
-  //       dispositivos => {
-  //         if (dispositivos.terminos_condiciones != null) {
-  //           this.aceptaTerminos = dispositivos.terminos_condiciones;
-  //           this.mostrarCheckboxInicialmente = this.aceptaTerminos;
-  //         } else {
-  //           this.aceptaTerminos = false;
-  //         }
-  //         console.log("TERMINOS Y CONDICIONES", this.aceptaTerminos);
-  //       }, error => {
-  //         this.aceptaTerminos = false;
-  //         console.log("TERMINOS Y CONDICIONES", this.aceptaTerminos);
-  //       }
-  //     )
-  //   });
+  obtenerInfoTerminosCondiciones() {
+    this.infoDispositivo();
+    Device.getId().then((id) => {
+      this.relojService.obtenerDispositivoPorID(id.identifier).subscribe(
+        dispositivos => {
+          console.log('ingresa en terminos')
+          if (dispositivos.terminos_condiciones != null) {
+            this.aceptaTerminos = dispositivos.terminos_condiciones;
+            this.mostrarCheckboxInicialmente = this.aceptaTerminos;
+          } else {
+            this.aceptaTerminos = false;
+          }
+          console.log("TERMINOS Y CONDICIONES", this.aceptaTerminos);
+        }, error => {
+          this.aceptaTerminos = false;
+          console.log("TERMINOS Y CONDICIONES", this.aceptaTerminos);
+        }
+      )
+    });
 
-  // }
+  }
 
   mostrarPassword(): void {
     this.verPassword = !this.verPassword;
@@ -387,16 +398,12 @@ export class LoginPage implements OnInit {
 
   // METODO PARA REGISTRAR EL DISPOSITIVO
   registrarIdDispositivoenBDD(id_celular: any, model_dispositivo: any) {
-    // this.obtenerInfoTerminosCondiciones();
+    this.obtenerInfoTerminosCondiciones();
     console.log('aceptaTerminos:', this.aceptaTerminos); // Depuración
 
     const id_usuario = localStorage.getItem('empleadoID');
-    var ip = localStorage.getItem('ip');
 
-    var user_name = this.userService.username;
-    var ip_local = this.ips_locales;
-
-    this.relojService.registrarCelularUsuario(id_usuario, id_celular, model_dispositivo, user_name, ip, true, ip_local).subscribe(
+    this.relojService.registrarCelularUsuario(id_usuario, id_celular, model_dispositivo, true).subscribe(
       res => {
         localStorage.setItem('UidDispositivo', id_celular);
         res.id_empleado = id_usuario

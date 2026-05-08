@@ -15,8 +15,7 @@ import { Notificacion, notificacionValueDefault } from 'src/app/interfaces/Notif
 import { estadoBoolean } from 'src/app/interfaces/Estados';
 import { Cg_Feriados } from 'src/app/interfaces/Catalogos';
 import { HorarioE } from 'src/app/interfaces/Horarios';
-import { ParametrosService } from 'src/app/services/parametros.service';
-import { HorasExtrasService } from 'src/app/services/horas-extras.service';
+import { ParametrosService } from 'src/app/services/parametros.service';;
 import { PermisosService } from 'src/app/services/permisos.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 
@@ -69,7 +68,6 @@ export class EditarVacacionComponent implements OnInit {
   constructor(
     private empleadoService: EmpleadosService,
     private permisoService: PermisosService,
-    private horasExtrasService: HorasExtrasService,
     private vacacionService: VacacionesService,
     private catalogoService: CatalogosService,
     public validar: ValidacionesService,
@@ -201,7 +199,7 @@ export class EditarVacacionComponent implements OnInit {
 
     } else {
 
-      if (!(DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd') ==  DateTime.fromISO(this.dia_inicio).toFormat('yyyy-MM-dd'))) {
+      if (!(DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd') == DateTime.fromISO(this.dia_inicio).toFormat('yyyy-MM-dd'))) {
         this.reg.fecha_final = null;
         this.reg.fecha_ingreso = null;
         this.reg.dia_laborable = null;
@@ -339,7 +337,7 @@ export class EditarVacacionComponent implements OnInit {
 
 
     if (DateTime.fromISO(fec_inicio).toFormat('yyyy-MM-dd') != DateTime.fromISO(this.fecha_inicio).toFormat('yyyy-MM-dd') ||
-    DateTime.fromISO(fec_final).toFormat('yyyy-MM-dd') != DateTime.fromISO(this.fecha_final).toFormat('yyyy-MM-dd')) {
+      DateTime.fromISO(fec_final).toFormat('yyyy-MM-dd') != DateTime.fromISO(this.fecha_final).toFormat('yyyy-MM-dd')) {
 
       this.permisoService.getlistaPermisosByFechasyCodigoEdit(fec_inicio, fec_final, codigo, id_solicitud).subscribe(solicitados => {
         if (solicitados.length != 0) {
@@ -349,31 +347,19 @@ export class EditarVacacionComponent implements OnInit {
           return this.btnOcultoguardar = true;
         }
         else {
-          this.horasExtrasService.getlistaHorasExtrasByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
+          this.vacacionService.getlistaVacacionesByFechasyCodigoEdit(fec_inicio, fec_final, codigo, id_solicitud).subscribe(solicitados => {
             if (solicitados.length != 0) {
               this.reg.dia_laborable = null;
               this.reg.dia_libre = null;
-              this.validar.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
+              this.validar.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
               return this.btnOcultoguardar = true;
             }
             else {
-              this.vacacionService.getlistaVacacionesByFechasyCodigoEdit(fec_inicio, fec_final, codigo, id_solicitud).subscribe(solicitados => {
-                if (solicitados.length != 0) {
-                  this.reg.dia_laborable = null;
-                  this.reg.dia_libre = null;
-                  this.validar.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
-                  return this.btnOcultoguardar = true;
-                }
-                else {
-                  this.calcularDiasVacaciones();
-                  return this.btnOcultoguardar = false;
-                }
-              }, error => {
-                this.validar.showToast('Lo sentimos tenemos problemas para verificar si existen vacaciones', 3500, 'warning');
-              });
+              this.calcularDiasVacaciones();
+              return this.btnOcultoguardar = false;
             }
           }, error => {
-            this.validar.showToast('Lo sentimos tenemos problemas para verificar su existen horas', 3500, 'warning');
+            this.validar.showToast('Lo sentimos tenemos problemas para verificar si existen vacaciones', 3500, 'warning');
           });
         }
       }, error => {
@@ -427,7 +413,7 @@ export class EditarVacacionComponent implements OnInit {
     console.log('PASO VALIDACIONES DE FECHAS Y HORAS');
     this.reg.user_name = this.userService.username;
     this.reg.ip = localStorage.getItem('ip');
-    this.reg.ip_local= this.ips_locales;
+    this.reg.ip_local = this.ips_locales;
 
     this.subscripted = this.vacacionService.putVacacion(this.reg).subscribe(
       resp => {
@@ -455,13 +441,13 @@ export class EditarVacacionComponent implements OnInit {
     this.autoriza.BuscarJefes(datos).subscribe(vacacion => {
       vacacion.EmpleadosSendNotiEmail.push(this.solInfo);
       console.log(vacacion);
-     // this.EnviarCorreoVacacion(vacacion);
+      // this.EnviarCorreoVacacion(vacacion);
       this.EnviarNotificacionVacacion(vacacion);
       this.validar.showToast('Proceso realizado exitosamente.', 5000, 'success');
     });
   }
 
-  
+
   // METODO PARA ENVIAR NOTIFICACIONES
   EnviarNotificacionVacacion(vacaciones: any) {
 
@@ -479,9 +465,9 @@ export class EditarVacacionComponent implements OnInit {
     noti.mensaje = 'Ha actualizado su solicitud de vacaciones desde ' +
       desde + ' hasta ' + hasta;
 
-      noti.ip = localStorage.getItem("ip");
-      noti.ip_local = this.ips_locales;
-      noti.user_name = this.userService.username;
+    noti.ip = localStorage.getItem("ip");
+    noti.ip_local = this.ips_locales;
+    noti.user_name = this.userService.username;
 
     //Listado para eliminar el usuario duplicado
     var allNotificaciones = [];

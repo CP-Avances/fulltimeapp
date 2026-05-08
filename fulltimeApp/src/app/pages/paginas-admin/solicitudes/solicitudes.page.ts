@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ParametrosService } from 'src/app/services/parametros.service';
-import { AlertController, MenuController, ToastController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 import { Platform } from '@ionic/angular';
 import { NetworkService } from 'src/app/libs/network.service';
 import { ConnectivityService } from 'src/app/services/conexion-servidor.service'

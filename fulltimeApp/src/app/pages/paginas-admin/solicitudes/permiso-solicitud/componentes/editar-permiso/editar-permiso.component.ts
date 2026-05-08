@@ -17,7 +17,6 @@ import { Cg_Feriados } from 'src/app/interfaces/Catalogos';
 import { estadoBoolean } from 'src/app/interfaces/Estados';
 import { HorarioE } from 'src/app/interfaces/Horarios';
 import { ParametrosService } from 'src/app/services/parametros.service';
-import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { VacacionesService } from 'src/app/services/vacaciones.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 
@@ -94,7 +93,6 @@ export class EditarPermisoComponent implements OnInit {
   constructor(
     private empleadoService: EmpleadosService,
     private permisoService: PermisosService,
-    private horasExtrasService: HorasExtrasService,
     private vacacionService: VacacionesService,
     private validaciones: ValidacionesService,
     private autorizacion: AutorizacionesService,
@@ -552,8 +550,8 @@ export class EditarPermisoComponent implements OnInit {
     this.btnOculto = false;
     this.valoresDefectoValidacionResultados();
     if (!e.target.value) {
-      this.reg.hora_salida = DateTime.now().toISO(); 
-      return this.hora_inicio =  DateTime.fromISO(this.reg.hora_salida).toFormat('h:mm a');
+      this.reg.hora_salida = DateTime.now().toISO();
+      return this.hora_inicio = DateTime.fromISO(this.reg.hora_salida).toFormat('h:mm a');
     } else {
       this.reg.hora_salida = e.target.value;
       this.hora_final = '';
@@ -599,7 +597,7 @@ export class EditarPermisoComponent implements OnInit {
 
       });
 
-      return this.hora_inicio =  DateTime.fromISO(e.target.value).toFormat('h:mm a');
+      return this.hora_inicio = DateTime.fromISO(e.target.value).toFormat('h:mm a');
 
     }
   }
@@ -708,7 +706,7 @@ export class EditarPermisoComponent implements OnInit {
     this.valoresDefectoValidacionResultados();
     this.valoresDefectoValidacionHoras();
     if (!e.target.value) {
-      if (DateTime.fromISO(this.reg.fecha_inicio).toFormat('yyyy-MM-dd')== DateTime.now().toFormat('yyyy-MM-dd')) {
+      if (DateTime.fromISO(this.reg.fecha_inicio).toFormat('yyyy-MM-dd') == DateTime.now().toFormat('yyyy-MM-dd')) {
         this.reg.fecha_final = this.reg.fecha_inicio;
         this.dia_fianl = DateTime.fromISO(e.target.value).toFormat('yyyy-MM-dd');//Ajustamos el formato de la fecha para mostrar en el input
       } else {
@@ -874,33 +872,20 @@ export class EditarPermisoComponent implements OnInit {
             return false
           }
           else {
-            this.horasExtrasService.getlistaHorasExtrasByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
+            this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
               if (solicitados.length != 0) {
                 this.reg.dias_permiso = null;
                 this.reg.dia_libre = null;
                 this.reg.horas_permiso = null;
-                this.validaciones.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
+                this.validaciones.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
                 return false
               }
               else {
-                this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
-                  if (solicitados.length != 0) {
-                    this.reg.dias_permiso = null;
-                    this.reg.dia_libre = null;
-                    this.reg.horas_permiso = null;
-                    this.validaciones.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
-                    return false
-                  }
-                  else {
-                    this.calcularhoras();
-                  }
-                }, error => {
-                  this.validaciones.showToast('!Ups Lo sentimos tenemos problemas para verificar su permiso ', 3500, 'warning');
-                });
+                this.calcularhoras();
               }
             }, error => {
-              this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
-            });
+              this.validaciones.showToast('!Ups Lo sentimos tenemos problemas para verificar su permiso ', 3500, 'warning');
+            });;
           }
         }, error => {
           this.validaciones.showToast('Tenemos problemas para verificar su permiso', 3500, 'warning');
@@ -914,29 +899,16 @@ export class EditarPermisoComponent implements OnInit {
             return false
           }
           else {
-            this.horasExtrasService.getlistaHorasExtrasByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
+            this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
               if (solicitados.length != 0) {
                 this.reg.dias_permiso = null;
                 this.reg.dia_libre = null;
                 this.reg.horas_permiso = null;
-                this.validaciones.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
+                this.validaciones.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
                 return false
               }
               else {
-                this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
-                  if (solicitados.length != 0) {
-                    this.reg.dias_permiso = null;
-                    this.reg.dia_libre = null;
-                    this.reg.horas_permiso = null;
-                    this.validaciones.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
-                    return false
-                  }
-                  else {
-                    this.calcularhoras();
-                  }
-                }, error => {
-                  this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');
-                });
+                this.calcularhoras();
               }
             }, error => {
               this.validaciones.showToast('Lo sentimos tenemos problemas para verificar su permiso', 3500, 'warning');

@@ -33,24 +33,3 @@ export interface Cg_Feriados {
     fecha: Date | string;
     fecha_recuperacion: Date | string;
 }
-
-export interface Cg_DetalleMenu {
-    id: number;
-    nombre: string;
-    valor: number;
-    observacion: string;
-    id_horario_comida: number;
-}
-
-export interface Servicios_Comida{
-    id: number;
-    nombre: string;
-}
-
-export interface Menu_Servicios{
-    id: number;
-    nombre: string;
-    id_comida: number;
-    hora_inicio: string;
-    hora_fin: string;
-}

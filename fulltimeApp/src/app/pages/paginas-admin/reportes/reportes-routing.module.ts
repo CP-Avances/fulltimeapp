@@ -22,26 +22,6 @@ const routes: Routes = [
     loadChildren: () => import('./reporte-timbresConNovedades/reporte-timbresConNovedades.module').then(m => m.ReporteTimbresConNovedadesPageModule)
   },
   {
-    path: 'atrasos',
-    loadChildren: () => import('./reporte-atrasos/reporte-atrasos.module').then(m => m.ReporteAtrasosPageModule)
-  },
-  {
-    path: 'inasistencia',
-    loadChildren: () => import('./reporte-inasistencia/reporte-inasistencia.module').then(m => m.ReporteInasistenciaPageModule)
-  },
-  {
-    path: 'solicitud',
-    loadChildren: () => import('./reporte-solicitudes/reporte-solicitudes.module').then(m => m.ReporteSolicitudesPageModule)
-  },
-  {
-    path: 'alimentacion',
-    loadChildren: () => import('./reporte-alimentacion/reporte-alimentacion.module').then(m => m.ReporteAlimentacionPageModule)
-  },
-  {
-    path: 'horas-extras',
-    loadChildren: () => import('./reporte-horas-extras/reporte-horas-extras.module').then(m => m.ReporteHorasExtrasPageModule)
-  },
-  {
     path: 'vacaciones',
     loadChildren: () => import('./reporte-vacaciones/reporte-vacaciones.module').then(m => m.ReporteVacacionesPageModule)
   },

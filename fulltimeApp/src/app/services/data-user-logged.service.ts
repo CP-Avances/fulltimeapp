@@ -28,13 +28,6 @@ export class DataUserLoggedService {
     return JSON.parse(a)
   }
 
-  // METODO PARA OBTENER LA INFORMACION DE LA VACUNA DEL EMPLEADO 
-  public get dataVacuna(): any {
-    const v: any = (localStorage.getItem('vacuna_info') === null) ? '' : localStorage.getItem('vacuna_info');
-    if (v === '' || v === 'undefined') return { id_tipo_vacuna: '' }
-    return JSON.parse(v)
-  }
-
   private _fechainicio: string = '';
   private _fechafinal: string = '';
 

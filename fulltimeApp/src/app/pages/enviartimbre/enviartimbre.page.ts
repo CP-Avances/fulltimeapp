@@ -542,68 +542,136 @@ export class EnviartimbrePage implements OnInit {
 
   timbrarDesconocido: string;
 
-  // METODO PARA VALIDAR EL PARAMETO DE TIMBRE CON UBICACION DESCONOCIDA
+  // METODO PARA VALIDAR EL PARAMETRO DE TIMBRE CON UBICACION DESCONOCIDA
   BuscarParametroTimbreUbicacionDesconocida() {
+    const empleadoID = parseInt(localStorage.getItem("empleadoID") ?? "0", 10);
 
-    let buscar = {
-      ids_empleados: [parseInt(localStorage.getItem("empleadoID"), 10)],
+    const buscar = {
+      ids_empleados: [empleadoID],
     };
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
-        const timbreFoto = res.respuesta[0].timbre_ubicacion_desconocida;
-        console.log("ver parametro de ubicacion desconocida", timbreFoto);
-        const resultado = timbreFoto ? 'Si' : 'No';
-        localStorage.setItem('timbrarUbicacionDesconocida', resultado);
+        console.log("respuesta parámetro ubicación desconocida", res);
+
+        const parametro = res.data?.[0];
+
+        if (!parametro) {
+          console.warn(
+            "No existen parámetros de ubicación desconocida para el empleado:",
+            empleadoID
+          );
+
+          localStorage.setItem("timbrarUbicacionDesconocida", "No");
+          return;
+        }
+
+        const timbreUbicacionDesconocida = parametro.timbre_ubicacion_desconocida;
+
+        console.log(
+          "ver parametro de ubicacion desconocida",
+          timbreUbicacionDesconocida
+        );
+
+        const resultado = timbreUbicacionDesconocida ? "Si" : "No";
+        localStorage.setItem("timbrarUbicacionDesconocida", resultado);
       },
       error => {
-        console.log('Error 404 Not Found');
-        localStorage.setItem('timbrarUbicacionDesconocida', 'No');
+        console.log("Error al obtener parámetro de ubicación desconocida", error);
+        localStorage.setItem("timbrarUbicacionDesconocida", "No");
       }
     );
   }
 
   // METODO PARA VALIDAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON INTERNET REQUERIDO
   BuscarParametroTimbreSinInternet() {
-    let buscar = {
-      ids_empleados: [parseInt(localStorage.getItem("empleadoID"), 10)],
+    const empleadoID = parseInt(localStorage.getItem("empleadoID") ?? "0", 10);
+
+    const buscar = {
+      ids_empleados: [empleadoID],
     };
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
-        console.log("ver si hay respuesta de parametros de usuario", res)
+        console.log("ver si hay respuesta de parametros de usuario", res);
 
-        const timbreFoto = res.respuesta[0].timbre_internet;
-        console.log("ver parametro de internet", timbreFoto)
+        const parametro = res.data?.[0];
 
-        const resultado = timbreFoto ? 'Si' : 'No';
-        localStorage.setItem('timbrarSinInternet', resultado);
+        if (!parametro) {
+          console.warn(
+            "No existen parámetros de internet para el empleado:",
+            empleadoID
+          );
+
+          localStorage.setItem("timbrarSinInternet", "No");
+          return;
+        }
+
+        const timbreInternet = parametro.timbre_internet;
+
+        console.log("ver parametro de internet", timbreInternet);
+
+        const resultado = timbreInternet ? "Si" : "No";
+        localStorage.setItem("timbrarSinInternet", resultado);
       },
       error => {
-        console.log('Error 404 Not Found');
-      });
+        console.log("Error al obtener parámetro de internet", error);
+        localStorage.setItem("timbrarSinInternet", "No");
+      }
+    );
   }
 
   // METODO PARA VALIDAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON FOTO
   BuscarParametroTimbreConFoto() {
-    let buscar = {
-      ids_empleados: [parseInt(localStorage.getItem("empleadoID"), 10)],
+    const empleadoID = parseInt(localStorage.getItem("empleadoID") ?? "0", 10);
+
+    const buscar = {
+      ids_empleados: [empleadoID],
     };
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
-        const timbreFoto = res.respuesta[0].timbre_foto;
-        const resultado = timbreFoto ? 'Si' : 'No';
-        localStorage.setItem('timbrarConFoto', resultado);
-        const resultado_opcional = res.respuesta[0].opcional_obligatorio ? 'Si' : 'No';
-        this.timbrarConFoto = localStorage.getItem('timbrarConFoto')
-        localStorage.setItem('opcional_obligatorio', resultado_opcional);
-        this.timbreFotoObligatoria = localStorage.getItem('opcional_obligatorio');
+        console.log("respuesta parámetro timbre con foto", res);
 
+        const parametro = res.data?.[0] ?? res.respuesta?.[0];
+
+        if (!parametro) {
+          console.warn(
+            "No existen parámetros de timbre con foto para el empleado:",
+            empleadoID
+          );
+
+          localStorage.setItem("timbrarConFoto", "No");
+          localStorage.setItem("opcional_obligatorio", "No");
+
+          this.timbrarConFoto = "No";
+          this.timbreFotoObligatoria = "No";
+
+          return;
+        }
+
+        const timbreFoto = parametro.timbre_foto;
+        const resultado = timbreFoto ? "Si" : "No";
+
+        localStorage.setItem("timbrarConFoto", resultado);
+        this.timbrarConFoto = resultado;
+
+        const opcionalObligatorio = parametro.opcional_obligatorio;
+        const resultadoOpcional = opcionalObligatorio ? "Si" : "No";
+
+        localStorage.setItem("opcional_obligatorio", resultadoOpcional);
+        this.timbreFotoObligatoria = resultadoOpcional;
       },
       error => {
-        console.log('Error 404 Not Found');
-      });
+        console.log("Error al obtener parámetro de timbre con foto", error);
+
+        localStorage.setItem("timbrarConFoto", "No");
+        localStorage.setItem("opcional_obligatorio", "No");
+
+        this.timbrarConFoto = "No";
+        this.timbreFotoObligatoria = "No";
+      }
+    );
   }
 
   ubicacion: string = '';
@@ -614,7 +682,7 @@ export class EnviartimbrePage implements OnInit {
     this.restP.ObtenerCoordenadas(informacion).subscribe(
       res => {
         console.log("datos de ObtenerCoordenadas", res)
-        if (res[0].verificar === 'ok') {
+        if (res.data[0].verificar === 'ok') {
           console.log("coordenadas OK")
           this.contar = this.contar + 1;
           this.ubicacion = descripcion;
@@ -718,7 +786,7 @@ export class EnviartimbrePage implements OnInit {
         informacion.lat2 = res[0].latitud;
         informacion.lng2 = res[0].longitud;
         this.restP.ObtenerCoordenadas(informacion).subscribe(resu => {
-          if (resu[0].verificar === 'ok') {
+          if (resu.data[0].verificar === 'ok') {
             timbre.ubicacion = 'DOMICILIO';
             this.storageUbica = timbre.ubicacion;
             this.abrirToas('Marcación realizada dentro del perímetro definido como DOMICILIO.', "primary", 3000, "top");

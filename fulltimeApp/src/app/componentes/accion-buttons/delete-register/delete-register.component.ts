@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, Input, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { DateTime } from 'luxon';
 import { DeleteService } from 'src/app/libs/delete.service';
@@ -8,11 +8,8 @@ import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { Notificacion, notificacionValueDefault } from 'src/app/interfaces/Notificaciones';
 import { cg_permisoValueDefault } from 'src/app/interfaces/Permisos';
 import { Cg_TipoPermiso } from 'src/app/interfaces/Catalogos';
-import { NotificacionesService } from 'src/app/services/notificaciones.service';
-import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { PermisosService } from 'src/app/services/permisos.service';
 import { VacacionesService } from 'src/app/services/vacaciones.service';
-import { AlimentacionService } from 'src/app/services/alimentacion.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 @Component({
@@ -55,12 +52,9 @@ export class DeleteRegisterComponent {
   constructor(
     private catalogos: CatalogosService,
     private autoriza: AutorizacionesService,
-    private notifica: NotificacionesService,
     private deleteSevice: DeleteService,
     private permisoService: PermisosService,
     private vacacionService: VacacionesService,
-    private horaExtraService: HorasExtrasService,
-    private alimentacionService: AlimentacionService,
     public alertController: AlertController,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
@@ -179,15 +173,6 @@ export class DeleteRegisterComponent {
       else if (tabla === 'mv_solicitud_vacacion') {
         // this.EnviarCorreoVacacion(data, infoUsuario);
         this.EnviarNotificacionVacacion(data, nota, user);
-      }
-      else if (tabla === 'mhe_solicitud_hora_extra') {
-        this.EliminarDocumentoHoraE(data);
-        //this.EnviarCorreoHE(data, infoUsuario);
-        this.EnviarNotificacionHE(data, nota, user);
-      }
-      else if (tabla === 'ma_solicitud_comida') {
-        //this.EnviarCorreoComida(data);
-        this.NotificarEventoComida(data, nota, user);
       }
     });
   }
@@ -352,140 +337,6 @@ export class DeleteRegisterComponent {
         )
       }
     })
-  }
-
-
-  /** ******************************************************************************************* **
-   ** **                METODO DE ENVIO DE NOTIFICACIONES DE HORAS EXTRAS                      ** **
-   ** ******************************************************************************************* **/
-
-
-
-  // METODO PARA ENVIAR NOTIIFICACIONES AL SISTEMA
-  EnviarNotificacionHE(horaExtra: any, nota: string, user: string) {
-
-    // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let desde = this.validar.FormatearFecha(horaExtra.fecha_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(horaExtra.fecha_final, this.formato_fecha, this.validar.dia_completo);
-
-    let h_inicio = this.validar.FormatearHora(horaExtra.fecha_inicio, this.formato_hora)
-    let h_final = this.validar.FormatearHora(horaExtra.fecha_final, this.formato_hora);
-
-    // CAPTURANDO ESTADO DE LA SOLICITUD DE HORA EXTRA
-    if (horaExtra.estado === 1) {
-      var estado_h = 'Pendiente de autorización';
-    }
-    else if (horaExtra.estado === 2) {
-      var estado_h = 'Preautorizado';
-    }
-    else if (horaExtra.estado === 3) {
-      var estado_h = 'Autorizado';
-    }
-    else if (horaExtra.estado === 4) {
-      var estado_h = 'Negado';
-    }
-
-    const noti: Notificacion = notificacionValueDefault;
-    noti.id_hora_extra = horaExtra.id;
-    noti.id_send_empl = parseInt(String(localStorage.getItem('empleadoID')));
-    noti.id_permiso = noti.id_vacaciones = null;
-    noti.fecha_hora = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
-    noti.estado = estado_h!;
-    noti.tipo = 3;
-    noti.mensaje = 'Ha eliminado ' + nota + ' de horas extras ' + user + ' desde ' +
-      desde + ' hasta ' + hasta +
-      ' horario de ' + h_inicio + ' a ' + h_final;
-
-    //Listado para eliminar el usuario duplicado
-    var NotificacionesHorasExtrasFiltrados: any = [];
-    //Ciclo por cada elemento del listado
-    horaExtra.EmpleadosSendNotiEmail.forEach(function (elemento: any, indice: any, array: any) {
-      // Discriminación de elementos iguales
-      if (NotificacionesHorasExtrasFiltrados.find((p: any) => p.empleado == elemento.empleado) == undefined) {
-        // Nueva lista de empleados que reciben la notificacion
-        NotificacionesHorasExtrasFiltrados.push(elemento);
-      }
-    });
-
-    console.log("Usuarios que reciben la notificacion Horas: ", NotificacionesHorasExtrasFiltrados);
-
-    NotificacionesHorasExtrasFiltrados.forEach((e: any) => {
-      noti.id_receives_empl = e.empleado;
-
-      noti.user_name = this.dataUserServices.username;
-      noti.ip = localStorage.getItem('ip');
-      noti.ip_local = this.ips_locales;
-      if (e.hora_extra_noti) {
-        this.autoriza.postNotificacion(noti).subscribe(
-          resp => {
-            this.horaExtraService.sendNotiRealTimeAprobar(resp.respuesta);
-            //this.validar.showToast(resp.message, 3000, 'success') 
-          },
-          err => { this.validar.showToast(err.error.message, 3000, 'danger') },
-          () => { },
-        )
-      }
-    })
-  }
-
-  // ELIMINAR ARCHIVO DE PERMISO
-  EliminarDocumentoHoraE(data: any) {
-    this.horaExtraService.EliminarArchivoRespaldo(data.documento).subscribe(
-      resp => { })
-  }
-
-  /** ******************************************************************************************* **
-   ** **                METODO DE ENVIO DE NOTIFICACIONES DE ALIMENTACION                      ** **
-   ** ******************************************************************************************* **/
-
-
-
-  // METODO PARA ENVIO DE NOTIFICACION
-  NotificarEventoComida(alimentacion: any, nota: string, user: string) {
-
-    // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE ALIMENTACIÓN
-    let desde = this.validar.FormatearFecha(alimentacion.fecha_comida, this.formato_fecha, this.validar.dia_completo);
-
-    let inicio = this.validar.FormatearHora(alimentacion.hora_inicio, this.formato_hora);
-    let final = this.validar.FormatearHora(alimentacion.hora_fin, this.formato_hora);
-
-    let mensaje = {
-      fecha_hora: this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss'),
-      id_empleado_envia: parseInt(String(localStorage.getItem('empleadoID'))),
-      id_empleado_recibe: '',
-      tipo: 1, // SOLICITUD SERVICIO DE ALIMENTACIÓN 
-      descripcion: 'Ha eliminado ' + nota + ' de alimentación ' + user + ' desde ' +
-        desde +
-        ' horario de ' + inicio + ' a ' + final + ' servicio ',
-      id_comida: alimentacion.id_comida,
-      user_name: this.dataUserServices.username,
-      ip: localStorage.getItem('ip')
-
-    }
-
-    //Listado para eliminar el usuario duplicado
-    var NotificacionesAlimentacionFiltrados: any = [];
-    //Ciclo por cada elemento del listado
-    alimentacion.EmpleadosSendNotiEmail.forEach(function (elemento: any, indice: any, array: any) {
-      // Discriminación de elementos iguales
-      if (NotificacionesAlimentacionFiltrados.find((p: any) => p.empleado == elemento.empleado) == undefined) {
-        // Nueva lista de empleados que reciben la notificacion
-        NotificacionesAlimentacionFiltrados.push(elemento);
-      }
-    });
-
-    console.log("Usuarios que reciben la notificacion Alimen: ", NotificacionesAlimentacionFiltrados);
-
-    NotificacionesAlimentacionFiltrados.forEach((e: any) => {
-      mensaje.id_empleado_recibe = e.empleado;
-      if (e.comida_noti) {
-        this.notifica.EnviarMensajePlanComida(mensaje).subscribe(res => {
-          console.log(res.message);
-          this.alimentacionService.sendNotiRealTime(res.respuesta);
-        })
-      }
-    })
-
   }
 
 }

@@ -64,7 +64,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
 
   ) { }
 
-   
+
   ionViewWillEnter() {
     this.ngOnInit();
     this.consultarDataReporte();
@@ -75,7 +75,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
     this.data.fullname = localStorage.getItem('nom') + ' ' + localStorage.getItem('ap')
     console.log('reporte timbreConNovedades | Data empleado: ', this.data);
     this.BuscarFormatos();
-    this.obtenerDatosEmpresa(localStorage.getItem('id_empresa'));
+    this.obtenerDatosEmpresa();
     this.ObtenerLogo();
     this.ObtenerColores();
     this.bordeCompleto = {
@@ -102,16 +102,17 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
   }
 
   // METODOS PARA OBTENER LOS DATOS DE LA EMPRESA
-  obtenerDatosEmpresa(idEmpresa: any) {
-    this.relojService.obtenerDatosEmpresa(idEmpresa).subscribe(
-      res => {
-
-        console.log("ver datos empresa", res)
-        console.log(res);
-        this.empresa = res[0];
-      },
-      err => {
-        console.log(err)
+  obtenerDatosEmpresa() {
+    this.relojService.obtenerDatosEmpresa().subscribe(
+      {
+        next: res => {
+          console.log("ver datos empresa", res)
+          console.log(res);
+          this.empresa = res.data;
+        },
+        error: err => {
+          console.log(err)
+        }
       }
     );
   }
@@ -303,7 +304,7 @@ export class ReporteTimbreConNovedadesComponent implements OnInit {
         establecimiento = '';
       }
       else if (selec.opcion == 4) {
-        descripcion = 'ROL: '+ selec.rol;
+        descripcion = 'ROL: ' + selec.rol;
         establecimiento = '';
       }
 

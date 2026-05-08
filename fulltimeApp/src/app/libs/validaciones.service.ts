@@ -891,11 +891,6 @@ export class ValidacionesService {
         return new Date(fec.split('T')[0] + 'T' + hora)
     }
 
-    Unir_Fecha_Hora_HE(fecha: String, hora: string): Date {
-        const fec = fecha.toString()
-        return new Date(fec.split('T')[0] + 'T' + hora)
-    }
-
     MilisegToSegundos(miliseg: number) {
         return miliseg / 1000
     }
@@ -1092,11 +1087,6 @@ export class ValidacionesService {
         }
     }
 
-    CalcularHorasExtrasTotales(tiempo_total: number): any {
-        return {
-            tiempo_transcurrido: this.SegundosToHHMM(tiempo_total),
-        }
-    }
 
     async showToast(mensaje: string, duracion: number, color: string) {
 

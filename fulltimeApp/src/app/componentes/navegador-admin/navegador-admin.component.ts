@@ -9,7 +9,7 @@ import { TimbresPerdidosComponent } from '../../pages/bienvenido/showTimbresGuar
 
 import { Notificacion } from '../../interfaces/Notificaciones';
 import { NotificacionTimbre } from '../../interfaces/Notificaciones';
-import { ActionPerformed, LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
+import { LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
 
 import { Router } from '@angular/router';
 import { ParametrosService } from 'src/app/services/parametros.service';

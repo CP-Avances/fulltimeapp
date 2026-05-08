@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Empresa } from 'src/app/interfaces/Empresa';
 import { Usuario } from 'src/app/interfaces/Usuario';
 import { DatePipe } from '@angular/common';
-import { AlertController, Platform, ToastController, ModalController } from '@ionic/angular';
+import { AlertController, Platform, ModalController } from '@ionic/angular';
 import { DataUserLoggedService } from '../../services/data-user-logged.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
@@ -55,10 +55,6 @@ export class InformacionEmpleadoPage implements OnInit {
     return this.dataUser.dataApp
   }
 
-  public get app_vacuna(): any {
-    return this.dataUser.dataVacuna
-  }
-
   constructor(
     public alertController: AlertController,
     private dataUser: DataUserLoggedService,
@@ -73,6 +69,7 @@ export class InformacionEmpleadoPage implements OnInit {
 
   async ngOnInit() {
     this.networkSubscriber()
+    console.log('data ', this.data)
     this.serverConnected = await this.connectivityService.checkServerConnection();
     this.usuario.correo = this.data.correo;
     this.usuario.apellido = this.data.apellido;
@@ -89,7 +86,6 @@ export class InformacionEmpleadoPage implements OnInit {
     this.usuario.name_regimen=this.data.name_regimen;
     this.usuario.nombre_nacionalidad=this.data.nombre_nacionalidad;
 
-    console.log('data vacuna empleado ... ', this.dataUser.dataVacuna)
     console.log(this.usuario)
     this.BuscarFormatos();
   }
@@ -128,7 +124,6 @@ export class InformacionEmpleadoPage implements OnInit {
       resp => {
         this.formato_fecha = resp.fecha;
         this.formato_hora = resp.hora;
-        this.fecha_ = this.validar.FormatearFecha(this.dataUser.dataVacuna.fecha, this.formato_fecha, this.validar.dia_completo);
         this.caduca_ = this.validar.FormatearFecha(this.dataUser.dataApp.caducidad_licencia, this.formato_fecha, this.validar.dia_completo);
       }
     )

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Cg_DetalleMenu, Cg_Feriados, Cg_TipoPermiso, Servicios_Comida, Menu_Servicios } from '../interfaces/Catalogos';
+import { Cg_Feriados, Cg_TipoPermiso,} from '../interfaces/Catalogos';
 import { HttpClient } from '@angular/common/http';
 import { throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
@@ -97,81 +97,5 @@ export class CatalogosService {
     }
 
   }
-
-  /*********************************************************************
-  *
-  *            INFORMACION DE CATALOGO DE DETALLE COMIDA.
-  *
-  **********************************************************************/
-  private lista_detalle_menu: Cg_DetalleMenu[] = [];
-
-  public get detalle_menu(): Cg_DetalleMenu[] {
-    return [...this.lista_detalle_menu]
-  }
-
-  getDetalleMenu(): void {
-
-    if (!!sessionStorage.getItem('cg_detalleMenu')) {
-      const lista: any = sessionStorage.getItem('cg_detalleMenu')
-      this.lista_detalle_menu = JSON.parse(lista)
-    } else {
-      const url = `${this.apiUrl}/catalogos/cg-det-menu`;
-      this.http.get<Cg_DetalleMenu[]>(url)
-        .pipe(
-          tap(console.log),
-          catchError(this.handleError)
-        ).subscribe(cg_detalle_menu => {
-          this.lista_detalle_menu = cg_detalle_menu;
-          sessionStorage.setItem('cg_detalleMenu', JSON.stringify(cg_detalle_menu))
-        })
-    }
-  }
-
-  private lista_servicios: Servicios_Comida[] = [];
-
-  public get servicios_comida_lista(): Servicios_Comida[] {
-    return [...this.lista_servicios]
-  }
-
-  getServicioComida() {
-    if (!!sessionStorage.getItem('servicios-comida')) {
-      const lista: any = sessionStorage.getItem('servicios-comida')
-      this.lista_servicios = JSON.parse(lista)
-    } else {
-      const url = `${this.apiUrl}/catalogos/servicio-comida`;
-      this.http.get<Servicios_Comida[]>(url)
-        .pipe(
-          tap(console.log),
-          catchError(this.handleError)
-        ).subscribe(servicios => {
-          this.lista_servicios = servicios;
-          sessionStorage.setItem('servicios-comida', JSON.stringify(servicios))
-        })
-    }
-  }
-
-  private lista_menus_servicios: Menu_Servicios[] = [];
-
-  public get lista_menu(): Menu_Servicios[] {
-    return [...this.lista_menus_servicios]
-  }
-
-  getMenuServicios() {
-    if (!!sessionStorage.getItem('menu-servicio')) {
-      const lista: any = sessionStorage.getItem('menu-servicio')
-      this.lista_menus_servicios = JSON.parse(lista)
-    } else {
-      const url = `${this.apiUrl}/catalogos/servicio-menu`;
-      this.http.get<Menu_Servicios[]>(url)
-        .pipe(
-          tap(console.log),
-          catchError(this.handleError)
-        ).subscribe(menu => {
-          this.lista_menus_servicios = menu;
-          sessionStorage.setItem('menu-servicio', JSON.stringify(menu))
-        })
-    }
-  }
-
 
 }

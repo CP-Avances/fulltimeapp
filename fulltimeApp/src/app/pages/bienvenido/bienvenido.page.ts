@@ -1,19 +1,19 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { ToastController, ModalController, Platform, AlertController } from '@ionic/angular';
+import { ToastController, ModalController, AlertController } from '@ionic/angular';
 import { TimbresPerdidosComponent } from './showTimbresGuardados.component';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { Router } from '@angular/router';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
-import { Subscription, interval } from 'rxjs';
+import { interval } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { NetworkService } from '../../libs/network.service';
 import { NavegadorAdminComponent } from 'src/app/componentes/navegador-admin/navegador-admin.component';
 import { Geolocation } from '@capacitor/geolocation';
 import { timeout } from 'rxjs/operators';
-import { SocketService } from 'src/app/services/socket.service';
+
 
 @Component({
   selector: 'app-bienvenido',
@@ -147,59 +147,113 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   // METODO PARA BUSCAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON FOTO
   BuscarParametroTimbreConFoto() {
-    let buscar = {
-      ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
+    const empleadoID = parseInt(localStorage.getItem("empleadoID") ?? "0", 10);
+
+    const buscar = {
+      ids_empleados: [empleadoID],
     };
 
-    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
-      res => {
-        const timbreFoto = res.respuesta[0].timbre_foto;
-        console.log("ver parametro de foto", timbreFoto)
-        const resultado = timbreFoto ? 'Si' : 'No';
+    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe({
+      next: (res) => {
+        console.log('res bienvenida ', res);
+
+        const parametro = res.data?.[0];
+
+        if (!parametro) {
+          console.warn('No existen parámetros de timbre para el empleado:', empleadoID);
+
+          localStorage.setItem('timbrarConFoto', 'No');
+          localStorage.setItem('opcional_obligatorio', 'No');
+
+          return;
+        }
+
+        const resultado = parametro.timbre_foto ? 'Si' : 'No';
         localStorage.setItem('timbrarConFoto', resultado);
 
-        const resultado_opcional = res.respuesta[0].opcional_obligatorio ? 'Si' : 'No';
-        localStorage.setItem('opcional_obligatorio', resultado_opcional);
+        const resultadoOpcional = parametro.opcional_obligatorio ? 'Si' : 'No';
+        localStorage.setItem('opcional_obligatorio', resultadoOpcional);
 
+        console.log("ver parametro de foto", parametro.timbre_foto);
       },
-      error => {
-        console.log('Error 404 Not Found');
+      error: (error) => {
+        console.log('Error al obtener parámetros de timbre', error);
       }
-    );
+    });
   }
 
   // METODO PARA BUSCAR EL PARAMETRO DEL EMPLEADO DE TIMBRE ESPECIAL
   BuscarParametroTimbreEspecial() {
-    let buscar = {
-      ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
+    const empleadoID = parseInt(localStorage.getItem("empleadoID") ?? "0", 10);
+
+    const buscar = {
+      ids_empleados: [empleadoID],
     };
+
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
-        const timbreFoto = res.respuesta[0].timbre_especial;
-        console.log("ver parametro de foto", timbreFoto);
-        const resultado = timbreFoto ? 'Si' : 'No';
+        console.log('res timbre especial', res);
+
+        const parametro = res.data?.[0];
+
+        if (!parametro) {
+          console.warn('No existen parámetros de timbre especial para el empleado:', empleadoID);
+
+          localStorage.setItem('timbrarEspecial', 'No');
+          return;
+        }
+
+        const timbreEspecial = parametro.timbre_especial;
+        console.log("ver parametro de timbre especial", timbreEspecial);
+
+        const resultado = timbreEspecial ? 'Si' : 'No';
         localStorage.setItem('timbrarEspecial', resultado);
       },
       error => {
-        console.log('Error 404 Not Found');
+        console.log('Error al obtener parámetro de timbre especial', error);
+        localStorage.setItem('timbrarEspecial', 'No');
       }
     );
   }
 
   // METODO PARA BUSCAR EL PARAMETRO DE UBICACION DESCONOCIDA
   BuscarParametroTimbreUbicacionDesconocida() {
-    let buscar = {
-      ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
+    const empleadoID = parseInt(localStorage.getItem("empleadoID") ?? "0", 10);
+
+    const buscar = {
+      ids_empleados: [empleadoID],
     };
+
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
-        const timbreFoto = res.respuesta[0].timbre_ubicacion_desconocida;
-        console.log("ver parametro de ubicacion desconocida", timbreFoto);
-        const resultado = timbreFoto ? 'Si' : 'No';
+        console.log('res ubicación desconocida', res);
+
+        const parametro = res.data?.[0];
+
+        if (!parametro) {
+          console.warn(
+            'No existen parámetros de ubicación desconocida para el empleado:',
+            empleadoID
+          );
+
+          localStorage.setItem('timbrarUbicacionDesconocida', 'No');
+          return;
+        }
+
+        const timbreUbicacionDesconocida = parametro.timbre_ubicacion_desconocida;
+
+        console.log(
+          "ver parametro de ubicación desconocida",
+          timbreUbicacionDesconocida
+        );
+
+        const resultado = timbreUbicacionDesconocida ? 'Si' : 'No';
+
         localStorage.setItem('timbrarUbicacionDesconocida', resultado);
       },
       error => {
-        console.log('Error 404 Not Found');
+        console.log('Error al obtener parámetro de ubicación desconocida', error);
+        localStorage.setItem('timbrarUbicacionDesconocida', 'No');
       }
     );
   }
@@ -210,33 +264,41 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
     await Geolocation.checkPermissions().then(() => {
       if (this.networkService.getNetworkStatusDispositivo() == true) {
-        let buscar = {
-          ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
+        const empleadoID = parseInt(localStorage.getItem("empleadoID") ?? "0", 10);
+
+        const buscar = {
+          ids_empleados: [empleadoID],
         };
-        this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(2000)).subscribe(
-          res => {
-            const timbreFoto = res.respuesta[0].timbre_internet;
-            const resultado = timbreFoto ? 'Si' : 'No';
-            localStorage.setItem('timbrarSinInternet', resultado);
-            this.router.navigate(['/enviartimbre', accion]);
-          }, error => {
-            console.log('Código de error:', error.status); // Verifica el código de error
-            if (error.status === 0) {
-              // Error de red, servidor no disponible
+
+        this.parametros.ObtenerDetalleParametroUsuario(buscar)
+          .pipe(timeout(2000))
+          .subscribe(
+            res => {
+              console.log('res timbre sin internet', res);
+
+              const parametro = res.data?.[0];
+
+              if (!parametro) {
+                console.warn('No existen parámetros de timbre sin internet para el empleado:', empleadoID);
+
+                localStorage.setItem('timbrarSinInternet', 'No');
+                this.router.navigate(['/enviartimbre', accion]);
+                return;
+              }
+
+              const timbreInternet = parametro.timbre_internet;
+              const resultado = timbreInternet ? 'Si' : 'No';
+
+              localStorage.setItem('timbrarSinInternet', resultado);
               this.router.navigate(['/enviartimbre', accion]);
-            } else if (error.status === 503) {
-              // Error 503: Servicio no disponible
-              this.router.navigate(['/enviartimbre', accion]);
-            } else if (error.status === 404) {
-              // Error 404: Recurso no encontrado
-              this.router.navigate(['/enviartimbre', accion]);
-            } else {
-              // Manejo de otros errores
+            },
+            error => {
+              console.log('Código de error:', error.status);
+
+              localStorage.setItem('timbrarSinInternet', 'No');
               this.router.navigate(['/enviartimbre', accion]);
             }
-
-          }
-        );
+          );
       } else {
         if (localStorage.getItem("timbrarSinInternet") == "Si") {
           this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
@@ -249,52 +311,104 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     });
   }
 
-  // METODO QUE REALIZA VALIDACIONES Y DAN PASO A ENVIAR TIMIBRE ESPECIAL
+  // METODO QUE REALIZA VALIDACIONES Y DAN PASO A ENVIAR TIMBRE ESPECIAL
   async VerificarTimbreEspecial(accion: string) {
-    let buscar = {
-      ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
-    };
-    this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(2000)).subscribe(
-      async res => {
-        const timbreFoto = res.respuesta[0].timbre_especial;
-        console.log("ver parametro de foto", timbreFoto);
-        const resultado = timbreFoto ? 'Si' : 'No';
-        localStorage.setItem('timbrarEspecial', resultado);
+    const empleadoID = parseInt(localStorage.getItem("empleadoID") ?? "0", 10);
 
-        if (localStorage.getItem("timbrarEspecial") == 'Si') {
-          this.VerificarTimbresSinInternet(accion);
-        } else {
-          this.abrirToas('Ups!!!, al parecer no tiene activado el timbre especial', "warning", 3000, "middle");
+    const buscar = {
+      ids_empleados: [empleadoID],
+    };
+
+    this.parametros.ObtenerDetalleParametroUsuario(buscar)
+      .pipe(timeout(2000))
+      .subscribe(
+        async res => {
+          console.log('res timbre especial', res);
+
+          const parametro = res.data?.[0];
+
+          if (!parametro) {
+            console.warn('No existen parámetros de timbre especial para el empleado:', empleadoID);
+
+            localStorage.setItem('timbrarEspecial', 'No');
+            this.abrirToas(
+              'Ups!!!, al parecer no tiene activado el timbre especial',
+              "warning",
+              3000,
+              "middle"
+            );
+
+            return;
+          }
+
+          const timbreEspecial = parametro.timbre_especial;
+          console.log("ver parametro de timbre especial", timbreEspecial);
+
+          const resultado = timbreEspecial ? 'Si' : 'No';
+          localStorage.setItem('timbrarEspecial', resultado);
+
+          if (resultado === 'Si') {
+            this.VerificarTimbresSinInternet(accion);
+          } else {
+            this.abrirToas(
+              'Ups!!!, al parecer no tiene activado el timbre especial',
+              "warning",
+              3000,
+              "middle"
+            );
+          }
+        },
+        error => {
+          console.log('Error al verificar timbre especial', error);
+
+          if (localStorage.getItem("timbrarEspecial") === 'Si') {
+            this.VerificarTimbresSinInternet(accion);
+          } else {
+            this.abrirToas(
+              'Ups!!!, al parecer no tiene activado el timbre especial',
+              "warning",
+              3000,
+              "middle"
+            );
+          }
         }
-      },
-      error => {
-        console.log('Error 404 Not Found');
-        if (localStorage.getItem("timbrarEspecial") == 'Si') {
-          this.VerificarTimbresSinInternet(accion);
-        } else {
-          this.abrirToas('Ups!!!, al parecer no tiene activado el timbre especial', "warning", 3000, "middle");
-        }
-      }
-    );
+      );
   }
 
-  // METODO PARA BUSCAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON REQUERIMIENTO A INTERNET
   BuscarParametroTimbreInternetRequerido() {
-    let buscar = {
-      ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
+    const empleadoID = parseInt(localStorage.getItem("empleadoID") ?? "0", 10);
+
+    const buscar = {
+      ids_empleados: [empleadoID],
     };
+
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
       res => {
-        console.log("ver si hay respuesta de parametros de usuario", res)
+        console.log("ver si hay respuesta de parametros de usuario", res);
 
-        const timbreFoto = res.respuesta[0].timbre_internet;
-        console.log("ver parametro de internet", timbreFoto)
+        const parametro = res.data?.[0];
 
-        const resultado = timbreFoto ? 'Si' : 'No';
+        if (!parametro) {
+          console.warn(
+            'No existen parámetros de internet requerido para el empleado:',
+            empleadoID
+          );
+
+          localStorage.setItem('timbrarSinInternet', 'No');
+          return;
+        }
+
+        const timbreInternet = parametro.timbre_internet;
+
+        console.log("ver parametro de internet", timbreInternet);
+
+        const resultado = timbreInternet ? 'Si' : 'No';
         localStorage.setItem('timbrarSinInternet', resultado);
       },
       error => {
-        console.log('Error 404 Not Found');
+        console.log('Error al obtener parámetro de internet requerido', error);
+
+        localStorage.setItem('timbrarSinInternet', 'No');
       }
     );
   }
@@ -367,11 +481,11 @@ export class BienvenidoPage implements OnInit, OnDestroy {
           }
         } else {
           let buscar = {
-            ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
+            ids_empleados: [parseInt(localStorage.getItem("empleadoID"), 10)],
           };
           this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(2000)).subscribe(
             res => {
-              const timbreFoto = res.respuesta[0].timbre_internet;
+              const timbreFoto = res.data[0].timbre_internet;
               const resultado = timbreFoto ? 'Si' : 'No';
               localStorage.setItem('timbrarSinInternet', resultado);
               this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
@@ -403,11 +517,11 @@ export class BienvenidoPage implements OnInit, OnDestroy {
           }
         } else {
           let buscar = {
-            ids_empleados: [parseInt( localStorage.getItem("empleadoID"), 10)],
+            ids_empleados: [parseInt(localStorage.getItem("empleadoID"), 10)],
           };
           this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(2000)).subscribe(
             res => {
-              const timbreFoto = res.respuesta[0].timbre_internet;
+              const timbreFoto = res.data[0].timbre_internet;
               const resultado = timbreFoto ? 'Si' : 'No';
               localStorage.setItem('timbrarSinInternet', resultado);
               this.router.navigate(['/enviartimbre', 'Fin de permiso']);

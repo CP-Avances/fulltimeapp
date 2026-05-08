@@ -13,24 +13,17 @@ import { EnviarUsuarioComponent } from '../pages/paginas-admin/comunicado/enviar
 
 // componentes modals autorizaciones
 import { UpdateAutorizacionComponent } from './update-autorizacion/update-autorizacion.component';
-import { ShowHoraExtraComponent } from './update-autorizacion/show-hora-extra/show-hora-extra.component';
 import { ShowPermisoComponent } from './update-autorizacion/show-permiso/show-permiso.component';
 import { ShowVacacionComponent } from './update-autorizacion/show-vacacion/show-vacacion.component';
 
 // componentes modals autorizaciones multiple
 import { UpdateAutorizacionMultipleComponent } from './update-autorizacion-multiple/update-autorizacion-multiple.component';
-import { ShowHoraExtraMultipleComponent } from './update-autorizacion-multiple/show-hora-extra-multiple/show-hora-extra-multiple.component';
 import { ShowPermisoMultipleComponent } from './update-autorizacion-multiple/show-permiso-multiple/show-permiso-multiple.component';
 import { ShowVacacionMultipleComponent } from './update-autorizacion-multiple/show-vacacion-multiple/show-vacacion-multiple.component';
 
 // componente modals Reporteria
-import { ReporteAtrasoComponent } from './reporte-atraso/reporte-atraso.component';
-import { ReporteInasistenciaComponent } from './reporte-inasistencia/reporte-inasistencia.component';
 import { ReporteTimbreComponent } from './reporte-timbre/reporte-timbre.component';
 import { ReporteTimbreConNovedadesComponent } from './reporte-timbreConNovedades/reporte-timbreConNovedades.component';
-import { ReporteSolicitudComponent } from './reporte-solicitud/reporte-solicitud.component';
-import { ReporteAlimentacionComponent } from './reporte-alimentacion/reporte-alimentacion.component';
-import { ReporteHoraExtraComponent } from './reporte-hora-extra/reporte-hora-extra.component';
 import { ReporteVacacionComponent } from './reporte-vacacion/reporte-vacacion.component';
 import { VerImagenModalPage } from './ver-timbre-empleado/ver-imagen/ver-imagen.component';
 
@@ -43,20 +36,13 @@ import { VerImagenModalPage } from './ver-timbre-empleado/ver-imagen/ver-imagen.
     VerTimbreEmpleadoComponent,
     EnviarUsuarioComponent,
     UpdateAutorizacionComponent,
-    ShowHoraExtraComponent,
     ShowPermisoComponent,
     ShowVacacionComponent,
     UpdateAutorizacionMultipleComponent,
-    ShowHoraExtraMultipleComponent,
     ShowPermisoMultipleComponent,
     ShowVacacionMultipleComponent,
-    ReporteInasistenciaComponent,
-    ReporteAtrasoComponent,
     ReporteTimbreComponent,
     ReporteTimbreConNovedadesComponent,
-    ReporteSolicitudComponent,
-    ReporteAlimentacionComponent,
-    ReporteHoraExtraComponent,
     ReporteVacacionComponent,
     VerImagenModalPage
   ],
@@ -67,13 +53,8 @@ import { VerImagenModalPage } from './ver-timbre-empleado/ver-imagen/ver-imagen.
     EnviarUsuarioComponent,
     UpdateAutorizacionComponent,
     UpdateAutorizacionMultipleComponent,
-    ReporteInasistenciaComponent,
-    ReporteAtrasoComponent,
     ReporteTimbreComponent,
     ReporteTimbreConNovedadesComponent,
-    ReporteSolicitudComponent,
-    ReporteAlimentacionComponent,
-    ReporteHoraExtraComponent,
     ReporteVacacionComponent,
     VerImagenModalPage
   ],

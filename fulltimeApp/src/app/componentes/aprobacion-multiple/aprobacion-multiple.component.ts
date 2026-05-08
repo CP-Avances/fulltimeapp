@@ -4,7 +4,6 @@ import { Permiso } from '../../interfaces/Permisos';
 import { ValidacionesService } from '../../libs/validaciones.service';
 import { ModalController } from '@ionic/angular';
 import { Vacacion } from '../../interfaces/Vacacion';
-import { HoraExtra } from '../../interfaces/HoraExtra';
 
 @Component({
   selector: 'app-aprobacion-multiple',
@@ -15,9 +14,8 @@ export class AprobacionMultipleComponent implements OnDestroy {
 
   @Input() permisos: Permiso[];
   @Input() vacaciones: Vacacion[];
-  @Input() horas_extras: HoraExtra[];
 
-  @Output() onArrCheck: EventEmitter<Permiso[] | Vacacion[] | HoraExtra[]> = new EventEmitter
+  @Output() onArrCheck: EventEmitter<Permiso[] | Vacacion[]> = new EventEmitter
   @Output() onChecked: EventEmitter<boolean> = new EventEmitter
   @Output() onRefreshOnInit: EventEmitter<boolean> = new EventEmitter
 
@@ -36,11 +34,7 @@ export class AprobacionMultipleComponent implements OnDestroy {
         this.onChecked.emit(false);
         this.vacaciones.forEach(o => { o.isChecked = false })
     }
-    
-    if (this.horas_extras) {
-      this.onChecked.emit(false);
-      this.horas_extras.forEach(o => { o.isChecked = false })
-    }
+
   }
 
   async presentModalAutorizarMultiple() {
@@ -50,9 +44,7 @@ export class AprobacionMultipleComponent implements OnDestroy {
     if (this.vacaciones) {
       await this.vacacionesAutorizacion()
     }
-    if (this.horas_extras) {
-      await this.horasExtrasAutorizacion()
-    }
+
   }
 
   private async permisosAutorizacion() {
@@ -103,29 +95,6 @@ export class AprobacionMultipleComponent implements OnDestroy {
     return;
   }
 
-  private async horasExtrasAutorizacion() {
-    let horas_extras = await this.horas_extras.filter(o => { return o.isChecked === true });
-
-    if (horas_extras.length === 0) return this.validacionService.showToast('Seleccione solicitudes.', 3000, 'danger');
-
-    const modal = await this.modalController.create({
-      component: UpdateAutorizacionMultipleComponent,
-      componentProps: {
-        horas_extras,
-        labelAutorizacion: 'Horas Extras'
-      },
-      cssClass: 'my-custom-class'
-    });
-
-    await modal.present();
-
-    const { data: { refreshInfo } } = await modal.onDidDismiss()
-
-    if (refreshInfo) {
-      this.refeshSolicitudes(true)
-    }
-    return;
-  }
 
   refeshSolicitudes(refreshInfo: boolean) {
     this.onRefreshOnInit.emit(refreshInfo)
@@ -149,10 +118,7 @@ export class AprobacionMultipleComponent implements OnDestroy {
       this.onArrCheck.emit(this.vacaciones);
       return;
     }
-    if (this.horas_extras) {
-      this.horas_extras.forEach(o => { o.isChecked = this.isAllCheck })
-      this.onArrCheck.emit(this.horas_extras);
-    }
+
   }
 
 }

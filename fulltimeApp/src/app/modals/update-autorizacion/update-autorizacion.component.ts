@@ -7,12 +7,10 @@ import { DateTime } from 'luxon';
 import { estadoSelectItems, EstadoSolicitudes } from '../../interfaces/Estados';
 import { Permiso, cg_permisoValueDefault } from '../../interfaces/Permisos';
 import { Vacacion } from 'src/app/interfaces/Vacacion';
-import { HoraExtra } from 'src/app/interfaces/HoraExtra';
 import { Autorizacion, autorizacionValueDefault } from '../../interfaces/Autorizaciones';
-import { Notificacion, NotificacionTimbre, notificacionTimbreValueDefault, notificacionValueDefault } from 'src/app/interfaces/Notificaciones';
+import { Notificacion, notificacionValueDefault } from 'src/app/interfaces/Notificaciones';
 import { CatalogosService } from 'src/app/services/catalogos.service';
 import { AlertController, ModalController } from '@ionic/angular';
-import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { PermisosService } from 'src/app/services/permisos.service';
 import { VacacionesService } from 'src/app/services/vacaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
@@ -32,7 +30,6 @@ export class UpdateAutorizacionComponent implements OnInit {
   showForm: boolean = true;
   @Input() permiso: Permiso;
   @Input() vacacion: Vacacion;
-  @Input() hora_extra: HoraExtra;
   @Input() labelAutorizacion: string = '';
 
   autorizacion: Autorizacion = autorizacionValueDefault;
@@ -65,7 +62,6 @@ export class UpdateAutorizacionComponent implements OnInit {
     public modalController: ModalController,
     private vacacionService: VacacionesService,
     private permisoService: PermisosService,
-    private horaExtraService: HorasExtrasService,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
     public restAutoriza: AutorizacionesService,
@@ -83,7 +79,7 @@ export class UpdateAutorizacionComponent implements OnInit {
 
   tiempo: any;
   ngOnInit() {
-    console.log('pantalla update-autorizacion .. ', this.permiso, ' ', this.vacacion, ' ', this.hora_extra)
+    console.log('pantalla update-autorizacion .. ', this.permiso, ' ', this.vacacion, ' ')
     this.tiempo = DateTime.now();
     this.BuscarFormatos();
     this.validar.ObtenerIPsLocales().then((ips) => {
@@ -261,42 +257,6 @@ export class UpdateAutorizacionComponent implements OnInit {
 
     }
 
-    if (this.hora_extra) {
-      this.autoService.getInfoEmpleadoByCodigo(this.hora_extra.id_empleado_solicita).subscribe(
-        res => {
-          if (res.estado === 1) {
-            var estado = true;
-          }
-          this.solInfo = [];
-          this.solInfo = {
-            hora_extra_mail: res.hora_extra_mail,
-            hora_extra_noti: res.hora_extra_notificacion,
-            id_empleado: res.id_empleado,
-            id_suc: res.id_suc,
-            id_departamento: res.id_depa,
-            estado: estado,
-            correo: res.correo,
-          }
-          this.processInfoEmpleado(res)
-          this.BuscarTipoAutorizacion(this.solInfo);
-
-          this.empleado_estado = [];
-          this.listadoDepaAutoriza = [];
-          this.lectura = 1;
-          return this.autoService.getAutorizacionHoraExtra(this.hora_extra.id).subscribe(
-            autorizacion => {
-              this.autorizacion = autorizacion;
-              setTimeout(() => {
-                this.ConfiguracionAutorizacion(this.autorizacion, this.hora_extra, this.solInfo);
-              }, 2000);
-            },
-            err => { this.errorResponse(err.error.message) },
-            () => { }
-          )
-        },
-        err => { this.errorResponse(err.error.message) },
-      )
-    }
   }
 
   nivel_padre: number = 0;
@@ -470,7 +430,6 @@ export class UpdateAutorizacionComponent implements OnInit {
       this.showForm = false;
       this.permiso = undefined;
       this.vacacion = undefined;
-      this.hora_extra = undefined;
     }
     this.infoEmpleadoRecibe = info;
   }
@@ -503,10 +462,6 @@ export class UpdateAutorizacionComponent implements OnInit {
       newAutorizaciones.id_permiso = null,
         newAutorizaciones.id_vacacion = this.vacacion.id,
         newAutorizaciones.id_hora_extra = null;
-    } else if (solicitud === 'hora_extra') {
-      newAutorizaciones.id_permiso = null,
-        newAutorizaciones.id_vacacion = null,
-        newAutorizaciones.id_hora_extra = this.hora_extra.id;
     }
     newAutorizaciones.user_name = this.userService.username;
     newAutorizaciones.ip = localStorage.getItem('ip');
@@ -560,14 +515,6 @@ export class UpdateAutorizacionComponent implements OnInit {
         )
       }
 
-      else if (this.hora_extra) {
-        this.autoService.putAutorizacionHoraExtra(this.hora_extra.id, data).subscribe(
-          autorizacion => { this.successResponse(autorizacion, 'hora_extra', this.autorizacion.estado) },
-          err => { this.errorResponse(err.error.message) },
-          () => { this.loadingBtn = false }
-        )
-      }
-
       this.closeModal(true)
     }
   }
@@ -605,16 +552,6 @@ export class UpdateAutorizacionComponent implements OnInit {
 
         console.log('ver autoriza vacacion .. ', this.vacacion, ' infoempleado ... ', this.infoEmpleadoRecibe)
         this.NotificarAprobacionVacacion(this.vacacion, this.infoEmpleadoRecibe);
-        break;
-
-      case 'hora_extra':
-        this.autoService.updateEstadoSolicitudes({ estado: this.estadoChange.id, id_solicitud: this.hora_extra.id, user_name: this.userService.username, ip: localStorage.getItem('ip'), ip_local: this.ips_locales }, 'mhe_solicitud_hora_extra').subscribe(
-          resp => { this.validaciones.showToast(resp.message, 3000, 'success') },
-          err => { this.validaciones.showToast(err.error.message, 3000, 'danger') },
-        )
-        this.hora_extra.estado = this.estadoChange.id;
-        console.log('ver autoriza hora extra...', this.hora_extra, ' ... ', this.infoEmpleadoRecibe)
-        this.NotificarAprobacionHE(this.hora_extra, this.infoEmpleadoRecibe);
         break;
 
       default:
@@ -884,7 +821,7 @@ export class UpdateAutorizacionComponent implements OnInit {
 
     noti.user_name = this.userService.username;
     noti.ip = localStorage.getItem('ip');
-    noti.ip_local =this.ips_locales;
+    noti.ip_local = this.ips_locales;
 
     //Listado para eliminar el usuario duplicado
     var allNotificacionesVacaciones = [];
@@ -919,178 +856,4 @@ export class UpdateAutorizacionComponent implements OnInit {
   }
 
 
-  /** ******************************************************************************************* **
-   ** **                METODO DE ENVIO DE NOTIFICACIONES DE HORAS EXTRAS                      ** **
-   ** ******************************************************************************************* **/
-
-  // METODO DE ENVIO DE NOTIFICACIONES RESPECTO A LA APROBACION
-  NotificarAprobacionHE(horaExtra: any, infoUsuario: any) {
-    var datos = {
-      depa_user_loggin: infoUsuario.id_departamento,
-      objeto: horaExtra,
-    }
-
-    // CAPTURANDO ESTADO DE LA SOLICITUD DE PERMISO
-    if (horaExtra.estado === 2) {
-      var estado_h = 'Preautorizado';
-      var estado_c = 'Preautorizada';
-      var estado_n = 'preautorizadas';
-    }
-    else if (horaExtra.estado === 3) {
-      var estado_h = 'Autorizado';
-      var estado_c = 'Autorizada';
-      var estado_n = 'autorizadas';
-    }
-    else if (horaExtra.estado === 4) {
-      var estado_h = 'Negado';
-      var estado_c = 'Negada';
-      var estado_n = 'negadas';
-    }
-    this.autoService.BuscarJefes(datos).subscribe(horaExtra => {
-      horaExtra.EmpleadosSendNotiEmail.push(this.solInfo);
-      console.log(horaExtra);
-      //this.configuracionCorreoHE(horaExtra, estado_h, estado_c, horaExtra.num_hora, estado_n);
-      this.EnviarNotificacionHE(horaExtra, estado_h, horaExtra.horas_solicitud, estado_n, infoUsuario);
-      this.validaciones.showToast('Proceso realizado exitosamente.', 5000, 'success');
-    });
-  }
-
-  configuracionCorreoHE(horaExtra: any, estado_h: string, estado_c: string, valor: any, estado_n: string) {
-    console.log('ver horas extras ....   ', horaExtra);
-    this.empleado_estado = [];
-    this.listadoDepaAutoriza = [];
-    this.listaEnvioCorreo = [];
-    this.id_departamento = this.solInfo.id_dep;
-    this.lectura = 1;
-    this.autoService.getAutorizacionHoraExtra(this.hora_extra.id).subscribe(res3 => {
-      this.autorizacion = res3;
-      // METODO PARA OBTENER EMPLEADOS Y ESTADOS
-      var autorizaciones = this.autorizacion.id_documento.split(',');
-      autorizaciones.map((obj: string) => {
-        this.lectura = this.lectura + 1;
-        if (obj != '') {
-          let empleado_id = obj.split('_')[0];
-          this.estado_auto = obj.split('_')[1];
-
-          // CREAR ARRAY DE DATOS DE COLABORADORES
-          var data = {
-            id_empleado: empleado_id,
-            estado: this.estado_auto
-          }
-
-          // CAMBIAR DATO ESTADO INT A VARCHAR
-          if (this.estado_auto === '1') {
-            this.estado_auto = 'Pendiente';
-          }
-          if (this.estado_auto === '2') {
-            this.estado_auto = 'Preautorizado';
-          }
-
-          this.empleado_estado = this.empleado_estado.concat(data);
-          // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
-          if (this.lectura === autorizaciones.length) {
-            if ((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')) {
-              this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion.id_departamento).subscribe(res => {
-                this.listadoDepaAutoriza = res;
-                this.listadoDepaAutoriza.filter(item => {
-                  if ((item.nivel === autorizaciones.length) && (item.nivel_padre === item.nivel)) {
-                    return this.listaEnvioCorreo.push(item);
-                  } else if ((item.nivel === autorizaciones.length || item.nivel === (autorizaciones.length - 1))) {
-                    return this.listaEnvioCorreo.push(item);
-                  }
-                })
-                //  this.EnviarCorreoHE(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, valor, estado_n);
-              });
-            } else if (this.estado_auto > 2) {
-              this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion.id_departamento).subscribe(res => {
-                this.listadoDepaAutoriza = res;
-                this.listadoDepaAutoriza.filter(item => {
-                  if ((item.nivel_padre === this.InfoListaAutoriza.nivel) && (item.nivel_padre === item.nivel)) {
-                    return this.listaEnvioCorreo.push(item);
-                  } else {
-                    //Esta condicion es para enviar el correo a todos los usuraios que autorizan siempre y cuando la solicitud fue negada antes
-                    this.listaEnvioCorreo = this.listadoDepaAutoriza;
-
-                  }
-                })
-
-
-
-                //  this.EnviarCorreoHE(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, valor, estado_n);
-              });
-            }
-          }
-        } else if (autorizaciones.length == 1) {
-          this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion.id_departamento).subscribe(res => {
-            this.listadoDepaAutoriza = res;
-            this.listadoDepaAutoriza.filter(item => {
-              if (item.nivel < 3) {
-                return this.listaEnvioCorreo.push(item);
-              }
-            })
-            // this.EnviarCorreoHE(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, valor, estado_n);
-          });
-        }
-      })
-
-    }, err => {
-      this.errorResponse(err.error.message)
-    });
-  }
-
-
-
-  // METODO PARA ENVIAR NOTIIFICACIONES AL SISTEMA
-  EnviarNotificacionHE(horaExtra: any, estado_h: string, valor: any, estado_n: string, infoUsuario: any) {
-
-    // MÉTODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
-    let desde = this.validar.FormatearFecha(DateTime.fromISO(horaExtra.fecha_inicio).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(DateTime.fromISO(horaExtra.fecha_final).toFormat('yyyy-MM-dd'), this.formato_fecha, this.validar.dia_completo);
-
-    let h_inicio = this.validar.FormatearHora(DateTime.fromISO(horaExtra.fecha_inicio).toFormat('HH:mm:ss'), this.formato_hora)
-    let h_final = this.validar.FormatearHora(DateTime.fromISO(horaExtra.fecha_final).toFormat('HH:mm:ss'), this.formato_hora);
-
-    const noti: NotificacionTimbre = notificacionTimbreValueDefault;
-    noti.tipo = 12;
-    noti.id_empleado_envia = parseInt(localStorage.getItem('empleadoID'));
-    noti.fecha_hora = this.tiempo.format('YYYY-MM-DD') + ' ' + this.tiempo.format('HH:mm:ss');
-
-    noti.descripcion = 'Ha ' + estado_h.toLowerCase() + ' la solicitud de horas extras para ' +
-      infoUsuario.fullname + ' desde ' +
-      desde + ' hasta ' +
-      hasta + ' horario de ' + h_inicio + ' a ' + h_final +
-      ' estado ' + estado_n + ' horas ' + DateTime.fromFormat(valor, 'HH:mm').toFormat('HH:mm');;
-
-    noti.user_name = this.userService.username;
-    noti.ip = localStorage.getItem('ip');
-    noti.ip_local = this.ips_locales
-    //Listado para eliminar el usuario duplicado
-    var allNotificacionesHorasExtras = [];
-    //Ciclo por cada elemento del listado
-    horaExtra.EmpleadosSendNotiEmail.forEach(function (elemento, indice, array) {
-      // Discriminación de elementos iguales
-      if (allNotificacionesHorasExtras.find(p => p.empleado == elemento.empleado) == undefined) {
-        // Nueva lista de empleados que reciben la notificacion
-        allNotificacionesHorasExtras.push(elemento);
-      }
-    });
-
-    console.log("Usuarios que reciben la notificacion: ", allNotificacionesHorasExtras);
-
-    allNotificacionesHorasExtras.forEach(e => {
-      noti.id_empleado_recibe = e.empleado;
-
-      if (e.hora_extra_noti) {
-        this.autoService.postAvisosGenerales(noti).subscribe(
-          resp => {
-            this.horaExtraService.sendNotiRealTimeAprobar(resp.respuesta);
-          },
-          err => {
-            this.validaciones.showToast(err.error.message, 3000, 'danger')
-          },
-          () => { },
-        )
-      }
-    })
-  }
 }

@@ -15,7 +15,6 @@ import { CatalogosService } from 'src/app/services/catalogos.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
 import { CloseModalComponent } from 'src/app/componentes/close-modal/close-modal.component';
 import { ParametrosService } from 'src/app/services/parametros.service';
-import { HorasExtrasService } from 'src/app/services/horas-extras.service';
 import { PermisosService } from 'src/app/services/permisos.service';
 import { AlertController, IonDatetime } from '@ionic/angular';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
@@ -68,7 +67,6 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
   constructor(
     public validar: ValidacionesService,
     private permisoService: PermisosService,
-    private horasExtrasService: HorasExtrasService,
     private vacacionService: VacacionesService,
     private catalogoService: CatalogosService,
     private empleadoService: EmpleadosService,
@@ -337,29 +335,16 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
         return this.btnOcultoguardar = true;
       }
       else {
-        this.horasExtrasService.getlistaHorasExtrasByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
+        this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
           if (solicitados.length != 0) {
             this.reg.dia_laborable = null;
             this.reg.dia_libre = null;
-            this.validar.showToast('Ups! Ya existe horas extras en esas fechas ', 3500, 'warning');
+            this.validar.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
             return this.btnOcultoguardar = true;
           }
           else {
-            this.vacacionService.getlistaVacacionesByFechasyCodigo(fec_inicio, fec_final, codigo).subscribe(solicitados => {
-              if (solicitados.length != 0) {
-                this.reg.dia_laborable = null;
-                this.reg.dia_libre = null;
-                this.validar.showToast('Ups! Ya existe vacaciones en esas fechas ', 3500, 'warning');
-                return this.btnOcultoguardar = true;
-              }
-              else {
-                this.calcularDiasVacaciones();
-                return this.btnOcultoguardar = false;
-              }
-            }, err => {
-              this.validar.showToast('Lo sentimos tenemos inconvenientes con el servidor', 3500, 'warning');
-            });
-
+            this.calcularDiasVacaciones();
+            return this.btnOcultoguardar = false;
           }
         }, err => {
           this.validar.showToast('Lo sentimos tenemos inconvenientes con el servidor', 3500, 'warning');
@@ -458,7 +443,7 @@ export class RegistrarVacacionComponent implements OnInit, OnDestroy {
 
     noti.user_name = this.userService.username;
     noti.ip = localStorage.getItem('ip');
-    noti.ip_local= this.ips_locales;
+    noti.ip_local = this.ips_locales;
 
     //Listado para eliminar el usuario duplicado
     var allNotificaciones = [];
