@@ -44,6 +44,29 @@ export class VacacionCriterioBusquedaPage implements OnInit {
     this.fechaDesde = this.obtenerFechaHoy();
   }
 
+  ionViewWillEnter() {
+    const debeResetear = localStorage.getItem('resetBusquedaVacaciones');
+
+    if (debeResetear === 'true') {
+      localStorage.removeItem('resetBusquedaVacaciones');
+      this.resetearPantallaBusqueda();
+    }
+  }
+
+  resetearPantallaBusqueda() {
+    this.idEmpleado = parseInt(localStorage.getItem('empleadoID') || '0', 10);
+
+    this.fechaDesde = this.obtenerFechaHoy();
+    this.estadoSeleccionado = 1;
+
+    this.solicitudes = [];
+    this.totalSolicitudes = 0;
+    this.busquedaRealizada = false;
+    this.cargando = false;
+    this.desde = 0;
+    this.mostrarFormularioBusqueda = true;
+  }
+
   obtenerFechaHoy(): string {
     return new Date().toISOString().split('T')[0];
   }
@@ -152,15 +175,14 @@ export class VacacionCriterioBusquedaPage implements OnInit {
   }
 
   verSolicitud(solicitud: any) {
-    console.log('Ver solicitud:', solicitud);
-  }
-
-  editarSolicitud(solicitud: any) {
-    console.log('Editar solicitud:', solicitud);
-  }
-
-  eliminarSolicitud(solicitud: any) {
-    console.log('Eliminar solicitud:', solicitud);
+    this.router.navigateByUrl(
+      '/reloj/solicitudes/vacacion-solicitud/vacacion-detalle-solicitud',
+      {
+        state: {
+          solicitud
+        }
+      }
+    );
   }
 
   regresar() {

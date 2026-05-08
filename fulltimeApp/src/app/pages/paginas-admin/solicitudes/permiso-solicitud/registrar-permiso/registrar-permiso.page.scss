@@ -1,0 +1,120 @@
+.contenedor-formulario {
+  padding: 14px;
+}
+
+.form-card {
+  border-radius: 14px;
+}
+
+.input-item {
+  margin-bottom: 12px;
+  border-radius: 10px;
+}
+
+ion-segment {
+  margin: 12px 0 16px 0;
+}
+
+.nota-feriados {
+  font-size: 13px;
+  text-align: justify;
+  margin: 10px 0;
+  color: var(--ion-color-medium);
+}
+
+.bloque-archivo {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.btn-archivo {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: #87e887;
+  color: #ffffff;
+  padding: 13px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.archivo-info {
+  margin-top: 10px;
+  background: rgba(120, 120, 120, 0.15);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.resumen-titulo {
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+  margin: 18px 0 10px 0;
+}
+
+.tabla-resumen {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.fila {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  text-align: center;
+}
+
+.fila div {
+  padding: 12px 4px;
+  font-size: 13px;
+}
+
+.cabecera {
+  background: rgba(120, 120, 120, 0.25);
+  font-weight: bold;
+}
+
+.cuerpo {
+  background: rgba(120, 120, 120, 0.15);
+}
+
+.total {
+  background: #2f8be6;
+  color: white;
+  font-weight: bold;
+}
+
+.seleccionado {
+  background: rgba(47, 139, 230, 0.35);
+  font-weight: bold;
+}
+
+.acciones {
+  margin-top: 20px;
+}
+
+.resultado-card {
+  margin-top: 16px;
+}
+
+.resultado-verificacion {
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.resultado-verificacion.ok {
+  background: rgba(76, 175, 80, 0.18);
+  color: #2e7d32;
+}
+
+.resultado-verificacion.error {
+  background: rgba(244, 67, 54, 0.18);
+  color: #c62828;
+}

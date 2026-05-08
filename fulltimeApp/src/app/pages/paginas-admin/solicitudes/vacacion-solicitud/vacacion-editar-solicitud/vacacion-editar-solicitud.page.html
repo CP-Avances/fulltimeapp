@@ -1,0 +1,194 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/reloj/solicitudes/vacacion-solicitud/vacacion-detalle-solicitud"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Editar vacación</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="contenedor-formulario">
+
+    <ion-card class="form-card">
+      <ion-card-header>
+        <ion-card-title>Editar solicitud de vacación</ion-card-title>
+        <ion-card-subtitle>
+          Solicitud N° {{ obtenerIdSolicitud() }}
+        </ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <ion-item class="input-item">
+          <ion-label position="stacked">Tipo de vacación</ion-label>
+          <ion-select
+            [(ngModel)]="tipoVacacionSeleccionado"
+            (ionChange)="onTipoVacacionChange()"
+            interface="popover"
+            placeholder="Seleccione">
+            <ion-select-option *ngFor="let tipo of tiposVacacion" [value]="tipo.id">
+              {{ tipo.descripcion }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ng-container *ngIf="!permiteHoras">
+          <ion-item class="input-item">
+            <ion-label position="stacked">Fecha inicio de vacaciones</ion-label>
+            <ion-input
+              type="date"
+              [(ngModel)]="fechaInicio"
+              (ionChange)="onFechasChange()">
+            </ion-input>
+          </ion-item>
+
+          <ion-item class="input-item">
+            <ion-label position="stacked">Fecha fin de vacaciones</ion-label>
+            <ion-input
+              type="date"
+              [(ngModel)]="fechaFinal"
+              (ionChange)="onFechasChange()">
+            </ion-input>
+          </ion-item>
+        </ng-container>
+
+        <ng-container *ngIf="permiteHoras">
+          <ion-item class="input-item">
+            <ion-label position="stacked">Fecha de vacación</ion-label>
+            <ion-input
+              type="date"
+              [(ngModel)]="fechaHoras"
+              (ionChange)="onFechasChange()">
+            </ion-input>
+          </ion-item>
+
+          <ion-item class="input-item">
+            <ion-label position="stacked">Hora inicio</ion-label>
+            <ion-input
+              type="time"
+              [(ngModel)]="horaInicio"
+              (ionChange)="onFechasChange()">
+            </ion-input>
+          </ion-item>
+
+          <ion-item class="input-item">
+            <ion-label position="stacked">Hora fin</ion-label>
+            <ion-input
+              type="time"
+              [(ngModel)]="horaFinal"
+              (ionChange)="onFechasChange()">
+            </ion-input>
+          </ion-item>
+        </ng-container>
+
+        <ion-item class="input-item">
+          <ion-label position="stacked">Vacaciones: días feriados</ion-label>
+          <ion-input [value]="diasFeriados" readonly></ion-input>
+        </ion-item>
+
+        <ion-item class="input-item">
+          <ion-label position="stacked">Saldo de vacaciones</ion-label>
+          <ion-input [value]="saldoVacacionesVisible" readonly></ion-input>
+        </ion-item>
+
+        <div class="nota-feriados" *ngIf="incluirFeriadosSeleccionado !== null">
+          <p *ngIf="incluirFeriadosSeleccionado">
+            Nota: Los días feriados serán contabilizados en los días totales porque el parámetro está activado.
+          </p>
+          <p *ngIf="!incluirFeriadosSeleccionado">
+            Nota: Los días feriados no serán contabilizados en los días totales porque el parámetro está desactivado.
+          </p>
+        </div>
+
+        <div class="bloque-archivo">
+          <label for="archivoVacacionEditar" class="btn-archivo">
+            Subir documento
+          </label>
+
+          <input
+            id="archivoVacacionEditar"
+            type="file"
+            hidden
+            (change)="seleccionarArchivo($event)" />
+
+          <div class="archivo-info">
+            <span>{{ nombreArchivo || 'Ningún archivo seleccionado.' }}</span>
+
+            <ion-button
+              fill="clear"
+              color="danger"
+              size="small"
+              *ngIf="nombreArchivo"
+              (click)="quitarArchivo()">
+              Quitar
+            </ion-button>
+          </div>
+        </div>
+
+        <div class="resumen-titulo">
+          {{ permiteHoras ? 'Horas seleccionadas por día de la semana' : 'Número de días (por día de la semana) en el periodo seleccionado' }}
+        </div>
+
+        <div class="tabla-resumen">
+          <div class="fila cabecera">
+            <div>Lun</div>
+            <div>Mar</div>
+            <div>Mié</div>
+            <div>Jue</div>
+            <div>Vie</div>
+            <div>Sáb</div>
+            <div>Dom</div>
+            <div class="total">{{ permiteHoras ? 'Horas' : 'Total' }}</div>
+          </div>
+
+          <div class="fila cuerpo">
+            <div [class.seleccionado]="permiteHoras && diaSemanaSeleccionado === 'L'">{{ permiteHoras ? '' : conteoDiasSemana.L }}</div>
+            <div [class.seleccionado]="permiteHoras && diaSemanaSeleccionado === 'M'">{{ permiteHoras ? '' : conteoDiasSemana.M }}</div>
+            <div [class.seleccionado]="permiteHoras && diaSemanaSeleccionado === 'X'">{{ permiteHoras ? '' : conteoDiasSemana.X }}</div>
+            <div [class.seleccionado]="permiteHoras && diaSemanaSeleccionado === 'J'">{{ permiteHoras ? '' : conteoDiasSemana.J }}</div>
+            <div [class.seleccionado]="permiteHoras && diaSemanaSeleccionado === 'V'">{{ permiteHoras ? '' : conteoDiasSemana.V }}</div>
+            <div [class.seleccionado]="permiteHoras && diaSemanaSeleccionado === 'S'">{{ permiteHoras ? '' : conteoDiasSemana.S }}</div>
+            <div [class.seleccionado]="permiteHoras && diaSemanaSeleccionado === 'D'">{{ permiteHoras ? '' : conteoDiasSemana.D }}</div>
+            <div class="total">{{ permiteHoras ? horasTotales : diasTotales }}</div>
+          </div>
+        </div>
+
+        <div class="acciones">
+          <ion-button
+            expand="block"
+            [disabled]="!puedeVerificar() || actualizando"
+            (click)="verificarSolicitud()">
+            Verificar
+          </ion-button>
+
+          <ion-button
+            expand="block"
+            color="success"
+            [disabled]="!puedeActualizar()"
+            (click)="actualizarSolicitud()">
+            <ion-spinner
+              *ngIf="actualizando"
+              name="crescent"
+              slot="start">
+            </ion-spinner>
+            Actualizar solicitud
+          </ion-button>
+        </div>
+
+        <ion-card class="resultado-card" *ngIf="verificacionRealizada">
+          <ion-card-header>
+            <ion-card-title>Resultado de la verificación</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="resultado-verificacion" [ngClass]="estadoVerificacion">
+              {{ mensajeVerificacion }}
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+</ion-content>

@@ -254,13 +254,7 @@ export class SolicitudesPage implements OnInit {
 
   // METODO PARA REDIRECCIONAR A LA PAGINA DE PERMISOS
   BtnPermisos_click() {
-    if (this.Btn_permisos == true) {
-      this.router.navigateByUrl("/reloj/solicitudes/permiso-solicitud");
-    } else if (this.Btn_permisos == false) {
-      this.usuarioIncorrectoToas("Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.\n\nTe gustaría activarlo?");
-    } else {
-      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexión. \n Comprueba tu conexión a internet o");
-    }
+    this.router.navigateByUrl("/reloj/solicitudes/permiso-solicitud");
   }
 
   // METODO PARA REDIRECCIONAR A LA PAGINA DE HORAS EXTRAS
