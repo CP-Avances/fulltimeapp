@@ -1,16 +1,19 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { ToastController } from '@ionic/angular';
+
 import { VacacionesService } from 'src/app/services/vacaciones.service';
 import { FeriadosService, IFeriado } from 'src/app/services/feriados.service';
 import { DocumentosService } from 'src/app/services/documentos.service';
-import { ToastController } from '@ionic/angular';
-import { Router } from '@angular/router';
- 
+
 @Component({
-  selector: 'app-registrar-vacacion',
-  templateUrl: './registrar-vacacion.page.html',
-  styleUrls: ['./registrar-vacacion.page.scss'],
+  selector: 'app-vacacion-editar-solicitud',
+  templateUrl: './vacacion-editar-solicitud.page.html',
+  styleUrls: ['./vacacion-editar-solicitud.page.scss'],
 })
-export class RegistrarVacacionPage implements OnInit {
+export class VacacionEditarSolicitudPage implements OnInit {
+
+  solicitud: any = null;
 
   tiposVacacion: any[] = [];
   tipoVacacionSeleccionado: number | null = null;
@@ -39,37 +42,88 @@ export class RegistrarVacacionPage implements OnInit {
   verificacionRealizada = false;
   estadoVerificacion = '';
   mensajeVerificacion = '';
+  resultadoVerificacionDetalle: any = null;
 
   nombreArchivo = '';
   archivoSeleccionado: File | null = null;
+  documentoOriginal = '';
+  documentoPendienteEliminar = false;
 
   feriados: IFeriado[] = [];
+
   idEmpleado!: number;
   idSucursal!: number;
 
   cargandoTipos = false;
   cargandoSaldo = false;
   cargandoFeriados = false;
+  actualizando = false;
 
   debeVerificarProgramacion = false;
-  resultadoVerificacionDetalle: any = null;
 
   constructor(
     private vacacionesService: VacacionesService,
     private feriadosService: FeriadosService,
     private documentosService: DocumentosService,
     private toastController: ToastController,
-    private router: Router,
-
+    private router: Router
   ) { }
 
   ngOnInit() {
-    this.idEmpleado = parseInt(localStorage.getItem('empleadoID') || '0', 10);
+    const navigation = this.router.getCurrentNavigation();
+    this.solicitud = navigation?.extras?.state?.['solicitud'] || history.state?.solicitud || null;
+
+    if (!this.solicitud) {
+      this.mostrarToast('No se encontró la solicitud para editar.', 'warning');
+      this.router.navigateByUrl('/reloj/solicitudes/vacacion-solicitud/vacacion-criterio-busqueda');
+      return;
+    }
+
+    this.idEmpleado = Number(this.solicitud.id_empleado || localStorage.getItem('empleadoID') || 0);
     this.idSucursal = parseInt(localStorage.getItem('csucur') || '0', 10);
 
+    this.precargarFormulario();
     this.cargarTiposVacacion();
     this.cargarSaldoEmpleado();
     this.cargarFeriados();
+  }
+
+  obtenerIdSolicitud(): number {
+    return Number(this.solicitud?.id_solicitud_vacacion || this.solicitud?.id || 0);
+  }
+
+  precargarFormulario() {
+    this.tipoVacacionSeleccionado = Number(this.solicitud.id_configuracion);
+
+    this.fechaInicio = this.formatearFechaInput(this.solicitud.fecha_inicio);
+    this.fechaFinal = this.formatearFechaInput(this.solicitud.fecha_final);
+    this.fechaHoras = this.formatearFechaInput(this.solicitud.fecha_inicio);
+
+    this.conteoDiasSemana = {
+      L: Number(this.solicitud.numero_dias_lunes || 0),
+      M: Number(this.solicitud.numero_dias_martes || 0),
+      X: Number(this.solicitud.numero_dias_miercoles || 0),
+      J: Number(this.solicitud.numero_dias_jueves || 0),
+      V: Number(this.solicitud.numero_dias_viernes || 0),
+      S: Number(this.solicitud.numero_dias_sabado || 0),
+      D: Number(this.solicitud.numero_dias_domingo || 0),
+    };
+
+    this.diasTotales = Number(this.solicitud.numero_dias_totales || 0);
+    this.incluirFeriadosSeleccionado = !!this.solicitud.incluir_feriados;
+
+    this.documentoOriginal = this.solicitud.documento || '';
+    this.nombreArchivo = this.documentoOriginal;
+
+    const minutos = Number(this.solicitud.minutos_totales || 0);
+    if (minutos > 0) {
+      const horas = Math.floor(minutos / 60);
+      const mins = minutos % 60;
+
+      this.horasTotales = `${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+      this.horaInicio = '';
+      this.horaFinal = '';
+    }
   }
 
   cargarTiposVacacion() {
@@ -79,6 +133,8 @@ export class RegistrarVacacionPage implements OnInit {
       next: (data) => {
         const lista = Array.isArray(data) ? data : [];
         this.tiposVacacion = lista.filter(v => Number(v.sucursal_id) === Number(this.idSucursal));
+
+        this.aplicarConfiguracionTipo();
         this.cargandoTipos = false;
       },
       error: (err) => {
@@ -97,11 +153,13 @@ export class RegistrarVacacionPage implements OnInit {
     this.vacacionesService.ObtenerSaldoEmpleados(this.idEmpleado).subscribe({
       next: (response) => {
         const saldo = response?.data?.saldo_disponible;
+
         if (saldo) {
           this.saldoVacacionesVisible = `${saldo.dias} días, ${saldo.horas} horas, ${saldo.minutos} minutos`;
         } else {
           this.saldoVacacionesVisible = '—';
         }
+
         this.cargandoSaldo = false;
       },
       error: (err) => {
@@ -128,37 +186,34 @@ export class RegistrarVacacionPage implements OnInit {
     });
   }
 
-  onTipoVacacionChange() {
+  aplicarConfiguracionTipo() {
     const tipo = this.tiposVacacion.find(t => Number(t.id) === Number(this.tipoVacacionSeleccionado));
 
     this.permiteHoras = !!tipo?.permite_horas;
-    this.incluirFeriadosSeleccionado = tipo?.incluir_feriados ?? null;
+    this.incluirFeriadosSeleccionado = tipo?.incluir_feriados ?? this.incluirFeriadosSeleccionado;
     this.requiereDocumento = !!tipo?.documento;
-
-    this.limpiarFormularioDependiente();
   }
 
-  limpiarFormularioDependiente() {
-    this.fechaInicio = '';
-    this.fechaFinal = '';
-    this.fechaHoras = '';
-    this.horaInicio = '';
-    this.horaFinal = '';
-    this.diasFeriados = 0;
-    this.diasTotales = 0;
-    this.horasTotales = '00:00';
-    this.diaSemanaSeleccionado = null;
-    this.conteoDiasSemana = { L: 0, M: 0, X: 0, J: 0, V: 0, S: 0, D: 0 };
-    this.verificacionRealizada = false;
-    this.estadoVerificacion = '';
-    this.mensajeVerificacion = '';
+  onTipoVacacionChange() {
+    this.aplicarConfiguracionTipo();
+    this.limpiarVerificacion();
+
+    if (!this.permiteHoras) {
+      this.fechaHoras = '';
+      this.horaInicio = '';
+      this.horaFinal = '';
+      this.calcularDias();
+    } else {
+      this.fechaInicio = '';
+      this.fechaFinal = '';
+      this.conteoDiasSemana = { L: 0, M: 0, X: 0, J: 0, V: 0, S: 0, D: 0 };
+      this.diasTotales = 0;
+      this.actualizarResumenPorHoras();
+    }
   }
 
   onFechasChange() {
-    this.verificacionRealizada = false;
-    this.estadoVerificacion = '';
-    this.mensajeVerificacion = '';
-    this.resultadoVerificacionDetalle = null;
+    this.limpiarVerificacion();
 
     if (!this.permiteHoras) {
       this.calcularDias();
@@ -236,10 +291,10 @@ export class RegistrarVacacionPage implements OnInit {
 
     const horas = Math.floor(totalMinutos / 60);
     const minutos = totalMinutos % 60;
+
     this.horasTotales = `${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}`;
 
-    const fechaActual = this.fechaHoras;
-    const esFeriado = this.feriados.some(f => String(f.fecha).substring(0, 10) === fechaActual);
+    const esFeriado = this.feriados.some(f => String(f.fecha).substring(0, 10) === this.fechaHoras);
     this.diasFeriados = esFeriado ? 1 : 0;
   }
 
@@ -249,18 +304,19 @@ export class RegistrarVacacionPage implements OnInit {
 
     this.archivoSeleccionado = file;
     this.nombreArchivo = file.name;
+    this.documentoPendienteEliminar = false;
+    this.limpiarVerificacion();
   }
 
   quitarArchivo() {
     this.archivoSeleccionado = null;
     this.nombreArchivo = '';
+    this.documentoPendienteEliminar = !!this.documentoOriginal;
+    this.limpiarVerificacion();
   }
 
   verificarSolicitud() {
-    this.verificacionRealizada = false;
-    this.estadoVerificacion = '';
-    this.mensajeVerificacion = '';
-    this.resultadoVerificacionDetalle = null;
+    this.limpiarVerificacion();
 
     if (!this.tipoVacacionSeleccionado) {
       this.estadoVerificacion = 'error';
@@ -282,6 +338,13 @@ export class RegistrarVacacionPage implements OnInit {
       if (!this.fechaInicio || !this.fechaFinal) {
         this.estadoVerificacion = 'error';
         this.mensajeVerificacion = 'Ingrese la fecha inicial y la fecha final.';
+        this.verificacionRealizada = true;
+        return;
+      }
+
+      if (new Date(this.fechaFinal) < new Date(this.fechaInicio)) {
+        this.estadoVerificacion = 'error';
+        this.mensajeVerificacion = 'La fecha final debe ser posterior o igual a la fecha inicial.';
         this.verificacionRealizada = true;
         return;
       }
@@ -325,7 +388,7 @@ export class RegistrarVacacionPage implements OnInit {
           id_empleado: this.idEmpleado,
           fecha_inicio: payload.fechaInicio,
           fecha_final: payload.fechaFin,
-          excluir_solicitud_actual: null
+          excluir_solicitud_actual: this.obtenerIdSolicitud()
         };
 
         this.vacacionesService.BuscarSolicitudExistente(payloadExistente).subscribe({
@@ -358,7 +421,7 @@ export class RegistrarVacacionPage implements OnInit {
     });
   }
 
-  registrarSolicitud() {
+  actualizarSolicitud() {
     if (!this.verificacionRealizada || this.estadoVerificacion !== 'ok') {
       this.mostrarToast('Primero debe verificar correctamente la solicitud.', 'warning');
       return;
@@ -371,7 +434,10 @@ export class RegistrarVacacionPage implements OnInit {
       return;
     }
 
-    if (this.requiereDocumento && !this.archivoSeleccionado) {
+    const tieneDocumentoActual = !!this.documentoOriginal && !this.documentoPendienteEliminar;
+    const tieneDocumentoNuevo = !!this.archivoSeleccionado;
+
+    if (this.requiereDocumento && !tieneDocumentoActual && !tieneDocumentoNuevo) {
       this.mostrarToast('Este tipo de vacación requiere adjuntar un documento.', 'warning');
       return;
     }
@@ -382,64 +448,107 @@ export class RegistrarVacacionPage implements OnInit {
     const fechaFinalSolicitud = esPorHoras ? this.fechaHoras : this.fechaFinal;
 
     const payload: any = {
-      subir_documento: !!this.archivoSeleccionado,
-      id_tipo_vacacion: this.tipoVacacionSeleccionado,
-      id_empleado: this.idEmpleado,
+      id_solicitud_vacacion: this.obtenerIdSolicitud(),
+      id_configuracion: this.tipoVacacionSeleccionado,
       fecha_inicio: fechaInicioSolicitud,
       fecha_final: fechaFinalSolicitud,
+      numero_dias_lunes: esPorHoras ? 0 : this.conteoDiasSemana.L,
+      numero_dias_martes: esPorHoras ? 0 : this.conteoDiasSemana.M,
+      numero_dias_miercoles: esPorHoras ? 0 : this.conteoDiasSemana.X,
+      numero_dias_jueves: esPorHoras ? 0 : this.conteoDiasSemana.J,
+      numero_dias_viernes: esPorHoras ? 0 : this.conteoDiasSemana.V,
+      numero_dias_sabado: esPorHoras ? 0 : this.conteoDiasSemana.S,
+      numero_dias_domingo: esPorHoras ? 0 : this.conteoDiasSemana.D,
+      numero_dias_totales: esPorHoras ? 0 : this.diasTotales,
       incluir_feriados: this.incluirFeriadosSeleccionado ?? false,
-      permite_horas: esPorHoras,
-      num_horas: esPorHoras ? this.horasTotales : '00:00',
-      num_lunes: esPorHoras ? 0 : this.conteoDiasSemana.L,
-      num_martes: esPorHoras ? 0 : this.conteoDiasSemana.M,
-      num_miercoles: esPorHoras ? 0 : this.conteoDiasSemana.X,
-      num_jueves: esPorHoras ? 0 : this.conteoDiasSemana.J,
-      num_viernes: esPorHoras ? 0 : this.conteoDiasSemana.V,
-      num_sabado: esPorHoras ? 0 : this.conteoDiasSemana.S,
-      num_domingo: esPorHoras ? 0 : this.conteoDiasSemana.D,
-      num_dias_totales: esPorHoras ? 0 : this.diasTotales
+      documento: this.documentoPendienteEliminar ? null : this.documentoOriginal,
+      minutos_totales: esPorHoras ? this.calcularMinutosTotales() : 0
     };
 
-    this.vacacionesService.RegistrarVacaciones(payload).subscribe({
-      next: (response) => {
-        const solicitudCreada = response?.data ?? response ?? null;
+    this.actualizando = true;
 
-        if (!solicitudCreada || !solicitudCreada.id) {
-          this.mostrarToast('La solicitud se registró, pero no se obtuvo el identificador.', 'warning');
-          return;
-        }
-
-        if (this.archivoSeleccionado) {
-          const formData = new FormData();
-          formData.append('uploads', this.archivoSeleccionado, this.archivoSeleccionado.name);
-
-          this.documentosService.SubirDocumento(
-            formData,
-            solicitudCreada.id,
-            this.idEmpleado,
-            'vacaciones'
-          ).subscribe({
-            next: () => {
-              this.mostrarToast('Solicitud registrada correctamente.', 'success');
-              this.resetearFormularioCompleto();
-            },
-            error: (err) => {
-              console.error('Error subiendo documento:', err);
-              this.mostrarToast('La solicitud se registró, pero ocurrió un error al subir el documento.', 'warning');
-            }
-          });
-
-          return;
-        }
-
-        this.mostrarToast('Solicitud registrada correctamente.', 'success');
-        this.router.navigateByUrl('/reloj/solicitudes/vacacion-solicitud');
+    this.vacacionesService.EditarSolicitudesVacaciones(payload).subscribe({
+      next: (solicitudActualizada) => {
+        this.procesarDocumentoDespuesActualizar(solicitudActualizada);
       },
       error: (err) => {
-        console.error('Error registrando solicitud:', err);
-        this.mostrarToast(err?.message || 'Ocurrió un error al registrar la solicitud.', 'danger');
+        console.error('Error actualizando solicitud:', err);
+        this.actualizando = false;
+        this.mostrarToast(err?.message || 'Ocurrió un error al actualizar la solicitud.', 'danger');
       }
     });
+  }
+
+  procesarDocumentoDespuesActualizar(solicitudActualizada: any) {
+    const idSolicitud = this.obtenerIdSolicitud();
+
+    if (this.archivoSeleccionado) {
+      const formData = new FormData();
+      formData.append('uploads', this.archivoSeleccionado, this.archivoSeleccionado.name);
+
+      this.documentosService.SubirDocumento(
+        formData,
+        idSolicitud,
+        this.idEmpleado,
+        'vacaciones'
+      ).subscribe({
+        next: () => {
+          this.actualizando = false;
+          this.mostrarToast('Solicitud actualizada correctamente.', 'success');
+          this.regresarDetalleConSolicitudActualizada(solicitudActualizada);
+        },
+        error: (err) => {
+          console.error('Error subiendo documento:', err);
+          this.actualizando = false;
+          this.mostrarToast('La solicitud se actualizó, pero ocurrió un error al subir el documento.', 'warning');
+          this.regresarDetalleConSolicitudActualizada(solicitudActualizada);
+        }
+      });
+
+      return;
+    }
+
+    if (this.documentoPendienteEliminar) {
+      this.vacacionesService.EliminarDocumentoSolicitud(idSolicitud).subscribe({
+        next: () => {
+          this.actualizando = false;
+          this.mostrarToast('Solicitud actualizada correctamente.', 'success');
+          this.regresarDetalleConSolicitudActualizada({
+            ...solicitudActualizada,
+            documento: null
+          });
+        },
+        error: (err) => {
+          console.error('Error eliminando documento:', err);
+          this.actualizando = false;
+          this.mostrarToast('La solicitud se actualizó, pero no se pudo eliminar el documento.', 'warning');
+          this.regresarDetalleConSolicitudActualizada(solicitudActualizada);
+        }
+      });
+
+      return;
+    }
+
+    this.actualizando = false;
+    this.mostrarToast('Solicitud actualizada correctamente.', 'success');
+    this.regresarDetalleConSolicitudActualizada(solicitudActualizada);
+  }
+
+  regresarDetalleConSolicitudActualizada(solicitudActualizada: any) {
+    localStorage.setItem('resetBusquedaVacaciones', 'true');
+    this.router.navigateByUrl(
+      '/reloj/solicitudes/vacacion-solicitud/vacacion-criterio-busqueda'
+    );
+  }
+
+  calcularMinutosTotales(): number {
+    if (!this.horaInicio || !this.horaFinal) return 0;
+
+    const [h1, m1] = this.horaInicio.split(':').map(Number);
+    const [h2, m2] = this.horaFinal.split(':').map(Number);
+
+    const total = (h2 * 60 + m2) - (h1 * 60 + m1);
+    return total > 0 ? total : 0;
   }
 
   puedeVerificar(): boolean {
@@ -452,8 +561,35 @@ export class RegistrarVacacionPage implements OnInit {
     return !!this.fechaHoras && !!this.horaInicio && !!this.horaFinal;
   }
 
-  puedeRegistrar(): boolean {
-    return this.verificacionRealizada && this.estadoVerificacion === 'ok';
+  puedeActualizar(): boolean {
+    return this.verificacionRealizada && this.estadoVerificacion === 'ok' && !this.actualizando;
+  }
+
+  obtenerTipoSeleccionado() {
+    return this.tiposVacacion.find(t => Number(t.id) === Number(this.tipoVacacionSeleccionado));
+  }
+
+  limpiarVerificacion() {
+    this.verificacionRealizada = false;
+    this.estadoVerificacion = '';
+    this.mensajeVerificacion = '';
+    this.resultadoVerificacionDetalle = null;
+  }
+
+  formatearFechaInput(fecha: string): string {
+    if (!fecha) return '';
+    return String(fecha).substring(0, 10);
+  }
+
+  regresarDetalle() {
+    this.router.navigateByUrl(
+      '/reloj/solicitudes/vacacion-solicitud/vacacion-detalle-solicitud',
+      {
+        state: {
+          solicitud: this.solicitud
+        }
+      }
+    );
   }
 
   async mostrarToast(mensaje: string, color: 'success' | 'warning' | 'danger') {
@@ -467,41 +603,4 @@ export class RegistrarVacacionPage implements OnInit {
 
     await toast.present();
   }
-
-  obtenerTipoSeleccionado() {
-    return this.tiposVacacion.find(t => Number(t.id) === Number(this.tipoVacacionSeleccionado));
-  }
-
-  resetearFormularioCompleto() {
-    this.tipoVacacionSeleccionado = null;
-    this.permiteHoras = false;
-    this.incluirFeriadosSeleccionado = null;
-    this.requiereDocumento = false;
-
-    this.fechaInicio = '';
-    this.fechaFinal = '';
-    this.fechaHoras = '';
-    this.horaInicio = '';
-    this.horaFinal = '';
-
-    this.diasFeriados = 0;
-    this.diasTotales = 0;
-    this.horasTotales = '00:00';
-    this.diaSemanaSeleccionado = null;
-
-    this.conteoDiasSemana = { L: 0, M: 0, X: 0, J: 0, V: 0, S: 0, D: 0 };
-
-    this.verificacionRealizada = false;
-    this.estadoVerificacion = '';
-    this.mensajeVerificacion = '';
-    this.resultadoVerificacionDetalle = null;
-
-    this.archivoSeleccionado = null;
-    this.nombreArchivo = '';
-
-    this.cargarSaldoEmpleado();
-  }
-
-
-
 }

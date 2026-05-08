@@ -7,6 +7,10 @@ const routes: Routes = [
   {
     path: '',
     component: PermisoSolicitudPage
+  },
+  {
+    path: 'registrar-permiso',
+    loadChildren: () => import('./registrar-permiso/registrar-permiso.module').then( m => m.RegistrarPermisoPageModule)
   }
 ];
 

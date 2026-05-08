@@ -125,3 +125,65 @@ export const diasHoras: opcionesDiasHoras[] = [
     { label: 'Horas', value: 'Horas', message: 'Ingrese el rango de horas y minutos a Solicitar' },
     //{ label: 'Días y Horas', value: 'Días y Horas', message: 'Ingrese el rango de días y horas a Solicitar' },
 ];
+
+export interface TipoPermiso {
+  id: number;
+  descripcion: string;
+  dias_maximo_permiso?: number;
+  horas_maximo_permiso?: string;
+  dias_anticipar_permiso?: number;
+  crear_dias_anteriores?: number;
+  contar_feriados?: boolean;
+  legalizar?: boolean;
+  documento?: boolean;
+  tipo_descuento?: string;
+  sucursal_id?: number;
+}
+
+export interface VerificarPermisoVacacionesPayload {
+  empleados: number[];
+  fechaInicio: string;
+  fechaFin: string;
+  incluirFeriados: boolean;
+  permiteHoras: boolean;
+  numHoras: string;
+  horaInicio?: string;
+  horaFin?: string;
+  tipoDescuento?: string;
+}
+
+export interface CalcularTiempoPermisoPayload {
+  empleados: number[];
+  fechaInicio: string;
+  fechaFin: string;
+  permiteHoras: boolean;
+  incluirFeriados: boolean;
+  horaInicio?: string;
+  horaFin?: string;
+  idTipoPermiso: number;
+}
+
+export interface TiempoPermisoEmpleado {
+  idEmpleado: number;
+  tiempoPermisoTexto?: string;
+  saldoVacacionesTexto?: string;
+}
+
+export interface SolicitudPermisoDetalle {
+  id: number;
+  id_tipo_permiso: number;
+  id_empleado: number;
+  descripcion?: string;
+  fecha_inicio: string;
+  fecha_final: string;
+  permite_horas: boolean;
+  hora_inicio?: string | null;
+  hora_fin?: string | null;
+  num_horas?: string;
+  dias_permiso?: number;
+  minutos_totales?: number;
+  incluir_feriados?: boolean;
+  estado?: number;
+  legalizado?: boolean;
+  documento?: any;
+}

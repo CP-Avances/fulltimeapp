@@ -1,0 +1,195 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/reloj/solicitudes/vacacion-solicitud/vacacion-criterio-busqueda"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle solicitud</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <div class="contenedor-detalle" *ngIf="solicitud">
+
+    <ion-card class="detalle-card">
+
+      <ion-card-header class="detalle-header">
+        <div class="header-superior">
+          <ion-badge [color]="estadoColor(solicitud.estado)">
+            {{ estadoTexto(solicitud.estado) }}
+          </ion-badge>
+        </div>
+
+        <div class="titulo-solicitud">
+          <ion-card-title>Solicitud de vacaciones</ion-card-title>
+          <ion-card-subtitle>N° {{ solicitud.id_solicitud_vacacion || solicitud.id }}</ion-card-subtitle>
+        </div>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <div class="bloque-info">
+          <div class="bloque-titulo">
+            <ion-icon name="person-outline"></ion-icon>
+            <span>Empleado</span>
+          </div>
+
+          <div class="info-linea">
+            <span>Empleado</span>
+            <strong>
+              {{ solicitud.apellido_empleado }}
+              {{ solicitud.nombre_empleado }}
+            </strong>
+          </div>
+
+          <div class="info-linea">
+            <span>Código</span>
+            <strong>{{ solicitud.codigo_empleado || '—' }}</strong>
+          </div>
+
+          <div class="info-linea">
+            <span>Departamento</span>
+            <strong>{{ solicitud.nombre_departamento || '—' }}</strong>
+          </div>
+        </div>
+
+        <div class="bloque-info">
+          <div class="bloque-titulo">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <span>Datos de la solicitud</span>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-card">
+              <span>Fecha inicio</span>
+              <strong>{{ formatearFecha(solicitud.fecha_inicio) }}</strong>
+            </div>
+
+            <div class="info-card">
+              <span>Fecha final</span>
+              <strong>{{ formatearFecha(solicitud.fecha_final) }}</strong>
+            </div>
+
+            <div class="info-card">
+              <span>Fecha registro</span>
+              <strong>{{ formatearFecha(solicitud.fecha_registro) }}</strong>
+            </div>
+
+            <div class="info-card">
+              <span>Fecha actualización</span>
+              <strong>{{ formatearFecha(solicitud.fecha_actualizacion) }}</strong>
+            </div>
+          </div>
+
+          <div class="info-linea feriados-linea">
+            <span>Feriados incluidos</span>
+            <strong>{{ textoFeriadosIncluidos(solicitud.incluir_feriados) }}</strong>
+          </div>
+        </div>
+
+        <div class="bloque-info">
+          <div class="bloque-titulo">
+            <ion-icon name="list-outline"></ion-icon>
+            <span>Detalle de días</span>
+          </div>
+
+          <div class="tabla-resumen">
+            <div class="fila cabecera">
+              <div>Lun</div>
+              <div>Mar</div>
+              <div>Mié</div>
+              <div>Jue</div>
+              <div>Vie</div>
+              <div>Sáb</div>
+              <div>Dom</div>
+              <div class="total">Total</div>
+            </div>
+
+            <div class="fila cuerpo">
+              <div>{{ solicitud.numero_dias_lunes || 0 }}</div>
+              <div>{{ solicitud.numero_dias_martes || 0 }}</div>
+              <div>{{ solicitud.numero_dias_miercoles || 0 }}</div>
+              <div>{{ solicitud.numero_dias_jueves || 0 }}</div>
+              <div>{{ solicitud.numero_dias_viernes || 0 }}</div>
+              <div>{{ solicitud.numero_dias_sabado || 0 }}</div>
+              <div>{{ solicitud.numero_dias_domingo || 0 }}</div>
+              <div class="total">{{ solicitud.numero_dias_totales || 0 }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bloque-info" *ngIf="solicitud.documento">
+          <div class="bloque-titulo">
+            <ion-icon name="document-attach-outline"></ion-icon>
+            <span>Documento adjunto</span>
+          </div>
+
+          <div class="documento-box">
+            <ion-icon name="document-text-outline"></ion-icon>
+            <span>{{ solicitud.documento }}</span>
+          </div>
+        </div>
+
+        <div class="acciones-detalle">
+
+          <ion-button
+            size="small"
+            color="success"
+            fill="outline"
+            (click)="editarSolicitud()">
+            <ion-icon name="create-outline" slot="start"></ion-icon>
+            Editar
+          </ion-button>
+
+          <ion-button
+            size="small"
+            color="tertiary"
+            fill="outline"
+            [disabled]="imprimiendo"
+            (click)="imprimirSolicitud()">
+
+            <ion-spinner
+              *ngIf="imprimiendo"
+              name="crescent"
+              slot="start">
+            </ion-spinner>
+
+            <ion-icon
+              *ngIf="!imprimiendo"
+              name="print-outline"
+              slot="start">
+            </ion-icon>
+
+            {{ imprimiendo ? 'Generando' : 'Imprimir' }}
+          </ion-button>
+
+          <ion-button
+            size="small"
+            color="danger"
+            fill="outline"
+            [disabled]="eliminando"
+            (click)="eliminarSolicitud()">
+            <ion-spinner
+              *ngIf="eliminando"
+              name="crescent"
+              slot="start">
+            </ion-spinner>
+
+            <ion-icon
+              *ngIf="!eliminando"
+              name="trash-outline"
+              slot="start">
+            </ion-icon>
+
+            {{ eliminando ? 'Eliminando' : 'Eliminar' }}
+          </ion-button>
+
+        </div>
+
+      </ion-card-content>
+
+    </ion-card>
+
+  </div>
+
+</ion-content>

@@ -222,7 +222,9 @@ export class VacacionesService {
 
   // EDITAR SOLICITUD
   EditarSolicitudesVacaciones(data: any): Observable<any> {
-    if (!data.id || data.id <= 0) {
+    const idSolicitud = Number(data.id_solicitud_vacacion || data.id || 0);
+
+    if (!idSolicitud || idSolicitud <= 0) {
       return throwError(() => new Error('ID de solicitud no válido'));
     }
 
@@ -239,13 +241,14 @@ export class VacacionesService {
       numero_dias_domingo: data.numero_dias_domingo,
       numero_dias_totales: data.numero_dias_totales,
       incluir_feriados: data.incluir_feriados,
-      documento: data.documento,
-      minutos_totales: data.minutos_totales
+      documento: data.documento ?? null,
+      minutos_totales: data.minutos_totales ?? 0
     };
 
-    return this.http.put<any>(`${this.apiUrl}/editar_solicitud/${data.id}`, datosActualizacion)
+    return this.http.put<any>(`${this.apiUrl}/editar_solicitud/${idSolicitud}`, datosActualizacion)
       .pipe(
         retry(1),
+        map(response => response?.data || response),
         catchError(this.handleError)
       );
   }
@@ -325,8 +328,5 @@ export class VacacionesService {
         catchError(this.handleError)
       );
   }
-
-
-
 
 }

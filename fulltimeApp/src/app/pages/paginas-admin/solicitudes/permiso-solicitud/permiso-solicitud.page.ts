@@ -1,4 +1,6 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Platform } from '@ionic/angular';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-permiso-solicitud',
@@ -8,9 +10,18 @@ import { Component, OnInit} from '@angular/core';
 export class PermisoSolicitudPage implements OnInit {
 
   constructor(
-    ) {}
+    public platform: Platform,
+    private router: Router,
+  ) {}
 
   ngOnInit() {
   }
 
+  irSolicitarPermiso() {
+    this.router.navigateByUrl('/reloj/solicitudes/permiso-solicitud/registrar-permiso');
+  }
+
+  irMisSolicitudes() {
+    this.router.navigateByUrl('/reloj/solicitudes/permiso-solicitud/permiso-criterio-busqueda');
+  }
 }

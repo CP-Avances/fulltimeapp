@@ -15,6 +15,14 @@ const routes: Routes = [
   {
     path: 'vacacion-criterio-busqueda',
     loadChildren: () => import('./vacacion-criterio-busqueda/vacacion-criterio-busqueda.module').then( m => m.VacacionCriterioBusquedaPageModule)
+  },
+  {
+    path: 'vacacion-detalle-solicitud',
+    loadChildren: () => import('./vacacion-detalle-solicitud/vacacion-detalle-solicitud.module').then( m => m.VacacionDetalleSolicitudPageModule)
+  },
+  {
+    path: 'vacacion-editar-solicitud',
+    loadChildren: () => import('./vacacion-editar-solicitud/vacacion-editar-solicitud.module').then( m => m.VacacionEditarSolicitudPageModule)
   }
 ];
 
