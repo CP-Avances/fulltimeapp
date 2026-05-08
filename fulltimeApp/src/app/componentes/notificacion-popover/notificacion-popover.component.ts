@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController, PopoverController } from '@ionic/angular';
-import { AutorizacionesService } from '../../services/autorizaciones.service';
 import { Notificacion } from '../../interfaces/Notificaciones';
 import { NotificacionTimbre } from '../../interfaces/Notificaciones';
 import { SkeletonListNotificacionesArray } from '../../interfaces/Skeleton';
-import { Router } from '@angular/router';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { ListaNotificacionComponent } from '../lista-notificaciones/lista-notificacion.component';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
@@ -37,8 +35,6 @@ export class NotificacionPopoverComponent implements OnInit {
   formato_hora: string = 'HH:mm:ss';
 
   constructor(
-    private notificacionService: AutorizacionesService,
-    private router: Router,
     public pooverCtrl: PopoverController,
     private vistonotificacion: NotificacionesService,
     public modalController: ModalController,
@@ -54,31 +50,7 @@ export class NotificacionPopoverComponent implements OnInit {
     });
     this.loading = true;
     this.countNoti = 0;
-    this.notificacionService.getNotificacionesFulltime(id_empleado + '').subscribe(
-      (res: any[]) => {
-        this.notificacionesAll = this.formatearNotificaciones(res, this.formato_fecha, this.formato_hora);
-        console.log("AVISOS", this.notificacionesAll);
-        this.notificacionesAll.sort((a, b) => {
-          if (a.visto === b.visto) {
-            return a.create_at < b.create_at ? 1 : -1;
-          }
-          return a.visto ? 1 : -1;
-        });
 
-        this.notificacionesAll.forEach((item) => {
-          if (item.visto === false) {
-            this.countNoti++;
-          }
-        });
-
-      },
-      (error) => {
-        console.error('Error al cargar notificaciones:', error);
-      },
-      () => {
-        this.loading = false;
-      }
-    );
   }
 
 

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { MenuController, ModalController, PopoverController, AlertController, LoadingController, ToastController } from '@ionic/angular';
-import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
 import { NotificacionPopoverComponent } from '../notificacion-popover/notificacion-popover.component';
@@ -11,9 +10,7 @@ import { Notificacion } from '../../interfaces/Notificaciones';
 import { NotificacionTimbre } from '../../interfaces/Notificaciones';
 import { LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
 
-import { Router } from '@angular/router';
 import { ParametrosService } from 'src/app/services/parametros.service';
-import { EmpleadosService } from 'src/app/services/empleados.service';
 import { NetworkService } from '../../libs/network.service';
 import { SocketService } from 'src/app/services/socket.service';
 
@@ -50,14 +47,11 @@ export class NavegadorAdminComponent implements OnInit {
   constructor(
     private userService: DataUserLoggedService,
     private relojService: RelojServiceService,
-    private empleadoService: EmpleadosService,
     private menu: MenuController,
     public modalController: ModalController,
     public pooverCtrl: PopoverController,
-    private notificacionService: AutorizacionesService,
     public platform: Platform,
     public alertCrtl: AlertController,
-    private router: Router,
     public loadingController: LoadingController,
     private toastController: ToastController,
     public parametros: ParametrosService,
@@ -200,63 +194,7 @@ export class NavegadorAdminComponent implements OnInit {
 
   // METODO PARA LEER LAS NOTIFICACIONES
   LlamarNotificcaccciones(id_empleado: number) {
-    this.notificacionService.getNotificacionesByIdEmpleado(id_empleado).subscribe(
-      notificacion => {
-        console.log("ver todas la notificaciones del empleado: ", notificacion)
-        this.notificaciones = notificacion;
 
-        this.notificacionService.getNotificacionesTimbreByIdEmpleado(id_empleado).subscribe(
-          notificaciontim => {
-            this.notificacionestimbres = notificaciontim;
-            this.notificacionesAll = this.notificaciones.concat(this.notificacionestimbres);
-            this.countNoti = 0;
-            this.notificacionesAll.forEach((item: any) => {
-              if (item.visto === false) {
-                this.countNoti++;
-                this.empleEnvia = item.nempleadosend;
-              }
-            });
-
-            //badge de notificacciones pendientes
-            if (this.countNoti == 0) {
-              this.valor = false;
-            } else {
-              this.valor = true;
-            }
-
-          },
-          err => { console.log(err) }, () => { this.loading = false }
-        )
-      },
-      err => {
-
-        this.notificacionService.getNotificacionesTimbreByIdEmpleado(id_empleado).subscribe(
-          notificaiontim => {
-            this.notificacionesAll = notificaiontim;
-
-            this.countNoti = 0;
-            //cuenta las notificaciones que estan sin ver
-            this.notificacionesAll.forEach((item: any) => {
-              if (item.visto === false) {
-                this.countNoti++;
-                this.empleEnvia = item.nempleadosend;
-              }
-            });
-
-            //badge de notificacciones pendientes
-            if (this.countNoti == 0) {
-              this.valor = false;
-            } else {
-              this.valor = true;
-            }
-
-          },
-          err => { console.log(err) },
-          () => { this.loading = false }
-        )
-        console.log(err)
-      },
-      () => { this.loading = false });
   }
 
   //Verifica si tiene activado los modulos mediante la tabla funciones
@@ -366,8 +304,6 @@ export class NavegadorAdminComponent implements OnInit {
   cerrarSesion() {
     this.relojService.cerrarSesion();
     this.closeAdmin();
-
-    this.notificacionService.unsubscribe(); // Desuscribirse usando el servicio
 
   }
 

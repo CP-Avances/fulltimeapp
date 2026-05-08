@@ -49,12 +49,5 @@ export class DocumentosService {
       );
   }
 
-  // DESCARGAR PLANTILLA
-  descargarPlantilla(): Observable<HttpResponse<Blob>> {
-    const url = `${this.apiUrl}/descargar-plantilla`;
-    return this.http.get(url, {
-      responseType: 'blob',
-      observe: 'response',
-    });
-  }
+
 }

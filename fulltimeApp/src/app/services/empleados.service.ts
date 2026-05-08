@@ -81,21 +81,6 @@ export class EmpleadosService {
     return this.http.get<any>(`${this.apiUrl}/empleado/ubicacion/${id}`);
   }
 
-  // METODO PARA BUSCAR INFORMACION DEL USUARIO QUE APRUEBA SOLICITUDES
-  InformarEmpleadoAutoriza(id_empleado: number) {
-    return this.http.get(`${this.apiUrl}/empleado/empleadoAutoriza/${id_empleado}`);
-  }
-
-  // METODO PARA BUSCAR HORARIO DEL USUARIO POR HORAS MISMO DIA (MD)
-  BuscarComidaHorarioHorasMD(datos: any) {
-    return this.http.post<any>(`${this.apiUrl}/empleado/horario-comida-horas-mismo-dia/`, datos);
-  }
-
-  // METODO PARA BUSCAR HORARIO DEL USUARIO POR HORAS DIAS DIFERENTES (DD)
-  BuscarComidaHorarioHorasDD(datos: any) {
-    return this.http.post<any>(`${this.apiUrl}/empleado/horario-comida-horas-dias-diferentes/`, datos);
-  }
-
   // METODO PARA MOSTRAR IMAGEN DEL EMPLEADO
   ObtenerImagen(id: any, imagen: any) {
     return this.http.get<any>(`${this.apiUrl}/empleado/img/codificado/${id}/${imagen}`)

@@ -8,7 +8,6 @@ import { RelojServiceService } from 'src/app/services/reloj-service.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
 import { interval } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { AutorizacionesService } from 'src/app/services/autorizaciones.service';
 import { NetworkService } from '../../libs/network.service';
 import { NavegadorAdminComponent } from 'src/app/componentes/navegador-admin/navegador-admin.component';
 import { Geolocation } from '@capacitor/geolocation';
@@ -44,7 +43,6 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     public router: Router,
     public relojService: RelojServiceService,
     public empleadoService: EmpleadosService,
-    public autorizacionesServices: AutorizacionesService,
     private networkService: NetworkService,
 
   ) {
@@ -63,7 +61,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
         },
         error => console.error('Error fetching data:', error)
       );
-    this.autorizacionesServices.setSubscription(subscription); // Guardar la suscripción en el servicio
+
     this.networkSubscriber();
     this.refreshNavegadorAdmin();
   }
@@ -569,8 +567,6 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   // METODO PARA CERRAR SESION
   cerrarSesion() {
     this.relojService.cerrarSesion();
-    this.autorizacionesServices.unsubscribe(); // Desuscribirse usando el servicio
-
   }
 
   ngOnDestroy() {

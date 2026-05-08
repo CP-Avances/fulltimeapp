@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
 
 // SERVICIOS
 import { StorageService } from './storage.service';
@@ -10,6 +9,7 @@ import { SocketService } from 'src/app/services/socket.service';
 @Injectable({
   providedIn: 'root'
 })
+
 export class NotificacionesService {
 
   private apiUrl = '';

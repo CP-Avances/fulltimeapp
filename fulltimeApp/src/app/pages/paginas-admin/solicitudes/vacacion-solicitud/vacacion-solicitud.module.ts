@@ -5,7 +5,6 @@ import { IonicModule } from '@ionic/angular';
 
 import { VacacionSolicitudPageRoutingModule } from './vacacion-solicitud-routing.module';
 import { VacacionSolicitudPage } from './vacacion-solicitud.page';
-import { VacacionAdminModule } from './componentes/vacacion-admin/vacacion-admin.module';
 
 @NgModule({
   imports: [
@@ -13,7 +12,6 @@ import { VacacionAdminModule } from './componentes/vacacion-admin/vacacion-admin
     FormsModule,
     IonicModule,
     VacacionSolicitudPageRoutingModule,
-    VacacionAdminModule
   ],
   declarations: [VacacionSolicitudPage]
 })

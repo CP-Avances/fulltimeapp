@@ -5,7 +5,6 @@ import { IonicModule } from '@ionic/angular';
 
 import { PermisoSolicitudPageRoutingModule } from './permiso-solicitud-routing.module';
 import { PermisoSolicitudPage } from './permiso-solicitud.page';
-import { PermisosAdminModule } from './componentes/permisos-admin/permisos-admin.module'
 
 @NgModule({
   imports: [
@@ -13,7 +12,6 @@ import { PermisosAdminModule } from './componentes/permisos-admin/permisos-admin
     FormsModule,
     IonicModule,
     PermisoSolicitudPageRoutingModule,
-    PermisosAdminModule
   ],
   declarations: [PermisoSolicitudPage]
 })

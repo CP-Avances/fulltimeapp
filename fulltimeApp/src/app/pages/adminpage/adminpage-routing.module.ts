@@ -48,11 +48,6 @@ const routes: Routes = [
         loadChildren: () => import('../paginas-admin/solicitudes/solicitudes.module').then(m => m.SolicitudesPageModule)
       },
       {
-        path: 'aprobaciones',
-        loadChildren: () => import('../paginas-admin/aprobaciones/aprobaciones.module').then(m => m.AprobacionesPageModule)
-      },
-
-      {
         path: 'comunicado',
         loadChildren: () => import('../paginas-admin/comunicado/comunicado.module').then(m => m.ComunicadoPageModule)
       },
@@ -67,14 +62,6 @@ const routes: Routes = [
       {
         path: 'justificar-timbres',
         loadChildren: () => import('../paginas-admin/justificar-timbres/justificar-timbres.module').then(m => m.JustificarTimbresPageModule)
-      },
-      {
-        path: 'aprobar-permisos',
-        loadChildren: () => import('../paginas-admin/aprobar-permisos/aprobar-permisos.module').then(m => m.AprobarPermisosPageModule)
-      },
-      {
-        path: 'aprobar-vacaciones',
-        loadChildren: () => import('../paginas-admin/aprobar-vacaciones/aprobar-vacaciones.module').then(m => m.AprobarVacacionesPageModule)
       },
       {
         path: 'reportes',

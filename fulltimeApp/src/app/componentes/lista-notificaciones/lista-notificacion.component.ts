@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController, PopoverController, NavParams } from '@ionic/angular';
-import { AutorizacionesService } from '../../services/autorizaciones.service';
 import { Notificacion } from '../../interfaces/Notificaciones';
 import { NotificacionTimbre } from '../../interfaces/Notificaciones';
 import { SkeletonListNotificacionesArray } from '../../interfaces/Skeleton';
@@ -37,7 +36,6 @@ export class ListaNotificacionComponent implements OnInit {
 
   constructor(
     private navParams: NavParams,
-    private notificacionService: AutorizacionesService,
     private router: Router,
     public pooverCtrl: PopoverController,
     private vistonotificacion: NotificacionesService,
@@ -60,32 +58,7 @@ export class ListaNotificacionComponent implements OnInit {
     this.serverConnected = await this.connectivityService.checkServerConnection();
     const id_empleado = localStorage.getItem('empleadoID');
 
-    this.notificacionService.ListarAvisos(id_empleado + '').subscribe(
-      res => {
-        this.notificacionesAll = res;
 
-        this.FormatearInformacionAvisos(this.notificacionesAll);
-        console.log("AVISOS FORMATEADOS", this.notificacionesAll);
-        //Ordenar por visto y fecha
-        this.notificacionesAll.sort((a, b) =>
-          a.visto === b.visto
-            ? (a.fecha_hora > b.fecha_hora ? -1 : 1)
-            : a.visto ? 1 : -1
-        );
-
-
-        if (this.notificacionesAll.length < 21) {
-          this.ver = true;
-        }
-
-        this.loading = false;
-      },
-      err => {
-        console.error(err);
-        this.ver = true;
-        this.loading = false;
-      }
-    );
   }
 
   async ionViewWillEnter() {

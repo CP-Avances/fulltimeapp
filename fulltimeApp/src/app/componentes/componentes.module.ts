@@ -16,12 +16,11 @@ import { RangoFechasComponent } from './rango-fechas/rango-fechas.component';
 import { CloseModalComponent } from './close-modal/close-modal.component';
 import { SaveRegisterComponent } from './accion-buttons/save-register/save-register.component';
 import { SearchRegisterComponent } from './accion-buttons/search-register/search-register.component';
-import { DeleteRegisterComponent } from './accion-buttons/delete-register/delete-register.component';
 import { UpdateRegisterComponent } from './accion-buttons/update-register/update-register.component';
 import { RefreshInfoComponent } from './refresh-info/refresh-info.component';
 import { ListaNotificacionComponent } from './lista-notificaciones/lista-notificacion.component';
 import { PestaniasEstadosComponent } from './pestaniasEstados/pestaniasEstados.component';
-import { AprobacionMultipleComponent } from './aprobacion-multiple/aprobacion-multiple.component';
+
 
 @NgModule({
     declarations: [
@@ -30,12 +29,10 @@ import { AprobacionMultipleComponent } from './aprobacion-multiple/aprobacion-mu
         CloseModalComponent,
         SaveRegisterComponent,
         SearchRegisterComponent,
-        DeleteRegisterComponent,
         UpdateRegisterComponent,
         RefreshInfoComponent,
         ListaEmpleadosComponent,
         ListaNotificacionComponent,
-        AprobacionMultipleComponent,
         PestaniasEstadosComponent,
         RangoFechasComponent,
     ],
@@ -45,12 +42,10 @@ import { AprobacionMultipleComponent } from './aprobacion-multiple/aprobacion-mu
         CloseModalComponent,
         SaveRegisterComponent,
         SearchRegisterComponent,
-        DeleteRegisterComponent,
         UpdateRegisterComponent,
         RefreshInfoComponent,
         ListaEmpleadosComponent,
         ListaNotificacionComponent,
-        AprobacionMultipleComponent,
         PestaniasEstadosComponent,
         RangoFechasComponent,
     ],
