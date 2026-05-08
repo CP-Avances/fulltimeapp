@@ -27,12 +27,7 @@ export class PermisosService {
     private socketService: SocketService,
     private storageService: StorageService,
   ) {
-    this.obtenerUrlEmpresa();
     this.socket = this.socketService.getSocket();
-  }
-
-  async obtenerUrlEmpresa() {
-    this.apiUrl = await this.storageService.get('urlEmpresa');
   }
 
   // METODO PARA ENVIAR NOTIFICACIONES MEDIANTE SOCKET
@@ -194,6 +189,15 @@ export class PermisosService {
   }
 
 
+
+
+
+  /*********************************************************************
+  *
+  * METODOS USADOS DE SERVIDOR MULTITENANT
+  *
+  **********************************************************************
+  */
 
     // LISTAR TIPOS DE PERMISO
   listarTiposPermiso() {

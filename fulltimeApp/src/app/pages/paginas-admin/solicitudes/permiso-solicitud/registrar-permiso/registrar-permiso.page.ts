@@ -32,6 +32,7 @@ export class RegistrarPermisoPage implements OnInit {
 
   diasFeriados = 0;
   saldoVacacionesVisible = '—';
+  cargandoSaldo = false;
 
   conteoDiasSemana = {
     L: 0, M: 0, X: 0, J: 0, V: 0, S: 0, D: 0
@@ -124,7 +125,14 @@ export class RegistrarPermisoPage implements OnInit {
     this.modoSolicitud = 'DIAS';
     this.permiteHoras = false;
 
+    this.saldoVacacionesVisible = '—';
+    this.cargandoSaldo = false;
+
     this.limpiarFormularioDependiente();
+
+    if (this.esDescuentoVacaciones(tipo)) {
+      this.cargarSaldoVacacionesPermiso();
+    }
   }
 
   cambiarModoSolicitud() {
@@ -458,8 +466,8 @@ export class RegistrarPermisoPage implements OnInit {
       next: (tiempos) => {
         const tiempoEmpleado = Array.isArray(tiempos) ? tiempos[0] : null;
 
-        if (tiempoEmpleado?.saldoVacacionesTexto) {
-          this.saldoVacacionesVisible = tiempoEmpleado.saldoVacacionesTexto;
+        if (this.esDescuentoVacaciones(tipo)) {
+          this.saldoVacacionesVisible = tiempoEmpleado?.saldoVacacionesTexto || '—';
         }
 
         this.finalizarVerificacion('ok', 'La solicitud pasó la verificación correctamente.');
@@ -601,6 +609,59 @@ export class RegistrarPermisoPage implements OnInit {
     return this.tiposPermiso.find(
       t => Number(t.id) === Number(this.tipoPermisoSeleccionado)
     );
+  }
+
+  esDescuentoVacaciones(tipo: any): boolean {
+    return String(tipo?.tipo_descuento || '').trim().toUpperCase() === 'VACACIONES';
+  }
+
+  cargarSaldoVacacionesPermiso() {
+    const tipo = this.obtenerTipoSeleccionado();
+
+    if (!tipo || !this.esDescuentoVacaciones(tipo)) {
+      this.saldoVacacionesVisible = '—';
+      this.cargandoSaldo = false;
+      return;
+    }
+
+    if (!this.idEmpleado) {
+      this.saldoVacacionesVisible = '—';
+      this.cargandoSaldo = false;
+      return;
+    }
+
+    this.cargandoSaldo = true;
+
+    const fechaISO = this.formatearFechaLocal(new Date());
+
+    const payloadTiempo: any = {
+      empleados: [this.idEmpleado],
+      fechaInicio: fechaISO,
+      fechaFin: fechaISO,
+      permiteHoras: false,
+      incluirFeriados: false,
+      horaInicio: undefined,
+      horaFin: undefined,
+      idTipoPermiso: tipo.id
+    };
+
+    this.permisosService.calcularTiempoPermiso(payloadTiempo).subscribe({
+      next: (tiempos) => {
+        const tiemposArr = Array.isArray(tiempos) ? tiempos : [];
+
+        const tiempoEmpleado = tiemposArr.find(
+          (t: any) => Number(t.idEmpleado) === Number(this.idEmpleado)
+        );
+
+        this.saldoVacacionesVisible = tiempoEmpleado?.saldoVacacionesTexto || '—';
+        this.cargandoSaldo = false;
+      },
+      error: (err) => {
+        console.error('Error cargando saldo de vacaciones para permiso:', err);
+        this.saldoVacacionesVisible = '—';
+        this.cargandoSaldo = false;
+      }
+    });
   }
 
   finalizarVerificacion(estado: string, mensaje: string) {
