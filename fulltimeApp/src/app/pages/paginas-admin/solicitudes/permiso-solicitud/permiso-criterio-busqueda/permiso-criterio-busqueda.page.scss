@@ -1,0 +1,96 @@
+.contenedor-formulario {
+  padding: 16px;
+}
+
+.form-card,
+.resultado-card,
+.solicitud-card {
+  border-radius: 14px;
+}
+
+.input-item {
+  margin-bottom: 14px;
+  border-radius: 10px;
+}
+
+.acciones-formulario {
+  margin-top: 20px;
+}
+
+.resultado-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.estado-carga {
+  text-align: center;
+  margin-top: 24px;
+}
+
+.estado-carga p {
+  margin-top: 8px;
+  color: var(--ion-color-medium);
+}
+
+.sin-resultados {
+  text-align: center;
+  margin-top: 32px;
+  color: var(--ion-color-medium);
+}
+
+.sin-resultados ion-icon {
+  font-size: 42px;
+  margin-bottom: 8px;
+}
+
+.solicitud-card {
+  margin-top: 14px;
+}
+
+.cabecera-solicitud {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cabecera-solicitud h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.cabecera-solicitud p {
+  font-size: 13px;
+  color: var(--ion-color-medium);
+  margin: 4px 0 0 0;
+}
+
+.detalle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.detalle-item {
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(120, 120, 120, 0.08);
+}
+
+.detalle-item span {
+  display: block;
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  margin-bottom: 6px;
+}
+
+.detalle-item strong {
+  font-size: 14px;
+}
+
+.acciones-solicitud {
+  margin-top: 18px;
+}
