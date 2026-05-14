@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { ToastController, LoadingController, Platform } from '@ionic/angular';
-import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 
 import { environment } from 'src/environments/environment';
 import { DataUserLoggedService } from '../services/data-user-logged.service';
@@ -10,7 +9,7 @@ import { File, IWriteOptions } from '@awesome-cordova-plugins/file/ngx';
 import { FileOpener } from '@awesome-cordova-plugins/file-opener/ngx';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
-import { StorageService } from '../services/storage.service';
+import { map } from 'rxjs';
 
 // Asignar vfs correctamente
 (pdfMake as any).vfs = (pdfFonts as any).vfs;
@@ -25,7 +24,7 @@ const EXCEL_EXTENSION = '.xlsx';
 })
 export class PlantillaReportesService {
 
-  private api_url = '';
+  private readonly apiUrl = `${environment.urlMultitenant}/api/empresa`
 
   constructor(
     private file: File,
@@ -35,41 +34,40 @@ export class PlantillaReportesService {
     private http: HttpClient,
     private toastController: ToastController,
     private dataUser: DataUserLoggedService,
-    private storageService: StorageService,
-  ) { this.obtenerUrlEmpresa();}
-
-
-    async obtenerUrlEmpresa() {
-    this.api_url = await this.storageService.get('urlEmpresa');
-  }
-
-  // SERVICIOS DE LA APLICACION WEB PARA CONSULTAR DATOS DE LA EMPRESA
-  ConsultarDatosEmpresa(id: number) {
-    return this.http.get(`${this.api_url}/empresas/buscar/datos/${id}`);
-  }
+  ) { }
 
   // METODO PARA OBTENER LOGO DE EMPRESA      
-  LogoEmpresaImagenBase64(id_empresa: string) {
-    return this.http.get<any>(`${this.api_url}/empresas/logo/codificado/${parseInt(id_empresa)}`)
+  LogoEmpresaImagenBase64(campo: string) {
+    return this.http.get<any>(`${this.apiUrl}/buscar/imagen/${campo}`)
+      .pipe(map(res => res.data));
   }
 
   // METODO PARA GENERAR EL PDF CON LA LIBRERIA PDFMAKE
   generarPdf(getDocumentDefinicion: any, filename = 'reporte.pdf') {
     this.presentLoading('Creando archivo PDF...');
+
     const documentDefinition = getDocumentDefinicion;
     const pdfDoc = pdfMake.createPdf(documentDefinition);
+
     pdfDoc.getBuffer((uint8Array: Uint8Array) => {
-      let buffer = uint8Array.buffer;
+      const buffer = uint8Array.buffer as ArrayBuffer;
+
       if (this.platform.is('capacitor')) {
         this.descargarDeCelular(buffer, filename.split('.')[0], PDF_TYPE, '.pdf');
       } else {
-        const data: Blob = new Blob([buffer]);
-        var a = window.document.createElement('a');
+        const data: Blob = new Blob([new Uint8Array(buffer)], {
+          type: PDF_TYPE
+        });
+
+        const a = window.document.createElement('a');
         a.href = window.URL.createObjectURL(data);
         a.download = filename;
+
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+
+        window.URL.revokeObjectURL(a.href);
       }
     });
   }
@@ -99,7 +97,7 @@ export class PlantillaReportesService {
   // METODO PARA DESCARGAR EL REPORTE EN EL DISPOSITIVO
   private descargarDeCelular(buffer: any, nombreArchivo: string, tipo: string, extencion: string) {
     const directory = this.file.dataDirectory;
-    console.log(directory);
+
     const fileName = nombreArchivo + extencion;
     let options: IWriteOptions = { replace: true };
     //Writing File to Device
@@ -117,7 +115,7 @@ export class PlantillaReportesService {
 
   private descargarExcelDeCelular(buffer: any, nombreArchivo: string, tipo: string, extencion: string) {
     const directory = this.file.dataDirectory;
-    console.log(directory);
+
     const fileName = nombreArchivo + extencion;
     let options: IWriteOptions = { replace: true };
     const blob = new Blob([buffer], { type: tipo });
@@ -294,37 +292,48 @@ export class PlantillaReportesService {
   }
 
   // METODO PARA ALMACENAR EL LOGO Y LOS COLORES
-  ShowColoresLogo(id_empresa: string) {
+  private readonly campo = 'logo';
+  ShowColoresLogo() {
     const logoBase64 = sessionStorage.getItem('logo');
     const name_empresa = sessionStorage.getItem('name_empresa');
     const p = sessionStorage.getItem('p_color');
     const s = sessionStorage.getItem('s_color');
 
-    if (logoBase64 === null || name_empresa === null || p === null || s === null) {
-      localStorage.removeItem('name_empresa');
-      const params = new HttpParams()
-        .set('id_empresa', id_empresa)
-
-      this.http.get<any>(`${environment.url}/reportes/info-plantilla`, { params }).subscribe(
-        res => {
-          this.setLogoBase64('data:image/jpeg;base64,' + res.imagen);
-          this.setNameEmpresa(res.nom_empresa);
-          this.setColorPrimary(res.color_p);
-          this.setColorSecondary(res.color_s);
-
-          sessionStorage.setItem('p_color', res.color_p);
-          sessionStorage.setItem('s_color', res.color_s);
-          sessionStorage.setItem('name_empresa', res.nom_empresa);
-          (res.imagen == '') ? sessionStorage.setItem('logo', '') : sessionStorage.setItem('logo', 'data:image/jpeg;base64,' + res.imagen)
-        }, err => {
+    if (logoBase64 === null) {
+      // BUSCAR DATOS LOGO DE EMPRESA
+      this.http.get<any>(`${environment.urlMultitenant}/api/empresa/buscar/imagen/${this.campo}`).subscribe({
+        next: (res) => {
+          this.setLogoBase64(res.data);
+          sessionStorage.setItem('logo', res.data)
+        }, error: () => {
+          // QUITAR DATOS DE EMPRESA
           sessionStorage.removeItem('logo')
+        }
+      })
+    } else {
+      // DEFINIR DATOS DE LOGO
+      this.setLogoBase64(logoBase64);
+    }
+
+
+    if (name_empresa === null || p === null || s === null) {
+      localStorage.removeItem('name_empresa');
+
+      this.http.get<any>(`${environment.urlMultitenant}/api/empresa/buscar/datos`).subscribe(
+        {next: (res) => {
+          this.setNameEmpresa(res.data.nombre);
+          this.setColorPrimary(res.data.color_principal);
+          this.setColorSecondary(res.data.color_secundario);
+
+          sessionStorage.setItem('p_color', res.data.color_principal);
+          sessionStorage.setItem('s_color', res.data.color_secundario);
+          sessionStorage.setItem('name_empresa', res.data.nombre);
+        }, error: () => {
           sessionStorage.removeItem('name_empresa');
           sessionStorage.removeItem('p_color');
           sessionStorage.removeItem('s_color');
-          console.log(err);
-        })
+        }})
     } else {
-      this.setLogoBase64(logoBase64);
       this.setNameEmpresa(name_empresa);
       this.setColorPrimary(p);
       this.setColorSecondary(s);

@@ -12,10 +12,11 @@ export class TokenInterceptorService {
 
   // INTERCEPTOR HTTP
   intercept(req: any, next: any) {
+    const codigoEmpresa = localStorage.getItem('codigo_empresa') || '';
     const tokenizeReq = req.clone({
       setHeaders: {
         Authorization: `Bearer ${this.relojServiceService.getToken()}`,
-        'x-codigo-empresa': "Prueba123"
+        'x-codigo-empresa': codigoEmpresa
       }
     });
     return next.handle(tokenizeReq);

@@ -1,44 +1,26 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { HorarioE } from '../interfaces/Horarios';
-import { Observable } from 'rxjs';
 
 // SERVICIOS
-import { StorageService } from './storage.service';
-import { UrlService } from './url.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class EmpleadosService {
 
-  private apiUrl = '';
+  private readonly apiUrlM = `${environment.urlMultitenant}`;
 
   constructor(
     private http: HttpClient,
-    private storageService: StorageService,
-    private urlService: UrlService,
-  ) {
-    this.urlService.getUrl().subscribe(url => {
-      if (url) this.apiUrl = url; // Se actualiza automáticamente cuando cambia la URL
-    });
-    this.obtenerUrlEmpresa();
-  }
-
-  async obtenerUrlEmpresa() {
-    this.apiUrl = await this.storageService.get('urlEmpresa');
-    console.log('URL Empresa service empleados: ', this.apiUrl);
-  }
+  ) { }
 
   // METODO PARA LEER LA LISTA DE EMPLEADOS
-  ObtenerListaEmpleados() {
-    return this.http.get<any>(`${this.apiUrl}/empleado/todosempleados/lista`)
-  }
-
-  // BUSCAR UN REGISTRO DE USUARIO  --**VERIFICADO
-  BuscarUnEmpleado(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/empleado/${id}`);
+  ObtenerListaEmpleados(estado: number) {
+    return this.http.get<any>(`${this.apiUrlM}/generalidades/todosempleados/lista/${estado}`)
   }
 
   // METODO PARA OBTENER EL HORARIO DE EMPLEADO SEGUN SU CODIGO
@@ -46,7 +28,7 @@ export class EmpleadosService {
     const params = new HttpParams()
       .set('codigo', datos.codigo)
       .set('fecha_inicio', datos.fecha)
-    return this.http.get<HorarioE[]>(`${this.apiUrl}/empleado/horarios/horariosEmpleado`, { params })
+    return this.http.get<HorarioE[]>(`${this.apiUrlM}/planificacion_general/horarios/horariosEmpleado`, { params })
       .pipe(
         tap(console.log)
       )
@@ -56,21 +38,7 @@ export class EmpleadosService {
   getPlanificacionHorariosEmplbyCodigo(codigo) {
     const params = new HttpParams()
       .set('codigo', codigo)
-    return this.http.get<HorarioE[]>(`${this.apiUrl}/empleado/horariosempleado/planificacionHorarioEmplCodigo`, { params })
-      .pipe(
-        tap(console.log)
-      )
-  }
-  // METODO PARA OBTENER LA PLANIFICACION HORARIA
-  BuscarPlanificacionHorarioEmple(datos: any) {
-    return this.http.post<any>(`${this.apiUrl}/planificacion_general/horario-general-planificacion`, datos);
-  }
-  // METODO PARA OBTENER EL HORARIO DEL EMPLEADO
-  ObtenerUnHorarioEmpleado(codigo: number | string, fecha_hoy: any) {
-    const params = new HttpParams()
-      .set('codigo', codigo)
-      .set('fecha_hoy', fecha_hoy.split(' ')[0]);
-    return this.http.get<HorarioE>(`${this.apiUrl}/empleado/un-horario`, { params })
+    return this.http.get<HorarioE[]>(`${this.apiUrlM}/planificacion_general/horariosempleado/planificacionHorarioEmplCodigo`, { params })
       .pipe(
         tap(console.log)
       )
@@ -78,21 +46,22 @@ export class EmpleadosService {
 
   // METODO PARA OBTENER LA UBICACION REGISTRADA DEL EMPLEADO
   ObtenerUbicacion(id: any) {
-    return this.http.get<any>(`${this.apiUrl}/empleado/ubicacion/${id}`);
+    return this.http.get<any>(`${this.apiUrlM}/empleado/ubicacion/${id}`);
   }
 
   // METODO PARA MOSTRAR IMAGEN DEL EMPLEADO
-  ObtenerImagen(id: any, imagen: any) {
-    return this.http.get<any>(`${this.apiUrl}/empleado/img/codificado/${id}/${imagen}`)
+  ObtenerImagen(id: any) {
+    return this.http.get<any>(`${this.apiUrlM}/empleado/img/codificado/${id}`)
+      .pipe(map(res => res.data));
   }
 
   // BUSCAR DATOS DE UN HORARIO    **USADO
   BuscarUnHorario(id: number) {
-    return this.http.get(`${this.apiUrl}/horario/${id}`);
+    return this.http.get<any>(`${this.apiUrlM}/horario/${id}`);
   }
 
   // METODO PARA VERIFICAR SI EL USUARIO TIENE HABILIOTADA LA APLICACION MOVIL
   accesoMovil(id_epleado: any) {
-    return this.http.get<any>(`${this.apiUrl}/usuarios/movil/acceso/activo/${id_epleado}`);
+    return this.http.get<any>(`${this.apiUrlM}/usuarios/datos/${id_epleado}`);
   }
 }

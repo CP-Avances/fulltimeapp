@@ -57,8 +57,9 @@ export class TimbreJustificadoComponent implements OnInit {
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
-    
+
     this.obtenerIdCelular();
+
   }
   modelo_dispositivo: string = "";
   dispositivo_timbre: string = "";
@@ -79,7 +80,7 @@ export class TimbreJustificadoComponent implements OnInit {
 
   // METODO PARA SELECCIONAR LA ACCION DEL TIMBRE 
   accionChange(e) {
-    console.log(e.target.value);
+
     this.accion = e.target.value;
     const [obj1] = this.selectOptions.filter(o => { return o.accion === this.accion }).map(o => { return o.teclaFuncion })
     this.tecla_funcion = obj1
@@ -97,7 +98,7 @@ export class TimbreJustificadoComponent implements OnInit {
     this.fec_timbre = this.formatDateLocal(fechaSeleccionada); // Formateamos la fecha como una cadena local
 
     this.versegundos = true;
-    console.log("ver fecha timbre ", this.fec_timbre)
+
   }
 
   // METODO PARA SUMAR LA FECHA CON LOS SEGUNDOS SELECCIONADOS
@@ -113,7 +114,6 @@ export class TimbreJustificadoComponent implements OnInit {
       this.fec_timbre = fechaSeleccionada.toISOString(); // Formato ISO string
       this.fec_timbre = this.formatDateLocal(fechaSeleccionada); // Formateamos la fecha como una cadena local
 
-      console.log('Fecha con segundos sumados:', this.fec_timbre);
     }
   }
 
@@ -130,34 +130,94 @@ export class TimbreJustificadoComponent implements OnInit {
 
   // METODO PARA ENVIAR EL TIMBRE
   enviarTimbre() {
-    console.log('timbre enviar...');
-    if (this.accion === '' || this.tecla_funcion === -1 || this.fec_timbre === '') return this.abrirToas('Falta llenar todos los campos', "warning", 3000)
-    let dataTimbre = {
-      fec_hora_timbre: this.fec_timbre,
+
+    if (this.accion === '' || this.tecla_funcion === -1 || this.fec_timbre === '') {
+      return this.abrirToas('Falta llenar todos los campos', 'warning', 3000);
+    }
+
+    const fecHoraTimbre = this.normalizarFechaHoraTimbre(this.fec_timbre);
+
+    if (!fecHoraTimbre) {
+      return this.abrirToas('La fecha del timbre no es válida.', 'warning', 3000);
+    }
+
+    const timbrePayload = {
+      fec_hora_timbre: fecHoraTimbre,
       accion: this.accion,
       tecl_funcion: this.tecla_funcion,
       observacion: 'Timbre realizado por ' + this.fullnameAdmin + ', ' + this.observacion,
-      latitud: null,
-      longitud: null,
-      codigo: this.data.codigo,
-      id_reloj: 97,
-      id: this.data.id,
-      ip: localStorage.getItem('ip'),
-      ip_local: this.ips_locales,
-      documento: this.documento,
-      dispositivo_timbre: this.dispositivo_timbre,
-      conexion: true,
-      hora_timbre_diferente: false,
-      user_name: this.dataUserService.username
+      id_empleado: [this.data.id],
+      id_reloj: 98,
+    };
 
+    const formData = new FormData();
+
+    formData.append('timbres', JSON.stringify([timbrePayload]));
+
+    const mapDocumentos: { index: number; fileIndex: number }[] = [];
+
+    if (this.documento) {
+      const archivo = this.convertirDataUrlAFile(
+        this.documento,
+        'documento_timbre.webp'
+      );
+
+      formData.append('documentos', archivo, archivo.name);
+
+      mapDocumentos.push({
+        index: 0,
+        fileIndex: 0
+      });
     }
-    this.timbresService.PostTimbreWebAdmin(dataTimbre).subscribe(res => {
-      console.log(res);
-      this.closeModal(true);
-      this.abrirToas(res.message, "success", 3000)
-    }, err => {
-      console.log(err);
-    })
+
+    formData.append('mapDocumentos', JSON.stringify(mapDocumentos));
+
+    this.timbresService.RegistrarTimbreAdmin(formData).subscribe({
+      next: () => {
+
+        this.closeModal(true);
+        this.abrirToas('Operación exitosa.', 'success', 3000);
+      },
+      error: () => {
+        this.abrirToas('Error al registrar el timbre.', 'danger', 3000);
+      }
+    });
+  }
+
+  normalizarFechaHoraTimbre(valor: any): string | null {
+    if (!valor) return null;
+
+    const fecha = new Date(valor);
+
+    if (isNaN(fecha.getTime())) {
+
+      return null;
+    }
+
+    const yyyy = fecha.getFullYear();
+    const mm = String(fecha.getMonth() + 1).padStart(2, '0');
+    const dd = String(fecha.getDate()).padStart(2, '0');
+    const hh = String(fecha.getHours()).padStart(2, '0');
+    const min = String(fecha.getMinutes()).padStart(2, '0');
+    const ss = String(fecha.getSeconds()).padStart(2, '0');
+
+    return `${yyyy}-${mm}-${dd}T${hh}:${min}:${ss}`;
+  }
+
+  convertirDataUrlAFile(dataUrl: string, fileName: string): File {
+    const arr = dataUrl.split(',');
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    const mime = mimeMatch ? mimeMatch[1] : 'image/webp';
+
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+
+    return new File([u8arr], fileName, { type: mime });
   }
 
   // METODO PARA CONFIGURAR LOS PARAMETROS DEL TOAST
@@ -173,12 +233,13 @@ export class TimbreJustificadoComponent implements OnInit {
 
   // METODO PARA ELIMINAR EL MODAL
   closeModal(refreshInfo: Boolean) {
-    console.log('CERRAR MODAL timbre justificado');
+
     this.modalController.dismiss({
       'refreshInfo': refreshInfo
     });
   }
 
+  // METODO PARA ABRIR LA GALERIA Y SELECCIONAR UNA IMAGEN
   // METODO PARA ABRIR LA GALERIA Y SELECCIONAR UNA IMAGEN
   async selectImage() {
     console.log("ver imagen");
@@ -188,14 +249,18 @@ export class TimbreJustificadoComponent implements OnInit {
       allowEditing: false,
       resultType: CameraResultType.DataUrl,
       source: CameraSource.Photos,
-      width: 1200, // ANCHO DE LA IMAGEN
-      height: 1200, // ALTO DE LA IMAGEN
+      width: 1200,
+      height: 1200,
     });
 
     if (image.dataUrl) {
       this.documento = await this.convertirBase64AWebP(image.dataUrl);
+      this.fileName = 'documento_timbre.webp';
+      this.mensajeFile = 'Imagen seleccionada correctamente';
     } else {
       this.documento = '';
+      this.fileName = null;
+      this.mensajeFile = null;
     }
   }
 
@@ -206,9 +271,9 @@ export class TimbreJustificadoComponent implements OnInit {
 
   // METODO PARA ELIMINAR LA IMAGEN SELECCIONADA
   deleteImagen() {
-    console.log('El archivo ', this.fileName, ' Se quito Correctamente');
-    this.validar.showToast('El archivo se quito correctamente', 3500, 'acua');
-    // Resetea el input de archivo
+
+    this.validar.showToast('El archivo se quitó correctamente', 3500, 'acua');
+
     if (this.fileInput) {
       this.fileInput.value = '';
     }
@@ -224,13 +289,17 @@ export class TimbreJustificadoComponent implements OnInit {
 
     return new Promise((resolve, reject) => {
       const img = new Image();
+
       img.onload = () => {
         canvas.width = img.width;
         canvas.height = img.height;
+
         ctx.drawImage(img, 0, 0);
+
         const webpBase64 = canvas.toDataURL("image/webp", 0.9);
         resolve(webpBase64);
       };
+
       img.onerror = reject;
       img.src = base64;
     });

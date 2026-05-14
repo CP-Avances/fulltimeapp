@@ -9,6 +9,7 @@ import { ModalController, Platform, ToastController } from '@ionic/angular';
 import { InformacionEmpleadoPage } from '../informacion-empleado/informacion-empleado.page';
 import { NetworkService } from '../../libs/network.service';
 import { ConnectivityService } from '../../services/conexion-servidor.service'
+import { ParametrosSistema } from 'src/app/libs/parametros.emun';
 
 @Component({
   selector: 'app-informacion-admin',
@@ -113,18 +114,22 @@ export class InformacionAdminPage implements OnInit {
   formato_fecha: string = '';
   formato_hora: string = '';
   BuscarFormatos() {
-    this.parametro.ObtenerFormatos().subscribe(
+    const detalles = [
+      ParametrosSistema.FORMATO_FECHA,
+      ParametrosSistema.FORMATO_HORA
+    ];
+    this.parametro.ObtenerFormatos(detalles).subscribe(
       resp => {
-        this.formato_fecha = resp.fecha;
-        this.formato_hora = resp.hora;
-        console.log("ver fecha", localStorage.getItem("caducidad_licencia"))
-        console.log("ver fecha de caducidad licencia", localStorage.getItem("caducidad_licencia"))
+        resp.forEach(p => {
+          if (p.id_parametro === ParametrosSistema.FORMATO_FECHA) {
+            this.formato_fecha = p.descripcion;
+          } else if (p.id_parametro === ParametrosSistema.FORMATO_HORA) {
+            this.formato_hora = p.descripcion;
+          }
+        });
         this.caduca_ = this.validar.FormatearFecha(localStorage.getItem("caducidad_licencia"), this.formato_fecha, this.validar.dia_completo);
-      },
-      err => {
-        console.log(err)
       }
-    )
+    );
   }
 
   // METODO PARA OBTENER LOS DATOS DE LA EMPRESA
@@ -132,13 +137,8 @@ export class InformacionAdminPage implements OnInit {
     this.relojService.obtenerDatosEmpresa().subscribe(
       {
         next: res => {
-          console.log("ver datos empresa", res.data)
-          console.log(res);
           this.empresa = res.data;
           this.obtenerEmpleados();
-        },
-        error: err => {
-          console.log(err)
         }
       }
     );
@@ -146,22 +146,16 @@ export class InformacionAdminPage implements OnInit {
 
   // METODO PARA OBTENER LOS EMPLEADOS 
   obtenerEmpleados() {
-    console.log("ver obtenerEmpleados ")
     this.relojService.obtenerUsuarioEmpresa().subscribe(
       res => {
-        console.log("res: ", res)
         this.empleados = res;
         this.existenEmpleados = true;
         this.empleados_filtro = [...this.empleados];
-        console.log('lista empleados: ', this.empleados)
         if (this.empleados.length < 11) {
           return this.ver = true;
         } else {
           return this.ver = false;
         }
-      },
-      err => {
-        console.log(err)
       }
     );
 
@@ -182,7 +176,6 @@ export class InformacionAdminPage implements OnInit {
   doRefresh(event: any) {
     this.ngOnInit();
     setTimeout(() => {
-      console.log('Async operation has ended');
       event.target.complete();
     }, 1500);
   }
@@ -192,16 +185,12 @@ export class InformacionAdminPage implements OnInit {
     this.relojService.obtenerUsuario(iduser).subscribe(
       res => {
         this.usuario = res;
-      },
-      err => {
-        console.log(err)
       }
     );
   }
 
   // METODO PARA DEFINIR EL CAMBIO DE VISTA AL MODAL IMFORMACIÓN EMPLEADO
   async presentModal(usuario: any) {
-    console.log("ver usuario", usuario)
     const modal = await this.modalController.create({
       component: InformacionEmpleadoPage,
       componentProps: {

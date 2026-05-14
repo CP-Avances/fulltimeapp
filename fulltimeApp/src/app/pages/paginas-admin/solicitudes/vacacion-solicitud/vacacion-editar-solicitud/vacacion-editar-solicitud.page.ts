@@ -137,8 +137,7 @@ export class VacacionEditarSolicitudPage implements OnInit {
         this.aplicarConfiguracionTipo();
         this.cargandoTipos = false;
       },
-      error: (err) => {
-        console.error('Error cargando tipos de vacación:', err);
+      error: () => {
         this.tiposVacacion = [];
         this.cargandoTipos = false;
       }
@@ -162,8 +161,7 @@ export class VacacionEditarSolicitudPage implements OnInit {
 
         this.cargandoSaldo = false;
       },
-      error: (err) => {
-        console.error('Error cargando saldo:', err);
+      error: () => {
         this.saldoVacacionesVisible = '—';
         this.cargandoSaldo = false;
       }
@@ -178,8 +176,7 @@ export class VacacionEditarSolicitudPage implements OnInit {
         this.feriados = Array.isArray(data) ? data : [];
         this.cargandoFeriados = false;
       },
-      error: (err) => {
-        console.error('Error cargando feriados:', err);
+      error: () => {
         this.feriados = [];
         this.cargandoFeriados = false;
       }
@@ -413,7 +410,6 @@ export class VacacionEditarSolicitudPage implements OnInit {
         });
       },
       error: (err) => {
-        console.error('Error en verificación de vacaciones:', err);
         this.estadoVerificacion = 'error';
         this.mensajeVerificacion = err?.message || 'Ocurrió un error al verificar la solicitud.';
         this.verificacionRealizada = true;
@@ -497,8 +493,7 @@ export class VacacionEditarSolicitudPage implements OnInit {
           this.mostrarToast('Solicitud actualizada correctamente.', 'success');
           this.regresarDetalleConSolicitudActualizada(solicitudActualizada);
         },
-        error: (err) => {
-          console.error('Error subiendo documento:', err);
+        error: () => {
           this.actualizando = false;
           this.mostrarToast('La solicitud se actualizó, pero ocurrió un error al subir el documento.', 'warning');
           this.regresarDetalleConSolicitudActualizada(solicitudActualizada);
@@ -518,8 +513,7 @@ export class VacacionEditarSolicitudPage implements OnInit {
             documento: null
           });
         },
-        error: (err) => {
-          console.error('Error eliminando documento:', err);
+        error: () => {
           this.actualizando = false;
           this.mostrarToast('La solicitud se actualizó, pero no se pudo eliminar el documento.', 'warning');
           this.regresarDetalleConSolicitudActualizada(solicitudActualizada);

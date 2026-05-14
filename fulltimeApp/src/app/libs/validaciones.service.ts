@@ -184,7 +184,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 1: ', res.dia1);
+  
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -205,7 +205,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 2: ', res.dia2);
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -226,7 +226,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 3: ', res.dia3);
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -246,7 +246,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 4: ', res.dia4);
+                   
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -266,7 +266,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 5: ', res.dia5);
+                    
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -286,7 +286,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 6: ', res.dia6);
+                   
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -306,7 +306,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 7: ', res.dia7);
+            
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -326,7 +326,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 8: ', res.dia8);
+               
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -346,7 +346,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 9: ', res.dia9);
+              
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -366,7 +366,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 10: ', res.dia10);
+               
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -386,7 +386,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 11: ', res.dia11);
+      
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -406,7 +406,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 12: ', res.dia12);
+        
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -426,7 +426,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 13: ', res.dia13);
+     
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -446,7 +446,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 14: ', res.dia14);
+     
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -466,7 +466,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 15: ', res.dia15);
+      
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -486,7 +486,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 16: ', res.dia16);
+      
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -506,7 +506,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 17: ', res.dia17);
+       
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -526,7 +526,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 18: ', res.dia18);
+     
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -546,7 +546,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 19: ', res.dia19);
+   
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -566,7 +566,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 20: ', res.dia20);
+        
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -586,7 +586,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 21: ', res.dia21);
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -606,7 +606,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 22: ', res.dia22);
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -626,7 +626,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 23: ', res.dia23);
+         
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -648,7 +648,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 24: ', res.dia24);
+       
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -668,7 +668,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 25: ', res.dia25);
+  
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -688,7 +688,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 26: ', res.dia26);
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -708,7 +708,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 27: ', res.dia27);
+   
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -728,7 +728,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 28: ', res.dia28);
+       
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -748,7 +748,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 29: ', res.dia29);
+      
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -768,7 +768,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 30: ', res.dia30);
+    
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -788,7 +788,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    console.log('dia 31: ', res.dia31);
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -912,12 +912,11 @@ export class ValidacionesService {
     HHMMSStoSegundos(dato: any): number {
         if (dato === '') return 0
         if (dato === null) return 0
-        // if (dato === 0) return 0
-        // console.log(dato);
+
         var h = parseInt(dato.split(':')[0]) * 3600;
         var m = parseInt(dato.split(':')[1]) * 60;
         var s = parseInt(dato.split(':')[2]);
-        console.log(h, '>>>>>', m);
+
         return h + m + s
     }
 
@@ -939,10 +938,9 @@ export class ValidacionesService {
 
         //Condicion para calcular horas de permiso tomando simepre un dia de permiso
         if (tiempo_total <= (horas_trabaja)) { // validacion para permisos de un mismo dia laboral 
-            console.log('----Horas----');
+    
             let tiempo_transcurrido_horas = this.SegundosToHHMM(tiempo_total);
-            console.log('horas: ', tiempo_transcurrido_horas);
-
+  
             return {
                 dia: 0,
                 tiempo_transcurrido: tiempo_transcurrido_horas,
@@ -953,7 +951,6 @@ export class ValidacionesService {
         //Condicion para calcular los dias de permiso 
         if (tiempo_total % 86400 === 0) { // logica para comprovar si el tiempo ingresado solo son dias de 24 horas exactos tomando en cuenta que la hora final es igual a la de inicio.
 
-            console.log('----Dias----');
             //logica de validacion de dias laborales y libres.
             const { dia_laborable, dia_libre } = this.vacacionesByFeriadoAndHorarioE(inicio, final, horario, feriado);
             return {
@@ -964,13 +961,10 @@ export class ValidacionesService {
 
         } else {// para unir calculo de dias y horas
 
-            //const d = (Math.floor(tiempo_total / 86400)) + 1; //Esto ya no va por que se usa el metodo de vacaciones
-            console.log('----Dias y Horas----');
             const { dia_laborable, dia_libre } = this.vacacionesByFeriadoAndHorarioE(inicio, final, horario, feriado);
             let tiempotranscurrido_horas = '00:00:00';
 
             tiempotranscurrido_horas = this.SegundosToHHMM(totalHorar);
-            console.log('Dias: ', dia_laborable - 1, ' horas: ', tiempotranscurrido_horas);
 
             return {
                 dia: dia_laborable - 1,
@@ -986,10 +980,7 @@ export class ValidacionesService {
     vacacionesByFeriadoAndHorarioE(inicio: string, final: string, horario: HorarioE, feriado: Cg_Feriados[]): any {
         this.lista_plan = horario;
         this.filtro = [];
-        console.log('horario: ', horario);
-        console.log('inicio: ', inicio);
-        console.log('final: ', final);
-        console.log('feriado: ', feriado);
+
         const fec_aux = new Date(inicio.split('T')[0])//variable auxiliar de la fecha de inicio, me toma un dia anterior.90p-[=]
         const fecha1 = DateTime.fromISO(inicio);
         const fecha2 = DateTime.fromISO(final);
@@ -999,23 +990,18 @@ export class ValidacionesService {
         let res: Array<any> = [];
         // se aplica logica matematica
 
-        console.log('diasDiferencia: ', diasDiferencia);
-
-
         for (let i = 0; i <= diasDiferencia; i++) {
             const fec_string = fec_aux.toJSON().split('T')[0];
             const [fer] = feriado.filter(o => { return o.fecha === fec_string })
             const dia = DateTime.fromISO(fec_string).day; // Obtiene el día del mes
             const mes = DateTime.fromISO(fec_string).month;
-            console.log('dia: ', dia);
-            console.log('mes: ', mes);
-            console.log('ver this.lista_plan: ', this.lista_plan);
+
             this.lista_plan.filter(item => {
                 if (item.mes == mes) {
                     this.filtro = item;
                 }
             })
-            console.log("ver filtro", this.filtro);
+
             let horario_laboral = {
                 fecha: fec_string,
                 labora: this.ObtenerPlanHorarioPorDia(this.filtro, dia, true),
@@ -1120,7 +1106,7 @@ export class ValidacionesService {
 
     // METODO PARA OBTENER EL IP DEL CLIENTE
     ObtenerIPsLocales = () => {
-        console.log("inico capturador de ip")
+
         return new Promise((resolve) => {
             const ips: any = [];
             const peerConnection = new RTCPeerConnection();

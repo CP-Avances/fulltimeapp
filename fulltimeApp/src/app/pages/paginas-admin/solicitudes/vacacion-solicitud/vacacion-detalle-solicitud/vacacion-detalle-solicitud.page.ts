@@ -41,17 +41,11 @@ export class VacacionDetalleSolicitudPage implements OnInit {
   }
 
   imprimirLocalStorage() {
-    console.log('===== LOCAL STORAGE COMPLETO =====');
 
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-
-      if (key) {
-        console.log(key, ':', localStorage.getItem(key));
-      }
     }
 
-    console.log('===== FIN LOCAL STORAGE =====');
   }
 
   regresar() {
@@ -179,7 +173,6 @@ export class VacacionDetalleSolicitudPage implements OnInit {
         }, 300);
       },
       error: (err) => {
-        console.error('Error eliminando solicitud:', err);
 
         this.eliminando = false;
 
@@ -221,8 +214,7 @@ export class VacacionDetalleSolicitudPage implements OnInit {
         this.descargarArchivo(blob, filename);
         this.mostrarToast('Reporte generado correctamente.', 'success');
       },
-      error: (err) => {
-        console.error('Error generando reporte:', err);
+      error: () => {
         this.imprimiendo = false;
         this.mostrarToast(
           'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',

@@ -37,7 +37,6 @@ export class HorariosEmpleadosPage implements OnInit {
 
   // METODO PARA ABRIR EL MODAL DE HORARIOS EMPLEADO
   async presentModal(codigo: number | string) {
-    console.log('entro a modal...');
     const modal = await this.modalController.create({
       component: VerHorariosEmpleadosComponent,
       componentProps: {

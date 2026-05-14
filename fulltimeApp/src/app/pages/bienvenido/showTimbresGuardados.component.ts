@@ -9,6 +9,7 @@ import { EmpleadosService } from 'src/app/services/empleados.service';
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { timeout } from 'rxjs/operators';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
+import { ParametrosSistema } from 'src/app/libs/parametros.emun';
 @Component({
   template: `
   <app-close-modal titleModal="Timbres no enviados"></app-close-modal>
@@ -160,71 +161,61 @@ export class TimbresPerdidosComponent implements OnInit {
     this.restP.ObtenerDetalleParametroUsuario(buscar)
       .pipe(timeout(3000))
       .subscribe(
-        res => {
-          console.log('res ubicación desconocida', res);
+        {
+          next: res => {
 
-          const parametro = res.data?.[0];
+            const parametro = res.data?.[0];
 
-          if (!parametro) {
-            console.warn(
-              'No existen parámetros de ubicación desconocida para el empleado:',
-              empleadoID
-            );
+            if (!parametro) {
+              localStorage.setItem('timbrarUbicacionDesconocida', 'No');
+              return;
+            }
 
+            const timbreUbicacionDesconocida = parametro.timbre_ubicacion_desconocida;
+
+            const resultado = timbreUbicacionDesconocida ? 'Si' : 'No';
+            localStorage.setItem('timbrarUbicacionDesconocida', resultado);
+          },
+          error: () => {
             localStorage.setItem('timbrarUbicacionDesconocida', 'No');
-            return;
           }
-
-          const timbreUbicacionDesconocida = parametro.timbre_ubicacion_desconocida;
-
-          console.log(
-            "ver parametro de ubicacion desconocida",
-            timbreUbicacionDesconocida
-          );
-
-          const resultado = timbreUbicacionDesconocida ? 'Si' : 'No';
-          localStorage.setItem('timbrarUbicacionDesconocida', resultado);
-        },
-        error => {
-          console.log('Error al obtener parámetro de ubicación desconocida', error);
-          localStorage.setItem('timbrarUbicacionDesconocida', 'No');
         }
       );
   }
 
 
-  ComprobarConexionServidor(): any {
-    const timbres = [...this.dataLocalService.timbresPerdidosStorage]
-    console.log('timbres: ', timbres);
-    if (timbres.length > 0) {
-      this.relojService.obtenerUsuario(this.iduser).subscribe(
-        res => {
-          this.BuscarParametro();
-          return this.btn_Enviar = false;
-        },
-        () => {
-          console.log('Sin conexion al servidor');
-          this.mensage = `<div class="card-alert">
-                            <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
-                            <br>
-                            <p> Ups! Falló la conexión con el servidor, no se podrán enviar los timbres </p>
-                            <p> Por favor intentelo más tarde </p>
-                          </div>`;
-          this.presentAlert(this.mensage);
-          return this.btn_Enviar = true;
-        }
-      ), () => {
-        console.log('Sin conexion al servidor');
-        this.mensage = `<div class="card-alert">
-                            <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
-                            <br>
-                            <p> Ups! Falló la conexión con el servidor, no se podrán enviar los timbres </p>
-                            <p> Por favor intentelo más tarde prueba móvil </p>
-                          </div>`;
-        this.presentAlert(this.mensage);
-        return this.btn_Enviar = true;
-      };
+  ComprobarConexionServidor(): void {
+    const timbres = [...this.dataLocalService.timbresPerdidosStorage];
+
+    if (timbres.length === 0) {
+      this.btn_Enviar = true;
+      return;
     }
+
+    this.relojService.obtenerUsuario(this.iduser)
+      .pipe(timeout(3000))
+      .subscribe({
+        next: () => {
+
+          this.BuscarParametro();
+
+          this.btn_Enviar = false;
+        },
+        error: () => {
+          this.mensage = `
+          <div class="card-alert">
+            <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
+            <br>
+            <p>Ups! Falló la conexión con el servidor, no se podrán enviar los timbres.</p>
+            <p>Por favor inténtelo más tarde.</p>
+          </div>
+        `;
+
+          this.presentAlert(this.mensage);
+
+          this.btn_Enviar = true;
+        }
+      });
   }
 
 
@@ -232,17 +223,14 @@ export class TimbresPerdidosComponent implements OnInit {
   //PARAMETROS
   // METODO QUE VALIDA LA TOLERANCIA DE LA UBICACION
   BuscarParametro() {
-    let datos = [];
-    this.restP.ObtenerDetallesParametros(4).pipe(timeout(3000)).subscribe(
-      res => {
-        datos = res;
-        if (datos.length != 0) {
-          this.rango = (parseInt(datos[0].descripcion));
-          return this.rango;
+    this.rango = 0.00;
+    this.restP.ObtenerDetallesParametros(ParametrosSistema.TOLERANCIA_UBICACION).pipe(timeout(3000)).subscribe(
+      {
+        next: res => {
+          res.forEach(p => {
+            this.rango = Number(p.descripcion);
+          });
         }
-      },
-      err => {
-        return this.rango = 0.00;//FUERA DE RANGO
       }
     );
   }
@@ -252,31 +240,27 @@ export class TimbresPerdidosComponent implements OnInit {
   // MÉTODO QUE VERIFICAR SI EL TIMBRE FUE REALIZADO EN UN PERíMETRO DEFINIDO
   CompararCoordenadas(informacion: any, timbre: any, descripcion: any, data: any) {
     this.restP.ObtenerCoordenadas(informacion).pipe(timeout(3000)).subscribe(
-      res => {
-        console.log("entrando a ObtenerCoordenadas en CompararCoordenadas ");
-        if (res.data[0].verificar === 'ok') {
-          console.log("CON COORDENADAS");
-
-          this.contar = this.contar + 1;
-          this.ubicacion = descripcion;
-          if (this.contar === 1) {
-            timbre.ubicacion = this.ubicacion;
-            this.abrirToas('Timbre realizado dentro del perímetro definido como ' + this.ubicacion + '.', "primary", 3000, "top");
-            this.EnviarTimbres(this.latitud, this.longitud, timbre);
+      {
+        next: res => {
+          if (res.data[0].verificar === 'ok') {
+            this.contar = this.contar + 1;
+            this.ubicacion = descripcion;
+            if (this.contar === 1) {
+              timbre.ubicacion = this.ubicacion;
+              this.abrirToas('Timbre realizado dentro del perímetro definido como ' + this.ubicacion + '.', "primary", 3000, "top");
+              this.EnviarTimbres(this.latitud, this.longitud, timbre);
+            }
           }
-        }
-        else {
-          console.log("SIN COORDENADAS");
-          this.sin_ubicacion = this.sin_ubicacion + 1;
-          if (this.sin_ubicacion === data.length) {
-            console.log("SIN COORDENADAS");
-
-            this.ValidarDomicilio(informacion, timbre);
+          else {
+            this.sin_ubicacion = this.sin_ubicacion + 1;
+            if (this.sin_ubicacion === data.length) {
+              this.ValidarDomicilio(informacion, timbre);
+            }
           }
+        },
+        error: () => {
+          this.dataLocalService.guardarTimbresPerdidos(timbre);
         }
-      },
-      err => {
-        this.dataLocalService.guardarTimbresPerdidos(timbre);
       }
     );
   }
@@ -296,26 +280,27 @@ export class TimbresPerdidosComponent implements OnInit {
 
     //Usa el servicio de buscar coordenadas del usuario
     this.restP.ObtenerUbicacionUsuario(this.id_usuario).pipe(timeout(3000)).subscribe(
-      res => {
-        if (res.length != 0) {
-          datosUbicacion = res;
-          datosUbicacion.forEach((obj: any) => {
-            informacion.lat2 = obj.latitud;
-            informacion.lng2 = obj.longitud;
-            this.CompararCoordenadas(informacion, timbre, obj.descripcion, datosUbicacion);
-          })
-          console.log('ver empleado....... ', res)
-        }
-        else {
-          this.ValidarDomicilio(informacion, timbre);
-        }
-      }, () => {
-        if (localStorage.getItem('timbrarUbicacionDesconocida') === 'Si') {
-          timbre.ubicacion = 'DESCONOCIDO';
-          this.EnviarTimbres(latitud, longitud, timbre);
-        } else {
-          this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "bottom");
-          return this.router.navigate(['/login']);
+      {
+        next: res => {
+          if (res.length != 0) {
+            datosUbicacion = res.data;
+            datosUbicacion.forEach((obj: any) => {
+              informacion.lat2 = obj.latitud;
+              informacion.lng2 = obj.longitud;
+              this.CompararCoordenadas(informacion, timbre, obj.descripcion, datosUbicacion);
+            })
+          }
+          else {
+            this.ValidarDomicilio(informacion, timbre);
+          }
+        }, error: () => {
+          if (localStorage.getItem('timbrarUbicacionDesconocida') === 'Si') {
+            timbre.ubicacion = 'DESCONOCIDO';
+            this.EnviarTimbres(latitud, longitud, timbre);
+          } else {
+            this.abrirToas('Timbre con ubicación Desconocida. No Permitido', "danger", 5000, "bottom");
+            return this.router.navigate(['/login']);
+          }
         }
       }
     );
@@ -324,7 +309,7 @@ export class TimbresPerdidosComponent implements OnInit {
   // METODO PARA VALIDAR LAS COORDENADAD DEL DOMICILIO QUE ESTEN REGISTRADAS EN LA TABLA EMPLEADOS
   ValidarDomicilio(informacion: any, timbre: any) {
     this.restE.ObtenerUbicacion(this.id_usuario).subscribe(res => {
-      if (res[0].longitud != null || res[0].latitud != null) {
+      if (res.data[0].longitud != null || res.data[0].latitud != null) {
         informacion.lat2 = res[0].latitud;
         informacion.lng2 = res[0].longitud;
         this.restP.ObtenerCoordenadas(informacion).subscribe(resu => {
@@ -351,35 +336,36 @@ export class TimbresPerdidosComponent implements OnInit {
     if (timbres.length > 0) {
       //obtener datos de usuario para ver si no hay problemas con el servidor
       this.relojService.obtenerUsuario(this.iduser).pipe(timeout(3000)).subscribe(
-        res => {
-          timbres.forEach(t => {
-            this.longitud = t.longitud;
-            this.latitud = t.latitud;
-            this.BuscarUbicacion(this.latitud, this.longitud, this.rango, t);
-          });
+        {
+          next: () => {
+            timbres.forEach(t => {
+              this.longitud = t.longitud;
+              this.latitud = t.latitud;
+              this.BuscarUbicacion(this.latitud, this.longitud, this.rango, t);
+            });
 
-          this.closeModal();
-          setTimeout(() => {
-            this.dataLocalService.eliminarInfo('timbresPerdidos');
-            if (timbres.length > 1) {
-              this.mensage = 'Los ' + timbres.length + ' timbres se han enviado.';
-            } else {
-              this.mensage = 'El timbre ha sido enviado exitosamente.';
-            }
-            this.presentAlert(this.mensage);
-          }, 1000);
+            this.closeModal();
+            setTimeout(() => {
+              this.dataLocalService.eliminarInfo('timbresPerdidos');
+              if (timbres.length > 1) {
+                this.mensage = 'Los ' + timbres.length + ' timbres se han enviado.';
+              } else {
+                this.mensage = 'El timbre ha sido enviado exitosamente.';
+              }
+              this.presentAlert(this.mensage);
+            }, 1000);
 
-        },
-        err => {
-          console.log('Sin conexion al servidor');
-          this.mensage = `<div class="card-alert">
+          },
+          error: () => {
+            this.mensage = `<div class="card-alert">
                             <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
                             <br>
                             <p> Ups!!! Falló la conexión con el servidor, no se podrán enviar los timbres </p>
                             <p> Por favor intentelo más tarde </p>
                           </div>`;
-          this.presentAlert(this.mensage);
-          return this.btn_Enviar = true;
+            this.presentAlert(this.mensage);
+            return this.btn_Enviar = true;
+          }
         }
       );
     }
@@ -387,20 +373,17 @@ export class TimbresPerdidosComponent implements OnInit {
 
   //METODO PARA ENVIAR EL TIMBRE
   EnviarTimbres(latitud: any, longitud: any, timbre: any): void {
-    console.log("entrando a ver EnviarTimbres")
     timbre.fecha_hora_timbre_servidor = null;
     timbre.latitud = latitud + "";
     timbre.longitud = longitud + "";
     timbre.novedades_conexion = "Falló conexión al servidor";
-    timbre.user_name = this.dataUserServices.username,
-      timbre.ip = localStorage.getItem('ip'),
-      timbre.ip_local = this.ips_locales;
 
-
-    this.relojService.enviarTimbreSinConexion(timbre).pipe(timeout(3000)).subscribe(
-      res => { },
-      err => {
-        this.dataLocalService.guardarTimbresPerdidos(timbre);
+    this.relojService.enviarTimbre(timbre).pipe(timeout(3000)).subscribe(
+      {
+        next: () => { },
+        error: () => {
+          this.dataLocalService.guardarTimbresPerdidos(timbre);
+        }
       }
     );
   }
@@ -429,7 +412,6 @@ export class TimbresPerdidosComponent implements OnInit {
   }
 
   closeModal() {
-    console.log('CERRAR MODAL Reporte timbre');
     this.modalController.dismiss({
       'refreshInfo': true
     });

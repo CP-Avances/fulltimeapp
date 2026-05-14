@@ -17,10 +17,7 @@ const routes: Routes = [
     path: 'timbres',
     loadChildren: () => import('./reporte-timbres/reporte-timbres.module').then(m => m.ReporteTimbresPageModule)
   },
-  {
-    path: 'timbresConNovedades',
-    loadChildren: () => import('./reporte-timbresConNovedades/reporte-timbresConNovedades.module').then(m => m.ReporteTimbresConNovedadesPageModule)
-  }
+
 ];
 
 @NgModule({

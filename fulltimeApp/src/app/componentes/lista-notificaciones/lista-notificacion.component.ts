@@ -3,17 +3,19 @@ import { ModalController, PopoverController, NavParams } from '@ionic/angular';
 import { Notificacion } from '../../interfaces/Notificaciones';
 import { NotificacionTimbre } from '../../interfaces/Notificaciones';
 import { SkeletonListNotificacionesArray } from '../../interfaces/Skeleton';
-import { Router } from '@angular/router';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
-import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
 import { NetworkService } from '../../libs/network.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
+import { ParametrosSistema } from 'src/app/libs/parametros.emun';
+import { ParametrosService } from 'src/app/services/parametros.service';
+
 @Component({
   selector: 'app-lista-notificacion',
   templateUrl: './lista-notificacion.component.html',
   styleUrls: ['./lista-notificacion.component.scss'],
 })
+
 export class ListaNotificacionComponent implements OnInit {
   ips_locales: any = '';
 
@@ -34,16 +36,20 @@ export class ListaNotificacionComponent implements OnInit {
   ver: boolean = false;
   id_noti: any;
 
+  formato_fecha = 'dd/MM/yyyy';
+  formato_hora = 'HH:mm:ss';
+
+  id_empleado_logueado: number = 0;
+
   constructor(
     private navParams: NavParams,
-    private router: Router,
     public pooverCtrl: PopoverController,
     private vistonotificacion: NotificacionesService,
     public modalController: ModalController,
-    private userService: DataUserLoggedService,
     private networkService: NetworkService,
     private connectivityService: ConnectivityService,
     public validar: ValidacionesService,
+    public parametro: ParametrosService,
   ) {
     this.id_noti = this.navParams.get('id')
   }
@@ -56,9 +62,9 @@ export class ListaNotificacionComponent implements OnInit {
     });
 
     this.serverConnected = await this.connectivityService.checkServerConnection();
-    const id_empleado = localStorage.getItem('empleadoID');
+    this.id_empleado_logueado = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
 
-
+    this.BuscarParametro();
   }
 
   async ionViewWillEnter() {
@@ -71,141 +77,87 @@ export class ListaNotificacionComponent implements OnInit {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
   }
 
-  // METODO PARA ASIGNAR LOS COLORES POR TIPO DE NOTIFICACION
-  tiponotificacion(noti: { id: any, id_permiso: string; id_vacaciones: string; id_hora_extra: string; visto: boolean, tipo: number }) {
-    if (noti.visto === true) {
-      return "reportes";
-    }
-    else {
-      if (noti.id_permiso != null) {
-        return "permisos";
-      } else if (noti.id_vacaciones != null) {
-        return "vacaciones";
-      } else if (noti.id_hora_extra != null) {
-        return "horas_extras";
-      } else if (noti.tipo >= 1 && noti.tipo <= 2) {
-        return "alimentacion1";
-      } else if (noti.tipo == 2) {
-        return "alimentacion2";
-      } else if (noti.tipo == 6) {
-        return "comunicados6";
-      } else if (noti.tipo >= 10 && noti.tipo <= 12) {
-        return "planificacionhe10";
-      } else if (noti.tipo == 20) {
-        return "planificacionalimen";
-      } else if (noti.tipo == null) {
-        return "danger";
-      } else {
-        return "reportes";
-      }
-    }
-  }
 
   // METODO PARA ABRIR LA NOTIFICACION EN LA VISTA DEL MODULO AL QUE PERTENECE
   AbrirNoti(noti: { id: number, id_permiso: string; id_vacaciones: string; id_hora_extra: string; estado: string, tipo: number; nempleadoreceives: string; id_receives_empl: number; nempleadosend: string; }) {
     this.cambiovistanoti(noti);
     this.cambiovistanotitimbre(noti);
     this.modalController.dismiss({});
-    if (noti.nempleadoreceives === noti.nempleadosend) {
-      if (noti.id_permiso != null && noti.estado === "Pendiente") {
-        return this.router.navigate(['/reloj/solicitudes/permiso-solicitud']);
-      } else if (noti.id_hora_extra != null && noti.estado === "Pendiente") {
-        return this.router.navigate(['/reloj/solicitudes/hora-extra-solicitud']);
-      } else if (noti.id_vacaciones != null && noti.estado === "Pendiente") {
-        return this.router.navigate(['/reloj/solicitudes/vacacion-solicitud']);
-      }
-      if (noti.tipo === 1) {
-        return this.router.navigate(['/reloj/solicitudes/alimentacion-solicitud']);
-      }
-    }
-    else {
-      if (noti.id_permiso != null && noti.estado != "Pendiente") {
-        console.log("Aprobar Permiso ", noti.id_permiso, " = ", noti.estado);
-        return this.router.navigate(['/reloj/solicitudes/permiso-solicitud']);
-      } else if (noti.tipo === 12) {
-        console.log("Aprobar Hora Extra ", noti.tipo);
-        return this.router.navigate(['/reloj/solicitudes/hora-extra-solicitud']);
-      } else if (noti.id_vacaciones != null && noti.estado != "Pendiente") {
-        console.log("Aprobar Vacaciones ", noti.id_vacaciones, " = ", noti.estado)
-        return this.router.navigate(['/relojo/solicitudes/vacacion-solicitud']);
-      }
-      if (noti.tipo === 2) {
-        console.log("Aprobar Alimentacion ", noti.tipo, " = ", noti.estado)
-        return this.router.navigate(['/reloj/solicitudes/alimentacion-solicitud']);
-      }
-
-      //Aprobaciones Admin envia
-      if (noti.id_permiso != null && noti.estado === "Pendiente") {
-        return this.router.navigate(['/reloj/aprobar-permisos']);
-      } else if (noti.id_hora_extra != null && noti.estado === "Pendiente") {
-        return this.router.navigate(['/reloj/aprobar-horas-extras']);
-      } else if (noti.id_vacaciones != null && noti.estado === "Pendiente") {
-        return this.router.navigate(['/reloj/aprobar-vacaciones']);
-      }
-
-      if (noti.tipo === 1) {
-        return this.router.navigate(['/reloj/aprobar-alimentacion']);
-      }
-    }
 
   }
 
-  //cambia el estado de la columna visto de la tabla realtime_noti de true a false.
-  cambiovistanoti(noti: { id: number }) {
-    const vista = true;
-    const datos = { id_notificacion: noti.id, visto: vista, user_name: this.userService.username, ip: localStorage.getItem('ip'), ip_local: this.ips_locales }
 
-    this.vistonotificacion.PutNotificaVisto(noti.id, datos).subscribe(
-      (res: any) => {
-        res.visto = false;
-      },
-      res => { console.error() },
-      () => { this.loading = false }
-    )
+  cambiovistanoti(noti: { id: number }) {
+    if (!noti?.id) {
+      console.warn('No se recibió el id de la notificación');
+      return;
+    }
+
+    const datos = {
+      id: noti.id,
+      visto: true
+    };
+
+    this.vistonotificacion.PutNotificaVisto(datos).subscribe(
+      {
+        next: () => {
+          this.loading = false;
+        },
+        error: () => {
+          this.loading = false;
+        }
+      }
+    );
   }
 
   //cambia el estado de la columna visto de la tabla realtime_notitimbre de true a false.
   cambiovistanotitimbre(noti: { id: number }) {
     const vista = true;
-    const datos = { id_notificacion: noti.id, vista: vista, user_name: this.userService.username, ip: localStorage.getItem('ip'), ip_local: this.ips_locales }
+    const datos = { id: noti.id, visto: vista }
 
-    this.vistonotificacion.PutNotifiTimbreVisto(noti.id, datos).subscribe(
-      (res: any) => {
-        res.visto = false;
-      },
-      res => { console.error() },
-      () => { this.loading = false }
+    this.vistonotificacion.PutNotifiTimbreVisto(datos).subscribe(
+      {
+        next: () => {
+          this.loading = false;
+        },
+        error: () => {
+          this.loading = false;
+        }
+      }
     )
   }
 
   //Poner todas las notificaciones como vistas
   notificacionesvistanoti(noti: any) {
     const vista = true;
-    var datos = { id_notificacion: 0, visto: vista, user_name: this.userService.username, ip: localStorage.getItem('ip'), ip_local: this.ips_locales }
+    var datos = { id: 0, visto: vista }
     var allNotificaciones = [];
     allNotificaciones = noti;
 
     noti.forEach((item: any) => {
       if (item.visto != true) {
-        datos.id_notificacion = item.id
-        this.vistonotificacion.PutNotificaVisto(item.id, datos).subscribe(
-          (res: any) => {
-            res.forEach((notificacio: any) => {
-              notificacio.visto = true;
-            });
-          },
-          res => { console.error() },
-          () => { this.loading = false }
+        datos.id = item.id;
+
+        this.vistonotificacion.PutNotificaVisto(datos).subscribe(
+          {
+            next: () => {
+              this.loading = false;
+            },
+            error: () => {
+              this.loading = false;
+            }
+          }
         )
 
-        this.vistonotificacion.PutNotifiTimbreVisto(item.id, datos).subscribe(
-          (res: any) => {
-            res.forEach((notificaciontim: any) => {
-              notificaciontim = true;
-            });
-          },
-          res => { console.error() },
-          () => { this.loading = false }
+        this.vistonotificacion.PutNotifiTimbreVisto(datos).subscribe(
+          {
+            next: () => {
+              this.loading = false;
+            },
+            error: () => {
+              this.loading = false;
+            }
+          }
         )
       }
     });
@@ -226,111 +178,385 @@ export class ListaNotificacionComponent implements OnInit {
     screenReaderCurrentLabel: `You're on page`
   };
 
-  //METODO PARA FORMATEAR LOS DATOS DE LOS AVISOS
-  FormatearInformacionAvisos(lista: any[]) {
-    const formato_fecha = 'dd/MM/yyyy';
-    const formato_hora = 'HH:mm:ss';
-    const idioma = 'es';
+  // METODO PARA CAMBIAR ESTILOS
+  CambiarEstiloNotificacion: any = {
+    // COMUNICADO
+    6: {
+      color: '#f5cafc',
+      icon: 'mail-outline',
+      iconColor: '#260DE6',
+      grupo: 'comunicado'
+    },
 
-    lista.forEach((aviso: any) => {
-      if (!aviso.create_at) return;
+    // PERMISOS
+    1: {
+      color: '#FAF28A',
+      icon: 'document-text-outline',
+      iconColor: '#2563EB',
+      grupo: 'solicitud'
+    },
+    2: {
+      color: '#FAF28A',
+      icon: 'create-outline',
+      iconColor: '#2563EB',
+      grupo: 'solicitud'
+    },
+    3: {
+      color: '#FAF28A',
+      icon: 'trash-outline',
+      iconColor: '#2563EB',
+      grupo: 'solicitud'
+    },
+    4: {
+      color: '#FAF28A',
+      icon: 'document-text-outline',
+      iconColor: '#2563EB',
+      grupo: 'solicitud'
+    },
+    5: {
+      color: '#FAF28A',
+      icon: 'checkmark-circle-outline',
+      iconColor: '#2563EB',
+      grupo: 'solicitud'
+    },
+    7: {
+      color: '#FAF28A',
+      icon: 'close-circle-outline',
+      iconColor: '#2563EB',
+      grupo: 'solicitud'
+    },
+    8: {
+      color: '#FAF28A',
+      icon: 'create-outline',
+      iconColor: '#2563EB',
+      grupo: 'solicitud'
+    },
 
-      const partesFecha = aviso.create_at.split(' ');
-      const fechaFormateada = this.validar.DarFormatoFecha(partesFecha[0], 'yyyy-MM-dd');
+    // VACACIONES
+    9: {
+      color: '#D8F9C6',
+      icon: 'calendar-outline',
+      iconColor: '#2563EB',
+      grupo: 'solicitud'
+    },
+    10: {
+      color: '#D8F9C6',
+      icon: 'calendar-outline',
+      iconColor: '#2563EB',
+      grupo: 'solicitud'
+    },
+    11: {
+      color: '#D8F9C6',
+      icon: 'calendar-clear-outline',
+      iconColor: '#2563EB',
+      grupo: 'solicitud'
+    },
+    12: {
+      color: '#D8F9C6',
+      icon: 'calendar-outline',
+      iconColor: '#2563EB',
+      grupo: 'solicitud'
+    },
+    13: {
+      color: '#D8F9C6',
+      icon: 'calendar-number-outline',
+      iconColor: '#2563EB',
+      grupo: 'solicitud'
+    },
+    14: {
+      color: '#D8F9C6',
+      icon: 'close-circle-outline',
+      iconColor: '#2563EB',
+      grupo: 'solicitud'
+    },
 
-      aviso.fecha = this.validar.FormatearFecha(
-        fechaFormateada || '',
-        formato_fecha,
-        this.validar.dia_completo
-      );
+    // ATRASOS / FALTAS / SALIDAS
+    100: {
+      color: '#fff9c4',
+      icon: 'time-outline',
+      iconColor: '#260DE6',
+      grupo: 'asistencia'
+    },
+    101: {
+      color: '#f8d7da',
+      icon: 'person-remove-outline',
+      iconColor: '#260DE6',
+      grupo: 'asistencia'
+    },
+    102: {
+      color: '#bbdefb',
+      icon: 'log-out-outline',
+      iconColor: '#260DE6',
+      grupo: 'asistencia'
+    },
+  };
 
-      aviso.hora_registro = this.validar.FormatearHora(
-        partesFecha[1],
-        formato_hora
-      );
 
-      if (aviso.tipo === 100) {
-        const partes = aviso.mensaje.split('//');
-        aviso.notificacion = partes[4];
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
+  BuscarParametro() {
+    const detalles = [
+      ParametrosSistema.FORMATO_FECHA,
+      ParametrosSistema.FORMATO_HORA
+    ];
 
-        const horario = partes[0].split(' ');
-        const timbre = partes[1].split(' ');
+    this.parametro.ObtenerFormatos(detalles).subscribe({
+      next: (res) => {
+        res.forEach((p: any) => {
+          if (p.id_parametro === ParametrosSistema.FORMATO_FECHA) {
+            this.formato_fecha = p.descripcion;
+          } else if (p.id_parametro === ParametrosSistema.FORMATO_HORA) {
+            this.formato_hora = p.descripcion;
+          }
+        });
 
-        aviso.horario_fecha = this.validar.FormatearFecha(
-          this.validar.DarFormatoFecha(horario[0], 'yyyy-MM-dd') || '',
-          formato_fecha,
-          this.validar.dia_completo
-        );
-        aviso.horario_hora = this.validar.FormatearHora(horario[1], formato_hora);
-
-        aviso.timbre_fecha = this.validar.FormatearFecha(
-          this.validar.DarFormatoFecha(timbre[0], 'yyyy-MM-dd') || '',
-          formato_fecha,
-          this.validar.dia_completo
-        );
-        aviso.timbre_hora = this.validar.FormatearHora(timbre[1], formato_hora);
-
-        aviso.tolerancia = partes[2];
-        aviso.atraso = partes[3];
-      }
-
-      else if (aviso.tipo === 101) {
-        const partes = aviso.mensaje.split('//');
-        aviso.notificacion = partes[1];
-        aviso.horario_fecha = this.validar.FormatearFecha(
-          this.validar.DarFormatoFecha(partes[0], 'yyyy-MM-dd') || '',
-          formato_fecha,
-          this.validar.dia_completo
-        );
-      }
-
-      else if (aviso.tipo === 102) {
-        const partes = aviso.mensaje.split('//');
-        aviso.notificacion = partes[3];
-
-        const horario = partes[0].split(' ');
-        const timbre = partes[1].split(' ');
-
-        aviso.horario_fecha = this.validar.FormatearFecha(
-          this.validar.DarFormatoFecha(horario[0], 'yyyy-MM-dd') || '',
-          formato_fecha,
-          this.validar.dia_completo
-        );
-        aviso.horario_hora = this.validar.FormatearHora(horario[1], formato_hora);
-
-        aviso.timbre_fecha = this.validar.FormatearFecha(
-          this.validar.DarFormatoFecha(timbre[0], 'yyyy-MM-dd') || '',
-          formato_fecha,
-          this.validar.dia_completo
-        );
-        aviso.timbre_hora = this.validar.FormatearHora(timbre[1], formato_hora);
-
-        aviso.salida = partes[2];
-      }
-
-      else if (aviso.tipo === 6) {
-        aviso.notificacion = aviso.mensaje;
+        this.CargarNotificacionesIniciales();
+      },
+      error: () => {
+        this.CargarNotificacionesIniciales();
       }
     });
   }
 
-  CambiarIcono(tipo: number): string {
-    switch (tipo) {
-      case 6: return 'mail-unread-outline';        
-      case 100: return 'alarm-outline';            
-      case 101: return 'remove-circle-outline';    
-      case 102: return 'exit-outline';              
-      default: return 'help-outline';              
+  // CARGAR TODAS LAS NOTIFICACIONES INICIALES
+  CargarNotificacionesIniciales() {
+    this.loading = true;
+    this.notificacionesAll = [];
+    this.countNoti = 0;
+
+    this.LeerAvisosGenerales();
+    this.LeerNotificacionesSolicitudes();
+  }
+
+  // LEER AVISOS GENERALES / ASISTENCIA / COMUNICADOS
+  LeerAvisosGenerales() {
+    this.vistonotificacion.BuscarAvisosGenerales(this.id_empleado_logueado).subscribe({
+      next: (res) => {
+        if (res && res.length > 0) {
+          const avisosFormateados = res.map((aviso: any) => {
+            return this.formatearNotificacionGeneral(aviso);
+          });
+
+          this.agregarNotificacionesALista(avisosFormateados);
+        }
+
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+      }
+    });
+  }
+
+  // LEER NOTIFICACIONES DE PERMISOS / VACACIONES / HORAS EXTRA
+  LeerNotificacionesSolicitudes() {
+    this.vistonotificacion.ObtenerNotasUsuario(this.id_empleado_logueado).subscribe({
+      next: (res) => {
+        if (res && res.length > 0) {
+          const notificacionesFormateadas = res.map((noti: any) => {
+            return this.formatearNotificacionGeneral(noti);
+          });
+
+          this.agregarNotificacionesALista(notificacionesFormateadas);
+        }
+
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+      }
+    });
+  }
+
+  // AGREGA NOTIFICACIONES INICIALES A LA LISTA GENERAL
+  agregarNotificacionesALista(notificaciones: any[]) {
+    notificaciones.forEach((noti: any) => {
+      const existe = this.notificacionesAll.some((n: any) =>
+        Number(n.id) === Number(noti.id) &&
+        Number(n.tipo) === Number(noti.tipo)
+      );
+
+      if (!existe) {
+        if (noti.visto === false) {
+          this.countNoti += 1;
+        }
+
+        this.notificacionesAll.push(noti);
+      }
+    });
+
+    this.notificacionesAll.sort((a: any, b: any) => {
+      const fechaA = new Date(a.create_at).getTime();
+      const fechaB = new Date(b.create_at).getTime();
+
+      return fechaB - fechaA;
+    });
+
+    this.notificacionesAll = this.notificacionesAll.slice(0, 10);
+  }
+
+  // METODO PARA FORMATEAR LOS DATOS SEGUN EL TIPO DE NOTIFICACION
+  private formatearNotificacionGeneral(noti: any): any {
+    const [fechaRaw = '', horaRaw = ''] = String(noti.create_at ?? '').split(' ');
+
+    const fechaRegistro = this.validar.DarFormatoFecha(fechaRaw, 'yyyy-MM-dd') ?? '';
+
+    noti.fecha_ = this.validar.FormatearFecha(
+      fechaRegistro,
+      this.formato_fecha,
+      this.validar.dia_abreviado
+    );
+
+    noti.hora_ = this.validar.FormatearHora(horaRaw, this.formato_hora);
+
+    const tipo = Number(noti.tipo);
+
+    if ([6, 100, 101, 102].includes(tipo)) {
+      this.formatearAvisoAsistencia(noti);
+    } else {
+      this.formatearNotificacionSolicitud(noti);
+    }
+
+    return noti;
+  }
+
+  // FORMATEAR NOTIFICACIONES DE SOLICITUDES / PERMISOS / VACACIONES / HORAS EXTRA
+  private formatearNotificacionSolicitud(noti: any): void {
+    try {
+      const mensajeObj = typeof noti.mensaje === 'string'
+        ? JSON.parse(noti.mensaje)
+        : noti.mensaje;
+
+      const data = mensajeObj?.data ?? {};
+
+      noti.notificacion = mensajeObj?.notificacion ?? noti.descripcion ?? '';
+      noti.empleado = data.empleado ?? noti.empleado ?? '';
+
+      const desde = data.fecha_desde ?? data.fecha_hora ?? null;
+      const hasta = data.fecha_hasta ?? data.fecha_hora ?? null;
+
+      noti.fecha_desde = desde
+        ? this.validar.FormatearFecha(
+          desde,
+          this.formato_fecha,
+          this.validar.dia_abreviado
+        )
+        : '';
+
+      noti.fecha_hasta = hasta
+        ? this.validar.FormatearFecha(
+          hasta,
+          this.formato_fecha,
+          this.validar.dia_abreviado
+        )
+        : '';
+
+      noti.dias = data.dias ?? '';
+      noti.motivo = data.motivo ?? '';
+
+      noti.hora_inicio = data.hora_inicio
+        ? this.validar.FormatearHora(data.hora_inicio, this.formato_hora)
+        : '';
+
+      noti.hora_fin = data.hora_fin
+        ? this.validar.FormatearHora(data.hora_fin, this.formato_hora)
+        : '';
+
+    } catch (error) {
+      console.error('Error al formatear notificación de solicitud:', error, noti);
+
+      noti.notificacion = noti.descripcion ?? '';
+      noti.empleado = noti.empleado ?? '';
+      noti.fecha_desde = '';
+      noti.fecha_hasta = '';
+      noti.motivo = '';
+      noti.hora_inicio = '';
+      noti.hora_fin = '';
     }
   }
 
-  CambiarEstiloIcono(tipo: number): string {
-    switch (tipo) {
-      case 6: return 'comunicado-color';        
-      case 100: return 'atraso-color';          
-      case 101: return 'falta-color';      
-      case 102: return 'salida-color';          
-      default: return 'default-color';         
+  // FORMATEAR AVISOS DE ASISTENCIA / COMUNICADOS
+  private formatearAvisoAsistencia(aviso: any): void {
+    const tipo = Number(aviso.tipo);
+    const partes = String(aviso.mensaje ?? '').split('//');
+
+    if (tipo === 100) {
+      aviso.notificacion = partes[4] ?? aviso.descripcion ?? '';
+
+      const fechaHorario = String(partes[0] ?? '').split(' ')[0];
+      const horaHorario = String(partes[0] ?? '').split(' ')[1];
+
+      aviso.horario_fecha = this.validar.FormatearFecha(
+        fechaHorario,
+        this.formato_fecha,
+        this.validar.dia_completo
+      );
+
+      aviso.horario_hora = this.validar.FormatearHora(
+        horaHorario,
+        this.formato_hora
+      );
+
+      aviso.timbre_fecha = this.validar.FormatearFecha(
+        String(partes[1] ?? '').split(' ')[0],
+        this.formato_fecha,
+        this.validar.dia_completo
+      );
+
+      aviso.timbre_hora = this.validar.FormatearHora(
+        String(partes[1] ?? '').split(' ')[1],
+        this.formato_hora
+      );
+
+      aviso.tolerancia = partes[2] ?? '';
+      aviso.atraso = partes[3] ?? '';
+    }
+
+    else if (tipo === 101) {
+      aviso.notificacion = partes[2] ?? aviso.descripcion ?? '';
+      aviso.nombre_horario = partes[1] ?? '';
+
+      aviso.horario_fecha = this.validar.FormatearFecha(
+        partes[0] ?? '',
+        this.formato_fecha,
+        this.validar.dia_completo
+      );
+
+      aviso.horario_hora = '';
+    }
+
+    else if (tipo === 102) {
+      aviso.notificacion = partes[3] ?? aviso.descripcion ?? '';
+
+      const fechaHorario = String(partes[0] ?? '').split(' ')[0];
+      const horaHorario = String(partes[0] ?? '').split(' ')[1];
+
+      aviso.horario_fecha = this.validar.FormatearFecha(
+        fechaHorario,
+        this.formato_fecha,
+        this.validar.dia_completo
+      );
+
+      aviso.horario_hora = this.validar.FormatearHora(
+        horaHorario,
+        this.formato_hora
+      );
+
+      aviso.timbre_fecha = this.validar.FormatearFecha(
+        String(partes[1] ?? '').split(' ')[0],
+        this.formato_fecha,
+        this.validar.dia_completo
+      );
+
+      aviso.timbre_hora = this.validar.FormatearHora(
+        String(partes[1] ?? '').split(' ')[1],
+        this.formato_hora
+      );
+
+      aviso.salida = partes[2] ?? '';
+    }
+
+    else if (tipo === 6) {
+      aviso.notificacion = aviso.mensaje ?? aviso.descripcion ?? '';
     }
   }
 }

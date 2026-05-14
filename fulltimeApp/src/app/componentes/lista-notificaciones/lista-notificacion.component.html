@@ -14,66 +14,153 @@
 
       <ion-item>
         <ion-label>
-          <h3><ion-skeleton-text animated style="width: 40%"></ion-skeleton-text></h3>
-          <p><ion-skeleton-text animated style="width: 70%"></ion-skeleton-text></p>
-          <p><ion-skeleton-text animated style="width: 100%"></ion-skeleton-text></p>
+          <h3>
+            <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
+          </h3>
+          <p>
+            <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+          </p>
+          <p>
+            <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+          </p>
         </ion-label>
       </ion-item>
     </ion-list>
   </ng-template>
 
-  <!-- Lista de notificaciones -->
   <ng-template #showList>
 
     <ion-button shape="round" expand="block" color="acua" style="margin: 2% 3%;"
       (click)="notificacionesvistanoti(notificacionesAll)">
+
       <ion-item color="acua" style="font-size: 80%; align-items: center;">
-        <p style="margin: auto;"> Marcar todas las notificaciones como leídas </p>
+        <p style="margin: auto;">Marcar todas las notificaciones como leídas</p>
         <ion-icon name="checkmark-done-outline" class="btnleerTodas"></ion-icon>
       </ion-item>
+
     </ion-button>
 
-    <ion-card *ngFor="let noti of notificacionesAll | paginate: { itemsPerPage: 10, currentPage: pageActual }">
-      <ion-item (click)="AbrirNoti(noti)" class="ion-activated" [color]="CambiarEstiloIcono(noti.tipo)">
+    <ion-card *ngIf="notificacionesAll.length === 0" style="margin: 3%; padding: 4%; text-align: center;">
 
-        <ion-icon slot="start" [name]="CambiarIcono(noti.tipo)" [ngClass]="CambiarEstiloIcono(noti.tipo)">
-        </ion-icon>
+      <ion-label>
+        <h4 style="font-size: 90%;">No tiene notificaciones</h4>
+      </ion-label>
 
-        <ion-label>
-          <p><strong>{{ noti.descripcion }}</strong></p>
-          <p><strong>Enviado por:</strong> {{ noti.empleado_envia }}</p>
-          <p><strong>Fecha de envío:</strong> {{ noti.fecha }}</p>
-          <p><strong>Hora de envío:</strong> {{ noti.hora_registro }}</p>
-          <p><strong>Notificación:</strong> <em>{{ noti.notificacion }}</em></p>
-
-          <!-- ATRASO -->
-          <ng-container *ngIf="noti.tipo === 100">
-            <p><strong>Horario:</strong> {{ noti.horario_fecha }} {{ noti.horario_hora }}</p>
-            <p><strong>Timbre:</strong> {{ noti.timbre_fecha }} {{ noti.timbre_hora }}</p>
-            <p><strong>Tolerancia:</strong> {{ noti.tolerancia }} minutos</p>
-            <p><strong>Atraso:</strong> {{ noti.atraso }} minutos</p>
-          </ng-container>
-
-          <!-- FALTA -->
-          <ng-container *ngIf="noti.tipo === 101">
-            <p><strong>Horario:</strong> {{ noti.horario_fecha }}</p>
-          </ng-container>
-
-          <!-- SALIDA ANTICIPADA -->
-          <ng-container *ngIf="noti.tipo === 102">
-            <p><strong>Horario:</strong> {{ noti.horario_fecha }} {{ noti.horario_hora }}</p>
-            <p><strong>Timbre:</strong> {{ noti.timbre_fecha }} {{ noti.timbre_hora }}</p>
-            <p><strong>Salida anticipada:</strong> {{ noti.salida }} minutos</p>
-          </ng-container>
-        </ion-label>
-
-        <ion-icon color="primary" class="tamanoIconoEmpleado" name="eye-outline" *ngIf="noti.id === id_noti"></ion-icon>
-      </ion-item>
     </ion-card>
 
+    <ng-container *ngFor="let noti of notificacionesAll | paginate: { itemsPerPage: 10, currentPage: pageActual }">
 
-    <!-- Paginación -->
-    <ion-item style="font-size: 80%; margin: 1% 0%;">
+      <ion-card *ngIf="CambiarEstiloNotificacion[noti.tipo]" (click)="AbrirNoti(noti)" [ngStyle]="{
+          'background': noti.visto
+            ? 'rgb(226, 226, 226)'
+            : CambiarEstiloNotificacion[noti.tipo].color,
+          'margin-bottom': '8px'
+        }">
+
+        <ion-item lines="none" style="--background: transparent;">
+
+          <ion-icon slot="start" [name]="CambiarEstiloNotificacion[noti.tipo].icon" [ngStyle]="{
+              'color': noti.visto
+                ? 'rgb(0, 0, 0)'
+                : CambiarEstiloNotificacion[noti.tipo].iconColor,
+              'font-size': '22px'
+            }">
+          </ion-icon>
+
+          <ion-label>
+
+            <p style="font-size: 12px; margin-top: 1%;">
+              <ng-container *ngIf="noti.tipo === 6; else otraNoti">
+                <strong>COMUNICADO</strong>
+              </ng-container>
+
+              <ng-template #otraNoti>
+                <strong>{{ noti.descripcion }}</strong>
+              </ng-template>
+            </p>
+
+            <p style="font-size: 11px; margin-top: 1%;" *ngIf="noti.empleado">
+              <strong>Enviado por:</strong> {{ noti.empleado }}
+            </p>
+
+            <p style="font-size: 11px; margin-top: 1%;" *ngIf="noti.notificacion">
+              <strong>Notificación:</strong>&nbsp;<em>{{ noti.notificacion }}</em>
+            </p>
+
+            <!-- PERMISOS / VACACIONES / HORAS EXTRA -->
+            <ng-container *ngIf="CambiarEstiloNotificacion[noti.tipo].grupo === 'solicitud'">
+
+              <p style="font-size: 11px; margin-top: 1%;" *ngIf="noti.motivo">
+                <strong>Motivo:</strong> {{ noti.motivo }}
+              </p>
+
+              <p style="font-size: 11px; margin-top: 1%;" *ngIf="noti.fecha_desde">
+                <strong>Desde:</strong> {{ noti.fecha_desde }}
+              </p>
+
+              <p style="font-size: 11px; margin-top: 1%;" *ngIf="noti.fecha_hasta">
+                <strong>Hasta:</strong> {{ noti.fecha_hasta }}
+              </p>
+
+              <p style="font-size: 11px; margin-top: 1%;" *ngIf="noti.hora_inicio">
+                <strong>Horario:</strong> {{ noti.hora_inicio }} - {{ noti.hora_fin }}
+              </p>
+
+              <p style="font-size: 11px; margin-top: 1%;" *ngIf="noti.dias">
+                <strong>Días:</strong> {{ noti.dias }}
+              </p>
+
+            </ng-container>
+
+            <!-- ATRASOS / FALTAS / SALIDAS ANTICIPADAS -->
+            <ng-container *ngIf="CambiarEstiloNotificacion[noti.tipo].grupo === 'asistencia'">
+
+              <p style="font-size: 11px; margin-top: 1%;" *ngIf="noti.horario_fecha">
+                <strong>Horario:</strong> {{ noti.horario_fecha }}
+                <span *ngIf="noti.horario_hora">&nbsp;&nbsp;{{ noti.horario_hora }}</span>
+              </p>
+
+              <p style="font-size: 11px; margin-top: 1%;" *ngIf="noti.nombre_horario">
+                <strong>Nombre horario:</strong> {{ noti.nombre_horario }}
+              </p>
+
+              <p style="font-size: 11px; margin-top: 1%;" *ngIf="noti.timbre_fecha">
+                <strong>Timbre:</strong> {{ noti.timbre_fecha }}
+                <span *ngIf="noti.timbre_hora">&nbsp;&nbsp;{{ noti.timbre_hora }}</span>
+              </p>
+
+              <p style="font-size: 11px; margin-top: 1%;" *ngIf="noti.tolerancia">
+                <strong>Tolerancia:</strong> {{ noti.tolerancia }} minutos
+              </p>
+
+              <p style="font-size: 11px; margin-top: 1%;" *ngIf="noti.atraso">
+                <strong>Atraso:</strong> {{ noti.atraso }} minutos
+              </p>
+
+              <p style="font-size: 11px; margin-top: 1%;" *ngIf="noti.salida">
+                <strong>Salida anticipada:</strong> {{ noti.salida }} minutos
+              </p>
+
+            </ng-container>
+
+            <!-- FECHA DE ENVÍO -->
+            <p style="font-size: 11px; margin-top: 1%;">
+              <strong>Fecha:</strong> {{ noti.fecha_ }}
+              <strong>&nbsp;&nbsp;Hora:</strong> {{ noti.hora_ }}
+            </p>
+
+          </ion-label>
+
+          <ion-icon color="primary" class="tamanoIconoEmpleado" name="eye-outline" *ngIf="noti.id === id_noti">
+          </ion-icon>
+
+        </ion-item>
+
+      </ion-card>
+
+    </ng-container>
+
+    <ion-item style="font-size: 80%; margin: 1% 0%;" *ngIf="notificacionesAll.length > 10">
       <pagination-controls class="paginacion" (pageChange)="pageActual = $event" [maxSize]="maxSize"
         [directionLinks]="directionLinks" [responsive]="responsive" [autoHide]="autoHide"
         [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
@@ -84,36 +171,48 @@
     </ion-item>
 
   </ng-template>
+
 </ion-content>
 
-<!-- Vista sin conexión -->
 <ion-content *ngIf="!isConnected || !serverConnected">
   <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
 
   <div style="margin: 2%; padding: 2%; text-align: center; border-radius: 2%;">
-    <ion-text color='medium' style="font-size: 90%;">
+    <ion-text color="medium" style="font-size: 90%;">
       En esta vista encontrará sus notificaciones
-    </ion-text><br><br>
-    <ion-text color='medium' style="font-size: 80%;" *ngIf="!isConnected">
+    </ion-text>
+
+    <br><br>
+
+    <ion-text color="medium" style="font-size: 80%;" *ngIf="!isConnected">
       Se podrá visualizar cuando tenga conexión a internet
-    </ion-text><br>
-    <ion-text color='medium' style="font-size: 80%;" *ngIf="!serverConnected">
+    </ion-text>
+
+    <br>
+
+    <ion-text color="medium" style="font-size: 80%;" *ngIf="!serverConnected">
       Se podrán visualizar cuando tenga conexión al servidor
     </ion-text>
   </div>
+
   <div class="Imagen">
     <span class="center1">
       <img src="../../../assets/images/C_FTLOGORV.png">
+
       <ion-label style="text-align:center" color="medium">
         <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
       </ion-label>
     </span>
+
     <img src="../../../assets/images/lost_timee.svg" />
   </div>
 
   <div style="margin: 4%; padding: 4%; text-align: center;">
-    <ion-text color='dark'>No tiene conexión a internet</ion-text><br>
-    <ion-text color='medium' style="font-size: 80%;" *ngIf="!serverConnected">
+    <ion-text color="dark">No tiene conexión a internet</ion-text>
+
+    <br>
+
+    <ion-text color="medium" style="font-size: 80%;" *ngIf="!serverConnected">
       No tiene conexión al servidor
     </ion-text>
   </div>

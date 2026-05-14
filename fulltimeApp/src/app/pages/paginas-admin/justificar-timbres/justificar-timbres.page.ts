@@ -39,7 +39,6 @@ export class JustificarTimbresPage implements OnInit {
 
   // METODO PARA ABIR EL MODAL DE REGISTRAR TIMBRE
   async presentModal(objeto: any) {
-    console.log('entro a modal...');
     const modal = await this.modalController.create({
       component: TimbreJustificadoComponent,
       componentProps: {

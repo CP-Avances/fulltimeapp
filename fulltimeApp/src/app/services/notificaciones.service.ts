@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 // SERVICIOS
-import { StorageService } from './storage.service';
-import { SocketService } from 'src/app/services/socket.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -12,72 +11,55 @@ import { SocketService } from 'src/app/services/socket.service';
 
 export class NotificacionesService {
 
-  private apiUrl = '';
-  private socket: any;
+  private readonly apiUrlM = `${environment.urlMultitenant}`;
 
   constructor(
     private http: HttpClient,
-    private socketService: SocketService,
-    private storageService: StorageService,
   ) {
-    this.obtenerUrlEmpresa();
-    this.socket = this.socketService.getSocket();
   }
 
-  async obtenerUrlEmpresa() {
-    this.apiUrl = await this.storageService.get('urlEmpresa');
-  }
 
-  // METODO PARA RECEPCION Y EMISION DE AVISOS
-  RecibirNuevosAvisos(data: any) {
-    this.socket.emit('nuevo_aviso', data);
-  }
 
   /** ************************************************************************************ **
    ** **                 MÉTODOS DE CONSULTA DE DATOS DE COMUNICADOS                    ** **
    ** ************************************************************************************ **/
 
-  EnviarCorreoComunicado( datos: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/noti-real-time/mail-comunicado`, datos);
+  EnviarCorreoComunicado(datos: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrlM}/api/notificacion-general/mail-comunicado`, datos);
   }
 
   // METODO PARA BUSCAR LOS EMPLEADOS CON SU INFORMACION GENERAL
   BuscarDatosGenerales() {
     const estado = 1;
-    return this.http.get<any>(`${this.apiUrl}/generalidades/datos_generales_comunicados/${estado}`);
+    return this.http.get<any>(`${this.apiUrlM}/generalidades/datos_generales_comunicados/${estado}`)
+      .pipe(map(res => res.data));
   }
 
   // METODOS PARA MARCAR EN VISTO LA NOTIFICACIONES
-  PutNotificaVisto(id_realtime: number, data: any) {
-    return this.http.put(`${this.apiUrl}/noti-real-time/vista/${id_realtime}`, data);
+  PutNotificaVisto(data: any) {
+    return this.http.put(`${this.apiUrlM}/api/avisos-generales/actualizar-notificacion-vista`, data);
   }
 
-  PutNotifiTimbreVisto(id_noti_timbre: number, datos: any) {
-    return this.http.put(`${this.apiUrl}/timbres/noti-timbres/vista/${id_noti_timbre}`, datos);
+  PutNotifiTimbreVisto(datos: any) {
+    return this.http.put(`${this.apiUrlM}/api/avisos-generales/actualizar-vista`, datos);
   }
 
-
-  // ALERTAS DE NOTIFICACIÓN DE COMUNICADOS
-  EnviarMensajeComunicado(data: any) {
-    return this.http.post<any>(`${this.apiUrl}/noti-real-time/noti-comunicado-movil/`, data);
-  }
   // ALERTAS DE NOTIFICACIÓN DE COMUNICADOS -MULTIPLES
   EnviarMensajeGeneralMultiple(data: any) {
-    return this.http.post<any>(`${this.apiUrl}/noti-real-time/noti-comunicado-multiplador-movil/`, data);
+    return this.http.post<any>(`${this.apiUrlM}/api/avisos-generales/aviso-comunicado-multiple`, data);
   }
 
-  /** ************************************************************************************ **
-   ** **                   MÉTODOS PARA ENVIO DE CORREOS MULTIPLES                      ** **
-   ** ************************************************************************************ **/
-  // METODO PARA ENVIO DE CORREO MULTIPLE
-  EnviarCorreoMultiple(datos: any) {
-    console.log('datos  11: ', datos);
-    return this.http.post<any>(`${this.apiUrl}/noti-real-time/mail-multiple-movil`, datos)
+
+  // METODO DE CONSULTA DE AVISOS GENERALES   **USADO**
+  BuscarAvisosGenerales(id_empleado: number) {
+    return this.http.get<any>(`${this.apiUrlM}/api/avisos-generales/colaborador/${id_empleado}`)
+      .pipe(map(res => res.data));
   }
 
-  // METODO DE BUSQUEDA DE CONFIGURACION DE RECEPCION DE NOTIFICACIONES
-  ObtenerConfiguracionEmpleado(id_empleado: number) {
-    return this.http.get<any>(`${this.apiUrl}/notificaciones/config/${id_empleado}`);
+  // METODO PARA BUSCAR NOTIFICACIONES - MODULOS RECIBIDAS POR UN USUARIO    **USADO**
+  ObtenerNotasUsuario(id_empleado: number) {
+    return this.http.get<any>(`${this.apiUrlM}/api/avisos-generales/listar-limite-notificaciones/${id_empleado}`)
+      .pipe(map(res => res.data));
   }
 
 }

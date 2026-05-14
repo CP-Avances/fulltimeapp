@@ -19,7 +19,6 @@ export class VacacionesService {
   ) { }
 
   private handleError(error: HttpErrorResponse) {
-    console.error('ERROR CAPTURADO EN VACACIONES SERVICE:', error);
 
     let mensaje = 'Error desconocido en vacaciones';
 

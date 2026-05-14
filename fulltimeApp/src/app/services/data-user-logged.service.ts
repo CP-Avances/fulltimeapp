@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
+
 export class DataUserLoggedService {
 
   constructor() { }
@@ -11,7 +12,6 @@ export class DataUserLoggedService {
   public get UserFullname(): string {
     const nombre = (localStorage.getItem('nom') === null) ? '' : localStorage.getItem('nom');
     const apellido = (localStorage.getItem('ap') === null) ? '' : localStorage.getItem('ap');
-    console.log(nombre, apellido);
     return nombre + ' ' + apellido
   }
 

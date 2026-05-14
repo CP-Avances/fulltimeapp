@@ -8,6 +8,7 @@ import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { NetworkService } from '../../libs/network.service';
 import { ConnectivityService } from '../../services/conexion-servidor.service'
+import { ParametrosSistema } from 'src/app/libs/parametros.emun';
 
 
 @Component({
@@ -48,7 +49,7 @@ export class InformacionEmpleadoPage implements OnInit {
     name_dep: "",
     name_rol: "",
     name_regimen: "",
-    nombre_nacionalidad:"",
+    nombre_nacionalidad: "",
   }
 
   public get app_info(): any {
@@ -69,7 +70,6 @@ export class InformacionEmpleadoPage implements OnInit {
 
   async ngOnInit() {
     this.networkSubscriber()
-    console.log('data ', this.data)
     this.serverConnected = await this.connectivityService.checkServerConnection();
     this.usuario.correo = this.data.correo;
     this.usuario.apellido = this.data.apellido;
@@ -77,16 +77,15 @@ export class InformacionEmpleadoPage implements OnInit {
     this.usuario.identificacion = this.data.identificacion;
     this.usuario.usuario = this.data.usuario;
     this.usuario.telefono = this.data.telefono;
-    this.usuario.genero=this.data.nombre_genero;
-    this.usuario.domicilio=this.data.domicilio;
-    this.usuario.ciudad=this.data.ciudad;
-    this.usuario.name_suc=this.data.name_suc;
-    this.usuario.name_dep=this.data.name_dep;
-    this.usuario.name_rol=this.data.name_rol;
-    this.usuario.name_regimen=this.data.name_regimen;
-    this.usuario.nombre_nacionalidad=this.data.nombre_nacionalidad;
+    this.usuario.genero = this.data.nombre_genero;
+    this.usuario.domicilio = this.data.domicilio;
+    this.usuario.ciudad = this.data.ciudad;
+    this.usuario.name_suc = this.data.name_suc;
+    this.usuario.name_dep = this.data.name_dep;
+    this.usuario.name_rol = this.data.name_rol;
+    this.usuario.name_regimen = this.data.name_regimen;
+    this.usuario.nombre_nacionalidad = this.data.nombre_nacionalidad;
 
-    console.log(this.usuario)
     this.BuscarFormatos();
   }
 
@@ -107,7 +106,6 @@ export class InformacionEmpleadoPage implements OnInit {
 
   // METODO PARA CERRAR EL MODAL
   closeModal() {
-    console.log('CERRAR MODAL USUARIOS');
     this.modalController.dismiss({
       'refreshInfo': true
     });
@@ -120,12 +118,21 @@ export class InformacionEmpleadoPage implements OnInit {
   formato_fecha: string;
   formato_hora: string;
   BuscarFormatos() {
-    this.parametro.ObtenerFormatos().subscribe(
+    const detalles = [
+      ParametrosSistema.FORMATO_FECHA,
+      ParametrosSistema.FORMATO_HORA
+    ];
+    this.parametro.ObtenerFormatos(detalles).subscribe(
       resp => {
-        this.formato_fecha = resp.fecha;
-        this.formato_hora = resp.hora;
+        resp.forEach(p => {
+          if (p.id_parametro === ParametrosSistema.FORMATO_FECHA) {
+            this.formato_fecha = p.descripcion;
+          } else if (p.id_parametro === ParametrosSistema.FORMATO_HORA) {
+            this.formato_hora = p.descripcion;
+          }
+        });
         this.caduca_ = this.validar.FormatearFecha(this.dataUser.dataApp.caducidad_licencia, this.formato_fecha, this.validar.dia_completo);
       }
-    )
+    );
   }
 }

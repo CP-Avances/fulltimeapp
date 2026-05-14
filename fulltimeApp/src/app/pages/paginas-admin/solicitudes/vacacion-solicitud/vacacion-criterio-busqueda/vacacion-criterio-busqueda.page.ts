@@ -111,7 +111,6 @@ export class VacacionCriterioBusquedaPage implements OnInit {
         this.mostrarFormularioBusqueda = false;
       },
       error: (err) => {
-        console.error('Error consultando solicitudes:', err);
         this.cargando = false;
         this.mostrarToast(err?.message || 'No se pudieron consultar las solicitudes.', 'danger');
       }

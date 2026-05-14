@@ -1,81 +1,109 @@
 import { Injectable } from '@angular/core';
-import { Socket } from 'ngx-socket-io';
-
-import { StorageService } from './storage.service';
-import { UrlService } from './url.service';
-
+import { io, Socket } from 'socket.io-client';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SocketService {
+
   private socket: Socket | null = null;
-  private serverUrl: string | null = null; // Para almacenar la URL del servidor actual
+  private codigoEmpresa: string | null = null;
 
-  constructor(
-    private storaService: StorageService,
-    private urlService: UrlService,
-  ) {
-    console.log('SocketService inicializado');
+  private avisoListeners = new Set<(data: any) => void>();
+  private notificacionListeners = new Set<(data: any) => void>();
+
+  setEmpresa(codigoEmpresa: string) {
+    const nuevo = String(codigoEmpresa || '').trim();
+    const actual = String(this.codigoEmpresa || '').trim();
+
+    if (nuevo && nuevo === actual && this.socket?.connected) return;
+
+    this.desconectar(false);
+    this.conectar(nuevo);
   }
 
-  async obtenerUrlEmpresa() {
-    this.urlService.getSocketUrl().subscribe(url => {
-      if (url) this.serverUrl = url; // Se actualiza automáticamente cuando cambia la URL
-    });
-    this.serverUrl = await this.storaService.get('urlSocketEmpresa');
-    console.log('URL del servidor socket:', this.serverUrl);
-  }
+  conectar(codigoEmpresa: string) {
+    this.codigoEmpresa = String(codigoEmpresa || '').trim();
+    if (!this.codigoEmpresa) return;
 
-  /**
-   * Verifica si el socket ya está conectado y lo inicia si no lo está.
-   * @param serverUrl URL del servidor socket
-   */
-  async connectSocket() {
-    if (this.socket && this.socket.ioSocket.connected) {
-      console.log('El socket ya está conectado.');
-      return;
-    }
+    if (this.socket?.connected) return;
 
-    await this.obtenerUrlEmpresa();
-
-    if (!this.serverUrl) {
-      console.error('No se ha especificado la URL del servidor socket.');
-      return;
-    }
-
-    this.socket = new Socket({ url: this.serverUrl, options: {} });
-
-    this.socket.connect();
-
-    this.socket.fromEvent('connect').subscribe(() => {
-      console.log('Conectado al servidor:', this.serverUrl);
+    this.socket = io(environment.socketUrl, {
+      transports: ['websocket'],
+      reconnection: true,
+      reconnectionAttempts: 20,
+      reconnectionDelay: 500,
     });
 
-    this.socket.fromEvent('disconnect').subscribe(() => {
-      console.log('Desconectado del servidor');
+    this.socket.on('connect', () => {
+      console.log('Socket conectado:', this.socket?.id);
+
+      this.socket?.emit('registrar_empresa', this.codigoEmpresa);
+
+      this.configurarListenersSocket();
+    });
+
+    this.socket.on('disconnect', (reason) => {
+      console.log('Socket desconectado:', reason);
+    });
+
+    this.socket.on('connect_error', (err) => {
+      console.log('connect_error:', err.message);
     });
   }
 
-  /**
-   * Obtiene el socket si está conectado, de lo contrario, lo reconecta.
-   */
-  getSocket(): Socket | null {
-    if (!this.socket || !this.socket.ioSocket.connected) {
-      console.warn('El socket no está conectado. Intentando reconectar...');
-      this.connectSocket();
-    }
-    return this.socket;
+  private configurarListenersSocket() {
+    if (!this.socket) return;
+
+    this.socket.off('aviso:nuevo');
+    this.socket.on('aviso:nuevo', (data: any) => {
+      this.avisoListeners.forEach(cb => cb(data));
+    });
+
+    this.socket.off('notificacion:nueva');
+    this.socket.on('notificacion:nueva', (data: any) => {
+      this.notificacionListeners.forEach(cb => cb(data));
+    });
   }
 
-  /**
-   * Desconecta y elimina el socket manualmente.
-   */
-  disconnectSocket() {
+  onAviso(cb: (data: any) => void): () => void {
+    this.avisoListeners.add(cb);
+
     if (this.socket) {
-      this.socket.disconnect();
-      console.log('Socket desconectado manualmente.');
+      this.configurarListenersSocket();
     }
+
+    return () => {
+      this.avisoListeners.delete(cb);
+    };
+  }
+
+  onNotificacion(cb: (data: any) => void): () => void {
+    this.notificacionListeners.add(cb);
+
+    if (this.socket) {
+      this.configurarListenersSocket();
+    }
+
+    return () => {
+      this.notificacionListeners.delete(cb);
+    };
+  }
+
+  desconectar(limpiarListeners: boolean = true) {
+    this.socket?.off();
+    this.socket?.disconnect();
     this.socket = null;
+    this.codigoEmpresa = null;
+
+    if (limpiarListeners) {
+      this.avisoListeners.clear();
+      this.notificacionListeners.clear();
+    }
+  }
+
+  getSocket(): Socket | null {
+    return this.socket;
   }
 }

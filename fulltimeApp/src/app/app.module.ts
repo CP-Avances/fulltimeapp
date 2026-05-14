@@ -29,6 +29,8 @@ import { SocketIoModule } from 'ngx-socket-io';
 
 import { importProvidersFrom } from '@angular/core';
 
+import { FingerprintAIO } from '@awesome-cordova-plugins/fingerprint-aio/ngx';
+
 @NgModule({
   declarations: [AppComponent],
   imports: [
@@ -51,7 +53,7 @@ import { importProvidersFrom } from '@angular/core';
     Diagnostic,
     FileOpener,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    AutenticacionGuard,{
+    AutenticacionGuard, {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptorService,
       multi: true
@@ -65,7 +67,8 @@ import { importProvidersFrom } from '@angular/core';
       provide: LOCALE_ID, useValue: "es-EC"
     },
     importProvidersFrom(IonicStorageModule.forRoot()),
+    FingerprintAIO
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

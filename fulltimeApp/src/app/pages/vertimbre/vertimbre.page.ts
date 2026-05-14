@@ -13,6 +13,7 @@ import { NetworkService } from '../../libs/network.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { ConnectivityService } from '../../services/conexion-servidor.service'
+import { ParametrosSistema } from 'src/app/libs/parametros.emun';
 
 @Component({
   selector: 'app-vertimbre',
@@ -112,13 +113,23 @@ export class VertimbrePage implements OnInit {
   formato_fecha: string;
   formato_hora: string;
   BuscarFormatos() {
-    this.parametro.ObtenerFormatos().subscribe(
+    const detalles = [
+      ParametrosSistema.FORMATO_FECHA,
+      ParametrosSistema.FORMATO_HORA
+    ];
+    this.parametro.ObtenerFormatos(detalles).subscribe(
       resp => {
-        this.formato_fecha = resp.fecha;
-        this.formato_hora = resp.hora;
+        resp.forEach(p => {
+          if (p.id_parametro === ParametrosSistema.FORMATO_FECHA) {
+            this.formato_fecha = p.descripcion;
+          } else if (p.id_parametro === ParametrosSistema.FORMATO_HORA) {
+            this.formato_hora = p.descripcion;
+          }
+        });
         this.obtenerTimbres(localStorage.getItem('codigo'));
       }
-    )
+    );
+
   }
 
   // METODO PAR LEER LOS TIMBRES DEL USUARIO
@@ -192,114 +203,13 @@ export class VertimbrePage implements OnInit {
     this.limpiarImagenesAnteriores();
     this.timbres = [];
     this.relojService.obtenerTimbres(codigo)
-    .pipe(takeUntil(this.unsubscribe$))
-    .subscribe({
-      next: (res: any[]) => {
-        console.log("ver timbres ", res);
-
-        let fechasObjeto = {};
-        this.imageUrls = [];
-
-        res.forEach(data => {
-          // Formatear fecha y hora
-          data.fecha = this.validar.FormatearFechaZonaHoraria(
-            data.fecha_hora_timbre,
-            this.formato_fecha,
-            this.validar.dia_completo,
-            data.zona_horaria_servidor
-          );
-
-          data.hora = this.validar.FormatearHoraZonaHoraria(
-            data.fecha_hora_timbre,
-            this.formato_hora,
-            data.zona_horaria_servidor
-          );
-
-          data.sfecha = '';
-          data.shora = '';
-
-          if (data.fecha_hora_timbre_servidor != null) {
-            console.log("ver fecha registrada en el servidor", data.fecha_hora_timbre_servidor);
-            data.sfecha = this.validar.FormatearFechaZonaHoraria(
-              data.fecha_hora_timbre_servidor,
-              this.formato_fecha,
-              this.validar.dia_completo,
-              data.zona_horaria_servidor
-            );
-            data.shora = this.validar.FormatearHoraZonaHoraria(
-              data.fecha_hora_timbre_servidor,
-              this.formato_hora,
-              data.zona_horaria_servidor
-            );
-          } else if (data.fecha_subida_servidor != null) {
-            data.sfecha = this.validar.FormatearFechaZonaHoraria(
-              data.fecha_subida_servidor,
-              this.formato_fecha,
-              this.validar.dia_completo,
-              data.zona_horaria_servidor
-            );
-            data.shora = this.validar.FormatearHoraZonaHoraria(
-              data.fecha_subida_servidor,
-              this.formato_hora,
-              data.zona_horaria_servidor
-            );
-          }
-
-          // Convertir imagen
-          if (data.imagen && data.imagen.data) {
-            const blob = new Blob([new Uint8Array(data.imagen.data)], { type: "image/webp" });
-            const imageUrl = URL.createObjectURL(blob);
-            this.imageUrls.push(imageUrl);
-            data.imagen = imageUrl;
-          }
-
-          if (data.documento && data.documento.data) {
-            const blob = new Blob([new Uint8Array(data.documento.data)], { type: "image/webp" });
-            const imageUrl = URL.createObjectURL(blob);
-            this.imageUrls.push(imageUrl);
-            data.documento = imageUrl;
-          }
-
-          // Agrupar por fecha
-          if (!fechasObjeto.hasOwnProperty(data.fecha)) {
-            fechasObjeto[data.fecha] = [];
-          }
-          fechasObjeto[data.fecha].push(data);
-        });
-
-        console.log('timbres en el objeto', fechasObjeto);
-        this.timbres = fechasObjeto;
-
-        // Si no hay datos
-        if (Object.keys(fechasObjeto).length === 0) {
-          this.vacio = false;
-          this.todos = true;
-          this.btn_filtro = true;
-          this.btn_todos = true;
-        }
-      },
-      error: (err) => {
-        console.error('Error al obtener timbres:', err);
-      }
-    });
-
-  }
-
-  // METODO PARA OBTENER LOS TIMBRES FILTRADOS Y FORMATEAR LAS FECHAS
-  filtrarFechas() {
-    this.limpiarImagenesAnteriores();
-    this.timbres_filtro = [];
-    if (this.fechaInicio <= this.fechaFinal) {
-      const datos = { fecInicio: this.fechaInicio, fecFinal: this.fechaFinal, codigo: localStorage.getItem('codigo') }
-
-      this.filtimbre.PostFiltrotimbres(datos)
+      .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (res: any[]) => {
-          console.log("ver timbres ", res);
-  
+
           let fechasObjeto = {};
           this.imageUrls = [];
-  
+
           res.forEach(data => {
             // Formatear fecha y hora
             data.fecha = this.validar.FormatearFechaZonaHoraria(
@@ -308,18 +218,18 @@ export class VertimbrePage implements OnInit {
               this.validar.dia_completo,
               data.zona_horaria_servidor
             );
-  
+
             data.hora = this.validar.FormatearHoraZonaHoraria(
               data.fecha_hora_timbre,
               this.formato_hora,
               data.zona_horaria_servidor
             );
-  
+
             data.sfecha = '';
             data.shora = '';
-  
+
             if (data.fecha_hora_timbre_servidor != null) {
-              console.log("ver fecha registrada en el servidor", data.fecha_hora_timbre_servidor);
+
               data.sfecha = this.validar.FormatearFechaZonaHoraria(
                 data.fecha_hora_timbre_servidor,
                 this.formato_fecha,
@@ -344,7 +254,7 @@ export class VertimbrePage implements OnInit {
                 data.zona_horaria_servidor
               );
             }
-  
+
             // Convertir imagen
             if (data.imagen && data.imagen.data) {
               const blob = new Blob([new Uint8Array(data.imagen.data)], { type: "image/webp" });
@@ -359,29 +269,121 @@ export class VertimbrePage implements OnInit {
               this.imageUrls.push(imageUrl);
               data.documento = imageUrl;
             }
-    
+
             // Agrupar por fecha
             if (!fechasObjeto.hasOwnProperty(data.fecha)) {
               fechasObjeto[data.fecha] = [];
             }
             fechasObjeto[data.fecha].push(data);
           });
-  
-          console.log('timbres en el objeto', fechasObjeto);
-          this.timbres_filtro = fechasObjeto;
-  
+
+          this.timbres = fechasObjeto;
+
           // Si no hay datos
           if (Object.keys(fechasObjeto).length === 0) {
-            this.filtro_mensaje = false;
-            this.filtro = true;
-            this.vacio = true;
+            this.vacio = false;
+            this.todos = true;
+            this.btn_filtro = true;
+            this.btn_todos = true;
           }
-        },
-        error: (err) => {
-          console.error('Error al obtener timbres:', err);
-          return this.mostrarToas('Lo sentimos no fue posible conectar con el servidor', 3000, "danger");
         }
       });
+
+  }
+
+  // METODO PARA OBTENER LOS TIMBRES FILTRADOS Y FORMATEAR LAS FECHAS
+  filtrarFechas() {
+    this.limpiarImagenesAnteriores();
+    this.timbres_filtro = [];
+    if (this.fechaInicio <= this.fechaFinal) {
+      const datos = { fecInicio: this.fechaInicio, fecFinal: this.fechaFinal, codigo: localStorage.getItem('codigo') }
+
+      this.filtimbre.PostFiltrotimbres(datos)
+        .subscribe({
+          next: (res: any[]) => {
+
+            let fechasObjeto = {};
+            this.imageUrls = [];
+
+            res.forEach(data => {
+              // Formatear fecha y hora
+              data.fecha = this.validar.FormatearFechaZonaHoraria(
+                data.fecha_hora_timbre,
+                this.formato_fecha,
+                this.validar.dia_completo,
+                data.zona_horaria_servidor
+              );
+
+              data.hora = this.validar.FormatearHoraZonaHoraria(
+                data.fecha_hora_timbre,
+                this.formato_hora,
+                data.zona_horaria_servidor
+              );
+
+              data.sfecha = '';
+              data.shora = '';
+
+              if (data.fecha_hora_timbre_servidor != null) {
+                data.sfecha = this.validar.FormatearFechaZonaHoraria(
+                  data.fecha_hora_timbre_servidor,
+                  this.formato_fecha,
+                  this.validar.dia_completo,
+                  data.zona_horaria_servidor
+                );
+                data.shora = this.validar.FormatearHoraZonaHoraria(
+                  data.fecha_hora_timbre_servidor,
+                  this.formato_hora,
+                  data.zona_horaria_servidor
+                );
+              } else if (data.fecha_subida_servidor != null) {
+                data.sfecha = this.validar.FormatearFechaZonaHoraria(
+                  data.fecha_subida_servidor,
+                  this.formato_fecha,
+                  this.validar.dia_completo,
+                  data.zona_horaria_servidor
+                );
+                data.shora = this.validar.FormatearHoraZonaHoraria(
+                  data.fecha_subida_servidor,
+                  this.formato_hora,
+                  data.zona_horaria_servidor
+                );
+              }
+
+              // Convertir imagen
+              if (data.imagen && data.imagen.data) {
+                const blob = new Blob([new Uint8Array(data.imagen.data)], { type: "image/webp" });
+                const imageUrl = URL.createObjectURL(blob);
+                this.imageUrls.push(imageUrl);
+                data.imagen = imageUrl;
+              }
+
+              if (data.documento && data.documento.data) {
+                const blob = new Blob([new Uint8Array(data.documento.data)], { type: "image/webp" });
+                const imageUrl = URL.createObjectURL(blob);
+                this.imageUrls.push(imageUrl);
+                data.documento = imageUrl;
+              }
+
+              // Agrupar por fecha
+              if (!fechasObjeto.hasOwnProperty(data.fecha)) {
+                fechasObjeto[data.fecha] = [];
+              }
+              fechasObjeto[data.fecha].push(data);
+            });
+
+            this.timbres_filtro = fechasObjeto;
+
+            // Si no hay datos
+            if (Object.keys(fechasObjeto).length === 0) {
+              this.filtro_mensaje = false;
+              this.filtro = true;
+              this.vacio = true;
+            }
+          },
+          error: () => {
+            return this.mostrarToas('Lo sentimos no fue posible conectar con el servidor', 3000, "danger");
+          }
+        });
     }
   }
 

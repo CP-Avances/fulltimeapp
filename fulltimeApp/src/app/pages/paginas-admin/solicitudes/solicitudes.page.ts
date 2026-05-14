@@ -173,7 +173,6 @@ export class SolicitudesPage implements OnInit {
   colorv: any;
   colora: any;
 
-  funciones: any = [];
   isConnected: boolean;
   constructor(
     public platform: Platform,
@@ -214,42 +213,39 @@ export class SolicitudesPage implements OnInit {
 
   // METODO PARA VERIFICAR LAS FUNCIONES HABILITADAS
   VerificarFunciones() {
-    this.parametros.ObtenerFunciones().subscribe(res => {
-      this.funciones = res[0];
-      this.Btn_permisos = this.funciones.permisos;
-      this.Btn_horasExtras = this.funciones.hora_extra;
-      this.Btn_alimentacion = this.funciones.alimentacion;
-      this.Btn_vacaciones = this.funciones.vacaciones
+    const raw = localStorage.getItem('modulos');
 
-      if (this.Btn_permisos == true) {
-        this.colorp = "habilitado";
-      } else {
-        this.colorp = "deshabilitado";
-      }
+    const modulos = JSON.parse(raw);
 
-      if (this.Btn_horasExtras == true) {
-        this.colorh = "habilitado";
-      } else {
-        this.colorh = "deshabilitado";
-      }
+    const { permisos, vacaciones } = modulos;
 
-      if (this.Btn_alimentacion == true) {
-        this.colora = "habilitado";
-      } else {
-        this.colora = "deshabilitado";
-      }
+    this.Btn_permisos = permisos;
+    this.Btn_vacaciones = vacaciones
 
-      if (this.Btn_vacaciones == true) {
-        this.colorv = "habilitado";
-      } else {
-        this.colorv = "deshabilitado";
-      }
-    }, error => {
-      this.colorp = "c";
+    if (this.Btn_permisos == true) {
+      this.colorp = "habilitado";
+    } else {
+      this.colorp = "deshabilitado";
+    }
+
+    if (this.Btn_horasExtras == true) {
+      this.colorh = "habilitado";
+    } else {
       this.colorh = "deshabilitado";
-      this.colorv = "deshabilitado";
+    }
+
+    if (this.Btn_alimentacion == true) {
+      this.colora = "habilitado";
+    } else {
       this.colora = "deshabilitado";
-    });
+    }
+
+    if (this.Btn_vacaciones == true) {
+      this.colorv = "habilitado";
+    } else {
+      this.colorv = "deshabilitado";
+    }
+
   }
 
   // METODO PARA REDIRECCIONAR A LA PAGINA DE PERMISOS

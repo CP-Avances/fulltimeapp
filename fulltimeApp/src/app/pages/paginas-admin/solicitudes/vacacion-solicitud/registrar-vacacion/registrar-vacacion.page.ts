@@ -81,8 +81,7 @@ export class RegistrarVacacionPage implements OnInit {
         this.tiposVacacion = lista.filter(v => Number(v.sucursal_id) === Number(this.idSucursal));
         this.cargandoTipos = false;
       },
-      error: (err) => {
-        console.error('Error cargando tipos de vacación:', err);
+      error: () => {
         this.tiposVacacion = [];
         this.cargandoTipos = false;
       }
@@ -104,8 +103,7 @@ export class RegistrarVacacionPage implements OnInit {
         }
         this.cargandoSaldo = false;
       },
-      error: (err) => {
-        console.error('Error cargando saldo:', err);
+      error: () => {
         this.saldoVacacionesVisible = '—';
         this.cargandoSaldo = false;
       }
@@ -120,8 +118,7 @@ export class RegistrarVacacionPage implements OnInit {
         this.feriados = Array.isArray(data) ? data : [];
         this.cargandoFeriados = false;
       },
-      error: (err) => {
-        console.error('Error cargando feriados:', err);
+      error: () => {
         this.feriados = [];
         this.cargandoFeriados = false;
       }
@@ -341,8 +338,7 @@ export class RegistrarVacacionPage implements OnInit {
             this.mensajeVerificacion = 'La solicitud pasó la verificación correctamente.';
             this.verificacionRealizada = true;
           },
-          error: (errExiste) => {
-            console.error('Error verificando solicitud existente:', errExiste);
+          error: () => {
             this.estadoVerificacion = 'error';
             this.mensajeVerificacion = 'No fue posible validar si ya existe una solicitud en ese rango.';
             this.verificacionRealizada = true;
@@ -350,7 +346,6 @@ export class RegistrarVacacionPage implements OnInit {
         });
       },
       error: (err) => {
-        console.error('Error en verificación de vacaciones:', err);
         this.estadoVerificacion = 'error';
         this.mensajeVerificacion = err?.message || 'Ocurrió un error al verificar la solicitud.';
         this.verificacionRealizada = true;
@@ -423,8 +418,7 @@ export class RegistrarVacacionPage implements OnInit {
               this.mostrarToast('Solicitud registrada correctamente.', 'success');
               this.resetearFormularioCompleto();
             },
-            error: (err) => {
-              console.error('Error subiendo documento:', err);
+            error: () => {
               this.mostrarToast('La solicitud se registró, pero ocurrió un error al subir el documento.', 'warning');
             }
           });
@@ -436,7 +430,6 @@ export class RegistrarVacacionPage implements OnInit {
         this.router.navigateByUrl('/reloj/solicitudes/vacacion-solicitud');
       },
       error: (err) => {
-        console.error('Error registrando solicitud:', err);
         this.mostrarToast(err?.message || 'Ocurrió un error al registrar la solicitud.', 'danger');
       }
     });

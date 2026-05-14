@@ -53,26 +53,28 @@ export class ListaEmpleadosComponent implements OnInit {
   ObtenerListaEmpleados() {
     const emp = sessionStorage.getItem('lista-empleados')
     if (emp === null) {
-      console.log('entro a peticion');
-      this.empleadoService.ObtenerListaEmpleados().subscribe(res => {
-        console.log("ver busqueda de empleados, ", res);
-        this.empleados = res;
-        this.empleados_filtro = [...this.empleados];
-        sessionStorage.setItem('lista-empleados', JSON.stringify(this.empleados))
 
-        this.loading = true;
-        if (this.empleados_filtro.length < 11) {
-          this.ver = true;
-        }else{
-          this.ver = false;
-        }
+      this.empleadoService.ObtenerListaEmpleados(1).subscribe(
+        {
+          next: res => {
 
-      },error => {
-        this.loading = true;
-        console.log(error);
-        this.ver = true;
-       // return this.abrirToas('Ups!, No fue posible conectarse con el servidor', 'danger', 3500, 'middle')
-      });
+            this.empleados = res;
+            this.empleados_filtro = [...this.empleados];
+            sessionStorage.setItem('lista-empleados', JSON.stringify(this.empleados))
+
+            this.loading = true;
+            if (this.empleados_filtro.length < 11) {
+              this.ver = true;
+            } else {
+              this.ver = false;
+            }
+
+          }, error: () => {
+            this.loading = true;
+            this.ver = true;
+            return this.abrirToas('Ups!, No fue posible conectarse con el servidor', 'danger', 3500, 'middle')
+          }
+        });
     } else {
       this.loading = true;
 
@@ -80,25 +82,24 @@ export class ListaEmpleadosComponent implements OnInit {
       this.empleados_filtro = [...this.empleados];
       if (this.empleados_filtro.length < 11) {
         this.ver = true;
-      }else{
+      } else {
         this.ver = false;
       }
     }
-    
-    if((this.empleados_filtro == undefined) || (this.empleados_filtro == null)){
+
+    if ((this.empleados_filtro == undefined) || (this.empleados_filtro == null)) {
       this.loading = false;
       this.ver = true;
     }
   }
 
   changeSearch(e: any) {
-    console.log("entra a busqueda", e.detail.value)
-    const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
-    console.log("ver las palabra de busqueda ",palabrasBusqueda )
-    const filtro = this.empleados.filter((o: any) => {
-      const nombreCompleto = `${o.fullname }`.toLowerCase();
 
-      console.log("ver el nombre de empleado: ", o.nombre)
+    const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
+
+    const filtro = this.empleados.filter((o: any) => {
+      const nombreCompleto = `${o.fullname}`.toLowerCase();
+
       return palabrasBusqueda.every(palabra => nombreCompleto.includes(palabra))
     })
     this.empleados_filtro = filtro

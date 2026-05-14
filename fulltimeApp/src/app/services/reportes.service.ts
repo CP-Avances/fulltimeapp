@@ -1,37 +1,29 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-
 // SERVICIOS
-import { StorageService } from './storage.service';
+import { environment } from 'src/environments/environment';
+import { map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReportesService {
 
-  private api_url = '';
+  private readonly apiUrl = `${environment.urlMultitenant}`;
 
   constructor(
     private http: HttpClient,
-    private storageService: StorageService,
   ) {
-    this.obtenerUrlEmpresa();
   }
 
-  async obtenerUrlEmpresa() {
-    this.api_url = await this.storageService.get('urlEmpresa');
-  }
 
   // METODO PARA CONSULTAR LISTA DE TIMBRES DEL USUARIO
   ReporteTimbresMultiple(data: any, desde: string, hasta: string) {
-    return this.http.post<any>(`${this.api_url}/reportes-asistencias/timbres/${desde}/${hasta}`, data);
+    return this.http.post<any>(`${this.apiUrl}/reportes-asistencias/timbres/${desde}/${hasta}`, data)
+      .pipe(map(res => res.data));
   }
 
-  // METODO PARA CONSULTAR LISTA DE TIMBRES CON NOVEDAD
-  getInfoReporteTimbresNovedad(data: any, desde: string, hasta: string) {
-    return this.http.post<any>(`${this.api_url}/reporte/timbresConNovedad/${desde}/${hasta}`, data);
-  }
 
   // METODO PARA OBTENER EL TOTAL DE REGISTROS
   SumarRegistros(array: any[]) {

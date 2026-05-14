@@ -36,7 +36,6 @@ export class TimbresEmpleadosPage implements OnInit {
   // METODO PARA VISUALIZAR LA LISTA DE TIMBRES DEL EMPLADO SELECCIONADO
   isConnected: boolean;
   async presentModal(codigo: number | string) {
-    console.log('entro a modal...');
 
     const modal = await this.modalController.create({
       component: VerTimbreEmpleadoComponent,
@@ -52,7 +51,6 @@ export class TimbresEmpleadosPage implements OnInit {
   // METODO PARA VERIFICAR LA CONEXION A INTERNET
   networkSubscriber() {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
-    console.log("Esta conectado: ", this.isConnected)
   }
 
 }

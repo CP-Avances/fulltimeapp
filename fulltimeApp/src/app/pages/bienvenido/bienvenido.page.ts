@@ -153,13 +153,10 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe({
       next: (res) => {
-        console.log('res bienvenida ', res);
 
         const parametro = res.data?.[0];
 
         if (!parametro) {
-          console.warn('No existen parámetros de timbre para el empleado:', empleadoID);
-
           localStorage.setItem('timbrarConFoto', 'No');
           localStorage.setItem('opcional_obligatorio', 'No');
 
@@ -172,10 +169,6 @@ export class BienvenidoPage implements OnInit, OnDestroy {
         const resultadoOpcional = parametro.opcional_obligatorio ? 'Si' : 'No';
         localStorage.setItem('opcional_obligatorio', resultadoOpcional);
 
-        console.log("ver parametro de foto", parametro.timbre_foto);
-      },
-      error: (error) => {
-        console.log('Error al obtener parámetros de timbre', error);
       }
     });
   }
@@ -189,27 +182,24 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     };
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
-      res => {
-        console.log('res timbre especial', res);
+      {
+        next: (res) => {
 
-        const parametro = res.data?.[0];
+          const parametro = res.data?.[0];
 
-        if (!parametro) {
-          console.warn('No existen parámetros de timbre especial para el empleado:', empleadoID);
+          if (!parametro) {
+            localStorage.setItem('timbrarEspecial', 'No');
+            return;
+          }
 
+          const timbreEspecial = parametro.timbre_especial;
+
+          const resultado = timbreEspecial ? 'Si' : 'No';
+          localStorage.setItem('timbrarEspecial', resultado);
+        },
+        error: () => {
           localStorage.setItem('timbrarEspecial', 'No');
-          return;
         }
-
-        const timbreEspecial = parametro.timbre_especial;
-        console.log("ver parametro de timbre especial", timbreEspecial);
-
-        const resultado = timbreEspecial ? 'Si' : 'No';
-        localStorage.setItem('timbrarEspecial', resultado);
-      },
-      error => {
-        console.log('Error al obtener parámetro de timbre especial', error);
-        localStorage.setItem('timbrarEspecial', 'No');
       }
     );
   }
@@ -223,42 +213,32 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     };
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
-      res => {
-        console.log('res ubicación desconocida', res);
+      {
+        next: (res) => {
 
-        const parametro = res.data?.[0];
+          const parametro = res.data?.[0];
 
-        if (!parametro) {
-          console.warn(
-            'No existen parámetros de ubicación desconocida para el empleado:',
-            empleadoID
-          );
+          if (!parametro) {
+            localStorage.setItem('timbrarUbicacionDesconocida', 'No');
+            return;
+          }
 
+          const timbreUbicacionDesconocida = parametro.timbre_ubicacion_desconocida;
+
+
+          const resultado = timbreUbicacionDesconocida ? 'Si' : 'No';
+
+          localStorage.setItem('timbrarUbicacionDesconocida', resultado);
+        },
+        error: () => {
           localStorage.setItem('timbrarUbicacionDesconocida', 'No');
-          return;
         }
-
-        const timbreUbicacionDesconocida = parametro.timbre_ubicacion_desconocida;
-
-        console.log(
-          "ver parametro de ubicación desconocida",
-          timbreUbicacionDesconocida
-        );
-
-        const resultado = timbreUbicacionDesconocida ? 'Si' : 'No';
-
-        localStorage.setItem('timbrarUbicacionDesconocida', resultado);
-      },
-      error => {
-        console.log('Error al obtener parámetro de ubicación desconocida', error);
-        localStorage.setItem('timbrarUbicacionDesconocida', 'No');
       }
     );
   }
 
   // METODO QUE REALIZA VALIDACIONES Y DAN PASO A ENVIAR TIMIBRE
   async VerificarTimbresSinInternet(accion: string) {
-    console.log('Estado de la red: ', this.networkService.getNetworkStatusDispositivo());
 
     await Geolocation.checkPermissions().then(() => {
       if (this.networkService.getNetworkStatusDispositivo() == true) {
@@ -271,30 +251,27 @@ export class BienvenidoPage implements OnInit, OnDestroy {
         this.parametros.ObtenerDetalleParametroUsuario(buscar)
           .pipe(timeout(2000))
           .subscribe(
-            res => {
-              console.log('res timbre sin internet', res);
+            {
+              next: (res) => {
 
-              const parametro = res.data?.[0];
+                const parametro = res.data?.[0];
 
-              if (!parametro) {
-                console.warn('No existen parámetros de timbre sin internet para el empleado:', empleadoID);
+                if (!parametro) {
+                  localStorage.setItem('timbrarSinInternet', 'No');
+                  this.router.navigate(['/enviartimbre', accion]);
+                  return;
+                }
 
+                const timbreInternet = parametro.timbre_internet;
+                const resultado = timbreInternet ? 'Si' : 'No';
+
+                localStorage.setItem('timbrarSinInternet', resultado);
+                this.router.navigate(['/enviartimbre', accion]);
+              },
+              error: () => {
                 localStorage.setItem('timbrarSinInternet', 'No');
                 this.router.navigate(['/enviartimbre', accion]);
-                return;
               }
-
-              const timbreInternet = parametro.timbre_internet;
-              const resultado = timbreInternet ? 'Si' : 'No';
-
-              localStorage.setItem('timbrarSinInternet', resultado);
-              this.router.navigate(['/enviartimbre', accion]);
-            },
-            error => {
-              console.log('Código de error:', error.status);
-
-              localStorage.setItem('timbrarSinInternet', 'No');
-              this.router.navigate(['/enviartimbre', accion]);
             }
           );
       } else {
@@ -320,54 +297,51 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     this.parametros.ObtenerDetalleParametroUsuario(buscar)
       .pipe(timeout(2000))
       .subscribe(
-        async res => {
-          console.log('res timbre especial', res);
+        {
+          next: (res) => {
 
-          const parametro = res.data?.[0];
+            const parametro = res.data?.[0];
 
-          if (!parametro) {
-            console.warn('No existen parámetros de timbre especial para el empleado:', empleadoID);
+            if (!parametro) {
 
-            localStorage.setItem('timbrarEspecial', 'No');
-            this.abrirToas(
-              'Ups!!!, al parecer no tiene activado el timbre especial',
-              "warning",
-              3000,
-              "middle"
-            );
+              localStorage.setItem('timbrarEspecial', 'No');
+              this.abrirToas(
+                'Ups!!!, al parecer no tiene activado el timbre especial',
+                "warning",
+                3000,
+                "middle"
+              );
 
-            return;
-          }
+              return;
+            }
 
-          const timbreEspecial = parametro.timbre_especial;
-          console.log("ver parametro de timbre especial", timbreEspecial);
+            const timbreEspecial = parametro.timbre_especial;
 
-          const resultado = timbreEspecial ? 'Si' : 'No';
-          localStorage.setItem('timbrarEspecial', resultado);
+            const resultado = timbreEspecial ? 'Si' : 'No';
+            localStorage.setItem('timbrarEspecial', resultado);
 
-          if (resultado === 'Si') {
-            this.VerificarTimbresSinInternet(accion);
-          } else {
-            this.abrirToas(
-              'Ups!!!, al parecer no tiene activado el timbre especial',
-              "warning",
-              3000,
-              "middle"
-            );
-          }
-        },
-        error => {
-          console.log('Error al verificar timbre especial', error);
-
-          if (localStorage.getItem("timbrarEspecial") === 'Si') {
-            this.VerificarTimbresSinInternet(accion);
-          } else {
-            this.abrirToas(
-              'Ups!!!, al parecer no tiene activado el timbre especial',
-              "warning",
-              3000,
-              "middle"
-            );
+            if (resultado === 'Si') {
+              this.VerificarTimbresSinInternet(accion);
+            } else {
+              this.abrirToas(
+                'Ups!!!, al parecer no tiene activado el timbre especial',
+                "warning",
+                3000,
+                "middle"
+              );
+            }
+          },
+          error: () => {
+            if (localStorage.getItem("timbrarEspecial") === 'Si') {
+              this.VerificarTimbresSinInternet(accion);
+            } else {
+              this.abrirToas(
+                'Ups!!!, al parecer no tiene activado el timbre especial',
+                "warning",
+                3000,
+                "middle"
+              );
+            }
           }
         }
       );
@@ -381,32 +355,25 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     };
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
-      res => {
-        console.log("ver si hay respuesta de parametros de usuario", res);
+      {
+        next: (res) => {
 
-        const parametro = res.data?.[0];
+          const parametro = res.data?.[0];
 
-        if (!parametro) {
-          console.warn(
-            'No existen parámetros de internet requerido para el empleado:',
-            empleadoID
-          );
+          if (!parametro) {
 
+            localStorage.setItem('timbrarSinInternet', 'No');
+            return;
+          }
+
+          const timbreInternet = parametro.timbre_internet;
+
+          const resultado = timbreInternet ? 'Si' : 'No';
+          localStorage.setItem('timbrarSinInternet', resultado);
+        },
+        error: () => {
           localStorage.setItem('timbrarSinInternet', 'No');
-          return;
         }
-
-        const timbreInternet = parametro.timbre_internet;
-
-        console.log("ver parametro de internet", timbreInternet);
-
-        const resultado = timbreInternet ? 'Si' : 'No';
-        localStorage.setItem('timbrarSinInternet', resultado);
-      },
-      error => {
-        console.log('Error al obtener parámetro de internet requerido', error);
-
-        localStorage.setItem('timbrarSinInternet', 'No');
       }
     );
   }
@@ -424,46 +391,28 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   // METODO PARA VERIFICAR LAS FUNCIONES
   VerificarFunciones() {
-    this.parametros.ObtenerFunciones().pipe(timeout(2000)).subscribe(res => {
-      this.funciones = res[0];
-      this.apro_permisos = this.funciones.permisos;
-      localStorage.setItem("apro_permisos", JSON.stringify(this.funciones.permisos));
 
-      if (this.apro_permisos == true) {
-        this.colorIp = "primary"
-        this.colorFp = "dark"
-        localStorage.setItem("colorIp", "primary")
-        localStorage.setItem("colorFp", "dark")
-      } else {
-        this.colorIp = "deshabilitado"
-        this.colorFp = "deshabilitado"
-        localStorage.setItem("colorIp", "deshabilitado")
-        localStorage.setItem("colorFp", "deshabilitado")
-      }
-    }, error => {
+    const raw = localStorage.getItem('modulos');
 
-      if (error.status === 0) {
-        // Error de red, servidor no disponible
-        this.colorIp = localStorage.getItem("colorIp")
-        this.colorFp = localStorage.getItem("colorFp")
+    const modulos = JSON.parse(raw);
 
-      } else if (error.status === 503) {
-        // Error 503: Servicio no disponible
-        this.colorIp = localStorage.getItem("colorIp")
-        this.colorFp = localStorage.getItem("colorFp")
-      } else if (error.status === 404) {
-        // Error 404: Recurso no encontrado
-        this.colorIp = localStorage.getItem("colorIp")
-        this.colorFp = localStorage.getItem("colorFp")
-      } else {
-        // Manejo de otros errores
-        this.colorIp = localStorage.getItem("colorIp")
-        this.colorFp = localStorage.getItem("colorFp")
-      }
+    const { permisos } = modulos
 
+    this.apro_permisos = permisos;
+    localStorage.setItem("apro_permisos", permisos);
 
+    if (this.apro_permisos == true) {
+      this.colorIp = "primary"
+      this.colorFp = "dark"
+      localStorage.setItem("colorIp", "primary")
+      localStorage.setItem("colorFp", "dark")
+    } else {
+      this.colorIp = "deshabilitado"
+      this.colorFp = "deshabilitado"
+      localStorage.setItem("colorIp", "deshabilitado")
+      localStorage.setItem("colorFp", "deshabilitado")
     }
-    );
+
   }
   // METODO PARA VERIFICAR LAS FUNCIONES, VALIDAR PARAMETROS Y DAR PASO A ENVIAR TIMBRE DE INICIO DE PERMISO
   async btn_InicioPermisosClick() {
@@ -482,13 +431,23 @@ export class BienvenidoPage implements OnInit, OnDestroy {
             ids_empleados: [parseInt(localStorage.getItem("empleadoID"), 10)],
           };
           this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(2000)).subscribe(
-            res => {
-              const timbreFoto = res.data[0].timbre_internet;
-              const resultado = timbreFoto ? 'Si' : 'No';
-              localStorage.setItem('timbrarSinInternet', resultado);
-              this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
-            }, error => {
-              this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
+            {
+              next: res => {
+
+                const parametro = res.data?.[0];
+
+                if (!parametro) {
+                  localStorage.setItem('timbrarSinInternet', 'No');
+                  return;
+                }
+
+                const timbreFoto = parametro.timbre_internet;
+                const resultado = timbreFoto ? 'Si' : 'No';
+                localStorage.setItem('timbrarSinInternet', resultado);
+                this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
+              }, error: () => {
+                this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
+              }
             }
           );
         }
@@ -518,13 +477,23 @@ export class BienvenidoPage implements OnInit, OnDestroy {
             ids_empleados: [parseInt(localStorage.getItem("empleadoID"), 10)],
           };
           this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(2000)).subscribe(
-            res => {
-              const timbreFoto = res.data[0].timbre_internet;
-              const resultado = timbreFoto ? 'Si' : 'No';
-              localStorage.setItem('timbrarSinInternet', resultado);
-              this.router.navigate(['/enviartimbre', 'Fin de permiso']);
-            }, error => {
-              this.router.navigate(['/enviartimbre', 'Fin de permiso']);
+            {
+              next: res => {
+
+                const parametro = res.data?.[0];
+
+                if (!parametro) {
+                  localStorage.setItem('timbrarSinInternet', 'No');
+                  return;
+                }
+
+                const timbreFoto = parametro.timbre_internet;
+                const resultado = timbreFoto ? 'Si' : 'No';
+                localStorage.setItem('timbrarSinInternet', resultado);
+                this.router.navigate(['/enviartimbre', 'Fin de permiso']);
+              }, error: () => {
+                this.router.navigate(['/enviartimbre', 'Fin de permiso']);
+              }
             }
           );
         }
@@ -554,12 +523,14 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   // METODO DE VALIDACION DE APLICACION MOVIL HABILITADA
   async checkSession(id_empleado) {
-    this.empleadoService.accesoMovil(id_empleado).subscribe((x: any) => {
-      if (x[0].app_habilita == false) {
-        console.log('Session invalid. Closing session...');
+    this.empleadoService.accesoMovil(id_empleado).subscribe({
+      next: (x: any) => {
+        if (x.data[0].app_habilita == false) {
+          console.log('Session invalid. Closing session...');
+          this.cerrarSesion();
+        }
+      }, error: () => {
         this.cerrarSesion();
-      } else {
-        console.log('Session valid');
       }
     })
   }

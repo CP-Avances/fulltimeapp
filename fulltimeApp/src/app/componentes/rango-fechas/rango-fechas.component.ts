@@ -57,7 +57,7 @@ export class RangoFechasComponent {
   }
 
   closeRangoFecha() {
-    console.log('Destroy Fecha rango');
+
     this.dataUserService.setFechaRangoInicio('');
     this.dataUserService.setFechaRangoFinal('');
     this.fechaIn = "";

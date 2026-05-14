@@ -1,48 +1,74 @@
-import { Component, OnInit } from '@angular/core';
-import { Platform } from '@ionic/angular';
-import { MenuController, ModalController, PopoverController, AlertController, LoadingController, ToastController } from '@ionic/angular';
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
+import {
+  AlertController,
+  LoadingController,
+  MenuController,
+  ModalController,
+  Platform,
+  PopoverController,
+  ToastController
+} from '@ionic/angular';
+
+import { LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
+
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
+import { NotificacionesService } from 'src/app/services/notificaciones.service';
+import { SocketService } from 'src/app/services/socket.service';
+
+import { NetworkService } from '../../libs/network.service';
 import { NotificacionPopoverComponent } from '../notificacion-popover/notificacion-popover.component';
 import { TimbresPerdidosComponent } from '../../pages/bienvenido/showTimbresGuardados.component';
 
-import { Notificacion } from '../../interfaces/Notificaciones';
-import { NotificacionTimbre } from '../../interfaces/Notificaciones';
-import { LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
-
-import { ParametrosService } from 'src/app/services/parametros.service';
-import { NetworkService } from '../../libs/network.service';
-import { SocketService } from 'src/app/services/socket.service';
+import { Notificacion, NotificacionTimbre } from '../../interfaces/Notificaciones';
 
 @Component({
   selector: 'app-navegador-admin',
   templateUrl: './navegador-admin.component.html',
   styleUrls: ['./navegador-admin.component.scss'],
 })
-export class NavegadorAdminComponent implements OnInit {
+export class NavegadorAdminComponent implements OnInit, OnDestroy {
 
   username: string = '';
-  imagen: string = localStorage.getItem('imagen64');
+  imagen: string = localStorage.getItem('imagen64') ?? '';
 
   idEmpleadoIngresa: number = 0;
+
   valor: boolean = true;
   loading: boolean = true;
+
   notificaciones: Notificacion[] = [];
   notificaiontimbre: NotificacionTimbre[] = [];
-  notificacionestimbres: any = [];
-  notificacionesAll: any = [];
+  notificacionestimbres: any[] = [];
+  notificacionesAll: any[] = [];
 
   public countNoti: number = 0;
   public countbadge: number = 0;
-  mensaje: string = "";
-  empleEnvia: string = "";
+
+  mensaje: string = '';
+  empleEnvia: string = '';
 
   ids: number[] = [];
   resume: boolean = false;
 
   colorNOtifi: string = '';
 
-  socket: any;
+  isConnected: boolean = true;
+
+  funciones: any = [];
+  apro_permisos: any;
+  apro_vacaciones: any;
+  apro_horasExtras: any;
+  apro_alimentaciones: any;
+
+  colorp: any;
+  colorh: any;
+  colorv: any;
+  colora: any;
+
+  private unsubscribeNotificacion?: () => void;
+  private unsubscribeAviso?: () => void;
+  private socketEscuchando: boolean = false;
 
   constructor(
     private userService: DataUserLoggedService,
@@ -54,134 +80,64 @@ export class NavegadorAdminComponent implements OnInit {
     public alertCrtl: AlertController,
     public loadingController: LoadingController,
     private toastController: ToastController,
-    public parametros: ParametrosService,
     private networkService: NetworkService,
     private socketService: SocketService,
+    private notificacionesService: NotificacionesService,
+    private readonly ngZone: NgZone,
   ) { }
-
-  ionViewWillEnter() {
-    this.ngOnInit();
-    this.VerificarFunciones();
-    this.networkSubscriber()
-
-  }
 
   ngOnInit() {
     this.username = this.userService.username;
-    this.idEmpleadoIngresa = parseInt(localStorage.getItem('empleadoID'));
-    this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
 
-    this.socket = this.socketService.getSocket();
+    const empleadoID = Number(localStorage.getItem('empleadoID') ?? 0);
+    this.idEmpleadoIngresa = Number.isNaN(empleadoID) ? 0 : empleadoID;
 
-    if (this.socket) {
-      this.socket.on('recibir_notificacion', (data_llega: any) => {
-        this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
-        console.log("Notificacion: ", data_llega);
-        if (data_llega.id_receives_empl === this.idEmpleadoIngresa) {
-          this.mensaje = data_llega.usuario;
-          try {
-            var t = new Date();
-            t.setSeconds(t.getSeconds() + 5);
-            let id = this.ids.length;
-            this.ids.push(id);
+    this.networkSubscriber();
+    this.VerificarFunciones();
 
-            let options: ScheduleOptions = {
-              notifications: [{
-                id: data_llega.id,
-                title: "Fulltime Notificacion",
-                body: this.mensaje,
-                schedule: {
-                  allowWhileIdle: false,
-                },
-                largeBody: this.mensaje + "\n" + data_llega.mensaje,
-              }]
-            }
-            LocalNotifications.schedule(options);
-          } catch (error) {
-            this.mostrarToasNoti("No se pudo resibir la notificacion: \n" + error);
-            console.log("Problemas en la notificacion: ", error);
-          }
-        }
-      });
+    this.CargarContadorNotificaciones();
+    this.EscucharNotificacionesTiempoReal();
+  }
 
-      this.socket.on('recibir_aviso', (data_llega: any) => {
-        console.log(" entrando al proceso de notificaciones")
-        this.LlamarNotificcaccciones(this.idEmpleadoIngresa);
-        console.log("Aviso recibido", data_llega.id);
+  ionViewWillEnter() {
+    this.username = this.userService.username;
 
-        if (data_llega.id_receives_empl === this.idEmpleadoIngresa) {
-          this.mensaje = data_llega.usuario;
-          console.log("Usuario envio", this.empleEnvia);
+    const empleadoID = Number(localStorage.getItem('empleadoID') ?? 0);
+    this.idEmpleadoIngresa = Number.isNaN(empleadoID) ? 0 : empleadoID;
 
-          try {
-            this.mostrarToasNoti("Notificacion Recibida de " + data_llega + "\n");
-            var t = new Date();
-            t.setSeconds(t.getSeconds() + 5);
-            let id = this.ids.length;
-            this.ids.push(id);
+    this.networkSubscriber();
+    this.VerificarFunciones();
+    this.CargarContadorNotificaciones();
+  }
 
-            let options: ScheduleOptions = {
-              notifications: [{
-                id: data_llega.id,
-                title: "Fulltime Aviso",
-                body: this.mensaje,
-                largeBody: this.mensaje + "\n" + data_llega.descripcion,
-                schedule: {
-                  allowWhileIdle: true,
-                }
-              }]
-            }
-            if(data_llega.mensaje.split(" ")[0] =='NOTIFICACIÓN'){
-               options = {
-                notifications: [{
-                  id: data_llega.id,
-                  title: data_llega.mensaje,
-                  body: this.mensaje,
-                  largeBody: this.mensaje + "\n" + data_llega.descripcion,
-                  schedule: {
-                    allowWhileIdle: true,
-                  }
-                }]
-              }
-            }
-
-
-            console.log("ver options", options)
-
-            LocalNotifications.schedule(options).then(() => { });
-
-          } catch (error) {
-            this.mostrarToasNoti("No se pudo resibir el Aviso: \n" + error);
-            console.log("Problemas en el Aviso: ", error);
-          }
-        }
-
-      });
-    }
-
-    this.networkSubscriber()
+  ngOnDestroy() {
+    this.unsubscribeNotificacion?.();
+    this.unsubscribeAviso?.();
+    this.socketEscuchando = false;
   }
 
   onImageError(event: any) {
-    event.target.src = "../../../assets/images/perfildefecto.png";
+    event.target.src = '../../../assets/images/perfildefecto.png';
   }
 
-  // METODO DE VERIFICACION DE CONEXION A INTERNET
-  isConnected: boolean;
   networkSubscriber() {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
-    console.log("Esta conectado: ", this.isConnected)
+
     if (!this.isConnected) {
-      this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
-      console.log('Desconectado');
-      this.imagen = localStorage.getItem("imagen64")
-    } else {
-      console.log('conectado');
-      this.imagen = localStorage.getItem("imagen64")
+      this.abrirToas(
+        'Por favor verifique su conexión a Internet',
+        'danger',
+        3000,
+        'middle'
+      );
+
+      this.imagen = localStorage.getItem('imagen64') ?? '';
+      return;
     }
+
+    this.imagen = localStorage.getItem('imagen64') ?? '';
   }
 
-  // METODO DE CONFIGURACION DE TOAST
   async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
     const toast = await this.toastController.create({
       message: mensaje,
@@ -189,132 +145,220 @@ export class NavegadorAdminComponent implements OnInit {
       color: color,
       position: position
     });
-    toast.present();
+
+    await toast.present();
   }
 
-  // METODO PARA LEER LAS NOTIFICACIONES
-  LlamarNotificcaccciones(id_empleado: number) {
+  CargarContadorNotificaciones() {
+    if (!this.idEmpleadoIngresa) return;
 
-  }
+    this.countNoti = 0;
 
-  //Verifica si tiene activado los modulos mediante la tabla funciones
-  funciones: any = [];
-  apro_permisos: any;
-  apro_vacaciones: any;
-  apro_horasExtras: any;
-  apro_alimentaciones: any;
-
-
-  colorp: any;
-  colorh: any;
-  colorv: any;
-  colora: any;
-
-  // METODO PARA VERIFICAR LOS MODULOS ACTIVOS
-  VerificarFunciones() {
-    this.parametros.ObtenerFunciones().subscribe(res => {
-      this.funciones = res[0];
-      this.apro_permisos = this.funciones.permisos;
-      this.apro_vacaciones = this.funciones.vacaciones;
-      this.apro_horasExtras = this.funciones.hora_extra;
-      this.apro_alimentaciones = this.funciones.alimentacion;
-
-      if (this.apro_permisos == true) {
-        this.colorp = "dark"
-      } else {
-        this.colorp = "medium"
+    this.notificacionesService.BuscarAvisosGenerales(this.idEmpleadoIngresa).subscribe({
+      next: (res: any[]) => {
+        if (res && res.length > 0) {
+          const noVistas = res.filter((n: any) => n.visto === false).length;
+          this.countNoti += noVistas;
+        }
       }
+    });
 
-      if (this.apro_vacaciones == true) {
-        this.colorv = "dark"
-      } else {
-        this.colorv = "medium"
+    this.notificacionesService.ObtenerNotasUsuario(this.idEmpleadoIngresa).subscribe({
+      next: (res: any[]) => {
+        if (res && res.length > 0) {
+          const noVistas = res.filter((n: any) => n.visto === false).length;
+          this.countNoti += noVistas;
+        }
       }
-
-      if (this.apro_horasExtras == true) {
-        this.colorh = "dark"
-      } else {
-        this.colorh = "medium"
-      }
-
-      if (this.apro_alimentaciones == true) {
-        this.colora = "dark"
-      } else {
-        this.colora = "medium"
-      }
-
     });
   }
 
+  EscucharNotificacionesTiempoReal() {
+    if (this.socketEscuchando) return;
 
-  //METODOS DE CONFIGURACION DE MENSAJES
+    this.socketEscuchando = true;
+
+    this.unsubscribeNotificacion = this.socketService.onNotificacion((noti: any) => {
+      this.ngZone.run(() => {
+        this.procesarNotificacionSocket(noti, 'Fulltime Notificación');
+      });
+    });
+
+    this.unsubscribeAviso = this.socketService.onAviso((aviso: any) => {
+      this.ngZone.run(() => {
+        this.procesarNotificacionSocket(aviso, 'Fulltime Aviso');
+      });
+    });
+  }
+
+  private procesarNotificacionSocket(data: any, titulo: string) {
+    if (!this.idEmpleadoIngresa) return;
+
+    const idRecibe = this.obtenerIdEmpleadoRecibe(data);
+
+    if (idRecibe !== Number(this.idEmpleadoIngresa)) return;
+
+    if (data.visto === false || data.visto === undefined || data.visto === null) {
+      this.countNoti += 1;
+    }
+
+    this.mensaje = this.obtenerMensajeNotificacion(data);
+
+    this.enviarNotificacionLocal(data, titulo);
+  }
+
+  private obtenerIdEmpleadoRecibe(data: any): number {
+    return Number(
+      data?.id_empleado_recibe ??
+      data?.id_receives_empl ??
+      data?.id_recibe ??
+      0
+    );
+  }
+
+  private obtenerMensajeNotificacion(data: any): string {
+    if (data?.descripcion) return String(data.descripcion);
+
+    if (data?.notificacion) return String(data.notificacion);
+
+    if (data?.usuario) return String(data.usuario);
+
+    if (data?.mensaje) {
+      if (typeof data.mensaje === 'string') {
+        try {
+          const mensajeObj = JSON.parse(data.mensaje);
+          return mensajeObj?.notificacion ?? data.mensaje;
+        } catch {
+          return data.mensaje;
+        }
+      }
+
+      return data.mensaje?.notificacion ?? 'Tiene una nueva notificación';
+    }
+
+    return 'Tiene una nueva notificación';
+  }
+
+  private async enviarNotificacionLocal(data: any, titulo: string) {
+    try {
+      const idLocal = Number(data?.id ?? Date.now());
+
+      const options: ScheduleOptions = {
+        notifications: [
+          {
+            id: idLocal,
+            title: titulo,
+            body: this.mensaje,
+            largeBody: this.mensaje,
+            schedule: {
+              allowWhileIdle: true
+            }
+          }
+        ]
+      };
+
+      await LocalNotifications.schedule(options);
+
+    } catch (error) {
+      console.log('No se pudo mostrar la notificación local:', error);
+    }
+  }
+
+  VerificarFunciones() {
+    const raw = localStorage.getItem('modulos');
+
+    if (!raw) return;
+
+    try {
+      const modulos = JSON.parse(raw);
+
+      const { permisos, vacaciones } = modulos;
+
+      this.apro_permisos = permisos;
+      this.apro_vacaciones = vacaciones;
+
+      this.colorp = this.apro_permisos === true ? 'dark' : 'medium';
+      this.colorv = this.apro_vacaciones === true ? 'dark' : 'medium';
+
+    } catch (error) {
+      console.log('Error al leer módulos:', error);
+    }
+  }
+
   async mostrarToas(mensaje: string) {
     const toast = await this.toastController.create({
-      message: `<ion-icon name="information-circle-outline"></ion-icon>` + mensaje + "\n\n Te gustaria activarlo? \n Comunicate con nosotros: www.casapazmino.com.ec",
+      message:
+        `<ion-icon name="information-circle-outline"></ion-icon>` +
+        mensaje +
+        '\n\n Te gustaria activarlo? \n Comunicate con nosotros: www.casapazmino.com.ec',
       duration: 4500,
-      position: "top",
-      color: "notificacicon",
-      mode: "ios",
+      position: 'top',
+      color: 'notificacicon',
+      mode: 'ios',
       cssClass: 'toast-custom-class',
     });
+
     await toast.present();
   }
 
   async mostrarToasNoti(mensaje: string) {
     const toast = await this.toastController.create({
-      message: this.mensaje,
+      message: mensaje,
       duration: 3000,
-      position: "top",
-      color: "notificacicon",
-      mode: "ios",
+      position: 'top',
+      color: 'notificacicon',
+      mode: 'ios',
       cssClass: 'toast-custom-class',
     });
+
     await toast.present();
   }
 
-  // METODO PARA MOSTRAR LAS NOTIFICACIONES
   async Mostrarpopnotificaciones(event: any) {
     this.countNoti = 0;
     this.valor = false;
+
     const popover = await this.pooverCtrl.create({
       component: NotificacionPopoverComponent,
       event: event,
-      mode: "md",
+      mode: 'md',
       translucent: true,
       cssClass: 'noti-popover',
     });
+
     await popover.present();
     await popover.onDidDismiss();
+
+    this.CargarContadorNotificaciones();
   }
 
-
-  // METOO PARA ABRIR EL MENU
   openAdmin() {
     this.menu.enable(true, 'admin');
     this.menu.open('admin');
     this.VerificarFunciones();
   }
 
-  // METOO PARA CERRAR EL MENU
   closeAdmin() {
     this.menu.close('admin');
   }
 
-  // METODO PARA CERRAR LA SESION
   cerrarSesion() {
+    this.unsubscribeNotificacion?.();
+    this.unsubscribeAviso?.();
+    this.socketEscuchando = false;
+
     this.relojService.cerrarSesion();
     this.closeAdmin();
-
   }
 
-  // METODO PARA MOSTRAL EL MODAL DE TIMBRES PERDIDOS
   async presentModalTimbresPerdidos() {
     this.closeAdmin();
+
     const modal = await this.modalController.create({
       component: TimbresPerdidosComponent,
       cssClass: 'my-custom-class'
     });
+
     return await modal.present();
   }
-
 }

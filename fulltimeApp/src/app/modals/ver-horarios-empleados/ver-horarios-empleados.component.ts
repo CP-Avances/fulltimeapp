@@ -4,6 +4,7 @@ import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { EmpleadosService } from '../../services/empleados.service';
 import { DateTime } from 'luxon';
+import { ParametrosSistema } from 'src/app/libs/parametros.emun';
 
 @Component({
   selector: 'app-ver-horarios-empleados',
@@ -64,7 +65,6 @@ export class VerHorariosEmpleadosComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    console.log('CODIGO DEL EMPLEADO: ', this.data);
     this.BuscarFormatos();
   }
 
@@ -72,43 +72,53 @@ export class VerHorariosEmpleadosComponent implements OnInit {
   formato_fecha: string;
   formato_hora: string;
   BuscarFormatos() {
-    this.parametro.ObtenerFormatos().subscribe(
+    const detalles = [
+      ParametrosSistema.FORMATO_FECHA,
+      ParametrosSistema.FORMATO_HORA
+    ];
+    this.parametro.ObtenerFormatos(detalles).subscribe(
       resp => {
-        this.formato_fecha = resp.fecha;
-        this.formato_hora = resp.hora;
+        resp.forEach(p => {
+          if (p.id_parametro === ParametrosSistema.FORMATO_FECHA) {
+            this.formato_fecha = p.descripcion;
+          } else if (p.id_parametro === ParametrosSistema.FORMATO_HORA) {
+            this.formato_hora = p.descripcion;
+          }
+        });
         this.obtenerHorariosEmpleado(this.data.id)
       }
-    )
+    );
   }
 
   // METODO PARA CONSULTAR LOS HORARIOS DE LOS EMPLEADOS 
   obtenerHorariosEmpleado(codigo) {
-    var i = 0;
     this.horariocontent = false;
-    this.empleadosService.getPlanificacionHorariosEmplbyCodigo(codigo).subscribe(res => {
-      this.horarios = res;
-      var listaAnios = [];
-      this.horarios.forEach(function (elemento) {
-        if (listaAnios.find(p => p.anio == elemento.anio) == undefined) {
-          listaAnios.push(elemento);
+    this.empleadosService.getPlanificacionHorariosEmplbyCodigo(codigo).subscribe({
+      next: (res) => {
+        this.horarios = res;
+        var listaAnios = [];
+        this.horarios.forEach(function (elemento) {
+          if (listaAnios.find(p => p.anio == elemento.anio) == undefined) {
+            listaAnios.push(elemento);
+          }
+        });
+
+        this.listaAnios = listaAnios;
+        if (this.listaAnios.length < 2) {
+          this.mensajeOcultar = true;
+          this.tablaPlanificacion = true;
+          this.filtrarMese(this.horarios);
+          this.anio = this.listaAnios[0].anio;
+        } else {
+          this.mensajeOcultar = true;
+          this.tablaPlanificacion = true;
         }
-      });
 
-      this.listaAnios = listaAnios;
-      if (this.listaAnios.length < 2) {
-        this.mensajeOcultar = true;
-        this.tablaPlanificacion = true;
-        this.filtrarMese(this.horarios);
-        this.anio = this.listaAnios[0].anio;
-      } else {
-        this.mensajeOcultar = true;
-        this.tablaPlanificacion = true;
+      }, error: () => {
+        this.mensajeOcultar = false;
+        this.horariocontent = true;
+
       }
-
-    }, error => {
-      this.mensajeOcultar = false;
-      this.horariocontent = true;
-      console.log('no hay planificacion')
     });
   }
   meseFiltradosPorAnio: any = [];
@@ -137,7 +147,7 @@ export class VerHorariosEmpleadosComponent implements OnInit {
 
     this.filtrarMese(this.listafiltada);
     this.anio = e.target.value;
-    console.log('this.tablaPlanificacion: ', this.tablaPlanificacion);
+
   }
 
   // METODO PARA CAMBIAR EL MES
@@ -167,11 +177,10 @@ export class VerHorariosEmpleadosComponent implements OnInit {
     });
     // Obtener el último día del mes
     const endDay = startDay.endOf('month');
-    console.log("startDay: ", startDay);
-    console.log("endDay: ", endDay);
+
     this.dateSelect = startDay;
     const numberDays = endDay.day - startDay.day + 1; // +1 para incluir el primer día
-    console.log("numberDays: ", numberDays);
+
     const arrayDays = Object.keys([...Array(numberDays)]).map((a: any) => {
       a = parseInt(a) + 1;
 
@@ -188,12 +197,12 @@ export class VerHorariosEmpleadosComponent implements OnInit {
       }
     });
     this.monthSelect = arrayDays;
-    console.log('this.monthSelect: ', this.monthSelect);
+
   }
 
   // METODO PARA CERRAR EL MODAL DE HORARIOS 
   closeModal() {
-    console.log('CERRAR MODAL HORARIOS');
+
     this.modalController.dismiss({
       'refreshInfo': true
     });
@@ -287,10 +296,10 @@ export class VerHorariosEmpleadosComponent implements OnInit {
     }
     this.empleadoService.getHorariosEmpleadobyCodigo(busqueda).subscribe(datos => {
       this.plan_horario = this.validar.ObtenerDetallesPlanificacion(datos);
-      console.log("ver paln horario", this.plan_horario)
+
       this.plan_horario.forEach((x) => {
         this.empleadoService.BuscarUnHorario(x.horario).subscribe(y => {
-          x.horario_codigo = y[0].codigo;
+          x.horario_codigo = y.data[0].codigo;
         })
       })
       this.isModalOpen = true;

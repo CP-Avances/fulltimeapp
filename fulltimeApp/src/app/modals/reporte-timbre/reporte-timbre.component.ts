@@ -11,6 +11,7 @@ import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import * as ExcelJS from 'exceljs';
+import { ParametrosSistema } from 'src/app/libs/parametros.emun';
 
 
 (pdfMake as any).vfs = (pdfFonts as any).vfs;
@@ -117,9 +118,6 @@ export class ReporteTimbreComponent implements OnInit {
           this.empresa = res.data;
           this.cargaEmpresaCompleta = true;
           this.verificarCargaCompleta();
-        },
-        error: err => {
-          console.log(err);
         }
       }
     );
@@ -129,10 +127,19 @@ export class ReporteTimbreComponent implements OnInit {
   formato_fecha: string;
   formato_hora: string;
   BuscarFormatos() {
-    this.parametro.ObtenerFormatos().subscribe(
+    const detalles = [
+      ParametrosSistema.FORMATO_FECHA,
+      ParametrosSistema.FORMATO_HORA
+    ];
+    this.parametro.ObtenerFormatos(detalles).subscribe(
       resp => {
-        this.formato_fecha = resp.fecha;
-        this.formato_hora = resp.hora;
+        resp.forEach(p => {
+          if (p.id_parametro === ParametrosSistema.FORMATO_FECHA) {
+            this.formato_fecha = p.descripcion;
+          } else if (p.id_parametro === ParametrosSistema.FORMATO_HORA) {
+            this.formato_hora = p.descripcion;
+          }
+        });
         this.cargaFormatosCompleta = true;
         this.verificarCargaCompleta();
       }
@@ -151,20 +158,22 @@ export class ReporteTimbreComponent implements OnInit {
     const fechaF = new Date(this.fechaFinal);
     const fechaFormateadaFin = fechaF.toISOString().split('T')[0];
 
-    this.reporteService.ReporteTimbresMultiple(this.data, fechaFormateadaInicio, fechaFormateadaFin).subscribe(res => {
-      this.data_pdf = res;
-      this.ExtraerDatos();
-      this.loading = true;
-      if (this.count === 100) {
-        this.alertLimiteReporte();
+    this.reporteService.ReporteTimbresMultiple(this.data, fechaFormateadaInicio, fechaFormateadaFin).subscribe({
+      next: (res) => {
+        this.data_pdf = res;
+        this.ExtraerDatos();
+        this.loading = true;
+        if (this.count === 100) {
+          this.alertLimiteReporte();
+        }
+        this.showBtnPdf = true;
+      }, error: () => {
+
+        this.existenEmpleados = true;
+        this.showBtnPdf = false;
+        this.loading = true;
+        this.plantillaPDF.abrirToas('No existen timbres registrados', 'danger', 3000);
       }
-      this.showBtnPdf = true;
-    }, err => {
-      console.error("no existen resultados");
-      this.existenEmpleados = true;
-      this.showBtnPdf = false;
-      this.loading = true;
-      this.plantillaPDF.abrirToas('No existen timbres registrados', 'danger', 3000);
     });
   }
 
@@ -180,7 +189,7 @@ export class ReporteTimbreComponent implements OnInit {
   }
 
   closeModal() {
-    console.log('CERRAR MODAL Reporte timbre');
+
     this.modalController.dismiss({
       'refreshInfo': true
     });
@@ -195,39 +204,34 @@ export class ReporteTimbreComponent implements OnInit {
   frase: any;
   // METODO PARA OBTENER LOS COLORES DE LA EMPRESA
   ObtenerColores() {
-    this.plantillaPDF.ConsultarDatosEmpresa(parseInt(localStorage.getItem('id_empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_principal;
-      this.s_color = res[0].color_secundario;
-      this.frase = res[0].marca_agua;
+    this.relojService.obtenerDatosEmpresa().subscribe(res => {
+      this.p_color = res.data.color_principal;
+      this.s_color = res.data.color_secundario;
+      this.frase = res.data.marca_agua;
     });
   }
 
   logo: any = String;
   // METODO PARA OBTENER EL LOGO DE LA EMPRESA
   ObtenerLogo() {
-    const idEmpresa = localStorage.getItem('id_empresa');
-    if (!idEmpresa || idEmpresa === 'null') {
-      return;
-    }
-
-    this.plantillaPDF.LogoEmpresaImagenBase64(idEmpresa).subscribe(
-      res => {
-        this.logo = 'data:image/jpeg;base64,' + res.imagen;
+    this.plantillaPDF.LogoEmpresaImagenBase64('logo').subscribe({
+      next: res => {
+        this.logo = res;
         this.cargaLogoCompleta = true;
         this.verificarCargaCompleta();
       },
-      err => {
+      error: () => {
         this.cargaLogoCompleta = true;
         this.verificarCargaCompleta();
       }
-    );
+    });
   }
 
 
   // METODO PARA GENERAR EL PDF
   GenerarPDF() {
     if (!this.logo || !this.logo.startsWith('data:image')) {
-      console.error('Logo no cargado correctamente.');
+
       return;
     }
 
@@ -500,7 +504,7 @@ export class ReporteTimbreComponent implements OnInit {
     let datos: any[] = [];
     let n: number = 1;
     let accionT = '';
-    console.log("ver datos data_pdf: ", this.data_pdf)
+
     this.data_pdf.forEach((data: any) => {
       data.empleados.forEach((usu: any) => {
         usu.timbres.forEach((t: any) => {
@@ -546,8 +550,7 @@ export class ReporteTimbreComponent implements OnInit {
               t.fecha_hora_timbre,
               horaTimbre
             ])
-            console.log("✅ Datos generados para Excel:");
-            console.log("Fila 1:", datos[0]);
+
             datos[0].forEach((celda, index) => {
               console.log(`Columna ${index + 1}:`, celda, "→ tipo:", typeof celda);
             });
@@ -578,10 +581,9 @@ export class ReporteTimbreComponent implements OnInit {
       })
     });
 
-    console.log("📋 Total de filas generadas:", datos.length);
 
     if (datos.length > 0) {
-      console.log("🧪 Inspección detallada de la primera fila:");
+
       datos[0].forEach((valor, index) => {
         console.log(`Columna ${index + 1}:`, valor, "→ tipo:", typeof valor);
       });
@@ -668,7 +670,6 @@ export class ReporteTimbreComponent implements OnInit {
         { name: "HORA TIMBRE DISPOSITIVO", totalsRowLabel: "", filterButton: true },
       ]
 
-      console.log("🔍 Columnas:", columnas);
       columnas.forEach((col, i) => {
         console.log(`Columna ${i + 1}:`, col, "→ tipo:", typeof col.name);
       });

@@ -1,14 +1,13 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
-import { NotificacionesService } from 'src/app/services/notificaciones.service';
-import { ParametrosService } from 'src/app/services/parametros.service';
-import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { LocalNotifications } from '@capacitor/local-notifications';
+
+import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 
-interface checkOptions {
+interface CheckOptions {
   valor: number;
-  nombre: string
+  nombre: string;
 }
 
 @Component({
@@ -17,711 +16,562 @@ interface checkOptions {
   styleUrls: ['./enviar-usuario.component.scss'],
 })
 export class EnviarUsuarioComponent implements OnInit {
-  ips_locales: any = '';
 
   @Input() data: any;
 
-  loadingEmpleado: boolean = true;
-  listLoaded: boolean = false;
-  opcion_sucursal: boolean = false;
-  opcion_depa: boolean = false;
-  opcion_empleado: boolean = false;
-  opcion_rol: boolean = false;
-  idEmpleado: number;
-  idEmpresa: number;
-  solicitudes: checkOptions[] = [
+  ips_locales: any = '';
+
+  loadingEmpleado = true;
+  listLoaded = false;
+
+  opcion_sucursal = false;
+  opcion_depa = false;
+  opcion_empleado = false;
+  opcion_rol = false;
+
+  idEmpleado = 0;
+  idEmpresa = 0;
+
+  solicitudes: CheckOptions[] = [
     { valor: 1, nombre: 'Sucursal' },
     { valor: 2, nombre: 'Departamento' },
     { valor: 3, nombre: 'Empleado' },
     { valor: 4, nombre: 'Rol' },
   ];
-  departamentos: any = [];
-  sucursales: any = [];
-  respuesta: any[];
-  empleados: any = [];
-  roles: any = [];
-  empleados_filtro: any = [];
-  departamentos_filtro: any = [];
-  sucursales_filtro: any = [];
-  roles_filtro: any = [];
-  isChecked: boolean = true;
+
+  empleados: any[] = [];
+  sucursales: any[] = [];
+  departamentos: any[] = [];
+  roles: any[] = [];
+
+  empleados_filtro: any[] = [];
+  sucursales_filtro: any[] = [];
+  departamentos_filtro: any[] = [];
+  roles_filtro: any[] = [];
+
+  respuesta: any[] = [];
+
+  selectedValue: any;
+  radioValue: any;
+
+  isChecked = true;
+
+  isAllCheck_sucu = false;
+  isAllCheck_depa = false;
+  isAllCheck_empl = false;
+  isAllCheck_rol = false;
+
+  isChecked_sucu = true;
+  isChecked_depa = true;
+  isChecked_empl = true;
+  isChecked_rol = true;
+
+  envios: any[] = [];
+  cont = 0;
+  boton_enviar = false;
+
+  verificador = 0;
+  cont_correo = 0;
+  info_correo = '';
+
+  pageActual = 1;
+  pageActualDepartamento = 1;
+  pageActualSucursal = 1;
+  pageActualRol = 1;
+
+  ver = true;
+  verDepartamento = true;
+  verSucursal = true;
+  verRol = true;
+
+  public maxSize = 5;
+  public directionLinks = true;
+  public autoHide = false;
+  public responsive = true;
+
+  public labels: any = {
+    previousLabel: 'ante..',
+    nextLabel: 'sigui..',
+    screenReaderPaginationLabel: 'Pagination',
+    screenReaderPageLabel: 'page',
+    screenReaderCurrentLabel: `You're on page`,
+  };
 
   constructor(
     public modalController: ModalController,
     public restN: NotificacionesService,
     public toastController: ToastController,
-    public restP: ParametrosService,
-    private dataUserServices: DataUserLoggedService,
     public validar: ValidacionesService,
-
   ) {
-    this.idEmpleado = parseInt(localStorage.getItem('empleadoID'));
-    this.idEmpresa = parseInt(localStorage.getItem('id_empresa'));
+    this.idEmpleado = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
   }
 
   ngOnInit(): void {
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
-    sessionStorage.removeItem('datos_comunicado');
-    this.loadingEmpleado = true;
-    console.log("Ver loadinEmpleado", this.loadingEmpleado)
-    this.requestNotificationPermission();
 
+    sessionStorage.removeItem('datos_comunicado');
+
+    this.loadingEmpleado = true;
+    this.requestNotificationPermission();
   }
 
   // METODO PARA SOLICITAR EL PERMISO DE NOTIFICACIONES LOCALES AL DISPOSITIVO
   async requestNotificationPermission() {
-    // Solicitar permiso para enviar notificaciones locales
-    const permission = await LocalNotifications.requestPermissions();
-    if (permission.display === 'granted') {
-      console.log('Permiso concedido para notificaciones locales');
-    } else {
-      console.log('Permiso denegado para notificaciones locales');
+    try {
+      const permission = await LocalNotifications.requestPermissions();
+
+      if (permission.display === 'granted') {
+        console.log('Permiso concedido para notificaciones locales');
+      } else {
+        console.log('Permiso denegado para notificaciones locales');
+      }
+
+    } catch (error) {
+      console.log('No se pudo solicitar permiso de notificaciones locales', error);
     }
   }
 
-  // METODO PARA CARGAR LA LISTA DE SUCURSALES EN UN ARREGLO
-  cargarListaSucursales() {
-    this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
-      console.log("VER BuscarDatosGenerales ", res)
-      res.forEach(obj => {
-        this.empleados.push({
-          id: obj.id,
-          nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
-          codigo: obj.codigo,
-          identificacion: obj.identificacion,
-          correo: obj.correo,
-          id_cargo: obj.id_cargo,
-          id_contrato: obj.id_contrato,
-          sucursal: obj.name_suc,
-          id_suc: obj.id_suc,
-          id_regimen: obj.id_regimen,
-          id_depa: obj.id_depa,
-          id_cargo_: obj.id_cargo_, // TIPO DE CARGO
-          hora_trabaja: obj.hora_trabaja,
-          app_habilita: obj.app_habilita,
-          web_habilita: obj.web_habilita,
-          comunicado_mail: obj.comunicado_mail,
-          comunicado_noti: obj.comunicado_notificacion
-        })
-      })
-      sessionStorage.setItem('datos_comunicado', JSON.stringify(this.empleados));
-      res.forEach(obj => {
-        this.sucursales.push({
-          id: obj.id_suc,
-          sucursal: obj.name_suc
-        })
-      })
-      // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
-      let verificados_suc = this.sucursales.filter((objeto: any, indice: any, valor: any) => {
-        // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-        for (let i = 0; i < indice; i++) {
-          if (valor[i].id === objeto.id) {
-            return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-          }
-        }
-        return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-      });
-      this.sucursales = verificados_suc;
-      this.sucursales_filtro = [...this.sucursales]
-      if (this.sucursales_filtro.length < 11) {
-        this.verSucursal = true;
-      } else {
-        this.verSucursal = false;
-      }
-      this.loadingEmpleado = true;
-      this.departamentos = [];
-      this.roles= [];
-      this.BuscarParametro();
-    }, err => {
-      this.mostrarAlertas("No se ha encontrado información.", 1000, 'danger')
-    })
-  }
+  // ==============================
+  // CARGA GENERAL DE INFORMACIÓN
+  // ==============================
 
-  // METODO PARA CARGAR LA LISTA DE DEPARTAMENTOS EN UN ARREGLO
-  cargarDepartamentos() {
-    this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
-      console.log("VER BuscarDatosGenerales ", res)
-      res.forEach(obj => {
-        this.empleados.push({
-          id: obj.id,
-          nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
-          codigo: obj.codigo,
-          identificacion: obj.identificacion,
-          correo: obj.correo,
-          id_cargo: obj.id_cargo,
-          id_contrato: obj.id_contrato,
-          sucursal: obj.name_suc,
-          id_suc: obj.id_suc,
-          id_regimen: obj.id_regimen,
-          id_depa: obj.id_depa,
-          id_cargo_: obj.id_cargo_, // TIPO DE CARGO
-          hora_trabaja: obj.hora_trabaja,
-          app_habilita: obj.app_habilita,
-          web_habilita: obj.web_habilita,
-          comunicado_mail: obj.comunicado_mail,
-          comunicado_noti: obj.comunicado_notificacion
-        })
+  private cargarDatosGenerales(callback: () => void) {
+    this.restN.BuscarDatosGenerales().subscribe({
+      next: (res: any[]) => {
+        this.limpiarListas();
 
+        this.empleados = res.map((obj: any) => this.mapEmpleado(obj));
         sessionStorage.setItem('datos_comunicado', JSON.stringify(this.empleados));
 
-        this.departamentos.push({
-          id: obj.id_depa,
-          departamento: obj.name_dep,
-          sucursal: obj.name_suc,
-          id_suc: obj.id_suc,
-          id_regimen: obj.id_regimen,
-        })
-      })
-      // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
-      let verificados_dep = this.departamentos.filter((objeto: any, indice: any, valor: any) => {
-        // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-        for (let i = 0; i < indice; i++) {
-          if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
-            return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-          }
-        }
-        return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-      });
-      this.departamentos = verificados_dep;
-      this.departamentos_filtro = [...this.departamentos]
+        callback();
 
-      if (this.departamentos_filtro.length < 11) {
-        this.verDepartamento = true;
-      } else {
-        this.verDepartamento = false;
-      }
-      this.loadingEmpleado = true;
-      this.sucursales = [];
-      this.roles = [];
-      this.BuscarParametro();
-    }, err => {
-      this.mostrarAlertas("No se ha encontrado información.", 1000, 'danger')
-    })
-  }
-
-    // METODO PARA CARGAR LA LISTA DE ROLES EN UN ARREGLO
-    cargarRoles() {
-      this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
-        res.forEach(obj => {
-          console.log("ROLES", res)
-          this.empleados.push({
-            id: obj.id,
-            nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
-            codigo: obj.codigo,
-            identificacion: obj.identificacion,
-            correo: obj.correo,
-            id_cargo: obj.id_cargo,
-            id_contrato: obj.id_contrato,
-            sucursal: obj.name_suc,
-            rol: obj.name_rol,
-            id_rol: obj.id_rol,
-            id_suc: obj.id_suc,
-            id_regimen: obj.id_regimen,
-            id_depa: obj.id_depa,
-            id_cargo_: obj.id_cargo_, // TIPO DE CARGO
-            hora_trabaja: obj.hora_trabaja,
-            app_habilita: obj.app_habilita,
-            web_habilita: obj.web_habilita,
-            comunicado_mail: obj.comunicado_mail,
-            comunicado_noti: obj.comunicado_notificacion
-          })
-        })
-  
-        sessionStorage.setItem('datos_comunicado', JSON.stringify(this.empleados));
-          
-          res.forEach(obj => {
-            this.roles.push({
-              id: obj.id_rol,
-              rol: obj.name_rol
-            })
-          })
-        // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
-        let verificados_rol = this.roles.filter((objeto: any, indice: any, valor: any) => {
-          // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-          for (let i = 0; i < indice; i++) {
-            if (valor[i].id === objeto.id) {
-              return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-            }
-          }
-          return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-        });
-        this.roles = verificados_rol;
-        this.roles_filtro = [...this.roles]
-  
-        if (this.roles_filtro.length < 11) {
-          this.verRol = true;
-        } else {
-          this.verRol = false;
-        }
         this.loadingEmpleado = true;
-        this.sucursales = [];
-        this.departamentos = [];
-        this.BuscarParametro();
-      }, err => {
-        this.mostrarAlertas("No se ha encontrado información.", 1000, 'danger')
-      })
-    }
-  
-
-
-
-  // METODO PARA CARGAR LA LISTA DE EMPLEADOS EN UN ARREGLO
-  cargarEmpleados() {
-    this.restN.BuscarDatosGenerales().subscribe((res: any[]) => {
-      console.log("VER BuscarDatosGenerales ", res)
-      res.forEach(obj => {
-        this.empleados.push({
-          id: obj.id,
-          nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
-          codigo: obj.codigo,
-          identificacion: obj.identificacion,
-          correo: obj.correo,
-          id_cargo: obj.id_cargo,
-          id_contrato: obj.id_contrato,
-          sucursal: obj.name_suc,
-          id_suc: obj.id_suc,
-          id_regimen: obj.id_regimen,
-          id_depa: obj.id_depa,
-          id_cargo_: obj.id_cargo_, // TIPO DE CARGO
-          hora_trabaja: obj.hora_trabaja,
-          app_habilita: obj.app_habilita,
-          web_habilita: obj.web_habilita,
-          comunicado_mail: obj.comunicado_mail,
-          comunicado_noti: obj.comunicado_notificacion
-        })
-      })
-      sessionStorage.setItem('datos_comunicado', this.empleados)
-
-
-      this.empleados_filtro = [...this.empleados];
-      if (this.empleados_filtro.length < 11) {
-        this.ver = true;
-      } else {
-        this.ver = false;
+      },
+      error: () => {
+        this.loadingEmpleado = true;
+        this.mostrarAlertas('No se ha encontrado información.', 1000, 'danger');
       }
-
-      this.loadingEmpleado = true;
-      this.sucursales = [];
-      this.departamentos = [];
-      this.roles = [];
-
-      this.BuscarParametro();
-    }, err => {
-      this.mostrarAlertas("No se ha encontrado información.", 1000, 'danger')
-    })
-  }
-
-  // METODO PARA DEFINIR EL BUSCADOR DE SUCURSALES
-  changeSearchSucursales(e: any) {
-    console.log("entra a busqueda", e.detail.value)
-    const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
-    console.log("ver las palabra de busqueda ", palabrasBusqueda)
-    const filtro = this.sucursales.filter((o: any) => {
-      const nombreCompleto = `${o.sucursal}`.toLowerCase();
-      console.log("ver el nombre de empleado: ", o.nombre)
-      return palabrasBusqueda.every(palabra => nombreCompleto.includes(palabra))
-    })
-    this.sucursales_filtro = filtro
-  }
-
-  // METODO PARA DEFINIR EL BUSCADOR DE DEPARTAMENTOS
-  changeSearchDepartamento(e: any) {
-    console.log("entra a busqueda", e.detail.value)
-    const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
-    console.log("ver las palabra de busqueda ", palabrasBusqueda)
-    const filtro = this.departamentos.filter((o: any) => {
-      const nombreCompleto = `${o.departamento}`.toLowerCase();
-      console.log("ver el nombre de empleado: ", o.nombre)
-      return palabrasBusqueda.every(palabra => nombreCompleto.includes(palabra))
-    })
-    this.departamentos_filtro = filtro
-  }
-
-  // METODO PARA DEFINIR EL BUSCADOR DE EMPLEADOS
-  changeSearch(e: any) {
-    console.log("entra a busqueda", e.detail.value)
-    const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
-    console.log("ver las palabra de busqueda ", palabrasBusqueda)
-    const filtro = this.empleados.filter((o: any) => {
-      const nombreCompleto = `${o.nombre}`.toLowerCase();
-      console.log("ver el nombre de empleado: ", o.nombre)
-      return palabrasBusqueda.every(palabra => nombreCompleto.includes(palabra))
-    })
-    this.empleados_filtro = filtro;
-  }
-
-  // METODO PARA DEFINIR EL BUSCADOR DE ROLES
-  changeSearchRoles(e: any) {
-    console.log("entra a busqueda", e.detail.value)
-    const palabrasBusqueda = e.detail.value.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
-    console.log("ver las palabra de busqueda ", palabrasBusqueda)
-    const filtro = this.roles.filter((o: any) => {
-      const nombreCompleto = `${o.rol}`.toLowerCase();
-      console.log("ver el nombre de empleado: ", o.nombre)
-      return palabrasBusqueda.every(palabra => nombreCompleto.includes(palabra))
-    })
-    this.roles_filtro = filtro
-  }  
-
-  // METODO PARA CERRAR EL MODAL
-  closeModal() {
-    console.log('CERRAR MODAL USUARIOS');
-    this.modalController.dismiss({
-      'refreshInfo': true
     });
   }
 
-  // METODO PARA DEFINIR LOS PARAMETROS DE LAS ALERTAS
+  private limpiarListas() {
+    this.empleados = [];
+    this.sucursales = [];
+    this.departamentos = [];
+    this.roles = [];
+
+    this.empleados_filtro = [];
+    this.sucursales_filtro = [];
+    this.departamentos_filtro = [];
+    this.roles_filtro = [];
+  }
+
+  private mapEmpleado(obj: any) {
+    return {
+      id: obj.id,
+      nombre: `${(obj.nombre ?? '').toUpperCase()} ${(obj.apellido ?? '').toUpperCase()}`.trim(),
+      codigo: obj.codigo,
+      identificacion: obj.identificacion,
+      correo: obj.correo,
+      id_cargo: obj.id_cargo,
+      id_contrato: obj.id_contrato,
+      sucursal: obj.name_suc,
+      rol: obj.name_rol,
+      id_rol: obj.id_rol,
+      id_suc: obj.id_suc,
+      id_regimen: obj.id_regimen,
+      id_depa: obj.id_depa,
+      id_cargo_: obj.id_cargo_,
+      hora_trabaja: obj.hora_trabaja,
+      app_habilita: obj.app_habilita,
+      web_habilita: obj.web_habilita,
+      comunicado_mail: obj.comunicado_mail,
+      comunicado_noti: obj.comunicado_notificacion,
+    };
+  }
+
+  private obtenerDatosSession(): any[] {
+    return JSON.parse(sessionStorage.getItem('datos_comunicado') ?? '[]');
+  }
+
+  private filtrarUnicos<T>(lista: T[], obtenerClave: (item: T) => string): T[] {
+    const claves = new Set<string>();
+
+    return lista.filter((item: T) => {
+      const clave = obtenerClave(item);
+
+      if (claves.has(clave)) {
+        return false;
+      }
+
+      claves.add(clave);
+      return true;
+    });
+  }
+
+  // ==============================
+  // CARGA POR OPCIÓN
+  // ==============================
+
+  cargarListaSucursales() {
+    this.cargarDatosGenerales(() => {
+      this.sucursales = this.empleados.map((obj: any) => ({
+        id: obj.id_suc,
+        sucursal: obj.sucursal,
+      }));
+
+      this.sucursales = this.filtrarUnicos(this.sucursales, (item: any) => String(item.id));
+      this.sucursales_filtro = [...this.sucursales];
+
+      this.verSucursal = this.sucursales_filtro.length < 11;
+
+      this.departamentos = [];
+      this.roles = [];
+    });
+  }
+
+  cargarDepartamentos() {
+    this.cargarDatosGenerales(() => {
+      this.departamentos = this.empleados.map((obj: any) => ({
+        id: obj.id_depa,
+        departamento: obj.departamento ?? obj.name_dep,
+        sucursal: obj.sucursal,
+        id_suc: obj.id_suc,
+        id_regimen: obj.id_regimen,
+      }));
+
+      this.departamentos = this.filtrarUnicos(
+        this.departamentos,
+        (item: any) => `${item.id}-${item.id_suc}`
+      );
+
+      this.departamentos_filtro = [...this.departamentos];
+
+      this.verDepartamento = this.departamentos_filtro.length < 11;
+
+      this.sucursales = [];
+      this.roles = [];
+    });
+  }
+
+  cargarRoles() {
+    this.cargarDatosGenerales(() => {
+      this.roles = this.empleados.map((obj: any) => ({
+        id: obj.id_rol,
+        rol: obj.rol,
+      }));
+
+      this.roles = this.filtrarUnicos(this.roles, (item: any) => String(item.id));
+      this.roles_filtro = [...this.roles];
+
+      this.verRol = this.roles_filtro.length < 11;
+
+      this.sucursales = [];
+      this.departamentos = [];
+    });
+  }
+
+  cargarEmpleados() {
+    this.cargarDatosGenerales(() => {
+      this.empleados_filtro = [...this.empleados];
+
+      this.ver = this.empleados_filtro.length < 11;
+
+      this.sucursales = [];
+      this.departamentos = [];
+      this.roles = [];
+    });
+  }
+
+  // ==============================
+  // BUSCADORES
+  // ==============================
+
+  private filtrarPorTexto(lista: any[], campo: string, texto: string): any[] {
+    const palabrasBusqueda = String(texto ?? '').toLowerCase().split(' ').filter(Boolean);
+
+    return lista.filter((item: any) => {
+      const valorCampo = String(item[campo] ?? '').toLowerCase();
+      return palabrasBusqueda.every((palabra: string) => valorCampo.includes(palabra));
+    });
+  }
+
+  changeSearchSucursales(e: any) {
+    this.sucursales_filtro = this.filtrarPorTexto(
+      this.sucursales,
+      'sucursal',
+      e.detail.value
+    );
+  }
+
+  changeSearchDepartamento(e: any) {
+    this.departamentos_filtro = this.filtrarPorTexto(
+      this.departamentos,
+      'departamento',
+      e.detail.value
+    );
+  }
+
+  changeSearch(e: any) {
+    this.empleados_filtro = this.filtrarPorTexto(
+      this.empleados,
+      'nombre',
+      e.detail.value
+    );
+  }
+
+  changeSearchRoles(e: any) {
+    this.roles_filtro = this.filtrarPorTexto(
+      this.roles,
+      'rol',
+      e.detail.value
+    );
+  }
+
+  // ==============================
+  // MODAL / ALERTAS
+  // ==============================
+
+  closeModal() {
+    this.modalController.dismiss({
+      refreshInfo: true
+    });
+  }
+
   async mostrarAlertas(mensaje: string, duracion: number, color: string) {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: duracion,
-      color: color,
+      color,
       mode: 'ios',
       cssClass: 'showtoast-custom-class'
     });
-    toast.present();
+
+    await toast.present();
   }
 
-  // METODOS PARA ELEGIR EL ITEM DE BUSQUEDA
-  selectedValue: any;
-  checkValue(event) {
+  // ==============================
+  // RADIO BUTTONS
+  // ==============================
+
+  checkValue(event: any) {
     console.log('Selected value: ', this.selectedValue);
   }
 
-  print(event) {
-    console.log(this.checkValue(event))
+  print(event: any) {
+    console.log(this.checkValue(event));
   }
 
-  radioValue;
-  // METODO PARA LA CARGA DE DATOS DE ACUERDO AL ITEM SELECCIONADO
   showValue() {
+    this.loadingEmpleado = false;
 
-    console.log(this.radioValue);
+    this.opcion_sucursal = this.radioValue === 1;
+    this.opcion_depa = this.radioValue === 2;
+    this.opcion_empleado = this.radioValue === 3;
+    this.opcion_rol = this.radioValue === 4;
 
     if (this.radioValue === 1) {
-      this.loadingEmpleado = false;
-      this.opcion_sucursal = true;
-      this.opcion_depa = false;
-      this.opcion_empleado = false;
-      this.opcion_rol = false;
       this.cargarListaSucursales();
-    }
-    else if (this.radioValue === 2) {
-      this.loadingEmpleado = false;
-      this.opcion_sucursal = false;
-      this.opcion_depa = true;
-      this.opcion_empleado = false;
-      this.opcion_rol = false;
+    } else if (this.radioValue === 2) {
       this.cargarDepartamentos();
-    }
-    else if (this.radioValue === 3) {
-      this.loadingEmpleado = false;
-      this.opcion_sucursal = false;
-      this.opcion_depa = false;
-      this.opcion_empleado = true;
-      this.opcion_rol = false;
+    } else if (this.radioValue === 3) {
       this.cargarEmpleados();
-    }
-    else if (this.radioValue === 4) {
-      this.loadingEmpleado = false;
-      this.opcion_sucursal = false;
-      this.opcion_depa = false;
-      this.opcion_empleado = false;
-      this.opcion_rol = true;
+    } else if (this.radioValue === 4) {
       this.cargarRoles();
     }
   }
 
-  // METODOS PARA VERIFICAR LA SELECCION DE TODOS LOS REGISTROS DE SUCURSALES
-  isAllCheck_sucu: boolean = false;
-  checkedAll_sucu(isAllChecked_sucu) {
+  // ==============================
+  // CHECK TODOS
+  // ==============================
+
+  checkedAll_sucu(isAllChecked_sucu: boolean) {
     this.isAllCheck_sucu = !isAllChecked_sucu;
+
     if (this.radioValue === 1) {
-      this.sucursales.forEach(o => { o.isChecked_sucu = this.isAllCheck_sucu })
-      return;
+      this.sucursales.forEach((o: any) => {
+        o.isChecked_sucu = this.isAllCheck_sucu;
+      });
     }
   }
 
-  // METODOS PARA VERIFICAR LA SELECCION DE TODOS LOS REGISTROS DE DEPARTAMENTOS
-  isAllCheck_depa: boolean = false;
-  checkedAll_depa(isAllChecked_depa) {
+  checkedAll_depa(isAllChecked_depa: boolean) {
     this.isAllCheck_depa = !isAllChecked_depa;
-    //console.log('..............depa............', this.departamentos)
+
     if (this.radioValue === 2) {
-      this.departamentos.forEach(o => { o.isChecked_depa = this.isAllCheck_depa });
-      console.log('..............departamentos............', this.departamentos)
-      return;
+      this.departamentos.forEach((o: any) => {
+        o.isChecked_depa = this.isAllCheck_depa;
+      });
     }
   }
 
-  // METODOS PARA VERIFICAR LA SELECCION DE TODOS LOS REGISTROS DE EMPLEADOS
-  isAllCheck_empl: boolean = false;
-  checkedAll_empl(isAllChecked_empl) {
+  checkedAll_empl(isAllChecked_empl: boolean) {
     this.isAllCheck_empl = !isAllChecked_empl;
+
     if (this.radioValue === 3) {
-      this.empleados.forEach(o => { o.isChecked_empl = this.isAllCheck_empl });
-      return;
+      this.empleados.forEach((o: any) => {
+        o.isChecked_empl = this.isAllCheck_empl;
+      });
     }
   }
 
-  // METODOS PARA VERIFICAR LA SELECCION DE TODOS LOS REGISTROS DE ROLES
-  isAllCheck_rol: boolean = false;
-  checkedAll_rol(isAllChecked_rol) {
+  checkedAll_rol(isAllChecked_rol: boolean) {
     this.isAllCheck_rol = !isAllChecked_rol;
-    if (this.radioValue === 1) {
-      this.roles.forEach(o => { o.isChecked_rol = this.isAllCheck_rol })
+
+    if (this.radioValue === 4) {
+      this.roles.forEach((o: any) => {
+        o.isChecked_rol = this.isAllCheck_rol;
+      });
+    }
+  }
+
+  // ==============================
+  // ENVIAR POR TIPO DE SELECCIÓN
+  // ==============================
+
+  EnviarSucursal() {
+    const seleccionados = this.sucursales.filter((o: any) => o.isChecked_sucu === true);
+    this.ModelarSucursal(seleccionados);
+  }
+
+  EnviarDepartamento() {
+    const seleccionados = this.departamentos.filter((o: any) => o.isChecked_depa === true);
+    this.ModelarDepartamentos(seleccionados);
+  }
+
+  EnviarEmpleado() {
+    const seleccionados = this.empleados.filter((o: any) => o.isChecked_empl === true);
+    this.ModelarEmpleados(seleccionados);
+  }
+
+  EnviarRoles() {
+    const seleccionados = this.roles.filter((o: any) => o.isChecked_rol === true);
+    this.ModelarRoles(seleccionados);
+  }
+
+  // ==============================
+  // MODELAR USUARIOS
+  // ==============================
+
+  ModelarSucursal(dataSucursal: any[]) {
+    const respuesta = this.obtenerDatosSession();
+
+    const usuarios = respuesta.filter((empleado: any) =>
+      dataSucursal.some((sucursal: any) => empleado.id_suc === sucursal.id)
+    );
+
+    this.EnviarNotificaciones(usuarios);
+    this.closeModal();
+  }
+
+  ModelarDepartamentos(dataDepartamentos: any[]) {
+    const respuesta = this.obtenerDatosSession();
+
+    const usuarios = respuesta.filter((empleado: any) =>
+      dataDepartamentos.some((departamento: any) => empleado.id_depa === departamento.id)
+    );
+
+    this.EnviarNotificaciones(usuarios);
+    this.closeModal();
+  }
+
+  ModelarEmpleados(dataEmpleados: any[]) {
+    const usuarios = this.empleados.filter((empleado: any) =>
+      dataEmpleados.some((seleccionado: any) => seleccionado.id === empleado.id)
+    );
+
+    this.EnviarNotificaciones(usuarios);
+    this.closeModal();
+  }
+
+  ModelarRoles(dataRoles: any[]) {
+    const respuesta = this.obtenerDatosSession();
+
+    const usuarios = respuesta.filter((empleado: any) =>
+      dataRoles.some((rol: any) => empleado.id_rol === rol.id)
+    );
+
+    this.EnviarNotificaciones(usuarios);
+    this.closeModal();
+  }
+
+  // ==============================
+  // ENVÍO DE COMUNICADOS
+  // ==============================
+
+  EnviarNotificaciones(data: any[]) {
+    if (!data || data.length === 0) {
+      this.mostrarAlertas('No ha seleccionado usuarios.', 3000, 'danger');
       return;
     }
-  }  
 
+    this.LeerCorreos(data);
 
-  // METODO PARA ENVIAR EL COMUNICADO A LOS EMPLEADOS DE LAS SUCURSALES SELECCIONADAS
-  isChecked_sucu: boolean = true;
-  EnviarSucursal() {
-    console.log('ver sucu-------', this.sucursales);
-    let sucu = [];
-    this.sucursales.forEach(o => {
-      if (o.isChecked_sucu === true) {
-        sucu.push(o);
-      }
-    });
-    console.log('ver depa-------', sucu);
-    this.ModelarSucursal(sucu)
+    this.cont = 0;
+    this.boton_enviar = true;
+
+    const ids = data
+      .filter((obj: any) => obj.comunicado_noti === true)
+      .map((obj: any) => obj.id);
+
+    this.NotificarSistema(this.idEmpleado, ids);
   }
 
-  // METODO PARA ENVIAR EL COMUNICADO A LOS EMPLEADOS DE LOS DEPARTAMENTOS SELECCIONADAS
-  isChecked_depa: boolean = true;
-  EnviarDepartamento() {
-    let depa = [];
-    this.departamentos.forEach(o => {
-      if (o.isChecked_depa === true) {
-        depa.push(o);
-      }
-    });
-    console.log('ver depa-------', depa);
-    this.ModelarDepartamentos(depa);
+  LeerCorreos(data: any[]) {
+    this.info_correo = data
+      .filter((obj: any) => obj.comunicado_mail === true && obj.correo)
+      .map((obj: any) => obj.correo)
+      .join(', ');
   }
 
-  // METODO PARA ENVIAR EL COMUNICADO A LOS EMPLEADOS SELECCIONADOS
-  isChecked_empl: boolean = true;
-  EnviarEmpleado() {
-    let empl = [];
-    this.empleados.forEach(o => {
-      if (o.isChecked_empl === true) {
-        empl.push(o);
-      }
-    });
-    console.log('ver depa-------', empl);
-    this.ModelarEmpleados(empl)
-  }
-
-  // METODO PARA ENVIAR EL COMUNICADO A LOS EMPLEADOS DE LOS ROLES SELECCIONADAS
-  isChecked_rol: boolean = true;
-  EnviarRoles() {
-    console.log('ver roles-------', this.roles);
-    let role = [];
-    this.roles.forEach(o => {
-      if (o.isChecked_rol === true) {
-        role.push(o);
-      }
-    });
-    console.log('ver rol-------', role);
-    this.ModelarRoles(role)
-  }  
-
-  // METODO PARA ALMACENAR LOS USUARIOS DE LAS SUCURSALES SELECCIONADAS EN UN ARREGLO
-  ModelarSucursal(dataSucursal) {
-    let usuarios: any = [];
-    let respuesta = JSON.parse(sessionStorage.getItem('datos_comunicado') || '[]');
-    respuesta.forEach((obj: any) => {
-      dataSucursal.find(obj1 => {
-        if (obj.id_suc === obj1.id) {
-          usuarios.push(obj)
-        }
-      })
-    })
-    console.log('ver usuario---------------------------', usuarios);
-    this.EnviarNotificaciones(usuarios);
-    this.closeModal();
-  }
-
-  // METODO PARA ALMACENAR LOS USUARIOS DE LAS DEPARTAMENTOS SELECCIONADAS EN UN ARREGLO
-  ModelarDepartamentos(dataDepartamentos) {
-    let usuarios: any = [];
-    let respuesta = JSON.parse(sessionStorage.getItem('datos_comunicado'))
-    respuesta.forEach((obj: any) => {
-      dataDepartamentos.find(obj2 => {
-        if (obj.id_depa === obj2.id) {
-          usuarios.push(obj)
-        }
-      })
-    })
-    console.log('ver usuario---------------------------', usuarios);
-    this.EnviarNotificaciones(usuarios);
-    this.closeModal();
-    console.log(' ver empleados de departamentos', respuesta)
-  }
-
-  // METODO PARA ALMACENAR LOS USUARIOS EN UN ARREGLO
-  ModelarEmpleados(dataEmpleados) {
-    let respuesta: any = [];
-    this.empleados.forEach((obj: any) => {
-      dataEmpleados.find(obj1 => {
-        if (obj1.id === obj.id) {
-          respuesta.push(obj)
-        }
-      })
-    })
-
-    console.log('ver usuario---------------------------', respuesta);
-    this.EnviarNotificaciones(respuesta);
-    this.closeModal();
-  }
-
-  // METODO PARA ALMACENAR LOS USUARIOS DE LOS ROLES SELECCIONADOS EN UN ARREGLO
-  ModelarRoles(dataRoles) {
-    let usuarios: any = [];
-    let respuesta = JSON.parse(sessionStorage.getItem('datos_comunicado') || '[]');
-    respuesta.forEach((obj: any) => {
-      dataRoles.find(obj1 => {
-        if (obj.id_rol === obj1.id) {
-          usuarios.push(obj)
-        }
-      })
-    })
-    console.log('ver usuario---------------------------', usuarios);
-    this.EnviarNotificaciones(usuarios);
-    this.closeModal();
-  }  
-
-
-  envios: any = [];
-  cont: number = 0;
-  boton_enviar = false;
-  // METODO PARA ENVIAR EL COMUNICADO
-  EnviarNotificaciones(data: any) {
-    console.log("ver data: ", data)
-    if (data.length > 0) {
-      this.LeerCorreos(data);
-      this.cont = 0;
-      this.boton_enviar = true;
-      let ids = data.filter((obj: any) => obj.comunicado_noti === true)
-        .map((obj: any) => obj.id);
-      this.NotificarSistema(this.idEmpleado, ids);
-
-    }
-    else {
-      this.mostrarAlertas("No ha seleccionado usuarios.", 3000, 'danger')
-    }
-  }
-
-
-  verificador: number = 0;
-  // MÉTODO USADO PARA ENVIAR COMUNICADO POR CORREO 
-  EnviarCorreo(correos) {
-    let datosCorreo = {
+  EnviarCorreo(correos: string) {
+    const datosCorreo = {
       id_envia: this.idEmpleado,
-      correo: correos,
       mensaje: this.data.mensaje,
+      correo: correos,
       asunto: this.data.asunto,
-    }
-    
-    this.restN.EnviarCorreoComunicado(datosCorreo).subscribe(envio => {
-      if (envio.message === 'error') {
-        this.mostrarAlertas("Ups !!! algo salio mal, revisa tu configuración de correo electrónico.",
-          6000, 'danger');
+      plataforma: 'Aplicación Móvil'
+    };
+
+    this.restN.EnviarCorreoComunicado(datosCorreo).subscribe({
+      next: () => {
+        this.mostrarAlertas('Mensaje enviado exitosamente.', 6000, 'success');
+        this.closeModal();
+      },
+      error: () => {
+        this.mostrarAlertas(
+          'Ups !!! algo salio mal, revisa tu configuración de correo electrónico.',
+          6000,
+          'danger'
+        );
         this.closeModal();
       }
-      else {
-        this.mostrarAlertas("Mensaje enviado exitosamente.", 6000, 'success');
-        this.closeModal();
-      }
-    }, error => { });
+    });
   }
 
-  cont_correo: number = 0;
-  info_correo: string = '';
-  LeerCorreos(data: any) {
-    this.info_correo = '';
-    data.forEach((obj: any) => {
-      if (obj.comunicado_mail === true) {
-        if (this.info_correo === '') {
-          this.info_correo = obj.correo;
-        }
-        else {
-          this.info_correo = this.info_correo + ', ' + obj.correo;
-        }
-      }
-    })
-  }
-
-  // METODO QUE CONSUME EL SERVICIO DE ENVIAR COMUNICADO
-  NotificarSistema(empleado_envia: any, empleado_recive: any) {
-    let mensaje = {
+  NotificarSistema(empleado_envia: any, empleado_recive: any[]) {
+    const mensaje = {
       id_empl_envia: empleado_envia,
       id_empl_recive: empleado_recive,
       descripcion: this.data.asunto,
       mensaje: this.data.mensaje,
-      tipo: 6,
-      user_name: this.dataUserServices.username,
-      ip: localStorage.getItem('ip'),
-      ip_local: this.ips_locales
-    }
-    console.log(mensaje);
+      tipo: 6
+    };
 
-    this.restN.EnviarMensajeGeneralMultiple(mensaje).subscribe(res => {
-      res.respuesta.forEach((notificaciones: any) => {
-        this.restN.RecibirNuevosAvisos(notificaciones);
-      })
-      if (this.info_correo === '') {
-        this.mostrarAlertas("Mensaje enviado exitosamente.", 4000, 'success');
-      }
-      else {
-        this.EnviarCorreo(this.info_correo);
-      }
-    }, error => {
-      console.log("Error al enviar mensaje general")
-    })
-  }
-
-  correos: number;
-  BuscarParametro() {
-    let datos = [];
-    this.restP.ObtenerDetallesParametros(33).subscribe(
-      res => {
-        datos = res;
-        console.log('datos correo -----------')
-        if (datos.length != 0) {
-          this.correos = parseInt(datos[0].descripcion)
+    this.restN.EnviarMensajeGeneralMultiple(mensaje).subscribe({
+      next: () => {
+        if (this.info_correo === '') {
+          this.mostrarAlertas('Mensaje enviado exitosamente.', 4000, 'success');
+        } else {
+          this.EnviarCorreo(this.info_correo);
         }
-        else {
-          this.correos = 0
-        }
-      });
+      },
+      error: () => {
+        console.log('Error al enviar mensaje general');
+      }
+    });
   }
-
-  //variables de configuracion del componente de paginacion (pagination-controls)
-  pageActual: number = 1;
-  pageActualDepartamento: number = 1;
-  pageActualSucursal: number = 1;
-  pageActualRol: number = 1;
-  ver: boolean = true;
-  verDepartamento: boolean = true;
-  verSucursal: boolean = true;
-  verRol: boolean = true;
-  public maxSize: number = 5;
-  public directionLinks: boolean = true;
-  public autoHide: boolean = false;
-  public responsive: boolean = true;
-  public labels: any = {
-    previousLabel: 'ante..',
-    nextLabel: 'sigui..',
-    screenReaderPaginationLabel: 'Pagination',
-    screenReaderPageLabel: 'page',
-    screenReaderCurrentLabel: `You're on page`
-  };
 
 }

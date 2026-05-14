@@ -7,6 +7,7 @@ import { NavParams, ModalController } from '@ionic/angular';
   styleUrls: ['./ver-imagen.component.scss'], // Asegúrate de que el nombre del archivo coincida
 
 })
+
 export class VerImagenModalPage {
 
   imagen: string;

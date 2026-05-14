@@ -12,7 +12,6 @@ import { EnviarUsuarioComponent } from '../pages/paginas-admin/comunicado/enviar
 
 // componente modals Reporteria
 import { ReporteTimbreComponent } from './reporte-timbre/reporte-timbre.component';
-import { ReporteTimbreConNovedadesComponent } from './reporte-timbreConNovedades/reporte-timbreConNovedades.component';
 import { VerImagenModalPage } from './ver-timbre-empleado/ver-imagen/ver-imagen.component';
 
 
@@ -24,7 +23,6 @@ import { VerImagenModalPage } from './ver-timbre-empleado/ver-imagen/ver-imagen.
     VerTimbreEmpleadoComponent,
     EnviarUsuarioComponent,
     ReporteTimbreComponent,
-    ReporteTimbreConNovedadesComponent,
     VerImagenModalPage
   ],
   exports:[
@@ -33,7 +31,6 @@ import { VerImagenModalPage } from './ver-timbre-empleado/ver-imagen/ver-imagen.
     VerTimbreEmpleadoComponent,
     EnviarUsuarioComponent,
     ReporteTimbreComponent,
-    ReporteTimbreConNovedadesComponent,
     VerImagenModalPage
   ],
   imports: [

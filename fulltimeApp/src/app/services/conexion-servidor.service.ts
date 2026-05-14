@@ -1,37 +1,27 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { timeout } from 'rxjs/operators';
-
-// SERVICIOS
-import { StorageService } from './storage.service';
+import { timeout, firstValueFrom } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConnectivityService {
-  private apiUrl = '';
 
+  private apiUrl = environment.urlMultitenant;
 
-  constructor(
-    private http: HttpClient,
-    private storageService: StorageService,
-  ) {
-    this.obtenerUrlEmpresa();
-  }
+  constructor(private http: HttpClient) { }
 
-  async obtenerUrlEmpresa() {
-    this.apiUrl = await this.storageService.get('urlEmpresa');
-  }
-
-  // METODO PARA VERIFICAR LA CONEXION AL SERVIDOR
   async checkServerConnection(): Promise<boolean> {
     try {
-      const response = await this.http.get(this.apiUrl, { observe: 'response' }).pipe(timeout(1000)).toPromise();
+      const response = await firstValueFrom(
+        this.http.get(`${this.apiUrl}/pruebas/health`, { observe: 'response' })
+          .pipe(timeout(1000))
+      );
+
       return response.status === 200;
-    } catch (error) {
-      // Siempre devolverá false si hay un error
+    } catch {
       return false;
     }
   }
-
 }

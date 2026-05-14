@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Route, Router } from '@angular/router';
+import { CanActivate} from '@angular/router';
 import { RelojServiceService } from "../services/reloj-service.service";
 import { NavController } from "@ionic/angular";
 
@@ -14,7 +14,6 @@ export class AutenticacionGuard implements CanActivate {
     ) { }
 
   canActivate(): boolean {
-    // console.log('AutenticacionGuard: ',this.relojServiceService.estaLogueado());
     if (this.relojServiceService.estaLogueado()) {
       return true;
     } else {

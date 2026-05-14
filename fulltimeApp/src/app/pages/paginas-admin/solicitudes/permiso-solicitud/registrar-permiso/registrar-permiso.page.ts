@@ -436,8 +436,7 @@ export class RegistrarPermisoPage implements OnInit {
 
         this.calcularTiempoPermiso(payload);
       },
-      error: (err) => {
-        console.error('Error verificando permiso:', err);
+      error: () => {
         this.finalizarVerificacion('error', 'Ocurrió un error al verificar la solicitud.');
       }
     });
@@ -472,8 +471,7 @@ export class RegistrarPermisoPage implements OnInit {
 
         this.finalizarVerificacion('ok', 'La solicitud pasó la verificación correctamente.');
       },
-      error: (err) => {
-        console.error('Error calculando tiempo de permiso:', err);
+      error: () => {
         this.finalizarVerificacion('error', 'La solicitud fue verificada, pero no se pudo calcular el tiempo.');
       }
     });
@@ -555,8 +553,7 @@ export class RegistrarPermisoPage implements OnInit {
               this.mostrarToast('Solicitud de permiso registrada correctamente.', 'success');
               this.router.navigateByUrl('/reloj/solicitudes/permiso-solicitud');
             },
-            error: (err) => {
-              console.error('Error subiendo documento:', err);
+            error: () => {
               this.mostrarToast('La solicitud se registró, pero ocurrió un error al subir el documento.', 'warning');
             }
           });
@@ -567,8 +564,7 @@ export class RegistrarPermisoPage implements OnInit {
         this.mostrarToast('Solicitud de permiso registrada correctamente.', 'success');
         this.router.navigateByUrl('/reloj/solicitudes/permiso-solicitud');
       },
-      error: (err) => {
-        console.error('Error registrando permiso:', err);
+      error: () => {
         this.mostrarToast('Ocurrió un error al registrar la solicitud.', 'danger');
       }
     });
@@ -656,8 +652,7 @@ export class RegistrarPermisoPage implements OnInit {
         this.saldoVacacionesVisible = tiempoEmpleado?.saldoVacacionesTexto || '—';
         this.cargandoSaldo = false;
       },
-      error: (err) => {
-        console.error('Error cargando saldo de vacaciones para permiso:', err);
+      error: () => {
         this.saldoVacacionesVisible = '—';
         this.cargandoSaldo = false;
       }
