@@ -1,0 +1,230 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button
+        defaultHref="/reloj/solicitudes/permiso-solicitud/permiso-criterio-busqueda">
+      </ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle solicitud</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="contenedor-detalle" *ngIf="solicitud">
+
+    <ion-card class="detalle-card">
+
+      <div class="estado-superior">
+        <ion-badge [color]="estadoColor(solicitud.estado)">
+          {{ estadoTexto(solicitud.estado) }}
+        </ion-badge>
+      </div>
+
+      <div class="encabezado-detalle">
+        <h2>SOLICITUD DE PERMISO</h2>
+        <p>N° {{ getNumeroSolicitud() }}</p>
+      </div>
+
+      <ion-card-content>
+
+        <div class="seccion">
+          <div class="seccion-titulo">
+            <ion-icon name="person-outline"></ion-icon>
+            <h3>Empleado</h3>
+          </div>
+
+          <div class="info-linea">
+            <span>Empleado</span>
+            <strong>{{ getNombreEmpleado() }}</strong>
+          </div>
+
+          <div class="info-linea">
+            <span>Código</span>
+            <strong>{{ solicitud.codigo || 'N/D' }}</strong>
+          </div>
+
+          <div class="info-linea">
+            <span>Identificación</span>
+            <strong>{{ solicitud.identificacion || 'N/D' }}</strong>
+          </div>
+
+          <div class="info-linea">
+            <span>Departamento</span>
+            <strong>{{ getDepartamento() }}</strong>
+          </div>
+        </div>
+
+        <div class="separador"></div>
+
+        <div class="seccion">
+          <div class="seccion-titulo">
+            <ion-icon name="reader-outline"></ion-icon>
+            <h3>Datos del permiso</h3>
+          </div>
+
+          <div class="info-linea">
+            <span>Tipo de permiso</span>
+            <strong>{{ getTipoPermiso() }}</strong>
+          </div>
+
+          <div class="info-linea">
+            <span>Tipo de descuento</span>
+            <strong>{{ getTipoDescuento() }}</strong>
+          </div>
+
+          <div class="info-linea">
+            <span>Legalizado</span>
+            <strong>{{ solicitud.legalizado ? 'Sí' : 'No' }}</strong>
+          </div>
+
+          <div class="info-linea">
+            <span>Feriados incluidos</span>
+            <strong>{{ solicitud.incluir_feriados ? 'Sí' : 'No' }}</strong>
+          </div>
+        </div>
+
+        <div class="seccion-grid">
+          <div class="detalle-item">
+            <span>Fecha solicitud</span>
+            <strong>{{ formatearFechaHora(solicitud.fecha_creacion) }}</strong>
+          </div>
+
+          <div class="detalle-item">
+            <span>Fecha inicio</span>
+            <strong>{{ formatearFecha(solicitud.fecha_inicio) }}</strong>
+          </div>
+
+          <div class="detalle-item">
+            <span>Fecha fin</span>
+            <strong>{{ formatearFecha(solicitud.fecha_final) }}</strong>
+          </div>
+
+          <div class="detalle-item" *ngIf="mostrarHorario()">
+            <span>Horario</span>
+            <strong>
+              {{ solicitud.hora_inicio || '--:--' }}
+              -
+              {{ solicitud.hora_fin || '--:--' }}
+            </strong>
+          </div>
+
+          <div class="detalle-item">
+            <span>Días</span>
+            <strong>{{ getDiasPermiso() }}</strong>
+          </div>
+
+          <div class="detalle-item">
+            <span>Horas</span>
+            <strong>{{ getHorasFormatoHHmm() }}</strong>
+          </div>
+        </div>
+
+        <div class="seccion" *ngIf="solicitud.descripcion">
+          <div class="seccion-titulo">
+            <ion-icon name="chatbox-ellipses-outline"></ion-icon>
+            <h3>Descripción / motivo</h3>
+          </div>
+
+          <p class="descripcion">
+            {{ solicitud.descripcion || 'Sin descripción' }}
+          </p>
+        </div>
+
+        <div class="separador"></div>
+
+        <div class="seccion">
+          <div class="seccion-titulo">
+            <ion-icon name="list-outline"></ion-icon>
+            <h3>Detalle de días</h3>
+          </div>
+
+          <div class="tabla-resumen">
+            <div class="fila cabecera">
+              <div>Lun</div>
+              <div>Mar</div>
+              <div>Mié</div>
+              <div>Jue</div>
+              <div>Vie</div>
+              <div>Sáb</div>
+              <div>Dom</div>
+              <div class="total">Total Días</div>
+              <div class="total">Total Minutos</div>
+            </div>
+
+            <div class="fila cuerpo">
+              <div>{{ getNumeroDia('numero_dias_lunes') }}</div>
+              <div>{{ getNumeroDia('numero_dias_martes') }}</div>
+              <div>{{ getNumeroDia('numero_dias_miercoles') }}</div>
+              <div>{{ getNumeroDia('numero_dias_jueves') }}</div>
+              <div>{{ getNumeroDia('numero_dias_viernes') }}</div>
+              <div>{{ getNumeroDia('numero_dias_sabados') }}</div>
+              <div>{{ getNumeroDia('numero_dias_domingos') }}</div>
+              <div class="total">{{ getDiasPermiso() }}</div>
+              <div class="total">{{ getMinutosTotales() }}</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="seccion" *ngIf="solicitud.documento">
+          <div class="seccion-titulo">
+            <ion-icon name="document-attach-outline"></ion-icon>
+            <h3>Documento adjunto</h3>
+          </div>
+
+          <div class="documento-box">
+            {{ solicitud.documento }}
+          </div>
+        </div>
+
+        <div class="acciones-detalle">
+          <ion-button
+            expand="block"
+            fill="outline"
+            color="success"
+            (click)="editarSolicitud()">
+            <ion-icon name="create-outline" slot="start"></ion-icon>
+            Editar
+          </ion-button>
+
+          <ion-button
+            expand="block"
+            fill="outline"
+            color="tertiary"
+            (click)="imprimirSolicitud()">
+            <ion-icon name="print-outline" slot="start"></ion-icon>
+            Imprimir
+          </ion-button>
+
+          <ion-button
+            expand="block"
+            fill="outline"
+            color="danger"
+            [disabled]="eliminando"
+            (click)="confirmarEliminar()">
+            <ion-spinner
+              *ngIf="eliminando"
+              name="crescent"
+              slot="start">
+            </ion-spinner>
+
+            <ion-icon
+              *ngIf="!eliminando"
+              name="trash-outline"
+              slot="start">
+            </ion-icon>
+
+            {{ eliminando ? 'Eliminando...' : 'Eliminar' }}
+          </ion-button>
+        </div>
+
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+
+  <div class="estado-carga" *ngIf="cargando">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando detalle...</p>
+  </div>
+</ion-content>
