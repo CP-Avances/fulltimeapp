@@ -39,7 +39,7 @@ export class ParametrosService {
 
   // METODO PARA OBTENER LAS COORDENADAS DE UNA UBICACION REGISTRADA
   ObtenerCoordenadas(data: any) {
-    return this.http.post<any>(`${this.apiUrlM}/parametrizacion/coordenadas`, data);;
+    return this.http.post<any>(`${this.apiUrlM}/api/parametrizacion/coordenadas`, data);;
   }
 
   // METODO PARA OBTENER LA UBICACION REGISTRADA AL EMPLEADO
