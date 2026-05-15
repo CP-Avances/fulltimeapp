@@ -1,23 +1,25 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController, ToastController, AlertController } from '@ionic/angular';
-import { Platform } from '@ionic/angular';
-import { ActivatedRoute } from '@angular/router';
+import { NavController, ToastController, AlertController, Platform } from '@ionic/angular';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { Router } from '@angular/router';
 import { FingerprintAIO } from '@awesome-cordova-plugins/fingerprint-aio/ngx';
 import { Geolocation } from '@capacitor/geolocation';
 import { Device } from '@capacitor/device';
+import {
+  Camera,
+  CameraDirection,
+  CameraResultType,
+  CameraSource
+} from '@capacitor/camera';
+import { timeout } from 'rxjs/operators';
+
 import { Timbre } from '../../interfaces/Timbre';
 import { DataLocalService } from '../../libs/data-local.service';
 import { NetworkService } from '../../libs/network.service';
-
-// Servicios
 import { RelojServiceService } from '../../services/reloj-service.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
-import { Camera, CameraDirection, CameraResultType, CameraSource } from '@capacitor/camera';
 import { FechaHoraService } from 'src/app/services/fecha-hora.service';
-import { timeout } from 'rxjs/operators';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ParametrosSistema } from 'src/app/libs/parametros.emun';
 
@@ -30,7 +32,6 @@ export class EnviartimbrePage implements OnInit {
 
   ips_locales: any = '';
 
-  // PARAMETROS / OPCIONES DE MARCACION
   rango: number = 0;
   capturar_segundos: boolean = false;
 
@@ -39,16 +40,19 @@ export class EnviartimbrePage implements OnInit {
   desconocida: boolean = false;
   especial: boolean = false;
 
-  // Si está en true, NO permite timbrar sin internet.
+  /**
+   * Si está en true, NO permite timbrar sin internet.
+   */
   requiereInternet: boolean = false;
 
-  // Se mantiene solo por compatibilidad con partes antiguas del HTML/código
+  /**
+   * Variables para compatibilidad con código antiguo/localStorage.
+   */
   timbrarSinInternet: string = 'No';
   timbrarConFoto: string = 'No';
   timbreFotoObligatoria: string = 'No';
   timbrarDesconocido: string = 'No';
 
-  // Variables foto
   imagen: string = '';
   storageUbica: string = '';
 
@@ -128,7 +132,9 @@ export class EnviartimbrePage implements OnInit {
     private fingerprintAIO: FingerprintAIO
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.platform.ready();
+
     this.VerificarFunciones();
     this.networkSubscriber();
 
@@ -158,9 +164,119 @@ export class EnviartimbrePage implements OnInit {
       this.zonaHoraria = data.zonaHoraria;
       this.gmtDispositivo = data.gmtDispositivo;
     });
+
+    /**
+     * Esto ayuda a que en APK se soliciten permisos desde el inicio.
+     * Igual se vuelven a validar antes de timbrar.
+     */
+    await this.solicitarPermisosIniciales();
   }
 
-  // METODO PARA VERIFICAR LAS FUNCIONES DISPONIBLES
+  // ============================================================
+  // PERMISOS APK
+  // ============================================================
+
+  async solicitarPermisosIniciales() {
+    if (!this.platform.is('hybrid')) {
+      return;
+    }
+
+    await this.solicitarPermisoUbicacionInicial();
+
+    /**
+     * Solo solicito cámara si el parámetro de foto está activo.
+     * Si foto = false, no tiene sentido pedir cámara.
+     *
+     * OJO: BuscarOpcionMarcacion es async por subscribe, por eso también
+     * se vuelve a validar cámara en iniciarProcesoFoto().
+     */
+    if (this.foto === true) {
+      await this.solicitarPermisoCamara();
+    }
+  }
+
+  async solicitarPermisoUbicacionInicial(): Promise<boolean> {
+    try {
+      const permisos = await Geolocation.checkPermissions();
+
+      if (permisos.location === 'granted') {
+        await this.obtenerPosicion();
+        return true;
+      }
+
+      const request = await Geolocation.requestPermissions();
+
+      if (request.location === 'granted') {
+        await this.obtenerPosicion();
+        return true;
+      }
+
+      await this.abrirToas(
+        'No se otorgó permiso de ubicación. Para timbrar debe permitir el acceso a la ubicación.',
+        'warning',
+        4000,
+        'middle'
+      );
+
+      return false;
+
+    } catch (error) {
+      console.log('Error solicitando permiso de ubicación:', error);
+
+      await this.abrirToas(
+        'No fue posible solicitar el permiso de ubicación. Revise los permisos de la app.',
+        'danger',
+        4000,
+        'middle'
+      );
+
+      return false;
+    }
+  }
+
+  async solicitarPermisoCamara(): Promise<boolean> {
+    try {
+      const permisos = await Camera.checkPermissions();
+
+      if (permisos.camera === 'granted') {
+        return true;
+      }
+
+      const request = await Camera.requestPermissions({
+        permissions: ['camera']
+      });
+
+      if (request.camera === 'granted') {
+        return true;
+      }
+
+      await this.abrirToas(
+        'No se otorgó permiso de cámara. Para timbrar con foto debe permitir el acceso a la cámara.',
+        'warning',
+        4000,
+        'middle'
+      );
+
+      return false;
+
+    } catch (error) {
+      console.log('Error solicitando permiso de cámara:', error);
+
+      await this.abrirToas(
+        'No fue posible solicitar el permiso de cámara. Revise los permisos de la app.',
+        'danger',
+        4000,
+        'middle'
+      );
+
+      return false;
+    }
+  }
+
+  // ============================================================
+  // FUNCIONES / MÓDULOS
+  // ============================================================
+
   VerificarFunciones() {
     const raw = localStorage.getItem('modulos');
 
@@ -186,7 +302,10 @@ export class EnviartimbrePage implements OnInit {
     }
   }
 
-  // METODO PARA VERIFICAR LA CONEXION A INTERNET
+  // ============================================================
+  // RED / GPS
+  // ============================================================
+
   networkSubscriber() {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
 
@@ -202,84 +321,46 @@ export class EnviartimbrePage implements OnInit {
     this.comprobarGPS();
   }
 
-  // METODO PARA VERIFICAR LA UBICACION ACTIVADA
   async comprobarGPS() {
     if (this.platform.is('hybrid')) {
-      Geolocation.checkPermissions()
-        .then(() => this.requestLocationPermission())
-        .catch((error) => {
-          console.log('Error al verificar permisos de GPS:', error);
-
-          this.abrirToas(
-            'Ups, al parecer no tiene activada la localización. Por favor, active el GPS.',
-            'warning',
-            3000,
-            'middle'
-          );
-        });
-
+      await this.solicitarPermisoUbicacionInicial();
       return;
     }
 
     this.obtenerPosicionWeb();
   }
 
-  // METODO PARA SOLICITAR EL PERMISO DE UBICACION
   async requestLocationPermission() {
-    try {
-      if (!this.platform.is('hybrid')) {
-        this.obtenerPosicionWeb();
-        return;
-      }
-
-      const status = await Geolocation.requestPermissions();
-
-      if (status.location === 'granted') {
-        this.obtenerPosicion();
-      } else {
-        this.abrirToas(
-          'Ups!!! Al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.',
-          'danger',
-          3000,
-          'middle'
-        );
-      }
-
-    } catch {
-      this.abrirToas(
-        'Ups!!! Al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.',
-        'danger',
-        3000,
-        'middle'
-      );
-    }
+    await this.solicitarPermisoUbicacionInicial();
   }
 
-  // METODO PARA OBTENER LAS COORDENADAS EN APP MOVIL
   async obtenerPosicion() {
     this.cargandoPosicion = true;
 
-    await Geolocation.getCurrentPosition({
-      enableHighAccuracy: true
-    }).then((resp) => {
+    try {
+      const resp = await Geolocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 10000
+      });
+
       this.geoLongitude = resp.coords.longitude;
       this.geoLatitude = resp.coords.latitude;
-      this.cargandoPosicion = false;
 
-    }).catch((error) => {
-      this.cargandoPosicion = false;
+    } catch (error) {
+      console.log('Error al obtener coordenadas:', error);
 
-      this.abrirToas(
+      await this.abrirToas(
         'Ups!!! No se ha obtenido coordenadas de ubicación.',
         'danger',
         6000,
         'middle'
       );
 
-    });
+    } finally {
+      this.cargandoPosicion = false;
+    }
   }
 
-  // METODO PARA OBTENER COORDENADAS EN NAVEGADOR WEB
   obtenerPosicionWeb() {
     this.cargandoPosicion = true;
 
@@ -295,12 +376,14 @@ export class EnviartimbrePage implements OnInit {
         this.geoLatitude = position.coords.latitude;
         this.geoLongitude = position.coords.longitude;
         this.cargandoPosicion = false;
-
       },
       (error) => {
         console.warn('No se pudo obtener ubicación en navegador:', error);
 
-        // Coordenadas de prueba para no bloquear el flujo en ionic serve
+        /**
+         * Coordenadas de prueba para ionic serve.
+         * En APK debe obtener las coordenadas reales.
+         */
         this.geoLatitude = -0.180653;
         this.geoLongitude = -78.467834;
         this.cargandoPosicion = false;
@@ -312,7 +395,17 @@ export class EnviartimbrePage implements OnInit {
     );
   }
 
-  // METODO PARA OBTENER LA INFORMACION DEL DISPOSITIVO
+  refrescoEspecial() {
+    this.cargandoPosicion = false;
+    this.geoLatitude = 0;
+    this.geoLongitude = 0;
+    this.comprobarGPS();
+  }
+
+  // ============================================================
+  // DISPOSITIVO
+  // ============================================================
+
   obtenerIdCelular() {
     Device.getInfo().then((info) => {
       this.modelo_dispositivo = info.model;
@@ -327,40 +420,40 @@ export class EnviartimbrePage implements OnInit {
     });
   }
 
-  // METODO PARA INICIAR CON EL PROCESO DE FOTO SEGUN LOS PARAMETROS
+  // ============================================================
+  // FOTO
+  // ============================================================
+
   async iniciarProcesoFoto() {
     if (this.foto === true) {
 
-      if (this.foto_obligatorio === true) {
-        await this.tomarFoto()
-          .then(() => {
-            this.identificarUsuario();
-          })
-          .catch(() => {
-            this.abrirToas(
-              'No se pudo obtener la foto, timbre cancelado.',
-              'warning',
-              2000,
-              'middle'
-            );
-          });
+      const debeTomarFoto = this.foto_obligatorio === true || this.activarOpcion === true;
 
-        return;
-      }
+      if (debeTomarFoto) {
+        const permisoCamara = await this.solicitarPermisoCamara();
 
-      if (this.activarOpcion === true) {
-        await this.tomarFoto()
-          .then(() => {
-            this.identificarUsuario();
-          })
-          .catch(() => {
-            this.abrirToas(
-              'No se pudo obtener la foto, timbre cancelado.',
-              'warning',
-              2000,
-              'middle'
-            );
-          });
+        if (!permisoCamara) {
+          return this.abrirToas(
+            'No se pudo obtener permiso de cámara. Timbre cancelado.',
+            'warning',
+            3000,
+            'middle'
+          );
+        }
+
+        try {
+          await this.tomarFoto();
+          this.identificarUsuario();
+        } catch (error) {
+          console.log('Error al tomar foto:', error);
+
+          this.abrirToas(
+            'No se pudo obtener la foto, timbre cancelado.',
+            'warning',
+            3000,
+            'middle'
+          );
+        }
 
         return;
       }
@@ -372,7 +465,6 @@ export class EnviartimbrePage implements OnInit {
     this.identificarUsuario();
   }
 
-  // METODO PARA ABRIR LA CAMARA Y GUARDAR LA IMAGEN
   async tomarFoto() {
     const cameraPhoto = await Camera.getPhoto({
       quality: 100,
@@ -413,7 +505,10 @@ export class EnviartimbrePage implements OnInit {
     });
   }
 
-  // METODO PARA VERIFICAR LA AUTENTICACION POR HUELLA DACTILAR
+  // ============================================================
+  // BIOMETRÍA
+  // ============================================================
+
   async identificarUsuario() {
     if (!this.platform.is('hybrid')) {
       console.log('Autenticación biométrica no disponible en navegador');
@@ -433,7 +528,6 @@ export class EnviartimbrePage implements OnInit {
     });
   }
 
-  // METODO PARA ABRIR EL COMPONENTE DE AUTENTICACION POR HUELLA DACTILAR
   async openAutenticacion() {
     await this.fingerprintAIO.show({
       disableBackup: false,
@@ -465,7 +559,6 @@ export class EnviartimbrePage implements OnInit {
     });
   }
 
-  // METODO PARA ENVIAR TIMBRES SIN AUTENTICACION
   async enviarTimbreSinAuth() {
     const alert = await this.alertController.create({
       header: 'Autenticación no disponible',
@@ -488,7 +581,6 @@ export class EnviartimbrePage implements OnInit {
     await alert.present();
   }
 
-  // METODO PARA ENVIAR TIMBRE SI EXISTE PROBLEMA DE AUTENTICACION
   async enviarTimbreAuthProble() {
     const alert = await this.alertController.create({
       header: 'Problema con la autenticación',
@@ -511,7 +603,10 @@ export class EnviartimbrePage implements OnInit {
     await alert.present();
   }
 
-  // METODO PARA VERIFICAR LOS PERMISOS
+  // ============================================================
+  // ENVÍO DEL TIMBRE
+  // ============================================================
+
   async verificarPermisoLocation(): Promise<boolean> {
     if (!this.platform.is('hybrid')) {
       return true;
@@ -521,34 +616,20 @@ export class EnviartimbrePage implements OnInit {
     return result.location === 'granted';
   }
 
-  // METODO PARA ENVIAR EL TIMBRE SEGUN LOS PARAMETROS
   async enviarTimbre(ev?: any) {
     if (this.platform.is('hybrid')) {
+      const tienePermisoUbicacion = await this.solicitarPermisoUbicacionInicial();
 
-      await this.verificarPermisoLocation()
-        .then(async () => {
-          const status = await Geolocation.requestPermissions();
+      if (!tienePermisoUbicacion) {
+        return this.abrirToas(
+          'Ups, al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.',
+          'danger',
+          6000,
+          'middle'
+        );
+      }
 
-          if (status.location === 'granted') {
-            this.iniciarProcesoFoto();
-          } else {
-            this.abrirToas(
-              'Ups, al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.',
-              'danger',
-              6000,
-              'middle'
-            );
-          }
-        })
-        .catch(() => {
-          this.abrirToas(
-            'Ups!!! Debe activar la ubicación para enviar el timbre',
-            'danger',
-            3000,
-            'middle'
-          );
-        });
-
+      await this.iniciarProcesoFoto();
       return;
     }
 
@@ -568,10 +649,9 @@ export class EnviartimbrePage implements OnInit {
       this.geoLongitude = -78.467834;
     }
 
-    this.iniciarProcesoFoto();
+    await this.iniciarProcesoFoto();
   }
 
-  // METODO PARA OBTENER LA ACCION DEL TIMBRE
   obtenerIdTipo(): string {
     switch (this.nombreInfo_timbre) {
       case 'Inicio de jornada laboral':
@@ -608,20 +688,10 @@ export class EnviartimbrePage implements OnInit {
     }
   }
 
-  // METODO PARA REFRESCAR LA PAGINA
-  refrescoEspecial() {
-    this.cargandoPosicion = false;
-    this.geoLatitude = 0;
-    this.geoLongitude = 0;
-    this.comprobarGPS();
-  }
-
-  // METODO PARA VERIFICAR EL NUMERO DE CARACTERES
   ionChange() {
     this.numeroCaracteres = this.nuevoTimbre.observacion?.length ?? 0;
   }
 
-  // METODO PARA GUARDAR LA INFORMACION DEL TIMBRE EN LA BASE DE DATOS
   guardarEnBDD() {
     const fechaHoraTimbre = this.formatearFechaTimbreParaBackend(this.fechaHora);
 
@@ -669,10 +739,9 @@ export class EnviartimbrePage implements OnInit {
       return;
     }
 
-    // SIN INTERNET
     if (this.requiereInternet === true) {
       this.abrirToas(
-        'Timbre sin conexión a Internet. No Permitido',
+        'Timbre sin conexión a Internet. No permitido',
         'danger',
         5000,
         'middle'
@@ -692,7 +761,6 @@ export class EnviartimbrePage implements OnInit {
     localStorage.setItem('storageUbicacion', this.storageUbica);
   }
 
-  // METODO PARA FORMATEAR LA FECHA DEL TIMBRE PARA EL BACKEND
   formatearFechaTimbreParaBackend(fecha: any): string {
     if (!fecha) return '';
 
@@ -718,7 +786,6 @@ export class EnviartimbrePage implements OnInit {
     return `${dd}/${mm}/${yyyy} ${horas}:${minutos}:${segundos} ${ampm}`;
   }
 
-  // METODO PARA GUARDAR LOS TIMBRES EN MEMORIA CUANDO NO HAY INTERNET
   guardarTimbreStorage(timbre: Timbre) {
     this.dataLocalService.guardarTimbre(timbre);
 
@@ -729,7 +796,10 @@ export class EnviartimbrePage implements OnInit {
     });
   }
 
-  // METODO PARA BUSCAR PARAMETROS GENERALES DEL SISTEMA
+  // ============================================================
+  // PARÁMETROS
+  // ============================================================
+
   BuscarParametros() {
     this.rango = 0;
     this.capturar_segundos = false;
@@ -761,7 +831,6 @@ export class EnviartimbrePage implements OnInit {
     });
   }
 
-  // METODO PARA BUSCAR OPCIONES DE MARCACION DEL EMPLEADO
   BuscarOpcionMarcacion() {
     const empleadoID = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
 
@@ -776,7 +845,7 @@ export class EnviartimbrePage implements OnInit {
     this.requiereInternet = false;
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe({
-      next: (res: any) => {
+      next: async (res: any) => {
         const parametro = res.data?.[0] ?? res.respuesta?.[0];
 
         if (!parametro) {
@@ -792,6 +861,13 @@ export class EnviartimbrePage implements OnInit {
 
         this.guardarParametrosMarcacionEnLocalStorage();
 
+        /**
+         * Si el parámetro indica que se usa foto, pedimos permiso.
+         */
+        if (this.platform.is('hybrid') && this.foto === true) {
+          await this.solicitarPermisoCamara();
+        }
+
       },
       error: () => {
         this.foto = false;
@@ -805,7 +881,6 @@ export class EnviartimbrePage implements OnInit {
     });
   }
 
-  // SOLO PARA COMPATIBILIDAD CON CODIGO ANTIGUO QUE AUN LEE LOCALSTORAGE
   guardarParametrosMarcacionEnLocalStorage() {
     this.timbrarConFoto = this.foto ? 'Si' : 'No';
     this.timbreFotoObligatoria = this.foto_obligatorio ? 'Si' : 'No';
@@ -817,6 +892,10 @@ export class EnviartimbrePage implements OnInit {
     localStorage.setItem('timbrarUbicacionDesconocida', this.timbrarDesconocido);
     localStorage.setItem('timbrarSinInternet', this.timbrarSinInternet);
   }
+
+  // ============================================================
+  // UBICACIÓN / PERÍMETROS
+  // ============================================================
 
   PermitirUbicacionDesconocida(timbre: any, guardarSinServidor: boolean = false) {
     if (this.desconocida === true) {
@@ -840,7 +919,7 @@ export class EnviartimbrePage implements OnInit {
     }
 
     this.abrirToas(
-      'Timbre con ubicación Desconocida. No Permitido',
+      'Timbre con ubicación desconocida. No permitido',
       'danger',
       5000,
       'middle'
@@ -849,44 +928,41 @@ export class EnviartimbrePage implements OnInit {
     return this.router.navigate(['/login']);
   }
 
-  // METODO QUE VERIFICA SI EL TIMBRE FUE REALIZADO EN UN PERIMETRO DEFINIDO
   CompararCoordenadas(informacion: any, timbre: any, descripcion: any, data: any) {
-    this.restP.ObtenerCoordenadas(informacion).subscribe(
-      {
-        next: (res: any) => {
+    this.restP.ObtenerCoordenadas(informacion).subscribe({
+      next: (res: any) => {
 
-          if (res.data[0].verificar === 'ok') {
-            this.contar = this.contar + 1;
-            this.ubicacion = descripcion;
+        if (res.data[0].verificar === 'ok') {
+          this.contar = this.contar + 1;
+          this.ubicacion = descripcion;
 
-            if (this.contar === 1) {
-              timbre.ubicacion = this.ubicacion;
-              this.storageUbica = timbre.ubicacion;
+          if (this.contar === 1) {
+            timbre.ubicacion = this.ubicacion;
+            this.storageUbica = timbre.ubicacion;
 
-              this.abrirToas(
-                'Timbre realizado dentro del perímetro definido como ' + this.ubicacion + '.',
-                'primary',
-                3000,
-                'top'
-              );
+            this.abrirToas(
+              'Timbre realizado dentro del perímetro definido como ' + this.ubicacion + '.',
+              'primary',
+              3000,
+              'top'
+            );
 
-              this.EnviarDatos(timbre);
-            }
-          } else {
-            this.sin_ubicacion = this.sin_ubicacion + 1;
-
-            if (this.sin_ubicacion === data.length) {
-              this.ValidarDomicilio(informacion, timbre);
-            }
+            this.EnviarDatos(timbre);
           }
-        }, error: () => {
-          this.PermitirUbicacionDesconocida(timbre);
+        } else {
+          this.sin_ubicacion = this.sin_ubicacion + 1;
+
+          if (this.sin_ubicacion === data.length) {
+            this.ValidarDomicilio(informacion, timbre);
+          }
         }
+      },
+      error: () => {
+        this.PermitirUbicacionDesconocida(timbre);
       }
-    );
+    });
   }
 
-  // METODO QUE PERMITE VALIDACIONES DE UBICACION
   BuscarUbicacion(latitud: any, longitud: any, rango: any, timbre: any) {
     let datosUbicacion: any[] = [];
     this.contar = 0;
@@ -900,37 +976,34 @@ export class EnviartimbrePage implements OnInit {
       valor: rango
     };
 
-    this.restP.ObtenerUbicacionUsuario(this.id_usuario).subscribe(
-      {
-        next: (res: any) => {
-          datosUbicacion = res.data ?? res ?? [];
+    this.restP.ObtenerUbicacionUsuario(this.id_usuario).subscribe({
+      next: (res: any) => {
+        datosUbicacion = res.data ?? res ?? [];
 
-          if (datosUbicacion.length !== 0) {
-            datosUbicacion.forEach((obj: any) => {
-              informacion.lat2 = obj.latitud;
-              informacion.lng2 = obj.longitud;
+        if (datosUbicacion.length !== 0) {
+          datosUbicacion.forEach((obj: any) => {
+            informacion.lat2 = obj.latitud;
+            informacion.lng2 = obj.longitud;
 
-              this.CompararCoordenadas(
-                informacion,
-                timbre,
-                obj.descripcion,
-                datosUbicacion
-              );
-            });
+            this.CompararCoordenadas(
+              informacion,
+              timbre,
+              obj.descripcion,
+              datosUbicacion
+            );
+          });
 
-          } else {
-            this.ValidarDomicilio(informacion, timbre);
-          }
-        }, error: () => {
-          this.PermitirUbicacionDesconocida(timbre);
+        } else {
+          this.ValidarDomicilio(informacion, timbre);
         }
+      },
+      error: () => {
+        this.PermitirUbicacionDesconocida(timbre);
       }
-    );
+    });
   }
 
-  // METODO PARA VERIFICAR SI ESTA ACTIVO EL MODULO GEOLOCALIZACION
   ValidarModulo(latitud: any, longitud: any, rango: any, timbre: any) {
-
     if (this.modulo_geolocalizacion === true) {
       this.BuscarUbicacion(latitud, longitud, rango, timbre);
     } else {
@@ -940,55 +1013,54 @@ export class EnviartimbrePage implements OnInit {
     }
   }
 
-  // METODO PARA VALIDAR LAS COORDENADAS DEL DOMICILIO
   ValidarDomicilio(informacion: any, timbre: any) {
-    this.restE.ObtenerUbicacion(this.id_usuario).subscribe(
-      {
-        next: (res: any) => {
-          if (res.data[0].longitud != null) {
-            informacion.lat2 = res.data[0].latitud;
-            informacion.lng2 = res.data[0].longitud;
+    this.restE.ObtenerUbicacion(this.id_usuario).subscribe({
+      next: (res: any) => {
+        if (res.data[0].longitud != null) {
+          informacion.lat2 = res.data[0].latitud;
+          informacion.lng2 = res.data[0].longitud;
 
-            this.restP.ObtenerCoordenadas(informacion).subscribe(
-              {
-                next: (resu: any) => {
-                  if (resu.data[0].verificar === 'ok') {
-                    timbre.ubicacion = 'DOMICILIO';
-                    this.storageUbica = timbre.ubicacion;
+          this.restP.ObtenerCoordenadas(informacion).subscribe({
+            next: (resu: any) => {
+              if (resu.data[0].verificar === 'ok') {
+                timbre.ubicacion = 'DOMICILIO';
+                this.storageUbica = timbre.ubicacion;
 
-                    this.abrirToas(
-                      'Marcación realizada dentro del perímetro definido como DOMICILIO.',
-                      'primary',
-                      3000,
-                      'top'
-                    );
+                this.abrirToas(
+                  'Marcación realizada dentro del perímetro definido como DOMICILIO.',
+                  'primary',
+                  3000,
+                  'top'
+                );
 
-                    this.EnviarDatos(timbre);
-                  } else {
-                    this.PermitirUbicacionDesconocida(timbre);
-                  }
-                }, error: () => {
-                  this.PermitirUbicacionDesconocida(timbre);
-                }
+                this.EnviarDatos(timbre);
+              } else {
+                this.PermitirUbicacionDesconocida(timbre);
               }
-            );
-          } else {
-            this.PermitirUbicacionDesconocida(timbre);
-          }
-        }, error: () => {
+            },
+            error: () => {
+              this.PermitirUbicacionDesconocida(timbre);
+            }
+          });
+        } else {
           this.PermitirUbicacionDesconocida(timbre);
         }
+      },
+      error: () => {
+        this.PermitirUbicacionDesconocida(timbre);
       }
-    );
+    });
   }
 
-  // METODO PARA ENVIAR DATOS DEL TIMBRE MEDIANTE EL SERVICIO
+  // ============================================================
+  // GUARDADO / ENVÍO
+  // ============================================================
+
   EnviarDatos(data: any) {
     localStorage.setItem('storageUbicacion', this.storageUbica);
 
     this.relojService.enviarTimbre(data).pipe(timeout(5000)).subscribe({
       next: () => {
-
         this.navCtroller.navigateForward(['confirmaciontimbre'], {
           queryParams: {
             data: JSON.stringify(data)
@@ -1008,9 +1080,7 @@ export class EnviartimbrePage implements OnInit {
     });
   }
 
-  // METODO PARA ALMACENAR LOS TIMBRES SIN CONEXION AL SERVIDOR
   GuardartimbresinServidor(data: any) {
-
     data.conexion = false;
     data.novedades_conexion = 'Falló conexión al servidor';
 
@@ -1026,7 +1096,10 @@ export class EnviartimbrePage implements OnInit {
     });
   }
 
-  // METODO PARA DEFINIR LOS TOAST
+  // ============================================================
+  // UI
+  // ============================================================
+
   async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
     const toast = await this.toastController.create({
       message: mensaje,
@@ -1040,6 +1113,5 @@ export class EnviartimbrePage implements OnInit {
 
   toggleChanged(event: any) {
     this.activarOpcion = event.detail.checked;
-
   }
 }
