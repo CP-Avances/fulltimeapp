@@ -28,7 +28,6 @@ export class ListaNotificacionComponent implements OnInit {
   notificacionestimbres: any = [];
   notificacionesAll: any = [];
   countNoti: any;
-  pageActual: any = 1;
   valorcolor: string = '';
   noticheck: string = '';
   valor: boolean = false;
@@ -164,11 +163,14 @@ export class ListaNotificacionComponent implements OnInit {
     this.modalController.dismiss({});
   }
 
-  //variables de configuracion del componente de paginacion (pagination-controls)
+  // VARIABLES DE CONFIGURACION DEL COMPONENTE DE PAGINACION
+  pageActual: number = 1;
+  public itemsPerPage: number = 8;
   public maxSize: number = 5;
   public directionLinks: boolean = true;
   public autoHide: boolean = false;
   public responsive: boolean = true;
+
   public labels: any = {
     previousLabel: 'Anterior',
     nextLabel: 'Siguiente',
@@ -367,6 +369,7 @@ export class ListaNotificacionComponent implements OnInit {
   }
 
   // AGREGA NOTIFICACIONES INICIALES A LA LISTA GENERAL
+  // AGREGA NOTIFICACIONES INICIALES A LA LISTA GENERAL
   agregarNotificacionesALista(notificaciones: any[]) {
     notificaciones.forEach((noti: any) => {
       const existe = this.notificacionesAll.some((n: any) =>
@@ -390,7 +393,7 @@ export class ListaNotificacionComponent implements OnInit {
       return fechaB - fechaA;
     });
 
-    this.notificacionesAll = this.notificacionesAll.slice(0, 10);
+    this.pageActual = 1;
   }
 
   // METODO PARA FORMATEAR LOS DATOS SEGUN EL TIPO DE NOTIFICACION
