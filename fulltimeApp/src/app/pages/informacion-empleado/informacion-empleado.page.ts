@@ -50,6 +50,10 @@ export class InformacionEmpleadoPage implements OnInit {
     name_rol: "",
     name_regimen: "",
     nombre_nacionalidad: "",
+    id_suc: 0,
+    id_depa: 0,
+    id_regimen: 0,
+    id_cargo_: 0,
   }
 
   public get app_info(): any {

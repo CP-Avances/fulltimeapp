@@ -29,9 +29,16 @@ export class NotificacionesService {
   }
 
   // METODO PARA BUSCAR LOS EMPLEADOS CON SU INFORMACION GENERAL
-  BuscarDatosGenerales() {
+  BuscarDatosGeneralesComunicados() {
     const estado = 1;
     return this.http.get<any>(`${this.apiUrlM}/generalidades/datos_generales_comunicados/${estado}`)
+      .pipe(map(res => res.data));
+  }
+
+  // METODO PARA BUSCAR LOS EMPLEADOS CON SU INFORMACION GENERAL
+  BuscarDatosGeneralesInfo() {
+    const estado = 1;
+    return this.http.get<any>(`${this.apiUrlM}/generalidades/informacion-data-general/${estado}`)
       .pipe(map(res => res.data));
   }
 

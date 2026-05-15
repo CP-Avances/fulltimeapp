@@ -390,9 +390,7 @@ export class NotificacionPopoverComponent implements OnInit {
         ? this.validar.FormatearHora(data.hora_fin, this.formato_hora)
         : '';
 
-    } catch (error) {
-      console.error('Error al formatear notificación de solicitud:', error, noti);
-
+    } catch {
       noti.notificacion = noti.descripcion ?? '';
       noti.empleado = noti.empleado ?? '';
       noti.fecha_desde = '';

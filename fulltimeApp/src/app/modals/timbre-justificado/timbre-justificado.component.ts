@@ -24,12 +24,12 @@ export class TimbreJustificadoComponent implements OnInit {
   @Input() data: any;
   selectOptions: any = [
     { accion: 'Ninguno', view: 'Ninguno', teclaFuncion: -1 },
-    { accion: 'E', view: 'Inicio de jornada laboral', teclaFuncion: 0 },
-    { accion: 'S', view: 'Fin de jornada laboral', teclaFuncion: 1 },
-    { accion: 'S/A', view: 'Inicio de almuerzo', teclaFuncion: 2 },
-    { accion: 'E/A', view: 'Fin de almuerzo', teclaFuncion: 3 },
-    { accion: 'E/P', view: 'Inicio de permiso', teclaFuncion: 5 },
-    { accion: 'S/P', view: 'Fin de permiso', teclaFuncion: 4 },
+    { accion: 'E', view: 'Inicio jornada laboral', teclaFuncion: 0 },
+    { accion: 'S', view: 'Fin jornada laboral', teclaFuncion: 1 },
+    { accion: 'S/A', view: 'Inicio alimentación', teclaFuncion: 2 },
+    { accion: 'E/A', view: 'Fin alimentación', teclaFuncion: 3 },
+    { accion: 'E/P', view: 'Inicio permiso', teclaFuncion: 4 },
+    { accion: 'S/P', view: 'Fin permiso', teclaFuncion: 5 },
   ]
   accion: string = '';
   tecla_funcion: number = -1;
@@ -240,9 +240,7 @@ export class TimbreJustificadoComponent implements OnInit {
   }
 
   // METODO PARA ABRIR LA GALERIA Y SELECCIONAR UNA IMAGEN
-  // METODO PARA ABRIR LA GALERIA Y SELECCIONAR UNA IMAGEN
   async selectImage() {
-    console.log("ver imagen");
 
     const image = await Camera.getPhoto({
       quality: 100,

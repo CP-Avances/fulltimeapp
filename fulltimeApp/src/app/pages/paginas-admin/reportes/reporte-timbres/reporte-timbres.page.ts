@@ -12,6 +12,7 @@ import { DataUserLoggedService } from 'src/app/services/data-user-logged.service
 import { ReporteTimbreComponent } from 'src/app/modals/reporte-timbre/reporte-timbre.component';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
+import { AsignacionesMovilService } from 'src/app/services/asignaciones-movil.services';
 
 interface CheckOptions {
   valor: number;
@@ -84,6 +85,15 @@ export class ReporteTimbresPage {
   verSucursal: boolean = true;
   verRol: boolean = true;
 
+  // DATOS DEL USUARIO LOGUEADO
+  rolEmpleado: number = 0;
+  idEmpleado: number = 0;
+
+  // ASIGNACIONES DE ACCESO
+  idDepartamentosAcceso: Set<any> = new Set();
+  idSucursalesAcceso: Set<any> = new Set();
+  idUsuariosAcceso: Set<any> = new Set();
+
   // CHECKBOX TODOS
   isAllCheck_sucu: boolean = false;
   isAllCheck_depa: boolean = false;
@@ -121,18 +131,67 @@ export class ReporteTimbresPage {
     private dataUserService: DataUserLoggedService,
     public restN: NotificacionesService,
     public restP: ParametrosService,
+    private readonly asignacionesMovil: AsignacionesMovilService
   ) { }
 
-  ngOnInit() {
+  async ngOnInit(): Promise<void> {
+    this.idEmpleado = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') ?? '0', 10);
+
     this.reiniciarPantalla();
+
+    await this.cargarAsignacionesUsuario();
   }
 
-  ionViewWillEnter() {
+  async ionViewWillEnter(): Promise<void> {
+    this.idEmpleado = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') ?? '0', 10);
+
     this.reiniciarPantalla();
+
+    await this.cargarAsignacionesUsuario();
   }
 
   ionViewWillLeave() {
     this.limpiarRango_fechas();
+  }
+
+  private async cargarAsignacionesUsuario(): Promise<void> {
+    if (!this.idEmpleado) return;
+
+    try {
+      await this.asignacionesMovil.ObtenerAsignacionesUsuario(this.idEmpleado);
+
+      this.idDepartamentosAcceso = this.asignacionesMovil.idDepartamentosAcceso;
+      this.idSucursalesAcceso = this.asignacionesMovil.idSucursalesAcceso;
+      this.idUsuariosAcceso = this.asignacionesMovil.idUsuariosAcceso;
+
+    } catch (error) {
+      console.log('Error al cargar asignaciones del usuario', error);
+
+      this.idDepartamentosAcceso = new Set();
+      this.idSucursalesAcceso = new Set();
+      this.idUsuariosAcceso = new Set();
+    }
+  }
+
+  private aplicarFiltroPorAsignacion(informacion: any[]): any[] {
+    if (!informacion || informacion.length === 0) return [];
+
+    // SI ES SUPERADMINISTRADOR, VE TODO
+    if (this.rolEmpleado === 1) {
+      return informacion;
+    }
+
+    // SI NO HAY USUARIOS ASIGNADOS, NO MOSTRAR INFORMACIÓN
+    if (!this.idUsuariosAcceso || this.idUsuariosAcceso.size === 0) {
+      return [];
+    }
+
+    return informacion.filter((empleado: any) => {
+      const idEmpleado = Number(empleado.id ?? empleado.id_empleado);
+      return this.idUsuariosAcceso.has(idEmpleado);
+    });
   }
 
   private reiniciarPantalla(): void {
@@ -181,7 +240,7 @@ export class ReporteTimbresPage {
     this.fechaFi = DateTime.fromISO(this.fechaFinal).toFormat('yyyy-MM-dd');
   }
 
-  // METODO PARA LIMPIAR LAS VARIBLES DE FECHA FINAL E INICIAL
+  // METODO PARA LIMPIAR LAS VARIABLES DE FECHA FINAL E INICIAL
   limpiarRango_fechas() {
     this.dataUserService.setFechaRangoInicio('');
     this.dataUserService.setFechaRangoFinal('');
@@ -283,16 +342,23 @@ export class ReporteTimbresPage {
 
     this.empleados = [];
     this.empleados_filtro = [];
+
+    this.datosGenerales = [];
   }
 
   private cargarDatosGenerales(callback: () => void): void {
     this.limpiarListas();
 
-    this.restN.BuscarDatosGenerales().subscribe({
+    this.restN.BuscarDatosGeneralesInfo().subscribe({
       next: (res: any[]) => {
+        const informacion = res ?? [];
 
-        this.datosGenerales = res ?? [];
-        sessionStorage.setItem('datos_comunicado', JSON.stringify(this.datosGenerales));
+        this.datosGenerales = this.aplicarFiltroPorAsignacion(informacion);
+
+        sessionStorage.setItem(
+          'datos_comunicado',
+          JSON.stringify(this.datosGenerales)
+        );
 
         callback();
 
@@ -472,7 +538,6 @@ export class ReporteTimbresPage {
       this.departamentos.forEach((o: any) => {
         o.isChecked_depa = this.isAllCheck_depa;
       });
-
     }
   }
 

@@ -551,11 +551,6 @@ export class ReporteTimbreComponent implements OnInit {
               horaTimbre
             ])
 
-            datos[0].forEach((celda, index) => {
-              console.log(`Columna ${index + 1}:`, celda, "→ tipo:", typeof celda);
-            });
-
-
           } else {
             datos.push([
               n++,
@@ -580,15 +575,6 @@ export class ReporteTimbreComponent implements OnInit {
         });
       })
     });
-
-
-    if (datos.length > 0) {
-
-      datos[0].forEach((valor, index) => {
-        console.log(`Columna ${index + 1}:`, valor, "→ tipo:", typeof valor);
-      });
-    }
-
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Timbres");
@@ -669,11 +655,6 @@ export class ReporteTimbreComponent implements OnInit {
         { name: "FECHA TIMBRE DISPOSITIVO", totalsRowLabel: "", filterButton: true },
         { name: "HORA TIMBRE DISPOSITIVO", totalsRowLabel: "", filterButton: true },
       ]
-
-      columnas.forEach((col, i) => {
-        console.log(`Columna ${i + 1}:`, col, "→ tipo:", typeof col.name);
-      });
-
 
       worksheet.addTable({
         name: "TimbresReporteTabla",

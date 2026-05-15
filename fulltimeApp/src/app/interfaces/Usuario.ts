@@ -31,6 +31,10 @@ export interface Usuario {
     id_celulardb?: boolean
     ip?: string
     ciudad?: string
+    id_suc: number,
+    id_depa: number,
+    id_regimen: number,
+    id_cargo_: number,
     name_suc?: string
     name_dep?: string
     name_rol?: string

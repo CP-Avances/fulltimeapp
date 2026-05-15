@@ -26,30 +26,7 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
 
     <ion-grid *ngIf="isConnected && serverConnected">
       <ion-row>
-        <ion-col size="6">
-          <ion-button [color] = "colorp" expand="block" (click)="BtnPermisos_click()">
-            <div>
-              <ion-icon name="reader-outline"></ion-icon> <br>
-              <ion-text>
-                Permisos
-              </ion-text>
-            </div>
-          </ion-button>
-        </ion-col>
-        
-        <ion-col size="6">
-          <ion-button [color] = "colorh" expand="block" (click)="BtnHorasExtras_click()">
-            <div>
-              <ion-icon name="hourglass-outline"></ion-icon> <br>
-              <ion-text>
-                Horas Extras
-              </ion-text>
-            </div>
-          </ion-button>
-        </ion-col>
-      </ion-row>
 
-      <ion-row>
         <ion-col size="6">
           <ion-button [color] = "colorv" expand="block" (click)="BtnVacaciones_click()">
             <div>
@@ -62,16 +39,18 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
         </ion-col>
 
         <ion-col size="6">
-          <ion-button [color] = "colora" expand="block"  (click)="BtnAlimentacion_click()">
+          <ion-button [color] = "colorp" expand="block" (click)="BtnPermisos_click()">
             <div>
-              <ion-icon name="fast-food-outline"></ion-icon> <br>
+              <ion-icon name="reader-outline"></ion-icon> <br>
               <ion-text>
-                Alimentación
+                Permisos
               </ion-text>
             </div>
           </ion-button>
         </ion-col>
+        
       </ion-row>
+
     </ion-grid>
 
     <ion-content *ngIf="!isConnected || !serverConnected">
@@ -228,18 +207,6 @@ export class SolicitudesPage implements OnInit {
       this.colorp = "deshabilitado";
     }
 
-    if (this.Btn_horasExtras == true) {
-      this.colorh = "habilitado";
-    } else {
-      this.colorh = "deshabilitado";
-    }
-
-    if (this.Btn_alimentacion == true) {
-      this.colora = "habilitado";
-    } else {
-      this.colora = "deshabilitado";
-    }
-
     if (this.Btn_vacaciones == true) {
       this.colorv = "habilitado";
     } else {
@@ -250,26 +217,10 @@ export class SolicitudesPage implements OnInit {
 
   // METODO PARA REDIRECCIONAR A LA PAGINA DE PERMISOS
   BtnPermisos_click() {
-    this.router.navigateByUrl("/reloj/solicitudes/permiso-solicitud");
-  }
-
-  // METODO PARA REDIRECCIONAR A LA PAGINA DE HORAS EXTRAS
-  BtnHorasExtras_click() {
-    if (this.Btn_horasExtras == true) {
-      this.router.navigateByUrl("/reloj/solicitudes/hora-extra-solicitud");
-    } else if (this.Btn_horasExtras == false) {
-      this.usuarioIncorrectoToas("Ups!!! al parecer no tienes activado en tu plan el Módulo de Horas Extras.\n\nTe gustaría activarlo?");
-    } else {
-      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexión. \n Comprueba tu conexión a internet o");
-    }
-  }
-
-  // METODO PARA REDIRECCIONAR A LA PAGINA DE ALIMENTACION
-  BtnAlimentacion_click() {
-    if (this.Btn_alimentacion == true) {
-      this.router.navigateByUrl("/reloj/solicitudes/alimentacion-solicitud");
-    } else if (this.Btn_alimentacion == false) {
-      this.usuarioIncorrectoToas("  Ups!!! al parecer no tienes activado en tu plan el Módulo de Alimentación.\n\nTe gustaría activarlo?");
+    if (this.Btn_permisos == true) {
+      this.router.navigateByUrl("/reloj/solicitudes/permiso-solicitud");
+    } else if (this.Btn_permisos == false) {
+      this.usuarioIncorrectoToas("  Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.\n\nTe gustaría activarlo?");
     } else {
       this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion.\n Comprueba tu conexion a internet o");
     }
@@ -277,7 +228,13 @@ export class SolicitudesPage implements OnInit {
 
   // METODO PARA REDIRECCIONAR A LA PAGINA DE ALIMENTACION
   BtnVacaciones_click() {
-    this.router.navigateByUrl("/reloj/solicitudes/vacacion-solicitud");
+    if (this.Btn_vacaciones == true) {
+      this.router.navigateByUrl("/reloj/solicitudes/vacacion-solicitud");
+    } else if (this.Btn_vacaciones == false) {
+      this.usuarioIncorrectoToas("  Ups!!! al parecer no tienes activado en tu plan el Módulo de Vacaciones.\n\nTe gustaría activarlo?");
+    } else {
+      this.usuarioIncorrectoToas(" Ups! Parece que hay problemas con la conexion.\n Comprueba tu conexion a internet o");
+    }
   }
 
   //METODO PARA CONFIGUAR EL MENSAJE DE NO ACCESO A LOS MODULOS

@@ -52,8 +52,7 @@ export class PermisoDetalleSolicitudPage implements OnInit {
 
         this.cargando = false;
       },
-      error: (err) => {
-        console.error('Error obteniendo detalle de permiso:', err);
+      error: () => {
         this.cargando = false;
         this.mostrarToast('No se pudo cargar el detalle completo de la solicitud.', 'warning');
       }
@@ -237,8 +236,7 @@ export class PermisoDetalleSolicitudPage implements OnInit {
         localStorage.setItem('resetBusquedaPermisos', 'true');
         this.router.navigateByUrl('/reloj/solicitudes/permiso-solicitud/permiso-criterio-busqueda');
       },
-      error: (err) => {
-        console.error('Error eliminando permiso:', err);
+      error: () => {
         this.eliminando = false;
         this.mostrarToast('No se pudo eliminar la solicitud de permiso.', 'danger');
       }

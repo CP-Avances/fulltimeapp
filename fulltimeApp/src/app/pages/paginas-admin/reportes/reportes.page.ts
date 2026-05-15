@@ -16,7 +16,7 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
     <ion-grid *ngIf="isConnected && serverConnected">
 
     <ion-row>
-        <ion-col size="6">
+        <ion-col size="12">
           <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/timbres']">
             <div>
               <ion-icon name="alarm-outline"></ion-icon> <br>
@@ -26,87 +26,7 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
             </div>
           </ion-button>
         </ion-col>
-        <ion-col size="6">
-        <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/timbresConNovedades']">
-          <div>
-            <ion-icon name="alarm-outline"></ion-icon> <br>
-            <ion-text class="text-primario">
-              Timbres <br> con Novedades 
-            </ion-text>
-          </div>
-        </ion-button>
-      </ion-col>
       </ion-row>
-
-      <ion-row>
-        <ion-col size="6">
-          <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/inasistencia']">
-            <div>
-              <ion-icon name="timer-outline"></ion-icon> <br>
-              <ion-text class="text-primario">
-                Faltas
-              </ion-text>
-            </div>
-          </ion-button>
-        </ion-col>
-        <ion-col size="6">
-          <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/atrasos']">
-            <div>
-              <ion-icon name="time-outline"></ion-icon> <br>
-              <ion-text class="text-primario">
-                Atrasos
-              </ion-text>
-            </div>
-          </ion-button>
-        </ion-col>
-      </ion-row>
-
-      <ion-row>
-        <ion-col size="6">
-          <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/solicitud']" [disabled]="deshabilitado">
-            <div>
-              <ion-icon name="mail-unread-outline"></ion-icon> <br>
-              <ion-text class="text-primario">
-                Solicitudes <br> Pendientes
-              </ion-text>
-            </div>
-          </ion-button>
-        </ion-col>
-        <ion-col size="6">
-          <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/vacaciones']" [disabled]="deshabilitado">
-            <div>
-              <ion-icon name="airplane-outline"></ion-icon> <br>
-              <ion-text class="text-primario">
-                Vacaciones
-              </ion-text>
-            </div>
-          </ion-button>
-        </ion-col>
-      </ion-row>
-
-      <ion-row>
-      <ion-col size="6">
-          <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/horas-extras']" [disabled]="deshabilitado">
-            <div>
-              <ion-icon name="hourglass-outline"></ion-icon> <br>
-              <ion-text class="text-primario">
-                Horas Extras
-              </ion-text>
-            </div>
-          </ion-button>
-        </ion-col>
-     <ion-col size="6">
-       <ion-button expand="block" fill="clear" [routerLink]="['/reloj/reportes/alimentacion']" [disabled]="deshabilitado">
-         <div>
-           <ion-icon name="fast-food-outline"></ion-icon> <br>
-           <ion-text class="text-primario">
-             Alimentación
-           </ion-text>
-         </div>
-       </ion-button>
-     </ion-col>
-   </ion-row>
-      
 
     </ion-grid>
 

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RelojServiceService } from "src/app/services/reloj-service.service";
 import { NavController, ToastController, Platform, AlertController } from "@ionic/angular";
-import { Usuario, UsuarioValueDefault } from 'src/app/interfaces/Usuario';
 import { IdDispositivos } from 'src/app/interfaces/Usuario';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { Device } from '@capacitor/device';
@@ -29,7 +28,6 @@ export class LoginPage implements OnInit {
   }
 
   iddispositivos: IdDispositivos[] = [];
-  usuarioObtenido: Usuario = UsuarioValueDefault;
   verPassword = false;
   id_celular: any;
   dispositi: any;

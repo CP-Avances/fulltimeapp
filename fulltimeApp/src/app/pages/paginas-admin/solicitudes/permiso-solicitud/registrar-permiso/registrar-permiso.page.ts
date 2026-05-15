@@ -92,8 +92,7 @@ export class RegistrarPermisoPage implements OnInit {
 
         this.cargandoTipos = false;
       },
-      error: (err) => {
-        console.error('Error cargando tipos de permiso:', err);
+      error: () => {
         this.tiposPermiso = [];
         this.cargandoTipos = false;
       }
@@ -108,8 +107,7 @@ export class RegistrarPermisoPage implements OnInit {
         this.feriados = Array.isArray(data) ? data : [];
         this.cargandoFeriados = false;
       },
-      error: (err) => {
-        console.error('Error cargando feriados:', err);
+      error: () => {
         this.feriados = [];
         this.cargandoFeriados = false;
       }

@@ -47,4 +47,21 @@ export class ParametrosService {
     return this.http.get<any>(`${this.apiUrlM}/ubicacion/coordenadas-usuario/${id_empl}`);
   }
 
+
+  ObtenerPermisosRoles(datos: any) {
+    return this.http
+      .post<any>(`${this.apiUrlM}/api/rol-permisos/validar-funciones-rol`, datos)
+      .pipe(
+        map(res => Array.isArray(res?.data) ? res.data : [])
+      );
+  }
+
+
+  ObtenerAccionesRoles(datos: any) {
+    return this.http
+      .post<any>(`${this.apiUrlM}/api/rol-permisos/validar-acciones-rol`, datos)
+      .pipe(
+        map(res => Array.isArray(res?.data) ? res.data : [])
+      );
+  }
 }

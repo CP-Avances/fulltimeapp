@@ -2,14 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
 import { Usuario } from 'src/app/interfaces/Usuario';
 import { DatePipe } from '@angular/common';
-import { DataUserLoggedService } from '../../services/data-user-logged.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
-import { ModalController, Platform, ToastController } from '@ionic/angular';
+import { ModalController, ToastController } from '@ionic/angular';
 import { InformacionEmpleadoPage } from '../informacion-empleado/informacion-empleado.page';
 import { NetworkService } from '../../libs/network.service';
 import { ConnectivityService } from '../../services/conexion-servidor.service'
 import { ParametrosSistema } from 'src/app/libs/parametros.emun';
+import { AsignacionesMovilService } from 'src/app/services/asignaciones-movil.services';
 
 @Component({
   selector: 'app-informacion-admin',
@@ -24,6 +24,11 @@ export class InformacionAdminPage implements OnInit {
   pageActual: number = 1;
   isConnected: boolean;
   serverConnected: boolean = true;
+
+  rolEmpleado: number = 0;
+  idEmpleado: number = 0;
+
+  idUsuariosAcceso: Set<any> = new Set();
 
   empresa: any = {
     nombre: '',
@@ -53,6 +58,10 @@ export class InformacionAdminPage implements OnInit {
     name_regimen: "",
     genero: "",
     nombre_nacionalidad: "",
+    id_suc: 0,
+    id_depa: 0,
+    id_regimen: 0,
+    id_cargo_: 0,
   }
 
   public get app_info(): any {
@@ -63,24 +72,69 @@ export class InformacionAdminPage implements OnInit {
 
   constructor(
     private relojService: RelojServiceService,
-    private dataUser: DataUserLoggedService,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
     public modalController: ModalController,
     private toastController: ToastController,
     private networkService: NetworkService,
-    private connectivityService: ConnectivityService
+    private connectivityService: ConnectivityService,
+    private readonly asignacionesMovil: AsignacionesMovilService
   ) { }
 
   async ngOnInit() {
+    this.idEmpleado = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') ?? '0', 10);
+
+    await this.cargarAsignacionesUsuario();
+
     this.networkSubscriber();
 
     this.serverConnected = await this.connectivityService.checkServerConnection();
     console.log("serverConnected ", this.serverConnected);
   }
+
   async ionViewWillEnter() {
+    this.idEmpleado = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') ?? '0', 10);
+
+    await this.cargarAsignacionesUsuario();
+
     this.networkSubscriber();
+
     this.serverConnected = await this.connectivityService.checkServerConnection();
+  }
+
+  private async cargarAsignacionesUsuario(): Promise<void> {
+    if (!this.idEmpleado) return;
+
+    try {
+      await this.asignacionesMovil.ObtenerAsignacionesUsuario(this.idEmpleado);
+
+      this.idUsuariosAcceso = this.asignacionesMovil.idUsuariosAcceso;
+
+    } catch (error) {
+      console.log('Error al cargar asignaciones del usuario', error);
+      this.idUsuariosAcceso = new Set();
+    }
+  }
+
+  private aplicarFiltroPorAsignacion(empleados: any[]): any[] {
+    if (!empleados || empleados.length === 0) return [];
+
+    // SUPERADMINISTRADOR: ve todos
+    if (this.rolEmpleado === 1) {
+      return empleados;
+    }
+
+    // Si no tiene asignaciones, no mostrar empleados
+    if (!this.idUsuariosAcceso || this.idUsuariosAcceso.size === 0) {
+      return [];
+    }
+
+    return empleados.filter((empleado: any) => {
+      const idEmpleado = Number(empleado.id ?? empleado.id_empleado);
+      return this.idUsuariosAcceso.has(idEmpleado);
+    });
   }
 
   // METODO PARA VERIFICAR SI EXISTE CONEXION A INTERNET
@@ -145,31 +199,36 @@ export class InformacionAdminPage implements OnInit {
   }
 
   // METODO PARA OBTENER LOS EMPLEADOS 
+  // METODO PARA OBTENER LOS EMPLEADOS 
   obtenerEmpleados() {
     this.relojService.obtenerUsuarioEmpresa().subscribe(
       res => {
-        this.empleados = res;
+        const empleados = res ?? [];
+
+        this.empleados = this.aplicarFiltroPorAsignacion(empleados);
+
         this.existenEmpleados = true;
         this.empleados_filtro = [...this.empleados];
-        if (this.empleados.length < 11) {
-          return this.ver = true;
-        } else {
-          return this.ver = false;
-        }
+
+        this.ver = this.empleados.length < 11;
       }
     );
-
   }
 
   // METODO QUE DEFINE EL COMPORTAMIENTO DEL BUSCADOR
+  // METODO QUE DEFINE EL COMPORTAMIENTO DEL BUSCADOR
   changeSearch(e: any) {
-    const query = e.detail.value;
-    const filtro = this.empleados.filter((o: any) => {
-      return o.fullname.toLowerCase().indexOf(query.toLowerCase()) > -1 ||
-        o.codigo.toLowerCase().indexOf(query.toLowerCase()) > -1 ||
-        o.cedula.toLowerCase().indexOf(query.toLowerCase()) > -1
-    })
-    this.empleados_filtro = filtro
+    const query = String(e?.detail?.value ?? '').toLowerCase();
+
+    this.empleados_filtro = this.empleados.filter((o: any) => {
+      const fullname = String(o.fullname ?? '').toLowerCase();
+      const codigo = String(o.codigo ?? '').toLowerCase();
+      const cedula = String(o.cedula ?? o.identificacion ?? '').toLowerCase();
+
+      return fullname.includes(query) ||
+        codigo.includes(query) ||
+        cedula.includes(query);
+    });
   }
 
   // METODO PARA REFRESCAR LA PAGINA

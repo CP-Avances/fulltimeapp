@@ -21,6 +21,7 @@ import { NotificacionPopoverComponent } from '../notificacion-popover/notificaci
 import { TimbresPerdidosComponent } from '../../pages/bienvenido/showTimbresGuardados.component';
 
 import { Notificacion, NotificacionTimbre } from '../../interfaces/Notificaciones';
+import { ParametrosService } from 'src/app/services/parametros.service';
 
 @Component({
   selector: 'app-navegador-admin',
@@ -83,6 +84,7 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
     private networkService: NetworkService,
     private socketService: SocketService,
     private notificacionesService: NotificacionesService,
+    private parametros: ParametrosService,
     private readonly ngZone: NgZone,
   ) { }
 
@@ -97,6 +99,8 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
 
     this.CargarContadorNotificaciones();
     this.EscucharNotificacionesTiempoReal();
+
+    this.ValidarPermisosRol();
   }
 
   ionViewWillEnter() {
@@ -108,6 +112,8 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
     this.networkSubscriber();
     this.VerificarFunciones();
     this.CargarContadorNotificaciones();
+
+    this.ValidarPermisosRol();
   }
 
   ngOnDestroy() {
@@ -333,6 +339,8 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
   }
 
   openAdmin() {
+    const activeElement = document.activeElement as HTMLElement | null;
+    activeElement?.blur();
     this.menu.enable(true, 'admin');
     this.menu.open('admin');
     this.VerificarFunciones();
@@ -360,5 +368,58 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
     });
 
     return await modal.present();
+  }
+
+
+  // CONTROL DE MENU DEACUERDO CON EL ROL
+  permisosRol = {
+    comunicados: false,
+    horarios: false,
+    justificarTimbres: false,
+    timbresEmpleados: false,
+    reporteTimbres: false
+  };
+
+  ValidarPermisosRol() {
+    const idRol = Number(localStorage.getItem('rol') ?? 0);
+
+    const datos = {
+      id_rol: idRol,
+      funciones: [
+        'Comunicados',
+        'Ver Horarios',
+        'Registrar Timbres',
+        'Ver Timbres',
+        'Reporte Timbres'
+      ]
+    };
+
+    this.parametros.ObtenerPermisosRoles(datos).subscribe({
+      next: (res: any[]) => {
+        this.permisosRol.comunicados = this.tienePermiso(res, 'Comunicados');
+        this.permisosRol.horarios = this.tienePermiso(res, 'Ver Horarios');
+        this.permisosRol.justificarTimbres = this.tienePermiso(res, 'Registrar Timbres');
+        this.permisosRol.timbresEmpleados = this.tienePermiso(res, 'Ver Timbres');
+        this.permisosRol.reporteTimbres = this.tienePermiso(res, 'Reporte Timbres');
+      },
+      error: (error) => {
+        console.log('Error al validar permisos del rol', error);
+
+        this.permisosRol = {
+          comunicados: false,
+          horarios: false,
+          justificarTimbres: false,
+          timbresEmpleados: false,
+          reporteTimbres: false
+        };
+      }
+    });
+  }
+
+  private tienePermiso(permisos: any[], funcion: string): boolean {
+    return permisos.some((item: any) =>
+      String(item.funcion ?? '').trim().toLowerCase() === funcion.trim().toLowerCase()
+      && item.permiso === true
+    );
   }
 }

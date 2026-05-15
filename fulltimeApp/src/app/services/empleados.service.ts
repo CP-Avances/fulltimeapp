@@ -64,4 +64,20 @@ export class EmpleadosService {
   accesoMovil(id_epleado: any) {
     return this.http.get<any>(`${this.apiUrlM}/usuarios/datos/${id_epleado}`);
   }
+
+  // METODO DE BUSQUEDA DE DATOS DE USUARIO - DEPARTAMENTOS - ASIGNACION DE INFORMACION **USADO**
+  BuscarUsuarioDepartamento(id_empleado: { id_empleado: number }) {
+    return this.http.post<any>(`${this.apiUrlM}/api/usuario-departamento/buscar-usuario-departamento`, id_empleado)
+      .pipe(map(datos => datos.data));
+  }
+
+  // METODO PARA OBTENER IDS USUARIOS MEDIANTE DEPARTAMENTO VIGENTE **USADO**
+  ObtenerIdUsuariosDepartamento(data: { id_departamento: number }) {
+    return this.http
+      .post<{ ok: boolean; data: { id: number }[] }>(
+        `${this.apiUrlM}/usuarios/buscar-ids-usuarios-departamento`,
+        data
+      )
+      .pipe(map(res => res.data ?? []));
+  }
 }

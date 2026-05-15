@@ -179,9 +179,7 @@ export class EnviartimbrePage implements OnInit {
       this.modulo_vacaciones = !!vacaciones;
       this.modulo_geolocalizacion = !!geolocalizacion;
 
-    } catch (error) {
-      console.log('Error al leer módulos:', error);
-
+    } catch {
       this.modulo_permisos = false;
       this.modulo_vacaciones = false;
       this.modulo_geolocalizacion = false;
@@ -247,9 +245,7 @@ export class EnviartimbrePage implements OnInit {
         );
       }
 
-    } catch (error) {
-      console.log('Error solicitando permiso de ubicación:', error);
-
+    } catch {
       this.abrirToas(
         'Ups!!! Al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.',
         'danger',
@@ -280,7 +276,6 @@ export class EnviartimbrePage implements OnInit {
         'middle'
       );
 
-      console.log('No se pudo obtener la posicion:', error);
     });
   }
 
@@ -453,9 +448,7 @@ export class EnviartimbrePage implements OnInit {
         this.nuevoTimbre.tipo_autenticacion = this.IDENTIFICACION_BIOMETRICA;
         this.guardarEnBDD();
       }
-    }).catch((error: any) => {
-      console.log(error);
-
+    }).catch(() => {
       this.abrirToas(
         'Ocurrió un error al autenticar del usuario. El timbre no se envió',
         'danger',

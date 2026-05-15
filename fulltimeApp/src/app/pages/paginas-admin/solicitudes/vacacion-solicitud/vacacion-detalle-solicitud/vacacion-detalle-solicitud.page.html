@@ -132,53 +132,30 @@
 
         <div class="acciones-detalle">
 
-          <ion-button
-            size="small"
-            color="success"
-            fill="outline"
-            (click)="editarSolicitud()">
+          <ion-button *ngIf="tienePermisoAccion('Solicitud Vacaciones', 'Editar Solicitud Vacación')" size="small"
+            color="success" fill="outline" (click)="editarSolicitud()">
             <ion-icon name="create-outline" slot="start"></ion-icon>
             Editar
           </ion-button>
 
-          <ion-button
-            size="small"
-            color="tertiary"
-            fill="outline"
-            [disabled]="imprimiendo"
+          <ion-button size="small" color="tertiary" fill="outline" [disabled]="imprimiendo"
             (click)="imprimirSolicitud()">
 
-            <ion-spinner
-              *ngIf="imprimiendo"
-              name="crescent"
-              slot="start">
+            <ion-spinner *ngIf="imprimiendo" name="crescent" slot="start">
             </ion-spinner>
 
-            <ion-icon
-              *ngIf="!imprimiendo"
-              name="print-outline"
-              slot="start">
+            <ion-icon *ngIf="!imprimiendo" name="print-outline" slot="start">
             </ion-icon>
 
             {{ imprimiendo ? 'Generando' : 'Imprimir' }}
           </ion-button>
 
-          <ion-button
-            size="small"
-            color="danger"
-            fill="outline"
-            [disabled]="eliminando"
-            (click)="eliminarSolicitud()">
-            <ion-spinner
-              *ngIf="eliminando"
-              name="crescent"
-              slot="start">
+          <ion-button *ngIf="tienePermisoAccion('Solicitud Vacaciones', 'Eliminar Solicitud Vacación')" size="small"
+            color="danger" fill="outline" [disabled]="eliminando" (click)="eliminarSolicitud()">
+            <ion-spinner *ngIf="eliminando" name="crescent" slot="start">
             </ion-spinner>
 
-            <ion-icon
-              *ngIf="!eliminando"
-              name="trash-outline"
-              slot="start">
+            <ion-icon *ngIf="!eliminando" name="trash-outline" slot="start">
             </ion-icon>
 
             {{ eliminando ? 'Eliminando' : 'Eliminar' }}

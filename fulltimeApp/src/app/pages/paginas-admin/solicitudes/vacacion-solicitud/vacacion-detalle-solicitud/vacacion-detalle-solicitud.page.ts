@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { AlertController, NavController, ToastController } from '@ionic/angular';
 import { VacacionesService } from 'src/app/services/vacaciones.service';
 import { ReportesMicroService } from 'src/app/services/reportes-micro.service';
+import { ParametrosService } from 'src/app/services/parametros.service';
+import { PermisosAccionesService } from 'src/app/services/permisos-acciones.service';
 
 @Component({
   selector: 'app-vacacion-detalle-solicitud',
@@ -21,10 +23,11 @@ export class VacacionDetalleSolicitudPage implements OnInit {
     private alertController: AlertController,
     private vacacionesService: VacacionesService,
     private navCtrl: NavController,
-    private reportes: ReportesMicroService
+    private reportes: ReportesMicroService,
+    private permisosAcciones: PermisosAccionesService
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.imprimirLocalStorage();
     const navigation = this.router.getCurrentNavigation();
     this.solicitud = navigation?.extras?.state?.['solicitud'];
@@ -38,6 +41,8 @@ export class VacacionDetalleSolicitudPage implements OnInit {
       this.mostrarToast('No se encontró la información de la solicitud.', 'warning');
       this.regresar();
     }
+
+    await this.cargarPermisosAcciones();
   }
 
   imprimirLocalStorage() {
@@ -309,5 +314,33 @@ export class VacacionDetalleSolicitudPage implements OnInit {
     });
 
     await toast.present();
+  }
+
+
+
+  // CONTROL DE BOTONES
+  async cargarPermisosAcciones() {
+    await this.permisosAcciones.cargarAccionesRol([
+      {
+        pagina: 'Solicitud Permisos',
+        accion: 'Editar Solicitud Permiso'
+      },
+      {
+        pagina: 'Solicitud Permisos',
+        accion: 'Eliminar Solicitud Permiso'
+      },
+      {
+        pagina: 'Solicitud Vacaciones',
+        accion: 'Editar Solicitud Vacación'
+      },
+      {
+        pagina: 'Solicitud Vacaciones',
+        accion: 'Eliminar Solicitud Vacación'
+      }
+    ]);
+  }
+
+  tienePermisoAccion(pagina: string, accion: string): boolean {
+    return this.permisosAcciones.tienePermisoAccion(pagina, accion);
   }
 }

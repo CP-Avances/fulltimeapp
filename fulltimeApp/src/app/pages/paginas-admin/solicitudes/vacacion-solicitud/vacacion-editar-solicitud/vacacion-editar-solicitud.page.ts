@@ -401,8 +401,7 @@ export class VacacionEditarSolicitudPage implements OnInit {
             this.mensajeVerificacion = 'La solicitud pasó la verificación correctamente.';
             this.verificacionRealizada = true;
           },
-          error: (errExiste) => {
-            console.error('Error verificando solicitud existente:', errExiste);
+          error: () => {
             this.estadoVerificacion = 'error';
             this.mensajeVerificacion = 'No fue posible validar si ya existe una solicitud en ese rango.';
             this.verificacionRealizada = true;
@@ -468,7 +467,6 @@ export class VacacionEditarSolicitudPage implements OnInit {
         this.procesarDocumentoDespuesActualizar(solicitudActualizada);
       },
       error: (err) => {
-        console.error('Error actualizando solicitud:', err);
         this.actualizando = false;
         this.mostrarToast(err?.message || 'Ocurrió un error al actualizar la solicitud.', 'danger');
       }

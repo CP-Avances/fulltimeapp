@@ -105,8 +105,7 @@ export class PermisoCriterioBusquedaPage implements OnInit {
         this.cargando = false;
         this.mostrarFormularioBusqueda = false;
       },
-      error: (err) => {
-        console.error('Error consultando solicitudes de permiso:', err);
+      error: () => {
         this.cargando = false;
         this.mostrarToast('No se pudieron consultar las solicitudes de permiso.', 'danger');
       }

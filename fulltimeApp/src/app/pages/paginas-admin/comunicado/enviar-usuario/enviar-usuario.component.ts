@@ -4,6 +4,7 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
+import { AsignacionesMovilService } from 'src/app/services/asignaciones-movil.services';
 
 interface CheckOptions {
   valor: number;
@@ -83,6 +84,7 @@ export class EnviarUsuarioComponent implements OnInit {
   verDepartamento = true;
   verSucursal = true;
   verRol = true;
+  rolEmpleado = 0;
 
   public maxSize = 5;
   public directionLinks = true;
@@ -102,11 +104,15 @@ export class EnviarUsuarioComponent implements OnInit {
     public restN: NotificacionesService,
     public toastController: ToastController,
     public validar: ValidacionesService,
+    private readonly asignacionesMovil: AsignacionesMovilService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
   }
 
   ngOnInit(): void {
+
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') ?? '0', 10);
+
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
@@ -115,6 +121,16 @@ export class EnviarUsuarioComponent implements OnInit {
 
     this.loadingEmpleado = true;
     this.requestNotificationPermission();
+  }
+
+  private async cargarAsignacionesUsuario(): Promise<void> {
+    if (!this.idEmpleado) return;
+
+    try {
+      await this.asignacionesMovil.ObtenerAsignacionesUsuario(this.idEmpleado);
+    } catch (error) {
+      console.log('Error al cargar asignaciones del usuario', error);
+    }
   }
 
   // METODO PARA SOLICITAR EL PERMISO DE NOTIFICACIONES LOCALES AL DISPOSITIVO
@@ -138,12 +154,30 @@ export class EnviarUsuarioComponent implements OnInit {
   // ==============================
 
   private cargarDatosGenerales(callback: () => void) {
-    this.restN.BuscarDatosGenerales().subscribe({
-      next: (res: any[]) => {
+    this.restN.BuscarDatosGeneralesComunicados().subscribe({
+      next: async (res: any[]) => {
         this.limpiarListas();
 
-        this.empleados = res.map((obj: any) => this.mapEmpleado(obj));
-        sessionStorage.setItem('datos_comunicado', JSON.stringify(this.empleados));
+        let empleadosMapeados = res.map((obj: any) => this.mapEmpleado(obj));
+
+        if (this.rolEmpleado !== 1) {
+          if (!this.asignacionesMovil.tieneEstadoCargado()) {
+            await this.asignacionesMovil.ObtenerAsignacionesUsuario(this.idEmpleado);
+          }
+
+          empleadosMapeados = this.asignacionesMovil.filtrarDatosGenerales(
+            empleadosMapeados,
+            this.rolEmpleado,
+            this.idEmpleado
+          );
+        }
+
+        this.empleados = empleadosMapeados;
+
+        sessionStorage.setItem(
+          'datos_comunicado',
+          JSON.stringify(this.empleados)
+        );
 
         callback();
 
@@ -178,6 +212,7 @@ export class EnviarUsuarioComponent implements OnInit {
       id_cargo: obj.id_cargo,
       id_contrato: obj.id_contrato,
       sucursal: obj.name_suc,
+      departamento: obj.name_dep,
       rol: obj.name_rol,
       id_rol: obj.id_rol,
       id_suc: obj.id_suc,
@@ -355,14 +390,6 @@ export class EnviarUsuarioComponent implements OnInit {
   // ==============================
   // RADIO BUTTONS
   // ==============================
-
-  checkValue(event: any) {
-    console.log('Selected value: ', this.selectedValue);
-  }
-
-  print(event: any) {
-    console.log(this.checkValue(event));
-  }
 
   showValue() {
     this.loadingEmpleado = false;
@@ -567,9 +594,6 @@ export class EnviarUsuarioComponent implements OnInit {
         } else {
           this.EnviarCorreo(this.info_correo);
         }
-      },
-      error: () => {
-        console.log('Error al enviar mensaje general');
       }
     });
   }

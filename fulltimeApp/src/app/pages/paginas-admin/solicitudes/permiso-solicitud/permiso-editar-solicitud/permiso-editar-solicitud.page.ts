@@ -121,8 +121,7 @@ export class PermisoEditarSolicitudPage implements OnInit {
         this.cargarDatosEnFormulario();
         this.cargando = false;
       },
-      error: (err) => {
-        console.error('Error cargando detalle de permiso:', err);
+      error: () => {
         this.cargando = false;
         this.mostrarToast('No se pudo cargar el detalle de la solicitud.', 'danger');
       }
@@ -237,8 +236,7 @@ export class PermisoEditarSolicitudPage implements OnInit {
           this.cargarSaldoVacacionesPermiso();
         }
       },
-      error: (err) => {
-        console.error('Error cargando tipos de permiso:', err);
+      error: () => {
         this.tiposPermiso = [];
         this.cargandoTipos = false;
       }
@@ -253,8 +251,7 @@ export class PermisoEditarSolicitudPage implements OnInit {
         this.feriados = Array.isArray(data) ? data : [];
         this.cargandoFeriados = false;
       },
-      error: (err) => {
-        console.error('Error cargando feriados:', err);
+      error: () => {
         this.feriados = [];
         this.cargandoFeriados = false;
       }
@@ -557,8 +554,7 @@ export class PermisoEditarSolicitudPage implements OnInit {
 
         this.calcularTiempoPermiso(payload);
       },
-      error: (err) => {
-        console.error('Error verificando permiso:', err);
+      error: () => {
         this.finalizarVerificacion('error', 'Ocurrió un error al verificar la solicitud.');
       }
     });
@@ -596,8 +592,7 @@ export class PermisoEditarSolicitudPage implements OnInit {
 
         this.finalizarVerificacion('ok', 'La solicitud pasó la verificación correctamente.');
       },
-      error: (err) => {
-        console.error('Error calculando tiempo de permiso:', err);
+      error: () => {
         this.finalizarVerificacion('error', 'La solicitud fue verificada, pero no se pudo calcular el tiempo.');
       }
     });
@@ -669,8 +664,7 @@ export class PermisoEditarSolicitudPage implements OnInit {
         this.mostrarToast('Solicitud de permiso actualizada correctamente.', 'success');
         this.regresarBusquedaPermisos();
       },
-      error: (err) => {
-        console.error('Error actualizando permiso:', err);
+      error: () => {
         this.guardando = false;
         this.mostrarToast('No se pudo actualizar la solicitud de permiso.', 'danger');
       }
@@ -698,8 +692,7 @@ export class PermisoEditarSolicitudPage implements OnInit {
         this.mostrarToast('Solicitud y documento actualizados correctamente.', 'success');
         this.regresarBusquedaPermisos();
       },
-      error: (err) => {
-        console.error('Error subiendo documento:', err);
+      error: () => {
         this.guardando = false;
         this.mostrarToast('La solicitud se actualizó, pero ocurrió un error al subir el documento.', 'warning');
         this.regresarBusquedaPermisos();
@@ -789,8 +782,7 @@ export class PermisoEditarSolicitudPage implements OnInit {
         this.saldoVacacionesVisible = tiempoEmpleado?.saldoVacacionesTexto || '—';
         this.cargandoSaldo = false;
       },
-      error: (err) => {
-        console.error('Error cargando saldo de vacaciones para permiso:', err);
+      error: () => {
         this.saldoVacacionesVisible = '—';
         this.cargandoSaldo = false;
       }
