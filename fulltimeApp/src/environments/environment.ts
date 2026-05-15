@@ -4,9 +4,9 @@
 
 export const environment = {
   production: false,
-  urlMultitenant: 'http://localhost:3011',
+  urlMultitenant: 'https://conexionfulltime.fulltime.com.ec',
   reportesURL: 'https://reportesfulltime.fulltime.com.ec/api/reporte',
-  socketUrl: 'http://localhost:3011',
+  socketUrl: 'https://conexionfulltime.fulltime.com.ec',
 
 };
 

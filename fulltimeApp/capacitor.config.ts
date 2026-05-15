@@ -7,7 +7,7 @@ const config: CapacitorConfig = {
   webDir: 'www',
   bundledWebRuntime: false,
   server: {
-    androidScheme: 'http'
+    androidScheme: 'https'
   },
   plugins: {
     Keyboard: {
