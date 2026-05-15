@@ -48,8 +48,8 @@
 
     </ion-card>
 
-    <ng-container *ngFor="let noti of notificacionesAll | paginate: { itemsPerPage: 10, currentPage: pageActual }">
-
+    <ng-container
+      *ngFor="let noti of notificacionesAll | paginate: { itemsPerPage: itemsPerPage, currentPage: pageActual }">
       <ion-card *ngIf="CambiarEstiloNotificacion[noti.tipo]" (click)="AbrirNoti(noti)" [ngStyle]="{
           'background': noti.visto
             ? 'rgb(226, 226, 226)'
@@ -160,7 +160,7 @@
 
     </ng-container>
 
-    <ion-item style="font-size: 80%; margin: 1% 0%;" *ngIf="notificacionesAll.length > 10">
+    <ion-item style="font-size: 80%; margin: 1% 0%;" *ngIf="notificacionesAll.length > itemsPerPage">
       <pagination-controls class="paginacion" (pageChange)="pageActual = $event" [maxSize]="maxSize"
         [directionLinks]="directionLinks" [responsive]="responsive" [autoHide]="autoHide"
         [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"

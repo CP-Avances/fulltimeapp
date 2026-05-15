@@ -100,7 +100,12 @@ export class NotificacionPopoverComponent implements OnInit {
   }
 
   // METODO PARA AGREGAR NOTIFICACION EN TIEMPO REAL SIN DUPLICAR
+  // METODO PARA AGREGAR NOTIFICACION EN TIEMPO REAL SIN DUPLICAR
   agregarNotificacionTiempoReal(noti: any) {
+
+    // SOLO MOSTRAR NOTIFICACIONES NO VISTAS
+    if (noti.visto === true) return;
+
     const existe = this.notificacionesAll.some((n: any) =>
       Number(n.id) === Number(noti.id) &&
       Number(n.tipo) === Number(noti.tipo)
@@ -110,13 +115,9 @@ export class NotificacionPopoverComponent implements OnInit {
 
     this.notificacionesAll.unshift(noti);
 
-    if (this.notificacionesAll.length > 10) {
-      this.notificacionesAll.pop();
-    }
+    this.notificacionesAll = this.notificacionesAll.slice(0, 10);
 
-    if (noti.visto === false) {
-      this.countNoti += 1;
-    }
+    this.countNoti = this.notificacionesAll.length;
 
     this.cdr.detectChanges();
   }
@@ -196,16 +197,16 @@ export class NotificacionPopoverComponent implements OnInit {
   }
 
   // ACTUALIZA LOCALMENTE LA NOTIFICACION COMO VISTA
+  // ACTUALIZA LOCALMENTE LA NOTIFICACION COMO VISTA Y LA QUITA DEL POPOVER
   actualizarVistaLocal(id: number) {
-    const noti = this.notificacionesAll.find((n: any) => Number(n.id) === Number(id));
 
-    if (noti && noti.visto === false) {
-      noti.visto = true;
+    this.notificacionesAll = this.notificacionesAll.filter((n: any) =>
+      Number(n.id) !== Number(id)
+    );
 
-      if (this.countNoti > 0) {
-        this.countNoti -= 1;
-      }
-    }
+    this.countNoti = this.notificacionesAll.length;
+
+    this.cdr.detectChanges();
   }
 
   // METODO PARA ABRIR EL MODAL DE LISTA DE NOTIFICACIONES
@@ -297,18 +298,20 @@ export class NotificacionPopoverComponent implements OnInit {
   }
 
   // AGREGA NOTIFICACIONES INICIALES A LA LISTA GENERAL
+  // AGREGA NOTIFICACIONES INICIALES A LA LISTA GENERAL
   agregarNotificacionesALista(notificaciones: any[]) {
+
     notificaciones.forEach((noti: any) => {
+
+      // SOLO MOSTRAR NOTIFICACIONES NO VISTAS
+      if (noti.visto === true) return;
+
       const existe = this.notificacionesAll.some((n: any) =>
         Number(n.id) === Number(noti.id) &&
         Number(n.tipo) === Number(noti.tipo)
       );
 
       if (!existe) {
-        if (noti.visto === false) {
-          this.countNoti += 1;
-        }
-
         this.notificacionesAll.push(noti);
       }
     });
@@ -321,6 +324,9 @@ export class NotificacionPopoverComponent implements OnInit {
     });
 
     this.notificacionesAll = this.notificacionesAll.slice(0, 10);
+
+    // EL CONTADOR SERÁ IGUAL A LAS NOTIFICACIONES NO VISTAS MOSTRADAS
+    this.countNoti = this.notificacionesAll.length;
   }
 
   // METODO PARA FORMATEAR LOS DATOS SEGUN EL TIPO DE NOTIFICACION
