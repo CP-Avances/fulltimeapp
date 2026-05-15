@@ -11,6 +11,7 @@ import {
   CameraResultType,
   CameraSource
 } from '@capacitor/camera';
+import { firstValueFrom } from 'rxjs';
 import { timeout } from 'rxjs/operators';
 
 import { Timbre } from '../../interfaces/Timbre';
@@ -39,7 +40,6 @@ export class EnviartimbrePage implements OnInit {
   foto_obligatorio: boolean = false;
   desconocida: boolean = false;
   especial: boolean = false;
-
   requiereInternet: boolean = false;
 
   timbrarSinInternet: string = 'No';
@@ -141,13 +141,12 @@ export class EnviartimbrePage implements OnInit {
     this.nombre_usuario = localStorage.getItem('nom') ?? '';
     this.apellido_usuario = localStorage.getItem('ap') ?? '';
 
+    this.ubicacion = localStorage.getItem('storageUbicacion') ?? '';
+
     this.nombreInfo_timbre = this.activateRoute.snapshot.paramMap.get('idTimbre') ?? '';
     this.nombre_timbre = this.nombreInfo_timbre.toUpperCase();
 
     this.obtenerIdCelular();
-
-    this.BuscarParametros();
-    this.BuscarOpcionMarcacion();
 
     this.fechaHoraService.fechaHora$.subscribe(async (fechaHora) => {
       const data = await fechaHora;
@@ -159,7 +158,15 @@ export class EnviartimbrePage implements OnInit {
       this.gmtDispositivo = data.gmtDispositivo;
     });
 
+    await this.BuscarParametros();
+    await this.BuscarOpcionMarcacion();
     await this.solicitarPermisosIniciales();
+
+    /**
+     * IMPORTANTE:
+     * Aquí ya se valida y se muestra la ubicación ANTES de presionar Continuar.
+     */
+    await this.actualizarUbicacionAntesDeContinuar();
   }
 
   // ============================================================
@@ -328,11 +335,12 @@ export class EnviartimbrePage implements OnInit {
       return;
     }
 
-    this.obtenerPosicionWeb();
+    await this.obtenerPosicionWeb();
   }
 
   async requestLocationPermission() {
     await this.solicitarPermisoUbicacionInicial();
+    await this.actualizarUbicacionAntesDeContinuar();
   }
 
   async obtenerPosicion() {
@@ -348,8 +356,16 @@ export class EnviartimbrePage implements OnInit {
       this.geoLongitude = resp.coords.longitude;
       this.geoLatitude = resp.coords.latitude;
 
+      console.log('Coordenadas obtenidas:', {
+        latitud: this.geoLatitude,
+        longitud: this.geoLongitude
+      });
+
     } catch (error) {
       console.log('Error al obtener coordenadas:', error);
+
+      this.geoLatitude = 0;
+      this.geoLongitude = 0;
 
       await this.abrirToas(
         'Ups!!! No se ha obtenido coordenadas de ubicación.',
@@ -363,42 +379,52 @@ export class EnviartimbrePage implements OnInit {
     }
   }
 
-  obtenerPosicionWeb() {
+  obtenerPosicionWeb(): Promise<void> {
     this.cargandoPosicion = true;
 
-    if (!navigator.geolocation) {
-      this.geoLatitude = -0.180653;
-      this.geoLongitude = -78.467834;
-      this.cargandoPosicion = false;
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        this.geoLatitude = position.coords.latitude;
-        this.geoLongitude = position.coords.longitude;
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        this.geoLatitude = 0;
+        this.geoLongitude = 0;
         this.cargandoPosicion = false;
-      },
-      (error) => {
-        console.warn('No se pudo obtener ubicación en navegador:', error);
-
-        this.geoLatitude = -0.180653;
-        this.geoLongitude = -78.467834;
-        this.cargandoPosicion = false;
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
+        resolve();
+        return;
       }
-    );
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          this.geoLatitude = position.coords.latitude;
+          this.geoLongitude = position.coords.longitude;
+          this.cargandoPosicion = false;
+          resolve();
+        },
+        (error) => {
+          console.warn('No se pudo obtener ubicación en navegador:', error);
+
+          this.geoLatitude = 0;
+          this.geoLongitude = 0;
+          this.cargandoPosicion = false;
+          resolve();
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    });
   }
 
-  refrescoEspecial() {
+  async refrescoEspecial() {
     this.cargandoPosicion = false;
     this.geoLatitude = 0;
     this.geoLongitude = 0;
-    this.comprobarGPS();
+    this.ubicacion = '';
+    this.storageUbica = '';
+    localStorage.removeItem('storageUbicacion');
+
+    await this.comprobarGPS();
+    await this.actualizarUbicacionAntesDeContinuar();
   }
 
   // ============================================================
@@ -633,24 +659,51 @@ export class EnviartimbrePage implements OnInit {
         );
       }
 
-      await this.iniciarProcesoFoto();
-      return;
+      if (!this.geoLatitude || !this.geoLongitude) {
+        await this.obtenerPosicion();
+      }
+    } else {
+      console.log('Probando timbre desde navegador web');
+
+      this.abrirToas(
+        'Prueba desde navegador: no se usará autenticación biométrica.',
+        'warning',
+        2000,
+        'middle'
+      );
+
+      this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
+
+      if (!this.geoLatitude || !this.geoLongitude) {
+        await this.obtenerPosicionWeb();
+      }
     }
 
-    console.log('Probando timbre desde navegador web');
+    /**
+     * Antes de continuar, volvemos a validar la ubicación.
+     * Así no se envía el timbre con ubicación vacía.
+     */
+    await this.actualizarUbicacionAntesDeContinuar();
 
-    this.abrirToas(
-      'Prueba desde navegador: no se usará autenticación biométrica.',
-      'warning',
-      2000,
-      'middle'
-    );
+    if (!this.ubicacion) {
+      return this.abrirToas(
+        'No se pudo validar la ubicación. Intente refrescar la pantalla.',
+        'warning',
+        4000,
+        'middle'
+      );
+    }
 
-    this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
-
-    if (!this.geoLatitude || !this.geoLongitude) {
-      this.geoLatitude = -0.180653;
-      this.geoLongitude = -78.467834;
+    if (
+      this.ubicacion === 'DESCONOCIDO' &&
+      this.desconocida !== true
+    ) {
+      return this.abrirToas(
+        'Timbre con ubicación desconocida. No permitido.',
+        'danger',
+        5000,
+        'middle'
+      );
     }
 
     await this.iniciarProcesoFoto();
@@ -696,7 +749,7 @@ export class EnviartimbrePage implements OnInit {
     this.numeroCaracteres = this.nuevoTimbre.observacion?.length ?? 0;
   }
 
-  guardarEnBDD() {
+  async guardarEnBDD() {
     const fechaHoraTimbre = this.formatearFechaTimbreParaBackend(this.fechaHora);
 
     if (!fechaHoraTimbre) {
@@ -708,13 +761,25 @@ export class EnviartimbrePage implements OnInit {
       );
     }
 
+    const teclaFuncion = this.obtenerIdTipo();
+
     this.nuevoTimbre.codigo = this.codigo;
     this.nuevoTimbre.fec_hora_timbre = fechaHoraTimbre;
+
     this.nuevoTimbre.zona_dispositivo = this.zonaHoraria;
-    this.nuevoTimbre.tecl_funcion = this.obtenerIdTipo();
+    this.nuevoTimbre.zona_horaria_dispositivo = this.zonaHoraria;
+
+    this.nuevoTimbre.tecl_funcion = teclaFuncion;
+    this.nuevoTimbre.tecla_funcion = teclaFuncion;
+
     this.nuevoTimbre.imagen = this.imagen || null;
     this.nuevoTimbre.capturar_segundos = this.capturar_segundos;
     this.nuevoTimbre.gmt_dispositivo = this.gmtDispositivo;
+
+    this.nuevoTimbre.latitud = this.geoLatitude ? String(this.geoLatitude) : '0';
+    this.nuevoTimbre.longitud = this.geoLongitude ? String(this.geoLongitude) : '0';
+
+    this.nuevoTimbre.ubicacion = this.ubicacion || 'Sin Ubicación';
 
     if (this.nuevoTimbre.accion === 'HA' && !this.nuevoTimbre.observacion) {
       return this.abrirToas(
@@ -728,18 +793,10 @@ export class EnviartimbrePage implements OnInit {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
 
     if (this.isConnected === true) {
-      this.nuevoTimbre.latitud = this.geoLatitude ? String(this.geoLatitude) : '0';
-      this.nuevoTimbre.longitud = this.geoLongitude ? String(this.geoLongitude) : '0';
       this.nuevoTimbre.conexion = true;
       this.nuevoTimbre.novedades_conexion = 'Sin problemas de conexión';
 
-      this.ValidarModulo(
-        this.geoLatitude,
-        this.geoLongitude,
-        this.rango,
-        this.nuevoTimbre
-      );
-
+      this.EnviarDatos(this.nuevoTimbre);
       return;
     }
 
@@ -754,21 +811,25 @@ export class EnviartimbrePage implements OnInit {
       return this.router.navigate(['/login']);
     }
 
-    this.nuevoTimbre.latitud = this.geoLatitude ? String(this.geoLatitude) : '0';
-    this.nuevoTimbre.longitud = this.geoLongitude ? String(this.geoLongitude) : '0';
-    this.nuevoTimbre.ubicacion = 'Sin Ubicación';
-    this.storageUbica = this.nuevoTimbre.ubicacion;
+    this.nuevoTimbre.ubicacion = this.ubicacion || 'Sin Ubicación';
+    this.actualizarUbicacionPantalla(this.nuevoTimbre.ubicacion);
+
     this.nuevoTimbre.conexion = false;
     this.nuevoTimbre.novedades_conexion = 'Falló conexión al Internet';
 
     this.guardarTimbreStorage(this.nuevoTimbre);
-    localStorage.setItem('storageUbicacion', this.storageUbica);
   }
 
   formatearFechaTimbreParaBackend(fecha: any): string {
     if (!fecha) return '';
 
-    const fechaDate = new Date(fecha);
+    let fechaDate: Date;
+
+    if (typeof fecha === 'string' && fecha.includes(' ') && fecha.includes('-')) {
+      fechaDate = new Date(fecha.replace(' ', 'T'));
+    } else {
+      fechaDate = new Date(fecha);
+    }
 
     if (isNaN(fechaDate.getTime())) {
       return '';
@@ -804,7 +865,7 @@ export class EnviartimbrePage implements OnInit {
   // PARÁMETROS
   // ============================================================
 
-  BuscarParametros() {
+  async BuscarParametros() {
     this.rango = 0;
     this.capturar_segundos = false;
 
@@ -813,29 +874,26 @@ export class EnviartimbrePage implements OnInit {
       ParametrosSistema.CONSIDERAR_SEGUNDOS_MARCACIONES
     ];
 
-    this.restP.ObtenerFormatos(detalles).subscribe({
-      next: (res: any[]) => {
-        res.forEach((p: any) => {
+    try {
+      const res: any[] = await firstValueFrom(this.restP.ObtenerFormatos(detalles));
 
-          if (p.id_parametro === ParametrosSistema.TOLERANCIA_UBICACION) {
-            this.rango = Number(p.descripcion);
-          }
+      res.forEach((p: any) => {
+        if (p.id_parametro === ParametrosSistema.TOLERANCIA_UBICACION) {
+          this.rango = Number(p.descripcion);
+        }
 
-          if (p.id_parametro === ParametrosSistema.CONSIDERAR_SEGUNDOS_MARCACIONES) {
-            this.capturar_segundos = p.descripcion === 'Si';
-          }
+        if (p.id_parametro === ParametrosSistema.CONSIDERAR_SEGUNDOS_MARCACIONES) {
+          this.capturar_segundos = p.descripcion === 'Si';
+        }
+      });
 
-        });
-
-      },
-      error: () => {
-        this.rango = 0;
-        this.capturar_segundos = false;
-      }
-    });
+    } catch {
+      this.rango = 0;
+      this.capturar_segundos = false;
+    }
   }
 
-  BuscarOpcionMarcacion() {
+  async BuscarOpcionMarcacion() {
     const empleadoID = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
 
     const buscar = {
@@ -848,38 +906,37 @@ export class EnviartimbrePage implements OnInit {
     this.especial = false;
     this.requiereInternet = false;
 
-    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe({
-      next: async (res: any) => {
-        const parametro = res.data?.[0] ?? res.respuesta?.[0];
+    try {
+      const res: any = await firstValueFrom(this.parametros.ObtenerDetalleParametroUsuario(buscar));
 
-        if (!parametro) {
-          this.guardarParametrosMarcacionEnLocalStorage();
-          return;
-        }
+      const parametro = res.data?.[0] ?? res.respuesta?.[0];
 
-        this.foto = !!parametro.timbre_foto;
-        this.foto_obligatorio = !!parametro.opcional_obligatorio;
-        this.desconocida = !!parametro.timbre_ubicacion_desconocida;
-        this.especial = !!parametro.timbre_especial;
-        this.requiereInternet = !!parametro.timbre_internet;
-
+      if (!parametro) {
         this.guardarParametrosMarcacionEnLocalStorage();
-
-        if (this.platform.is('hybrid') && this.foto === true) {
-          await this.solicitarPermisoCamara();
-        }
-
-      },
-      error: () => {
-        this.foto = false;
-        this.foto_obligatorio = false;
-        this.desconocida = false;
-        this.especial = false;
-        this.requiereInternet = false;
-
-        this.guardarParametrosMarcacionEnLocalStorage();
+        return;
       }
-    });
+
+      this.foto = !!parametro.timbre_foto;
+      this.foto_obligatorio = !!parametro.opcional_obligatorio;
+      this.desconocida = !!parametro.timbre_ubicacion_desconocida;
+      this.especial = !!parametro.timbre_especial;
+      this.requiereInternet = !!parametro.timbre_internet;
+
+      this.guardarParametrosMarcacionEnLocalStorage();
+
+      if (this.platform.is('hybrid') && this.foto === true) {
+        await this.solicitarPermisoCamara();
+      }
+
+    } catch {
+      this.foto = false;
+      this.foto_obligatorio = false;
+      this.desconocida = false;
+      this.especial = false;
+      this.requiereInternet = false;
+
+      this.guardarParametrosMarcacionEnLocalStorage();
+    }
   }
 
   guardarParametrosMarcacionEnLocalStorage() {
@@ -898,10 +955,146 @@ export class EnviartimbrePage implements OnInit {
   // UBICACIÓN / PERÍMETROS
   // ============================================================
 
+  actualizarUbicacionPantalla(valor: string) {
+    this.ubicacion = valor;
+    this.storageUbica = valor;
+    localStorage.setItem('storageUbicacion', valor);
+  }
+
+  async actualizarUbicacionAntesDeContinuar() {
+    this.cargandoPosicion = true;
+
+    try {
+      this.actualizarUbicacionPantalla('Validando ubicación...');
+
+      if (!this.geoLatitude || !this.geoLongitude) {
+        if (this.platform.is('hybrid')) {
+          await this.obtenerPosicion();
+        } else {
+          await this.obtenerPosicionWeb();
+        }
+      }
+
+      if (!this.geoLatitude || !this.geoLongitude) {
+        this.actualizarUbicacionPantalla('Sin Ubicación');
+        return;
+      }
+
+      const ubicacionCalculada = await this.calcularUbicacionActual(
+        this.geoLatitude,
+        this.geoLongitude,
+        this.rango
+      );
+
+      this.actualizarUbicacionPantalla(ubicacionCalculada);
+
+    } catch (error) {
+      console.log('Error validando ubicación antes de continuar:', error);
+      this.actualizarUbicacionPantalla('Sin Ubicación');
+    } finally {
+      this.cargandoPosicion = false;
+    }
+  }
+
+  async calcularUbicacionActual(latitud: any, longitud: any, rango: any): Promise<string> {
+    if (this.modulo_geolocalizacion !== true) {
+      return 'DESCONOCIDO';
+    }
+
+    const informacion: any = {
+      lat1: String(latitud ?? '0'),
+      lng1: String(longitud ?? '0'),
+      lat2: '',
+      lng2: '',
+      valor: rango
+    };
+
+    const ubicacionPermitida = await this.buscarUbicacionPermitida(informacion);
+
+    if (ubicacionPermitida) {
+      return ubicacionPermitida;
+    }
+
+    const domicilio = await this.buscarUbicacionDomicilio(informacion);
+
+    if (domicilio) {
+      return domicilio;
+    }
+
+    if (this.desconocida === true) {
+      return 'DESCONOCIDO';
+    }
+
+    return 'Sin Ubicación';
+  }
+
+  async buscarUbicacionPermitida(informacion: any): Promise<string> {
+    try {
+      const res: any = await firstValueFrom(this.restP.ObtenerUbicacionUsuario(this.id_usuario));
+      const datosUbicacion: any[] = res.data ?? res ?? [];
+
+      if (!datosUbicacion || datosUbicacion.length === 0) {
+        return '';
+      }
+
+      for (const obj of datosUbicacion) {
+        informacion.lat2 = obj.latitud;
+        informacion.lng2 = obj.longitud;
+
+        const estaDentro = await this.validarCoordenadas(informacion);
+
+        if (estaDentro) {
+          return obj.descripcion ?? 'Ubicación Permitida';
+        }
+      }
+
+      return '';
+
+    } catch (error) {
+      console.log('Error buscando ubicación permitida:', error);
+      return '';
+    }
+  }
+
+  async buscarUbicacionDomicilio(informacion: any): Promise<string> {
+    try {
+      const res: any = await firstValueFrom(this.restE.ObtenerUbicacion(this.id_usuario));
+      const domicilio = res.data?.[0] ?? res?.[0];
+
+      if (!domicilio?.latitud || !domicilio?.longitud) {
+        return '';
+      }
+
+      informacion.lat2 = domicilio.latitud;
+      informacion.lng2 = domicilio.longitud;
+
+      const estaDentro = await this.validarCoordenadas(informacion);
+
+      return estaDentro ? 'DOMICILIO' : '';
+
+    } catch (error) {
+      console.log('Error buscando ubicación domicilio:', error);
+      return '';
+    }
+  }
+
+  async validarCoordenadas(informacion: any): Promise<boolean> {
+    try {
+      const res: any = await firstValueFrom(this.restP.ObtenerCoordenadas(informacion));
+      const resultado = res.data?.[0] ?? res?.[0];
+
+      return resultado?.verificar === 'ok';
+
+    } catch (error) {
+      console.log('Error comparando coordenadas:', error);
+      return false;
+    }
+  }
+
   PermitirUbicacionDesconocida(timbre: any, guardarSinServidor: boolean = false) {
     if (this.desconocida === true) {
       timbre.ubicacion = 'DESCONOCIDO';
-      this.storageUbica = timbre.ubicacion;
+      this.actualizarUbicacionPantalla(timbre.ubicacion);
 
       if (guardarSinServidor) {
         this.GuardartimbresinServidor(timbre);
@@ -929,136 +1122,12 @@ export class EnviartimbrePage implements OnInit {
     return this.router.navigate(['/login']);
   }
 
-  CompararCoordenadas(informacion: any, timbre: any, descripcion: any, data: any) {
-    this.restP.ObtenerCoordenadas(informacion).subscribe({
-      next: (res: any) => {
-
-        if (res.data[0].verificar === 'ok') {
-          this.contar = this.contar + 1;
-          this.ubicacion = descripcion;
-
-          if (this.contar === 1) {
-            timbre.ubicacion = this.ubicacion;
-            this.storageUbica = timbre.ubicacion;
-
-            this.abrirToas(
-              'Timbre realizado dentro del perímetro definido como ' + this.ubicacion + '.',
-              'primary',
-              3000,
-              'top'
-            );
-
-            this.EnviarDatos(timbre);
-          }
-        } else {
-          this.sin_ubicacion = this.sin_ubicacion + 1;
-
-          if (this.sin_ubicacion === data.length) {
-            this.ValidarDomicilio(informacion, timbre);
-          }
-        }
-      },
-      error: () => {
-        this.PermitirUbicacionDesconocida(timbre);
-      }
-    });
-  }
-
-  BuscarUbicacion(latitud: any, longitud: any, rango: any, timbre: any) {
-    let datosUbicacion: any[] = [];
-    this.contar = 0;
-    this.sin_ubicacion = 0;
-
-    const informacion: any = {
-      lat1: String(latitud),
-      lng1: String(longitud),
-      lat2: '',
-      lng2: '',
-      valor: rango
-    };
-
-    this.restP.ObtenerUbicacionUsuario(this.id_usuario).subscribe({
-      next: (res: any) => {
-        datosUbicacion = res.data ?? res ?? [];
-
-        if (datosUbicacion.length !== 0) {
-          datosUbicacion.forEach((obj: any) => {
-            informacion.lat2 = obj.latitud;
-            informacion.lng2 = obj.longitud;
-
-            this.CompararCoordenadas(
-              informacion,
-              timbre,
-              obj.descripcion,
-              datosUbicacion
-            );
-          });
-
-        } else {
-          this.ValidarDomicilio(informacion, timbre);
-        }
-      },
-      error: () => {
-        this.PermitirUbicacionDesconocida(timbre);
-      }
-    });
-  }
-
-  ValidarModulo(latitud: any, longitud: any, rango: any, timbre: any) {
-    if (this.modulo_geolocalizacion === true) {
-      this.BuscarUbicacion(latitud, longitud, rango, timbre);
-    } else {
-      timbre.ubicacion = 'DESCONOCIDO';
-      this.storageUbica = timbre.ubicacion;
-      this.EnviarDatos(timbre);
-    }
-  }
-
-  ValidarDomicilio(informacion: any, timbre: any) {
-    this.restE.ObtenerUbicacion(this.id_usuario).subscribe({
-      next: (res: any) => {
-        if (res.data[0].longitud != null) {
-          informacion.lat2 = res.data[0].latitud;
-          informacion.lng2 = res.data[0].longitud;
-
-          this.restP.ObtenerCoordenadas(informacion).subscribe({
-            next: (resu: any) => {
-              if (resu.data[0].verificar === 'ok') {
-                timbre.ubicacion = 'DOMICILIO';
-                this.storageUbica = timbre.ubicacion;
-
-                this.abrirToas(
-                  'Marcación realizada dentro del perímetro definido como DOMICILIO.',
-                  'primary',
-                  3000,
-                  'top'
-                );
-
-                this.EnviarDatos(timbre);
-              } else {
-                this.PermitirUbicacionDesconocida(timbre);
-              }
-            },
-            error: () => {
-              this.PermitirUbicacionDesconocida(timbre);
-            }
-          });
-        } else {
-          this.PermitirUbicacionDesconocida(timbre);
-        }
-      },
-      error: () => {
-        this.PermitirUbicacionDesconocida(timbre);
-      }
-    });
-  }
-
   // ============================================================
   // GUARDADO / ENVÍO
   // ============================================================
 
   EnviarDatos(data: any) {
-    localStorage.setItem('storageUbicacion', this.storageUbica);
+    this.actualizarUbicacionPantalla(data.ubicacion || 'DESCONOCIDO');
 
     this.relojService.enviarTimbre(data).pipe(timeout(5000)).subscribe({
       next: () => {
@@ -1084,6 +1153,12 @@ export class EnviartimbrePage implements OnInit {
   GuardartimbresinServidor(data: any) {
     data.conexion = false;
     data.novedades_conexion = 'Falló conexión al servidor';
+
+    if (!data.ubicacion) {
+      data.ubicacion = this.ubicacion || 'Sin Ubicación';
+    }
+
+    this.actualizarUbicacionPantalla(data.ubicacion);
 
     this.nuevoTimbre.conexion = data.conexion;
     this.nuevoTimbre.novedades_conexion = data.novedades_conexion;
