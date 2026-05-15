@@ -40,14 +40,8 @@ export class EnviartimbrePage implements OnInit {
   desconocida: boolean = false;
   especial: boolean = false;
 
-  /**
-   * Si está en true, NO permite timbrar sin internet.
-   */
   requiereInternet: boolean = false;
 
-  /**
-   * Variables para compatibilidad con código antiguo/localStorage.
-   */
   timbrarSinInternet: string = 'No';
   timbrarConFoto: string = 'No';
   timbreFotoObligatoria: string = 'No';
@@ -165,10 +159,6 @@ export class EnviartimbrePage implements OnInit {
       this.gmtDispositivo = data.gmtDispositivo;
     });
 
-    /**
-     * Esto ayuda a que en APK se soliciten permisos desde el inicio.
-     * Igual se vuelven a validar antes de timbrar.
-     */
     await this.solicitarPermisosIniciales();
   }
 
@@ -183,30 +173,37 @@ export class EnviartimbrePage implements OnInit {
 
     await this.solicitarPermisoUbicacionInicial();
 
-    /**
-     * Solo solicito cámara si el parámetro de foto está activo.
-     * Si foto = false, no tiene sentido pedir cámara.
-     *
-     * OJO: BuscarOpcionMarcacion es async por subscribe, por eso también
-     * se vuelve a validar cámara en iniciarProcesoFoto().
-     */
     if (this.foto === true) {
       await this.solicitarPermisoCamara();
     }
   }
 
   async solicitarPermisoUbicacionInicial(): Promise<boolean> {
-    try {
-      const permisos = await Geolocation.checkPermissions();
+    if (!this.platform.is('hybrid')) {
+      return true;
+    }
 
-      if (permisos.location === 'granted') {
+    try {
+      const permisos: any = await Geolocation.checkPermissions();
+
+      const locationGranted =
+        permisos.location === 'granted' ||
+        permisos.coarseLocation === 'granted';
+
+      if (locationGranted) {
         await this.obtenerPosicion();
         return true;
       }
 
-      const request = await Geolocation.requestPermissions();
+      const request: any = await Geolocation.requestPermissions({
+        permissions: ['location']
+      } as any);
 
-      if (request.location === 'granted') {
+      const requestGranted =
+        request.location === 'granted' ||
+        request.coarseLocation === 'granted';
+
+      if (requestGranted) {
         await this.obtenerPosicion();
         return true;
       }
@@ -214,19 +211,19 @@ export class EnviartimbrePage implements OnInit {
       await this.abrirToas(
         'No se otorgó permiso de ubicación. Para timbrar debe permitir el acceso a la ubicación.',
         'warning',
-        4000,
+        5000,
         'middle'
       );
 
       return false;
 
-    } catch (error) {
+    } catch (error: any) {
       console.log('Error solicitando permiso de ubicación:', error);
 
       await this.abrirToas(
-        'No fue posible solicitar el permiso de ubicación. Revise los permisos de la app.',
+        'No fue posible solicitar el permiso de ubicación. Revise que la ubicación esté activa y que la app tenga permiso desde la configuración del teléfono.',
         'danger',
-        4000,
+        6000,
         'middle'
       );
 
@@ -235,6 +232,10 @@ export class EnviartimbrePage implements OnInit {
   }
 
   async solicitarPermisoCamara(): Promise<boolean> {
+    if (!this.platform.is('hybrid')) {
+      return true;
+    }
+
     try {
       const permisos = await Camera.checkPermissions();
 
@@ -253,7 +254,7 @@ export class EnviartimbrePage implements OnInit {
       await this.abrirToas(
         'No se otorgó permiso de cámara. Para timbrar con foto debe permitir el acceso a la cámara.',
         'warning',
-        4000,
+        5000,
         'middle'
       );
 
@@ -265,7 +266,7 @@ export class EnviartimbrePage implements OnInit {
       await this.abrirToas(
         'No fue posible solicitar el permiso de cámara. Revise los permisos de la app.',
         'danger',
-        4000,
+        5000,
         'middle'
       );
 
@@ -340,7 +341,8 @@ export class EnviartimbrePage implements OnInit {
     try {
       const resp = await Geolocation.getCurrentPosition({
         enableHighAccuracy: true,
-        timeout: 10000
+        timeout: 10000,
+        maximumAge: 0
       });
 
       this.geoLongitude = resp.coords.longitude;
@@ -380,17 +382,14 @@ export class EnviartimbrePage implements OnInit {
       (error) => {
         console.warn('No se pudo obtener ubicación en navegador:', error);
 
-        /**
-         * Coordenadas de prueba para ionic serve.
-         * En APK debe obtener las coordenadas reales.
-         */
         this.geoLatitude = -0.180653;
         this.geoLongitude = -78.467834;
         this.cargandoPosicion = false;
       },
       {
         enableHighAccuracy: true,
-        timeout: 10000
+        timeout: 10000,
+        maximumAge: 0
       }
     );
   }
@@ -612,8 +611,13 @@ export class EnviartimbrePage implements OnInit {
       return true;
     }
 
-    const result = await Geolocation.checkPermissions();
-    return result.location === 'granted';
+    try {
+      const result: any = await Geolocation.checkPermissions();
+
+      return result.location === 'granted' || result.coarseLocation === 'granted';
+    } catch {
+      return false;
+    }
   }
 
   async enviarTimbre(ev?: any) {
@@ -861,9 +865,6 @@ export class EnviartimbrePage implements OnInit {
 
         this.guardarParametrosMarcacionEnLocalStorage();
 
-        /**
-         * Si el parámetro indica que se usa foto, pedimos permiso.
-         */
         if (this.platform.is('hybrid') && this.foto === true) {
           await this.solicitarPermisoCamara();
         }
