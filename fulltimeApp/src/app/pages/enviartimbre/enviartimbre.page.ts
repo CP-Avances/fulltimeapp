@@ -711,27 +711,27 @@ export class EnviartimbrePage implements OnInit {
 
   obtenerIdTipo(): string {
     switch (this.nombreInfo_timbre) {
-      case 'Inicio de jornada laboral':
+      case 'Inicio jornada laboral':
         this.nuevoTimbre.accion = 'E';
         return '0';
 
-      case 'Fin de jornada laboral':
+      case 'Fin jornada laboral':
         this.nuevoTimbre.accion = 'S';
         return '1';
 
-      case 'Inicio de almuerzo':
+      case 'Inicio alimentación':
         this.nuevoTimbre.accion = 'S/A';
         return '2';
 
-      case 'Fin de almuerzo':
+      case 'Fin alimentación':
         this.nuevoTimbre.accion = 'E/A';
         return '3';
 
-      case 'Inicio de permiso':
+      case 'Inicio permiso':
         this.nuevoTimbre.accion = 'S/P';
         return '4';
 
-      case 'Fin de permiso':
+      case 'Fin permiso':
         this.nuevoTimbre.accion = 'E/P';
         return '5';
 
