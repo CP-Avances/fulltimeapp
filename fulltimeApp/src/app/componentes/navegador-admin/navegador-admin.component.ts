@@ -89,7 +89,7 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.username = this.userService.username;
+    this.username = this.userService.UserFullname
 
     const empleadoID = Number(localStorage.getItem('empleadoID') ?? 0);
     this.idEmpleadoIngresa = Number.isNaN(empleadoID) ? 0 : empleadoID;
@@ -104,7 +104,7 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
   }
 
   ionViewWillEnter() {
-    this.username = this.userService.username;
+    this.username = this.userService.UserFullname;
 
     const empleadoID = Number(localStorage.getItem('empleadoID') ?? 0);
     this.idEmpleadoIngresa = Number.isNaN(empleadoID) ? 0 : empleadoID;

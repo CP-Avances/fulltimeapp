@@ -30,6 +30,7 @@ import { SocketIoModule } from 'ngx-socket-io';
 import { importProvidersFrom } from '@angular/core';
 
 import { FingerprintAIO } from '@awesome-cordova-plugins/fingerprint-aio/ngx';
+import { ErrorInterceptor } from './services/error.interceptor';
 
 @NgModule({
   declarations: [AppComponent],
@@ -67,7 +68,12 @@ import { FingerprintAIO } from '@awesome-cordova-plugins/fingerprint-aio/ngx';
       provide: LOCALE_ID, useValue: "es-EC"
     },
     importProvidersFrom(IonicStorageModule.forRoot()),
-    FingerprintAIO
+    FingerprintAIO,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent],
 })

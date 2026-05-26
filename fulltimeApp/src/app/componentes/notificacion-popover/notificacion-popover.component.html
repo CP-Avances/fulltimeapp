@@ -97,12 +97,8 @@
                   <span *ngIf="noti.timbre_hora">&nbsp;&nbsp;{{ noti.timbre_hora }}</span>
                 </p>
 
-                <p class="detalle-noti" *ngIf="noti.tolerancia">
-                  <strong>Tolerancia:</strong> {{ noti.tolerancia }}
-                </p>
-
                 <p class="detalle-noti" *ngIf="noti.atraso">
-                  <strong>Atraso:</strong> {{ noti.atraso }}
+                  <strong>Atraso:</strong> {{ noti.atraso }}&nbsp;minutos
                 </p>
 
                 <p class="detalle-noti" *ngIf="noti.salida">

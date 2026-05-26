@@ -480,7 +480,7 @@ export class ListaNotificacionComponent implements OnInit {
     const partes = String(aviso.mensaje ?? '').split('//');
 
     if (tipo === 100) {
-      aviso.notificacion = partes[4] ?? aviso.descripcion ?? '';
+      aviso.notificacion = partes[5] ?? aviso.descripcion ?? '';
 
       const fechaHorario = String(partes[0] ?? '').split(' ')[0];
       const horaHorario = String(partes[0] ?? '').split(' ')[1];
