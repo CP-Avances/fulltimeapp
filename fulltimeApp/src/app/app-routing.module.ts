@@ -31,6 +31,10 @@ const routes: Routes = [
   {
     path: 'modals',
     loadChildren: () => import('./modals/modals.module').then( m => m.ModalsPageModule)
+  },
+  {
+    path: 'aprobaciones',
+    loadChildren: () => import('./pages/paginas-admin/aprobaciones/aprobaciones.module').then( m => m.AprobacionesPageModule)
   }
 ];
 @NgModule({

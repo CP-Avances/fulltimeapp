@@ -5,6 +5,7 @@ import { VacacionesService } from 'src/app/services/vacaciones.service';
 import { ReportesMicroService } from 'src/app/services/reportes-micro.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { PermisosAccionesService } from 'src/app/services/permisos-acciones.service';
+import { EmpresaService } from 'src/app/services/empresa.service';
 
 @Component({
   selector: 'app-vacacion-detalle-solicitud',
@@ -15,7 +16,12 @@ export class VacacionDetalleSolicitudPage implements OnInit {
 
   solicitud: any = null;
   eliminando = false;
-  imprimiendo = false;
+  imprimiendo = false; 
+  logo: any = null;
+  p_color: any = null;
+  s_color: any = null;
+  frase: any = null;
+
 
   constructor(
     private router: Router,
@@ -24,11 +30,11 @@ export class VacacionDetalleSolicitudPage implements OnInit {
     private vacacionesService: VacacionesService,
     private navCtrl: NavController,
     private reportes: ReportesMicroService,
-    private permisosAcciones: PermisosAccionesService
+    private permisosAcciones: PermisosAccionesService,
+    private empresaService: EmpresaService,
   ) { }
 
   async ngOnInit() {
-    this.imprimirLocalStorage();
     const navigation = this.router.getCurrentNavigation();
     this.solicitud = navigation?.extras?.state?.['solicitud'];
 
@@ -42,15 +48,47 @@ export class VacacionDetalleSolicitudPage implements OnInit {
       this.regresar();
     }
 
+    await this.ObtenerLogo();
+    await this.ObtenerColores();
+
     await this.cargarPermisosAcciones();
   }
 
-  imprimirLocalStorage() {
+  ObtenerLogo(): Promise<void> {
+    return new Promise((resolve) => {
+      this.empresaService.ObtenerEmpresaImagen('logo').subscribe({
+        next: (base64) => {
+          this.logo = base64;
+          resolve();
+        },
+        error: (error) => {
+          console.error('Error obteniendo logo de empresa:', error);
+          this.logo = null;
+          resolve();
+        }
+      });
+    });
+  }
 
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-    }
+  ObtenerColores(): Promise<void> {
+    return new Promise((resolve) => {
+      this.empresaService.ConsultarDatosEmpresa().subscribe({
+        next: (res) => {
+          this.p_color = res?.color_principal ?? null;
+          this.s_color = res?.color_secundario ?? null;
+          this.frase = res?.marca_agua ?? null;
 
+          resolve();
+        },
+        error: (error) => {
+          console.error('Error obteniendo colores/marca de agua:', error);
+          this.p_color = null;
+          this.s_color = null;
+          this.frase = null;
+          resolve();
+        }
+      });
+    });
   }
 
   regresar() {
@@ -244,10 +282,10 @@ export class VacacionDetalleSolicitudPage implements OnInit {
       usuario: nombreUsuario,
       empresa: nombreEmpresa.toUpperCase(),
 
-      fraseMarcaAgua: null,
-      logoBase64: null,
-      colorPrincipal: null,
-      colorSecundario: null,
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
 
       solicitud: {
         id: this.solicitud.id || this.solicitud.id_solicitud_vacacion,

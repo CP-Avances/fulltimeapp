@@ -48,6 +48,10 @@ const routes: Routes = [
         loadChildren: () => import('../paginas-admin/solicitudes/solicitudes.module').then(m => m.SolicitudesPageModule)
       },
       {
+        path: 'aprobaciones',
+        loadChildren: () => import('../paginas-admin/aprobaciones/aprobaciones.module').then(m => m.AprobacionesPageModule)
+      },
+      {
         path: 'comunicado',
         loadChildren: () => import('../paginas-admin/comunicado/comunicado.module').then(m => m.ComunicadoPageModule)
       },

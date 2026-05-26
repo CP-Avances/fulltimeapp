@@ -1,0 +1,375 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/reloj/aprobaciones"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Aprobación permisos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-refresher slot="fixed" (ionRefresh)="inicializarPantalla(); $event.target.complete()">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="contenedor-principal">
+
+    <div *ngIf="cargandoInicial" class="mensaje-centro">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando información...</p>
+    </div>
+
+    <ion-card *ngIf="!cargandoInicial && !tieneConfiguracionAprobacion">
+      <ion-card-content class="mensaje-vacio">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        <h3>Aprobaciones de permisos</h3>
+        <p>{{ mensajeSinConfiguracion }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card *ngIf="!cargandoInicial && tieneConfiguracionAprobacion && modoVista === 'criterios'">
+      <ion-card-header>
+        <ion-card-title>Criterios de búsqueda</ion-card-title>
+        <ion-card-subtitle>
+          Consulte únicamente solicitudes que puede aprobar
+        </ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <ion-item>
+          <ion-label position="stacked">Buscar por</ion-label>
+          <ion-select
+            interface="popover"
+            placeholder="Seleccione un criterio"
+            [(ngModel)]="criterioBusqueda"
+            (ionChange)="onCriterioChange()">
+
+            <ion-select-option value="tipo">Tipo de permiso</ion-select-option>
+            <ion-select-option value="dep">Departamento</ion-select-option>
+            <ion-select-option value="emp">Empleado</ion-select-option>
+
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Fecha desde</ion-label>
+          <ion-input
+            type="date"
+            [(ngModel)]="fechaDesde">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Estado</ion-label>
+          <ion-select
+            interface="popover"
+            [(ngModel)]="estadoSolicitud">
+
+            <ion-select-option *ngFor="let estado of estados" [value]="estado.valor">
+              {{ estado.etiqueta }}
+            </ion-select-option>
+
+          </ion-select>
+        </ion-item>
+
+        <ion-item
+          *ngIf="criterioBusqueda === 'tipo'"
+          button
+          detail="true"
+          (click)="abrirSelector('tipo')">
+
+          <ion-label position="stacked">Tipos de permiso</ion-label>
+          <ion-text>
+            {{ getResumenSeleccion('tipo') }}
+          </ion-text>
+
+        </ion-item>
+
+        <ion-item
+          *ngIf="criterioBusqueda === 'dep'"
+          button
+          detail="true"
+          (click)="abrirSelector('dep')">
+
+          <ion-label position="stacked">Departamentos</ion-label>
+          <ion-text>
+            {{ getResumenSeleccion('dep') }}
+          </ion-text>
+
+        </ion-item>
+
+        <ion-item
+          *ngIf="criterioBusqueda === 'emp'"
+          button
+          detail="true"
+          (click)="abrirSelector('emp')">
+
+          <ion-label position="stacked">Empleados</ion-label>
+          <ion-text>
+            {{ getResumenSeleccion('emp') }}
+          </ion-text>
+
+        </ion-item>
+
+        <ion-button
+          expand="block"
+          color="primary"
+          class="btn-buscar"
+          [disabled]="cargando"
+          (click)="buscarSolicitudes()">
+
+          <ion-spinner *ngIf="cargando" name="crescent"></ion-spinner>
+          <span *ngIf="!cargando">Buscar solicitudes</span>
+
+        </ion-button>
+
+      </ion-card-content>
+    </ion-card>
+
+    <div *ngIf="modoVista === 'lista'">
+
+      <div class="barra-aprobacion-fija" *ngIf="solicitudes.length > 0">
+
+        <div class="barra-superior">
+          <div>
+            <b>Solicitudes: {{ solicitudes.length }}</b>
+            <p>Seleccionadas: {{ solicitudesSeleccionadas.length }}</p>
+          </div>
+
+          <ion-button
+            size="small"
+            fill="outline"
+            color="medium"
+            [disabled]="procesandoMultiple"
+            (click)="volverACriterios()">
+            Nueva búsqueda
+          </ion-button>
+        </div>
+
+        <ion-item lines="none" class="item-seleccionar-todas">
+          <ion-checkbox
+            slot="start"
+            [checked]="todasSeleccionadas()"
+            [disabled]="procesandoMultiple"
+            (ionChange)="toggleSeleccionarTodas($event)">
+          </ion-checkbox>
+
+          <ion-label>Seleccionar todas</ion-label>
+        </ion-item>
+
+        <div class="acciones-multiples">
+
+        <ion-button
+          *ngIf="puedeAprobarSeleccion()"
+          expand="block"
+          size="small"
+          color="success"
+          [disabled]="procesandoMultiple"
+          (click)="confirmarAccionMultiple('Aprobar', 'APRUEBA')">
+          Aprobar
+        </ion-button>
+
+        <ion-button
+          *ngIf="puedeRechazarSeleccion()"
+          expand="block"
+          size="small"
+          color="danger"
+          [disabled]="procesandoMultiple"
+          (click)="confirmarAccionMultiple('Rechazar', 'RECHAZA')">
+          Rechazar
+        </ion-button>
+
+        </div>
+
+      </div>
+
+      <ion-card *ngIf="solicitudes.length === 0">
+        <ion-card-content class="mensaje-vacio">
+          <ion-icon name="folder-open-outline"></ion-icon>
+          <p>No existen solicitudes pendientes de aprobación para usted.</p>
+
+          <ion-button
+            expand="block"
+            color="medium"
+            (click)="volverACriterios()">
+            Nueva búsqueda
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card *ngFor="let s of solicitudesPaginadas" class="tarjeta-solicitud">
+
+        <ion-item lines="none" class="item-seleccionar-solicitud">
+          <ion-checkbox
+            slot="start"
+            [checked]="estaSeleccionada(s)"
+            [disabled]="procesandoMultiple"
+            (ionChange)="toggleSeleccionSolicitud(s, $event.detail.checked)">
+          </ion-checkbox>
+
+          <ion-label>Seleccionar solicitud</ion-label>
+
+          <ion-badge slot="end" [color]="estadoColor(s.estado)">
+            {{ estadoTexto(s.estado) }}
+          </ion-badge>
+        </ion-item>
+
+        <ion-card-header>
+          <ion-card-title>
+            {{ s.apellido_empleado }} {{ s.nombre_empleado }}
+          </ion-card-title>
+
+          <ion-card-subtitle>
+            {{ s.tipo_permiso_descripcion }}
+          </ion-card-subtitle>
+        </ion-card-header>
+
+        <ion-card-content>
+
+          <div class="fila-info">
+            <span>Fecha solicitud:</span>
+            <b>{{ formatearFecha(s.fecha_creacion) }}</b>
+          </div>
+
+          <div class="fila-info">
+            <span>Fecha inicio:</span>
+            <b>{{ formatearFecha(s.fecha_inicio) }}</b>
+          </div>
+
+          <div class="fila-info">
+            <span>Fecha fin:</span>
+            <b>{{ formatearFecha(s.fecha_final) }}</b>
+          </div>
+
+          <div class="fila-info">
+            <span>Días:</span>
+            <b>{{ s.dia || s.dias_permiso || 0 }}</b>
+          </div>
+
+          <div class="fila-info">
+            <span>Horas:</span>
+            <b>{{ getHorasFormatoHHmm(s) }}</b>
+          </div>
+
+        </ion-card-content>
+      </ion-card>
+
+      <div class="paginacion" *ngIf="solicitudes.length > pageSize">
+        <ion-button
+          fill="outline"
+          size="small"
+          [disabled]="page === 0 || procesandoMultiple"
+          (click)="paginaAnterior()">
+          Anterior
+        </ion-button>
+
+        <span>Página {{ page + 1 }}</span>
+
+        <ion-button
+          fill="outline"
+          size="small"
+          [disabled]="(page + 1) * pageSize >= solicitudes.length || procesandoMultiple"
+          (click)="paginaSiguiente()">
+          Siguiente
+        </ion-button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <ion-modal
+  [isOpen]="selectorAbierto"
+  cssClass="modal-selector-completo"
+  (didDismiss)="cerrarSelector()">
+
+  <ng-template>
+
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button (click)="cerrarSelector()">
+            <ion-icon name="arrow-back-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+
+        <ion-title>{{ getTituloSelector() }}</ion-title>
+      </ion-toolbar>
+
+      <ion-toolbar>
+        <ion-searchbar
+          [(ngModel)]="filtroSelector"
+          [placeholder]="getPlaceholderSelector()"
+          debounce="200">
+        </ion-searchbar>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content>
+
+      <div class="acciones-selector">
+        <ion-button
+          size="small"
+          fill="outline"
+          color="primary"
+          (click)="seleccionarTodasFiltradas()">
+          Seleccionar todos
+        </ion-button>
+
+        <ion-button
+          size="small"
+          fill="outline"
+          color="medium"
+          (click)="limpiarSeleccionTemporal()">
+          Limpiar
+        </ion-button>
+      </div>
+
+      <div class="contador-selector">
+        Seleccionados: {{ seleccionTemporal.length }}
+      </div>
+
+      <ion-list>
+
+        <ion-item *ngFor="let item of getOpcionesSelector()">
+          <ion-checkbox
+            slot="start"
+            [checked]="estaSeleccionTemporal(item.id)"
+            (ionChange)="toggleSeleccionTemporal(item, $event.detail.checked)">
+          </ion-checkbox>
+
+          <ion-label>
+            <h3>{{ getTextoOpcionSelector(item) }}</h3>
+            <p *ngIf="getSubTextoOpcionSelector(item)">
+              {{ getSubTextoOpcionSelector(item) }}
+            </p>
+          </ion-label>
+        </ion-item>
+
+      </ion-list>
+
+      <div *ngIf="getOpcionesSelector().length === 0" class="mensaje-vacio-selector">
+        <ion-icon name="search-outline"></ion-icon>
+        <p>No se encontraron resultados.</p>
+      </div>
+
+    </ion-content>
+
+    <ion-footer>
+      <ion-toolbar>
+        <ion-button
+          expand="block"
+          color="primary"
+          (click)="confirmarSelector()">
+          Aceptar selección
+        </ion-button>
+      </ion-toolbar>
+    </ion-footer>
+
+  </ng-template>
+
+</ion-modal>
+
+</ion-content>

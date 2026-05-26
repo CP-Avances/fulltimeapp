@@ -209,4 +209,66 @@ export class VacacionesService {
       );
   }
 
+  // CONSULTAR SOLICITUDES DE VACACIONES PARA APROBACIÓN
+  ObtenerSolicitudesVacacion(
+    limite: number = 5,
+    desde: number = 0,
+    filtros?: {
+      departamentos?: number[] | 'all';
+      empleados?: number[] | 'all';
+      estado?: number | 'all';
+      fechaDesde?: string;
+      fechaHasta?: string;
+    }
+  ): Observable<any> {
+
+    let params = new HttpParams()
+      .set('limite', limite.toString())
+      .set('desde', desde.toString());
+
+    if (filtros?.departamentos && filtros.departamentos !== 'all') {
+      params = params.set('departamentos', filtros.departamentos.join(','));
+    }
+
+    if (filtros?.empleados && filtros.empleados !== 'all') {
+      params = params.set('empleados', filtros.empleados.join(','));
+    }
+
+    if (filtros?.estado !== undefined && filtros.estado !== 'all') {
+      params = params.set('estado', filtros.estado.toString());
+    }
+
+    if (filtros?.fechaDesde) {
+      params = params.set('fechaDesde', filtros.fechaDesde);
+    }
+
+    if (filtros?.fechaHasta) {
+      params = params.set('fechaHasta', filtros.fechaHasta);
+    }
+
+    console.log('URL vacaciones móvil:', `${this.apiUrl}/lista`);
+    console.log('Params vacaciones móvil:', params.toString());
+
+    return this.http.get<any>(`${this.apiUrl}/lista`, { params })
+      .pipe(
+        retry(1),
+        map(response => {
+          return {
+            data: response.data || [],
+            pagination: response.pagination || {
+              total: 0,
+              limite: 10,
+              desde: 0,
+              pagina_actual: 1,
+              total_paginas: 0
+            },
+            filtros: response.filtros || { filtros: false }
+          };
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+
+
 }

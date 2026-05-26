@@ -377,7 +377,8 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
     horarios: false,
     justificarTimbres: false,
     timbresEmpleados: false,
-    reporteTimbres: false
+    reporteTimbres: false,
+    aprobaciones: false
   };
 
   ValidarPermisosRol() {
@@ -390,7 +391,8 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
         'Ver Horarios',
         'Registrar Timbres',
         'Ver Timbres',
-        'Reporte Timbres'
+        'Reporte Timbres',
+        'Aprobaciones'
       ]
     };
 
@@ -401,6 +403,7 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
         this.permisosRol.justificarTimbres = this.tienePermiso(res, 'Registrar Timbres');
         this.permisosRol.timbresEmpleados = this.tienePermiso(res, 'Ver Timbres');
         this.permisosRol.reporteTimbres = this.tienePermiso(res, 'Reporte Timbres');
+        this.permisosRol.aprobaciones = this.tienePermiso(res, 'Aprobaciones');
       },
       error: (error) => {
         console.log('Error al validar permisos del rol', error);
@@ -410,7 +413,8 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
           horarios: false,
           justificarTimbres: false,
           timbresEmpleados: false,
-          reporteTimbres: false
+          reporteTimbres: false,
+          aprobaciones: false
         };
       }
     });

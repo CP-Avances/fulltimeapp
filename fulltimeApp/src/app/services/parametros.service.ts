@@ -5,6 +5,15 @@ import { map } from 'rxjs';
 // SERVICIOS
 import { environment } from 'src/environments/environment';
 
+export interface IDetalleParametroExtendido {
+  id_tipo: number;
+  tipo: string;
+  id_detalle: number;
+  descripcion: string;
+  observacion: string;
+  id_parametro: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -18,13 +27,23 @@ export class ParametrosService {
   ) {
   }
 
+  // METODO PARA LISTAR DETALLES DE PARAMETRO POR ID
+  // Se agrega para compatibilidad con el flujo de aprobaciones de vacaciones
+  ListarDetalleParametro(id: number) {
+    return this.http
+      .get<{ ok: boolean; data: IDetalleParametroExtendido[] }>(
+        `${this.apiUrlM}/api/parametrizacion/detalle/${id}`
+      )
+      .pipe(
+        map(res => Array.isArray(res?.data) ? res.data : [])
+      );
+  }
 
   // METODO PARA OBTENER LOS DETALLES DE PARAMETROS POR ID
   ObtenerDetallesParametros(id: any) {
     return this.http.get<any>(this.apiUrlM + '/api/parametrizacion/detalle/' + id)
       .pipe(map(res => Array.isArray(res?.data) ? res.data : []));
   }
-
 
   // METODO PARA OBTENER LOS DETALLES DE PARAMETROS POR ID
   ObtenerDetalleParametroUsuario(datos: any) {
@@ -37,16 +56,15 @@ export class ParametrosService {
       .pipe(map(res => Array.isArray(res?.data) ? res.data : []));
   }
 
-  // METODO PARA OBTENER LAS COORDENADAS DE UNA UBICACION REGISTRADA
+  // METODO PARA OBTENER LA COORDENADAS DE UNA UBICACION REGISTRADA
   ObtenerCoordenadas(data: any) {
-    return this.http.post<any>(`${this.apiUrlM}/api/parametrizacion/coordenadas`, data);;
+    return this.http.post<any>(`${this.apiUrlM}/api/parametrizacion/coordenadas`, data);
   }
 
   // METODO PARA OBTENER LA UBICACION REGISTRADA AL EMPLEADO
   ObtenerUbicacionUsuario(id_empl: any) {
     return this.http.get<any>(`${this.apiUrlM}/ubicacion/coordenadas-usuario/${id_empl}`);
   }
-
 
   ObtenerPermisosRoles(datos: any) {
     return this.http
@@ -56,7 +74,6 @@ export class ParametrosService {
       );
   }
 
-
   ObtenerAccionesRoles(datos: any) {
     return this.http
       .post<any>(`${this.apiUrlM}/api/rol-permisos/validar-acciones-rol`, datos)
@@ -64,4 +81,5 @@ export class ParametrosService {
         map(res => Array.isArray(res?.data) ? res.data : [])
       );
   }
+
 }

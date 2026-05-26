@@ -4,7 +4,7 @@ import { Observable, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 export type ReportFormat = 'pdf';
-export type ReportModule = 'solicitud-vacacion';
+export type ReportModule = 'solicitud-vacacion' | 'solicitud-permiso';
 
 @Injectable({
   providedIn: 'root'

@@ -3,6 +3,8 @@ import { AlertController, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 
 import { PermisosService } from 'src/app/services/permisos.service';
+import { ReportesMicroService } from 'src/app/services/reportes-micro.service';
+import { EmpresaService } from 'src/app/services/empresa.service';
 
 @Component({
   selector: 'app-permiso-detalle-solicitud',
@@ -14,12 +16,19 @@ export class PermisoDetalleSolicitudPage implements OnInit {
   solicitud: any = null;
   cargando = false;
   eliminando = false;
+  imprimiendo = false;
+  logo: any = null;
+  p_color: any = null;
+  s_color: any = null;
+  frase: any = null;
 
   constructor(
     private permisosService: PermisosService,
     private toastController: ToastController,
     private alertController: AlertController,
-    private router: Router
+    private router: Router,
+    private reportes: ReportesMicroService,
+    private empresaService: EmpresaService
   ) { }
 
   ngOnInit() {
@@ -34,6 +43,42 @@ export class PermisoDetalleSolicitudPage implements OnInit {
 
     this.mostrarToast('No se recibió la información de la solicitud.', 'warning');
     this.regresar();
+  }
+
+  ObtenerLogo(): Promise<void> {
+    return new Promise((resolve) => {
+      this.empresaService.ObtenerEmpresaImagen('logo').subscribe({
+        next: (base64) => {
+          this.logo = base64;
+          resolve();
+        },
+        error: (error) => {
+          console.error('Error obteniendo logo de empresa:', error);
+          this.logo = null;
+          resolve();
+        }
+      });
+    });
+  }
+
+  ObtenerColores(): Promise<void> {
+    return new Promise((resolve) => {
+      this.empresaService.ConsultarDatosEmpresa().subscribe({
+        next: (res) => {
+          this.p_color = res?.color_principal ?? null;
+          this.s_color = res?.color_secundario ?? null;
+          this.frase = res?.marca_agua ?? null;
+          resolve();
+        },
+        error: (error) => {
+          console.error('Error obteniendo colores/marca de agua:', error);
+          this.p_color = null;
+          this.s_color = null;
+          this.frase = null;
+          resolve();
+        }
+      });
+    });
   }
 
   cargarDetalleDesdeBackend() {
@@ -192,7 +237,180 @@ export class PermisoDetalleSolicitudPage implements OnInit {
   }
 
   imprimirSolicitud() {
-    this.mostrarToast('La impresión de permisos se conectará en el siguiente paso.', 'warning');
+    this.generarReporteSolicitudPermiso();
+  }
+
+  async generarReporteSolicitudPermiso() {
+    if (!this.solicitud) {
+      this.mostrarToast('No se encontró la solicitud para generar el reporte.', 'warning');
+      return;
+    }
+
+    if (this.imprimiendo) return;
+
+    this.imprimiendo = true;
+
+    await this.ObtenerLogo();
+    await this.ObtenerColores();
+
+    const data = this.construirPayloadReporteSolicitudPermiso();
+
+    console.log('PAYLOAD REPORTE SOLICITUD PERMISO:', data);
+
+    this.reportes.generarReporteServicio('solicitud-permiso', 'pdf', data).subscribe({
+      next: ({ blob, filename }) => {
+        this.imprimiendo = false;
+        this.descargarArchivo(blob, filename);
+        this.mostrarToast('Reporte generado correctamente.', 'success');
+      },
+      error: (error) => {
+        console.error('Error generando reporte de permiso:', error);
+
+        this.imprimiendo = false;
+
+        this.mostrarToast(
+          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',
+          'danger'
+        );
+      }
+    });
+  }
+
+  construirPayloadReporteSolicitudPermiso() {
+    const nombreUsuario =
+      localStorage.getItem('fullname') ||
+      localStorage.getItem('nombre_usuario') ||
+      'Usuario Fulltime';
+
+    const nombreEmpresa =
+      localStorage.getItem('nombre_empresa') ||
+      this.solicitud?.nom_empresa ||
+      '';
+
+    return {
+      usuario: nombreUsuario,
+      empresa: nombreEmpresa.toUpperCase(),
+
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+
+      solicitud: {
+        id: this.solicitud.id,
+
+        numero_permiso: this.solicitud.numero_permiso || this.solicitud.id,
+
+        fecha_creacion:
+          this.solicitud.fecha_creacion ||
+          this.solicitud.fecha_registro ||
+          this.solicitud.created_at ||
+          null,
+
+        descripcion: this.solicitud.descripcion ?? '',
+
+        tipo_permiso:
+          this.solicitud.tipo_permiso_descripcion ||
+          this.solicitud.tipoPermiso ||
+          this.solicitud.descripcion_permiso ||
+          null,
+
+        tipo_descuento:
+          this.solicitud.tipo_permiso_tipo_descuento ||
+          this.solicitud.tipo_descuento ||
+          null,
+
+        fecha_inicio: this.solicitud.fecha_inicio,
+        fecha_final: this.solicitud.fecha_final,
+
+        hora_inicio: this.solicitud.hora_inicio || null,
+        hora_fin: this.solicitud.hora_fin || null,
+
+        dias_permiso:
+          this.solicitud.dias_permiso ??
+          this.solicitud.dia ??
+          this.solicitud.dias ??
+          0,
+
+        minutos_totales: this.solicitud.minutos_totales ?? 0,
+
+        incluir_feriados: this.solicitud.incluir_feriados ?? false,
+        legalizado: this.solicitud.legalizado ?? false,
+        estado: this.solicitud.estado,
+
+        documento: this.solicitud.documento ?? null,
+
+        numero_dias_lunes: this.solicitud.numero_dias_lunes ?? 0,
+        numero_dias_martes: this.solicitud.numero_dias_martes ?? 0,
+        numero_dias_miercoles: this.solicitud.numero_dias_miercoles ?? 0,
+        numero_dias_jueves: this.solicitud.numero_dias_jueves ?? 0,
+        numero_dias_viernes: this.solicitud.numero_dias_viernes ?? 0,
+
+        numero_dias_sabados:
+          this.solicitud.numero_dias_sabados ??
+          this.solicitud.numero_dias_sabado ??
+          0,
+
+        numero_dias_domingos:
+          this.solicitud.numero_dias_domingos ??
+          this.solicitud.numero_dias_domingo ??
+          0,
+
+        nombre_emple:
+          this.solicitud.nombre_emple ||
+          this.solicitud.nombre_empleado ||
+          this.solicitud.nombre ||
+          null,
+
+        apellido_emple:
+          this.solicitud.apellido_emple ||
+          this.solicitud.apellido_empleado ||
+          this.solicitud.apellido ||
+          null,
+
+        identificacion: this.solicitud.identificacion ?? null,
+
+        codigo:
+          this.solicitud.codigo ||
+          this.solicitud.codigo_empleado ||
+          null,
+
+        nom_regimen: this.solicitud.nom_regimen ?? null,
+        cargo: this.solicitud.cargo ?? null,
+
+        nom_empresa:
+          this.solicitud.nom_empresa ||
+          nombreEmpresa ||
+          null,
+
+        nom_ciudad: this.solicitud.nom_ciudad ?? null,
+        nom_sucursal: this.solicitud.nom_sucursal ?? null,
+
+        nom_departamento:
+          this.solicitud.nom_departamento ||
+          this.solicitud.nombre_departamento ||
+          this.solicitud.departamento_nombre ||
+          this.solicitud.departamento ||
+          null,
+      },
+
+      aprobaciones: []
+    };
+  }
+
+  descargarArchivo(blob: Blob, filename: string) {
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.target = '_blank';
+
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   }
 
   async confirmarEliminar() {

@@ -1,0 +1,99 @@
+<ion-content>
+
+  <br><br><br>
+  <hr>
+
+  <header style="text-align: center;">
+    <h3 *ngIf="isConnected && serverConnected">Aprobaciones</h3>
+  </header>
+
+  <div class="Imagen" *ngIf="isConnected && serverConnected">
+    <img class="center" src="../../../assets/images/C_FTLOGORV.png">
+
+    <ion-label style="text-align:center" mode="md" color="medium">
+      <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
+    </ion-label>
+
+    <img class="tamanoImagen" src="../../../assets/images/Solicitudes.svg">
+  </div>
+
+  <ion-grid *ngIf="isConnected && serverConnected">
+    <ion-row>
+
+      <ion-col size="6">
+        <ion-button [color]="colorv" expand="block" (click)="BtnVacaciones_click()">
+          <div>
+            <ion-icon name="airplane-outline"></ion-icon> <br>
+            <ion-text>
+              Vacaciones
+            </ion-text>
+          </div>
+        </ion-button>
+      </ion-col>
+
+      <ion-col size="6">
+        <ion-button [color]="colorp" expand="block" (click)="BtnPermisos_click()">
+          <div>
+            <ion-icon name="reader-outline"></ion-icon> <br>
+            <ion-text>
+              Permisos
+            </ion-text>
+          </div>
+        </ion-button>
+      </ion-col>
+
+    </ion-row>
+  </ion-grid>
+
+  <div *ngIf="!isConnected || !serverConnected">
+
+    <app-refresh-info
+      (onRefresh)="ngOnInit()"
+      removeItem="noClean">
+    </app-refresh-info>
+
+    <div style="margin: 2%; padding: 2%; text-align: center; border-radius: 2%;">
+      <ion-text color="medium" style="font-family: Arial, Helvetica, sans-serif; font-size: 90%;">
+        En esta vista encontrará información de aprobaciones
+      </ion-text>
+
+      <br><br>
+
+      <ion-text color="medium" style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;" *ngIf="!isConnected">
+        Se podrá visualizar cuando tenga conexión a internet
+      </ion-text>
+
+      <br>
+
+      <ion-text color="medium" style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;" *ngIf="!serverConnected">
+        Se podrá visualizar cuando tenga conexión al servidor
+      </ion-text>
+    </div>
+
+    <div class="Imagen">
+      <span class="center1">
+        <img src="../../../assets/images/C_FTLOGORV.png">
+
+        <ion-label style="text-align:center" mode="md" color="medium">
+          <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
+        </ion-label>
+      </span>
+
+      <img src="../../../assets/images/lost_timee.svg" />
+    </div>
+
+    <div style="margin: 4%; padding: 4%; text-align: center; border-radius: 2%;">
+      <ion-text color="dark" style="font-family: Arial, Helvetica, sans-serif;" *ngIf="!isConnected">
+        No tiene conexión a internet
+      </ion-text>
+
+      <br>
+
+      <ion-text color="dark" style="font-family: Arial, Helvetica, sans-serif;" *ngIf="!serverConnected">
+        No tiene conexión al servidor
+      </ion-text>
+    </div>
+
+  </div>
+
+</ion-content>
