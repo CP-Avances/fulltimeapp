@@ -1,52 +1,131 @@
 ion-label {
-  white-space: pre-line !important;
+  white-space: normal !important;
 }
 
-.btnleerTodas {
-  margin-top: 0.5%;
-  margin-left: 4%;
-  position: relative;
-  font-size: 30px;
+/* ================================
+   CONTENEDOR GENERAL
+================================ */
+
+ion-content {
+  --background: #f2f6fb;
 }
 
-.paginacion {
-  margin: auto;
-  padding-top: 2%;
-  padding-bottom: 2%;
+/* ================================
+   TARJETAS DE NOTIFICACIONES
+================================ */
+
+ion-card {
+  margin: 10px 12px;
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(15, 76, 129, 0.14);
+  overflow: hidden;
+  border: 1px solid rgba(15, 76, 129, 0.08);
 }
 
-.paginacion ::ng-deep .ngx-pagination {
-  padding: 0%;
-  margin: auto;
+/* Item interno de la tarjeta */
+ion-card ion-item {
+  --background: transparent;
+  --border-width: 0 !important;
+  --inner-border-width: 0 !important;
+  --padding-start: 12px;
+  --padding-end: 10px;
+  --inner-padding-end: 0;
+  border-bottom: none !important;
+  box-shadow: none !important;
 }
 
-.paginacion ::ng-deep .ngx-pagination .current {
-  background: rgb(28, 133, 219);
-  color: rgb(255, 255, 255);
-  font-weight: bold;
-  border-radius: 5px;
+/* Evita línea interna de Ionic */
+ion-item .item-inner {
+  border-bottom: none !important;
+  box-shadow: none !important;
 }
 
-.paginacion :host ::ng-deep .ngx-pagination span {
-  color: rgb(177, 221, 255);
-  font-family: monospace;
+/* Texto general dentro de tarjetas */
+ion-card p {
+  color: #1f2937 !important;
+  font-size: 11px !important;
+  line-height: 1.35;
+  margin-top: 4px !important;
+  margin-bottom: 2px !important;
 }
 
-.paginacion ::ng-deep .ngx-pagination a {
-  background-color: transparent;
-  color: rgb(67, 149, 226);
+/* Textos importantes */
+ion-card p strong {
+  color: #111827 !important;
+  font-weight: 700;
 }
 
-.refresh ::ng-deep app-refresh-info .cargar {
-  font-size: 2.3vw;
+/* Texto en cursiva */
+ion-card p em {
+  color: #374151 !important;
+  font-style: italic;
 }
+
+/* Título de cada notificación */
+ion-card p:first-child {
+  font-size: 12px !important;
+  font-weight: 700;
+  color: #111827 !important;
+  margin-bottom: 6px !important;
+  display: flex;
+  align-items: center;
+}
+
+/* Ícono del título */
+ion-card p:first-child ion-icon {
+  font-size: 18px !important;
+  margin-right: 6px !important;
+}
+
+/* Icono de visto / seleccionado */
+.tamanoIconoEmpleado {
+  font-size: 22px;
+  margin-left: 8px;
+  color: #0f75bc !important;
+}
+
+/* ================================
+   TARJETAS VISTAS
+   Se mantiene gris, pero legible
+================================ */
+
+ion-card[style*="rgb(226, 226, 226)"],
+ion-card[style*="#e2e2e2"] {
+  background: #e5e7eb !important;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 3px 10px rgba(31, 41, 55, 0.12);
+}
+
+ion-card[style*="rgb(226, 226, 226)"] p,
+ion-card[style*="#e2e2e2"] p {
+  color: #1f2937 !important;
+}
+
+ion-card[style*="rgb(226, 226, 226)"] p strong,
+ion-card[style*="#e2e2e2"] p strong {
+  color: #111827 !important;
+}
+
+ion-card[style*="rgb(226, 226, 226)"] p em,
+ion-card[style*="#e2e2e2"] p em {
+  color: #374151 !important;
+}
+
+ion-card[style*="rgb(226, 226, 226)"] ion-icon,
+ion-card[style*="#e2e2e2"] ion-icon {
+  color: #374151 !important;
+}
+
+/* ================================
+   COLORES DE ÍCONOS POR TIPO
+================================ */
 
 .comunicado-color {
   color: #f62cde !important;
 }
 
 .atraso-color {
-  color: #ffff00 !important;
+  color: #d1b000 !important;
 }
 
 .falta-color {
@@ -58,17 +137,176 @@ ion-label {
 }
 
 .default-color {
-  color: gray !important;
+  color: #6b7280 !important;
 }
 
-ion-item {
-  --border-width: 0 !important;
-  --inner-border-width: 0 !important;
-  border-bottom: none !important;
-  box-shadow: none !important;
+/* ================================
+   BOTÓN LEER TODAS
+================================ */
+
+.btnleerTodas {
+  margin-top: 6px;
+  margin-left: 12px;
+  position: relative;
+  font-size: 28px;
+  color: #0f75bc;
 }
 
-ion-item .item-inner {
-  border-bottom: none !important;
-  box-shadow: none !important;
+.btnleerTodas:hover {
+  color: #0b4f82;
+}
+
+/* ================================
+   PAGINACIÓN
+================================ */
+
+.paginacion {
+  margin: auto;
+  padding-top: 8px;
+  padding-bottom: 10px;
+  width: 100%;
+  text-align: center;
+}
+
+.paginacion ::ng-deep .ngx-pagination {
+  padding: 0;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.paginacion ::ng-deep .ngx-pagination li {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.paginacion ::ng-deep .ngx-pagination .current {
+  background: #0f75bc;
+  color: #ffffff;
+  font-weight: bold;
+  border-radius: 6px;
+  padding: 4px 9px;
+}
+
+.paginacion ::ng-deep .ngx-pagination a {
+  background-color: #ffffff;
+  color: #0f75bc;
+  border-radius: 6px;
+  padding: 4px 9px;
+  box-shadow: 0 2px 6px rgba(15, 76, 129, 0.12);
+}
+
+.paginacion ::ng-deep .ngx-pagination a:hover {
+  background-color: #e8f2fb;
+  color: #0b4f82;
+}
+
+.paginacion ::ng-deep .ngx-pagination span {
+  color: #0f4c81;
+  font-family: Arial, sans-serif;
+}
+
+/* ================================
+   REFRESH / SIN CONEXIÓN
+================================ */
+
+.refresh ::ng-deep app-refresh-info .cargar {
+  font-size: 2.3vw;
+}
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media only screen and (max-width: 480px) {
+  ion-card {
+    margin: 8px 10px;
+    border-radius: 12px;
+  }
+
+  ion-card p {
+    font-size: 10.5px !important;
+  }
+
+  ion-card p:first-child {
+    font-size: 11.5px !important;
+  }
+
+  .tamanoIconoEmpleado {
+    font-size: 20px;
+  }
+
+  .btnleerTodas {
+    font-size: 26px;
+  }
+
+.card-notificacion-movil {
+  margin: 10px 12px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-notificacion-movil:active {
+  transform: scale(0.98);
+}
+
+.card-notificacion-movil ion-item {
+  --background: transparent;
+  --padding-start: 10px;
+  --inner-padding-end: 10px;
+  --min-height: auto;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.card-notificacion-movil ion-icon[slot="start"] {
+  margin-right: 8px;
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.card-notificacion-movil ion-label {
+  margin: 0;
+  color: #1f2937;
+}
+
+.card-notificacion-movil ion-label p {
+  color: #1f2937;
+  line-height: 1.35;
+  margin-bottom: 3px;
+}
+
+.card-notificacion-movil ion-label strong {
+  color: #111827;
+  font-weight: 700;
+}
+
+.card-notificacion-movil ion-label em {
+  color: #374151;
+  font-style: italic;
+}
+
+.card-notificacion-movil.card-vista {
+  background: #e2e2e2 !important;
+  opacity: 1;
+}
+
+.card-notificacion-movil.card-vista ion-label,
+.card-notificacion-movil.card-vista ion-label p,
+.card-notificacion-movil.card-vista ion-label em {
+  color: #252525 !important;
+}
+
+.card-notificacion-movil.card-vista ion-label strong {
+  color: #111111 !important;
+}
+
+.card-notificacion-movil.card-vista ion-icon {
+  color: #444444 !important;
+}
+
 }

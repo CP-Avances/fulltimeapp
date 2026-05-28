@@ -1,8 +1,10 @@
 <div class="popover-notificaciones">
 
   <div class="cabecera-notificaciones">
-    <ion-icon name="notifications-outline"></ion-icon>
-    <span>Notificaciones</span>
+    <div class="cabecera-titulo">
+      <ion-icon name="notifications-outline"></ion-icon>
+      <span>Notificaciones</span>
+    </div>
 
     <b *ngIf="countNoti != 0" class="contador-notificaciones">
       {{ countNoti }}
@@ -17,31 +19,30 @@
 
       <ion-card *ngIf="countNoti == 0" class="card-sin-notificaciones">
         <ion-label>
+          <ion-icon name="notifications-off-outline"></ion-icon>
           <h4>No tiene nuevas notificaciones</h4>
         </ion-label>
       </ion-card>
 
       <ng-container *ngFor="let noti of notificacionesAll">
 
-        <ion-card
-          *ngIf="CambiarEstiloNotificacion[noti.tipo]"
-          class="card-notificacion"
-          (click)="AbrirNoti(noti)"
-          [ngStyle]="{
+        <ion-card *ngIf="CambiarEstiloNotificacion[noti.tipo]" class="card-notificacion" [class.card-vista]="noti.visto"
+          (click)="AbrirNoti(noti)" [ngStyle]="{
             'background': noti.visto
               ? 'rgb(226, 226, 226)'
               : CambiarEstiloNotificacion[noti.tipo].color
           }">
 
-          <ion-item lines="none" style="--background: transparent;">
+          <div class="borde-notificacion"></div>
+
+          <ion-item lines="none" class="item-notificacion">
             <ion-label>
 
-              <p class="titulo-card-noti">
-                <ion-icon
-                  [name]="CambiarEstiloNotificacion[noti.tipo].icon"
-                  [ngStyle]="{
+              <div class="titulo-card-noti">
+
+                <ion-icon class="icono-tipo-notificacion" [name]="CambiarEstiloNotificacion[noti.tipo].icon" [ngStyle]="{
                     'color': noti.visto
-                      ? 'rgb(0, 0, 0)'
+                      ? '#444'
                       : CambiarEstiloNotificacion[noti.tipo].iconColor
                   }">
                 </ion-icon>
@@ -53,33 +54,44 @@
                 <ng-template #otraNoti>
                   <strong>{{ noti.descripcion }}</strong>
                 </ng-template>
+
+              </div>
+
+              <p class="detalle-noti" *ngIf="noti.notificacion">
+                <strong>Notificación:</strong>
+                <em>{{ noti.notificacion }}</em>
               </p>
 
               <p class="detalle-noti" *ngIf="noti.empleado">
-                <strong>Enviado por:</strong> {{ noti.empleado }}
-              </p>
-
-              <p class="detalle-noti" *ngIf="noti.notificacion">
-                <strong>Notificación:</strong>&nbsp;<em>{{ noti.notificacion }}</em>
+                <strong>Enviado por:</strong>
+                <span>{{ noti.empleado }}</span>
               </p>
 
               <!-- PERMISOS / VACACIONES -->
               <ng-container *ngIf="CambiarEstiloNotificacion[noti.tipo].grupo === 'solicitud'">
 
-                <p class="detalle-noti" *ngIf="noti.motivo">
-                  <strong>Motivo:</strong>&nbsp;{{ noti.motivo }}
-                </p>
+                <div class="fila-doble" *ngIf="noti.motivo">
+                  <p class="detalle-noti">
+                    <strong>Motivo:</strong>
+                    <span>{{ noti.motivo }}</span>
+                  </p>
+                </div>
 
-                <p class="detalle-noti" *ngIf="noti.fecha_desde">
-                  <strong>Desde:</strong>&nbsp;{{ noti.fecha_desde }}
-                </p>
+                <div class="fila-fechas">
+                  <p class="detalle-noti" *ngIf="noti.fecha_desde">
+                    <strong>Desde:</strong>
+                    <span>{{ noti.fecha_desde }}</span>
+                  </p>
 
-                <p class="detalle-noti" *ngIf="noti.fecha_hasta">
-                  <strong>Hasta:</strong>&nbsp;{{ noti.fecha_hasta }}
-                </p>
+                  <p class="detalle-noti" *ngIf="noti.fecha_hasta">
+                    <strong>Hasta:</strong>
+                    <span>{{ noti.fecha_hasta }}</span>
+                  </p>
+                </div>
 
                 <p class="detalle-noti" *ngIf="noti.hora_inicio">
-                  <strong>Horario:</strong> {{ noti.hora_inicio }} - {{ noti.hora_fin }}
+                  <strong>Horario:</strong>
+                  <span>{{ noti.hora_inicio }} - {{ noti.hora_fin }}</span>
                 </p>
 
               </ng-container>
@@ -88,29 +100,37 @@
               <ng-container *ngIf="CambiarEstiloNotificacion[noti.tipo].grupo === 'asistencia'">
 
                 <p class="detalle-noti" *ngIf="noti.horario_fecha">
-                  <strong>Horario:</strong> {{ noti.horario_fecha }}
-                  <span *ngIf="noti.horario_hora">&nbsp;&nbsp;{{ noti.horario_hora }}</span>
+                  <strong>Horario:</strong>
+                  <span>
+                    {{ noti.horario_fecha }}
+                    <span *ngIf="noti.horario_hora">&nbsp;&nbsp;{{ noti.horario_hora }}</span>
+                  </span>
                 </p>
 
                 <p class="detalle-noti" *ngIf="noti.timbre_fecha">
-                  <strong>Timbre:</strong> {{ noti.timbre_fecha }}
-                  <span *ngIf="noti.timbre_hora">&nbsp;&nbsp;{{ noti.timbre_hora }}</span>
+                  <strong>Timbre:</strong>
+                  <span>
+                    {{ noti.timbre_fecha }}
+                    <span *ngIf="noti.timbre_hora">&nbsp;&nbsp;{{ noti.timbre_hora }}</span>
+                  </span>
                 </p>
 
                 <p class="detalle-noti" *ngIf="noti.atraso">
-                  <strong>Atraso:</strong> {{ noti.atraso }}&nbsp;minutos
+                  <strong>Atraso:</strong>
+                  <span>{{ noti.atraso }} minutos</span>
                 </p>
 
                 <p class="detalle-noti" *ngIf="noti.salida">
-                  <strong>Salida anticipada:</strong> {{ noti.salida }}
+                  <strong>Salida anticipada:</strong>
+                  <span>{{ noti.salida }}</span>
                 </p>
 
               </ng-container>
 
-              <p class="detalle-noti">
-                <strong>Fecha:</strong> {{ noti.fecha_ }}
-                <strong>&nbsp;&nbsp;Hora:</strong> {{ noti.hora_ }}
-              </p>
+              <div class="fecha-notificacion">
+                <ion-icon name="time-outline"></ion-icon>
+                <span>{{ noti.fecha_ }} - {{ noti.hora_ }}</span>
+              </div>
 
             </ion-label>
           </ion-item>
@@ -124,6 +144,7 @@
     <ng-template #showSkeletor>
       <ion-card class="card-sin-notificaciones">
         <ion-label>
+          <ion-icon name="cloud-offline-outline"></ion-icon>
           <h4>Sin Conexión</h4>
         </ion-label>
       </ion-card>

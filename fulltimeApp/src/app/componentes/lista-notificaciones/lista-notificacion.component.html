@@ -50,12 +50,17 @@
 
     <ng-container
       *ngFor="let noti of notificacionesAll | paginate: { itemsPerPage: itemsPerPage, currentPage: pageActual }">
-      <ion-card *ngIf="CambiarEstiloNotificacion[noti.tipo]" (click)="AbrirNoti(noti)" [ngStyle]="{
-          'background': noti.visto
-            ? 'rgb(226, 226, 226)'
-            : CambiarEstiloNotificacion[noti.tipo].color,
-          'margin-bottom': '8px'
-        }">
+      <ion-card *ngIf="CambiarEstiloNotificacion[noti.tipo]" class="card-notificacion-movil"
+        [class.card-vista]="noti.visto" (click)="AbrirNoti(noti)" [ngStyle]="{
+    'background': noti.visto
+      ? 'rgb(226, 226, 226)'
+      : CambiarEstiloNotificacion[noti.tipo].color,
+    'border-left': '7px solid ' + (
+      noti.visto
+        ? '#7a7a7a'
+        : CambiarEstiloNotificacion[noti.tipo].iconColor
+    )
+  }">
 
         <ion-item lines="none" style="--background: transparent;">
 
@@ -79,12 +84,12 @@
               </ng-template>
             </p>
 
-            <p style="font-size: 11px; margin-top: 1%;" *ngIf="noti.empleado">
-              <strong>Enviado por:</strong> {{ noti.empleado }}
-            </p>
-
             <p style="font-size: 11px; margin-top: 1%;" *ngIf="noti.notificacion">
               <strong>Notificación:</strong>&nbsp;<em>{{ noti.notificacion }}</em>
+            </p>
+
+            <p style="font-size: 11px; margin-top: 1%;" *ngIf="noti.empleado">
+              <strong>Enviado por:</strong> {{ noti.empleado }}
             </p>
 
             <!-- PERMISOS / VACACIONES / HORAS EXTRA -->
