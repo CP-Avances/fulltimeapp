@@ -59,7 +59,7 @@ export class LoginPage implements OnInit {
     this.obtenerInfoTerminosCondiciones();
     this.BuscarParametroTimbreUbicacionDesconocida();
     if (!this.relojService.esPrimeraVez()) {
-      this.navCtroller.navigateForward(['inicio']);
+      this.navCtroller.navigateForward(['login']);
     } else if (this.relojService.estaLogueado() && this.relojService.existeRol()) {
 
       this.navCtroller.pop();
