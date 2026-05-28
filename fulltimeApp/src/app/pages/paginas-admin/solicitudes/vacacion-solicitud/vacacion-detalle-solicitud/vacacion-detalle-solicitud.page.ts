@@ -6,6 +6,12 @@ import { ReportesMicroService } from 'src/app/services/reportes-micro.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { PermisosAccionesService } from 'src/app/services/permisos-acciones.service';
 import { EmpresaService } from 'src/app/services/empresa.service';
+import { firstValueFrom } from 'rxjs';
+
+import { NotificacionesService } from 'src/app/services/notificaciones.service';
+import { DatosGeneralesService } from 'src/app/services/datos-generales.service';
+import { AprobacionesService } from 'src/app/services/aprobaciones.service';
+import { TipoNotificacion } from 'src/app/interfaces/tipo-notificaciones.enum';
 
 @Component({
   selector: 'app-vacacion-detalle-solicitud',
@@ -32,6 +38,10 @@ export class VacacionDetalleSolicitudPage implements OnInit {
     private reportes: ReportesMicroService,
     private permisosAcciones: PermisosAccionesService,
     private empresaService: EmpresaService,
+    private notificacionesService: NotificacionesService,
+    private datosGeneralesService: DatosGeneralesService,
+    private aprobacionesService: AprobacionesService,
+
   ) { }
 
   async ngOnInit() {
@@ -189,8 +199,10 @@ export class VacacionDetalleSolicitudPage implements OnInit {
 
     this.eliminando = true;
 
+    const snapshot = JSON.parse(JSON.stringify(this.solicitud));
+
     this.vacacionesService.EliminarSolicitudesVacaciones(idSolicitud).subscribe({
-      next: (resp) => {
+      next: async (resp) => {
         const fallo = (resp && resp.message === 'error') || resp?.ok === false;
 
         if (fallo) {
@@ -202,6 +214,9 @@ export class VacacionDetalleSolicitudPage implements OnInit {
           return;
         }
 
+        await this.enviarComunicacionesEliminacionVacacion(snapshot);
+
+        this.eliminando = false;
         this.mostrarToast('Solicitud eliminada correctamente.', 'success');
 
         localStorage.setItem('resetBusquedaVacaciones', 'true');
@@ -216,7 +231,6 @@ export class VacacionDetalleSolicitudPage implements OnInit {
         }, 300);
       },
       error: (err) => {
-
         this.eliminando = false;
 
         if (err?.status === 409) {
@@ -233,6 +247,381 @@ export class VacacionDetalleSolicitudPage implements OnInit {
         );
       }
     });
+  }
+
+  private async enviarComunicacionesEliminacionVacacion(snapshot: any): Promise<void> {
+    try {
+      if (!snapshot?.id && !snapshot?.id_solicitud_vacacion) return;
+      if (!snapshot?.id_empleado) return;
+
+      const idVacaciones = Number(
+        snapshot?.id ??
+        snapshot?.id_solicitud_vacacion ??
+        0
+      );
+
+      const idEmpleadoSolicitante = Number(
+        snapshot?.id_empleado ??
+        snapshot?.empleado_id ??
+        0
+      );
+
+      const idTipoVacacion = Number(
+        snapshot?.id_configuracion ??
+        snapshot?.id_tipo_vacacion ??
+        snapshot?.tipo_vacacion_id ??
+        0
+      );
+
+      const empleados = await firstValueFrom(
+        this.datosGeneralesService.ObtenerInformacionModulos(1)
+      );
+
+      const empleadoSolicitante = empleados.find((e: any) =>
+        Number(e?.id_empleado ?? e?.id) === Number(idEmpleadoSolicitante)
+      );
+
+      const idDepartamento = Number(
+        snapshot?.id_departamento ??
+        snapshot?.id_departamento_origen ??
+        snapshot?.id_dep ??
+        empleadoSolicitante?.id_departamento ??
+        empleadoSolicitante?.id_dep ??
+        empleadoSolicitante?.departamento_id ??
+        0
+      );
+
+      if (!idVacaciones || !idEmpleadoSolicitante || !idTipoVacacion) {
+        console.warn('No se envía comunicación de eliminación de vacación: faltan datos base.', {
+          idVacaciones,
+          idEmpleadoSolicitante,
+          idTipoVacacion,
+          idDepartamento,
+          snapshot,
+          empleadoSolicitante
+        });
+        return;
+      }
+
+      let detalleFlujo: any = null;
+
+      if (idDepartamento && idTipoVacacion) {
+        const flujos = await firstValueFrom(
+          this.aprobacionesService.ListarFlujosDepartamento(idDepartamento)
+        );
+
+        const flujoVacacion = flujos.find((f: any) => {
+          const modulo = String(f?.modulo ?? '').trim().toUpperCase();
+
+          const tipoFlujo = Number(
+            f?.id_tipo_solicitud ??
+            f?.id_tipo_vacacion ??
+            f?.id_tipo ??
+            0
+          );
+
+          return modulo === 'VACACION' && tipoFlujo === idTipoVacacion;
+        });
+
+        const idFlujo = Number(
+          flujoVacacion?.id_flujo ??
+          flujoVacacion?.id ??
+          0
+        );
+
+        if (idFlujo) {
+          detalleFlujo = await firstValueFrom(
+            this.aprobacionesService.ObtenerDetalleFlujo(idFlujo)
+          );
+        }
+      }
+
+      const esJefe =
+        empleadoSolicitante?.jefe === true ||
+        empleadoSolicitante?.jefe === 1 ||
+        empleadoSolicitante?.jefe === 'true' ||
+        snapshot?.es_jefe === true;
+
+      const pasosIniciales = detalleFlujo
+        ? this.seleccionarPasosIniciales(detalleFlujo, esJefe)
+        : [];
+
+      const aprobadores = new Set<number>();
+
+      for (const paso of pasosIniciales) {
+        for (const idAprobador of this.obtenerDestinatariosPaso(paso)) {
+          aprobadores.add(idAprobador);
+        }
+      }
+
+      const idsReceptores = [
+        idEmpleadoSolicitante,
+        ...Array.from(aprobadores)
+      ].filter(id => !!id);
+
+      const idsUnicos = Array.from(new Set(idsReceptores));
+
+      const empleadosReceptores = empleados.filter((e: any) =>
+        idsUnicos.includes(Number(e?.id_empleado ?? e?.id))
+      );
+
+      const mensaje = this.armarMensajeEliminacionVacacion(
+        snapshot,
+        empleadoSolicitante
+      );
+
+      const idEnvia = Number(
+        localStorage.getItem('empleadoID') ||
+        localStorage.getItem('empleado') ||
+        idEmpleadoSolicitante
+      );
+
+      const idsCorreo = empleadosReceptores
+        .filter((e: any) => {
+          const recibeCorreo =
+            e?.vacacion_mail === true ||
+            e?.vacacion_mail === 1 ||
+            e?.vacacion_mail === 'true';
+
+          return recibeCorreo && !!e?.correo;
+        })
+        .map((e: any) => Number(e?.id_empleado ?? e?.id));
+
+      const idsNotificacion = empleadosReceptores
+        .filter((e: any) =>
+          e?.vacacion_notificacion === true ||
+          e?.vacacion_notificacion === 1 ||
+          e?.vacacion_notificacion === 'true'
+        )
+        .map((e: any) => Number(e?.id_empleado ?? e?.id));
+
+      if (idsCorreo.length > 0) {
+        try {
+          const correosEnviar = empleadosReceptores
+            .filter((e: any) => {
+              const recibeCorreo =
+                e?.vacacion_mail === true ||
+                e?.vacacion_mail === 1 ||
+                e?.vacacion_mail === 'true';
+
+              return recibeCorreo && !!e?.correo;
+            })
+            .map((e: any) => String(e.correo).trim())
+            .filter((correo: string) => !!correo);
+
+          const correoUnico = Array.from(new Set(correosEnviar)).join(', ');
+
+          const payloadCorreo = {
+            id_envia: idEnvia,
+            plataforma: 'Aplicación Móvil',
+            items: [
+              {
+                correo: correoUnico,
+                asunto: 'Solicitud de vacación eliminada',
+                mensaje,
+                id_vacaciones: idVacaciones
+              }
+            ]
+          };
+
+          await firstValueFrom(
+            this.notificacionesService.EnviarCorreoPermisoLegalizacionMultiple(payloadCorreo)
+          );
+
+        } catch (error) {
+          console.error('ERROR AL ENVIAR CORREO DE ELIMINACION DE VACACION', error);
+        }
+      }
+
+      if (idsNotificacion.length > 0) {
+        try {
+          const idsNotificacionUnicos = Array.from(new Set(idsNotificacion));
+
+          const payloadNotificacion = {
+            id_empl_envia: idEnvia,
+            id_empl_recive: idsNotificacionUnicos,
+            mensaje,
+            tipo: TipoNotificacion.ELIMINAR_VACACION,
+            id_vacaciones: idVacaciones
+          };
+
+          await firstValueFrom(
+            this.notificacionesService.EnviarNotificacionPermisoLegalizacionMultiple(payloadNotificacion)
+          );
+
+        } catch (error) {
+          console.error('ERROR AL ENVIAR NOTIFICACION DE ELIMINACION DE VACACION', error);
+        }
+      }
+
+    } catch (error) {
+      console.error('ERROR GENERAL AL ENVIAR COMUNICACIONES DE ELIMINACION DE VACACION', error);
+    }
+  }
+
+  private armarMensajeEliminacionVacacion(
+    solicitud: any,
+    empleadoSolicitante?: any
+  ): string {
+
+    const nombreEmp = [
+      empleadoSolicitante?.apellido ?? solicitud?.apellido_emple ?? solicitud?.apellido_empleado ?? solicitud?.apellido,
+      empleadoSolicitante?.nombre ?? solicitud?.nombre_emple ?? solicitud?.nombre_empleado ?? solicitud?.nombre
+    ].filter(Boolean).join(' ').trim() || `Empleado ${solicitud?.id_empleado ?? ''}`;
+
+    const cargoEmpleado =
+      empleadoSolicitante?.cargo ??
+      empleadoSolicitante?.name_cargo ??
+      solicitud?.cargo ??
+      null;
+
+    const departamentoEmpleado =
+      empleadoSolicitante?.departamento ??
+      empleadoSolicitante?.name_dep ??
+      solicitud?.nom_departamento ??
+      solicitud?.nombre_departamento ??
+      solicitud?.departamento_nombre ??
+      solicitud?.departamento ??
+      null;
+
+    const motivo = (
+      solicitud?.tipo_vacacion_descripcion ??
+      solicitud?.descripcion_vacacion ??
+      solicitud?.descripcion ??
+      solicitud?.motivo ??
+      ''
+    ).toString();
+
+    const dias = Number(
+      solicitud?.numero_dias_totales ??
+      solicitud?.num_dias_totales ??
+      solicitud?.dias ??
+      0
+    );
+
+    const minutos = Number(
+      solicitud?.minutos_totales ??
+      0
+    );
+
+    const esPorHoras = dias === 0 && minutos > 0;
+
+    const fechaDesde = String(
+      solicitud?.fecha_inicio ??
+      ''
+    ).substring(0, 10);
+
+    const fechaHasta = String(
+      solicitud?.fecha_final ??
+      ''
+    ).substring(0, 10);
+
+    const payloadMensaje = {
+      accion: 'ELIMINADO',
+      mensaje_principal: 'Se ha eliminado la siguiente solicitud de vacación:',
+      notificacion: 'Se ha eliminado la siguiente solicitud de vacación:',
+      data: {
+        empleado: nombreEmp,
+        identificacion: empleadoSolicitante?.identificacion ?? solicitud?.identificacion ?? null,
+        cargo: cargoEmpleado,
+        departamento: departamentoEmpleado,
+        fecha_solicitud: (
+          solicitud?.fecha_registro ??
+          solicitud?.fecha_creacion ??
+          solicitud?.fecha_solicitud ??
+          null
+        )?.toString()?.substring(0, 10) ?? null,
+        fecha_desde: fechaDesde,
+        fecha_hasta: esPorHoras ? fechaDesde : fechaHasta,
+        dias: esPorHoras ? null : dias,
+        hora: esPorHoras ? this.getHorasFormatoHHmmDesdeMinutos(minutos) : null,
+        hora_inicio: esPorHoras ? (solicitud?.hora_inicio ?? null) : null,
+        hora_fin: esPorHoras ? (solicitud?.hora_fin ?? null) : null,
+        motivo,
+        observacion: solicitud?.descripcion ?? '',
+        estado_solicitud: this.mapearEstadoTexto(Number(solicitud?.estado ?? 1)),
+        realizado_por:
+          localStorage.getItem('fullname') ||
+          localStorage.getItem('nombre') ||
+          nombreEmp,
+        codigo: empleadoSolicitante?.codigo ?? solicitud?.codigo ?? null
+      }
+    };
+
+    return JSON.stringify(payloadMensaje);
+  }
+
+  private cumpleTargetSolicitante(target: string, esJefe: boolean): boolean {
+    const t = String(target ?? 'AMBOS').toUpperCase();
+
+    if (t === 'AMBOS') return true;
+    if (t === 'JEFES') return esJefe === true;
+    if (t === 'EMPLEADOS') return esJefe === false;
+
+    return true;
+  }
+
+  private seleccionarPasosIniciales(detalle: any, esJefe: boolean): any[] {
+    const pasos = Array.isArray(detalle?.pasos)
+      ? detalle.pasos.slice().sort((a: any, b: any) => Number(a?.orden ?? 0) - Number(b?.orden ?? 0))
+      : [];
+
+    const aplicables = pasos.filter((p: any) =>
+      this.cumpleTargetSolicitante(p?.target_solicitante, esJefe)
+    );
+
+    const seleccionados: any[] = [];
+
+    for (const paso of aplicables) {
+      seleccionados.push(paso);
+
+      if (paso?.obligatorio === true) {
+        break;
+      }
+    }
+
+    return seleccionados;
+  }
+
+  private obtenerDestinatariosPaso(paso: any): number[] {
+    const modo = String(paso?.modo_aprobador ?? '').toUpperCase();
+
+    const jefes: number[] = Array.isArray(paso?.ids_empleados_jefes_destino)
+      ? paso.ids_empleados_jefes_destino.map((x: any) => Number(x)).filter(Number.isFinite)
+      : [];
+
+    const especificos: number[] = Array.isArray(paso?.ids_empleados_especificos)
+      ? paso.ids_empleados_especificos.map((x: any) => Number(x)).filter(Number.isFinite)
+      : [];
+
+    if (modo === 'JEFES') return jefes;
+    if (modo === 'ESPECIFICOS') return especificos;
+
+    return Array.from(new Set([...jefes, ...especificos]));
+  }
+
+  private mapearEstadoTexto(estado: number): string {
+    switch (Number(estado)) {
+      case 1:
+        return 'PENDIENTE';
+      case 2:
+        return 'PREAUTORIZADO';
+      case 3:
+        return 'AUTORIZADO';
+      case 4:
+        return 'RECHAZADO';
+      default:
+        return 'PENDIENTE';
+    }
+  }
+
+  private getHorasFormatoHHmmDesdeMinutos(minutos: number): string {
+    const total = Number(minutos || 0);
+
+    const horas = Math.floor(total / 60);
+    const mins = total % 60;
+
+    return `${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
   }
 
   imprimirSolicitud() {

@@ -69,4 +69,20 @@ export class NotificacionesService {
       .pipe(map(res => res.data));
   }
 
+  // CORREO - PERMISO LEGALIZACION MULTIPLE
+  EnviarCorreoPermisoLegalizacionMultiple(datos: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrlM}/api/notificacion-general/mail-permiso-legalizacion-multiple`,
+      datos
+    );
+  }
+
+  // NOTIFICACION INTERNA - PERMISO LEGALIZACION MULTIPLE
+  EnviarNotificacionPermisoLegalizacionMultiple(data: any) {
+    return this.http.post<any>(
+      `${this.apiUrlM}/api/avisos-generales/aviso-permiso-legalizacion-multiple`,
+      data
+    ).pipe(map(res => res.data));
+  }
+
 }

@@ -5,6 +5,12 @@ import { ToastController } from '@ionic/angular';
 import { VacacionesService } from 'src/app/services/vacaciones.service';
 import { FeriadosService, IFeriado } from 'src/app/services/feriados.service';
 import { DocumentosService } from 'src/app/services/documentos.service';
+import { firstValueFrom } from 'rxjs';
+
+import { NotificacionesService } from 'src/app/services/notificaciones.service';
+import { DatosGeneralesService } from 'src/app/services/datos-generales.service';
+import { AprobacionesService } from 'src/app/services/aprobaciones.service';
+import { TipoNotificacion } from 'src/app/interfaces/tipo-notificaciones.enum';
 
 @Component({
   selector: 'app-vacacion-editar-solicitud',
@@ -65,6 +71,9 @@ export class VacacionEditarSolicitudPage implements OnInit {
     private vacacionesService: VacacionesService,
     private feriadosService: FeriadosService,
     private documentosService: DocumentosService,
+    private notificacionesService: NotificacionesService,
+    private datosGeneralesService: DatosGeneralesService,
+    private aprobacionesService: AprobacionesService,
     private toastController: ToastController,
     private router: Router
   ) { }
@@ -463,8 +472,21 @@ export class VacacionEditarSolicitudPage implements OnInit {
     this.actualizando = true;
 
     this.vacacionesService.EditarSolicitudesVacaciones(payload).subscribe({
-      next: (solicitudActualizada) => {
-        this.procesarDocumentoDespuesActualizar(solicitudActualizada);
+      next: (response) => {
+        const respuestaActualizada = response?.data ?? response ?? null;
+
+        const solicitudActualizada = {
+          ...(this.solicitud ?? {}),
+          ...(respuestaActualizada ?? {}),
+          ...payload,
+          id: this.obtenerIdSolicitud(),
+          id_empleado: this.idEmpleado,
+          id_configuracion: this.tipoVacacionSeleccionado,
+          id_tipo_vacacion: this.tipoVacacionSeleccionado,
+          estado: this.solicitud?.estado ?? respuestaActualizada?.estado ?? 1
+        };
+
+        this.procesarDocumentoDespuesActualizar(solicitudActualizada, tipoSeleccionado);
       },
       error: (err) => {
         this.actualizando = false;
@@ -473,7 +495,7 @@ export class VacacionEditarSolicitudPage implements OnInit {
     });
   }
 
-  procesarDocumentoDespuesActualizar(solicitudActualizada: any) {
+  procesarDocumentoDespuesActualizar(solicitudActualizada: any, tipoSeleccionado: any) {
     const idSolicitud = this.obtenerIdSolicitud();
 
     if (this.archivoSeleccionado) {
@@ -486,12 +508,25 @@ export class VacacionEditarSolicitudPage implements OnInit {
         this.idEmpleado,
         'vacaciones'
       ).subscribe({
-        next: () => {
+        next: async () => {
+          await this.enviarComunicacionesEdicionVacacion(
+            {
+              ...solicitudActualizada,
+              documento: this.archivoSeleccionado?.name ?? solicitudActualizada?.documento
+            },
+            tipoSeleccionado
+          );
+
           this.actualizando = false;
           this.mostrarToast('Solicitud actualizada correctamente.', 'success');
           this.regresarDetalleConSolicitudActualizada(solicitudActualizada);
         },
-        error: () => {
+        error: async () => {
+          await this.enviarComunicacionesEdicionVacacion(
+            solicitudActualizada,
+            tipoSeleccionado
+          );
+
           this.actualizando = false;
           this.mostrarToast('La solicitud se actualizó, pero ocurrió un error al subir el documento.', 'warning');
           this.regresarDetalleConSolicitudActualizada(solicitudActualizada);
@@ -503,15 +538,27 @@ export class VacacionEditarSolicitudPage implements OnInit {
 
     if (this.documentoPendienteEliminar) {
       this.vacacionesService.EliminarDocumentoSolicitud(idSolicitud).subscribe({
-        next: () => {
-          this.actualizando = false;
-          this.mostrarToast('Solicitud actualizada correctamente.', 'success');
-          this.regresarDetalleConSolicitudActualizada({
+        next: async () => {
+          const solicitudSinDocumento = {
             ...solicitudActualizada,
             documento: null
-          });
+          };
+
+          await this.enviarComunicacionesEdicionVacacion(
+            solicitudSinDocumento,
+            tipoSeleccionado
+          );
+
+          this.actualizando = false;
+          this.mostrarToast('Solicitud actualizada correctamente.', 'success');
+          this.regresarDetalleConSolicitudActualizada(solicitudSinDocumento);
         },
-        error: () => {
+        error: async () => {
+          await this.enviarComunicacionesEdicionVacacion(
+            solicitudActualizada,
+            tipoSeleccionado
+          );
+
           this.actualizando = false;
           this.mostrarToast('La solicitud se actualizó, pero no se pudo eliminar el documento.', 'warning');
           this.regresarDetalleConSolicitudActualizada(solicitudActualizada);
@@ -521,9 +568,382 @@ export class VacacionEditarSolicitudPage implements OnInit {
       return;
     }
 
-    this.actualizando = false;
-    this.mostrarToast('Solicitud actualizada correctamente.', 'success');
-    this.regresarDetalleConSolicitudActualizada(solicitudActualizada);
+    this.enviarComunicacionesEdicionVacacion(
+      solicitudActualizada,
+      tipoSeleccionado
+    ).finally(() => {
+      this.actualizando = false;
+      this.mostrarToast('Solicitud actualizada correctamente.', 'success');
+      this.regresarDetalleConSolicitudActualizada(solicitudActualizada);
+    });
+  }
+
+  private async enviarComunicacionesEdicionVacacion(
+    solicitud: any,
+    tipoVacacion: any
+  ): Promise<void> {
+    try {
+      const idEmpleadoSolicitante = Number(
+        solicitud?.id_empleado ??
+        this.idEmpleado ??
+        0
+      );
+
+      const idTipoVacacion = Number(
+        solicitud?.id_configuracion ??
+        solicitud?.id_tipo_vacacion ??
+        this.tipoVacacionSeleccionado ??
+        0
+      );
+
+      const empleados = await firstValueFrom(
+        this.datosGeneralesService.ObtenerInformacionModulos(1)
+      );
+
+      const empleadoSolicitante = empleados.find((e: any) =>
+        Number(e?.id_empleado ?? e?.id) === Number(idEmpleadoSolicitante)
+      );
+
+      const idDepartamento = Number(
+        solicitud?.id_departamento ??
+        solicitud?.id_departamento_origen ??
+        solicitud?.id_dep ??
+        empleadoSolicitante?.id_departamento ??
+        empleadoSolicitante?.id_dep ??
+        empleadoSolicitante?.departamento_id ??
+        0
+      );
+
+      if (!idEmpleadoSolicitante || !idTipoVacacion || !idDepartamento) {
+        console.warn('No se envía comunicación de edición de vacación: faltan datos base.', {
+          idEmpleadoSolicitante,
+          idTipoVacacion,
+          idDepartamento,
+          solicitud,
+          empleadoSolicitante
+        });
+        return;
+      }
+
+      const flujos = await firstValueFrom(
+        this.aprobacionesService.ListarFlujosDepartamento(idDepartamento)
+      );
+
+      const flujoVacacion = flujos.find((f: any) => {
+        const modulo = String(f?.modulo ?? '').trim().toUpperCase();
+
+        const tipoFlujo = Number(
+          f?.id_tipo_solicitud ??
+          f?.id_tipo_vacacion ??
+          f?.id_tipo ??
+          0
+        );
+
+        return modulo === 'VACACION' && tipoFlujo === idTipoVacacion;
+      });
+
+      const idFlujo = Number(flujoVacacion?.id_flujo ?? flujoVacacion?.id ?? 0);
+
+      let detalleFlujo: any = null;
+
+      if (idFlujo) {
+        detalleFlujo = await firstValueFrom(
+          this.aprobacionesService.ObtenerDetalleFlujo(idFlujo)
+        );
+      }
+
+      const esJefe =
+        empleadoSolicitante?.jefe === true ||
+        empleadoSolicitante?.jefe === 1 ||
+        empleadoSolicitante?.jefe === 'true' ||
+        solicitud?.es_jefe === true;
+
+      const pasosIniciales = detalleFlujo
+        ? this.seleccionarPasosIniciales(detalleFlujo, esJefe)
+        : [];
+
+      const aprobadores = new Set<number>();
+
+      for (const paso of pasosIniciales) {
+        for (const idAprobador of this.obtenerDestinatariosPaso(paso)) {
+          aprobadores.add(idAprobador);
+        }
+      }
+
+      const idsReceptores = [
+        idEmpleadoSolicitante,
+        ...Array.from(aprobadores)
+      ].filter(id => !!id);
+
+      const idsUnicos = Array.from(new Set(idsReceptores));
+
+      const empleadosReceptores = empleados.filter((e: any) =>
+        idsUnicos.includes(Number(e?.id_empleado ?? e?.id))
+      );
+
+      const mensaje = this.armarMensajeEdicionVacacion(
+        solicitud,
+        tipoVacacion,
+        empleadoSolicitante
+      );
+
+      const idVacaciones = Number(
+        solicitud?.id ??
+        solicitud?.id_vacaciones ??
+        this.obtenerIdSolicitud() ??
+        0
+      );
+
+      const idEnvia = Number(
+        localStorage.getItem('empleadoID') ||
+        localStorage.getItem('empleado') ||
+        idEmpleadoSolicitante
+      );
+
+      const idsCorreo = empleadosReceptores
+        .filter((e: any) => {
+          const recibeCorreo =
+            e?.vacacion_mail === true ||
+            e?.vacacion_mail === 1 ||
+            e?.vacacion_mail === 'true';
+
+          return recibeCorreo && !!e?.correo;
+        })
+        .map((e: any) => Number(e?.id_empleado ?? e?.id));
+
+      const idsNotificacion = empleadosReceptores
+        .filter((e: any) =>
+          e?.vacacion_notificacion === true ||
+          e?.vacacion_notificacion === 1 ||
+          e?.vacacion_notificacion === 'true'
+        )
+        .map((e: any) => Number(e?.id_empleado ?? e?.id));
+
+      if (idsCorreo.length > 0) {
+        try {
+          const correosEnviar = empleadosReceptores
+            .filter((e: any) => {
+              const recibeCorreo =
+                e?.vacacion_mail === true ||
+                e?.vacacion_mail === 1 ||
+                e?.vacacion_mail === 'true';
+
+              return recibeCorreo && !!e?.correo;
+            })
+            .map((e: any) => String(e.correo).trim())
+            .filter((correo: string) => !!correo);
+
+          const correoUnico = Array.from(new Set(correosEnviar)).join(', ');
+
+          const payloadCorreo = {
+            id_envia: idEnvia,
+            plataforma: 'Aplicación Móvil',
+            items: [
+              {
+                correo: correoUnico,
+                asunto: 'Solicitud de vacación modificada',
+                mensaje,
+                id_vacaciones: idVacaciones
+              }
+            ]
+          };
+
+          await firstValueFrom(
+            this.notificacionesService.EnviarCorreoPermisoLegalizacionMultiple(payloadCorreo)
+          );
+
+        } catch (error) {
+          console.error('ERROR AL ENVIAR CORREO DE EDICION DE VACACION', error);
+        }
+      }
+
+      if (idsNotificacion.length > 0) {
+        try {
+          const idsNotificacionUnicos = Array.from(new Set(idsNotificacion));
+
+          const payloadNotificacion = {
+            id_empl_envia: idEnvia,
+            id_empl_recive: idsNotificacionUnicos,
+            mensaje,
+            tipo: TipoNotificacion.EDITAR_VACACION,
+            id_vacaciones: idVacaciones
+          };
+
+          await firstValueFrom(
+            this.notificacionesService.EnviarNotificacionPermisoLegalizacionMultiple(payloadNotificacion)
+          );
+
+        } catch (error) {
+          console.error('ERROR AL ENVIAR NOTIFICACION DE EDICION DE VACACION', error);
+        }
+      }
+
+    } catch (error) {
+      console.error('ERROR GENERAL AL ENVIAR COMUNICACIONES DE EDICION DE VACACION', error);
+    }
+  }
+
+  private armarMensajeEdicionVacacion(
+    solicitud: any,
+    tipoVacacion: any,
+    empleadoSolicitante?: any
+  ): string {
+
+    const nombreEmp = [
+      empleadoSolicitante?.apellido,
+      empleadoSolicitante?.nombre
+    ].filter(Boolean).join(' ').trim() || `Empleado ${solicitud?.id_empleado ?? this.idEmpleado}`;
+
+    const cargoEmpleado =
+      empleadoSolicitante?.cargo ??
+      empleadoSolicitante?.name_cargo ??
+      solicitud?.cargo ??
+      null;
+
+    const departamentoEmpleado =
+      empleadoSolicitante?.departamento ??
+      empleadoSolicitante?.name_dep ??
+      solicitud?.nom_departamento ??
+      solicitud?.departamento ??
+      null;
+
+    const motivo = (
+      tipoVacacion?.descripcion ??
+      tipoVacacion?.nombre ??
+      solicitud?.tipo_vacacion_descripcion ??
+      solicitud?.tipo_vacacion ??
+      ''
+    ).toString();
+
+    const dias = Number(
+      solicitud?.numero_dias_totales ??
+      solicitud?.num_dias_totales ??
+      this.diasTotales ??
+      0
+    );
+
+    const minutos = Number(
+      solicitud?.minutos_totales ??
+      this.calcularMinutosTotales() ??
+      0
+    );
+
+    const esPorHoras = dias === 0 && minutos > 0;
+
+    const fechaDesde = String(
+      solicitud?.fecha_inicio ??
+      this.fechaInicio ??
+      this.fechaHoras ??
+      ''
+    ).substring(0, 10);
+
+    const fechaHasta = String(
+      solicitud?.fecha_final ??
+      this.fechaFinal ??
+      this.fechaHoras ??
+      ''
+    ).substring(0, 10);
+
+    const payloadMensaje = {
+      accion: 'EDITADO',
+      mensaje_principal: 'Se ha modificado la siguiente solicitud de vacación:',
+      notificacion: 'Se ha modificado la siguiente solicitud de vacación:',
+      data: {
+        empleado: nombreEmp,
+        identificacion: empleadoSolicitante?.identificacion ?? solicitud?.identificacion ?? null,
+        cargo: cargoEmpleado,
+        departamento: departamentoEmpleado,
+        fecha_solicitud: new Date().toISOString().substring(0, 10),
+        fecha_desde: fechaDesde,
+        fecha_hasta: esPorHoras ? fechaDesde : fechaHasta,
+        dias: esPorHoras ? null : dias,
+        hora: esPorHoras ? this.getHorasFormatoHHmmDesdeMinutos(minutos) : null,
+        hora_inicio: esPorHoras ? (solicitud?.hora_inicio ?? this.horaInicio ?? null) : null,
+        hora_fin: esPorHoras ? (solicitud?.hora_fin ?? this.horaFinal ?? null) : null,
+        motivo,
+        observacion: solicitud?.descripcion ?? '',
+        estado_solicitud: this.mapearEstadoTexto(Number(solicitud?.estado ?? 1)),
+        realizado_por:
+          localStorage.getItem('fullname') ||
+          localStorage.getItem('nombre') ||
+          nombreEmp
+      }
+    };
+
+    return JSON.stringify(payloadMensaje);
+  }
+
+  private cumpleTargetSolicitante(target: string, esJefe: boolean): boolean {
+    const t = String(target ?? 'AMBOS').toUpperCase();
+
+    if (t === 'AMBOS') return true;
+    if (t === 'JEFES') return esJefe === true;
+    if (t === 'EMPLEADOS') return esJefe === false;
+
+    return true;
+  }
+
+  private seleccionarPasosIniciales(detalle: any, esJefe: boolean): any[] {
+    const pasos = Array.isArray(detalle?.pasos)
+      ? detalle.pasos.slice().sort((a: any, b: any) => Number(a?.orden ?? 0) - Number(b?.orden ?? 0))
+      : [];
+
+    const aplicables = pasos.filter((p: any) =>
+      this.cumpleTargetSolicitante(p?.target_solicitante, esJefe)
+    );
+
+    const seleccionados: any[] = [];
+
+    for (const paso of aplicables) {
+      seleccionados.push(paso);
+
+      if (paso?.obligatorio === true) {
+        break;
+      }
+    }
+
+    return seleccionados;
+  }
+
+  private obtenerDestinatariosPaso(paso: any): number[] {
+    const modo = String(paso?.modo_aprobador ?? '').toUpperCase();
+
+    const jefes: number[] = Array.isArray(paso?.ids_empleados_jefes_destino)
+      ? paso.ids_empleados_jefes_destino.map((x: any) => Number(x)).filter(Number.isFinite)
+      : [];
+
+    const especificos: number[] = Array.isArray(paso?.ids_empleados_especificos)
+      ? paso.ids_empleados_especificos.map((x: any) => Number(x)).filter(Number.isFinite)
+      : [];
+
+    if (modo === 'JEFES') return jefes;
+    if (modo === 'ESPECIFICOS') return especificos;
+
+    return Array.from(new Set([...jefes, ...especificos]));
+  }
+
+  private mapearEstadoTexto(estado: number): string {
+    switch (Number(estado)) {
+      case 1:
+        return 'PENDIENTE';
+      case 2:
+        return 'PREAUTORIZADO';
+      case 3:
+        return 'AUTORIZADO';
+      case 4:
+        return 'RECHAZADO';
+      default:
+        return 'PENDIENTE';
+    }
+  }
+
+  private getHorasFormatoHHmmDesdeMinutos(minutos: number): string {
+    const total = Number(minutos || 0);
+
+    const horas = Math.floor(total / 60);
+    const mins = total % 60;
+
+    return `${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
   }
 
   regresarDetalleConSolicitudActualizada(solicitudActualizada: any) {

@@ -4,6 +4,12 @@ import { FeriadosService, IFeriado } from 'src/app/services/feriados.service';
 import { DocumentosService } from 'src/app/services/documentos.service';
 import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+
+import { NotificacionesService } from 'src/app/services/notificaciones.service';
+import { DatosGeneralesService } from 'src/app/services/datos-generales.service';
+import { AprobacionesService } from 'src/app/services/aprobaciones.service';
+import { TipoNotificacion } from 'src/app/interfaces/tipo-notificaciones.enum';
  
 @Component({
   selector: 'app-registrar-vacacion',
@@ -60,6 +66,9 @@ export class RegistrarVacacionPage implements OnInit {
     private documentosService: DocumentosService,
     private toastController: ToastController,
     private router: Router,
+    private notificacionesService: NotificacionesService,
+    private datosGeneralesService: DatosGeneralesService,
+    private aprobacionesService: AprobacionesService,
 
   ) { }
 
@@ -371,6 +380,11 @@ export class RegistrarVacacionPage implements OnInit {
       return;
     }
 
+    if (this.archivoSeleccionado && this.archivoSeleccionado.size > 2e6) {
+      this.mostrarToast('El archivo ha excedido el tamaño permitido. Máximo 2MB.', 'warning');
+      return;
+    }
+
     const esPorHoras = this.permiteHoras;
 
     const fechaInicioSolicitud = esPorHoras ? this.fechaHoras : this.fechaInicio;
@@ -414,9 +428,11 @@ export class RegistrarVacacionPage implements OnInit {
             this.idEmpleado,
             'vacaciones'
           ).subscribe({
-            next: () => {
+            next: async () => {
+              await this.enviarComunicacionesCreacionVacacion(solicitudCreada, tipoSeleccionado);
+
               this.mostrarToast('Solicitud registrada correctamente.', 'success');
-              this.resetearFormularioCompleto();
+              this.router.navigateByUrl('/reloj/solicitudes/vacacion-solicitud');
             },
             error: () => {
               this.mostrarToast('La solicitud se registró, pero ocurrió un error al subir el documento.', 'warning');
@@ -426,14 +442,380 @@ export class RegistrarVacacionPage implements OnInit {
           return;
         }
 
-        this.mostrarToast('Solicitud registrada correctamente.', 'success');
-        this.router.navigateByUrl('/reloj/solicitudes/vacacion-solicitud');
+        this.enviarComunicacionesCreacionVacacion(solicitudCreada, tipoSeleccionado).finally(() => {
+          this.mostrarToast('Solicitud registrada correctamente.', 'success');
+          this.router.navigateByUrl('/reloj/solicitudes/vacacion-solicitud');
+        });
       },
       error: (err) => {
         this.mostrarToast(err?.message || 'Ocurrió un error al registrar la solicitud.', 'danger');
       }
     });
   }
+
+  private async enviarComunicacionesCreacionVacacion(
+    solicitud: any,
+    tipoVacacion: any
+  ): Promise<void> {
+    try {
+      const idEmpleadoSolicitante = Number(
+        solicitud?.id_empleado ??
+        this.idEmpleado ??
+        0
+      );
+
+      const idTipoVacacion = Number(
+        solicitud?.id_tipo_vacacion ??
+        solicitud?.id_configuracion ??
+        this.tipoVacacionSeleccionado ??
+        0
+      );
+
+      const empleados = await firstValueFrom(
+        this.datosGeneralesService.ObtenerInformacionModulos(1)
+      );
+
+      const empleadoSolicitante = empleados.find((e: any) =>
+        Number(e?.id_empleado ?? e?.id) === Number(idEmpleadoSolicitante)
+      );
+
+      const idDepartamento = Number(
+        solicitud?.id_departamento ??
+        solicitud?.id_departamento_origen ??
+        solicitud?.id_dep ??
+        empleadoSolicitante?.id_departamento ??
+        empleadoSolicitante?.id_dep ??
+        empleadoSolicitante?.departamento_id ??
+        0
+      );
+
+      if (!idEmpleadoSolicitante || !idTipoVacacion || !idDepartamento) {
+        console.warn('No se envía comunicación de vacación: faltan datos base.', {
+          idEmpleadoSolicitante,
+          idTipoVacacion,
+          idDepartamento,
+          solicitud,
+          empleadoSolicitante
+        });
+        return;
+      }
+
+      const flujos = await firstValueFrom(
+        this.aprobacionesService.ListarFlujosDepartamento(idDepartamento)
+      );
+
+      const flujoVacacion = flujos.find((f: any) => {
+        const modulo = String(f?.modulo ?? '').trim().toUpperCase();
+
+        const tipoFlujo = Number(
+          f?.id_tipo_solicitud ??
+          f?.id_tipo_vacacion ??
+          f?.id_tipo ??
+          0
+        );
+
+        return modulo === 'VACACION' && tipoFlujo === idTipoVacacion;
+      });
+
+      const idFlujo = Number(flujoVacacion?.id_flujo ?? flujoVacacion?.id ?? 0);
+
+      let detalleFlujo: any = null;
+
+      if (idFlujo) {
+        detalleFlujo = await firstValueFrom(
+          this.aprobacionesService.ObtenerDetalleFlujo(idFlujo)
+        );
+      }
+
+      const esJefe =
+        empleadoSolicitante?.jefe === true ||
+        empleadoSolicitante?.jefe === 1 ||
+        empleadoSolicitante?.jefe === 'true' ||
+        solicitud?.es_jefe === true;
+
+      const pasosIniciales = detalleFlujo
+        ? this.seleccionarPasosIniciales(detalleFlujo, esJefe)
+        : [];
+
+      const aprobadores = new Set<number>();
+
+      for (const paso of pasosIniciales) {
+        for (const idAprobador of this.obtenerDestinatariosPaso(paso)) {
+          aprobadores.add(idAprobador);
+        }
+      }
+
+      const idsReceptores = [
+        idEmpleadoSolicitante,
+        ...Array.from(aprobadores)
+      ].filter(id => !!id);
+
+      const idsUnicos = Array.from(new Set(idsReceptores));
+
+      const empleadosReceptores = empleados.filter((e: any) =>
+        idsUnicos.includes(Number(e?.id_empleado ?? e?.id))
+      );
+
+      const mensaje = this.armarMensajeCreacionVacacion(
+        solicitud,
+        tipoVacacion,
+        empleadoSolicitante
+      );
+
+      const idVacaciones = Number(
+        solicitud?.id ??
+        solicitud?.id_vacaciones ??
+        0
+      );
+
+      const idEnvia = Number(
+        localStorage.getItem('empleadoID') ||
+        localStorage.getItem('empleado') ||
+        idEmpleadoSolicitante
+      );
+
+      const idsCorreo = empleadosReceptores
+        .filter((e: any) => {
+          const recibeCorreo =
+            e?.vacacion_mail === true ||
+            e?.vacacion_mail === 1 ||
+            e?.vacacion_mail === 'true';
+
+          return recibeCorreo && !!e?.correo;
+        })
+        .map((e: any) => Number(e?.id_empleado ?? e?.id));
+
+      const idsNotificacion = empleadosReceptores
+        .filter((e: any) =>
+          e?.vacacion_notificacion === true ||
+          e?.vacacion_notificacion === 1 ||
+          e?.vacacion_notificacion === 'true'
+        )
+        .map((e: any) => Number(e?.id_empleado ?? e?.id));
+
+      if (idsCorreo.length > 0) {
+        try {
+          const correosEnviar = empleadosReceptores
+            .filter((e: any) => {
+              const recibeCorreo =
+                e?.vacacion_mail === true ||
+                e?.vacacion_mail === 1 ||
+                e?.vacacion_mail === 'true';
+
+              return recibeCorreo && !!e?.correo;
+            })
+            .map((e: any) => String(e.correo).trim())
+            .filter((correo: string) => !!correo);
+
+          const correoUnico = Array.from(new Set(correosEnviar)).join(', ');
+
+          const payloadCorreo = {
+            id_envia: idEnvia,
+            plataforma: 'Aplicación Móvil',
+            items: [
+              {
+                correo: correoUnico,
+                asunto: 'Solicitud de vacación registrada',
+                mensaje,
+                id_vacaciones: idVacaciones
+              }
+            ]
+          };
+
+          await firstValueFrom(
+            this.notificacionesService.EnviarCorreoPermisoLegalizacionMultiple(payloadCorreo)
+          );
+
+        } catch (error) {
+          console.error('ERROR AL ENVIAR CORREO DE CREACION DE VACACION', error);
+        }
+      }
+
+      if (idsNotificacion.length > 0) {
+        try {
+          const idsNotificacionUnicos = Array.from(new Set(idsNotificacion));
+
+          const payloadNotificacion = {
+            id_empl_envia: idEnvia,
+            id_empl_recive: idsNotificacionUnicos,
+            mensaje,
+            tipo: TipoNotificacion.CREAR_VACACION,
+            id_vacaciones: idVacaciones
+          };
+
+          await firstValueFrom(
+            this.notificacionesService.EnviarNotificacionPermisoLegalizacionMultiple(payloadNotificacion)
+          );
+
+        } catch (error) {
+          console.error('ERROR AL ENVIAR NOTIFICACION DE CREACION DE VACACION', error);
+        }
+      }
+
+    } catch (error) {
+      console.error('ERROR GENERAL AL ENVIAR COMUNICACIONES DE CREACION DE VACACION', error);
+    }
+  }
+
+  private armarMensajeCreacionVacacion(
+    solicitud: any,
+    tipoVacacion: any,
+    empleadoSolicitante?: any
+  ): string {
+
+    const nombreEmp = [
+      empleadoSolicitante?.apellido,
+      empleadoSolicitante?.nombre
+    ].filter(Boolean).join(' ').trim() || `Empleado ${solicitud?.id_empleado ?? this.idEmpleado}`;
+
+    const cargoEmpleado =
+      empleadoSolicitante?.cargo ??
+      empleadoSolicitante?.name_cargo ??
+      null;
+
+    const departamentoEmpleado =
+      empleadoSolicitante?.departamento ??
+      empleadoSolicitante?.name_dep ??
+      null;
+
+    const motivo = (
+      tipoVacacion?.descripcion ??
+      tipoVacacion?.nombre ??
+      solicitud?.tipo_vacacion_descripcion ??
+      ''
+    ).toString();
+
+    const dias = Number(
+      solicitud?.num_dias_totales ??
+      solicitud?.numero_dias_totales ??
+      this.diasTotales ??
+      0
+    );
+
+    const horasTexto = (
+      solicitud?.num_horas ??
+      this.horasTotales ??
+      '00:00'
+    ).toString();
+
+    const esPorHoras = dias === 0 && horasTexto !== '00:00';
+
+    const fechaDesde = String(
+      solicitud?.fecha_inicio ??
+      this.fechaInicio ??
+      this.fechaHoras ??
+      ''
+    ).substring(0, 10);
+
+    const fechaHasta = String(
+      solicitud?.fecha_final ??
+      this.fechaFinal ??
+      this.fechaHoras ??
+      ''
+    ).substring(0, 10);
+
+    const fechaSolicitudRaw =
+      solicitud?.fecha_registro ??
+      solicitud?.fecha_creacion ??
+      new Date().toISOString();
+
+    const fechaSolicitud = fechaSolicitudRaw
+      ? new Date(fechaSolicitudRaw).toISOString().substring(0, 10)
+      : null;
+
+    const payloadMensaje = {
+      accion: 'CREADO',
+      mensaje_principal: 'Se ha registrado la siguiente solicitud de vacación:',
+      notificacion: 'Se ha registrado la siguiente solicitud de vacación:',
+      data: {
+        empleado: nombreEmp,
+        identificacion: empleadoSolicitante?.identificacion ?? null,
+        cargo: cargoEmpleado,
+        departamento: departamentoEmpleado,
+        fecha_solicitud: fechaSolicitud,
+        fecha_desde: fechaDesde,
+        fecha_hasta: esPorHoras ? fechaDesde : fechaHasta,
+        dias: esPorHoras ? null : dias,
+        hora: esPorHoras ? horasTexto : null,
+        hora_inicio: esPorHoras ? (solicitud?.hora_inicio ?? this.horaInicio ?? null) : null,
+        hora_fin: esPorHoras ? (solicitud?.hora_fin ?? this.horaFinal ?? null) : null,
+        motivo,
+        observacion: solicitud?.descripcion ?? '',
+        estado_solicitud: this.mapearEstadoTexto(Number(solicitud?.estado ?? 1)),
+        realizado_por:
+          localStorage.getItem('fullname') ||
+          localStorage.getItem('nombre') ||
+          nombreEmp
+      }
+    };
+
+    return JSON.stringify(payloadMensaje);
+  }
+
+  private cumpleTargetSolicitante(target: string, esJefe: boolean): boolean {
+    const t = String(target ?? 'AMBOS').toUpperCase();
+
+    if (t === 'AMBOS') return true;
+    if (t === 'JEFES') return esJefe === true;
+    if (t === 'EMPLEADOS') return esJefe === false;
+
+    return true;
+  }
+
+  private seleccionarPasosIniciales(detalle: any, esJefe: boolean): any[] {
+    const pasos = Array.isArray(detalle?.pasos)
+      ? detalle.pasos.slice().sort((a: any, b: any) => Number(a?.orden ?? 0) - Number(b?.orden ?? 0))
+      : [];
+
+    const aplicables = pasos.filter((p: any) =>
+      this.cumpleTargetSolicitante(p?.target_solicitante, esJefe)
+    );
+
+    const seleccionados: any[] = [];
+
+    for (const paso of aplicables) {
+      seleccionados.push(paso);
+
+      if (paso?.obligatorio === true) {
+        break;
+      }
+    }
+
+    return seleccionados;
+  }
+
+  private obtenerDestinatariosPaso(paso: any): number[] {
+    const modo = String(paso?.modo_aprobador ?? '').toUpperCase();
+
+    const jefes: number[] = Array.isArray(paso?.ids_empleados_jefes_destino)
+      ? paso.ids_empleados_jefes_destino.map((x: any) => Number(x)).filter(Number.isFinite)
+      : [];
+
+    const especificos: number[] = Array.isArray(paso?.ids_empleados_especificos)
+      ? paso.ids_empleados_especificos.map((x: any) => Number(x)).filter(Number.isFinite)
+      : [];
+
+    if (modo === 'JEFES') return jefes;
+    if (modo === 'ESPECIFICOS') return especificos;
+
+    return Array.from(new Set([...jefes, ...especificos]));
+  }
+  
+  private mapearEstadoTexto(estado: number): string {
+    switch (Number(estado)) {
+      case 1:
+        return 'PENDIENTE';
+      case 2:
+        return 'PREAUTORIZADO';
+      case 3:
+        return 'AUTORIZADO';
+      case 4:
+        return 'RECHAZADO';
+      default:
+        return 'PENDIENTE';
+    }
+  }
+
 
   puedeVerificar(): boolean {
     if (!this.tipoVacacionSeleccionado) return false;

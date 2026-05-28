@@ -117,4 +117,24 @@ export class AprobacionesService {
       );
   }
 
+  ListarFlujosDepartamento(idDepartamentoOrigen: number) {
+    return this.http
+      .get<{ ok: boolean; data: any[] }>(
+        `${this.apiUrl}/flujos/departamento/${idDepartamentoOrigen}`
+      )
+      .pipe(
+        map(res => Array.isArray(res?.data) ? res.data : [])
+      );
+  }
+
+  ObtenerDetalleFlujo(idFlujo: number) {
+    return this.http
+      .get<{ ok: boolean; data: any }>(
+        `${this.apiUrl}/flujos/${idFlujo}`
+      )
+      .pipe(
+        map(res => res?.data ?? null)
+      );
+  }
+
 }

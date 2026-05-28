@@ -4,6 +4,11 @@ import { AprobacionesService } from 'src/app/services/aprobaciones.service';
 import { PermisosService } from 'src/app/services/permisos.service';
 import { DatosGeneralesService } from 'src/app/services/datos-generales.service';
 
+import { firstValueFrom } from 'rxjs';
+
+import { NotificacionesService } from 'src/app/services/notificaciones.service';
+import { TipoNotificacion } from 'src/app/interfaces/tipo-notificaciones.enum';
+
 @Component({
   selector: 'app-permiso-aprobacion',
   templateUrl: './permiso-aprobacion.page.html',
@@ -67,6 +72,7 @@ export class PermisoAprobacionPage implements OnInit {
     private aprobacionesService: AprobacionesService,
     private permisosService: PermisosService,
     private datosGeneralesService: DatosGeneralesService,
+    private notificacionesService: NotificacionesService,
     private toastController: ToastController,
     private alertController: AlertController
   ) { }
@@ -650,54 +656,577 @@ export class PermisoAprobacionPage implements OnInit {
     await alert.present();
   }
 
-  async ejecutarAccionMultiple(
-    decision: 'APRUEBA' | 'RECHAZA',
-    observacion: string
-  ) {
+  async ejecutarAccionMultiple(decision: 'APRUEBA' | 'RECHAZA', observacion: string) {
     this.procesandoMultiple = true;
-    this.cargando = true;
 
-    const solicitudesProcesadas: number[] = [];
-    const solicitudesConError: number[] = [];
+    let exitosas = 0;
+    let sinPermiso = 0;
+    let conflictos = 0;
+    let errores = 0;
 
     for (const solicitud of this.solicitudesSeleccionadas) {
       try {
-        const payload = {
-          modulo: 'PERMISO' as const,
-          id_solicitud_modulo: Number(solicitud.id),
+        const snapshot = JSON.parse(JSON.stringify(solicitud));
+
+        await firstValueFrom(
+          this.aprobacionesService.EjecutarAccionSolicitud({
+            modulo: 'PERMISO',
+            id_solicitud_modulo: Number(solicitud.id),
+            decision,
+            observacion
+          })
+        );
+
+        await this.enviarComunicacionesAprobacionPermiso(
+          snapshot,
           decision,
           observacion
-        };
+        );
 
-        console.log('Payload aprobación múltiple:', payload);
+        exitosas++;
 
-        await this.aprobacionesService.EjecutarAccionSolicitud(payload).toPromise();
-
-        solicitudesProcesadas.push(Number(solicitud.id));
-
-      } catch (error) {
-        console.log('Error aprobando solicitud múltiple:', solicitud.id, error);
-        solicitudesConError.push(Number(solicitud.id));
+      } catch (error: any) {
+        if (error?.status === 403) {
+          sinPermiso++;
+        } else if (error?.status === 409) {
+          conflictos++;
+        } else {
+          errores++;
+        }
       }
     }
 
-    this.solicitudes = this.solicitudes.filter(
-      (s: any) => !solicitudesProcesadas.includes(Number(s.id))
+    this.procesandoMultiple = false;
+
+    if (exitosas > 0) {
+      await this.mostrarToast(`Acción aplicada a ${exitosas} solicitud(es).`, 'success');
+    }
+
+    if (sinPermiso > 0) {
+      await this.mostrarToast(`${sinPermiso} solicitud(es) sin permisos para esa acción.`, 'danger');
+    }
+
+    if (conflictos > 0) {
+      await this.mostrarToast(`${conflictos} solicitud(es) no cumplen las validaciones actuales.`, 'warning');
+    }
+
+    if (errores > 0) {
+      await this.mostrarToast(`${errores} solicitud(es) no pudieron procesarse.`, 'danger');
+    }
+
+    await this.buscarSolicitudes();
+  }
+
+  private async enviarComunicacionesAprobacionPermiso(
+    snapshot: any,
+    decision: 'APRUEBA' | 'RECHAZA',
+    observacion: string
+  ): Promise<void> {
+    try {
+      const idSolicitud = Number(
+        snapshot?.id ??
+        snapshot?.id_permiso ??
+        snapshot?.id_solicitud_permiso ??
+        0
+      );
+
+      const idEmpleadoSolicitante = Number(
+        snapshot?.id_empleado ??
+        snapshot?.empleado_id ??
+        0
+      );
+
+      const idTipoPermiso = Number(
+        snapshot?.id_tipo_permiso ??
+        snapshot?.id_tipo_solicitud ??
+        snapshot?.tipo_permiso_id ??
+        0
+      );
+
+      const idDepartamento = Number(
+        snapshot?.id_departamento_origen ??
+        snapshot?.id_departamento ??
+        snapshot?.id_depa ??
+        snapshot?.id_dep ??
+        0
+      );
+
+      if (!idSolicitud || !idEmpleadoSolicitante || !idTipoPermiso) {
+        console.warn('No se envía comunicación de aprobación permiso: faltan datos base.', {
+          idSolicitud,
+          idEmpleadoSolicitante,
+          idTipoPermiso,
+          idDepartamento,
+          snapshot
+        });
+        return;
+      }
+
+      const pasoActual = snapshot?.validacionAprobacion?.paso_actual ?? null;
+
+      const accion = this.obtenerAccionPermiso(decision, pasoActual);
+
+      const mensaje = await this.armarMensajeAprobacionPermiso(
+        snapshot,
+        accion,
+        observacion
+      );
+
+      const destinatarios = await this.obtenerDestinatariosAprobacionPermiso(
+        snapshot,
+        idEmpleadoSolicitante,
+        idDepartamento,
+        idTipoPermiso,
+        decision,
+        pasoActual
+      );
+
+      await this.enviarCorreoYNotificacionPermiso(
+        destinatarios,
+        mensaje,
+        this.obtenerTipoNotificacionPermiso(accion),
+        this.obtenerAsuntoPermiso(accion),
+        idSolicitud,
+        idTipoPermiso
+      );
+
+    } catch (error) {
+      console.error('ERROR GENERAL AL ENVIAR COMUNICACIONES DE APROBACION PERMISO', error);
+    }
+  }
+
+  private async obtenerDestinatariosAprobacionPermiso(
+    snapshot: any,
+    idEmpleadoSolicitante: number,
+    idDepartamento: number,
+    idTipoPermiso: number,
+    decision: 'APRUEBA' | 'RECHAZA',
+    pasoActual: any
+  ): Promise<Set<number>> {
+
+    const destinatarios = new Set<number>([
+      idEmpleadoSolicitante,
+      this.idEmpleadoLogueado
+    ]);
+
+    const tipoPaso = String(pasoActual?.tipo_paso ?? '').toUpperCase();
+    const ordenActual = Number(pasoActual?.orden ?? 0);
+
+    const esRechazo = decision === 'RECHAZA';
+    const esAutorizacionFinal = tipoPaso === 'AUTORIZA' && decision === 'APRUEBA';
+
+    if (esRechazo || esAutorizacionFinal) {
+      return destinatarios;
+    }
+
+    if (!idDepartamento || !idTipoPermiso || !ordenActual) {
+      return destinatarios;
+    }
+
+    const detalle = await this.obtenerDetalleFlujoPermiso(
+      idDepartamento,
+      idTipoPermiso
     );
 
-      this.solicitudesSeleccionadas = [];
-      this.procesandoMultiple = false;
-      this.cargando = false;
+    const pasos = Array.isArray(detalle?.pasos)
+      ? detalle.pasos.slice().sort((a: any, b: any) => Number(a?.orden ?? 0) - Number(b?.orden ?? 0))
+      : [];
 
-    this.actualizarPaginacion();
+    const pasoDetActual = pasos.find((p: any) =>
+      Number(p?.orden ?? 0) === Number(ordenActual)
+    );
 
-    if (solicitudesProcesadas.length > 0 && solicitudesConError.length === 0) {
-      this.mostrarToast('Solicitudes procesadas correctamente.', 'success');
-    } else if (solicitudesProcesadas.length > 0 && solicitudesConError.length > 0) {
-      this.mostrarToast('Algunas solicitudes fueron procesadas, pero otras fallaron.', 'warning');
-    } else {
-      this.mostrarToast('No se pudo procesar ninguna solicitud.', 'danger');
+    const pasoDetSiguiente = pasos.find((p: any) =>
+      Number(p?.orden ?? 0) === Number(ordenActual + 1)
+    );
+
+    if (pasoDetActual) {
+      for (const idAprobador of this.obtenerDestinatariosPaso(pasoDetActual)) {
+        destinatarios.add(idAprobador);
+      }
     }
+
+    if (pasoDetSiguiente) {
+      for (const idAprobador of this.obtenerDestinatariosPaso(pasoDetSiguiente)) {
+        destinatarios.add(idAprobador);
+      }
+    }
+
+    return destinatarios;
+  }
+
+  private async enviarCorreoYNotificacionPermiso(
+    destinatarios: Set<number>,
+    mensajeJson: string,
+    tipoNoti: number,
+    asunto: string,
+    idPermiso: number,
+    idTipoPermiso: number
+  ): Promise<void> {
+    try {
+      const empleados = await firstValueFrom(
+        this.datosGeneralesService.ObtenerInformacionModulos(1)
+      );
+
+      const tiposPermiso: any[] = await firstValueFrom(
+        this.permisosService.listarTiposPermiso()
+      );
+
+      const tipoPermiso = Array.isArray(tiposPermiso)
+        ? tiposPermiso.find((t: any) => Number(t?.id) === Number(idTipoPermiso))
+        : null;
+
+      const tipoPermiteCorreo = this.valorBooleanoPermiso(
+        tipoPermiso?.permiso_mail ?? tipoPermiso?.correo,
+        true
+      );
+
+      const idsDestino = Array.from(destinatarios).map(id => Number(id));
+
+      const empleadosReceptores = empleados.filter((e: any) =>
+        idsDestino.includes(Number(e?.id_empleado ?? e?.id))
+      );
+
+      const correosEnviar = empleadosReceptores
+        .filter((e: any) => {
+          const recibeCorreo =
+            e?.permiso_mail === true ||
+            e?.permiso_mail === 1 ||
+            e?.permiso_mail === 'true';
+
+          return tipoPermiteCorreo && recibeCorreo && !!e?.correo;
+        })
+        .map((e: any) => String(e.correo).trim())
+        .filter((correo: string) => !!correo);
+
+      const idsNotificacion = empleadosReceptores
+        .filter((e: any) =>
+          e?.permiso_notificacion === true ||
+          e?.permiso_notificacion === 1 ||
+          e?.permiso_notificacion === 'true'
+        )
+        .map((e: any) => Number(e?.id_empleado ?? e?.id));
+
+      const correoUnico = Array.from(new Set(correosEnviar)).join(', ');
+
+      if (correoUnico) {
+        try {
+          const payloadCorreo = {
+            id_envia: this.idEmpleadoLogueado,
+            plataforma: 'Aplicación Móvil',
+            items: [
+              {
+                correo: correoUnico,
+                asunto,
+                mensaje: mensajeJson,
+                id_permiso: idPermiso
+              }
+            ]
+          };
+
+          await firstValueFrom(
+            this.notificacionesService.EnviarCorreoPermisoLegalizacionMultiple(payloadCorreo)
+          );
+
+        } catch (error) {
+          console.error('ERROR AL ENVIAR CORREO DE APROBACION PERMISO', error);
+        }
+      }
+
+      const idsNotificacionUnicos = Array.from(new Set(idsNotificacion));
+
+      if (idsNotificacionUnicos.length > 0) {
+        try {
+          const payloadNotificacion = {
+            id_empl_envia: this.idEmpleadoLogueado,
+            id_empl_recive: idsNotificacionUnicos,
+            mensaje: mensajeJson,
+            tipo: tipoNoti,
+            id_permiso: idPermiso
+          };
+
+          await firstValueFrom(
+            this.notificacionesService.EnviarNotificacionPermisoLegalizacionMultiple(payloadNotificacion)
+          );
+
+        } catch (error) {
+          console.error('ERROR AL ENVIAR NOTIFICACION DE APROBACION PERMISO', error);
+        }
+      }
+
+    } catch (error) {
+      console.error('ERROR GENERAL EN CORREO/NOTIFICACION PERMISO', error);
+    }
+  }
+
+  private async armarMensajeAprobacionPermiso(
+    solicitud: any,
+    accion: 'PREAUTORIZADO' | 'AUTORIZADO' | 'RECHAZADO',
+    observacionAccion: string
+  ): Promise<string> {
+
+    const empleados = await firstValueFrom(
+      this.datosGeneralesService.ObtenerInformacionModulos(1)
+    );
+
+    const idEmpleadoSolicitante = Number(
+      solicitud?.id_empleado ??
+      solicitud?.empleado_id ??
+      0
+    );
+
+    const empleadoSolicitante = empleados.find((e: any) =>
+      Number(e?.id_empleado ?? e?.id) === Number(idEmpleadoSolicitante)
+    );
+
+    const empleadoEjecutor = empleados.find((e: any) =>
+      Number(e?.id_empleado ?? e?.id) === Number(this.idEmpleadoLogueado)
+    );
+
+    const nombreEjecutor = [
+      empleadoEjecutor?.apellido,
+      empleadoEjecutor?.nombre
+    ].filter(Boolean).join(' ').trim() || `Empleado ${this.idEmpleadoLogueado}`;
+
+    const idTipoPermiso = Number(
+      solicitud?.id_tipo_permiso ??
+      solicitud?.id_tipo_solicitud ??
+      solicitud?.tipo_permiso_id ??
+      0
+    );
+
+    const tipoPermiso = await this.obtenerTipoPermisoPorId(idTipoPermiso);
+
+    const nombreEmp = [
+      empleadoSolicitante?.apellido ?? solicitud?.apellido_emple ?? solicitud?.apellido_empleado,
+      empleadoSolicitante?.nombre ?? solicitud?.nombre_emple ?? solicitud?.nombre_empleado
+    ].filter(Boolean).join(' ').trim() || `Empleado ${idEmpleadoSolicitante}`;
+
+    const cargoEmpleado =
+      empleadoSolicitante?.cargo ??
+      empleadoSolicitante?.name_cargo ??
+      solicitud?.cargo ??
+      null;
+
+    const departamentoEmpleado =
+      empleadoSolicitante?.departamento ??
+      empleadoSolicitante?.name_dep ??
+      solicitud?.nom_departamento ??
+      solicitud?.nombre_departamento ??
+      solicitud?.departamento_nombre ??
+      solicitud?.departamento ??
+      null;
+
+    const motivo = (
+      tipoPermiso?.descripcion ??
+      tipoPermiso?.nombre ??
+      solicitud?.tipo_permiso_descripcion ??
+      solicitud?.tipoPermiso ??
+      solicitud?.motivo ??
+      ''
+    ).toString();
+
+    const dias = Number(
+      solicitud?.dias_permiso ??
+      solicitud?.dia ??
+      solicitud?.dias ??
+      0
+    );
+
+    const minutos = Number(
+      solicitud?.minutos_totales ??
+      0
+    );
+
+    const esPorHoras = dias === 0 && minutos > 0;
+
+    const fechaDesde = String(
+      solicitud?.fecha_inicio ??
+      solicitud?.fecha ??
+      ''
+    ).substring(0, 10);
+
+    const fechaHasta = String(
+      solicitud?.fecha_final ??
+      solicitud?.fecha ??
+      ''
+    ).substring(0, 10);
+
+    const payloadMensaje = {
+      accion,
+      mensaje_principal: `La solicitud de permiso ha sido ${accion.toLowerCase()}:`,
+      notificacion: `La solicitud de permiso ha sido ${accion.toLowerCase()}:`,
+      data: {
+        empleado: nombreEmp,
+        identificacion: empleadoSolicitante?.identificacion ?? solicitud?.identificacion ?? null,
+        cargo: cargoEmpleado,
+        departamento: departamentoEmpleado,
+        fecha_solicitud: (
+          solicitud?.fecha_creacion ??
+          solicitud?.fecha_solicitud ??
+          null
+        )?.toString()?.substring(0, 10) ?? null,
+        fecha_desde: fechaDesde,
+        fecha_hasta: esPorHoras ? fechaDesde : fechaHasta,
+        dias: esPorHoras ? null : dias,
+        hora: esPorHoras ? this.getHorasFormatoHHmmDesdeMinutos(minutos) : null,
+        hora_inicio: esPorHoras ? (solicitud?.hora_inicio ?? null) : null,
+        hora_fin: esPorHoras ? (solicitud?.hora_fin ?? null) : null,
+        motivo,
+        observacion: observacionAccion ?? '',
+        observacion_accion: observacionAccion ?? '',
+        estado_solicitud: accion,
+        realizado_por: nombreEjecutor,
+        codigo: empleadoSolicitante?.codigo ?? solicitud?.codigo ?? null
+      }
+    };
+
+    return JSON.stringify(payloadMensaje);
+  }
+
+  private obtenerAccionPermiso(
+    decision: 'APRUEBA' | 'RECHAZA',
+    pasoActual: any
+    ): 'PREAUTORIZADO' | 'AUTORIZADO' | 'RECHAZADO' {
+
+      const tipoPaso = String(pasoActual?.tipo_paso ?? '').toUpperCase();
+
+      if (decision === 'RECHAZA') {
+        return 'RECHAZADO';
+      }
+
+      if (!tipoPaso || tipoPaso === 'AUTORIZA') {
+        return 'AUTORIZADO';
+      }
+
+      return 'PREAUTORIZADO';
+    }
+
+    private obtenerTipoNotificacionPermiso(accion: string): number {
+    if (accion === 'RECHAZADO') {
+      return TipoNotificacion.RECHAZAR_PERMISO;
+    }
+
+    if (accion === 'AUTORIZADO') {
+      return TipoNotificacion.AUTORIZAR_PERMISO;
+    }
+
+    return TipoNotificacion.PREAUTORIZAR_PERMISO;
+  }
+
+  private obtenerAsuntoPermiso(accion: string): string {
+    if (accion === 'RECHAZADO') {
+      return 'Solicitud de permiso rechazada';
+    }
+
+    if (accion === 'AUTORIZADO') {
+      return 'Solicitud de permiso autorizada';
+    }
+
+    return 'Solicitud de permiso preautorizada';
+  }
+
+  private async obtenerTipoPermisoPorId(idTipoPermiso: number): Promise<any | null> {
+    try {
+      const tipos: any[] = await firstValueFrom(
+        this.permisosService.listarTiposPermiso()
+      );
+
+      return Array.isArray(tipos)
+        ? tipos.find((t: any) => Number(t?.id) === Number(idTipoPermiso)) ?? null
+        : null;
+
+    } catch (error) {
+      console.error('Error consultando tipos de permiso:', error);
+      return null;
+    }
+  }
+
+  private async obtenerDetalleFlujoPermiso(
+    idDepartamento: number,
+    idTipoPermiso: number
+  ): Promise<any> {
+    try {
+      const flujos = await firstValueFrom(
+        this.aprobacionesService.ListarFlujosDepartamento(idDepartamento)
+      );
+
+      const flujo = flujos.find((f: any) => {
+        const modulo = String(f?.modulo ?? '').trim().toUpperCase();
+
+        const tipoFlujo = Number(
+          f?.id_tipo_solicitud ??
+          f?.id_tipo_permiso ??
+          f?.id_tipo ??
+          0
+        );
+
+        return modulo === 'PERMISO' && tipoFlujo === Number(idTipoPermiso);
+      });
+
+      const idFlujo = Number(flujo?.id_flujo ?? flujo?.id ?? 0);
+
+      if (!idFlujo) return null;
+
+      return await firstValueFrom(
+        this.aprobacionesService.ObtenerDetalleFlujo(idFlujo)
+      );
+
+    } catch {
+      return null;
+    }
+  }
+
+  private obtenerDestinatariosPaso(paso: any): number[] {
+    const modo = String(paso?.modo_aprobador ?? '').toUpperCase();
+
+    const jefes: number[] = Array.isArray(paso?.ids_empleados_jefes_destino)
+      ? paso.ids_empleados_jefes_destino.map((x: any) => Number(x)).filter(Number.isFinite)
+      : [];
+
+    const especificos: number[] = Array.isArray(paso?.ids_empleados_especificos)
+      ? paso.ids_empleados_especificos.map((x: any) => Number(x)).filter(Number.isFinite)
+      : [];
+
+    if (modo === 'JEFES') return jefes;
+    if (modo === 'ESPECIFICOS') return especificos;
+
+    return Array.from(new Set([...jefes, ...especificos]));
+  }
+
+  private getHorasFormatoHHmmDesdeMinutos(minutos: number): string {
+    const total = Number(minutos || 0);
+
+    const horas = Math.floor(total / 60);
+    const mins = total % 60;
+
+    return `${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+  }
+
+  private valorBooleanoPermiso(valor: any, defecto: boolean = true): boolean {
+    if (valor === undefined || valor === null) {
+      return defecto;
+    }
+
+    if (typeof valor === 'boolean') {
+      return valor;
+    }
+
+    if (typeof valor === 'number') {
+      return valor === 1;
+    }
+
+    const texto = String(valor).trim().toLowerCase();
+
+    if (['true', '1', 'si', 'sí', 's', 'activo'].includes(texto)) {
+      return true;
+    }
+
+    if (['false', '0', 'no', 'n', 'inactivo'].includes(texto)) {
+      return false;
+    }
+
+    return defecto;
   }
 
   abrirSelector(tipo: 'tipo' | 'dep' | 'emp') {

@@ -1,10 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
+import { firstValueFrom } from 'rxjs';
 
 import { PermisosService } from 'src/app/services/permisos.service';
 import { FeriadosService, IFeriado } from 'src/app/services/feriados.service';
 import { DocumentosService } from 'src/app/services/documentos.service';
+
+import { NotificacionesService } from 'src/app/services/notificaciones.service';
+import { DatosGeneralesService } from 'src/app/services/datos-generales.service';
+import { AprobacionesService } from 'src/app/services/aprobaciones.service';
+import { TipoNotificacion } from 'src/app/interfaces/tipo-notificaciones.enum';
 
 @Component({
   selector: 'app-registrar-permiso',
@@ -68,7 +74,10 @@ export class RegistrarPermisoPage implements OnInit {
     private feriadosService: FeriadosService,
     private documentosService: DocumentosService,
     private toastController: ToastController,
-    private router: Router
+    private router: Router,
+    private notificacionesService: NotificacionesService,
+    private datosGeneralesService: DatosGeneralesService,
+    private aprobacionesService: AprobacionesService,
   ) { }
 
   ngOnInit() {
@@ -547,7 +556,9 @@ export class RegistrarPermisoPage implements OnInit {
             this.idEmpleado,
             'permisos'
           ).subscribe({
-            next: () => {
+            next: async () => {
+              await this.enviarComunicacionesCreacionPermiso(solicitudCreada, tipo);
+
               this.mostrarToast('Solicitud de permiso registrada correctamente.', 'success');
               this.router.navigateByUrl('/reloj/solicitudes/permiso-solicitud');
             },
@@ -559,14 +570,336 @@ export class RegistrarPermisoPage implements OnInit {
           return;
         }
 
-        this.mostrarToast('Solicitud de permiso registrada correctamente.', 'success');
-        this.router.navigateByUrl('/reloj/solicitudes/permiso-solicitud');
+        this.enviarComunicacionesCreacionPermiso(solicitudCreada, tipo).finally(() => {
+          this.mostrarToast('Solicitud de permiso registrada correctamente.', 'success');
+          this.router.navigateByUrl('/reloj/solicitudes/permiso-solicitud');
+        });
+
       },
       error: () => {
         this.mostrarToast('Ocurrió un error al registrar la solicitud.', 'danger');
       }
     });
   }
+
+  private async enviarComunicacionesCreacionPermiso(solicitud: any, tipoPermiso: any) {
+    try {
+      const idDepartamento = Number(
+        solicitud?.id_departamento ??
+        solicitud?.id_departamento_origen ??
+        solicitud?.id_dep ??
+        tipoPermiso?.id_departamento ??
+        0
+      );
+
+      const idTipoPermiso = Number(
+        solicitud?.id_tipo_permiso ??
+        solicitud?.tipo_permiso_id ??
+        this.tipoPermisoSeleccionado ??
+        0
+      );
+
+
+      if (!idDepartamento || !idTipoPermiso) {
+        console.warn('No se pudo enviar notificación: falta departamento o tipo de permiso.', {
+          idDepartamento,
+          idTipoPermiso,
+          solicitud,
+          tipoPermiso
+        });
+        return;
+      }
+
+      const empleados = await firstValueFrom(
+        this.datosGeneralesService.ObtenerInformacionModulos(1)
+      );
+
+
+      const empleadoSolicitante = empleados.find((e: any) =>
+        Number(e.id_empleado ?? e.id) === Number(this.idEmpleado)
+      );
+
+      const flujos = await firstValueFrom(
+        this.aprobacionesService.ListarFlujosDepartamento(idDepartamento)
+      );
+
+      const flujoPermiso = flujos.find((f: any) => {
+        const modulo = String(f?.modulo || '').trim().toUpperCase();
+
+        const tipoFlujo = Number(
+          f?.id_tipo_permiso ??
+          f?.id_tipo ??
+          f?.id_tipo_solicitud ??
+          0
+        );
+
+        return modulo === 'PERMISO' && tipoFlujo === idTipoPermiso;
+      });
+
+      if (!flujoPermiso) {
+        console.warn('No se encontró flujo de aprobación para este permiso.', {
+          idDepartamento,
+          idTipoPermiso,
+          flujos
+        });
+        return;
+      }
+
+      const idFlujo = Number(
+        flujoPermiso?.id_flujo ??
+        flujoPermiso?.id ??
+        0
+      );
+
+      if (!idFlujo) {
+        console.warn('No se pudo obtener el id del flujo.', flujoPermiso);
+        return;
+      }
+
+      const detalleFlujo = await firstValueFrom(
+        this.aprobacionesService.ObtenerDetalleFlujo(idFlujo)
+      );
+
+      const esJefe = !!solicitud?.es_jefe;
+
+      const pasosIniciales = detalleFlujo
+        ? this.seleccionarPasosIniciales(detalleFlujo, esJefe)
+        : [];
+
+      const aprobadores = new Set<number>();
+
+      for (const paso of pasosIniciales) {
+        for (const idAprobador of this.obtenerDestinatariosPaso(paso)) {
+          aprobadores.add(idAprobador);
+        }
+      }
+
+      const idsReceptores = [
+        Number(this.idEmpleado),
+        ...Array.from(aprobadores)
+      ].filter(id => !!id);
+
+      const idsUnicos = [...new Set(idsReceptores)];
+
+      if (idsUnicos.length === 0) {
+        console.warn('No existen receptores para la notificación.');
+        return;
+      }
+
+      const empleadosReceptores = empleados.filter((e: any) =>
+        idsUnicos.includes(Number(e?.id_empleado ?? e?.id))
+      );
+
+      const tipoPermiteCorreoCreacion = this.valorBooleanoPermiso(
+        tipoPermiso?.correo_crear ?? tipoPermiso?.correo_solicitar,
+        true
+      );
+
+      const idsCorreo = empleadosReceptores
+        .filter((e: any) => {
+          const recibeCorreo =
+            e?.permiso_mail === true ||
+            e?.permiso_mail === 1 ||
+            e?.permiso_mail === 'true';
+
+          return tipoPermiteCorreoCreacion && recibeCorreo && !!e?.correo;
+        })
+        .map((e: any) => Number(e.id_empleado ?? e.id));
+
+      const idsNotificacion = empleadosReceptores
+        .filter((e: any) => {
+          return e?.permiso_notificacion === true ||
+            e?.permiso_notificacion === 1 ||
+            e?.permiso_notificacion === 'true';
+        })
+        .map((e: any) => Number(e.id_empleado ?? e.id));
+
+      const mensaje = this.armarMensajeNotificacionPermiso(
+        solicitud,
+        tipoPermiso,
+        empleadoSolicitante
+      );
+
+      const idPermiso = Number(
+        solicitud?.id ??
+        solicitud?.id_permiso ??
+        solicitud?.id_solicitud ??
+        0
+      );
+
+      const idEnvia = Number(this.idEmpleado);
+
+      if (idsCorreo.length > 0) {
+        try {
+        const correosEnviar = empleadosReceptores
+          .filter((e: any) => {
+            const recibeCorreo =
+              e?.permiso_mail === true ||
+              e?.permiso_mail === 1 ||
+              e?.permiso_mail === 'true';
+
+            return tipoPermiteCorreoCreacion && recibeCorreo && !!e?.correo;
+          })
+          .map((e: any) => String(e.correo).trim())
+          .filter((correo: string) => !!correo);
+
+          const correoUnico = Array.from(new Set(correosEnviar)).join(', ');
+
+          const payloadCorreo = {
+            id_envia: idEnvia,
+            plataforma: 'Aplicación Móvil',
+            items: [
+              {
+                correo: correoUnico,
+                asunto: 'Solicitud de permiso registrada',
+                mensaje,
+                id_permiso: idPermiso || null
+              }
+            ]
+          };
+
+          const respuestaCorreo = await firstValueFrom(
+            this.notificacionesService.EnviarCorreoPermisoLegalizacionMultiple(payloadCorreo)
+          );
+
+        } catch (error) {
+          console.error('ERROR AL ENVIAR CORREO PERMISO', error);
+        }
+      }
+
+      if (idsNotificacion.length > 0) {
+        try {
+          const idsNotificacionUnicos = Array.from(new Set(idsNotificacion));
+
+          const payloadNotificacion = {
+            id_empl_envia: idEnvia,
+            id_empl_recive: idsNotificacionUnicos,
+            mensaje,
+            tipo: TipoNotificacion.CREAR_PERMISO,
+            id_permiso: idPermiso || null
+          };
+
+          const respuestaNotificacion = await firstValueFrom(
+            this.notificacionesService.EnviarNotificacionPermisoLegalizacionMultiple(payloadNotificacion)
+          );
+
+        } catch (error) {
+          console.error('ERROR AL ENVIAR NOTIFICACION PERMISO', error);
+        }
+      }
+
+    } catch (error) {
+      console.error('Error al enviar comunicaciones de creación de permiso:', error);
+    }
+  }
+
+  private armarMensajeNotificacionPermiso(
+    solicitud: any,
+    tipoPermiso: any,
+    empleadoSolicitante?: any
+  ): string {
+
+    const nombreEmp = [
+      empleadoSolicitante?.apellido,
+      empleadoSolicitante?.nombre
+    ].filter(Boolean).join(' ').trim() || `Empleado ${solicitud?.id_empleado ?? this.idEmpleado}`;
+
+    const motivo = (tipoPermiso?.descripcion ?? tipoPermiso?.nombre ?? '').toString();
+
+    const dias = Number(solicitud?.dias_permiso ?? this.diasTotales ?? 0);
+    const minutos = Number(solicitud?.minutos_totales ?? this.calcularMinutosTotales() ?? 0);
+    const esPorHoras = dias === 0 && minutos > 0;
+
+    const fechaDesde = (
+      solicitud?.fecha_inicio ??
+      this.fechaInicio ??
+      this.fechaHoras ??
+      ''
+    ).toString().substring(0, 10);
+
+    const fechaHasta = (
+      solicitud?.fecha_final ??
+      this.fechaFinal ??
+      this.fechaHoras ??
+      ''
+    ).toString().substring(0, 10);
+
+    const payloadMensaje = {
+      accion: 'CREADO',
+      mensaje_principal: 'Se ha registrado la siguiente solicitud de permiso:',
+      notificacion: 'Se ha registrado la siguiente solicitud de permiso:',
+      data: {
+        empleado: nombreEmp,
+        identificacion: empleadoSolicitante?.identificacion ?? null,
+        cargo: empleadoSolicitante?.cargo ?? empleadoSolicitante?.name_cargo ?? null,
+        departamento: empleadoSolicitante?.departamento ?? empleadoSolicitante?.name_dep ?? null,
+        fecha_solicitud: (solicitud?.fecha_creacion ?? null)?.toString()?.substring(0, 10) ?? null,
+        fecha_desde: fechaDesde,
+        fecha_hasta: esPorHoras ? fechaDesde : fechaHasta,
+        dias: esPorHoras ? null : dias,
+        hora: esPorHoras ? this.getHorasFormatoHHmmDesdeMinutos(minutos) : null,
+        hora_inicio: esPorHoras ? (solicitud?.hora_inicio ?? this.horaInicio ?? null) : null,
+        hora_fin: esPorHoras ? (solicitud?.hora_fin ?? this.horaFinal ?? null) : null,
+        motivo: motivo,
+        observacion: solicitud?.descripcion ?? this.observacion ?? '',
+        estado_solicitud: this.mapearEstadoTexto(Number(solicitud?.estado ?? 1)),
+        realizado_por: nombreEmp,
+      }
+    };
+
+    return JSON.stringify(payloadMensaje);
+  }
+
+  private getHorasFormatoHHmmDesdeMinutos(minutos: number): string {
+    const total = Number(minutos || 0);
+
+    const horas = Math.floor(total / 60);
+    const mins = total % 60;
+
+    return `${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+  }
+
+  private mapearEstadoTexto(estado: number): string {
+    switch (Number(estado)) {
+      case 1:
+        return 'PENDIENTE';
+      case 2:
+        return 'PREAUTORIZADO';
+      case 3:
+        return 'AUTORIZADO';
+      case 4:
+        return 'NEGADO';
+      default:
+        return 'PENDIENTE';
+    }
+  }
+
+  private valorBooleanoPermiso(valor: any, defecto: boolean = true): boolean {
+    if (valor === undefined || valor === null) {
+      return defecto;
+    }
+
+    if (typeof valor === 'boolean') {
+      return valor;
+    }
+
+    if (typeof valor === 'number') {
+      return valor === 1;
+    }
+
+    const texto = String(valor).trim().toLowerCase();
+
+    if (['true', '1', 'si', 'sí', 's', 'activo'].includes(texto)) {
+      return true;
+    }
+
+    if (['false', '0', 'no', 'n', 'inactivo'].includes(texto)) {
+      return false;
+    }
+
+    return defecto;
+  }
+
 
   seleccionarArchivo(event: any) {
     const file = event.target.files?.[0];
@@ -755,4 +1088,54 @@ export class RegistrarPermisoPage implements OnInit {
     this.incumpleAnticipacion = false;
     this.incumpleDiasAnteriores = false;
   }
+
+  private cumpleTargetSolicitante(target: string, esJefe: boolean): boolean {
+    const t = String(target ?? 'AMBOS').toUpperCase();
+
+    if (t === 'AMBOS') return true;
+    if (t === 'JEFES') return esJefe === true;
+    if (t === 'EMPLEADOS') return esJefe === false;
+
+    return true;
+  }
+
+  private obtenerDestinatariosPaso(paso: any): number[] {
+    const modo = String(paso?.modo_aprobador ?? '').toUpperCase();
+
+    const jefes: number[] = Array.isArray(paso?.ids_empleados_jefes_destino)
+      ? paso.ids_empleados_jefes_destino.map((x: any) => Number(x)).filter(Number.isFinite)
+      : [];
+
+    const especificos: number[] = Array.isArray(paso?.ids_empleados_especificos)
+      ? paso.ids_empleados_especificos.map((x: any) => Number(x)).filter(Number.isFinite)
+      : [];
+
+    if (modo === 'JEFES') return jefes;
+    if (modo === 'ESPECIFICOS') return especificos;
+
+    return Array.from(new Set([...jefes, ...especificos]));
+  }
+
+  private seleccionarPasosIniciales(detalle: any, esJefe: boolean): any[] {
+    const pasos = Array.isArray(detalle?.pasos)
+      ? detalle.pasos.slice().sort((a: any, b: any) => Number(a?.orden ?? 0) - Number(b?.orden ?? 0))
+      : [];
+
+    const aplicables = pasos.filter((p: any) =>
+      this.cumpleTargetSolicitante(p?.target_solicitante, esJefe)
+    );
+
+    const seleccionados: any[] = [];
+
+    for (const paso of aplicables) {
+      seleccionados.push(paso);
+
+      if (paso?.obligatorio === true) {
+        break;
+      }
+    }
+
+    return seleccionados;
+  }
+
 }
