@@ -350,12 +350,12 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
     this.menu.close('admin');
   }
 
-  cerrarSesion() {
+  async cerrarSesion() {
     this.unsubscribeNotificacion?.();
     this.unsubscribeAviso?.();
     this.socketEscuchando = false;
 
-    this.relojService.cerrarSesion();
+    await this.relojService.cerrarSesion();
     this.closeAdmin();
   }
 

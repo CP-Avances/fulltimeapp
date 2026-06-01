@@ -3,6 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { NavController } from "@ionic/angular";
 import { environment } from '../../environments/environment';
 import { firstValueFrom, map } from 'rxjs';
+import { SessionStorageService } from './session-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,7 @@ export class RelojServiceService {
   constructor(
     private http: HttpClient,
     private navCtroller: NavController,
+    public sessionStorageService: SessionStorageService,
   ) {
   }
 
@@ -51,9 +53,11 @@ export class RelojServiceService {
 
 
   // VERIFICAR EXISTENCIA DE INICIO DE SESION
-  estaLogueado() {
-    return !!localStorage.getItem('token');
+  async estaLogueado(): Promise<boolean> {
+    const token = await this.sessionStorageService.getToken();
+    return !!token;
   }
+  
   // VERIFICAR EXISTENCIA DE ROL
   existeRol() {
     return !!localStorage.getItem('rol');
@@ -67,15 +71,19 @@ export class RelojServiceService {
   }
 
   // OBTENER TOKEN
-  getToken() {
-    return localStorage.getItem('token');
+  async getToken() {
+    return await this.sessionStorageService.getToken();
   }
 
   // METODO PARA CERRAR SESION
-  cerrarSesion() {
+  async cerrarSesion() {
+    await this.sessionStorageService.removeToken();
+
     localStorage.clear();
     sessionStorage.clear();
+
     localStorage.setItem('primeraVez', 'true');
+
     this.navCtroller.pop();
     this.navCtroller.navigateRoot('login');
   }
