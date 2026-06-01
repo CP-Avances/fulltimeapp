@@ -182,7 +182,6 @@
           <ion-button
             *ngIf="tienePermisoAccion('Solicitud Permisos', 'Editar Solicitud Permiso')"
             size="small"
-            expand="block"
             fill="outline"
             color="success"
             (click)="editarSolicitud()">
@@ -191,7 +190,7 @@
           </ion-button>
 
           <ion-button
-            expand="block"
+            size="small"
             fill="outline"
             color="tertiary"
             [disabled]="imprimiendo"
@@ -215,7 +214,6 @@
           <ion-button
             *ngIf="tienePermisoAccion('Solicitud Permisos', 'Eliminar Solicitud Permiso')"
             size="small"
-            expand="block"
             fill="outline"
             color="danger"
             [disabled]="eliminando"

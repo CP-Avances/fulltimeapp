@@ -149,10 +149,25 @@
 }
 
 .acciones-detalle {
-  margin-top: 28px;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
+  margin-top: 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.acciones-detalle ion-button {
+  flex: 1;
+  min-width: 90px;
+  text-transform: none;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+@media (max-width: 360px) {
+  .acciones-detalle ion-button {
+    min-width: 100%;
+  }
 }
 
 .estado-carga {
@@ -165,9 +180,4 @@
   color: var(--ion-color-medium);
 }
 
-@media (min-width: 600px) {
-  .acciones-detalle {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
 
