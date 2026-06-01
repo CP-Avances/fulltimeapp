@@ -40,11 +40,7 @@ export class RefreshInfoComponent {
     switch (this.removeItem) { // Esta logica es para saber que datos elimino del session storage.
       case 'cg_tipo_permiso': sessionStorage.removeItem(this.removeItem); break;
       case 'cg_feriado': sessionStorage.removeItem(this.removeItem); break;
-      case 'cg_detalleMenu': sessionStorage.removeItem(this.removeItem); break;
       case 'lista-empleados': sessionStorage.removeItem(this.removeItem); break;
-      case 'servicios-comida': sessionStorage.removeItem(this.removeItem); break;
-      case 'menu-servicio': sessionStorage.removeItem(this.removeItem); break;
-      case 'vacuna_info': sessionStorage.removeItem(this.removeItem); break;
       default:
         sessionStorage.clear();
         break;

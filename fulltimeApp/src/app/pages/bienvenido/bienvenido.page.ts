@@ -536,8 +536,8 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   }
 
   // METODO PARA CERRAR SESION
-  cerrarSesion() {
-    this.relojService.cerrarSesion();
+  async cerrarSesion() {
+    await this.relojService.cerrarSesion();
   }
 
   ngOnDestroy() {

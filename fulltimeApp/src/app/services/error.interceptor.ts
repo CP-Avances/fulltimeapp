@@ -9,6 +9,7 @@ import {
 import { Observable, throwError, from } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { ToastController, NavController } from '@ionic/angular';
+import { SessionStorageService } from './session-storage.service';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
@@ -17,8 +18,9 @@ export class ErrorInterceptor implements HttpInterceptor {
 
   constructor(
     private navController: NavController,
-    private toastController: ToastController
-  ) {}
+    private toastController: ToastController,
+    public sessionStorageService: SessionStorageService,
+  ) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
@@ -46,6 +48,8 @@ export class ErrorInterceptor implements HttpInterceptor {
     this.cerrandoSesion = true;
 
     await this.mostrarMensaje(message);
+
+    await this.sessionStorageService.removeToken();
 
     localStorage.clear();
     sessionStorage.clear();

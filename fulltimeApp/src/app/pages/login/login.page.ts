@@ -8,6 +8,7 @@ import { EmpleadosService } from 'src/app/services/empleados.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ParametrosSistema } from 'src/app/libs/parametros.emun';
 import { SocketService } from 'src/app/services/socket.service';
+import { SessionStorageService } from 'src/app/services/session-storage.service';
 
 @Component({
   selector: 'app-login',
@@ -44,6 +45,7 @@ export class LoginPage implements OnInit {
     public platform: Platform,
     private empleadoService: EmpleadosService,
     public validar: ValidacionesService,
+    public sessionStorageService: SessionStorageService,
     private readonly socketService: SocketService,
   ) { }
 
@@ -52,19 +54,24 @@ export class LoginPage implements OnInit {
 
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
+
     this.obtenerInfoTerminosCondiciones();
     this.BuscarParametroTimbreUbicacionDesconocida();
+
     if (!this.relojService.esPrimeraVez()) {
       this.navCtroller.navigateForward(['login']);
-    } else if (this.relojService.estaLogueado() && this.relojService.existeRol()) {
+      return;
+    }
 
+    const logueado = await this.relojService.estaLogueado();
+
+    if (logueado && this.relojService.existeRol()) {
       this.navCtroller.pop();
       this.navCtroller.navigateRoot(['reloj']);
-
     }
   }
 
@@ -185,8 +192,9 @@ export class LoginPage implements OnInit {
   }
 
   async registrarDatosLocales(datos: any) {
+    await this.sessionStorageService.setToken(datos.token);
+
     localStorage.setItem('rol', datos.rol);
-    localStorage.setItem('token', datos.token);
     localStorage.setItem('ip', datos.ip_adress);
     localStorage.setItem('username', datos.usuario);
     localStorage.setItem('imagen', datos.imagen);
@@ -312,8 +320,8 @@ export class LoginPage implements OnInit {
         {
           text: 'Cancelar',
           role: 'cancel',
-          handler: () => {
-            this.relojService.cerrarSesion();
+          handler: async () => {
+            await this.relojService.cerrarSesion();
             this.abrirToas("Debe registrar un dispositivo para usar el sistema", "danger", 3500);
           }
         },

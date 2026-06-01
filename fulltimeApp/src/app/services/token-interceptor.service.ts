@@ -1,25 +1,38 @@
 import { Injectable } from '@angular/core';
-import { RelojServiceService } from "./reloj-service.service";
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
+import { Observable, from } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { SessionStorageService } from './session-storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class TokenInterceptorService {
+export class TokenInterceptorService implements HttpInterceptor {
 
   constructor(
-    private relojServiceService: RelojServiceService
+    private sessionStorageService: SessionStorageService
   ) { }
 
-  // INTERCEPTOR HTTP
-  intercept(req: any, next: any) {
-    const codigoEmpresa = localStorage.getItem('codigo_empresa') || '';
-    const tokenizeReq = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${this.relojServiceService.getToken()}`,
-        'x-codigo-empresa': codigoEmpresa
-      }
-    });
-    return next.handle(tokenizeReq);
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    return from(this.sessionStorageService.getToken()).pipe(
+      switchMap((token) => {
+        const codigoEmpresa = localStorage.getItem('codigo_empresa') || '';
+
+        let headers: any = {
+          'x-codigo-empresa': codigoEmpresa
+        };
+
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        }
+
+        const tokenizeReq = req.clone({
+          setHeaders: headers
+        });
+
+        return next.handle(tokenizeReq);
+      })
+    );
   }
 
 }

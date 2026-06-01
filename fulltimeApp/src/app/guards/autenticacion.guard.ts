@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanActivate} from '@angular/router';
+import { CanActivate } from '@angular/router';
 import { RelojServiceService } from "../services/reloj-service.service";
 import { NavController } from "@ionic/angular";
 
@@ -11,16 +11,18 @@ export class AutenticacionGuard implements CanActivate {
   constructor(
     private relojServiceService: RelojServiceService,
     private navCtroller: NavController,
-    ) { }
+  ) { }
 
-  canActivate(): boolean {
-    if (this.relojServiceService.estaLogueado()) {
+  async canActivate(): Promise<boolean> {
+    const logueado = await this.relojServiceService.estaLogueado();
+
+    if (logueado) {
       return true;
-    } else {
-      this.navCtroller.navigateForward('login');
-      return false;
     }
 
+    this.navCtroller.navigateRoot('/login');
+    return false;
   }
+
 
 }
