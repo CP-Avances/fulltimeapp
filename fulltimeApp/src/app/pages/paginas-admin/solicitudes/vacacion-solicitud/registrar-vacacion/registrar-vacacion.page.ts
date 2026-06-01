@@ -56,7 +56,7 @@ export class RegistrarVacacionPage implements OnInit {
   cargandoTipos = false;
   cargandoSaldo = false;
   cargandoFeriados = false;
-
+  registrandoSolicitud = false;
   debeVerificarProgramacion = false;
   resultadoVerificacionDetalle: any = null;
 
@@ -363,6 +363,10 @@ export class RegistrarVacacionPage implements OnInit {
   }
 
   registrarSolicitud() {
+    if (this.registrandoSolicitud) {
+      return;
+    }
+
     if (!this.verificacionRealizada || this.estadoVerificacion !== 'ok') {
       this.mostrarToast('Primero debe verificar correctamente la solicitud.', 'warning');
       return;
@@ -384,6 +388,8 @@ export class RegistrarVacacionPage implements OnInit {
       this.mostrarToast('El archivo ha excedido el tamaño permitido. Máximo 2MB.', 'warning');
       return;
     }
+
+    this.registrandoSolicitud = true;
 
     const esPorHoras = this.permiteHoras;
 
@@ -414,6 +420,7 @@ export class RegistrarVacacionPage implements OnInit {
         const solicitudCreada = response?.data ?? response ?? null;
 
         if (!solicitudCreada || !solicitudCreada.id) {
+          this.registrandoSolicitud = false;
           this.mostrarToast('La solicitud se registró, pero no se obtuvo el identificador.', 'warning');
           return;
         }
@@ -435,6 +442,7 @@ export class RegistrarVacacionPage implements OnInit {
               this.router.navigateByUrl('/reloj/solicitudes/vacacion-solicitud');
             },
             error: () => {
+              this.registrandoSolicitud = false;
               this.mostrarToast('La solicitud se registró, pero ocurrió un error al subir el documento.', 'warning');
             }
           });
@@ -448,6 +456,7 @@ export class RegistrarVacacionPage implements OnInit {
         });
       },
       error: (err) => {
+        this.registrandoSolicitud = false;
         this.mostrarToast(err?.message || 'Ocurrió un error al registrar la solicitud.', 'danger');
       }
     });
@@ -828,7 +837,9 @@ export class RegistrarVacacionPage implements OnInit {
   }
 
   puedeRegistrar(): boolean {
-    return this.verificacionRealizada && this.estadoVerificacion === 'ok';
+    return this.verificacionRealizada &&
+      this.estadoVerificacion === 'ok' &&
+      !this.registrandoSolicitud;
   }
 
   async mostrarToast(mensaje: string, color: 'success' | 'warning' | 'danger') {

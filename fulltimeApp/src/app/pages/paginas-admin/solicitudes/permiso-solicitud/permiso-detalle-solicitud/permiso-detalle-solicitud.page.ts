@@ -11,6 +11,7 @@ import { firstValueFrom } from 'rxjs';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { DatosGeneralesService } from 'src/app/services/datos-generales.service';
 import { AprobacionesService } from 'src/app/services/aprobaciones.service';
+import { PermisosAccionesService } from 'src/app/services/permisos-acciones.service';
 import { TipoNotificacion } from 'src/app/interfaces/tipo-notificaciones.enum';
 
 @Component({
@@ -40,21 +41,28 @@ export class PermisoDetalleSolicitudPage implements OnInit {
     private empresaService: EmpresaService,
     private notificacionesService: NotificacionesService,
     private datosGeneralesService: DatosGeneralesService,
-    private aprobacionesService: AprobacionesService
+    private aprobacionesService: AprobacionesService,
+    private permisosAcciones: PermisosAccionesService
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
     const navigation = this.router.getCurrentNavigation();
-    const solicitudState = navigation?.extras?.state?.['solicitud'];
+    this.solicitud = navigation?.extras?.state?.['solicitud'];
 
-    if (solicitudState) {
-      this.solicitud = solicitudState;
-      this.cargarDetalleDesdeBackend();
+    if (!this.solicitud) {
+      const state = history.state;
+      this.solicitud = state?.solicitud || null;
+    }
+
+    if (!this.solicitud) {
+      this.mostrarToast('No se recibió la información de la solicitud.', 'warning');
+      this.regresar();
       return;
     }
 
-    this.mostrarToast('No se recibió la información de la solicitud.', 'warning');
-    this.regresar();
+    await this.cargarPermisosAcciones();
+
+    this.cargarDetalleDesdeBackend();
   }
 
   ObtenerLogo(): Promise<void> {
@@ -915,4 +923,30 @@ export class PermisoDetalleSolicitudPage implements OnInit {
 
     await toast.present();
   }
+
+  async cargarPermisosAcciones() {
+    await this.permisosAcciones.cargarAccionesRol([
+      {
+        pagina: 'Solicitud Permisos',
+        accion: 'Editar Solicitud Permiso'
+      },
+      {
+        pagina: 'Solicitud Permisos',
+        accion: 'Eliminar Solicitud Permiso'
+      },
+      {
+        pagina: 'Solicitud Vacaciones',
+        accion: 'Editar Solicitud Vacación'
+      },
+      {
+        pagina: 'Solicitud Vacaciones',
+        accion: 'Eliminar Solicitud Vacación'
+      }
+    ]);
+  }
+
+  tienePermisoAccion(pagina: string, accion: string): boolean {
+    return this.permisosAcciones.tienePermisoAccion(pagina, accion);
+  }    
+
 }

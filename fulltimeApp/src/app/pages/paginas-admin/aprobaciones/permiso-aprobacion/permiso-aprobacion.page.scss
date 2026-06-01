@@ -1,14 +1,45 @@
 .contenedor-principal {
   padding: 12px;
+  background: var(--ion-background-color);
+  color: var(--ion-text-color);
+}
+
+ion-card {
+  --background: var(--ion-card-background, var(--ion-item-background));
+  color: var(--ion-text-color);
 }
 
 ion-card-title {
   font-size: 17px;
   font-weight: bold;
+  color: var(--ion-text-color);
 }
 
 ion-card-subtitle {
   font-size: 13px;
+  color: var(--ion-color-medium);
+}
+
+ion-card-content {
+  color: var(--ion-text-color);
+}
+
+ion-item {
+  --background: transparent;
+  --color: var(--ion-text-color);
+}
+
+ion-label {
+  color: var(--ion-text-color);
+}
+
+ion-text {
+  color: var(--ion-text-color);
+}
+
+ion-input,
+ion-select {
+  color: var(--ion-text-color);
 }
 
 .btn-buscar {
@@ -18,34 +49,37 @@ ion-card-subtitle {
 .mensaje-centro {
   text-align: center;
   padding: 30px 15px;
+  color: var(--ion-text-color);
 
   ion-spinner {
     margin-bottom: 10px;
   }
 
   p {
-    color: #555;
+    color: var(--ion-color-medium);
     font-size: 14px;
   }
 }
 
 .mensaje-vacio {
   text-align: center;
-  color: #555;
+  color: var(--ion-text-color);
 
   ion-icon {
     font-size: 42px;
     margin-bottom: 10px;
-    color: #6c757d;
+    color: var(--ion-color-medium);
   }
 
   h3 {
     font-size: 17px;
     font-weight: bold;
+    color: var(--ion-text-color);
   }
 
   p {
     font-size: 14px;
+    color: var(--ion-color-medium);
   }
 }
 
@@ -57,11 +91,11 @@ ion-card-subtitle {
   font-size: 14px;
 
   span {
-    color: #666;
+    color: var(--ion-color-medium);
   }
 
   b {
-    color: #222;
+    color: var(--ion-text-color);
     text-align: right;
   }
 }
@@ -74,7 +108,7 @@ ion-card-subtitle {
 
   span {
     font-size: 14px;
-    color: #555;
+    color: var(--ion-text-color);
   }
 }
 
@@ -82,14 +116,15 @@ ion-card-subtitle {
   text-align: center;
   margin: 8px 0 12px 0;
   font-size: 14px;
-  color: #666;
+  color: var(--ion-color-medium);
 }
 
 .barra-aprobacion-fija {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: var(--ion-background-color, #ffffff);
+  background: var(--ion-background-color);
+  color: var(--ion-text-color);
   padding: 8px;
   margin-bottom: 10px;
   border-radius: 8px;
@@ -104,19 +139,26 @@ ion-card-subtitle {
 
   b {
     font-size: 14px;
+    color: var(--ion-text-color);
   }
 
   p {
     margin: 2px 0 0 0;
     font-size: 12px;
-    color: #777;
+    color: var(--ion-color-medium);
   }
 }
 
 .item-seleccionar-todas {
   --padding-start: 0;
   --inner-padding-end: 0;
+  --background: transparent;
+  --color: var(--ion-text-color);
   margin-top: 4px;
+
+  ion-label {
+    color: var(--ion-text-color);
+  }
 }
 
 .acciones-multiples {
@@ -137,15 +179,22 @@ ion-card-subtitle {
 .item-seleccionar-solicitud {
   --padding-start: 12px;
   --inner-padding-end: 12px;
+  --background: transparent;
+  --color: var(--ion-text-color);
 
   ion-label {
     font-size: 14px;
+    color: var(--ion-text-color);
   }
 
   ion-badge {
     font-size: 12px;
     padding: 6px 8px;
   }
+}
+
+ion-badge[color="warning"] {
+  color: #000;
 }
 
 .modal-selector-completo {
@@ -168,22 +217,28 @@ ion-card-subtitle {
 .contador-selector {
   padding: 4px 16px 8px 16px;
   font-size: 13px;
-  color: #777;
+  color: var(--ion-color-medium);
 }
 
 .mensaje-vacio-selector {
   text-align: center;
   padding: 40px 20px;
-  color: #777;
+  color: var(--ion-color-medium);
 
   ion-icon {
     font-size: 42px;
     margin-bottom: 8px;
+    color: var(--ion-color-medium);
   }
 
   p {
     font-size: 14px;
+    color: var(--ion-color-medium);
   }
+}
+
+ion-list {
+  background: var(--ion-background-color);
 }
 
 ion-searchbar {

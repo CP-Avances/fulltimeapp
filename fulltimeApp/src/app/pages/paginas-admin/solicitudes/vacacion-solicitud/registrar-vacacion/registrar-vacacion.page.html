@@ -114,12 +114,34 @@
         </div>
 
         <div class="acciones">
-          <ion-button expand="block" [disabled]="!puedeVerificar()" (click)="verificarSolicitud()">
+          <ion-button
+            type="button"
+            expand="block"
+            [disabled]="!puedeVerificar() || registrandoSolicitud"
+            (click)="verificarSolicitud()">
             Verificar
           </ion-button>
 
-          <ion-button expand="block" color="success" [disabled]="!puedeRegistrar()" (click)="registrarSolicitud()">
-            Registrar solicitud
+          <ion-button
+            type="button"
+            expand="block"
+            color="success"
+            [disabled]="!puedeRegistrar() || registrandoSolicitud"
+            (click)="registrarSolicitud()">
+
+            <ion-spinner
+              *ngIf="registrandoSolicitud"
+              name="crescent">
+            </ion-spinner>
+
+            <span *ngIf="!registrandoSolicitud">
+              Registrar solicitud
+            </span>
+
+            <span *ngIf="registrandoSolicitud">
+              Registrando...
+            </span>
+
           </ion-button>
         </div>
 

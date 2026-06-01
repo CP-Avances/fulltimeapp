@@ -178,7 +178,10 @@
         </div>
 
         <div class="acciones-detalle">
+
           <ion-button
+            *ngIf="tienePermisoAccion('Solicitud Permisos', 'Editar Solicitud Permiso')"
+            size="small"
             expand="block"
             fill="outline"
             color="success"
@@ -191,17 +194,33 @@
             expand="block"
             fill="outline"
             color="tertiary"
+            [disabled]="imprimiendo"
             (click)="imprimirSolicitud()">
-            <ion-icon name="print-outline" slot="start"></ion-icon>
-            Imprimir
+
+            <ion-spinner
+              *ngIf="imprimiendo"
+              name="crescent"
+              slot="start">
+            </ion-spinner>
+
+            <ion-icon
+              *ngIf="!imprimiendo"
+              name="print-outline"
+              slot="start">
+            </ion-icon>
+
+            {{ imprimiendo ? 'Generando' : 'Imprimir' }}
           </ion-button>
 
           <ion-button
+            *ngIf="tienePermisoAccion('Solicitud Permisos', 'Eliminar Solicitud Permiso')"
+            size="small"
             expand="block"
             fill="outline"
             color="danger"
             [disabled]="eliminando"
             (click)="confirmarEliminar()">
+
             <ion-spinner
               *ngIf="eliminando"
               name="crescent"
@@ -216,6 +235,7 @@
 
             {{ eliminando ? 'Eliminando...' : 'Eliminar' }}
           </ion-button>
+
         </div>
 
       </ion-card-content>

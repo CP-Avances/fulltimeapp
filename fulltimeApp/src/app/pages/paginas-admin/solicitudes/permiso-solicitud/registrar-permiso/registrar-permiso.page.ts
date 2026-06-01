@@ -69,6 +69,8 @@ export class RegistrarPermisoPage implements OnInit {
   incumpleAnticipacion = false;
   incumpleDiasAnteriores = false;
 
+  registrandoSolicitud = false;
+
   constructor(
     private permisosService: PermisosService,
     private feriadosService: FeriadosService,
@@ -485,6 +487,10 @@ export class RegistrarPermisoPage implements OnInit {
   }
 
   registrarSolicitud() {
+    if (this.registrandoSolicitud) {
+      return;
+    }
+
     if (!this.verificacionRealizada || this.estadoVerificacion !== 'ok') {
       this.mostrarToast('Primero debe verificar correctamente la solicitud.', 'warning');
       return;
@@ -506,6 +512,8 @@ export class RegistrarPermisoPage implements OnInit {
       this.mostrarToast('El archivo ha excedido el tamaño permitido. Máximo 2MB.', 'warning');
       return;
     }
+
+    this.registrandoSolicitud = true;
 
     const esPorHoras = this.permiteHoras;
 
@@ -542,6 +550,7 @@ export class RegistrarPermisoPage implements OnInit {
         const solicitudCreada = response?.data ?? response ?? null;
 
         if (!solicitudCreada || !solicitudCreada.id) {
+          this.registrandoSolicitud = false;
           this.mostrarToast('La solicitud se registró, pero no se obtuvo el identificador.', 'warning');
           return;
         }
@@ -563,6 +572,7 @@ export class RegistrarPermisoPage implements OnInit {
               this.router.navigateByUrl('/reloj/solicitudes/permiso-solicitud');
             },
             error: () => {
+              this.registrandoSolicitud = false;
               this.mostrarToast('La solicitud se registró, pero ocurrió un error al subir el documento.', 'warning');
             }
           });
@@ -577,6 +587,7 @@ export class RegistrarPermisoPage implements OnInit {
 
       },
       error: () => {
+        this.registrandoSolicitud = false;
         this.mostrarToast('Ocurrió un error al registrar la solicitud.', 'danger');
       }
     });
@@ -929,7 +940,9 @@ export class RegistrarPermisoPage implements OnInit {
   }
 
   puedeRegistrar(): boolean {
-    return this.verificacionRealizada && this.estadoVerificacion === 'ok';
+    return this.verificacionRealizada &&
+      this.estadoVerificacion === 'ok' &&
+      !this.registrandoSolicitud;
   }
 
   obtenerTipoSeleccionado() {

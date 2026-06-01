@@ -43,7 +43,7 @@ export class VacacionDetalleSolicitudPage implements OnInit {
     private aprobacionesService: AprobacionesService,
 
   ) { }
-
+ 
   async ngOnInit() {
     const navigation = this.router.getCurrentNavigation();
     this.solicitud = navigation?.extras?.state?.['solicitud'];
