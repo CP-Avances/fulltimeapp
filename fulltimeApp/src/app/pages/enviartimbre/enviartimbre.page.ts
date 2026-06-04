@@ -225,8 +225,6 @@ export class EnviartimbrePage implements OnInit {
       return false;
 
     } catch (error: any) {
-      console.log('Error solicitando permiso de ubicación:', error);
-
       await this.abrirToas(
         'No fue posible solicitar el permiso de ubicación. Revise que la ubicación esté activa y que la app tenga permiso desde la configuración del teléfono.',
         'danger',
@@ -268,8 +266,6 @@ export class EnviartimbrePage implements OnInit {
       return false;
 
     } catch (error) {
-      console.log('Error solicitando permiso de cámara:', error);
-
       await this.abrirToas(
         'No fue posible solicitar el permiso de cámara. Revise los permisos de la app.',
         'danger',
@@ -356,14 +352,7 @@ export class EnviartimbrePage implements OnInit {
       this.geoLongitude = resp.coords.longitude;
       this.geoLatitude = resp.coords.latitude;
 
-      console.log('Coordenadas obtenidas:', {
-        latitud: this.geoLatitude,
-        longitud: this.geoLongitude
-      });
-
-    } catch (error) {
-      console.log('Error al obtener coordenadas:', error);
-
+    } catch {
       this.geoLatitude = 0;
       this.geoLongitude = 0;
 
@@ -469,9 +458,7 @@ export class EnviartimbrePage implements OnInit {
         try {
           await this.tomarFoto();
           this.identificarUsuario();
-        } catch (error) {
-          console.log('Error al tomar foto:', error);
-
+        } catch {
           this.abrirToas(
             'No se pudo obtener la foto, timbre cancelado.',
             'warning',
@@ -536,8 +523,6 @@ export class EnviartimbrePage implements OnInit {
 
   async identificarUsuario() {
     if (!this.platform.is('hybrid')) {
-      console.log('Autenticación biométrica no disponible en navegador');
-
       this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
       this.guardarEnBDD();
 
@@ -562,8 +547,6 @@ export class EnviartimbrePage implements OnInit {
       description: 'Casa Pazmiño S.A'
     }).then((resul: any) => {
       if (resul) {
-        console.log('verified: ', resul.verified);
-
         this.nuevoTimbre.tipo_autenticacion = this.IDENTIFICACION_BIOMETRICA;
         this.guardarEnBDD();
       }
@@ -585,25 +568,8 @@ export class EnviartimbrePage implements OnInit {
   }
 
   async enviarTimbreSinAuth() {
-    const alert = await this.alertController.create({
-      header: 'Autenticación no disponible',
-      message: 'El timbre se enviará pero en su reporte de timbres se reflejará este particular.',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-        },
-        {
-          text: 'Listo',
-          handler: () => {
-            this.nuevoTimbre.tipo_autenticacion = this.IDENTIFICACION_DESACTIVADA;
-            this.guardarEnBDD();
-          }
-        }
-      ]
-    });
-
-    await alert.present();
+    this.nuevoTimbre.tipo_autenticacion = this.IDENTIFICACION_DESACTIVADA;
+    await this.guardarEnBDD();
   }
 
   async enviarTimbreAuthProble() {
@@ -663,8 +629,6 @@ export class EnviartimbrePage implements OnInit {
         await this.obtenerPosicion();
       }
     } else {
-      console.log('Probando timbre desde navegador web');
-
       this.abrirToas(
         'Prueba desde navegador: no se usará autenticación biométrica.',
         'warning',
@@ -988,8 +952,7 @@ export class EnviartimbrePage implements OnInit {
 
       this.actualizarUbicacionPantalla(ubicacionCalculada);
 
-    } catch (error) {
-      console.log('Error validando ubicación antes de continuar:', error);
+    } catch {
       this.actualizarUbicacionPantalla('Sin Ubicación');
     } finally {
       this.cargandoPosicion = false;
@@ -1050,8 +1013,7 @@ export class EnviartimbrePage implements OnInit {
 
       return '';
 
-    } catch (error) {
-      console.log('Error buscando ubicación permitida:', error);
+    } catch {
       return '';
     }
   }
@@ -1072,8 +1034,7 @@ export class EnviartimbrePage implements OnInit {
 
       return estaDentro ? 'DOMICILIO' : '';
 
-    } catch (error) {
-      console.log('Error buscando ubicación domicilio:', error);
+    } catch {
       return '';
     }
   }
@@ -1085,8 +1046,7 @@ export class EnviartimbrePage implements OnInit {
 
       return resultado?.verificar === 'ok';
 
-    } catch (error) {
-      console.log('Error comparando coordenadas:', error);
+    } catch {
       return false;
     }
   }

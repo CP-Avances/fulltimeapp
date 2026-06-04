@@ -1,76 +1,110 @@
-<ion-header>
-  <div style="padding:10% 1% 3% 1%; background: white">
-    <img class="center" style="width:45%;" src="../../../assets/images/C_FTLOGORV.png" />
+<ion-header class="comunicados-header">
+  <div class="header-logo">
+    <img class="center" src="../../../assets/images/ISOLOGO.png" />
   </div>
 </ion-header>
 
-<ion-content *ngIf="isConnected && serverConnected">
+<ion-content *ngIf="isConnected && serverConnected" class="comunicados-content">
 
-  <ion-text mode="ios" style="text-align:center;">
-    <h3 style="font-size: 5vw"><ion-icon name="megaphone-outline"></ion-icon>
+  <div class="titulo-contenedor">
+    <h3>
+      <ion-icon name="megaphone-outline"></ion-icon>
       Comunicados
     </h3>
-  </ion-text>
+    <p>Complete la información para enviar un comunicado.</p>
+  </div>
 
   <form (submit)="EnviarComunicado()" mode="md">
-    <!-- MENSAJE DE COMUNICADO -->
-    <div class="formComini">
-      <ion-item>
-        <ion-label position="floating" mode="md" class="is-required">Asunto</ion-label>
-        <ion-input type="text" mode="md" [(ngModel)]="noti.asunto" name="asunto_" class="form-control" minlength="3"
-          maxlength="45"></ion-input>
-      </ion-item>
+    <ion-card class="form-card">
+      <ion-card-content>
 
-      <ion-item>
-        <ion-label position="floating" mode="md" class="is-required">Mensaje</ion-label>
-        <ion-textarea name="mensaje_" [(ngModel)]="noti.mensaje" rows="7" cols="20" mode="md" minlength="3"
-          maxlengt="255" (ionChange)="textareaMaxLengthValidation()"></ion-textarea>
-      </ion-item>
+        <ion-item class="input-item">
+          <ion-label position="floating" mode="md" class="is-required">Asunto</ion-label>
+          <ion-input
+            type="text"
+            mode="md"
+            [(ngModel)]="noti.asunto"
+            name="asunto_"
+            class="form-control"
+            minlength="3"
+            maxlength="45">
+          </ion-input>
+        </ion-item>
 
-    </div>
-    <br>
-    <ion-button type="submit" mode="md" shape="round">Siguiente</ion-button>
+        <ion-item class="input-item textarea-item">
+          <ion-label position="floating" mode="md" class="is-required">Mensaje</ion-label>
+          <ion-textarea
+            name="mensaje_"
+            [(ngModel)]="noti.mensaje"
+            rows="7"
+            cols="20"
+            mode="md"
+            minlength="3"
+            maxlength="255"
+            (ionChange)="textareaMaxLengthValidation()">
+          </ion-textarea>
+        </ion-item>
+
+        <div class="contador-mensaje">
+          {{ noti.mensaje?.length || 0 }}/255
+        </div>
+
+        <ion-button
+          type="submit"
+          mode="md"
+          shape="round"
+          expand="block"
+          class="btn-siguiente">
+          <ion-icon name="arrow-forward-outline" slot="start"></ion-icon>
+          Siguiente
+        </ion-button>
+
+      </ion-card-content>
+    </ion-card>
   </form>
 
 </ion-content>
 
-<ion-content *ngIf="!isConnected || !serverConnected">
+<ion-content *ngIf="!isConnected || !serverConnected" class="sin-conexion-content">
   <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
 
-  <!-- Ventana de no conexion a internet-->
-  <div style="margin: 2%; padding: 2%; text-align: center; border-radius: 2%;">
-    <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 90%;">
-      En esta vista puede enviar comunicados.
-    </ion-text>
-    <br>
-    <br>
-    <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;" *ngIf="!isConnected">
-      Se podrán visualizar cuando tenga conexión a internet
-    </ion-text>
-    <br>
+  <div class="offline-card">
+    <div class="offline-icon">
+      <ion-icon name="cloud-offline-outline"></ion-icon>
+    </div>
 
-    <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;"
-      *ngIf="!serverConnected">
-      Se podrán visualizar cuando tenga conexión al servidor
-    </ion-text>
+    <h3>Comunicados</h3>
+
+    <p>
+      En esta vista puede enviar comunicados.
+    </p>
+
+    <p *ngIf="!isConnected">
+      Se podrán visualizar cuando tenga conexión a internet.
+    </p>
+
+    <p *ngIf="!serverConnected">
+      Se podrán visualizar cuando tenga conexión al servidor.
+    </p>
   </div>
+
   <div class="Imagen">
     <span class="center1">
-      <img src="../../../assets/images/C_FTLOGORV.png">
-      <ion-label style="text-align:center" mode="md" color="medium">
-        <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
+      <img src="../../../assets/images/ISOLOGO.png">
+      <ion-label mode="md" color="medium">
+        <h1><b>Reloj Virtual</b></h1>
       </ion-label>
     </span>
-    <img src="../../../assets/images/lost_timee.svg" />
+
+    <img class="offline-img" src="../../../assets/images/lost_timee.svg" />
   </div>
 
-  <div style="margin: 4%; padding: 4%; text-align: center; border-radius: 2%;">
-    <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;" *ngIf="!isConnected">
+  <div class="offline-message">
+    <ion-text *ngIf="!isConnected">
       No tiene conexión a internet
     </ion-text>
-    <br>
 
-    <ion-text color='dark' style="font-family: Arial, Helvetica, sans-serif;" *ngIf="!serverConnected">
+    <ion-text *ngIf="!serverConnected">
       No tiene conexión al servidor
     </ion-text>
   </div>

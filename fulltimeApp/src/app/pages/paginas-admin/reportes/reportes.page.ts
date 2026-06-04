@@ -51,7 +51,7 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
         </div>
         <div class="Imagen">
           <span class="center1">
-            <img src="../../../assets/images/C_FTLOGORV.png">
+            <img src="../../../assets/images/ISOLOGO.png">
             <ion-label style="text-align:center" mode="md" color="medium">
               <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
             </ion-label>

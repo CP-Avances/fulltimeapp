@@ -16,6 +16,7 @@ interface CheckOptions {
   templateUrl: './enviar-usuario.component.html',
   styleUrls: ['./enviar-usuario.component.scss'],
 })
+
 export class EnviarUsuarioComponent implements OnInit {
 
   @Input() data: any;
@@ -121,16 +122,6 @@ export class EnviarUsuarioComponent implements OnInit {
 
     this.loadingEmpleado = true;
     this.requestNotificationPermission();
-  }
-
-  private async cargarAsignacionesUsuario(): Promise<void> {
-    if (!this.idEmpleado) return;
-
-    try {
-      await this.asignacionesMovil.ObtenerAsignacionesUsuario(this.idEmpleado);
-    } catch (error) {
-      console.log('Error al cargar asignaciones del usuario', error);
-    }
   }
 
   // METODO PARA SOLICITAR EL PERMISO DE NOTIFICACIONES LOCALES AL DISPOSITIVO

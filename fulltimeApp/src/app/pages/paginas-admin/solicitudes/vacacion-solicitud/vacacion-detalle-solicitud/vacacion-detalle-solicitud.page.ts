@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { AlertController, NavController, ToastController } from '@ionic/angular';
 import { VacacionesService } from 'src/app/services/vacaciones.service';
 import { ReportesMicroService } from 'src/app/services/reportes-micro.service';
-import { ParametrosService } from 'src/app/services/parametros.service';
 import { PermisosAccionesService } from 'src/app/services/permisos-acciones.service';
 import { EmpresaService } from 'src/app/services/empresa.service';
 import { firstValueFrom } from 'rxjs';
@@ -22,12 +21,12 @@ export class VacacionDetalleSolicitudPage implements OnInit {
 
   solicitud: any = null;
   eliminando = false;
-  imprimiendo = false; 
+  imprimiendo = false;
   logo: any = null;
   p_color: any = null;
   s_color: any = null;
   frase: any = null;
-
+  imagen: string = localStorage.getItem('imagen64') ?? '';
 
   constructor(
     private router: Router,
@@ -43,7 +42,7 @@ export class VacacionDetalleSolicitudPage implements OnInit {
     private aprobacionesService: AprobacionesService,
 
   ) { }
- 
+
   async ngOnInit() {
     const navigation = this.router.getCurrentNavigation();
     this.solicitud = navigation?.extras?.state?.['solicitud'];

@@ -166,9 +166,7 @@ export class ReporteTimbresPage {
       this.idSucursalesAcceso = this.asignacionesMovil.idSucursalesAcceso;
       this.idUsuariosAcceso = this.asignacionesMovil.idUsuariosAcceso;
 
-    } catch (error) {
-      console.log('Error al cargar asignaciones del usuario', error);
-
+    } catch {
       this.idDepartamentosAcceso = new Set();
       this.idSucursalesAcceso = new Set();
       this.idUsuariosAcceso = new Set();

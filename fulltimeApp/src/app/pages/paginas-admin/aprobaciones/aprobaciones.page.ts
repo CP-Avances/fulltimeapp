@@ -78,9 +78,7 @@ export class AprobacionesPage implements OnInit {
       this.colorp = this.Btn_permisos ? 'habilitado' : 'deshabilitado';
       this.colorv = this.Btn_vacaciones ? 'habilitado' : 'deshabilitado';
 
-    } catch (error) {
-      console.log('Error al leer módulos:', error);
-
+    } catch {
       this.Btn_permisos = false;
       this.Btn_vacaciones = false;
       this.colorp = 'deshabilitado';

@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header class="detalle-solicitud-header">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/reloj/solicitudes/vacacion-solicitud/vacacion-criterio-busqueda"></ion-back-button>
@@ -29,10 +29,19 @@
       <ion-card-content>
 
         <div class="bloque-info">
-          <div class="bloque-titulo">
-            <ion-icon name="person-outline"></ion-icon>
+          <div class="bloque-titulo bloque-titulo-empleado">
+            <div class="avatar-detalle-empleado">
+              <img *ngIf="imagen; else iconoEmpleado" [src]="imagen" alt="Perfil" (error)="imagen = ''" />
+
+              <ng-template #iconoEmpleado>
+                <ion-icon name="person-outline"></ion-icon>
+              </ng-template>
+            </div>
+
             <span>Empleado</span>
           </div>
+
+
 
           <div class="info-linea">
             <span>Empleado</span>

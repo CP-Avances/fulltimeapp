@@ -9,6 +9,8 @@ import { NetworkService } from '../../libs/network.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ParametrosSistema } from 'src/app/libs/parametros.emun';
 import { ParametrosService } from 'src/app/services/parametros.service';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-lista-notificacion',
@@ -78,14 +80,39 @@ export class ListaNotificacionComponent implements OnInit {
 
 
   // METODO PARA ABRIR LA NOTIFICACION EN LA VISTA DEL MODULO AL QUE PERTENECE
-  AbrirNoti(noti: { id: number, id_permiso: string; id_vacaciones: string; id_hora_extra: string; estado: string, tipo: number; nempleadoreceives: string; id_receives_empl: number; nempleadosend: string; }) {
-    this.cambiovistanoti(noti);
-    this.cambiovistanotitimbre(noti);
+  AbrirNoti(noti: {
+    id: number,
+    id_permiso: string;
+    id_vacaciones: string;
+    id_hora_extra: string;
+    estado: string,
+    tipo: number;
+    nempleadoreceives: string;
+    id_receives_empl: number;
+    nempleadosend: string;
+  }) {
+    this.marcarNotificacionComoVista(noti);
     this.modalController.dismiss({});
-
   }
 
 
+  // METODO GENERAL PARA MARCAR COMO VISTA SEGUN EL TIPO
+  marcarNotificacionComoVista(noti: { id: number; tipo: number }) {
+    if (!noti?.id) {
+      return;
+    }
+
+    const tipo = Number(noti.tipo);
+
+    if ([6, 100, 101, 102].includes(tipo)) {
+      this.cambiovistanotitimbre(noti);
+    } else {
+      this.cambiovistanoti(noti);
+    }
+  }
+
+
+  // CAMBIA EL ESTADO DE VISTO DE NOTIFICACIONES DE SOLICITUDES
   cambiovistanoti(noti: { id: number }) {
     if (!noti?.id) {
       return;
@@ -96,71 +123,99 @@ export class ListaNotificacionComponent implements OnInit {
       visto: true
     };
 
-    this.vistonotificacion.PutNotificaVisto(datos).subscribe(
-      {
-        next: () => {
-          this.loading = false;
-        },
-        error: () => {
-          this.loading = false;
-        }
+    this.vistonotificacion.PutNotificaVisto(datos).subscribe({
+      next: () => {
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
       }
-    );
+    });
   }
 
-  //cambia el estado de la columna visto de la tabla realtime_notitimbre de true a false.
-  cambiovistanotitimbre(noti: { id: number }) {
-    const vista = true;
-    const datos = { id: noti.id, visto: vista }
 
-    this.vistonotificacion.PutNotifiTimbreVisto(datos).subscribe(
-      {
-        next: () => {
-          this.loading = false;
-        },
-        error: () => {
-          this.loading = false;
-        }
+  // CAMBIA EL ESTADO DE VISTO DE AVISOS / COMUNICADOS / ASISTENCIA
+  cambiovistanotitimbre(noti: { id: number }) {
+    if (!noti?.id) {
+      return;
+    }
+
+    const datos = {
+      id: noti.id,
+      visto: true
+    };
+
+    this.vistonotificacion.PutNotifiTimbreVisto(datos).subscribe({
+      next: () => {
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
       }
-    )
+    });
   }
 
   //Poner todas las notificaciones como vistas
   notificacionesvistanoti(noti: any) {
-    const vista = true;
-    var datos = { id: 0, visto: vista }
-    var allNotificaciones = [];
-    allNotificaciones = noti;
+    if (!Array.isArray(noti) || noti.length === 0) {
+      this.modalController.dismiss({});
+      return;
+    }
 
-    noti.forEach((item: any) => {
-      if (item.visto != true) {
-        datos.id = item.id;
+    this.loading = true;
 
-        this.vistonotificacion.PutNotificaVisto(datos).subscribe(
-          {
-            next: () => {
-              this.loading = false;
-            },
-            error: () => {
-              this.loading = false;
-            }
-          }
-        )
+    const pendientes = noti.filter((item: any) => item.visto !== true);
 
-        this.vistonotificacion.PutNotifiTimbreVisto(datos).subscribe(
-          {
-            next: () => {
-              this.loading = false;
-            },
-            error: () => {
-              this.loading = false;
-            }
-          }
-        )
+    if (pendientes.length === 0) {
+      this.loading = false;
+      this.modalController.dismiss({});
+      return;
+    }
+
+    const peticiones = pendientes.map((item: any) => {
+      const datos = {
+        id: item.id,
+        visto: true
+      };
+
+      const tipo = Number(item.tipo);
+
+      // Avisos / comunicados / asistencia
+      if ([6, 100, 101, 102].includes(tipo)) {
+        return this.vistonotificacion.PutNotifiTimbreVisto(datos).pipe(
+          catchError((error) => {
+            return of(null);
+          })
+        );
       }
+
+      // Notificaciones de solicitudes
+      return this.vistonotificacion.PutNotificaVisto(datos).pipe(
+        catchError((error) => {
+          return of(null);
+        })
+      );
     });
 
-    this.modalController.dismiss({});
+    forkJoin(peticiones).subscribe({
+      next: () => {
+        this.loading = false;
+
+        this.notificacionesAll = this.notificacionesAll.map((item: any) => ({
+          ...item,
+          visto: true
+        }));
+
+        this.countNoti = 0;
+
+        this.modalController.dismiss({
+          actualizado: true
+        });
+      },
+      error: () => {
+        this.loading = false;
+      }
+    });
   }
 
   // VARIABLES DE CONFIGURACION DEL COMPONENTE DE PAGINACION

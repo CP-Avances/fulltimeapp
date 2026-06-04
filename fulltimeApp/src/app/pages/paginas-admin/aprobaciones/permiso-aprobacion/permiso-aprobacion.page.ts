@@ -110,8 +110,6 @@ export class PermisoAprobacionPage implements OnInit {
 
     this.aprobacionesService.ObtenerScopeFiltrosPermisos().subscribe({
       next: (res: any) => {
-        console.log('Scope aprobación permisos:', res);
-
         this.scopeAprobacion = res;
 
         const idsDepartamentoAprobables = Array.isArray(res?.idsDepartamentoAprobables)
@@ -127,9 +125,7 @@ export class PermisoAprobacionPage implements OnInit {
 
         this.tieneConfiguracionAprobacion = true;
       },
-      error: (error) => {
-        console.log('Error al validar scope aprobación permisos:', error);
-
+      error: () => {
         this.tieneConfiguracionAprobacion = false;
         this.mensajeSinConfiguracion = 'No se pudo validar su configuración de aprobación.';
         this.cargandoInicial = false;
@@ -140,12 +136,9 @@ export class PermisoAprobacionPage implements OnInit {
   cargarTiposPermiso() {
     this.permisosService.listarTiposPermiso().subscribe({
       next: (res: any[]) => {
-        console.log('Tipos permiso:', res);
-
         this.tiposPermiso = Array.isArray(res) ? res : [];
       },
-      error: (error) => {
-        console.log('Error al cargar tipos de permiso:', error);
+      error: () => {
         this.tiposPermiso = [];
       }
     });
@@ -154,15 +147,11 @@ export class PermisoAprobacionPage implements OnInit {
   cargarInformacionGeneral() {
     this.datosGeneralesService.ObtenerInformacionGeneral(1).subscribe({
       next: (res: any[]) => {
-        console.log('Información general permisos aprobación:', res);
-
         this.procesarInformacionGeneral(res);
 
         this.cargandoInicial = false;
       },
-      error: (error) => {
-        console.log('Error al cargar información general:', error);
-
+      error: () => {
         this.empleados = [];
         this.departamentos = [];
         this.sucursalesAll = [];
@@ -238,39 +227,23 @@ export class PermisoAprobacionPage implements OnInit {
 
     this.departamentosAll = Array.from(mapaDepartamentos.values());
 
-    console.log('Departamentos procesados:', this.departamentosAll);
-    console.log('Empleados procesados:', this.empleadosAll);
-
     this.aplicarScopeFiltros();
   }
 
   aplicarScopeFiltros() {
-    console.log('Aplicando scope filtros...');
-    console.log('Rol empleado:', this.rolEmpleado);
-    console.log('Scope aprobación:', this.scopeAprobacion);
-    console.log('DepartamentosAll antes de filtrar:', this.departamentosAll);
-    console.log('EmpleadosAll antes de filtrar:', this.empleadosAll);
 
     if (this.rolEmpleado === 1) {
       this.empleados = [...this.empleadosAll];
       this.departamentos = [...this.departamentosAll];
-
-      console.log('Departamentos visibles admin:', this.departamentos);
-      console.log('Empleados visibles admin:', this.empleados);
       return;
     }
 
     const scopeDeps = new Set<number>(
       (this.scopeAprobacion?.idsDepartamentoAprobables || []).map((x: any) => Number(x))
     );
-
-    console.log('Departamentos aprobables:', Array.from(scopeDeps));
-
     if (scopeDeps.size === 0) {
       this.empleados = [];
       this.departamentos = [];
-
-      console.log('No hay departamentos aprobables.');
       return;
     }
 
@@ -282,9 +255,6 @@ export class PermisoAprobacionPage implements OnInit {
       const depEmp = Number(e.id_depa);
       return scopeDeps.has(depEmp);
     });
-
-    console.log('Departamentos visibles filtrados:', this.departamentos);
-    console.log('Empleados visibles filtrados:', this.empleados);
   }
 
   onCriterioChange() {
@@ -318,8 +288,6 @@ export class PermisoAprobacionPage implements OnInit {
       payload.idsEmpleado = this.idsEmpleadoSeleccionados;
     }
 
-    console.log('Payload buscar solicitudes aprobación permisos:', payload);
-
     this.cargando = true;
     this.solicitudes = [];
     this.solicitudesPaginadas = [];
@@ -329,8 +297,6 @@ export class PermisoAprobacionPage implements OnInit {
     this.permisosService.buscarSolicitudesPermisos(payload).subscribe({
       next: async (resp: any) => {
         const solicitudes = Array.isArray(resp?.data) ? resp.data : [];
-
-        console.log('Solicitudes encontradas antes de filtrar:', solicitudes);
 
         await this.filtrarSolicitudesAprobables(solicitudes);
 
@@ -344,9 +310,7 @@ export class PermisoAprobacionPage implements OnInit {
           this.mostrarToast('No existen solicitudes pendientes de aprobación para usted.', 'warning');
         }
       },
-      error: (error) => {
-        console.log('Error al buscar solicitudes permisos:', error);
-
+      error: () => {
         this.cargando = false;
         this.mostrarToast('No se pudieron consultar las solicitudes de permisos.', 'danger');
       }
@@ -363,14 +327,9 @@ export class PermisoAprobacionPage implements OnInit {
           id_solicitud_modulo: Number(solicitud.id)
         };
 
-        console.log('Payload validar acciones:', payloadValidar);
-        console.log('Solicitud enviada a validar:', solicitud);
-
         const validacion: any = await this.aprobacionesService
           .ValidarAccionesSolicitud(payloadValidar)
           .toPromise();
-
-        console.log('Respuesta validar acciones solicitud:', solicitud.id, validacion);
 
         const acciones = validacion?.acciones ?? {};
 
@@ -382,14 +341,6 @@ export class PermisoAprobacionPage implements OnInit {
           puedePreautorizar ||
           puedeAutorizar ||
           puedeNegar;
-
-        console.log('Acciones normalizadas:', {
-          idSolicitud: solicitud.id,
-          puedePreautorizar,
-          puedeAutorizar,
-          puedeNegar,
-          puedeActuar
-        });
 
         if (puedeActuar) {
           solicitudesAprobables.push({
@@ -410,7 +361,6 @@ export class PermisoAprobacionPage implements OnInit {
 
     this.solicitudes = solicitudesAprobables;
 
-    console.log('Solicitudes aprobables:', this.solicitudes);
   }
 
   obtenerCriterioBackend(): 'TIPO' | 'DEP' | 'EMP' {
