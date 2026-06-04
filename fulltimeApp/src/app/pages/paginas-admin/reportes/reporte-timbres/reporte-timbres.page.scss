@@ -1,41 +1,386 @@
-  
-.item-color{
-    --ion-item-background: white;
-    --ion-item-color: black;
-    margin-bottom: 1%;
-    margin-left: 4%;
-    margin-right: 4%;
-  }
+/* =========================
+   VARIABLES
+========================= */
 
-  
-.paginacion{
-  margin: auto;
-  padding-top: 2%;
-  padding-bottom: 2%;
+:host {
+  --app-primary: #0f75bc;
+  --app-primary-dark: #0b5a92;
+  --app-primary-light: #e8f4fd;
+
+  --app-bg: #f4f7fb;
+  --app-card: #ffffff;
+  --app-input: #f8fafc;
+  --app-text: #1f2937;
+  --app-text-soft: #64748b;
+  --app-border: rgba(15, 23, 42, 0.09);
+  --app-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
 }
 
+/* =========================
+   CONTENIDO GENERAL
+========================= */
 
+ion-content {
+  --background: var(--app-bg);
+}
 
-  .paginacion ::ng-deep .ngx-pagination {
-    padding: 0%;
-    margin: auto;
-  }
-  
-  .paginacion ::ng-deep .ngx-pagination .current {
-    background: rgb(29, 121, 197);
-    color: rgb(255, 255, 255);
-    font-weight: bold;
-    border-radius: 5px;
+ion-grid {
+  margin: 0 10px 10px 10px !important;
+  padding: 0;
+}
+
+ion-row {
+  margin: 0 10px 10px 10px;
+}
+
+ion-col {
+  padding: 4px;
+}
+
+/* =========================
+   BOTÓN TÍTULO / REGRESO
+========================= */
+
+ion-content > ion-text:first-child ion-button {
+  --background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  --color: #ffffff;
+  --border-radius: 0 0 18px 18px;
+  --box-shadow: 0 4px 14px rgba(15, 23, 42, 0.18);
+  min-height: 54px;
+  margin: 0;
+  text-transform: none;
+}
+
+ion-content > ion-text:first-child ion-label {
+  font-size: 15px !important;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+}
+
+/* =========================
+   CAMPOS DE FECHA
+========================= */
+
+.item_fondo {
+  --background: var(--app-card);
+  --color: var(--app-text);
+  --border-radius: 14px;
+  --padding-start: 12px;
+  --inner-padding-end: 10px;
+  --min-height: 56px;
+  margin-bottom: 8px;
+  border-radius: 14px !important;
+  border: 1px solid var(--app-border);
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.06);
+}
+
+.item_fondo ion-label {
+  color: var(--app-text-soft) !important;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.item_fondo ion-input {
+  color: var(--app-text);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* =========================
+   CRITERIOS
+========================= */
+
+ion-list {
+  background: transparent;
+  padding: 0;
+}
+
+ion-radio-group {
+  display: block;
+  margin: 0 14px 14px 14px;
+  padding: 14px;
+  border-radius: 20px;
+  background: var(--app-card);
+  color: var(--app-text);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+}
+
+ion-radio-group ion-text h3 {
+  margin: 0 0 12px 0;
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--app-text);
+}
+
+ion-radio-group ion-item {
+  --background: var(--app-input);
+  --color: var(--app-text);
+  --border-radius: 14px;
+  --padding-start: 12px;
+  --inner-padding-end: 12px;
+  --min-height: 48px;
+  margin-bottom: 8px;
+  border-radius: 14px;
+  border: 1px solid var(--app-border);
+}
+
+ion-radio-group ion-item ion-label {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--app-text);
+}
+
+/* =========================
+   TOGGLE DISPOSITIVO
+========================= */
+
+ion-item:has(ion-toggle) {
+  --background: var(--app-card);
+  --color: var(--app-text);
+  --border-radius: 16px;
+  --padding-start: 14px;
+  --inner-padding-end: 12px;
+  margin: 0 14px 14px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+}
+
+ion-item:has(ion-toggle) ion-label {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--app-text);
+}
+
+/* =========================
+   CARGA
+========================= */
+
+div[style*="text-align: center"] {
+  margin: 14px;
+  padding: 18px 14px;
+  border-radius: 18px;
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+}
+
+div[style*="text-align: center"] ion-text span {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+ion-progress-bar {
+  margin-top: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+/* =========================
+   ACCIONES BUSCAR / SELECCIONAR
+========================= */
+
+ion-row ion-button {
+  --border-radius: 14px;
+  min-height: 42px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: none;
+}
+
+ion-row ion-button[shape="round"] {
+  width: 100%;
+}
+
+/* =========================
+   BUSCADOR
+========================= */
+
+ion-searchbar {
+  padding: 0 14px 10px 14px;
+  --background: var(--app-card);
+  --color: var(--app-text);
+  --placeholder-color: var(--app-text-soft);
+  --icon-color: var(--app-primary);
+  --clear-button-color: var(--app-text-soft);
+  --border-radius: 16px;
+  --box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+/* =========================
+   TÍTULOS DE RESULTADOS
+========================= */
+
+ion-list > ion-text h3 {
+  margin: 8px 14px 10px 14px;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--app-card);
+  color: var(--app-text);
+  font-size: 16px;
+  font-weight: 900;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.06);
+  border: 1px solid var(--app-border);
+}
+
+/* =========================
+   ITEMS DE RESULTADO
+========================= */
+
+.item-color {
+  --background: var(--app-card);
+  --color: var(--app-text);
+  --border-radius: 16px;
+  --padding-start: 12px;
+  --inner-padding-end: 12px;
+  --min-height: 56px;
+  margin: 0 14px 9px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--app-border);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.07);
+}
+
+.item-color ion-checkbox {
+  margin-right: 8px;
+}
+
+.item-color ion-label {
+  color: var(--app-text);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.item-color ion-label h2 {
+  margin: 0;
+  color: var(--app-text);
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.item-color ion-label p {
+  margin: 4px 0 0 0;
+  color: var(--app-text-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* =========================
+   PAGINACIÓN
+========================= */
+
+ion-item:has(pagination-controls) {
+  --background: transparent;
+  --border-width: 0;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  margin: 0 14px 16px 14px !important;
+  display: flex;
+  justify-content: center;
+}
+
+.paginacion {
+  width: 100%;
+  margin: auto;
+  padding: 8px 4px;
+  display: flex;
+  justify-content: center;
+  border-radius: 16px;
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+}
+
+.paginacion ::ng-deep .ngx-pagination {
+  padding: 0;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.paginacion ::ng-deep .ngx-pagination li {
+  margin: 0 2px;
+}
+
+.paginacion ::ng-deep .ngx-pagination .current {
+  background: var(--app-primary);
+  color: #ffffff;
+  font-weight: 900;
+  border-radius: 8px;
+  padding: 5px 9px;
+}
+
+.paginacion ::ng-deep .ngx-pagination span {
+  color: var(--app-text-soft);
+  font-family: inherit;
+  font-weight: 800;
+}
+
+.paginacion ::ng-deep .ngx-pagination a {
+  background-color: transparent;
+  color: var(--app-primary);
+  font-weight: 800;
+  border-radius: 8px;
+}
+
+/* =========================
+   MODO OSCURO
+========================= */
+
+@media (prefers-color-scheme: dark) {
+  :host {
+    --app-bg: #0f172a;
+    --app-card: #1e293b;
+    --app-input: #111827;
+    --app-text: #f8fafc;
+    --app-text-soft: #cbd5e1;
+    --app-border: rgba(255, 255, 255, 0.08);
+    --app-shadow: 0 6px 18px rgba(0, 0, 0, 0.38);
   }
 
-  .paginacion :host ::ng-deep .ngx-pagination span {
-    color: rgb(120, 193, 250);
-    font-family:monospace;
-    font-weight: bold;
+  ion-searchbar {
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
   }
-  
-  .paginacion ::ng-deep .ngx-pagination a{
-    background-color: transparent;
-    color: rgb(67, 149, 226);
-    font-weight: bold;
+
+  .item-color {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
   }
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 380px) {
+  ion-content > ion-text:first-child ion-label {
+    font-size: 13px !important;
+  }
+
+  ion-grid {
+    margin-left: 6px !important;
+    margin-right: 6px !important;
+  }
+
+  ion-radio-group,
+  .item-color,
+  ion-item:has(ion-toggle),
+  ion-item:has(pagination-controls) {
+    margin-left: 10px !important;
+    margin-right: 10px !important;
+  }
+
+  ion-searchbar {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  ion-list > ion-text h3 {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+}

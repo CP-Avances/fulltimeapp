@@ -1,56 +1,509 @@
-.img {
-    display: block;
-    max-width: 100%;
-  }
+/* =========================
+   VARIABLES
+========================= */
 
-ion-content{
-  font-weight: 15%;
+:host {
+  --app-primary: #0f75bc;
+  --app-primary-dark: #0b5a92;
+  --app-primary-light: #e8f4fd;
+
+  --app-bg: #f4f7fb;
+  --app-card: #ffffff;
+  --app-input: #f8fafc;
+  --app-text: #1f2937;
+  --app-text-soft: #64748b;
+  --app-border: rgba(15, 23, 42, 0.09);
+  --app-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
 }
 
+/* =========================
+   HEADER
+========================= */
 
-ion-list-header{
-    text-align: center;
-}
-#label{
-    align-items: center;
-}
-
-.link {
-  margin-left: 20px;
-  text-decoration: none;
+.info-header {
+  background: var(--app-card);
 }
 
-.center{
+.info-header::after {
+  display: none;
+}
+
+.header-logo {
+  padding: 28px 12px 16px 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border-bottom: 1px solid var(--app-border);
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.06);
+  text-align: center;
+}
+
+.logo-principal {
+  width: 45%;
+  max-width: 170px;
+  min-width: 120px;
   display: block;
   margin: auto;
 }
 
-.paginacion{
+.header-title h1 {
+  margin: 8px 0 0 0;
+  font-size: 18px;
+  color: var(--app-text-soft);
+  font-weight: 900;
+}
+
+/* =========================
+   CONTENIDO
+========================= */
+
+.info-content {
+  --background: var(--app-bg);
+}
+
+/* =========================
+   EMPRESA
+========================= */
+
+.empresa-card {
+  margin: 14px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  color: #ffffff;
+  box-shadow: 0 7px 18px rgba(15, 117, 188, 0.24);
+  overflow: hidden;
+}
+
+.empresa-card ion-card-content {
+  padding: 20px 16px;
+  text-align: center;
+}
+
+.empresa-icono {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 12px auto;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empresa-icono ion-icon {
+  font-size: 30px;
+  color: #ffffff;
+}
+
+.empresa-card h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.25;
+}
+
+.empresa-card p {
+  margin: 8px 0 0 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* =========================
+   SECCIONES
+========================= */
+
+.seccion {
+  margin: 16px 14px;
+}
+
+.seccion-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: var(--app-text);
+}
+
+.seccion-titulo ion-icon {
+  font-size: 22px;
+  color: var(--app-primary);
+}
+
+.seccion-titulo h3 {
+  margin: 0;
+  color: var(--app-text);
+  font-size: 16px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+/* =========================
+   INFORMACIÓN APP
+========================= */
+
+.info-card {
+  margin: 0;
+  border-radius: 18px;
+  background: var(--app-card);
+  color: var(--app-text);
+  box-shadow: var(--app-shadow);
+  border: 1px solid var(--app-border);
+}
+
+.info-card ion-card-content {
+  padding: 14px 16px;
+}
+
+.info-linea {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.info-linea:last-child {
+  border-bottom: none;
+}
+
+.info-linea span {
+  color: var(--app-text-soft);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.info-linea strong {
+  color: var(--app-text);
+  font-size: 13px;
+  font-weight: 900;
+  text-align: right;
+}
+
+/* =========================
+   BUSCADOR
+========================= */
+
+.buscador {
+  padding: 0 0 10px 0;
+  --background: var(--app-card);
+  --color: var(--app-text);
+  --placeholder-color: var(--app-text-soft);
+  --icon-color: var(--app-primary);
+  --clear-button-color: var(--app-text-soft);
+  --border-radius: 16px;
+  --box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+/* =========================
+   CARGA
+========================= */
+
+.estado-carga {
+  padding: 18px 14px;
+  border-radius: 18px;
+  background: var(--app-card);
+  box-shadow: var(--app-shadow);
+  border: 1px solid var(--app-border);
+  text-align: center;
+}
+
+.estado-carga span {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.estado-carga ion-progress-bar {
+  margin-top: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+/* =========================
+   LISTA EMPLEADOS
+========================= */
+
+.lista-empleados {
+  background: transparent;
+  padding: 0;
+}
+
+.empleado-item {
+  --background: var(--app-card);
+  --color: var(--app-text);
+  --border-radius: 18px;
+  --padding-start: 12px;
+  --inner-padding-end: 8px;
+  --min-height: 68px;
+  margin-bottom: 10px;
+  border-radius: 18px;
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+}
+
+.empleado-avatar {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  background: var(--app-primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empleado-avatar ion-icon {
+  font-size: 34px;
+  color: var(--app-primary);
+}
+
+.empleado-item ion-label h2 {
+  margin: 0;
+  color: var(--app-text);
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.empleado-item ion-label p {
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.btn-info-empleado {
+  --padding-start: 0;
+  --padding-end: 0;
+  --background: var(--app-primary-light);
+  --color: var(--app-primary);
+  --border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  margin: 0;
+}
+
+.btn-info-empleado ion-icon {
+  font-size: 24px;
+}
+
+/* =========================
+   PAGINACIÓN
+========================= */
+
+.paginacion-contenedor {
+  margin: 0 0 16px 0;
+  padding: 8px 4px;
+  background: var(--app-card);
+  border-radius: 16px;
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+  text-align: center;
+}
+
+.paginacion {
   margin: auto;
-  padding-top: 2%;
-  padding-bottom: 2%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .paginacion ::ng-deep .ngx-pagination {
-  padding: 0%;
+  padding: 0;
   margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.paginacion ::ng-deep .ngx-pagination li {
+  margin: 0 2px;
 }
 
 .paginacion ::ng-deep .ngx-pagination .current {
-  background: rgb(29, 121, 197);
-  color: rgb(255, 255, 255);
-  font-weight: bold;
-  border-radius: 5px;
-}
-  
-.paginacion :host ::ng-deep .ngx-pagination span {
-  color: rgb(120, 193, 250);
-  font-family:monospace;
-  font-weight: bold;
+  background: var(--app-primary);
+  color: #ffffff;
+  font-weight: 900;
+  border-radius: 8px;
+  padding: 5px 9px;
 }
 
-.paginacion ::ng-deep .ngx-pagination a{
+.paginacion ::ng-deep .ngx-pagination span {
+  color: var(--app-text-soft);
+  font-family: inherit;
+  font-weight: 800;
+}
+
+.paginacion ::ng-deep .ngx-pagination a {
   background-color: transparent;
-  color: rgb(67, 149, 226);
-  font-weight: bold;
+  color: var(--app-primary);
+  font-weight: 800;
+  border-radius: 8px;
+}
+
+/* =========================
+   SIN CONEXIÓN
+========================= */
+
+.offline-card {
+  margin: 16px 14px 14px 14px;
+  padding: 22px 16px;
+  border-radius: 22px;
+  background: var(--app-card);
+  color: var(--app-text);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+  text-align: center;
+}
+
+.offline-icon {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 12px auto;
+  border-radius: 18px;
+  background: var(--app-primary-light);
+  color: var(--app-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.offline-icon ion-icon {
+  font-size: 32px;
+}
+
+.offline-card h3 {
+  margin: 0 0 10px 0;
+  color: var(--app-text);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.offline-card p {
+  margin: 8px 0 0 0;
+  color: var(--app-text-soft);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.offline-image-card {
+  margin: 14px;
+  padding: 18px 14px;
+  border-radius: 22px;
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+  text-align: center;
+}
+
+.center1 {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.center1 img {
+  width: 42%;
+  max-width: 150px;
+  min-width: 110px;
+}
+
+.center1 h1 {
+  margin: 6px 0 0 0;
+  font-size: 13px;
+  color: var(--app-text-soft);
+}
+
+.offline-img {
+  width: 72%;
+  max-width: 260px;
+  display: block;
+  margin: auto;
+}
+
+.offline-message {
+  margin: 14px;
+  padding: 14px;
+  text-align: center;
+  border-radius: 16px;
+  background: rgba(239, 68, 68, 0.10);
+  color: #b91c1c;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* =========================
+   MODO OSCURO
+========================= */
+
+@media (prefers-color-scheme: dark) {
+  :host {
+    --app-bg: #0f172a;
+    --app-card: #1e293b;
+    --app-input: #111827;
+    --app-text: #f8fafc;
+    --app-text-soft: #cbd5e1;
+    --app-border: rgba(255, 255, 255, 0.08);
+    --app-shadow: 0 6px 18px rgba(0, 0, 0, 0.38);
+    --app-primary-light: rgba(14, 165, 233, 0.16);
+  }
+
+  .header-logo {
+    background: linear-gradient(180deg, #1e293b 0%, #111827 100%);
+    border-bottom: 1px solid var(--app-border);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.28);
+  }
+
+  .offline-message {
+    background: rgba(239, 68, 68, 0.16);
+    color: #fca5a5;
+  }
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 380px) {
+  .header-logo {
+    padding: 24px 10px 14px 10px;
+  }
+
+  .logo-principal {
+    width: 48%;
+    min-width: 110px;
+  }
+
+  .header-title h1 {
+    font-size: 16px;
+  }
+
+  .empresa-card,
+  .seccion,
+  .offline-card,
+  .offline-image-card,
+  .offline-message {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .empresa-card h2 {
+    font-size: 15px;
+  }
+
+  .seccion-titulo h3 {
+    font-size: 15px;
+  }
+
+  .empleado-item {
+    --min-height: 64px;
+  }
+
+  .empleado-item ion-label h2 {
+    font-size: 13px;
+  }
+
+  .offline-img {
+    width: 78%;
+  }
 }

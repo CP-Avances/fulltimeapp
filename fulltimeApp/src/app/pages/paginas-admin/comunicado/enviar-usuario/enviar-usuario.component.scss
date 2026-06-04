@@ -1,41 +1,338 @@
-  
-.item-color{
-    --ion-item-background: white;
-    --ion-item-color: black;
-    margin-bottom: 1%;
-    margin-left: 4%;
-    margin-right: 4%;
-  }
+/* =========================
+   VARIABLES
+========================= */
 
-  
-.paginacion{
-  margin: auto;
-  padding-top: 2%;
-  padding-bottom: 2%;
+:host {
+  --app-primary: #0f75bc;
+  --app-primary-dark: #0b5a92;
+  --app-primary-light: #e8f4fd;
+
+  --app-bg: #f4f7fb;
+  --app-card: #ffffff;
+  --app-input: #f8fafc;
+  --app-text: #1f2937;
+  --app-text-soft: #64748b;
+  --app-border: rgba(15, 23, 42, 0.09);
+  --app-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
 }
 
+/* =========================
+   CONTENIDO
+========================= */
 
+.usuarios-content {
+  --background: var(--app-bg);
+}
 
-  .paginacion ::ng-deep .ngx-pagination {
-    padding: 0%;
-    margin: auto;
-  }
-  
-  .paginacion ::ng-deep .ngx-pagination .current {
-    background: rgb(29, 121, 197);
-    color: rgb(255, 255, 255);
-    font-weight: bold;
-    border-radius: 5px;
+/* =========================
+   CRITERIOS
+========================= */
+
+.criterios-card {
+  margin: 14px;
+  border-radius: 20px;
+  background: var(--app-card);
+  color: var(--app-text);
+  box-shadow: var(--app-shadow);
+  border: 1px solid var(--app-border);
+  overflow: hidden;
+}
+
+.criterios-card ion-card-header {
+  padding: 16px 16px 8px 16px;
+}
+
+.criterios-card ion-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--app-text);
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.criterios-card ion-card-title ion-icon {
+  color: var(--app-primary);
+  font-size: 22px;
+}
+
+.criterios-card ion-card-subtitle {
+  margin-top: 5px;
+  color: var(--app-text-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.criterios-card ion-card-content {
+  padding: 10px 14px 14px 14px;
+}
+
+.criterio-item {
+  --background: var(--app-input);
+  --color: var(--app-text);
+  --border-radius: 14px;
+  --padding-start: 12px;
+  --inner-padding-end: 12px;
+  --min-height: 48px;
+  margin-bottom: 8px;
+  border-radius: 14px;
+  border: 1px solid var(--app-border);
+}
+
+.criterio-item ion-label {
+  color: var(--app-text);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* =========================
+   CARGA
+========================= */
+
+.estado-carga {
+  margin: 14px;
+  padding: 22px 14px;
+  border-radius: 18px;
+  background: var(--app-card);
+  color: var(--app-text-soft);
+  box-shadow: var(--app-shadow);
+  border: 1px solid var(--app-border);
+  text-align: center;
+}
+
+.estado-carga ion-spinner {
+  margin-bottom: 10px;
+  color: var(--app-primary);
+}
+
+.estado-carga p {
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* =========================
+   ACCIONES SUPERIORES
+========================= */
+
+.acciones-superiores {
+  margin: 12px 14px 10px 14px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-seleccionar {
+  --border-radius: 14px;
+  min-width: 48px;
+  height: 42px;
+  margin: 0;
+}
+
+.btn-enviar {
+  --border-radius: 14px;
+  height: 42px;
+  margin: 0;
+  flex: 1;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: none;
+}
+
+/* =========================
+   BUSCADOR
+========================= */
+
+.buscador {
+  padding: 0 14px 10px 14px;
+  --background: var(--app-card);
+  --color: var(--app-text);
+  --placeholder-color: var(--app-text-soft);
+  --icon-color: var(--app-primary);
+  --clear-button-color: var(--app-text-soft);
+  --border-radius: 16px;
+  --box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+/* =========================
+   RESULTADOS
+========================= */
+
+.resultado-card {
+  margin: 0 14px 14px 14px;
+  border-radius: 20px;
+  background: var(--app-card);
+  color: var(--app-text);
+  box-shadow: var(--app-shadow);
+  border: 1px solid var(--app-border);
+  overflow: hidden;
+}
+
+.resultado-card ion-card-header {
+  padding: 14px 16px 8px 16px;
+}
+
+.resultado-card ion-card-title {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--app-text);
+}
+
+.resultado-card ion-card-content {
+  padding: 8px 10px 12px 10px;
+}
+
+.resultado-card ion-list {
+  background: transparent;
+  padding: 0;
+}
+
+.item-color {
+  --background: var(--app-input);
+  --color: var(--app-text);
+  --border-radius: 16px;
+  --padding-start: 12px;
+  --inner-padding-end: 12px;
+  --min-height: 58px;
+  margin-bottom: 9px;
+  border-radius: 16px;
+  border: 1px solid var(--app-border);
+}
+
+.item-color ion-checkbox {
+  margin-right: 8px;
+}
+
+.item-icono {
+  font-size: 23px;
+  color: var(--app-primary);
+  margin-right: 10px;
+}
+
+.item-color ion-label h2 {
+  margin: 0;
+  color: var(--app-text);
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.item-color ion-label p {
+  margin: 4px 0 0 0;
+  color: var(--app-text-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* =========================
+   PAGINACIÓN
+========================= */
+
+.paginacion-contenedor {
+  margin: 0 14px 16px 14px;
+  padding: 8px 4px;
+  background: var(--app-card);
+  border-radius: 16px;
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+  text-align: center;
+}
+
+.paginacion {
+  margin: auto;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.paginacion ::ng-deep .ngx-pagination {
+  padding: 0;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.paginacion ::ng-deep .ngx-pagination li {
+  margin: 0 2px;
+}
+
+.paginacion ::ng-deep .ngx-pagination .current {
+  background: var(--app-primary);
+  color: #ffffff;
+  font-weight: 900;
+  border-radius: 8px;
+  padding: 5px 9px;
+}
+
+.paginacion ::ng-deep .ngx-pagination span {
+  color: var(--app-text-soft);
+  font-family: inherit;
+  font-weight: 800;
+}
+
+.paginacion ::ng-deep .ngx-pagination a {
+  background-color: transparent;
+  color: var(--app-primary);
+  font-weight: 800;
+  border-radius: 8px;
+}
+
+/* =========================
+   MODO OSCURO
+========================= */
+
+@media (prefers-color-scheme: dark) {
+  :host {
+    --app-bg: #0f172a;
+    --app-card: #1e293b;
+    --app-input: #111827;
+    --app-text: #f8fafc;
+    --app-text-soft: #cbd5e1;
+    --app-border: rgba(255, 255, 255, 0.08);
+    --app-shadow: 0 6px 18px rgba(0, 0, 0, 0.38);
+    --app-primary-light: rgba(14, 165, 233, 0.16);
   }
 
-  .paginacion :host ::ng-deep .ngx-pagination span {
-    color: rgb(120, 193, 250);
-    font-family:monospace;
-    font-weight: bold;
+  .buscador {
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
   }
-  
-  .paginacion ::ng-deep .ngx-pagination a{
-    background-color: transparent;
-    color: rgb(67, 149, 226);
-    font-weight: bold;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 380px) {
+  .criterios-card,
+  .resultado-card {
+    margin-left: 10px;
+    margin-right: 10px;
+    border-radius: 18px;
   }
+
+  .acciones-superiores {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .buscador {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .paginacion-contenedor {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .item-color {
+    --min-height: 54px;
+  }
+
+  .item-color ion-label h2 {
+    font-size: 13px;
+  }
+}

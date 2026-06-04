@@ -1,41 +1,78 @@
 <app-refresh-info (onRefresh)="ngOnInit()" removeItem="lista-empleados"></app-refresh-info>
 
-<ion-searchbar autocomplete="off" showCancelButton="focus" (ionChange)="changeSearch($event)"></ion-searchbar>
+<div class="contenedor-empleados">
 
-<ion-content *ngIf="!loading">
-  <div style="text-align: center;">
-    <br>
-    <ion-text color="primary">
-      <span>Obteniendo empleados, por favor Espere</span>
-    </ion-text>
-    <ion-progress-bar type="indeterminate"></ion-progress-bar>
-    <br>
+  <ion-searchbar
+    class="buscador-empleados"
+    autocomplete="off"
+    showCancelButton="focus"
+    placeholder="Buscar empleado"
+    (ionChange)="changeSearch($event)">
+  </ion-searchbar>
+
+  <ion-content *ngIf="!loading">
+    <div class="estado-carga">
+      <ion-text color="primary">
+        <span>Obteniendo empleados, por favor espere</span>
+      </ion-text>
+      <ion-progress-bar type="indeterminate"></ion-progress-bar>
+    </div>
+  </ion-content>
+
+  <ion-card
+    class="card-empleado"
+    *ngFor="let e of empleados_filtro | paginate: { itemsPerPage: 10, currentPage: pageActual }">
+
+    <ion-item lines="none" class="item-empleado">
+
+      <div class="avatar-empleado" slot="start">
+        <ion-icon name="person-outline"></ion-icon>
+      </div>
+
+      <ion-label class="info-empleado">
+        <h2>{{ e.fullname }}</h2>
+
+        <p>
+          <ion-icon name="card-outline"></ion-icon>
+          <span>Identificación:</span> {{ e.identificacion }}
+        </p>
+
+        <p>
+          <ion-icon name="barcode-outline"></ion-icon>
+          <span>Código:</span> {{ e.codigo }}
+        </p>
+      </ion-label>
+
+      <ion-button
+        fill="clear"
+        class="btn-ver"
+        slot="end"
+        (click)="presentModal(e)">
+        <ion-icon name="navigate-circle-outline"></ion-icon>
+      </ion-button>
+
+    </ion-item>
+  </ion-card>
+
+  <div
+    class="contenedor-paginacion"
+    [hidden]="ver"
+    *ngIf="empleados_filtro != undefined || empleados_filtro != null">
+
+    <pagination-controls
+      class="paginacion"
+      (pageChange)="pageActual = $event"
+      [maxSize]="maxSize"
+      [directionLinks]="directionLinks"
+      [responsive]="responsive"
+      [autoHide]="autoHide"
+      [previousLabel]="labels.previousLabel"
+      [nextLabel]="labels.nextLabel"
+      [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+      [screenReaderPageLabel]="labels.screenReaderPageLabel"
+      [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+    </pagination-controls>
+
   </div>
-</ion-content>
 
-
-<ion-card style="margin: 2.5%; border-radius: 2%;"
-  *ngFor="let e of empleados_filtro | paginate: { itemsPerPage: 10, currentPage: pageActual}">
-  <ion-item style="width: 95%; margin: auto;">
-    <ion-avatar slot="start">
-      <ion-icon name="person-circle-outline" color="theme" style="font-size: 35px;"></ion-icon>
-    </ion-avatar>
-    <ion-label>
-      <h2> {{ e.fullname }}</h2>
-      <p>Identificación: {{ e.identificacion }} </p>
-      <p>Código: {{ e.codigo }} </p>
-    </ion-label>
-    <ion-icon name="navigate-circle-outline" color="acua" slot="end" style="font-size: 30px;"
-      (click)="presentModal(e)"></ion-icon>
-  </ion-item>
-</ion-card>
-
-<!--Configuracion del Pagination - ngxPaginationModulo-->
-<ion-item style="font-size: 70%; margin: 1% 0% 0% 0%;" [hidden]="ver"
-  *ngIf="empleados_filtro != undefined || empleados_filtro != null">
-  <pagination-controls class="paginacion" (pageChange)="pageActual = $event" [maxSize]=maxSize
-    [directionLinks]=directionLinks [responsive]=responsive [autoHide]="autoHide" [previousLabel]="labels.previousLabel"
-    [nextLabel]="labels.nextLabel" [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
-    [screenReaderPageLabel]="labels.screenReaderPageLabel" [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
-  </pagination-controls>
-</ion-item>
+</div>

@@ -261,9 +261,6 @@ export class VacacionAprobacionPage implements OnInit {
     });
 
     this.departamentosAll = Array.from(mapaDepartamentos.values());
-
-    console.log('Empleados vacaciones procesados:', this.empleadosAll);
-    console.log('Departamentos vacaciones procesados:', this.departamentosAll);
   }
 
   aplicarScopeFiltros() {
@@ -512,7 +509,6 @@ export class VacacionAprobacionPage implements OnInit {
     this.cargando = true;
 
     try {
-      console.log('Filtros vacaciones móvil:', JSON.stringify(filtros));
       const resultado: any = await firstValueFrom(
         this.vacacionesService.ObtenerSolicitudesVacacion(10, 0, filtros)
       );

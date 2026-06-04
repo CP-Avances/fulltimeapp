@@ -42,8 +42,7 @@ export class PermisosAccionesService {
 
       this.cargado = true;
 
-    } catch (error) {
-      console.log('Error al cargar acciones del rol', error);
+    } catch {
       this.accionesPermitidas = {};
       this.cargado = true;
     }

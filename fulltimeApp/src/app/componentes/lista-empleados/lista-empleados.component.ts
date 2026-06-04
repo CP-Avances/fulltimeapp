@@ -65,8 +65,7 @@ export class ListaEmpleadosComponent implements OnInit {
     try {
       await this.asignacionesMovil.ObtenerAsignacionesUsuario(this.idEmpleado);
       this.idUsuariosAcceso = this.asignacionesMovil.idUsuariosAcceso;
-    } catch (error) {
-      console.log('Error al cargar asignaciones del usuario', error);
+    } catch {
       this.idUsuariosAcceso = new Set();
     }
   }

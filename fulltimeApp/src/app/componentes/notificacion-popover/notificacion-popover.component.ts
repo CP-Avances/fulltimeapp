@@ -13,6 +13,7 @@ import { ParametrosService } from 'src/app/services/parametros.service';
   templateUrl: './notificacion-popover.component.html',
   styleUrls: ['./notificacion-popover.component.scss'],
 })
+
 export class NotificacionPopoverComponent implements OnInit {
 
   ips_locales: any = '';
@@ -27,8 +28,6 @@ export class NotificacionPopoverComponent implements OnInit {
   pageActual: number = 1;
   valorcolor: string = '';
   noticheck: string = '';
-
-  valor: boolean = false;
 
   formato_fecha: string = 'dd/MM/yyyy';
   formato_hora: string = 'HH:mm:ss';
@@ -142,9 +141,6 @@ export class NotificacionPopoverComponent implements OnInit {
       this.cambiovistanoti(noti);
     }
 
-    this.pooverCtrl.dismiss({});
-    this.valor = false;
-
     const modal = await this.modalController.create({
       component: ListaNotificacionComponent,
       cssClass: 'my-custom-class',
@@ -153,7 +149,14 @@ export class NotificacionPopoverComponent implements OnInit {
       }
     });
 
-    return await modal.present();
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    await this.pooverCtrl.dismiss({
+      actualizado: true,
+      modalActualizado: data?.actualizado === true
+    });
   }
 
   // METODO PARA CAMBIAR EL ESTADO DE VISTO DE NOTIFICACIONES DE SOLICITUDES
@@ -196,7 +199,6 @@ export class NotificacionPopoverComponent implements OnInit {
     });
   }
 
-  // ACTUALIZA LOCALMENTE LA NOTIFICACION COMO VISTA
   // ACTUALIZA LOCALMENTE LA NOTIFICACION COMO VISTA Y LA QUITA DEL POPOVER
   actualizarVistaLocal(id: number) {
 
@@ -211,15 +213,19 @@ export class NotificacionPopoverComponent implements OnInit {
 
   // METODO PARA ABRIR EL MODAL DE LISTA DE NOTIFICACIONES
   async abrirNotificaciones() {
-    this.pooverCtrl.dismiss({});
-    this.valor = false;
 
     const modal = await this.modalController.create({
       component: ListaNotificacionComponent,
       cssClass: 'my-custom-class'
     });
 
-    return await modal.present();
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    await this.pooverCtrl.dismiss({
+      actualizado: data?.actualizado === true
+    });
   }
 
   // METODO PARA BUSCAR DATOS DE PARAMETROS

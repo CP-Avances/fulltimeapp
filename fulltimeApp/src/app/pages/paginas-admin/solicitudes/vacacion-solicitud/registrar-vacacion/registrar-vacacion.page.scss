@@ -1,90 +1,203 @@
+/* =========================
+   VARIABLES
+========================= */
+
+:host {
+  --app-primary: #0f75bc;
+  --app-primary-dark: #0b4f86;
+  --app-primary-light: #e8f4fd;
+
+  --app-success: #22c55e;
+  --app-success-dark: #16a34a;
+  --app-danger: #ef4444;
+
+  --app-bg: #f4f7fb;
+  --app-card: #ffffff;
+  --app-input: #f8fafc;
+  --app-text: #1f2937;
+  --app-text-soft: #64748b;
+  --app-border: rgba(15, 23, 42, 0.09);
+  --app-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.vacacion-form-header ion-toolbar {
+  --background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  --color: #ffffff;
+  --border-width: 0;
+  --min-height: 56px;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.18);
+}
+
+.vacacion-form-header ion-title {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.vacacion-form-header ion-back-button {
+  --color: #ffffff;
+}
+
+/* =========================
+   CONTENIDO
+========================= */
+
 ion-content {
-  --background: #111111;
+  --background: var(--app-bg);
 }
 
 .contenedor-formulario {
-  padding: 1rem;
+  padding: 14px;
 }
 
+/* =========================
+   CARD PRINCIPAL
+========================= */
+
 .form-card {
-  border-radius: 16px;
-  background: #2b2b2b;
-  color: white;
-  box-shadow: none;
+  margin: 0;
+  border-radius: 20px;
+  background: var(--app-card);
+  color: var(--app-text);
+  box-shadow: var(--app-shadow);
+  border: 1px solid var(--app-border);
+  overflow: hidden;
+}
+
+.form-card ion-card-header {
+  padding: 16px 16px 8px 16px;
 }
 
 .form-card ion-card-title {
-  color: white;
-  font-size: 1rem;
+  color: var(--app-text);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.25;
 }
+
+.form-card ion-card-content {
+  padding: 10px 14px 16px 14px;
+}
+
+/* =========================
+   INPUTS
+========================= */
 
 .input-item {
-  --background: #3a3a3a;
-  --color: white;
-  --border-radius: 12px;
-  margin-bottom: 0.9rem;
-  border-radius: 12px;
+  --background: var(--app-input);
+  --color: var(--app-text);
+  --border-radius: 14px;
+  --padding-start: 12px;
+  --inner-padding-end: 12px;
+  --min-height: 58px;
+  margin-bottom: 12px;
+  border-radius: 14px;
+  border: 1px solid var(--app-border);
 }
 
+.input-item ion-label,
 ion-label {
-  color: #e8e8e8 !important;
+  color: var(--app-text-soft) !important;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 ion-input,
 ion-select {
-  color: white;
+  color: var(--app-text);
+  font-size: 14px;
+  font-weight: 600;
+  --placeholder-color: var(--app-text-soft);
 }
+
+ion-select::part(icon) {
+  color: var(--app-primary);
+}
+
+/* =========================
+   NOTA FERIADOS
+========================= */
 
 .nota-feriados {
-  margin: 0.75rem 0 1rem 0;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  font-size: 0.85rem;
-  color: #d9d9d9;
+  margin: 4px 0 14px 0;
+  padding: 12px;
+  background: var(--app-primary-light);
+  border-left: 4px solid var(--app-primary);
+  border-radius: 14px;
+  font-size: 12px;
+  color: var(--app-text);
+  line-height: 1.35;
 }
 
+.nota-feriados p {
+  margin: 0;
+}
+
+/* =========================
+   ARCHIVO
+========================= */
+
 .bloque-archivo {
-  margin: 1rem 0;
+  margin: 14px 0;
 }
 
 .btn-archivo {
   display: inline-block;
   width: 100%;
   text-align: center;
-  padding: 0.9rem 1rem;
-  border-radius: 12px;
-  background: #7ee081;
-  color: white;
-  font-weight: 700;
+  padding: 13px 14px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--app-success), var(--app-success-dark));
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 13px;
+  box-shadow: 0 5px 12px rgba(34, 197, 94, 0.25);
 }
 
 .archivo-info {
-  margin-top: 0.6rem;
-  padding: 0.8rem;
-  background: #3a3a3a;
-  border-radius: 12px;
-  color: #d9d9d9;
-  font-size: 0.85rem;
+  margin-top: 8px;
+  padding: 11px 12px;
+  background: var(--app-input);
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+  color: var(--app-text-soft);
+  font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
+.archivo-info span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================
+   RESUMEN
+========================= */
+
 .resumen-titulo {
-  margin: 1.2rem 0 0.7rem 0;
+  margin: 18px 0 10px 0;
   text-align: center;
-  color: #d9d9d9;
-  font-size: 0.9rem;
-  font-weight: 600;
+  color: var(--app-text);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
 }
 
 .tabla-resumen {
   overflow-x: auto;
-  border-radius: 12px;
-  background: #3a3a3a;
-  margin-bottom: 1rem;
+  border-radius: 15px;
+  background: var(--app-input);
+  border: 1px solid var(--app-border);
+  margin-bottom: 14px;
 }
 
 .fila {
@@ -94,67 +207,187 @@ ion-select {
 }
 
 .fila div {
-  padding: 0.8rem 0.35rem;
+  padding: 11px 6px;
   text-align: center;
-  font-size: 0.82rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+  color: var(--app-text);
+  border-bottom: 1px solid var(--app-border);
 }
 
 .cabecera div {
+  font-weight: 800;
+  background: rgba(15, 117, 188, 0.08);
+  color: var(--app-text);
+}
+
+.fila.cuerpo div {
   font-weight: 700;
-  color: white;
 }
 
 .total {
-  background: #2d8cff;
-  color: white;
-  font-weight: 700;
+  background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark)) !important;
+  color: #ffffff !important;
+  font-weight: 900 !important;
 }
 
 .seleccionado {
-  background: rgba(45, 140, 255, 0.18);
-  font-weight: 700;
+  background: rgba(15, 117, 188, 0.18) !important;
+  color: var(--app-primary) !important;
+  font-weight: 900 !important;
 }
+
+/* =========================
+   BOTONES
+========================= */
 
 .acciones {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 1rem;
+  gap: 10px;
+  margin-top: 14px;
 }
 
+.acciones ion-button {
+  --border-radius: 14px;
+  min-height: 46px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.acciones ion-spinner {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
+/* =========================
+   RESULTADO VERIFICACIÓN
+========================= */
+
 .resultado-card {
-  margin-top: 1rem;
-  background: #3a3a3a;
-  color: white;
-  border-radius: 14px;
+  margin: 16px 0 0 0;
+  background: var(--app-input);
+  color: var(--app-text);
+  border-radius: 16px;
   box-shadow: none;
+  border: 1px solid var(--app-border);
+}
+
+.resultado-card ion-card-header {
+  padding: 14px 14px 6px 14px;
 }
 
 .resultado-card ion-card-title {
-  color: white;
-  font-size: 0.95rem;
+  color: var(--app-text);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.resultado-card ion-card-content {
+  padding: 8px 14px 14px 14px;
 }
 
 .resultado-verificacion {
-  padding: 0.9rem;
-  border-radius: 10px;
-  font-size: 0.9rem;
-  font-weight: 600;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
 }
 
 .resultado-verificacion.ok {
-  background: rgba(59, 179, 92, 0.18);
-  color: #8ff0a4;
+  background: rgba(34, 197, 94, 0.14);
+  color: #15803d;
+  border: 1px solid rgba(34, 197, 94, 0.22);
 }
 
 .resultado-verificacion.error {
-  background: rgba(229, 72, 77, 0.18);
-  color: #ffb3b3;
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+  border: 1px solid rgba(239, 68, 68, 0.22);
 }
 
 .detalle-verificacion {
-  margin-top: 0.75rem;
-  color: #d9d9d9;
-  font-size: 0.85rem;
+  margin-top: 10px;
+  color: var(--app-text-soft);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* =========================
+   MODO OSCURO
+========================= */
+
+@media (prefers-color-scheme: dark) {
+  :host {
+    --app-bg: #0f172a;
+    --app-card: #1e293b;
+    --app-input: #111827;
+    --app-text: #f8fafc;
+    --app-text-soft: #cbd5e1;
+    --app-border: rgba(255, 255, 255, 0.08);
+    --app-shadow: 0 6px 18px rgba(0, 0, 0, 0.38);
+    --app-primary-light: rgba(14, 165, 233, 0.16);
+  }
+
+  .vacacion-form-header ion-toolbar {
+    --background: linear-gradient(135deg, #0f75bc, #083a63);
+  }
+
+  .cabecera div {
+    background: rgba(14, 165, 233, 0.14);
+  }
+
+  .resultado-verificacion.ok {
+    background: rgba(34, 197, 94, 0.16);
+    color: #86efac;
+    border-color: rgba(34, 197, 94, 0.26);
+  }
+
+  .resultado-verificacion.error {
+    background: rgba(239, 68, 68, 0.16);
+    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.26);
+  }
+}
+
+/* =========================
+   CELULARES PEQUEÑOS
+========================= */
+
+@media (max-width: 380px) {
+  .contenedor-formulario {
+    padding: 10px;
+  }
+
+  .form-card {
+    border-radius: 18px;
+  }
+
+  .form-card ion-card-header {
+    padding: 14px 14px 6px 14px;
+  }
+
+  .form-card ion-card-title {
+    font-size: 15px;
+  }
+
+  .form-card ion-card-content {
+    padding: 8px 12px 14px 12px;
+  }
+
+  .input-item {
+    --min-height: 54px;
+    margin-bottom: 10px;
+  }
+
+  .fila div {
+    font-size: 11px;
+    padding: 10px 5px;
+  }
+
+  .acciones ion-button {
+    min-height: 44px;
+  }
 }

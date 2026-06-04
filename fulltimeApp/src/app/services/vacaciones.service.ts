@@ -246,9 +246,6 @@ export class VacacionesService {
       params = params.set('fechaHasta', filtros.fechaHasta);
     }
 
-    console.log('URL vacaciones móvil:', `${this.apiUrl}/lista`);
-    console.log('Params vacaciones móvil:', params.toString());
-
     return this.http.get<any>(`${this.apiUrl}/lista`, { params })
       .pipe(
         retry(1),

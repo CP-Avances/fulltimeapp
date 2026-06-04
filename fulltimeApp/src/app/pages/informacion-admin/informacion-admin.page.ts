@@ -112,8 +112,7 @@ export class InformacionAdminPage implements OnInit {
 
       this.idUsuariosAcceso = this.asignacionesMovil.idUsuariosAcceso;
 
-    } catch (error) {
-      console.log('Error al cargar asignaciones del usuario', error);
+    } catch {
       this.idUsuariosAcceso = new Set();
     }
   }

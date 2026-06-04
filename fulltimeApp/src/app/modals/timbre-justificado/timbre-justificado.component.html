@@ -3,97 +3,140 @@
 <ion-content>
 
   <div class="contenido">
-    <ion-list style="margin-top: 3%; padding: -2%; border-radius: 3%;">
-      <ion-item>
-        <ion-icon slot="end" name="person" color="secondary"></ion-icon>
-        <b> NOMBRE DEL EMPLEADO:</b>
-      </ion-item>
-      <ion-item>
-        <ion-label>{{ data.fullname }}</ion-label>
-      </ion-item>
-    </ion-list>
 
-    <ion-list style="margin-top: 3%; padding: -2%; border-radius: 3%;">
-      <ion-item>
-        <ion-icon slot="end" name="time-outline" color="secondary"></ion-icon>
-        <b> TIPO DE TIMBRE: </b>
-      </ion-item>
-      <ion-item>
-        <ion-select value="Ninguno" okText="Aceptar" cancelText="Cancelar" (ionChange)="accionChange($event)">
-          <ion-select-option *ngFor="let t of selectOptions" [value]="t.accion">{{t.view}} </ion-select-option>
-        </ion-select>
-      </ion-item>
-    </ion-list>
+    <ion-card class="form-card">
+      <ion-card-content>
 
+        <div class="seccion-formulario">
+          <div class="seccion-titulo">
+            <ion-icon name="person-outline"></ion-icon>
+            <span>Nombre del empleado</span>
+          </div>
 
-    <ion-list style="margin-top: 3%; padding: -2%; border-radius: 3%;">
-      <ion-item>
-        <ion-icon slot="end" name="time-outline" color="secondary"></ion-icon>
-        <b> OBSERVACIONES: </b>
-      </ion-item>
-      <ion-item>
-        <ion-textarea placeholder="Escriba aquí..." maxlength=299 spellcheck (ionChange)="ionChange()"
-          [(ngModel)]="observacion"> </ion-textarea>
-        <p class="letraPeque">{{numeroCaracteres}}/299</p>
-      </ion-item>
-    </ion-list>
+          <div class="dato-empleado">
+            {{ data.fullname }}
+          </div>
+        </div>
 
-    <b style="margin-top: 3%; padding: -2%; margin-left: 4% ; border-radius: 3%;"> Subir documento de respaldo </b>
-    <div class="formdiv">
-      <ion-item class="item_fondo" for="file">
-        <ion-label style="margin: 3% 0% -1.5% 0%; font-size: 75%;"><b> Registrar Timbre </b></ion-label>
+        <div class="seccion-formulario">
+          <div class="seccion-titulo">
+            <ion-icon name="time-outline"></ion-icon>
+            <span>Tipo de timbre</span>
+          </div>
 
-        <!--Este input, permite validar el boton btn_save, que se active o este desactivado deacurdo al documento ingresado-->
-        <!-- Esto, permite ingresar el documento-->
+          <ion-item class="input-item">
+            <ion-select
+              value="Ninguno"
+              okText="Aceptar"
+              cancelText="Cancelar"
+              interface="popover"
+              placeholder="Seleccione el tipo de timbre"
+              (ionChange)="accionChange($event)">
 
-        <ion-input (click)="selectImage()" name="file" id="file"></ion-input>
+              <ion-select-option *ngFor="let t of selectOptions" [value]="t.accion">
+                {{ t.view }}
+              </ion-select-option>
 
-        <ion-label position="floating" style="font-size: 90%; margin-bottom: 3%;">
-          <ion-icon slot="start" color="theme" class="icon_upload" name="cloud-upload-outline"></ion-icon>&nbsp;
-          &nbsp;
-          &nbsp; Subir justificación:
-        </ion-label>
+            </ion-select>
+          </ion-item>
+        </div>
 
-        <!-- Mesaje que tiene el nombre del archivo a subir -->
-        <ion-text *ngIf="documento != '' && documento !== null && documento !== undefined"
-          style="font-size: 82%; margin:2% 0% 3% 0%; " color="success">Archivo subido correctamente</ion-text>
+        <div class="seccion-formulario">
+          <div class="seccion-titulo">
+            <ion-icon name="chatbox-ellipses-outline"></ion-icon>
+            <span>Observaciones</span>
+          </div>
 
-        <!-- Mesaje que indica el error en subir el archivo -->
+          <ion-item class="input-item textarea-item">
+            <ion-textarea
+              placeholder="Escriba aquí..."
+              maxlength="299"
+              spellcheck
+              (ionChange)="ionChange()"
+              [(ngModel)]="observacion">
+            </ion-textarea>
+          </ion-item>
 
-      </ion-item>
+          <p class="contador-caracteres">{{ numeroCaracteres }}/299</p>
+        </div>
 
-      <div *ngIf="documento != '' && documento !== null && documento !== undefined">
-        <ion-button [disabled]=" !documento" color="medium" shape="round" expand="block" (click)="deleteImagen()">
-          <ion-text style="font-size: 90%;"> <ion-icon color="danger" name="trash-outline"></ion-icon> Quitar documento
-          </ion-text>
+        <div class="seccion-formulario">
+          <div class="seccion-titulo">
+            <ion-icon name="cloud-upload-outline"></ion-icon>
+            <span>Documento de respaldo</span>
+          </div>
+
+          <div class="bloque-archivo" (click)="selectImage()">
+            <div class="archivo-icono">
+              <ion-icon name="cloud-upload-outline"></ion-icon>
+            </div>
+
+            <div class="archivo-texto">
+              <h4>Subir justificación</h4>
+              <p>
+                {{ documento ? 'Archivo subido correctamente' : 'Toque aquí para seleccionar un documento' }}
+              </p>
+            </div>
+          </div>
+
+          <ion-button
+            *ngIf="documento != '' && documento !== null && documento !== undefined"
+            color="medium"
+            fill="outline"
+            expand="block"
+            class="btn-quitar-documento"
+            (click)="deleteImagen()">
+
+            <ion-icon color="danger" name="trash-outline" slot="start"></ion-icon>
+            Quitar documento
+
+          </ion-button>
+        </div>
+
+        <div class="seccion-formulario">
+          <div class="seccion-titulo">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <span>Fecha y hora del timbre</span>
+          </div>
+
+          <div class="datetime-box">
+            <ion-datetime
+              hourCycle="h12"
+              color="success"
+              (ionChange)="fechaChange($event)"
+              placeholder="Seleccione Fecha"
+              mode="ios">
+
+              <span slot="title">Seleccione el día</span>
+              <span slot="time-label">Ingrese la Hora</span>
+
+            </ion-datetime>
+          </div>
+
+          <ion-item class="input-item" *ngIf="versegundos">
+            <ion-label>Segundos</ion-label>
+            <ion-select [(ngModel)]="selectedSecond" (ionChange)="updateFechaConSegundos()">
+              <ion-select-option *ngFor="let second of seconds" [value]="second">
+                {{ second }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+
+        <ion-button
+          class="btn-enviar"
+          shape="round"
+          expand="block"
+          (click)="enviarTimbre()">
+
+          <ion-icon name="paper-plane-outline" slot="start"></ion-icon>
+          Enviar Timbre
+
         </ion-button>
-      </div>
-    </div>
 
+      </ion-card-content>
+    </ion-card>
 
-    <ion-list style="margin-top: 3%; padding: -2%; border-radius: 3%;">
-      <ion-item>
-        <ion-icon slot="end" name="calendar-outline" color="success"></ion-icon>
-        <b> FECHA Y HORA TIMBRE:</b>
-      </ion-item>
-      <ion-item>
-        <ion-datetime hourCycle="h12" color="success" (ionChange)="fechaChange($event)" placeholder="Seleccion Fecha"
-          mode="ios">
-          <span slot="title">Seleccione el día</span>
-          <span slot="time-label">Ingrese la Hora</span>
-        </ion-datetime>
-      </ion-item>   
-      <ion-item *ngIf="versegundos">
-        <ion-label>Segundos</ion-label>
-        <ion-select [(ngModel)]="selectedSecond" (ionChange)="updateFechaConSegundos()">
-          <ion-select-option *ngFor="let second of seconds" [value]="second">{{ second }}</ion-select-option>
-        </ion-select>
-      </ion-item>
-      
-    </ion-list>
-    <br>
-    <ion-button shape="round" expand="block" (click)="enviarTimbre()"><ion-icon
-        name="paper-plane-outline"></ion-icon>&nbsp;&nbsp; Enviar Timbre</ion-button>
   </div>
 
 </ion-content>

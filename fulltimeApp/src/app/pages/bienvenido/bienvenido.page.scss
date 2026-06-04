@@ -1,85 +1,338 @@
-.fondo{
-    background-color: #ffffff;
-    position: static;
-    display: block; 
-    padding-top: 1%;
+/* ===============================
+   VARIABLES GENERALES
+================================ */
+
+:host {
+  --app-primary: #0f75bc;
+  --app-primary-dark: #0b4f86;
+  --app-bg: #f4f7fb;
+  --app-card: #ffffff;
+  --app-text: #1f2937;
+  --app-text-soft: #64748b;
+  --app-border: rgba(15, 23, 42, 0.08);
+  --app-shadow: 0 6px 18px rgba(15, 23, 42, 0.1);
+  --app-shadow-soft: 0 3px 10px rgba(15, 23, 42, 0.08);
 }
+
+/* ===============================
+   CONTENIDO GENERAL
+================================ */
 
 ion-content {
-    text-align: center;
+  --background: var(--app-bg);
+  text-align: center;
 }
 
-h3{
-    margin-top: 6%;
-}
-
-.textarea {
-    text-align: center;
+.fondo {
+  background: var(--app-card);
+  position: relative;
+  display: block;
+  padding: 12px 14px 6px 14px;
+  margin: 10px 12px 0 12px;
+  border-radius: 0 0 24px 24px;
+  box-shadow: var(--app-shadow-soft);
 }
 
 .center {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 30%;
+  display: block;
+  margin: 0 auto;
+  width: 34%;
+  max-width: 145px;
+  min-width: 95px;
 }
 
-.tamano {
-    font-size: 3vw;
+.fondo ion-label h1 {
+  margin: 2px 0 0 0 !important;
+  font-size: 11px !important;
+  font-weight: 700;
+  color: var(--app-text-soft);
+  letter-spacing: 0.2px;
 }
 
-.tamanoHora {
-    font-size: 200%;
-}
-.tamanoBoton {
-    height: 8vh;
-    width: 97%;
-    margin-bottom: -0.5vh;
-}
-
-
-.imgsvg{
-    display: block;
-    margin-top: auto;
+/* Imagen SVG: se mantiene igual, solo mejoramos espacio */
+.imgsvg,
+.imsvg {
+  display: block;
+  margin: 8px auto 12px auto !important;
+  max-width: 92%;
 }
 
+/* ===============================
+   ANIMACIONES SVG
+================================ */
 
-//Css, variables para dar animacion
-#Sol{
-    animation: animacion 40s;
-    animation-iteration-count:infinite; 
-
+#Sol {
+  animation: animacion 40s infinite;
 }
 
-#Luna{
-    animation: animacion 40s;
-    animation-iteration-count:infinite;
+#Luna {
+  animation: animacion 40s infinite;
 }
 
-#Nubes{
-    transform: translate(2%);
-    animation-name: movie_nubes;
-    animation-duration: 5s;
-    animation-iteration-count:infinite;    
+#Nubes {
+  transform: translate(2%);
+  animation-name: movie_nubes;
+  animation-duration: 5s;
+  animation-iteration-count: infinite;
 }
 
+@keyframes animacion {
+  0% {
+    transform: translateX(0%);
+  }
 
-//Css, permite dar animacion al sol y la luna y a las nubes
-@keyframes animacion{
-    0%{transform: translateX(0%)}
-    50%{transform: translateX(24%)}
+  50% {
+    transform: translateX(24%);
+  }
 }
 
 @keyframes movie_nubes {
-    50%{transform: inherit}
-  
+  50% {
+    transform: inherit;
+  }
 }
 
-.Info_hora{
-    position: relative;
-    display: block; 
+/* ===============================
+   FECHA, HORA Y TIMBRE ABIERTO
+================================ */
+
+.Info_hora {
+  position: relative;
+  display: block;
+  margin: 14px 14px 10px 14px;
+  padding: 12px 70px 14px 14px;
+  border-radius: 18px;
+  background: var(--app-card);
+  box-shadow: var(--app-shadow-soft);
+  min-height: 78px;
 }
 
-.botones{
-    position: static;
+.Info_hora h3 {
+  margin: 0 0 7px 0;
+  font-size: 12px !important;
+  font-weight: 700;
+  color: var(--app-text);
+  text-transform: capitalize;
+}
+
+.tamanoHora {
+  font-size: 25px !important;
+  line-height: 1.1;
+  color: var(--app-text);
+  letter-spacing: 0.2px;
+}
+
+/* Botón flotante timbre abierto */
+.Info_hora ion-fab {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  width: auto !important;
+  height: auto !important;
+}
+
+.Info_hora ion-fab-button {
+  --background: linear-gradient(135deg, #5b6cff, #4f46e5);
+  --background-activated: #4338ca;
+  --background-hover: #4f46e5;
+  --color: #ffffff;
+
+  width: 48px;
+  height: 48px;
+  margin: 0;
+
+  border-radius: 50%;
+  box-shadow: 0 8px 16px rgba(79, 70, 229, 0.32);
+}
+
+.Info_hora ion-fab-button::part(native) {
+  border-radius: 50%;
+}
+
+.Info_hora ion-fab-button ion-icon {
+  font-size: 22px;
+}
+
+/* ===============================
+   TARJETA DE BOTONES
+================================ */
+
+.botones {
+  position: static;
+  margin: 0 12px 14px 12px;
+}
+
+.botones ion-card {
+  margin: 12px 0 0 0 !important;
+  border-radius: 18px;
+  background: var(--app-card);
+  box-shadow: var(--app-shadow);
+  border: 1px solid var(--app-border);
+  overflow: hidden;
+}
+
+.botones ion-card-title {
+  display: block;
+  font-size: 13px !important;
+  font-weight: 700;
+  color: var(--app-text) !important;
+  margin: 14px 10px 8px 10px !important;
+}
+
+.botones ion-grid {
+  padding: 4px 10px 12px 10px;
+}
+
+.botones ion-row {
+  margin-bottom: 4px;
+}
+
+.botones ion-col {
+  padding: 5px;
+}
+
+/* ===============================
+   BOTONES DE TIMBRE
+================================ */
+
+.tamanoBoton {
+  height: 58px;
+  width: 100%;
+  margin: 0;
+  --border-radius: 12px;
+  --box-shadow: 0 4px 10px rgba(15, 23, 42, 0.16);
+  font-weight: 800;
+  overflow: hidden;
+}
+
+/* Botones azules */
+ion-button.tamanoBoton:not([color="dark"]) {
+  --background: linear-gradient(135deg, #3b82f6, #2563eb);
+  --background-activated: #1d4ed8;
+  --background-hover: #2563eb;
+  --color: #ffffff;
+}
+
+/* Botones oscuros */
+ion-button.tamanoBoton[color="dark"] {
+  --background: linear-gradient(135deg, #2f343b, #1f2329);
+  --background-activated: #111827;
+  --background-hover: #1f2937;
+  --color: #ffffff;
+}
+
+/* Si colorIp/colorFp usan primary/dark/etc, este estilo ayuda a mantener forma */
+ion-button.tamanoBoton::part(native) {
+  border-radius: 12px;
+}
+
+.tamano {
+  font-size: 11px;
+  line-height: 1.05;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  white-space: normal;
+}
+
+/* ===============================
+   OTROS
+================================ */
+
+.textarea {
+  text-align: center;
+}
+
+h3 {
+  margin-top: 0;
+}
+
+/* ===============================
+   MODO OSCURO
+================================ */
+
+@media (prefers-color-scheme: dark) {
+  :host {
+    --app-bg: #0f172a;
+    --app-card: #1e293b;
+    --app-text: #f8fafc;
+    --app-text-soft: #cbd5e1;
+    --app-border: rgba(255, 255, 255, 0.08);
+    --app-shadow: 0 6px 18px rgba(0, 0, 0, 0.38);
+    --app-shadow-soft: 0 3px 12px rgba(0, 0, 0, 0.28);
+  }
+
+  .fondo ion-label h1 {
+    color: var(--app-text-soft);
+  }
+
+  .Info_hora,
+  .botones ion-card,
+  .fondo {
+    background: var(--app-card);
+  }
+
+  .Info_hora h3,
+  .tamanoHora,
+  .botones ion-card-title {
+    color: var(--app-text) !important;
+  }
+
+  ion-button.tamanoBoton:not([color="dark"]) {
+    --background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  }
+
+  ion-button.tamanoBoton[color="dark"] {
+    --background: linear-gradient(135deg, #374151, #111827);
+  }
+}
+
+/* ===============================
+   CELULARES PEQUEÑOS
+================================ */
+
+@media (max-width: 380px) {
+  .fondo {
+    margin: 8px 10px 0 10px;
+    padding: 10px 10px 4px 10px;
+  }
+
+  .center {
+    width: 36%;
+  }
+
+  .Info_hora {
+    margin: 10px 12px 8px 12px;
+    padding: 10px 8px 12px 8px;
+  }
+
+  .Info_hora h3 {
+    font-size: 12px !important;
+  }
+
+  .tamanoHora {
+    font-size: 22px !important;
+  }
+
+  .Info_hora ion-fab-button {
+    width: 44px;
+    height: 44px;
+  }
+
+  .botones {
+    margin: 0 10px 12px 10px;
+  }
+
+  .tamanoBoton {
+    height: 54px;
+  }
+
+  .tamano {
+    font-size: 10px;
+  }
+
+  .botones ion-card-title {
+    font-size: 12px !important;
+  }
 }

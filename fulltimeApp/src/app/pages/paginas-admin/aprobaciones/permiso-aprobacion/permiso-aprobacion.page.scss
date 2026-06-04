@@ -1,246 +1,534 @@
-.contenedor-principal {
-  padding: 12px;
-  background: var(--ion-background-color);
-  color: var(--ion-text-color);
+/* =========================
+   VARIABLES
+========================= */
+
+:host {
+  --app-primary: #0f75bc;
+  --app-primary-dark: #0b4f86;
+  --app-primary-light: #e8f4fd;
+
+  --app-success: #22c55e;
+  --app-danger: #ef4444;
+
+  --app-bg: #f4f7fb;
+  --app-card: #ffffff;
+  --app-input: #f8fafc;
+  --app-text: #1f2937;
+  --app-text-soft: #64748b;
+  --app-border: rgba(15, 23, 42, 0.09);
+  --app-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
 }
+
+/* =========================
+   HEADER
+========================= */
+
+.aprobacion-permiso-header ion-toolbar {
+  --background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  --color: #ffffff;
+  --border-width: 0;
+  --min-height: 56px;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.18);
+}
+
+.aprobacion-permiso-header ion-title {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.aprobacion-permiso-header ion-back-button {
+  --color: #ffffff;
+}
+
+/* =========================
+   CONTENIDO
+========================= */
+
+ion-content {
+  --background: var(--app-bg);
+}
+
+.contenedor-principal {
+  padding: 14px;
+  padding-bottom: 30px;
+  background: var(--app-bg);
+  color: var(--app-text);
+}
+
+/* =========================
+   CARDS GENERALES
+========================= */
 
 ion-card {
-  --background: var(--ion-card-background, var(--ion-item-background));
-  color: var(--ion-text-color);
+  margin: 0 0 14px 0;
+  border-radius: 20px;
+  background: var(--app-card);
+  color: var(--app-text);
+  box-shadow: var(--app-shadow);
+  border: 1px solid var(--app-border);
+  overflow: hidden;
 }
 
-ion-card-title {
-  font-size: 17px;
-  font-weight: bold;
-  color: var(--ion-text-color);
-}
-
-ion-card-subtitle {
-  font-size: 13px;
-  color: var(--ion-color-medium);
+ion-card-header {
+  padding: 16px 16px 8px 16px;
 }
 
 ion-card-content {
-  color: var(--ion-text-color);
+  padding: 12px 14px 16px 14px;
+  color: var(--app-text);
 }
 
-ion-item {
-  --background: transparent;
-  --color: var(--ion-text-color);
+ion-card-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--app-text);
 }
 
-ion-label {
-  color: var(--ion-text-color);
+ion-card-subtitle {
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--app-text-soft);
 }
 
-ion-text {
-  color: var(--ion-text-color);
-}
-
-ion-input,
-ion-select {
-  color: var(--ion-text-color);
-}
-
-.btn-buscar {
-  margin-top: 18px;
-}
+/* =========================
+   ESTADOS / MENSAJES
+========================= */
 
 .mensaje-centro {
+  margin-top: 24px;
+  padding: 24px 14px;
   text-align: center;
-  padding: 30px 15px;
-  color: var(--ion-text-color);
+  color: var(--app-text-soft);
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  border-radius: 18px;
+  box-shadow: var(--app-shadow);
+}
 
-  ion-spinner {
-    margin-bottom: 10px;
-  }
+.mensaje-centro ion-spinner {
+  margin-bottom: 10px;
+  color: var(--app-primary);
+}
 
-  p {
-    color: var(--ion-color-medium);
-    font-size: 14px;
-  }
+.mensaje-centro p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--app-text-soft);
 }
 
 .mensaje-vacio {
   text-align: center;
-  color: var(--ion-text-color);
-
-  ion-icon {
-    font-size: 42px;
-    margin-bottom: 10px;
-    color: var(--ion-color-medium);
-  }
-
-  h3 {
-    font-size: 17px;
-    font-weight: bold;
-    color: var(--ion-text-color);
-  }
-
-  p {
-    font-size: 14px;
-    color: var(--ion-color-medium);
-  }
+  padding: 24px 16px !important;
+  color: var(--app-text-soft);
 }
 
-.fila-info {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 4px 0;
+.mensaje-vacio ion-icon {
+  font-size: 46px;
+  color: var(--app-primary);
+  margin-bottom: 8px;
+}
+
+.mensaje-vacio h3 {
+  margin: 0 0 8px 0;
+  color: var(--app-text);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.mensaje-vacio p {
+  margin: 0 0 14px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-text-soft);
+  line-height: 1.35;
+}
+
+/* =========================
+   FORMULARIO CRITERIOS
+========================= */
+
+ion-card ion-item {
+  --background: var(--app-input);
+  --color: var(--app-text);
+  --border-radius: 14px;
+  --padding-start: 12px;
+  --inner-padding-end: 12px;
+  --min-height: 58px;
+  margin-bottom: 12px;
+  border-radius: 14px;
+  border: 1px solid var(--app-border);
+}
+
+ion-card ion-item ion-label {
+  color: var(--app-text-soft) !important;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+ion-input,
+ion-select,
+ion-text {
+  color: var(--app-text);
   font-size: 14px;
-
-  span {
-    color: var(--ion-color-medium);
-  }
-
-  b {
-    color: var(--ion-text-color);
-    text-align: right;
-  }
+  font-weight: 600;
+  --placeholder-color: var(--app-text-soft);
 }
 
-.paginacion {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 15px 5px 25px 5px;
-
-  span {
-    font-size: 14px;
-    color: var(--ion-text-color);
-  }
+ion-select::part(icon) {
+  color: var(--app-primary);
 }
 
-.texto-seleccion {
-  text-align: center;
-  margin: 8px 0 12px 0;
-  font-size: 14px;
-  color: var(--ion-color-medium);
+.btn-buscar {
+  --border-radius: 14px;
+  min-height: 46px;
+  margin-top: 14px;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: none;
 }
+
+.btn-buscar ion-spinner {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
+/* =========================
+   BARRA APROBACIÓN
+========================= */
 
 .barra-aprobacion-fija {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: var(--ion-background-color);
-  color: var(--ion-text-color);
-  padding: 8px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  margin-bottom: 14px;
+  padding: 14px;
+  border-radius: 20px;
+  background: var(--app-card);
+  color: var(--app-text);
+  box-shadow: var(--app-shadow);
+  border: 1px solid var(--app-border);
 }
 
 .barra-superior {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  margin-bottom: 12px;
+}
 
-  b {
-    font-size: 14px;
-    color: var(--ion-text-color);
-  }
+.barra-superior b {
+  display: block;
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--app-text);
+}
 
-  p {
-    margin: 2px 0 0 0;
-    font-size: 12px;
-    color: var(--ion-color-medium);
-  }
+.barra-superior p {
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--app-text-soft);
+}
+
+.barra-superior ion-button {
+  --border-radius: 12px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: none;
 }
 
 .item-seleccionar-todas {
-  --padding-start: 0;
-  --inner-padding-end: 0;
-  --background: transparent;
-  --color: var(--ion-text-color);
-  margin-top: 4px;
+  --background: var(--app-input) !important;
+  --border-radius: 14px;
+  --padding-start: 10px;
+  --inner-padding-end: 10px;
+  margin: 0 0 12px 0 !important;
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+}
 
-  ion-label {
-    color: var(--ion-text-color);
-  }
+.item-seleccionar-todas ion-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--app-text);
 }
 
 .acciones-multiples {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 4px;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
   margin-top: 6px;
-
-  ion-button {
-    margin: 0;
-  }
 }
 
+.acciones-multiples ion-button {
+  --border-radius: 14px;
+  min-height: 40px;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: none;
+  margin: 0;
+}
+
+/* =========================
+   TARJETA SOLICITUD
+========================= */
+
 .tarjeta-solicitud {
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 .item-seleccionar-solicitud {
-  --padding-start: 12px;
-  --inner-padding-end: 12px;
-  --background: transparent;
-  --color: var(--ion-text-color);
+  --background: var(--app-input) !important;
+  --padding-start: 10px;
+  --inner-padding-end: 10px;
+  --min-height: 52px;
+  margin: 0 !important;
+  border-bottom: 1px solid var(--app-border);
+}
 
-  ion-label {
-    font-size: 14px;
-    color: var(--ion-text-color);
-  }
+.item-seleccionar-solicitud ion-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--app-text);
+}
 
-  ion-badge {
-    font-size: 12px;
-    padding: 6px 8px;
-  }
+.item-seleccionar-solicitud ion-badge {
+  padding: 7px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: normal;
+  text-align: center;
 }
 
 ion-badge[color="warning"] {
   color: #000;
 }
 
-.modal-selector-completo {
-  --width: 100%;
-  --height: 100%;
-  --border-radius: 0;
+.tarjeta-solicitud ion-card-title {
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.tarjeta-solicitud ion-card-subtitle {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* =========================
+   FILAS INFO
+========================= */
+
+.fila-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--app-border);
+  font-size: 14px;
+}
+
+.fila-info:last-child {
+  border-bottom: none;
+}
+
+.fila-info span {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--app-text-soft);
+}
+
+.fila-info b {
+  text-align: right;
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--app-text);
+  line-height: 1.25;
+}
+
+/* =========================
+   PAGINACIÓN
+========================= */
+
+.paginacion {
+  margin: 14px 0 0 0;
+  padding: 10px;
+  border-radius: 18px;
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  color: var(--app-text);
+}
+
+.paginacion span {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--app-text);
+}
+
+.paginacion ion-button {
+  --border-radius: 12px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: none;
+}
+
+/* =========================
+   SELECTOR LOCAL
+   El diseño principal del modal completo va en global.scss
+========================= */
+
+.texto-seleccion {
+  text-align: center;
+  margin: 8px 0 12px 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--app-text-soft);
 }
 
 .acciones-selector {
-  display: flex;
-  gap: 8px;
-  padding: 10px 12px 4px 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 12px 12px 8px 12px;
+}
 
-  ion-button {
-    flex: 1;
-    margin: 0;
-  }
+.acciones-selector ion-button {
+  --border-radius: 12px;
+  min-height: 38px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: none;
+  margin: 0;
 }
 
 .contador-selector {
-  padding: 4px 16px 8px 16px;
+  margin: 0 12px 10px 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  color: var(--app-text);
   font-size: 13px;
-  color: var(--ion-color-medium);
+  font-weight: 800;
+  text-align: center;
 }
 
 .mensaje-vacio-selector {
+  margin: 24px 14px;
+  padding: 28px 16px;
   text-align: center;
-  padding: 40px 20px;
-  color: var(--ion-color-medium);
+  color: var(--app-text-soft);
+  background: var(--app-card);
+  border: 1px dashed var(--app-border);
+  border-radius: 20px;
+  box-shadow: var(--app-shadow);
+}
 
-  ion-icon {
-    font-size: 42px;
-    margin-bottom: 8px;
-    color: var(--ion-color-medium);
-  }
+.mensaje-vacio-selector ion-icon {
+  font-size: 44px;
+  color: var(--app-primary);
+  margin-bottom: 8px;
+}
 
-  p {
-    font-size: 14px;
-    color: var(--ion-color-medium);
-  }
+.mensaje-vacio-selector p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 ion-list {
-  background: var(--ion-background-color);
+  background: transparent;
 }
 
 ion-searchbar {
   padding-bottom: 8px;
+}
+
+/* =========================
+   MODO OSCURO
+========================= */
+
+@media (prefers-color-scheme: dark) {
+  :host {
+    --app-bg: #0f172a;
+    --app-card: #1e293b;
+    --app-input: #111827;
+    --app-text: #f8fafc;
+    --app-text-soft: #cbd5e1;
+    --app-border: rgba(255, 255, 255, 0.08);
+    --app-shadow: 0 6px 18px rgba(0, 0, 0, 0.38);
+    --app-primary-light: rgba(14, 165, 233, 0.16);
+  }
+
+  .aprobacion-permiso-header ion-toolbar {
+    --background: linear-gradient(135deg, #0f75bc, #083a63);
+  }
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 380px) {
+  .contenedor-principal {
+    padding: 10px;
+    padding-bottom: 24px;
+  }
+
+  ion-card {
+    border-radius: 18px;
+  }
+
+  ion-card-header {
+    padding: 14px 14px 8px 14px;
+  }
+
+  ion-card-content {
+    padding: 10px 12px 14px 12px;
+  }
+
+  ion-card-title {
+    font-size: 15px;
+  }
+
+  .barra-aprobacion-fija {
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .barra-superior {
+    align-items: flex-start;
+  }
+
+  .acciones-multiples {
+    grid-template-columns: 1fr;
+  }
+
+  .fila-info {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .fila-info b {
+    text-align: left;
+  }
+
+  .paginacion {
+    gap: 6px;
+  }
+
+  .paginacion span {
+    font-size: 12px;
+  }
 }

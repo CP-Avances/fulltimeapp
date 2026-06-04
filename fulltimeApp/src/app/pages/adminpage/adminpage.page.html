@@ -1,17 +1,22 @@
-<ion-tabs>
-  <ion-tab-bar slot="bottom" ng-hide="$root.hideTabs">
-    <ion-tab-button tab="informacion">
+<ion-tabs class="app-tabs">
+  <ion-tab-bar slot="bottom" class="custom-tab-bar">
+
+    <ion-tab-button tab="informacion" class="custom-tab-button">
       <ion-icon name="people-outline"></ion-icon>
       <ion-label>Información</ion-label>
     </ion-tab-button>
-    <ion-tab-button tab="bienvenido">
-      <ion-icon name="home-outline"></ion-icon>
+
+    <ion-tab-button tab="bienvenido" class="custom-tab-button tab-home">
+      <div class="home-icon-wrapper">
+        <ion-icon name="home-outline"></ion-icon>
+      </div>
       <ion-label>Inicio</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="verTimbre">
+    <ion-tab-button tab="verTimbre" class="custom-tab-button">
       <ion-icon name="document-text-outline"></ion-icon>
       <ion-label>Lista timbres</ion-label>
     </ion-tab-button>
+
   </ion-tab-bar>
 </ion-tabs>

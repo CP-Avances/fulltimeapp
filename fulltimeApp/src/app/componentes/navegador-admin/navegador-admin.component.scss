@@ -1,6 +1,424 @@
-.nombreusua{
-    text-align: center;
-    font-size: 85%;
-    margin: 0% 2vw 0% 2vw;
-    width: 80vw;
+/* =========================
+   VARIABLES GENERALES
+========================= */
+
+:host {
+  --app-primary: #0f75bc;
+  --app-primary-dark: #0b4f86;
+  --app-primary-light: #e8f4fd;
+
+  --app-bg: #f4f7fb;
+  --app-card: #ffffff;
+  --app-text: #263238;
+  --app-text-soft: #64748b;
+  --app-border: rgba(15, 23, 42, 0.08);
+  --app-shadow: 0 4px 12px rgba(15, 23, 42, 0.10);
+}
+
+/* =========================
+   CABECERA PRINCIPAL
+========================= */
+
+.app-header ion-toolbar {
+  --background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  --color: #ffffff;
+  --min-height: 58px;
+  --border-width: 0;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.20);
+  position: relative;
+  overflow: visible !important;
+}
+
+.app-header ion-toolbar::part(container) {
+  overflow: visible !important;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-left: 4px;
+}
+
+.header-right {
+  padding-right: 10px;
+  overflow: visible !important;
+}
+
+.btn-header,
+.btn-notification {
+  --padding-start: 0;
+  --padding-end: 0;
+  --border-radius: 14px;
+  width: 42px;
+  height: 42px;
+  margin: 0;
+  color: #ffffff;
+}
+
+.btn-header ion-icon,
+.btn-notification ion-icon {
+  font-size: 24px;
+  color: #ffffff;
+}
+
+.avatar-header {
+  width: 39px;
+  height: 39px;
+  border-radius: 50%;
+  padding: 2px;
+  background: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+.avatar-header img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: block;
+  object-fit: cover;
+  background: #f1f5f9;
+}
+
+.nombreusua {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(100% - 150px);
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.nombreusua h6 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-notification {
+  position: relative;
+  overflow: visible !important;
+}
+
+.btn-notification::part(native) {
+  overflow: visible !important;
+}
+
+#notification-button {
+  position: relative;
+  overflow: visible !important;
+}
+
+#notifications-badge {
+  position: absolute;
+  top: 3px;
+  right: 2px;
+
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+
+  border-radius: 999px;
+  background: #ef4444;
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 17px;
+  text-align: center;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 999;
+  pointer-events: none;
+
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.45);
+}
+
+/* =========================
+   MENÚ LATERAL
+========================= */
+
+.menu-admin {
+  --width: 285px;
+}
+
+.menu-header ion-toolbar {
+  --background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  --color: #ffffff;
+  --min-height: 54px;
+  --border-width: 0;
+}
+
+.menu-header ion-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.btn-back-menu {
+  color: #ffffff;
+}
+
+.btn-back-menu ion-icon {
+  font-size: 22px;
+  color: #ffffff;
+}
+
+.menu-profile {
+  background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  padding: 12px 18px 20px 18px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  color: #ffffff;
+  position: relative;
+}
+
+.menu-profile::after {
+  content: '';
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.menu-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  padding: 3px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+  flex: 0 0 auto;
+}
+
+.menu-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: block;
+  object-fit: cover;
+  background: #f1f5f9;
+}
+
+.menu-user-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.menu-user-info h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.menu-user-info p {
+  margin: 4px 0 0 0;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.80);
+}
+
+.menu-content {
+  --background: var(--app-bg);
+}
+
+.menu-list {
+  background: transparent;
+  padding: 12px 10px 18px 10px;
+}
+
+.menu-item {
+  --background: var(--app-card);
+  --background-hover: var(--app-primary-light);
+  --background-focused: var(--app-primary-light);
+  --background-activated: #dbeafe;
+  --color: var(--app-text);
+  --min-height: 48px;
+  --padding-start: 10px;
+  --inner-padding-end: 12px;
+  --border-width: 0;
+  margin-bottom: 8px;
+  border-radius: 15px;
+  box-shadow: var(--app-shadow);
+  overflow: hidden;
+}
+
+.menu-item ion-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.menu-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: var(--app-primary-light);
+  color: var(--app-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+}
+
+.menu-icon ion-icon {
+  font-size: 19px;
+}
+
+.menu-icon.warning {
+  background: #fff4d6;
+  color: #c77700;
+}
+
+.menu-footer {
+  background: var(--app-bg);
+  padding: 8px 10px 12px 10px;
+  box-shadow: 0 -4px 14px rgba(15, 23, 42, 0.08);
+}
+
+.logout-item {
+  --background: var(--app-card);
+  --background-hover: #fff1f2;
+  --background-focused: #fff1f2;
+  --background-activated: #ffe4e6;
+  --min-height: 50px;
+  --padding-start: 10px;
+  --inner-padding-end: 12px;
+  --border-width: 0;
+  border-radius: 16px;
+  box-shadow: var(--app-shadow);
+}
+
+.logout-item ion-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #dc2626;
+}
+
+.menu-icon.logout {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* =========================
+   MODO OSCURO
+========================= */
+
+@media (prefers-color-scheme: dark) {
+  :host {
+    --app-bg: #0f172a;
+    --app-card: #1e293b;
+    --app-text: #f8fafc;
+    --app-text-soft: #cbd5e1;
+    --app-border: rgba(255, 255, 255, 0.08);
+    --app-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    --app-primary-light: rgba(14, 165, 233, 0.16);
+  }
+
+  .app-header ion-toolbar {
+    --background: linear-gradient(135deg, #0f75bc, #083a63);
+    --color: #ffffff;
+  }
+
+  .menu-header ion-toolbar,
+  .menu-profile {
+    background: linear-gradient(135deg, #0f75bc, #083a63);
+  }
+
+  .menu-item {
+    --background-hover: rgba(14, 165, 233, 0.18);
+    --background-focused: rgba(14, 165, 233, 0.18);
+    --background-activated: rgba(14, 165, 233, 0.24);
+  }
+
+  .menu-icon {
+    background: rgba(14, 165, 233, 0.18);
+    color: #38bdf8;
+  }
+
+  .menu-icon.warning {
+    background: rgba(245, 158, 11, 0.18);
+    color: #fbbf24;
+  }
+
+  .logout-item {
+    --background-hover: rgba(239, 68, 68, 0.12);
+    --background-focused: rgba(239, 68, 68, 0.12);
+    --background-activated: rgba(239, 68, 68, 0.18);
+  }
+
+  .menu-icon.logout {
+    background: rgba(239, 68, 68, 0.16);
+    color: #f87171;
+  }
+
+  .logout-item ion-label {
+    color: #f87171;
+  }
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 380px) {
+  .nombreusua {
+    width: calc(100% - 138px);
+  }
+
+  .nombreusua h6 {
+    font-size: 12px;
+  }
+
+  .avatar-header {
+    width: 36px;
+    height: 36px;
+  }
+
+  .btn-header,
+  .btn-notification {
+    width: 38px;
+    height: 38px;
+  }
+
+  #notifications-badge {
+    top: 2px;
+    right: 1px;
+    min-width: 16px;
+    height: 16px;
+    font-size: 8px;
+    line-height: 16px;
+    padding: 0 4px;
+  }
+
+  .menu-admin {
+    --width: 270px;
+  }
+
+  .menu-profile {
+    padding: 10px 15px 18px 15px;
+  }
+
+  .menu-avatar {
+    width: 50px;
+    height: 50px;
+  }
 }

@@ -29,6 +29,7 @@ export class PermisoDetalleSolicitudPage implements OnInit {
   p_color: any = null;
   s_color: any = null;
   frase: any = null;
+  imagen: string = localStorage.getItem('imagen64') ?? '';
 
   private readonly TIPO_NOTI_PERMISO_ELIMINAR = TipoNotificacion.ELIMINAR_PERMISO;
 
@@ -274,8 +275,6 @@ export class PermisoDetalleSolicitudPage implements OnInit {
     await this.ObtenerColores();
 
     const data = this.construirPayloadReporteSolicitudPermiso();
-
-    console.log('PAYLOAD REPORTE SOLICITUD PERMISO:', data);
 
     this.reportes.generarReporteServicio('solicitud-permiso', 'pdf', data).subscribe({
       next: ({ blob, filename }) => {
@@ -536,14 +535,6 @@ export class PermisoDetalleSolicitudPage implements OnInit {
         tipoPermiso?.correo_eliminar ?? tipoPermiso?.correo_eliminacion,
         true
       );
-
-      console.log('CONFIG CORREO ELIMINACION DESDE TIPO PERMISO', {
-        idTipoPermiso,
-        tipoPermiso,
-        correo_eliminar: tipoPermiso?.correo_eliminar,
-        correo_eliminacion: tipoPermiso?.correo_eliminacion,
-        tipoPermiteCorreoEliminacion
-      });
 
       const empleados = await firstValueFrom(
         this.datosGeneralesService.ObtenerInformacionModulos(1)
@@ -947,6 +938,6 @@ export class PermisoDetalleSolicitudPage implements OnInit {
 
   tienePermisoAccion(pagina: string, accion: string): boolean {
     return this.permisosAcciones.tienePermisoAccion(pagina, accion);
-  }    
+  }
 
 }

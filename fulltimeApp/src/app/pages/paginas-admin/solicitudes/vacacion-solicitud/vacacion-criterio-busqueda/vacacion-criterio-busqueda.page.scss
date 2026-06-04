@@ -1,176 +1,152 @@
+/* =========================
+   VARIABLES
+========================= */
+
+:host {
+  --app-primary: #0f75bc;
+  --app-primary-dark: #0b4f86;
+  --app-primary-light: #e8f4fd;
+
+  --app-bg: #f4f7fb;
+  --app-card: #ffffff;
+  --app-input: #f8fafc;
+  --app-text: #1f2937;
+  --app-text-soft: #64748b;
+  --app-border: rgba(15, 23, 42, 0.09);
+  --app-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.mis-solicitudes-header ion-toolbar {
+  --background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  --color: #ffffff;
+  --border-width: 0;
+  --min-height: 56px;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.18);
+}
+
+.mis-solicitudes-header ion-title {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.mis-solicitudes-header ion-back-button {
+  --color: #ffffff;
+}
+
+/* =========================
+   CONTENIDO
+========================= */
+
+ion-content {
+  --background: var(--app-bg);
+}
+
 .contenedor-formulario {
   padding: 14px;
   padding-bottom: 30px;
 }
 
+/* =========================
+   CARDS GENERALES
+========================= */
+
 .form-card,
 .resultado-card,
 .solicitud-card {
-  border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  margin: 0 0 14px 0;
+  border-radius: 20px;
+  background: var(--app-card);
+  color: var(--app-text);
+  box-shadow: var(--app-shadow);
+  border: 1px solid var(--app-border);
+  overflow: hidden;
 }
 
-.form-card {
-  margin-bottom: 14px;
+.form-card ion-card-header,
+.resultado-card ion-card-header {
+  padding: 16px 16px 8px 16px;
+}
+
+.form-card ion-card-content,
+.resultado-card ion-card-content,
+.solicitud-card ion-card-content {
+  padding: 12px 14px 16px 14px;
 }
 
 ion-card-title {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--app-text);
 }
 
 ion-card-subtitle {
   margin-top: 5px;
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--app-text-soft);
 }
 
+/* =========================
+   FORMULARIO DE BÚSQUEDA
+========================= */
+
 .input-item {
-  --background: transparent;
-  --padding-start: 0;
-  --inner-padding-end: 0;
-  margin-bottom: 14px;
+  --background: var(--app-input);
+  --color: var(--app-text);
+  --border-radius: 14px;
+  --padding-start: 12px;
+  --inner-padding-end: 12px;
+  --min-height: 58px;
+  margin-bottom: 12px;
+  border-radius: 14px;
+  border: 1px solid var(--app-border);
 }
 
 .input-item ion-label {
+  color: var(--app-text-soft) !important;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+ion-input,
+ion-select {
+  color: var(--app-text);
+  font-size: 14px;
   font-weight: 600;
-  color: var(--ion-color-dark);
+  --placeholder-color: var(--app-text-soft);
+}
+
+ion-select::part(icon) {
+  color: var(--app-primary);
 }
 
 .acciones-formulario {
-  margin-top: 18px;
+  margin-top: 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
 .acciones-formulario ion-button {
-  height: 44px;
-  font-weight: 600;
+  --border-radius: 14px;
+  height: 46px;
+  font-size: 13px;
+  font-weight: 800;
   text-transform: none;
+  letter-spacing: 0.2px;
 }
+
+/* =========================
+   RESULTADO HEADER
+========================= */
 
 .resultado-card {
-  margin-top: 16px;
+  margin-top: 0;
   margin-bottom: 12px;
-}
-
-.estado-carga {
-  margin-top: 24px;
-  text-align: center;
-  color: var(--ion-color-medium);
-}
-
-.estado-carga ion-spinner {
-  margin-bottom: 8px;
-}
-
-.estado-carga p {
-  margin: 0;
-  font-size: 14px;
-}
-
-.sin-resultados {
-  margin-top: 28px;
-  padding: 22px 14px;
-  text-align: center;
-  color: var(--ion-color-medium);
-}
-
-.sin-resultados ion-icon {
-  font-size: 46px;
-  margin-bottom: 8px;
-}
-
-.sin-resultados p {
-  margin: 0;
-  font-size: 14px;
-}
-
-.solicitud-card {
-  margin-top: 12px;
-}
-
-.cabecera-solicitud {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.cabecera-solicitud h2 {
-  margin: 0;
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--ion-color-dark);
-}
-
-.cabecera-solicitud p {
-  margin: 4px 0 0;
-  font-size: 13px;
-  color: var(--ion-color-medium);
-}
-
-.cabecera-solicitud ion-badge {
-  padding: 7px 9px;
-  border-radius: 10px;
-  font-size: 12px;
-  white-space: normal;
-  text-align: center;
-}
-
-.detalle-grid {
-  margin-top: 16px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.detalle-item {
-  background: rgba(0, 0, 0, 0.04);
-  border-radius: 12px;
-  padding: 10px;
-  min-height: 62px;
-}
-
-.detalle-item span {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 12px;
-  color: var(--ion-color-medium);
-}
-
-.detalle-item strong {
-  display: block;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--ion-color-dark);
-}
-
-.acciones-solicitud {
-  margin-top: 14px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  display: flex;
-  justify-content: space-between;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-.acciones-solicitud ion-button {
-  text-transform: none;
-  font-size: 13px;
-  --padding-start: 6px;
-  --padding-end: 6px;
-}
-
-@media (max-width: 360px) {
-  .detalle-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .acciones-solicitud {
-    justify-content: center;
-  }
 }
 
 .resultado-header {
@@ -183,5 +159,241 @@ ion-card-subtitle {
 .resultado-header ion-button {
   text-transform: none;
   font-size: 13px;
+  font-weight: 800;
+  --border-radius: 12px;
+}
+
+/* =========================
+   ESTADO DE CARGA
+========================= */
+
+.estado-carga {
+  margin-top: 22px;
+  padding: 22px 14px;
+  text-align: center;
+  color: var(--app-text-soft);
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  border-radius: 18px;
+  box-shadow: var(--app-shadow);
+}
+
+.estado-carga ion-spinner {
+  margin-bottom: 10px;
+  color: var(--app-primary);
+}
+
+.estado-carga p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* =========================
+   SIN RESULTADOS
+========================= */
+
+.sin-resultados {
+  margin-top: 22px;
+  padding: 26px 16px;
+  text-align: center;
+  color: var(--app-text-soft);
+  background: var(--app-card);
+  border: 1px dashed var(--app-border);
+  border-radius: 20px;
+  box-shadow: var(--app-shadow);
+}
+
+.sin-resultados ion-icon {
+  font-size: 46px;
+  margin-bottom: 8px;
+  color: var(--app-primary);
+}
+
+.sin-resultados p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+/* =========================
+   CARD SOLICITUD
+========================= */
+
+.solicitud-card {
+  margin-top: 12px;
+}
+
+.cabecera-solicitud {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.cabecera-solicitud h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--app-text);
+  line-height: 1.2;
+}
+
+.cabecera-solicitud p {
+  margin: 5px 0 0 0;
+  font-size: 12px;
   font-weight: 600;
+  color: var(--app-text-soft);
+}
+
+.cabecera-solicitud ion-badge {
+  padding: 7px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: normal;
+  text-align: center;
+  min-width: 74px;
+}
+
+/* =========================
+   DETALLE
+========================= */
+
+.detalle-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.detalle-item {
+  background: var(--app-input);
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+  padding: 10px;
+  min-height: 62px;
+}
+
+.detalle-item span {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--app-text-soft);
+}
+
+.detalle-item strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--app-text);
+  line-height: 1.25;
+}
+
+/* =========================
+   ACCIONES SOLICITUD
+========================= */
+
+.acciones-solicitud {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--app-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.acciones-solicitud ion-button {
+  text-transform: none;
+  font-size: 13px;
+  font-weight: 800;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --border-radius: 12px;
+}
+
+.acciones-solicitud ion-icon {
+  font-size: 18px;
+}
+
+/* =========================
+   MODO OSCURO
+========================= */
+
+@media (prefers-color-scheme: dark) {
+  :host {
+    --app-bg: #0f172a;
+    --app-card: #1e293b;
+    --app-input: #111827;
+    --app-text: #f8fafc;
+    --app-text-soft: #cbd5e1;
+    --app-border: rgba(255, 255, 255, 0.08);
+    --app-shadow: 0 6px 18px rgba(0, 0, 0, 0.38);
+    --app-primary-light: rgba(14, 165, 233, 0.16);
+  }
+
+  .mis-solicitudes-header ion-toolbar {
+    --background: linear-gradient(135deg, #0f75bc, #083a63);
+  }
+
+  .sin-resultados {
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+}
+
+/* =========================
+   CELULARES PEQUEÑOS
+========================= */
+
+@media (max-width: 380px) {
+  .contenedor-formulario {
+    padding: 10px;
+    padding-bottom: 24px;
+  }
+
+  .form-card,
+  .resultado-card,
+  .solicitud-card {
+    border-radius: 18px;
+  }
+
+  .form-card ion-card-header,
+  .resultado-card ion-card-header {
+    padding: 14px 14px 8px 14px;
+  }
+
+  .form-card ion-card-content,
+  .resultado-card ion-card-content,
+  .solicitud-card ion-card-content {
+    padding: 10px 12px 14px 12px;
+  }
+
+  ion-card-title {
+    font-size: 15px;
+  }
+
+  .input-item {
+    --min-height: 54px;
+  }
+
+  .cabecera-solicitud h2 {
+    font-size: 14px;
+  }
+
+  .detalle-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .acciones-solicitud {
+    justify-content: center;
+  }
+
+  .resultado-header {
+    align-items: flex-start;
+  }
 }
