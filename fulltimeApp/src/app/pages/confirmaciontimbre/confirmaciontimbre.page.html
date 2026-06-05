@@ -1,38 +1,76 @@
 <ion-app>
-  <ion-content fullscreen>
+  <ion-content fullscreen class="confirmacion-content">
 
-    <div style="text-align: center; margin-top: 3%;">
-      <img class="center" style="width:78%;" src="../../../assets/images/ISOLOGO.png">
-      <ion-label mode="md" style="text-align:center; font-size: 7.5vw;" color="medium">
-        <b>Reloj Virtual</b>
-      </ion-label>
+    <div class="confirmacion-wrapper">
+
+      <section class="logo-section">
+        <div class="logo-contenedor">
+          <img class="logo-app" src="../../../assets/images/ISOLOGO.png">
+        </div>
+
+        <ion-label mode="md" class="app-title">
+          <b>Reloj Virtual</b>
+        </ion-label>
+      </section>
+
+      <section class="success-card">
+
+        <div class="success-icon">
+          <ion-icon name="checkmark-done-outline"></ion-icon>
+        </div>
+
+        <h1>Timbre enviado con éxito</h1>
+
+        <p class="usuario-nombre">
+          {{ nombre_usuario }} {{ apellido_usuario }}
+        </p>
+
+        <img class="success-img" src="../../../assets/images/woman.png">
+
+        <div class="detalle-card">
+          <div class="detalle-linea">
+            <ion-icon name="calendar-outline"></ion-icon>
+
+            <div>
+              <span>Timbre enviado el</span>
+
+              <strong *ngIf="isConnected && serverConnected">
+                {{ fecha }} a las {{ hora }}
+              </strong>
+
+              <strong *ngIf="!isConnected || !serverConnected">
+                {{ fechaTransformada }} a las {{ horaTransformada }}
+              </strong>
+            </div>
+          </div>
+
+          <div class="detalle-linea">
+            <ion-icon name="location-outline"></ion-icon>
+
+            <div>
+              <span>Ubicación</span>
+
+              <strong *ngIf="ubicacion != null && ubicacion != undefined">
+                {{ ubicacion }}
+              </strong>
+
+              <strong *ngIf="ubicacion == null || ubicacion == undefined">
+                Sin ubicación
+              </strong>
+            </div>
+          </div>
+        </div>
+
+        <ion-button expand="block" shape="round" class="btn-inicio" (click)="irABienvenido()">
+
+          <ion-icon name="home-outline" slot="start"></ion-icon>
+          Ir a inicio
+
+        </ion-button>
+
+      </section>
+
     </div>
-
-    <div>
-      <h1> <label>Timbre enviado con éxito</label></h1>
-
-      <h4> <label>{{nombre_usuario}} {{apellido_usuario}}</label></h4>
-
-    </div><br>
-    <div>
-      <img class="img2" src="../../../assets/images/woman.png">
-    </div>
-    <br><br>
-    <div>
-      <label>Timbre enviado el: </label>
-      <p style="font-weight: bold; font-size: 1.6em;" *ngIf="isConnected && serverConnected">{{fecha + " a las " +
-        hora}}</p>
-      <p style="font-weight: bold; font-size: 1.6em;" *ngIf="!isConnected || !serverConnected ">{{fechaTransformada}} a
-        las {{horaTransformada}} </p>
-
-      <p *ngIf="ubicacion != null && ubicacion != undefined">Ubicación: {{ubicacion}}</p>
-      <p *ngIf="ubicacion == null || ubicacion == undefined">Ubicación: Sin Ubicación</p>
-    </div>
-
-    <ion-chip outline color="primary" (click)="irABienvenido()">
-      <ion-icon name="home-outline" color="primary"></ion-icon>
-      <ion-label>Ir a inicio</ion-label>
-    </ion-chip>
 
   </ion-content>
 </ion-app>

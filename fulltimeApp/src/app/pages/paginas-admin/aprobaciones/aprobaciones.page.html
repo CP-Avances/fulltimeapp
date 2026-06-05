@@ -1,99 +1,119 @@
-<ion-content>
+<ion-content class="aprobaciones-content">
 
-  <br><br><br>
-  <hr>
+  <!-- CON CONEXIÓN -->
+  <ng-container *ngIf="isConnected && serverConnected">
 
-  <header style="text-align: center;">
-    <h3 *ngIf="isConnected && serverConnected">Aprobaciones</h3>
-  </header>
+    <section class="hero-aprobaciones">
+      <div class="logo-box">
+        <img src="../../../assets/images/ISOLOGO.png" />
+        <h1>Reloj Virtual</h1>
+      </div>
 
-  <div class="Imagen" *ngIf="isConnected && serverConnected">
-    <img class="center" src="../../../assets/images/ISOLOGO.png">
+      <div class="hero-texto">
+        <div class="hero-icono">
+          <ion-icon name="checkmark-done-outline"></ion-icon>
+        </div>
 
-    <ion-label style="text-align:center" mode="md" color="medium">
-      <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
-    </ion-label>
+        <h2>Aprobaciones</h2>
+        <p>Seleccione el tipo de solicitud que desea revisar o aprobar.</p>
+      </div>
 
-    <img class="tamanoImagen" src="../../../assets/images/Solicitudes.svg">
-  </div>
+      <img class="imagen-aprobaciones" src="../../../assets/images/Solicitudes.svg" />
+    </section>
 
-  <ion-grid *ngIf="isConnected && serverConnected">
-    <ion-row>
+    <section class="opciones-section">
 
-      <ion-col size="6">
-        <ion-button [color]="colorv" expand="block" (click)="BtnVacaciones_click()">
-          <div>
-            <ion-icon name="airplane-outline"></ion-icon> <br>
-            <ion-text>
-              Vacaciones
-            </ion-text>
+      <ion-card class="opcion-card" [class.modulo-deshabilitado]="!Btn_vacaciones" button="true"
+        (click)="BtnVacaciones_click()">
+
+        <ion-card-content>
+          <div class="opcion-icono vacaciones">
+            <ion-icon name="airplane-outline"></ion-icon>
           </div>
-        </ion-button>
-      </ion-col>
 
-      <ion-col size="6">
-        <ion-button [color]="colorp" expand="block" (click)="BtnPermisos_click()">
-          <div>
-            <ion-icon name="reader-outline"></ion-icon> <br>
-            <ion-text>
-              Permisos
-            </ion-text>
+          <div class="opcion-info">
+            <h3>Vacaciones</h3>
+            <p>Revisar y aprobar solicitudes de vacaciones.</p>
           </div>
-        </ion-button>
-      </ion-col>
 
-    </ion-row>
-  </ion-grid>
+          <ion-icon class="opcion-flecha" name="chevron-forward-outline"></ion-icon>
+        </ion-card-content>
 
-  <div *ngIf="!isConnected || !serverConnected">
+      </ion-card>
 
-    <app-refresh-info
-      (onRefresh)="ngOnInit()"
-      removeItem="noClean">
+      <ion-card class="opcion-card" [class.modulo-deshabilitado]="!Btn_permisos" button="true"
+        (click)="BtnPermisos_click()">
+
+        <ion-card-content>
+          <div class="opcion-icono permisos">
+            <ion-icon name="reader-outline"></ion-icon>
+          </div>
+
+          <div class="opcion-info">
+            <h3>Permisos</h3>
+            <p>Revisar y aprobar solicitudes de permisos.</p>
+          </div>
+
+          <ion-icon class="opcion-flecha" name="chevron-forward-outline"></ion-icon>
+        </ion-card-content>
+
+      </ion-card>
+
+    </section>
+
+  </ng-container>
+
+  <!-- SIN CONEXIÓN -->
+  <ng-container *ngIf="!isConnected || !serverConnected">
+
+    <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean">
     </app-refresh-info>
 
-    <div style="margin: 2%; padding: 2%; text-align: center; border-radius: 2%;">
-      <ion-text color="medium" style="font-family: Arial, Helvetica, sans-serif; font-size: 90%;">
-        En esta vista encontrará información de aprobaciones
-      </ion-text>
+    <section class="offline-card">
+      <div class="offline-icon">
+        <ion-icon name="cloud-offline-outline"></ion-icon>
+      </div>
 
-      <br><br>
+      <h3>Aprobaciones no disponibles</h3>
 
-      <ion-text color="medium" style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;" *ngIf="!isConnected">
-        Se podrá visualizar cuando tenga conexión a internet
-      </ion-text>
+      <p>
+        En esta vista encontrará información de aprobaciones.
+      </p>
 
-      <br>
+      <p *ngIf="!isConnected">
+        Se podrá visualizar cuando tenga conexión a internet.
+      </p>
 
-      <ion-text color="medium" style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;" *ngIf="!serverConnected">
-        Se podrá visualizar cuando tenga conexión al servidor
-      </ion-text>
-    </div>
+      <p *ngIf="!serverConnected">
+        Se podrá visualizar cuando tenga conexión al servidor.
+      </p>
+    </section>
 
-    <div class="Imagen">
+    <section class="offline-image-card">
       <span class="center1">
-        <img src="../../../assets/images/ISOLOGO.png">
+        <div class="logo-contenedor">
+          <img src="../../../assets/images/ISOLOGO.png">
+        </div>
 
-        <ion-label style="text-align:center" mode="md" color="medium">
-          <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
+
+        <ion-label mode="md" color="medium">
+          <h1><b>Reloj Virtual</b></h1>
         </ion-label>
       </span>
 
-      <img src="../../../assets/images/lost_timee.svg" />
-    </div>
+      <img class="offline-img" src="../../../assets/images/lost_timee.svg" />
+    </section>
 
-    <div style="margin: 4%; padding: 4%; text-align: center; border-radius: 2%;">
-      <ion-text color="dark" style="font-family: Arial, Helvetica, sans-serif;" *ngIf="!isConnected">
+    <section class="offline-message">
+      <ion-text *ngIf="!isConnected">
         No tiene conexión a internet
       </ion-text>
 
-      <br>
-
-      <ion-text color="dark" style="font-family: Arial, Helvetica, sans-serif;" *ngIf="!serverConnected">
+      <ion-text *ngIf="!serverConnected">
         No tiene conexión al servidor
       </ion-text>
-    </div>
+    </section>
 
-  </div>
+  </ng-container>
 
 </ion-content>

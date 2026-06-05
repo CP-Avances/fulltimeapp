@@ -1,83 +1,619 @@
-.tamanoImagen {
-    height: 55%;
-    width: 55%;
-    display: block;
-    margin: auto;
-    
-  }
-  
-  .paginacion{
-      margin: auto;
-      padding-top: 2%;
-      padding-bottom: 2%;
-    }
-    
-    .paginacion ::ng-deep .ngx-pagination {
-      padding: 0%;
-      margin: auto;
-    }
-    
-  .paginacion ::ng-deep .ngx-pagination .current {
-      background: rgb(28, 133, 219);
-      color: rgb(255, 255, 255);
-      font-weight: bold;
-      border-radius: 5px;
-  }
-      
-  .paginacion :host ::ng-deep .ngx-pagination span {
-      color: rgb(255, 255, 255);
-      font-family:monospace;
-  }
-  
-  .paginacion ::ng-deep .ngx-pagination a{
-      background-color: transparent;
-      color: rgb(67, 149, 226);
-  }
+/* =========================
+   VARIABLES
+========================= */
 
-.text_info{
-  font-size: 75%; 
-  margin:7% 0% 0% 0%; 
-  margin-top: 3%;
+:host {
+  --app-primary: #0f75bc;
+  --app-primary-dark: #0b5a92;
+  --app-primary-light: #e8f4fd;
+
+  --app-bg: #f4f7fb;
+  --app-card: #ffffff;
+  --app-soft: #f8fafc;
+  --app-text: #1f2937;
+  --app-text-soft: #64748b;
+  --app-border: rgba(15, 23, 42, 0.09);
+  --app-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
+
+  --estado-laboral: #22c55e;
+  --estado-feriado: #0f75bc;
+  --estado-libre: #f59e0b;
 }
 
-.formdiv{
-  margin: 1% 1% 2% 1%;
-  padding-bottom: 0.5%;
-  border: solid 1px rgba(58, 84, 106, 0.961);
-  border-radius: 8px;
-  background-color: rgba(58, 84, 106, 0.961);
+/* =========================
+   CONTENIDO
+========================= */
+
+.horarios-content {
+  --background: var(--app-bg);
 }
 
-.item_fondo{
-  border-radius: 6px 6px 0px 0px; 
-  background-color: rgba(65, 65, 64, 0.961); 
-  margin-bottom: 2%;
-}
+/* =========================
+   ESTADO DE CARGA
+========================= */
 
-.columnaCabecera{
-  background-color: rgba(6, 74, 125, 0.666);
-  color: rgb(255, 255, 255);
-  grid-template-columns: repeat(7, 1fr);
-  display: grid;
-  margin: -1% -1% 0% -1.5%;
-  padding: 2% 0% 2% 0%;
-  border-radius: 10px 10px 0px 0px;
-}
-.columna {
-  border-radius: 0px 0px 10px 10px;
-  border: solid 0.3px rgba(6, 74, 125, 0.666);
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  margin: 0% -1% 0% -1%;
-  padding: 1%;
-}
-
-.cuadroDia{
+.estado-carga {
+  margin: 18px 14px;
+  padding: 24px 16px;
+  border-radius: 22px;
+  background: var(--app-card);
+  color: var(--app-text-soft);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
   text-align: center;
-  font-size: 1.5ch;
-  background-color: rgba(68, 68, 68, 0.652);
-  //border: solid 0.2px rgba(155, 155, 155, 0.961);
-  padding-bottom: 4%;
-  margin: 0.5px;
-  border-radius: 5px 5px 5px 5px;
+}
+
+.estado-carga ion-spinner {
+  margin-bottom: 10px;
+  color: var(--app-primary);
+}
+
+.estado-carga span {
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.estado-carga ion-progress-bar {
+  margin-top: 14px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+/* =========================
+   INFORMACIÓN
+========================= */
+
+.info-card {
+  margin: 14px;
+  padding: 20px 16px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  color: #ffffff;
+  box-shadow: 0 7px 18px rgba(15, 117, 188, 0.24);
+  text-align: center;
+}
+
+.info-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 12px auto;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-icon ion-icon {
+  font-size: 31px;
+  color: #ffffff;
+}
+
+.info-card h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 19px;
+  font-weight: 900;
+}
+
+.info-card p {
+  margin: 8px 0 0 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* =========================
+   FILTROS
+========================= */
+
+.filtros-card {
+  margin: 0 14px 16px 14px;
+  border-radius: 20px;
+  background: var(--app-card);
+  color: var(--app-text);
+  box-shadow: var(--app-shadow);
+  border: 1px solid var(--app-border);
+}
+
+.filtros-card ion-card-content {
+  padding: 10px;
+}
+
+.filtros-card ion-grid {
+  padding: 0;
+}
+
+.filtros-card ion-row {
+  margin: 0;
+}
+
+.filtros-card ion-col {
+  padding: 4px;
+}
+
+.input-item {
+  --background: var(--app-soft);
+  --color: var(--app-text);
+  --border-radius: 14px;
+  --padding-start: 12px;
+  --inner-padding-end: 10px;
+  --min-height: 58px;
+  border-radius: 14px;
+  border: 1px solid var(--app-border);
+}
+
+.input-item ion-label {
+  color: var(--app-text-soft) !important;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.input-item ion-select {
+  color: var(--app-text);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.is-required::after {
+  content: " *";
+  color: #ef4444;
+  font-weight: 900;
+}
+
+/* Compatibilidad con clases anteriores */
+.text_info {
+  font-size: 75%;
+  margin: 7% 0 0 0;
+}
+
+.formdiv {
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.item_fondo {
+  border-radius: 14px;
+  background-color: transparent;
+  margin-bottom: 0;
+}
+
+/* =========================
+   TÍTULO SECCIÓN
+========================= */
+
+.calendario-section {
+  margin: 0 14px 14px 14px;
+}
+
+.seccion-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: var(--app-text);
+}
+
+.seccion-titulo ion-icon {
+  font-size: 22px;
+  color: var(--app-primary);
+}
+
+.seccion-titulo h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--app-text);
+}
+
+/* =========================
+   CALENDARIO
+========================= */
+
+.calendario {
+  padding: 0;
+  border-radius: 20px;
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+  overflow: hidden;
+}
+
+.columnaCabecera {
+  background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  color: #ffffff;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin: 0;
+  padding: 0;
+}
+
+.day-name {
+  text-align: center;
+  padding: 10px 2px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.columna {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin: 0;
+  padding: 6px;
+  gap: 4px;
+  background: var(--app-card);
+  border: none;
+}
+
+.cuadroDia {
+  position: relative;
+  min-height: 54px;
+  text-align: center;
+  font-size: 12px;
+  background: var(--app-soft);
+  color: var(--app-text);
+  border: 1px solid var(--app-border);
+  border-radius: 13px;
+  padding: 7px 4px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.cuadroDia:active {
+  transform: scale(0.96);
+  box-shadow: inset 0 0 0 2px rgba(15, 117, 188, 0.22);
+}
+
+.numero-dia {
+  position: absolute;
+  top: 6px;
+  left: 7px;
+  color: var(--app-text);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.icono-dia {
+  height: 100%;
+  min-height: 39px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 12px;
+}
+
+.icono-dia ion-icon {
+  font-size: 23px;
+}
+
+.icono-laboral {
+  color: var(--estado-laboral);
+}
+
+.icono-feriado {
+  color: var(--estado-feriado);
+}
+
+.icono-libre {
+  color: var(--estado-libre);
+}
+
+/* =========================
+   MODAL HORARIO
+========================= */
+
+.modalHorario {
+  --width: 94%;
+  --height: 78%;
+  --border-radius: 22px;
+}
+
+.modalHorario::part(content) {
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+.modal-horario-content {
+  --background: var(--app-bg);
+}
+
+.modal-header {
+  padding: 16px 14px;
+  background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.modal-header p {
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.btn-cerrar-modal {
+  --background: rgba(255, 255, 255, 0.16);
+  --color: #ffffff;
+  --border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  margin: 0;
+}
+
+.btn-cerrar-modal ion-icon {
+  font-size: 22px;
+}
+
+.horario-card {
+  margin: 14px;
+  border-radius: 20px;
+  background: var(--app-card);
+  color: var(--app-text);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+  overflow: hidden;
+}
+
+.horario-card ion-card-header {
+  padding: 14px 16px 8px 16px;
+}
+
+.horario-card ion-card-title {
+  color: var(--app-primary);
+  font-size: 16px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.horario-card ion-card-content {
+  padding: 8px 12px 14px 12px;
+}
+
+.detalle-item {
+  --background: var(--app-soft);
+  --color: var(--app-text);
+  --border-radius: 15px;
+  --padding-start: 10px;
+  --inner-padding-end: 10px;
+  --min-height: 58px;
+  margin-bottom: 8px;
+  border-radius: 15px;
+  border: 1px solid var(--app-border);
+}
+
+.detalle-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 13px;
+  background: var(--app-primary-light);
+  color: var(--app-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+}
+
+.detalle-icon ion-icon {
+  font-size: 21px;
+}
+
+.detalle-item ion-label span {
+  display: block;
+  color: var(--app-text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.detalle-item ion-label strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--app-text);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+/* =========================
+   LEYENDA
+========================= */
+
+.leyenda-card {
+  margin: 0 14px 16px 14px;
+  border-radius: 18px;
+  background: var(--app-card);
+  color: var(--app-text);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+}
+
+.leyenda-card ion-card-content {
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.leyenda-item {
+  background: var(--app-soft);
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+  padding: 10px 6px;
+  text-align: center;
+}
+
+.leyenda-item ion-icon {
+  display: block;
+  margin: 0 auto 5px auto;
+  font-size: 21px;
+}
+
+.leyenda-item span {
+  display: block;
+  color: var(--app-text);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* =========================
+   SIN HORARIOS
+========================= */
+
+.sin-horarios-card {
+  margin: 18px 14px;
+  padding: 24px 16px;
+  border-radius: 24px;
+  background: var(--app-card);
+  color: var(--app-text);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+  text-align: center;
+}
+
+.sin-horarios-icon {
+  width: 70%;
+  max-width: 240px;
+  margin: 0 auto 16px auto;
+}
+
+.sin-horarios-icon img {
+  width: 100%;
+  display: block;
+}
+
+.sin-horarios-card h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--app-text);
+}
+
+.sin-horarios-card p {
+  margin: 8px 0 0 0;
+  color: var(--app-text-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* =========================
+   COMPATIBILIDAD
+========================= */
+
+.tamanoImagen {
+  height: auto;
+  width: 55%;
+  max-width: 240px;
+  display: block;
+  margin: auto;
+}
+
+.paginacion {
+  margin: auto;
+  padding-top: 2%;
+  padding-bottom: 2%;
+}
+
+.paginacion ::ng-deep .ngx-pagination {
+  padding: 0%;
+  margin: auto;
+}
+
+.paginacion ::ng-deep .ngx-pagination .current {
+  background: rgb(28, 133, 219);
+  color: rgb(255, 255, 255);
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+.paginacion ::ng-deep .ngx-pagination span {
+  color: rgb(255, 255, 255);
+  font-family: monospace;
+}
+
+.paginacion ::ng-deep .ngx-pagination a {
+  background-color: transparent;
+  color: rgb(67, 149, 226);
+}
+
+/* =========================
+   MODO OSCURO
+========================= */
+
+@media (prefers-color-scheme: dark) {
+  :host {
+    --app-bg: #0f172a;
+    --app-card: #1e293b;
+    --app-soft: #111827;
+    --app-text: #f8fafc;
+    --app-text-soft: #cbd5e1;
+    --app-border: rgba(255, 255, 255, 0.08);
+    --app-shadow: 0 6px 18px rgba(0, 0, 0, 0.38);
+    --app-primary-light: rgba(14, 165, 233, 0.16);
+  }
+
+  .cuadroDia {
+    background: #111827;
+  }
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 380px) {
+  .info-card,
+  .filtros-card,
+  .calendario-section,
+  .leyenda-card,
+  .sin-horarios-card {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .info-card h2 {
+    font-size: 17px;
+  }
+
+  .info-card p {
+    font-size: 12px;
+  }
+
+  .day-name {
+    font-size: 11px;
+  }
+
+  .cuadroDia {
+    min-height: 49px;
+    border-radius: 11px;
+    padding: 6px 3px;
+  }
+
+  .numero-dia {
+    font-size: 11px;
+    top: 5px;
+    left: 6px;
+  }
+
+  .icono-dia ion-icon {
+    font-size: 20px;
+  }
+
+  .leyenda-card ion-card-content {
+    gap: 6px;
+  }
+
+  .leyenda-item span {
+    font-size: 10px;
+  }
 }

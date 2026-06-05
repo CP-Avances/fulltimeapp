@@ -477,6 +477,24 @@ ion-modal.modal-selector-completo ion-footer ion-button {
   ion-modal.modal-selector-completo .mensaje-vacio-selector {
     color: #cbd5e1;
   }
+
+  .logo-contenedor {
+  width: fit-content;
+  max-width: 75%;
+  margin: 0 auto;
+  padding: 10px 16px;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+}
+
+.logo-app {
+  display: block;
+  width: 100%;
+  max-width: 230px;
+  height: auto;
+  object-fit: contain;
+}
 }
 
 

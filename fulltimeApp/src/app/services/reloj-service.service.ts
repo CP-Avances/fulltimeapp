@@ -53,10 +53,15 @@ export class RelojServiceService {
 
 
   // VERIFICAR EXISTENCIA DE INICIO DE SESION
-  async estaLogueado(): Promise<boolean> {
-    const token = await this.sessionStorageService.getToken();
-    return !!token;
+async estaLogueado(): Promise<boolean> {
+  const token = await this.sessionStorageService.getToken();
+
+  if (!token || token === 'null' || token === 'undefined') {
+    return false;
   }
+
+  return true;
+}
   
   // VERIFICAR EXISTENCIA DE ROL
   existeRol() {
@@ -71,9 +76,15 @@ export class RelojServiceService {
   }
 
   // OBTENER TOKEN
-  async getToken() {
-    return await this.sessionStorageService.getToken();
+async getToken() {
+  const token = await this.sessionStorageService.getToken();
+
+  if (!token || token === 'null' || token === 'undefined') {
+    return null;
   }
+
+  return token;
+}
 
   // METODO PARA CERRAR SESION
   async cerrarSesion() {

@@ -12,24 +12,14 @@
 
     <ion-row>
       <ion-col size="6">
-        <ion-button
-          color="acua"
-          shape="round"
-          expand="full"
-          (click)="mostrarfiltro()"
-          [disabled]="btn_filtro">
+        <ion-button color="acua" shape="round" expand="full" (click)="mostrarfiltro()" [disabled]="btn_filtro">
           <ion-icon color="light" name="search-outline" style="margin-right: 3%;"></ion-icon>
           <ion-label>BUSCAR TIMBRES</ion-label>
         </ion-button>
       </ion-col>
 
       <ion-col size="6">
-        <ion-button
-          color="theme"
-          shape="round"
-          expand="full"
-          (click)="mostrarTimbres()"
-          [disabled]="btn_todos">
+        <ion-button color="theme" shape="round" expand="full" (click)="mostrarTimbres()" [disabled]="btn_todos">
           <ion-icon color="light" name="list-outline" style="margin-right: 3%;"></ion-icon>
           <ion-label>MOSTRAR TODOS</ion-label>
         </ion-button>
@@ -78,11 +68,7 @@
 
                 <div class="accion-timbre">
 
-                  <ion-button
-                    *ngIf="t.dispositivo_timbre != ''"
-                    class="btn-info-timbre"
-                    fill="clear"
-                    size="small"
+                  <ion-button *ngIf="t.dispositivo_timbre != ''" class="btn-info-timbre" fill="clear" size="small"
                     (click)="presentAlert(t.observacion, t.hora_timbre_diferente, t.ubicacion, t.novedades_conexion, t.conexion)">
 
                     <ion-icon
@@ -117,37 +103,22 @@
               </div>
             </ion-button>
 
-            <ion-button
-              class="ubicacionDER"
-              mode="ios"
-              color="light"
-              shape="round"
-              (click)="abrirMapa(t.latitud, t.longitud)"
-              [disabled]="!t.latitud || !t.longitud">
+            <ion-button class="ubicacionDER" mode="ios" color="light" shape="round"
+              (click)="abrirMapa(t.latitud, t.longitud)" [disabled]="!t.latitud || !t.longitud">
               <div>
                 <ion-icon color="primary" class="tamanoIconoEmpleado" name="location-outline"></ion-icon>
               </div>
             </ion-button>
 
-            <ion-button
-              class="ubicacionMED"
-              mode="ios"
-              color="light"
-              shape="round"
-              (click)="mostrarImagenModal(t.documento)"
-              [disabled]="!t.documento">
+            <ion-button class="ubicacionMED" mode="ios" color="light" shape="round"
+              (click)="mostrarImagenModal(t.documento)" [disabled]="!t.documento">
               <div>
                 <ion-icon color="primary" class="tamanoIconoEmpleado" name="image-outline"></ion-icon>
               </div>
             </ion-button>
 
-            <ion-button
-              class="ubicacionIZQ"
-              mode="ios"
-              color="light"
-              shape="round"
-              (click)="mostrarImagenModal(t.imagen)"
-              [disabled]="!t.imagen">
+            <ion-button class="ubicacionIZQ" mode="ios" color="light" shape="round"
+              (click)="mostrarImagenModal(t.imagen)" [disabled]="!t.imagen">
               <div>
                 <ion-icon color="primary" class="tamanoIconoEmpleado" name="happy-outline"></ion-icon>
               </div>
@@ -162,15 +133,9 @@
   <!-- PAGINACIÓN TODOS -->
   <ion-footer class="footer-paginacion" *ngIf="!todos" [hidden]="todos">
     <ion-item>
-      <pagination-controls
-        class="paginacion"
-        (pageChange)="pageTodos = $event"
-        [maxSize]="maxSize"
-        [directionLinks]="directionLinks"
-        [responsive]="responsive"
-        [autoHide]="autoHide"
-        [previousLabel]="labels.previousLabel"
-        [nextLabel]="labels.nextLabel"
+      <pagination-controls class="paginacion" (pageChange)="pageTodos = $event" [maxSize]="maxSize"
+        [directionLinks]="directionLinks" [responsive]="responsive" [autoHide]="autoHide"
+        [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
         [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
         [screenReaderPageLabel]="labels.screenReaderPageLabel"
         [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
@@ -205,11 +170,7 @@
 
                 <div class="accion-timbre">
 
-                  <ion-button
-                    *ngIf="t.dispositivo_timbre != ''"
-                    class="btn-info-timbre"
-                    fill="clear"
-                    size="small"
+                  <ion-button *ngIf="t.dispositivo_timbre != ''" class="btn-info-timbre" fill="clear" size="small"
                     (click)="presentAlert(t.observacion, t.hora_timbre_diferente, t.ubicacion, t.novedades_conexion, t.conexion)">
 
                     <ion-icon
@@ -244,37 +205,22 @@
               </div>
             </ion-button>
 
-            <ion-button
-              class="ubicacionDER"
-              mode="ios"
-              color="light"
-              shape="round"
-              (click)="abrirMapa(t.latitud, t.longitud)"
-              [disabled]="!t.latitud || !t.longitud">
+            <ion-button class="ubicacionDER" mode="ios" color="light" shape="round"
+              (click)="abrirMapa(t.latitud, t.longitud)" [disabled]="!t.latitud || !t.longitud">
               <div>
                 <ion-icon color="primary" class="tamanoIconoEmpleado" name="location-outline"></ion-icon>
               </div>
             </ion-button>
 
-            <ion-button
-              class="ubicacionMED"
-              mode="ios"
-              color="light"
-              shape="round"
-              (click)="mostrarImagenModal(t.documento)"
-              [disabled]="!t.documento">
+            <ion-button class="ubicacionMED" mode="ios" color="light" shape="round"
+              (click)="mostrarImagenModal(t.documento)" [disabled]="!t.documento">
               <div>
                 <ion-icon color="primary" class="tamanoIconoEmpleado" name="image-outline"></ion-icon>
               </div>
             </ion-button>
 
-            <ion-button
-              class="ubicacionIZQ"
-              mode="ios"
-              color="light"
-              shape="round"
-              (click)="mostrarImagenModal(t.imagen)"
-              [disabled]="!t.imagen">
+            <ion-button class="ubicacionIZQ" mode="ios" color="light" shape="round"
+              (click)="mostrarImagenModal(t.imagen)" [disabled]="!t.imagen">
               <div>
                 <ion-icon color="primary" class="tamanoIconoEmpleado" name="happy-outline"></ion-icon>
               </div>
@@ -289,15 +235,9 @@
   <!-- PAGINACIÓN FILTRO -->
   <ion-footer class="footer-paginacion" *ngIf="!filtro">
     <ion-item>
-      <pagination-controls
-        class="paginacion"
-        (pageChange)="paginafiltro = $event"
-        [maxSize]="maxSize"
-        [directionLinks]="directionLinks"
-        [responsive]="responsive"
-        [autoHide]="autoHide"
-        [previousLabel]="labels.previousLabel"
-        [nextLabel]="labels.nextLabel"
+      <pagination-controls class="paginacion" (pageChange)="paginafiltro = $event" [maxSize]="maxSize"
+        [directionLinks]="directionLinks" [responsive]="responsive" [autoHide]="autoHide"
+        [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
         [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
         [screenReaderPageLabel]="labels.screenReaderPageLabel"
         [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
@@ -346,8 +286,9 @@
 
     <section class="offline-image-card">
       <span class="center1">
-        <img src="../../../assets/images/ISOLOGO.png">
-
+        <div class="logo-contenedor">
+          <img src="../../../assets/images/ISOLOGO.png">
+        </div>
         <ion-label mode="md" color="medium">
           <h1><b>Reloj Virtual</b></h1>
         </ion-label>

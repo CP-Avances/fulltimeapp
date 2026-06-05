@@ -62,19 +62,16 @@ export class LoginPage implements OnInit {
     });
 
     this.obtenerInfoTerminosCondiciones();
-    this.BuscarParametroTimbreUbicacionDesconocida();
-
-    if (!this.relojService.esPrimeraVez()) {
-      this.navCtroller.navigateForward(['login']);
-      return;
-    }
 
     const logueado = await this.relojService.estaLogueado();
 
     if (logueado && this.relojService.existeRol()) {
-      this.navCtroller.pop();
+      this.BuscarParametroTimbreUbicacionDesconocida();
       this.navCtroller.navigateRoot(['reloj']);
+      return;
     }
+
+    this.BuscarParametroTimbreUbicacionDesconocida();
   }
 
   rango_dispositivos: any;
@@ -164,6 +161,7 @@ export class LoginPage implements OnInit {
 
   // METODO PARA INICIAR SESION
   async validarEmpresa() {
+     this.iniciandoSesion = true;
     this.infoDispositivo();
     const credenciales = {
       nombre_usuario: this.user.nombre_usuario,
@@ -281,6 +279,7 @@ export class LoginPage implements OnInit {
 
   // METODO PARA CAMBIAR A LA PANTALLA DE BIENVENIDA
   cambiodepantallas() {
+     this.iniciandoSesion = false;
     this.navCtroller.pop();
     this.navCtroller.navigateRoot(['reloj']);
     var FormId = 'formulariologin';
