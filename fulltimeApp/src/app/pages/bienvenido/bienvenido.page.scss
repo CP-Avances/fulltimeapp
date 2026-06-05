@@ -551,3 +551,125 @@ h3 {
     line-height: 1;
   }
 }
+
+/* ===============================
+   LOGO INICIO
+   Solo afecta esta pantalla
+================================ */
+
+.marca-inicio {
+  width: 100%;
+  margin: 6px auto 6px auto;
+  text-align: center;
+}
+
+.marca-logo-box {
+  width: fit-content;
+  max-width: 58%;
+  margin: 0 auto;
+  padding: 7px 18px;
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.12);
+}
+
+.marca-logo {
+  display: block;
+  width: 128px;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.marca-inicio p {
+  margin: 3px 0 0 0;
+  color: var(--app-text-soft);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+/* Evita que el estilo global del logo blanco afecte esta pantalla */
+.marca-inicio.logo-contenedor,
+.marca-inicio .logo-contenedor {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* ===============================
+   LOGO EN MODO OSCURO
+================================ */
+
+@media (prefers-color-scheme: dark) {
+  .marca-logo-box {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow:
+      0 6px 16px rgba(0, 0, 0, 0.32),
+      0 0 0 1px rgba(56, 189, 248, 0.08);
+  }
+
+  .marca-inicio p {
+    color: #cbd5e1;
+  }
+}
+
+/* ===============================
+   RESPONSIVE LOGO
+================================ */
+
+@media (max-width: 380px) {
+  .marca-inicio {
+    margin: 5px auto 5px auto;
+  }
+
+  .marca-logo-box {
+    padding: 6px 16px;
+    border-radius: 15px;
+    max-width: 62%;
+  }
+
+  .marca-logo {
+    width: 118px;
+  }
+
+  .marca-inicio p {
+    font-size: 9.5px;
+  }
+}
+
+@media (max-height: 760px) {
+  .marca-inicio {
+    margin: 4px auto 4px auto;
+  }
+
+  .marca-logo-box {
+    padding: 5px 14px;
+    border-radius: 14px;
+  }
+
+  .marca-logo {
+    width: 110px;
+  }
+
+  .marca-inicio p {
+    font-size: 9px;
+    margin-top: 2px;
+  }
+}
+
+@media (max-height: 700px) {
+  .marca-logo {
+    width: 102px;
+  }
+
+  .marca-logo-box {
+    padding: 4px 12px;
+  }
+
+  .marca-inicio p {
+    font-size: 8.5px;
+  }
+}

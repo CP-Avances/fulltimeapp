@@ -69,10 +69,16 @@ import { ParametrosSistema } from 'src/app/libs/parametros.emun';
     </ion-list>
 
     <section class="estado-vacio" *ngIf="timbres.length == 0">
-      <div class="logo-box">
-        <img src="../../../assets/images/ISOLOGO.png">
-        <h3>Reloj Virtual</h3>
-      </div>
+     <div class="logo-box">
+  <div class="logo-card">
+    <img
+      class="logo-timbres"
+      src="../../../assets/images/ISOLOGO.png"
+      alt="AQHora">
+  </div>
+
+  <h3>Reloj Virtual</h3>
+</div>
 
       <img class="imagen-vacia" src="../../../assets/images/lost_timee.svg" />
 
@@ -292,21 +298,35 @@ import { ParametrosSistema } from 'src/app/libs/parametros.emun';
   }
 
   .logo-box {
-    margin-bottom: 12px;
-  }
+  margin-bottom: 12px;
+  text-align: center;
+}
 
-  .logo-box img {
-    width: 42%;
-    max-width: 150px;
-    min-width: 110px;
-  }
+.logo-card {
+  width: fit-content;
+  max-width: 78%;
+  margin: 0 auto;
+  padding: 8px 22px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+}
 
-  .logo-box h3 {
-    margin: 6px 0 0 0;
-    color: var(--app-text-soft);
-    font-size: 13px;
-    font-weight: 800;
-  }
+.logo-timbres {
+  display: block;
+  width: 145px;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.logo-box h3 {
+  margin: 7px 0 0 0;
+  color: var(--app-text-soft);
+  font-size: 13px;
+  font-weight: 800;
+}
 
   .imagen-vacia {
     width: 72%;
@@ -390,6 +410,14 @@ import { ParametrosSistema } from 'src/app/libs/parametros.emun';
       --app-primary-light: rgba(14, 165, 233, 0.16);
       --app-success-light: rgba(34, 197, 94, 0.14);
     }
+
+    .logo-card {
+  background: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(56, 189, 248, 0.08);
+}
   }
 
   @media (max-width: 380px) {
@@ -415,6 +443,15 @@ import { ParametrosSistema } from 'src/app/libs/parametros.emun';
     .imagen-vacia {
       width: 78%;
     }
+
+    .logo-card {
+  padding: 7px 18px;
+  border-radius: 16px;
+}
+
+.logo-timbres {
+  width: 130px;
+}
   }
 `],
 

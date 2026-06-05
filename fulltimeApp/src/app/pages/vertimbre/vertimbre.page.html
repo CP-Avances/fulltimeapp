@@ -1,6 +1,9 @@
 <ion-header class="timbres-header" *ngIf="isConnected && serverConnected">
   <div class="header-logo">
-    <ion-img class="center logo-principal" src="../../../assets/images/ISOLOGO.png"></ion-img>
+    <div class="logo-card">
+      <ion-img class="logo-timbres" src="../../../assets/images/ISOLOGO.png">
+      </ion-img>
+    </div>
 
     <ion-label mode="md" class="header-title">
       <h1><b>Reloj Virtual</b></h1>
@@ -286,8 +289,8 @@
 
     <section class="offline-image-card">
       <span class="center1">
-        <div class="logo-contenedor">
-          <img src="../../../assets/images/ISOLOGO.png">
+        <div class="logo-card logo-card-offline">
+          <img class="logo-timbres-offline" src="../../../assets/images/ISOLOGO.png" alt="AQHora">
         </div>
         <ion-label mode="md" color="medium">
           <h1><b>Reloj Virtual</b></h1>

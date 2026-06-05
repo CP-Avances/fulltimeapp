@@ -19,6 +19,7 @@ import { environment } from 'src/environments/environment';
 export class PushNotificationService {
 
     private listenersRegistrados: boolean = false;
+    private readonly CANAL_NOTIFICACIONES = 'fulltime_notificaciones_v2';
 
     constructor(
         private platform: Platform,
@@ -56,15 +57,18 @@ export class PushNotificationService {
 
         try {
             await PushNotifications.createChannel({
-                id: 'default',
-                name: 'Notificaciones AQHora',
+                id: this.CANAL_NOTIFICACIONES,
+                name: 'AQHora Notificaciones',
                 description: 'Canal principal de notificaciones de AQHora',
                 importance: 5,
                 visibility: 1,
                 sound: 'default',
                 vibration: true,
-                lights: true
+                lights: true,
+                lightColor: '#0f75bc'
             });
+
+            console.log('Canal de notificaciones Android creado correctamente.');
         } catch (error) {
             console.log('No se pudo crear el canal de notificaciones Android:', error);
         }

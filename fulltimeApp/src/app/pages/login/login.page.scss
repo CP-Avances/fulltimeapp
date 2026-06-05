@@ -5,6 +5,7 @@
 :host {
   --app-primary: #0f75bc;
   --app-primary-dark: #0b4f86;
+  --app-primary-bright: #38bdf8;
   --app-primary-light: #e8f4fd;
 
   --app-bg: #f4f7fb;
@@ -13,7 +14,7 @@
   --app-text: #1f2937;
   --app-text-soft: #64748b;
   --app-border: rgba(15, 23, 42, 0.10);
-  --app-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+  --app-shadow: 0 14px 34px rgba(15, 23, 42, 0.14);
 }
 
 /* =========================
@@ -22,16 +23,18 @@
 
 .login-content {
   --background:
-    radial-gradient(circle at top, rgba(15, 117, 188, 0.16) 0%, transparent 38%),
-    linear-gradient(180deg, #ffffff 0%, var(--app-bg) 42%, var(--app-bg) 100%);
+    radial-gradient(circle at top, rgba(15, 117, 188, 0.18) 0%, transparent 38%),
+    linear-gradient(180deg, #ffffff 0%, var(--app-bg) 44%, var(--app-bg) 100%);
+  text-align: center;
 }
 
 .login-wrapper {
   min-height: 100%;
-  padding: 42px 16px 14px 16px;
+  padding: 34px 16px 14px 16px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  box-sizing: border-box;
 }
 
 /* =========================
@@ -40,22 +43,23 @@
 
 .logo-section {
   text-align: center;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .logo-login {
   display: block;
-  width: 70%;
+  width: 68%;
   max-width: 250px;
-  min-width: 180px;
+  min-width: 175px;
   margin: 0 auto;
 }
 
 .app-title h1 {
-  margin: 10px 0 0 0;
+  margin: 8px 0 0 0;
   color: var(--app-text-soft);
-  font-size: 26px;
+  font-size: 25px;
   font-weight: 900;
+  letter-spacing: 0.2px;
 }
 
 /* =========================
@@ -64,7 +68,7 @@
 
 .login-card {
   margin: 0;
-  border-radius: 24px;
+  border-radius: 26px;
   background: var(--app-card);
   color: var(--app-text);
   box-shadow: var(--app-shadow);
@@ -73,13 +77,13 @@
 }
 
 .login-card ion-card-header {
-  padding: 20px 18px 8px 18px;
+  padding: 18px 18px 8px 18px;
   text-align: center;
 }
 
 .login-icon {
-  width: 56px;
-  height: 56px;
+  width: 54px;
+  height: 54px;
   margin: 0 auto 10px auto;
   border-radius: 18px;
   background: var(--app-primary-light);
@@ -90,20 +94,21 @@
 }
 
 .login-icon ion-icon {
-  font-size: 30px;
+  font-size: 29px;
 }
 
 .login-card ion-card-title {
   color: var(--app-text);
   font-size: 21px;
   font-weight: 900;
+  letter-spacing: 0.1px;
 }
 
 .login-card ion-card-subtitle {
   margin-top: 6px;
   color: var(--app-text-soft);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .login-card ion-card-content {
@@ -117,19 +122,20 @@
 .input-item {
   --background: var(--app-input);
   --color: var(--app-text);
-  --border-radius: 15px;
+  --border-radius: 16px;
   --padding-start: 12px;
   --inner-padding-end: 8px;
-  --min-height: 62px;
-  margin-bottom: 13px;
-  border-radius: 15px;
+  --min-height: 60px;
+  margin-bottom: 12px;
+  border-radius: 16px;
   border: 1px solid var(--app-border);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
 .input-item ion-label {
   color: var(--app-text-soft) !important;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .input-item ion-label ion-icon {
@@ -141,7 +147,7 @@
 ion-input {
   color: var(--app-text);
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .btn-ojo {
@@ -150,7 +156,7 @@ ion-input {
   --color: var(--app-primary);
   width: 38px;
   height: 38px;
-  margin: 14px 0 0 0;
+  margin: 13px 0 0 0;
 }
 
 .btn-ojo ion-icon {
@@ -167,7 +173,7 @@ ion-input {
   --inner-padding-end: 0;
   --min-height: auto;
   align-items: flex-start;
-  margin: 4px 0 14px 0;
+  margin: 8px 0 15px 0;
 }
 
 .terminos-item ion-checkbox {
@@ -175,20 +181,21 @@ ion-input {
   --size: 19px;
   --checkbox-background-checked: var(--app-primary);
   --border-color-checked: var(--app-primary);
+  --checkmark-color: #ffffff;
 }
 
 .paragraph-text {
   margin: 0;
   color: var(--app-text-soft);
-  font-size: 11px;
-  line-height: 1.35;
+  font-size: 11.7px;
+  line-height: 1.38;
   text-align: justify;
   overflow-wrap: anywhere;
 }
 
 .paragraph-text a {
   color: var(--app-primary);
-  font-weight: 800;
+  font-weight: 900;
   text-decoration: none;
 }
 
@@ -198,11 +205,22 @@ ion-input {
 
 .btn-login {
   --border-radius: 16px;
+  --background: linear-gradient(135deg, var(--app-primary), #2563eb);
+  --background-activated: #1d4ed8;
+  --background-hover: #2563eb;
+  --color: #ffffff;
   min-height: 48px;
   margin-top: 6px;
   text-transform: none;
   font-size: 14px;
   font-weight: 900;
+  letter-spacing: 0.1px;
+}
+
+.btn-login[disabled] {
+  --background: #d7e3f2;
+  --color: #64748b;
+  opacity: 1;
 }
 
 .progress-login {
@@ -220,17 +238,18 @@ ion-input {
 
 .device-info {
   width: 100%;
-  margin-top: 16px;
-  padding: 0 4px;
+  margin-top: 14px;
+  padding: 0 8px 4px 8px;
   display: flex;
   justify-content: space-between;
   gap: 10px;
+  box-sizing: border-box;
 }
 
 .device-info ion-label {
   color: var(--app-text-soft);
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 9.8px;
+  font-weight: 700;
   max-width: 48%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -240,10 +259,6 @@ ion-input {
 /* =========================
    COMPATIBILIDAD CON CLASES ANTIGUAS
 ========================= */
-
-ion-content {
-  text-align: center;
-}
 
 .cerrar {
   cursor: pointer;
@@ -300,15 +315,84 @@ ion-content {
     --app-input: #111827;
     --app-text: #f8fafc;
     --app-text-soft: #cbd5e1;
-    --app-border: rgba(255, 255, 255, 0.08);
-    --app-shadow: 0 10px 28px rgba(0, 0, 0, 0.42);
-    --app-primary-light: rgba(14, 165, 233, 0.16);
+    --app-border: rgba(255, 255, 255, 0.10);
+    --app-shadow: 0 14px 34px rgba(0, 0, 0, 0.46);
+    --app-primary-light: rgba(56, 189, 248, 0.16);
   }
 
   .login-content {
     --background:
-      radial-gradient(circle at top, rgba(14, 165, 233, 0.18) 0%, transparent 38%),
-      linear-gradient(180deg, #0f172a 0%, #0f172a 100%);
+      radial-gradient(circle at top, rgba(14, 165, 233, 0.16) 0%, transparent 36%),
+      linear-gradient(180deg, #0f172a 0%, #111827 100%);
+  }
+
+  .app-title h1 {
+    color: #cbd5e1;
+  }
+
+  .login-card {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+  }
+
+  .login-card ion-card-title {
+    color: #ffffff;
+  }
+
+  .login-card ion-card-subtitle {
+    color: #cbd5e1;
+  }
+
+  .login-icon {
+    background: rgba(14, 165, 233, 0.16);
+    color: #38bdf8;
+  }
+
+  .input-item {
+    --background: #111827;
+    border: 1px solid rgba(56, 189, 248, 0.18);
+    box-shadow: none;
+  }
+
+  .input-item ion-label {
+    color: #dbeafe !important;
+  }
+
+  .input-item ion-label ion-icon {
+    color: #38bdf8;
+  }
+
+  ion-input {
+    color: #ffffff;
+  }
+
+  .btn-ojo {
+    --color: #38bdf8;
+  }
+
+  .paragraph-text {
+    color: #d1d5db;
+  }
+
+  .paragraph-text a {
+    color: #38bdf8;
+  }
+
+  .btn-login {
+    --background: linear-gradient(135deg, #0f75bc, #2563eb);
+    --background-activated: #1d4ed8;
+    --background-hover: #2563eb;
+    --color: #ffffff;
+  }
+
+  .btn-login[disabled] {
+    --background: #334155;
+    --color: #94a3b8;
+    opacity: 1;
+  }
+
+  .device-info ion-label {
+    color: #cbd5e1;
   }
 }
 
@@ -318,31 +402,106 @@ ion-content {
 
 @media (max-width: 380px) {
   .login-wrapper {
-    padding: 30px 14px 12px 14px;
+    padding: 26px 14px 12px 14px;
   }
 
   .logo-login {
-    width: 68%;
-    min-width: 160px;
+    width: 66%;
+    min-width: 155px;
   }
 
   .app-title h1 {
-    font-size: 23px;
+    font-size: 22px;
   }
 
   .login-card {
     border-radius: 22px;
   }
 
+  .login-card ion-card-header {
+    padding: 16px 16px 8px 16px;
+  }
+
   .login-card ion-card-title {
     font-size: 19px;
   }
 
+  .login-card ion-card-content {
+    padding: 11px 14px 16px 14px;
+  }
+
+  .login-icon {
+    width: 50px;
+    height: 50px;
+  }
+
   .input-item {
-    --min-height: 58px;
+    --min-height: 57px;
+    margin-bottom: 11px;
   }
 
   .paragraph-text {
-    font-size: 10.5px;
+    font-size: 10.8px;
+    line-height: 1.34;
+  }
+
+  .btn-login {
+    min-height: 46px;
+  }
+}
+
+/* =========================
+   CELULARES BAJOS
+========================= */
+
+@media (max-height: 700px) {
+  .login-wrapper {
+    padding-top: 18px;
+    padding-bottom: 10px;
+  }
+
+  .logo-section {
+    margin-bottom: 10px;
+  }
+
+  .logo-login {
+    max-width: 210px;
+  }
+
+  .app-title h1 {
+    font-size: 21px;
+    margin-top: 5px;
+  }
+
+  .login-card ion-card-header {
+    padding-top: 14px;
+  }
+
+  .login-icon {
+    width: 46px;
+    height: 46px;
+    margin-bottom: 8px;
+  }
+
+  .login-icon ion-icon {
+    font-size: 25px;
+  }
+
+  .input-item {
+    --min-height: 54px;
+    margin-bottom: 10px;
+  }
+
+  .paragraph-text {
+    font-size: 10.3px;
+    line-height: 1.28;
+  }
+
+  .btn-login {
+    min-height: 44px;
+  }
+
+  .device-info {
+    margin-top: 10px;
   }
 }
