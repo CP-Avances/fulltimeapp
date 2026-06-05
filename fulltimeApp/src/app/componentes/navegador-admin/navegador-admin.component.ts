@@ -9,17 +9,16 @@ import {
   ToastController
 } from '@ionic/angular';
 
-import { LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 import { DataUserLoggedService } from 'src/app/services/data-user-logged.service';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { SocketService } from 'src/app/services/socket.service';
-
 import { NetworkService } from '../../libs/network.service';
 import { NotificacionPopoverComponent } from '../notificacion-popover/notificacion-popover.component';
 import { TimbresPerdidosComponent } from '../../pages/bienvenido/showTimbresGuardados.component';
-
 import { Notificacion, NotificacionTimbre } from '../../interfaces/Notificaciones';
 import { ParametrosService } from 'src/app/services/parametros.service';
 
@@ -28,6 +27,7 @@ import { ParametrosService } from 'src/app/services/parametros.service';
   templateUrl: './navegador-admin.component.html',
   styleUrls: ['./navegador-admin.component.scss'],
 })
+
 export class NavegadorAdminComponent implements OnInit, OnDestroy {
 
   username: string = '';
@@ -67,12 +67,21 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
   colorv: any;
   colora: any;
 
-  formato_fecha: string = 'dd/MM/yyyy';
-  formato_hora: string = 'HH:mm:ss';
+  permisosRol = {
+    comunicados: false,
+    horarios: false,
+    justificarTimbres: false,
+    timbresEmpleados: false,
+    reporteTimbres: false,
+    aprobaciones: false
+  };
 
   private unsubscribeNotificacion?: () => void;
   private unsubscribeAviso?: () => void;
   private socketEscuchando: boolean = false;
+
+  private contadorConsultaId: number = 0;
+  private socketsProcesados = new Set<string>();
 
   constructor(
     private userService: DataUserLoggedService,
@@ -99,11 +108,8 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
 
     this.networkSubscriber();
     this.VerificarFunciones();
-
-    this.CargarFormatosNotificaciones();
     this.CargarContadorNotificaciones();
     this.EscucharNotificacionesTiempoReal();
-
     this.ValidarPermisosRol();
   }
 
@@ -116,7 +122,6 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
     this.networkSubscriber();
     this.VerificarFunciones();
     this.CargarContadorNotificaciones();
-
     this.ValidarPermisosRol();
   }
 
@@ -124,6 +129,7 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
     this.unsubscribeNotificacion?.();
     this.unsubscribeAviso?.();
     this.socketEscuchando = false;
+    this.socketsProcesados.clear();
   }
 
   onImageError(event: any) {
@@ -159,53 +165,51 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
     await toast.present();
   }
 
-  CargarFormatosNotificaciones() {
-    const detalles = [
-      28, // ParametrosSistema.FORMATO_FECHA
-      29  // ParametrosSistema.FORMATO_HORA
-    ];
-
-    this.parametros.ObtenerFormatos(detalles).subscribe({
-      next: (res: any[]) => {
-        res.forEach((p: any) => {
-          if (p.id_parametro === 28) {
-            this.formato_fecha = p.descripcion;
-          }
-
-          if (p.id_parametro === 29) {
-            this.formato_hora = p.descripcion;
-          }
-        });
-      },
-      error: () => {
-        this.formato_fecha = 'dd/MM/yyyy';
-        this.formato_hora = 'HH:mm:ss';
-      }
-    });
-  }
-
   CargarContadorNotificaciones() {
-    if (!this.idEmpleadoIngresa) return;
+    if (!this.idEmpleadoIngresa) {
+      this.countNoti = 0;
+      return;
+    }
 
-    this.countNoti = 0;
+    const consultaActual = ++this.contadorConsultaId;
 
-    this.notificacionesService.BuscarAvisosGenerales(this.idEmpleadoIngresa).subscribe({
-      next: (res: any[]) => {
-        if (res && res.length > 0) {
-          const noVistas = res.filter((n: any) => n.visto === false).length;
-          this.countNoti += noVistas;
+    forkJoin({
+      avisos: this.notificacionesService.BuscarAvisosGenerales(this.idEmpleadoIngresa).pipe(
+        catchError(() => of([]))
+      ),
+      notificaciones: this.notificacionesService.ObtenerNotasUsuario(this.idEmpleadoIngresa).pipe(
+        catchError(() => of([]))
+      )
+    })
+      .pipe(
+        map(({ avisos, notificaciones }: any) => {
+          const avisosNoVistos = Array.isArray(avisos)
+            ? avisos.filter((n: any) => n.visto === false).length
+            : 0;
+
+          const notificacionesNoVistas = Array.isArray(notificaciones)
+            ? notificaciones.filter((n: any) => n.visto === false).length
+            : 0;
+
+          return avisosNoVistos + notificacionesNoVistas;
+        })
+      )
+      .subscribe({
+        next: (total: number) => {
+          if (consultaActual !== this.contadorConsultaId) {
+            return;
+          }
+
+          this.countNoti = total;
+        },
+        error: () => {
+          if (consultaActual !== this.contadorConsultaId) {
+            return;
+          }
+
+          this.countNoti = 0;
         }
-      }
-    });
-
-    this.notificacionesService.ObtenerNotasUsuario(this.idEmpleadoIngresa).subscribe({
-      next: (res: any[]) => {
-        if (res && res.length > 0) {
-          const noVistas = res.filter((n: any) => n.visto === false).length;
-          this.countNoti += noVistas;
-        }
-      }
-    });
+      });
   }
 
   EscucharNotificacionesTiempoReal() {
@@ -215,36 +219,35 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
 
     this.unsubscribeNotificacion = this.socketService.onNotificacion((noti: any) => {
       this.ngZone.run(() => {
-        this.procesarNotificacionSocket(noti, 'FullTime Notificación');
+        this.procesarNotificacionSocket(noti);
       });
     });
 
     this.unsubscribeAviso = this.socketService.onAviso((aviso: any) => {
       this.ngZone.run(() => {
-        this.procesarNotificacionSocket(aviso, 'FullTime Aviso');
+        this.procesarNotificacionSocket(aviso);
       });
     });
   }
 
-  private procesarNotificacionSocket(data: any, tituloDefault: string) {
+  private procesarNotificacionSocket(data: any) {
     if (!this.idEmpleadoIngresa) return;
 
     const idRecibe = this.obtenerIdEmpleadoRecibe(data);
 
     if (idRecibe !== Number(this.idEmpleadoIngresa)) return;
 
-    if (data.visto === false || data.visto === undefined || data.visto === null) {
-      this.countNoti += 1;
+    const claveSocket = `${data?.tipo ?? 'noti'}-${data?.id ?? data?.create_at ?? data?.mensaje ?? Date.now()}`;
+
+    if (this.socketsProcesados.has(claveSocket)) {
+      return;
     }
 
-    const notificacion = this.formatearNotificacionLocal(data, tituloDefault);
+    this.socketsProcesados.add(claveSocket);
 
-    this.enviarNotificacionLocal(
-      data,
-      notificacion.titulo,
-      notificacion.cuerpo,
-      notificacion.cuerpoLargo
-    );
+    if (data.visto === false || data.visto === undefined || data.visto === null) {
+      this.countNoti = Number(this.countNoti || 0) + 1;
+    }
   }
 
   private obtenerIdEmpleadoRecibe(data: any): number {
@@ -255,312 +258,6 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
       0
     );
   }
-
-  private formatearNotificacionLocal(data: any, tituloDefault: string): {
-    titulo: string;
-    cuerpo: string;
-    cuerpoLargo: string;
-  } {
-    const tipo = Number(data?.tipo ?? 0);
-
-    if (tipo === 6) {
-      return this.formatearComunicadoLocal(data);
-    }
-
-    if ([100, 101, 102].includes(tipo)) {
-      return this.formatearAvisoAsistenciaLocal(data);
-    }
-
-    return this.formatearSolicitudLocal(data, tituloDefault);
-  }
-
-  private formatearComunicadoLocal(data: any): {
-    titulo: string;
-    cuerpo: string;
-    cuerpoLargo: string;
-  } {
-    const empleado = data?.empleado ?? 'Sistema FullTime';
-    const mensaje = data?.mensaje ?? data?.descripcion ?? 'Tiene un nuevo comunicado.';
-    const fecha = this.formatearFechaHoraLocal(data?.create_at);
-
-    const titulo = 'FullTime Aviso';
-    const cuerpo = 'Tiene un nuevo comunicado';
-
-    const cuerpoLargo =
-      `COMUNICADO\n` +
-      `Enviado por: ${empleado}\n` +
-      `Notificación: ${mensaje}\n` +
-      `Fecha: ${fecha}`;
-
-    return {
-      titulo,
-      cuerpo,
-      cuerpoLargo
-    };
-  }
-
-  private formatearSolicitudLocal(data: any, tituloDefault: string): {
-    titulo: string;
-    cuerpo: string;
-    cuerpoLargo: string;
-  } {
-    const mensajeObj = this.obtenerMensajeJson(data?.mensaje);
-    const detalle = mensajeObj?.data ?? {};
-
-    const mensajePrincipal =
-      mensajeObj?.mensaje_principal ??
-      data?.descripcion ??
-      'Tiene una nueva notificación.';
-
-    const notificacion =
-      mensajeObj?.notificacion ??
-      data?.descripcion ??
-      'Tiene una nueva notificación.';
-
-    const empleado =
-      detalle?.empleado ??
-      data?.empleado ??
-      'No registrado';
-
-    const motivo =
-      detalle?.motivo ??
-      '';
-
-    const fechaDesde = detalle?.fecha_desde
-      ? this.formatearFechaCortaLocal(detalle.fecha_desde)
-      : '';
-
-    const fechaHasta = detalle?.fecha_hasta
-      ? this.formatearFechaCortaLocal(detalle.fecha_hasta)
-      : '';
-
-    const horaInicio = detalle?.hora_inicio
-      ? this.formatearHoraLocal(detalle.hora_inicio)
-      : '';
-
-    const horaFin = detalle?.hora_fin
-      ? this.formatearHoraLocal(detalle.hora_fin)
-      : '';
-
-    const fechaRegistro = this.formatearFechaHoraLocal(data?.create_at);
-
-    const titulo = tituloDefault || 'FullTime Notificación';
-    const cuerpo = String(mensajePrincipal).replace(/:$/, '');
-
-    let cuerpoLargo =
-      `${notificacion.replace(/:$/, '')}\n` +
-      `Colaborador: ${empleado}`;
-
-    if (motivo) {
-      cuerpoLargo += `\nMotivo: ${motivo}`;
-    }
-
-    if (fechaDesde || fechaHasta) {
-      cuerpoLargo += `\nDesde: ${fechaDesde || 'N/A'}    Hasta: ${fechaHasta || 'N/A'}`;
-    }
-
-    if (horaInicio || horaFin) {
-      cuerpoLargo += `\nHorario: ${horaInicio || 'N/A'} - ${horaFin || 'N/A'}`;
-    }
-
-    cuerpoLargo += `\nFecha: ${fechaRegistro}`;
-
-    return {
-      titulo,
-      cuerpo,
-      cuerpoLargo
-    };
-  }
-
-  private formatearAvisoAsistenciaLocal(data: any): {
-    titulo: string;
-    cuerpo: string;
-    cuerpoLargo: string;
-  } {
-    const tipo = Number(data?.tipo ?? 0);
-    const partes = String(data?.mensaje ?? '').split('//');
-    const fechaRegistro = this.formatearFechaHoraLocal(data?.create_at);
-
-    if (tipo === 100) {
-      const notificacion = partes[5] ?? data?.descripcion ?? 'Se ha registrado un atraso.';
-
-      const horario = this.formatearFechaHoraDesdeTexto(partes[0]);
-      const timbre = this.formatearFechaHoraDesdeTexto(partes[1]);
-
-      const titulo = 'FullTime Aviso';
-      const cuerpo = 'Aviso de atraso';
-
-      const cuerpoLargo =
-        `ATRASO\n` +
-        `Notificación: ${notificacion}\n` +
-        `Horario: ${horario}\n` +
-        `Timbre: ${timbre}\n` +
-        `Tolerancia: ${partes[2] ?? 'N/A'} minutos\n` +
-        `Total atraso: ${partes[3] ?? 'N/A'} minutos\n` +
-        `Fecha: ${fechaRegistro}`;
-
-      return {
-        titulo,
-        cuerpo,
-        cuerpoLargo
-      };
-    }
-
-    if (tipo === 101) {
-      const notificacion = partes[2] ?? data?.descripcion ?? 'Se ha registrado una falta.';
-      const horario = this.formatearFechaCortaLocal(partes[0]);
-      const nombreHorario = partes[1] ?? 'No registrado';
-
-      const titulo = 'FullTime Aviso';
-      const cuerpo = 'Aviso de falta';
-
-      const cuerpoLargo =
-        `FALTA\n` +
-        `Notificación: ${notificacion}\n` +
-        `Horario: ${horario}\n` +
-        `Nombre horario: ${nombreHorario}\n` +
-        `Fecha: ${fechaRegistro}`;
-
-      return {
-        titulo,
-        cuerpo,
-        cuerpoLargo
-      };
-    }
-
-    if (tipo === 102) {
-      const notificacion = partes[3] ?? data?.descripcion ?? 'Se ha registrado una salida anticipada.';
-
-      const horario = this.formatearFechaHoraDesdeTexto(partes[0]);
-      const timbre = this.formatearFechaHoraDesdeTexto(partes[1]);
-
-      const titulo = 'FullTime Aviso';
-      const cuerpo = 'Aviso de salida anticipada';
-
-      const cuerpoLargo =
-        `SALIDA ANTICIPADA\n` +
-        `Notificación: ${notificacion}\n` +
-        `Horario: ${horario}\n` +
-        `Timbre: ${timbre}\n` +
-        `Total anticipación: ${partes[2] ?? 'N/A'} minutos\n` +
-        `Fecha: ${fechaRegistro}`;
-
-      return {
-        titulo,
-        cuerpo,
-        cuerpoLargo
-      };
-    }
-
-    return {
-      titulo: 'FullTime Aviso',
-      cuerpo: 'Tiene un nuevo aviso',
-      cuerpoLargo: data?.descripcion ?? 'Tiene un nuevo aviso.'
-    };
-  }
-
-  private obtenerMensajeJson(mensaje: any): any {
-    if (!mensaje) return null;
-
-    if (typeof mensaje === 'object') return mensaje;
-
-    try {
-      return JSON.parse(mensaje);
-    } catch {
-      return null;
-    }
-  }
-
-  private formatearFechaHoraLocal(fechaHora: any): string {
-    if (!fechaHora) return 'No registrada';
-
-    const valor = String(fechaHora).trim();
-    const partes = valor.split(' ');
-
-    const fechaRaw = partes[0] ?? '';
-    const horaRaw = partes[1] ?? '';
-
-    const fecha = this.formatearFechaCortaLocal(fechaRaw);
-    const hora = horaRaw ? this.formatearHoraLocal(horaRaw) : '';
-
-    return hora ? `${fecha} - ${hora}` : fecha;
-  }
-
-  private formatearFechaHoraDesdeTexto(valor: any): string {
-    if (!valor) return 'N/A';
-
-    const texto = String(valor).trim();
-    const partes = texto.split(' ');
-
-    const fechaRaw = partes[0] ?? '';
-    const horaRaw = partes[1] ?? '';
-
-    const fecha = this.formatearFechaCortaLocal(fechaRaw);
-    const hora = horaRaw ? this.formatearHoraLocal(horaRaw) : '';
-
-    return hora ? `${fecha} ${hora}` : fecha;
-  }
-
-  private formatearFechaCortaLocal(fecha: any): string {
-    if (!fecha) return '';
-
-    const valor = String(fecha).trim();
-
-    if (/^\d{4}-\d{2}-\d{2}/.test(valor)) {
-      const [anio, mes, dia] = valor.substring(0, 10).split('-');
-      return `${dia}/${mes}/${anio}`;
-    }
-
-    if (/^\d{2}\/\d{2}\/\d{4}/.test(valor)) {
-      return valor.substring(0, 10);
-    }
-
-    return valor;
-  }
-
-  private formatearHoraLocal(hora: any): string {
-    if (!hora) return '';
-
-    const valor = String(hora).trim();
-
-    if (/^\d{2}:\d{2}/.test(valor)) {
-      return valor.substring(0, 5);
-    }
-
-    return valor;
-  }
-
-  private async enviarNotificacionLocal(
-    data: any,
-    titulo: string,
-    cuerpo: string,
-    cuerpoLargo: string
-  ) {
-    try {
-      const idLocal = Number(data?.id ?? Date.now());
-
-      const options: ScheduleOptions = {
-        notifications: [
-          {
-            id: idLocal,
-            title: titulo,
-            body: cuerpo,
-            largeBody: cuerpoLargo,
-            summaryText: 'FullTime',
-            schedule: {
-              allowWhileIdle: true
-            }
-          }
-        ]
-      };
-
-      await LocalNotifications.schedule(options);
-
-    } catch (error) {
-      console.log('No se pudo mostrar la notificación local:', error);
-    }
-  }
-
 
   VerificarFunciones() {
     const raw = localStorage.getItem('modulos');
@@ -625,11 +322,8 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
     });
 
     await popover.present();
-    const { data } = await popover.onDidDismiss();
 
-    if (data?.actualizado === true || data?.modalActualizado === true) {
-      this.countNoti = 0;
-    }
+    await popover.onDidDismiss();
 
     this.CargarContadorNotificaciones();
   }
@@ -637,8 +331,10 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
   openAdmin() {
     const activeElement = document.activeElement as HTMLElement | null;
     activeElement?.blur();
+
     this.menu.enable(true, 'admin');
     this.menu.open('admin');
+
     this.VerificarFunciones();
   }
 
@@ -649,7 +345,9 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
   async cerrarSesion() {
     this.unsubscribeNotificacion?.();
     this.unsubscribeAviso?.();
+
     this.socketEscuchando = false;
+    this.socketsProcesados.clear();
 
     await this.relojService.cerrarSesion();
     this.closeAdmin();
@@ -665,15 +363,6 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
 
     return await modal.present();
   }
-
-  permisosRol = {
-    comunicados: false,
-    horarios: false,
-    justificarTimbres: false,
-    timbresEmpleados: false,
-    reporteTimbres: false,
-    aprobaciones: false
-  };
 
   ValidarPermisosRol() {
     const idRol = Number(localStorage.getItem('rol') ?? 0);

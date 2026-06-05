@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
-import { LocalNotifications } from '@capacitor/local-notifications';
 
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
@@ -121,23 +120,6 @@ export class EnviarUsuarioComponent implements OnInit {
     sessionStorage.removeItem('datos_comunicado');
 
     this.loadingEmpleado = true;
-    this.requestNotificationPermission();
-  }
-
-  // METODO PARA SOLICITAR EL PERMISO DE NOTIFICACIONES LOCALES AL DISPOSITIVO
-  async requestNotificationPermission() {
-    try {
-      const permission = await LocalNotifications.requestPermissions();
-
-      if (permission.display === 'granted') {
-        console.log('Permiso concedido para notificaciones locales');
-      } else {
-        console.log('Permiso denegado para notificaciones locales');
-      }
-
-    } catch (error) {
-      console.log('No se pudo solicitar permiso de notificaciones locales', error);
-    }
   }
 
   // ==============================

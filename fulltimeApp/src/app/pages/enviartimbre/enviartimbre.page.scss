@@ -1,38 +1,420 @@
-ion-content {
-    text-align: center;
-}
-.button.customBtn {
-    width: 230px;
+/* =========================
+   VARIABLES
+========================= */
+
+:host {
+  --app-primary: #0f75bc;
+  --app-primary-dark: #0b5a92;
+  --app-primary-light: #e8f4fd;
+
+  --app-bg: #f4f7fb;
+  --app-card: #ffffff;
+  --app-soft: #f8fafc;
+  --app-text: #1f2937;
+  --app-text-soft: #64748b;
+  --app-border: rgba(15, 23, 42, 0.09);
+  --app-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
 }
 
-.titulotimbre{
-    text-align: center;
-    margin-left: -11%;
-    font-size: 85%;
+/* =========================
+   HEADER
+========================= */
+
+.timbre-header ion-toolbar {
+  --background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  --color: #ffffff;
+  --border-width: 0;
+  --min-height: 56px;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.20);
+}
+
+.timbre-header ion-back-button {
+  --color: #ffffff;
+}
+
+.timbre-header ion-title {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 900;
+  text-align: center;
+}
+
+/* =========================
+   CONTENIDO
+========================= */
+
+.timbre-content {
+  --background: var(--app-bg);
+}
+
+/* =========================
+   LOGO
+========================= */
+
+.logo-section {
+  margin: 0 0 12px 0;
+  padding: 18px 12px 14px 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border-bottom: 1px solid var(--app-border);
+  text-align: center;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.06);
+}
+
+.logo-app {
+  width: 40%;
+  max-width: 160px;
+  min-width: 110px;
+  display: block;
+  margin: auto;
+}
+
+.app-title h1 {
+  margin: 7px 0 0 0;
+  color: var(--app-text-soft);
+  font-size: 16px;
+  font-weight: 900;
+}
+
+/* =========================
+   TARJETAS
+========================= */
+
+.info-card {
+  margin: 12px 14px;
+  border-radius: 20px;
+  background: var(--app-card);
+  color: var(--app-text);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+  overflow: hidden;
+}
+
+.info-card ion-card-content {
+  padding: 14px;
+}
+
+.destaque-card {
+  border-left: 5px solid var(--app-primary);
+}
+
+.card-header-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  text-align: left;
+}
+
+.card-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 14px;
+  background: var(--app-primary-light);
+  color: var(--app-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-icon ion-icon {
+  font-size: 24px;
+}
+
+.card-header-info h2 {
+  margin: 0;
+  color: var(--app-text);
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.card-header-info p {
+  margin: 5px 0 0 0;
+  color: var(--app-text-soft);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+/* =========================
+   UBICACIÓN
+========================= */
+
+.info-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.info-box {
+  background: var(--app-soft);
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+  padding: 10px;
+  text-align: left;
+}
+
+.info-box span {
+  display: block;
+  color: var(--app-text-soft);
+  font-size: 11px;
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+
+.info-box strong {
+  display: block;
+  color: var(--app-text);
+  font-size: 12px;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+/* =========================
+   ZONA HORARIA
+========================= */
+
+.zona-horaria {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 14px;
+  background: var(--app-soft);
+  border: 1px solid var(--app-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--app-text-soft);
+  text-align: left;
+}
+
+.zona-horaria ion-icon {
+  color: var(--app-primary);
+  font-size: 18px;
+}
+
+.zona-horaria span {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* =========================
+   OBSERVACIONES
+========================= */
+
+.observacion-header {
+  margin-bottom: 12px;
+}
+
+.textarea-item {
+  --background: var(--app-soft);
+  --color: var(--app-text);
+  --border-radius: 15px;
+  --padding-start: 10px;
+  --inner-padding-end: 10px;
+  --min-height: 105px;
+  border-radius: 15px;
+  border: 1px solid var(--app-border);
+  text-align: left;
+}
+
+ion-textarea {
+  color: var(--app-text);
+  font-size: 14px;
+  font-weight: 600;
+  --placeholder-color: var(--app-text-soft);
+}
+
+.contador-textarea {
+  margin-top: 7px;
+  text-align: right;
+  color: var(--app-text-soft);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* =========================
+   CÁMARA
+========================= */
+
+.toggle-card {
+  margin-bottom: 14px;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.toggle-row .card-header-info {
+  flex: 1;
+}
+
+ion-toggle {
+  --track-background-checked: var(--app-primary-light);
+  --handle-background-checked: var(--app-primary);
+}
+
+/* =========================
+   ACCIONES
+========================= */
+
+.acciones {
+  margin: 16px 14px 22px 14px;
+}
+
+.btn-continuar {
+  --border-radius: 16px;
+  min-height: 48px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: none;
+}
+
+/* =========================
+   CARGANDO
+========================= */
+
+.cargando-card {
+  margin: 16px 14px 22px 14px;
+  padding: 18px 14px;
+  border-radius: 20px;
+  background: var(--app-card);
+  color: var(--app-text-soft);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+  text-align: center;
+}
+
+.cargando-card ion-spinner {
+  margin-bottom: 10px;
+  color: var(--app-primary);
+}
+
+.cargando-card span {
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.cargando-card ion-progress-bar {
+  margin-top: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+/* =========================
+   COMPATIBILIDAD
+========================= */
+
+ion-content {
+  text-align: center;
+}
+
+.button.customBtn {
+  width: 230px;
+}
+
+.titulotimbre {
+  text-align: center;
+  margin-left: -11%;
+  font-size: 85%;
 }
 
 .center {
-    margin-top: 0;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 75%;
+  margin-top: 0;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 75%;
 }
-.letraPeque {
-    font-size: 80%;
 
-    color: gray;
+.letraPeque {
+  font-size: 80%;
+  color: gray;
 }
 
 p {
-    font-size: 80%;
-    color: var(--ion-color-step-600, #000000);
+  font-size: 80%;
+  color: var(--ion-color-step-600, #000000);
 }
 
-ion-text{
-    margin: 5%;
+ion-text {
+  margin: 5%;
 }
 
-ion-title{
-    font-size: 16px;
+ion-title {
+  font-size: 16px;
+}
+
+/* =========================
+   MODO OSCURO
+========================= */
+
+@media (prefers-color-scheme: dark) {
+  :host {
+    --app-bg: #0f172a;
+    --app-card: #1e293b;
+    --app-soft: #111827;
+    --app-text: #f8fafc;
+    --app-text-soft: #cbd5e1;
+    --app-border: rgba(255, 255, 255, 0.08);
+    --app-shadow: 0 6px 18px rgba(0, 0, 0, 0.38);
+    --app-primary-light: rgba(14, 165, 233, 0.16);
+  }
+
+  .logo-section {
+    background: linear-gradient(180deg, #1e293b 0%, #111827 100%);
+    border-bottom: 1px solid var(--app-border);
+  }
+
+  p {
+    color: var(--app-text-soft);
+  }
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 380px) {
+  .logo-section {
+    padding: 16px 10px 12px 10px;
+  }
+
+  .logo-app {
+    width: 44%;
+    min-width: 105px;
+  }
+
+  .app-title h1 {
+    font-size: 15px;
+  }
+
+  .info-card,
+  .acciones,
+  .cargando-card {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .card-header-info h2 {
+    font-size: 13px;
+  }
+
+  .card-header-info p {
+    font-size: 12px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .toggle-row {
+    align-items: flex-start;
+  }
 }

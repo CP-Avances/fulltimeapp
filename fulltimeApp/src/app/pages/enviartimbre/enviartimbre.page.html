@@ -1,111 +1,182 @@
-<!-- Back button with a default href -->
-<ion-header>
+<ion-header class="timbre-header">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/login"></ion-back-button>
     </ion-buttons>
-    <div class="titulotimbre">
-      <ion-title> <b>{{nombre_timbre}}</b> </ion-title>
-    </div>
+
+    <ion-title>
+      {{ nombre_timbre }}
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content fullscreen>
-  <div style="padding:2%; background: white; margin-bottom: 2%;">
+<ion-content fullscreen class="timbre-content">
 
-    <ion-img class="center" style="width:40%;" src="../../../assets/images/ISOLOGO.png"></ion-img>
-    <ion-label mode="md" color="medium" style="text-align:center">
-      <h1 style="font-size: 4vw"><b>Reloj Virtual</b></h1>
+  <!-- LOGO -->
+  <section class="logo-section">
+    <div class="logo-contenedor">
+      <ion-img class="logo-app" src="../../../assets/images/ISOLOGO.png"></ion-img>
+    </div>
+
+    <ion-label mode="md" class="app-title">
+      <h1><b>Reloj Virtual</b></h1>
     </ion-label>
-  </div>
+  </section>
 
-  <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
+  <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean">
+  </app-refresh-info>
 
-  <ion-card style="margin: 3%; border-radius: 3%;">
-    <ion-item>
-      <ion-icon slot="end" name="person" color="secondary"></ion-icon>
-      <b> USUARIO: &nbsp;&nbsp;</b>
-      <ion-label>{{nombre_usuario}} {{apellido_usuario}}</ion-label>
-    </ion-item>
+  <!-- USUARIO -->
+  <ion-card class="info-card">
+    <ion-card-content>
+      <div class="card-header-info">
+        <div class="card-icon">
+          <ion-icon name="person-outline"></ion-icon>
+        </div>
+
+        <div>
+          <h2>Usuario</h2>
+          <p>{{ nombre_usuario }} {{ apellido_usuario }}</p>
+        </div>
+      </div>
+    </ion-card-content>
   </ion-card>
 
-  <ion-card style="margin: 3%; border-radius: 3%;">
-    <ion-item>
-      <ion-icon slot="end" name="phone-portrait-outline" color="secondary"></ion-icon>
-      <b>DISPOSITIVO:</b>
-    </ion-item>
-    <ion-item>
-      <ion-label> {{modelo_dispositivo}} </ion-label>
-    </ion-item>
+  <!-- DISPOSITIVO -->
+  <ion-card class="info-card">
+    <ion-card-content>
+      <div class="card-header-info">
+        <div class="card-icon">
+          <ion-icon name="phone-portrait-outline"></ion-icon>
+        </div>
+
+        <div>
+          <h2>Dispositivo</h2>
+          <p>{{ modelo_dispositivo }}</p>
+        </div>
+      </div>
+    </ion-card-content>
   </ion-card>
 
-  <ion-card style="margin: 3%; border-radius: 3%;">
-    <ion-item>
-      <ion-icon slot="end" name="location-outline" color="secondary"></ion-icon>
-      <b> UBICACIÓN:</b>
-    </ion-item>
+  <!-- UBICACIÓN -->
+  <ion-card class="info-card">
+    <ion-card-content>
+      <div class="card-header-info">
+        <div class="card-icon">
+          <ion-icon name="location-outline"></ion-icon>
+        </div>
 
-    <ion-item>
-      <ion-label>{{ubicacion}}</ion-label>
-    </ion-item>
+        <div>
+          <h2>Ubicación</h2>
+          <p>{{ ubicacion || 'Ubicación no disponible' }}</p>
+        </div>
+      </div>
 
-    <ion-item>
-      <ion-label>Longitud: {{geoLongitude}} </ion-label>
-    </ion-item>
+      <div class="info-grid">
+        <div class="info-box">
+          <span>Longitud</span>
+          <strong>{{ geoLongitude || '—' }}</strong>
+        </div>
 
-    <ion-item>
-      <ion-label>Latitud: {{geoLatitude}}</ion-label>
-    </ion-item>
+        <div class="info-box">
+          <span>Latitud</span>
+          <strong>{{ geoLatitude || '—' }}</strong>
+        </div>
+      </div>
+    </ion-card-content>
   </ion-card>
 
+  <!-- INFORMACIÓN TIMBRE -->
+  <ion-card class="info-card destaque-card">
+    <ion-card-content>
+      <div class="card-header-info">
+        <div class="card-icon">
+          <ion-icon name="time-outline"></ion-icon>
+        </div>
 
+        <div>
+          <h2>Información de timbre</h2>
+          <p>
+            {{ nombreInfo_timbre }} a las <b>{{ hora }}</b>
+          </p>
+        </div>
+      </div>
 
-  <ion-card style="margin: 3%; border-radius: 3%;">
-    <ion-item>
-      <ion-icon slot="end" name="time-outline" color="secondary"></ion-icon>
-      <b> INFORMACIÓN DE TIMBRE:</b>
-    </ion-item>
-    <ion-item>
-      <ion-label>
-        {{nombreInfo_timbre}} a las <b>{{hora}}</b>
-      </ion-label>
-    </ion-item>
-    <ion-item>
-      <ion-label>Zona horaria: {{zonaHoraria}}</ion-label>
-    </ion-item>
-
+      <div class="zona-horaria">
+        <ion-icon name="globe-outline"></ion-icon>
+        <span>Zona horaria: {{ zonaHoraria }}</span>
+      </div>
+    </ion-card-content>
   </ion-card>
 
-  <ion-card style="margin: 3%; border-radius: 3%;">
-    <ion-item>
-      <ion-icon slot="end" name="receipt-outline" color="secondary"></ion-icon>
-      <b> OBSERVACIONES: </b>
+  <!-- OBSERVACIONES -->
+  <ion-card class="info-card">
+    <ion-card-content>
+      <div class="card-header-info observacion-header">
+        <div class="card-icon">
+          <ion-icon name="receipt-outline"></ion-icon>
+        </div>
 
-    </ion-item>
-    <ion-item class="textarea">
+        <div>
+          <h2>Observaciones</h2>
+          <p>Agregue una observación si lo considera necesario.</p>
+        </div>
+      </div>
 
-      <ion-textarea placeholder="Escriba aquí..." maxlength=299 spellcheck (ionChange)="ionChange()"
-        [(ngModel)]="nuevoTimbre.observacion"> </ion-textarea>
-      <p class="letraPeque">{{numeroCaracteres}}/299</p>
-    </ion-item>
+      <ion-item class="textarea-item" lines="none">
+        <ion-textarea placeholder="Escriba aquí..." maxlength="299" spellcheck="true" (ionChange)="ionChange()"
+          [(ngModel)]="nuevoTimbre.observacion">
+        </ion-textarea>
+      </ion-item>
+
+      <div class="contador-textarea">
+        {{ numeroCaracteres }}/299
+      </div>
+    </ion-card-content>
   </ion-card>
 
-  <ion-item *ngIf="timbreFotoObligatoria !='Si' && timbrarConFoto =='Si'">
-    <ion-label>Mostrar cámara:</ion-label>
-    <ion-toggle (ionChange)="toggleChanged($event)" [(ngModel)]="activarOpcion"></ion-toggle>
-  </ion-item>
+  <!-- CÁMARA -->
+  <ion-card class="info-card toggle-card" *ngIf="timbreFotoObligatoria != 'Si' && timbrarConFoto == 'Si'">
 
-  <div style="margin: 5% 3% 2% 3%;" *ngIf="!cargandoPosicion; else elseBlock">
-    <ion-button shape="round" expand="block" (click)="enviarTimbre()"><ion-icon
-        name="paper-plane-outline"></ion-icon>&nbsp;&nbsp; Continuar</ion-button>
-  </div>
+    <ion-card-content>
+      <div class="toggle-row">
+        <div class="card-header-info">
+          <div class="card-icon">
+            <ion-icon name="camera-outline"></ion-icon>
+          </div>
 
+          <div>
+            <h2>Mostrar cámara</h2>
+            <p>Active esta opción para registrar foto en el timbre.</p>
+          </div>
+        </div>
+
+        <ion-toggle (ionChange)="toggleChanged($event)" [(ngModel)]="activarOpcion">
+        </ion-toggle>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- BOTÓN CONTINUAR -->
+  <section class="acciones" *ngIf="!cargandoPosicion; else elseBlock">
+    <ion-button shape="round" expand="block" class="btn-continuar" (click)="enviarTimbre()">
+
+      <ion-icon name="paper-plane-outline" slot="start"></ion-icon>
+      Continuar
+    </ion-button>
+  </section>
+
+  <!-- CARGANDO POSICIÓN -->
   <ng-template #elseBlock>
-    <ion-progress-bar type="indeterminate"></ion-progress-bar>
+    <section class="cargando-card">
+      <ion-spinner name="crescent"></ion-spinner>
 
-    <ion-text color="primary">
-      <span>Por favor, espere...</span>
-    </ion-text>
+      <ion-text color="primary">
+        <span>Por favor, espere...</span>
+      </ion-text>
+
+      <ion-progress-bar type="indeterminate"></ion-progress-bar>
+    </section>
   </ng-template>
 
 </ion-content>

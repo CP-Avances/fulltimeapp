@@ -299,7 +299,7 @@ export class PermisoDetalleSolicitudPage implements OnInit {
     const nombreUsuario =
       localStorage.getItem('fullname') ||
       localStorage.getItem('nombre_usuario') ||
-      'Usuario Fulltime';
+      'Usuario AQHora';
 
     const nombreEmpresa =
       localStorage.getItem('nombre_empresa') ||

@@ -20,28 +20,15 @@
 
         <ion-item class="input-item">
           <ion-label position="floating" mode="md" class="is-required">Asunto</ion-label>
-          <ion-input
-            type="text"
-            mode="md"
-            [(ngModel)]="noti.asunto"
-            name="asunto_"
-            class="form-control"
-            minlength="3"
+          <ion-input type="text" mode="md" [(ngModel)]="noti.asunto" name="asunto_" class="form-control" minlength="3"
             maxlength="45">
           </ion-input>
         </ion-item>
 
         <ion-item class="input-item textarea-item">
           <ion-label position="floating" mode="md" class="is-required">Mensaje</ion-label>
-          <ion-textarea
-            name="mensaje_"
-            [(ngModel)]="noti.mensaje"
-            rows="7"
-            cols="20"
-            mode="md"
-            minlength="3"
-            maxlength="255"
-            (ionChange)="textareaMaxLengthValidation()">
+          <ion-textarea name="mensaje_" [(ngModel)]="noti.mensaje" rows="7" cols="20" mode="md" minlength="3"
+            maxlength="255" (ionChange)="textareaMaxLengthValidation()">
           </ion-textarea>
         </ion-item>
 
@@ -49,12 +36,7 @@
           {{ noti.mensaje?.length || 0 }}/255
         </div>
 
-        <ion-button
-          type="submit"
-          mode="md"
-          shape="round"
-          expand="block"
-          class="btn-siguiente">
+        <ion-button type="submit" mode="md" shape="round" expand="block" class="btn-siguiente">
           <ion-icon name="arrow-forward-outline" slot="start"></ion-icon>
           Siguiente
         </ion-button>
@@ -90,7 +72,10 @@
 
   <div class="Imagen">
     <span class="center1">
-      <img src="../../../assets/images/ISOLOGO.png">
+      <div class="logo-contenedor">
+        <img src="../../../assets/images/ISOLOGO.png">
+      </div>
+
       <ion-label mode="md" color="medium">
         <h1><b>Reloj Virtual</b></h1>
       </ion-label>

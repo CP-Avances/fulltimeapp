@@ -1,21 +1,21 @@
 <ion-header>
   <div style="padding:10% 1% 4% 1%; background: white">
-    <img class="center" style="width:45%;" src="../../../assets/images/ISOLOGO.png"/>
+    <img class="center" style="width:45%;" src="../../../assets/images/ISOLOGO.png" />
   </div>
 </ion-header>
 
 <ion-content *ngIf="isConnected && serverConnected">
-  
+
   <ion-text mode="ios" style="text-align: center;">
     <h3 style="font-size: 5vw"><ion-icon name="today-outline"></ion-icon>
       Horarios empleados
     </h3>
   </ion-text>
 
-  <app-lista-empleados [open]="presentModal" ></app-lista-empleados>
+  <app-lista-empleados [open]="presentModal"></app-lista-empleados>
 
 
-</ion-content> 
+</ion-content>
 
 <ion-content *ngIf="!isConnected || !serverConnected">
   <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
@@ -32,13 +32,16 @@
     </ion-text>
     <br>
 
-    <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;" *ngIf="!serverConnected">
+    <ion-text color='medium' style="font-family: Arial, Helvetica, sans-serif; font-size: 80%;"
+      *ngIf="!serverConnected">
       Se podrá visualizar cuando tenga conexión al servidor
     </ion-text>
   </div>
   <div class="Imagen">
     <span class="center1">
-      <img src="../../../assets/images/ISOLOGO.png">
+      <div class="logo-contenedor">
+        <img src="../../../assets/images/ISOLOGO.png">
+      </div>
       <ion-label style="text-align:center" mode="md" color="medium">
         <h1 style="font-size: 3vw"><b>Reloj Virtual</b></h1>
       </ion-label>

@@ -70,10 +70,8 @@
           <span>Teléfono</span>
 
           <strong>
-            <a
-              *ngIf="(usuario.telefono?.length ?? 0) >= 10; else telefonoSimple"
-              [href]="'https://api.whatsapp.com/send?phone=' + (usuario.telefono ?? '')"
-              target="_blank"
+            <a *ngIf="(usuario.telefono?.length ?? 0) >= 10; else telefonoSimple"
+              [href]="'https://api.whatsapp.com/send?phone=' + (usuario.telefono ?? '')" target="_blank"
               class="telefono-link">
               <ion-icon name="logo-whatsapp"></ion-icon>
               {{ usuario.telefono }}
@@ -148,8 +146,9 @@
 
   <section class="offline-image-card">
     <span class="center1">
-      <img src="../../../assets/images/ISOLOGO.png">
-
+      <div class="logo-contenedor">
+        <img src="../../../assets/images/ISOLOGO.png">
+      </div>
       <ion-label mode="md" color="medium">
         <h1><b>Reloj Virtual</b></h1>
       </ion-label>

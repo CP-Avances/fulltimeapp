@@ -1,7 +1,7 @@
 {
-  "name": "fulltimeapp",
+  "name": "aqhoraapp",
   "version": "0.0.1",
-  "author": "Jhonatan Heredia",
+  "author": "Casa Pazmino S.A.",
   "homepage": "https://ionicframework.com/",
   "scripts": {
     "ng": "ng",
