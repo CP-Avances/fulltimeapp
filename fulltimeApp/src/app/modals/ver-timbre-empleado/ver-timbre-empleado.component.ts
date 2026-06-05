@@ -41,7 +41,7 @@ export class VerTimbreEmpleadoComponent implements OnInit {
 
   pageActual: number = 1;
   pagefiltro: number = 1;
-  itemsPorPagina: number = 10;
+  itemsPorPagina: number = 8;
 
   filtro_mensaje: boolean = true;
   todos: boolean = false;

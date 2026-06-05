@@ -34,7 +34,7 @@
 
 .vacacion-form-header ion-title {
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .vacacion-form-header ion-back-button {
@@ -51,6 +51,7 @@ ion-content {
 
 .contenedor-formulario {
   padding: 14px;
+  padding-bottom: 92px;
 }
 
 /* =========================
@@ -59,7 +60,7 @@ ion-content {
 
 .form-card {
   margin: 0;
-  border-radius: 20px;
+  border-radius: 22px;
   background: var(--app-card);
   color: var(--app-text);
   box-shadow: var(--app-shadow);
@@ -68,18 +69,48 @@ ion-content {
 }
 
 .form-card ion-card-header {
-  padding: 16px 16px 8px 16px;
+  padding: 16px 16px 10px 16px;
+}
+
+.titulo-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.titulo-icono {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 5px 12px rgba(15, 117, 188, 0.24);
+}
+
+.titulo-icono ion-icon {
+  font-size: 24px;
 }
 
 .form-card ion-card-title {
   color: var(--app-text);
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 900;
   line-height: 1.25;
 }
 
+.form-card ion-card-subtitle {
+  margin-top: 4px;
+  color: var(--app-text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .form-card ion-card-content {
-  padding: 10px 14px 16px 14px;
+  padding: 8px 14px 16px 14px;
 }
 
 /* =========================
@@ -89,28 +120,42 @@ ion-content {
 .input-item {
   --background: var(--app-input);
   --color: var(--app-text);
-  --border-radius: 14px;
+  --border-radius: 15px;
   --padding-start: 12px;
   --inner-padding-end: 12px;
-  --min-height: 58px;
+  --min-height: 62px;
   margin-bottom: 12px;
-  border-radius: 14px;
+  border-radius: 15px;
   border: 1px solid var(--app-border);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.input-item.compacto {
+  --min-height: 58px;
+  margin-bottom: 10px;
+}
+
+.input-item ion-icon[slot="start"] {
+  align-self: center;
+  margin-right: 10px;
+  color: var(--app-primary);
+  font-size: 22px;
 }
 
 .input-item ion-label,
 ion-label {
   color: var(--app-text-soft) !important;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 ion-input,
 ion-select {
   color: var(--app-text);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 800;
   --placeholder-color: var(--app-text-soft);
+  --placeholder-opacity: 0.75;
 }
 
 ion-select::part(icon) {
@@ -118,10 +163,37 @@ ion-select::part(icon) {
 }
 
 /* =========================
+   GRUPOS DE INFORMACIÓN
+========================= */
+
+.grupo-info {
+  margin-top: 4px;
+  margin-bottom: 12px;
+}
+
+.grupo-titulo {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 4px 0 10px 2px;
+  color: var(--app-text);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.grupo-titulo ion-icon {
+  color: var(--app-primary);
+  font-size: 18px;
+}
+
+/* =========================
    NOTA FERIADOS
 ========================= */
 
 .nota-feriados {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
   margin: 4px 0 14px 0;
   padding: 12px;
   background: var(--app-primary-light);
@@ -130,6 +202,13 @@ ion-select::part(icon) {
   font-size: 12px;
   color: var(--app-text);
   line-height: 1.35;
+  text-align: left;
+}
+
+.nota-feriados ion-icon {
+  color: var(--app-primary);
+  font-size: 20px;
+  min-width: 20px;
 }
 
 .nota-feriados p {
@@ -145,16 +224,23 @@ ion-select::part(icon) {
 }
 
 .btn-archivo {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
   text-align: center;
   padding: 13px 14px;
   border-radius: 14px;
   background: linear-gradient(135deg, var(--app-success), var(--app-success-dark));
   color: #ffffff;
-  font-weight: 800;
+  font-weight: 900;
   font-size: 13px;
   box-shadow: 0 5px 12px rgba(34, 197, 94, 0.25);
+}
+
+.btn-archivo ion-icon {
+  font-size: 20px;
 }
 
 .archivo-info {
@@ -171,7 +257,21 @@ ion-select::part(icon) {
   gap: 8px;
 }
 
-.archivo-info span {
+.archivo-nombre {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.archivo-nombre ion-icon {
+  color: var(--app-primary);
+  font-size: 18px;
+  min-width: 18px;
+}
+
+.archivo-nombre span {
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -188,8 +288,17 @@ ion-select::part(icon) {
   text-align: center;
   color: var(--app-text);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 900;
   line-height: 1.35;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.resumen-titulo ion-icon {
+  color: var(--app-primary);
+  font-size: 19px;
 }
 
 .tabla-resumen {
@@ -215,13 +324,13 @@ ion-select::part(icon) {
 }
 
 .cabecera div {
-  font-weight: 800;
+  font-weight: 900;
   background: rgba(15, 117, 188, 0.08);
   color: var(--app-text);
 }
 
 .fila.cuerpo div {
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .total {
@@ -251,14 +360,28 @@ ion-select::part(icon) {
   --border-radius: 14px;
   min-height: 46px;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: 0.2px;
+  text-transform: none;
+}
+
+.btn-verificar {
+  --background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  --background-activated: var(--app-primary-dark);
+  --background-hover: var(--app-primary);
+  --color: #ffffff;
+}
+
+.btn-registrar {
+  --background: linear-gradient(135deg, var(--app-success), var(--app-success-dark));
+  --background-activated: var(--app-success-dark);
+  --background-hover: var(--app-success);
+  --color: #ffffff;
 }
 
 .acciones ion-spinner {
   width: 18px;
   height: 18px;
-  margin-right: 8px;
 }
 
 /* =========================
@@ -281,7 +404,15 @@ ion-select::part(icon) {
 .resultado-card ion-card-title {
   color: var(--app-text);
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.resultado-card ion-card-title ion-icon {
+  color: var(--app-primary);
+  font-size: 18px;
 }
 
 .resultado-card ion-card-content {
@@ -292,8 +423,9 @@ ion-select::part(icon) {
   padding: 12px;
   border-radius: 12px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.35;
+  text-align: center;
 }
 
 .resultado-verificacion.ok {
@@ -335,6 +467,10 @@ ion-select::part(icon) {
     --background: linear-gradient(135deg, #0f75bc, #083a63);
   }
 
+  .input-item {
+    box-shadow: none;
+  }
+
   .cabecera div {
     background: rgba(14, 165, 233, 0.14);
   }
@@ -359,6 +495,7 @@ ion-select::part(icon) {
 @media (max-width: 380px) {
   .contenedor-formulario {
     padding: 10px;
+    padding-bottom: 92px;
   }
 
   .form-card {
@@ -366,7 +503,14 @@ ion-select::part(icon) {
   }
 
   .form-card ion-card-header {
-    padding: 14px 14px 6px 14px;
+    padding: 14px 14px 8px 14px;
+  }
+
+  .titulo-icono {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 13px;
   }
 
   .form-card ion-card-title {
@@ -378,8 +522,13 @@ ion-select::part(icon) {
   }
 
   .input-item {
-    --min-height: 54px;
+    --min-height: 56px;
     margin-bottom: 10px;
+  }
+
+  .input-item ion-icon[slot="start"] {
+    font-size: 20px;
+    margin-right: 8px;
   }
 
   .fila div {

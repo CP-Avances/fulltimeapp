@@ -7,14 +7,16 @@
 
   <ion-content [fullscreen]="true">
     <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
-    <div class="fondo">
-      <div class="logo-contenedor">
-        <img class="center" src="../../../assets/images/ISOLOGO.png">
-      </div>
-      <ion-label style="text-align:center" mode="md" color="medium">
-        <h1 style="font-size: 2vw"><b>Reloj Virtual</b></h1>
-      </ion-label>
 
+    <section class="marca-inicio">
+      <div class="marca-logo-box">
+        <img class="marca-logo" src="../../../assets/images/ISOLOGO.png" alt="AQHora">
+      </div>
+
+      <p>Reloj Virtual</p>
+    </section>
+
+    <div class="fondo">
       <!--Imagen.svg-->
       <svg style="margin-top: 2%; margin-bottom: 4%;" class="imgsvg" width="90%" height="90%" viewBox="0 0 749 417"
         fill="none" xmlns="http://www.w3.org/2000/svg">

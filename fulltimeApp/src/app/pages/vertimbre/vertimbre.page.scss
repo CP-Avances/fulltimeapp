@@ -29,12 +29,35 @@
   border-bottom: 1px solid var(--app-border);
 }
 
-.logo-principal {
-  width: 45%;
-  max-width: 170px;
-  min-width: 120px;
+.logo-card {
+  width: fit-content;
+  max-width: 78%;
+  margin: 0 auto;
+  padding: 8px 22px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+}
+
+.logo-timbres {
   display: block;
-  margin: auto;
+  width: 150px;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.logo-card-offline {
+  margin: 0 auto;
+}
+
+.logo-timbres-offline {
+  display: block;
+  width: 145px;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
 .header-title h1 {
@@ -271,8 +294,9 @@ ion-item-divider ion-label {
 /* PAGINACIÓN */
 
 .footer-paginacion {
-  background: var(--app-card);
-  border-top: 1px solid var(--app-border);
+  background: transparent;
+  border-top: none;
+  padding: 6px 10px 10px 10px;
 }
 
 .footer-paginacion ion-item {
@@ -280,45 +304,89 @@ ion-item-divider ion-label {
   --border-width: 0;
   --padding-start: 0;
   --inner-padding-end: 0;
+  --min-height: auto;
   margin: 0;
 }
 
 .paginacion {
-  margin: auto;
-  padding-top: 2%;
-  padding-bottom: 2%;
   width: 100%;
   display: flex;
   justify-content: center;
 }
 
 .paginacion ::ng-deep .ngx-pagination {
-  padding: 0%;
-  margin: auto;
+  padding: 8px 10px;
+  margin: 0 auto;
+  width: fit-content;
+  max-width: 100%;
+
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  border-radius: 16px;
+  box-shadow: var(--app-shadow);
 }
 
 .paginacion ::ng-deep .ngx-pagination li {
-  margin: 0 2px;
+  margin: 0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.paginacion ::ng-deep .ngx-pagination a,
+.paginacion ::ng-deep .ngx-pagination button {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+  color: var(--app-primary);
+  border-radius: 10px;
+
+  font-size: 12px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.paginacion ::ng-deep .ngx-pagination a:hover {
+  background: rgba(15, 117, 188, 0.10);
 }
 
 .paginacion ::ng-deep .ngx-pagination .current {
-  background: var(--app-primary);
+  min-width: 30px;
+  height: 30px;
+  padding: 0 9px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
   color: #ffffff;
-  font-weight: bold;
-  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 900;
+  border-radius: 10px;
+  box-shadow: 0 5px 12px rgba(15, 117, 188, 0.25);
+}
+
+.paginacion ::ng-deep .ngx-pagination .disabled {
+  color: var(--app-text-soft);
+  opacity: 0.45;
 }
 
 .paginacion ::ng-deep .ngx-pagination span {
-  color: var(--app-text-soft);
-  font-family: monospace;
-}
-
-.paginacion ::ng-deep .ngx-pagination a {
-  background-color: transparent;
-  color: var(--app-primary);
+  color: inherit;
+  font-family: inherit;
+  font-weight: 900;
 }
 
 /* OFFLINE */
@@ -451,9 +519,17 @@ ion-label {
     --app-primary-light: rgba(14, 165, 233, 0.16);
   }
 
-  .header-logo {
-    background: linear-gradient(180deg, #1e293b 0%, #111827 100%);
-  }
+.header-logo {
+  background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+}
+
+.logo-card {
+  background: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(56, 189, 248, 0.08);
+}
 
   ion-item-divider {
     --background: #111827;
@@ -484,5 +560,25 @@ ion-label {
   .offline-message {
     background: rgba(239, 68, 68, 0.16);
     color: #fca5a5;
+  }
+
+    .paginacion ::ng-deep .ngx-pagination {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.38);
+  }
+
+  .paginacion ::ng-deep .ngx-pagination a,
+  .paginacion ::ng-deep .ngx-pagination button {
+    color: #38bdf8;
+  }
+
+  .paginacion ::ng-deep .ngx-pagination a:hover {
+    background: rgba(56, 189, 248, 0.12);
+  }
+
+  .paginacion ::ng-deep .ngx-pagination .current {
+    background: linear-gradient(135deg, #0f75bc, #2563eb);
+    color: #ffffff;
   }
 }

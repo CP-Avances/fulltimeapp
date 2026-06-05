@@ -4,8 +4,9 @@
     <div class="login-wrapper">
 
       <div class="logo-section">
-        <ion-img class="logo-login" src="../../../assets/images/ISOLOGO.png"></ion-img>
-
+        <div class="logo-contenedor">
+          <ion-img class="logo-login" src="../../../assets/images/ISOLOGO.png"></ion-img>
+        </div>
         <ion-label class="app-title" mode="md">
           <h1><b>Reloj Virtual</b></h1>
         </ion-label>
@@ -33,15 +34,8 @@
                 <ion-text color="danger">*</ion-text>
               </ion-label>
 
-              <ion-input
-                required
-                type="text"
-                mode="ios"
-                [(ngModel)]="user.nombre_usuario"
-                name="username"
-                class="form-control"
-                minlength="3"
-                maxlength="25">
+              <ion-input required type="text" mode="ios" [(ngModel)]="user.nombre_usuario" name="username"
+                class="form-control" minlength="3" maxlength="25">
               </ion-input>
             </ion-item>
 
@@ -52,23 +46,11 @@
                 <ion-text color="danger">*</ion-text>
               </ion-label>
 
-              <ion-input
-                required
-                mode="ios"
-                [(ngModel)]="user.pass"
-                name="password"
-                [type]="verPassword ? 'text' : 'password'"
-                class="form-control"
-                minlength="3"
-                maxlength="15">
+              <ion-input required mode="ios" [(ngModel)]="user.pass" name="password"
+                [type]="verPassword ? 'text' : 'password'" class="form-control" minlength="3" maxlength="15">
               </ion-input>
 
-              <ion-button
-                type="button"
-                fill="clear"
-                slot="end"
-                class="btn-ojo"
-                (click)="mostrarPassword()">
+              <ion-button type="button" fill="clear" slot="end" class="btn-ojo" (click)="mostrarPassword()">
                 <ion-icon [name]="verPassword ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
               </ion-button>
             </ion-item>
@@ -80,51 +62,31 @@
                 <ion-text color="danger">*</ion-text>
               </ion-label>
 
-              <ion-input
-                required
-                type="text"
-                mode="md"
-                [(ngModel)]="user.codigo_empresa"
-                name="empresa"
-                class="form-control"
-                minlength="3">
+              <ion-input required type="text" mode="md" [(ngModel)]="user.codigo_empresa" name="empresa"
+                class="form-control" minlength="3">
               </ion-input>
             </ion-item>
 
             <ion-item lines="none" class="terminos-item">
-              <ion-checkbox
-                slot="start"
-                [(ngModel)]="aceptaTerminos"
-                name="aceptaTerminos"
-                required>
+              <ion-checkbox slot="start" [(ngModel)]="aceptaTerminos" name="aceptaTerminos" required>
               </ion-checkbox>
 
               <p class="paragraph-text">
-                He leído y presto mi consentimiento a los términos de uso de la aplicación, al procesamiento y tratamiento de mis datos personales conforme a lo dispuesto en la
+                He leído y presto mi consentimiento a los términos de uso de la aplicación, al procesamiento y
+                tratamiento de mis datos personales conforme a lo dispuesto en la
                 <a href="https://casapazmino.com.ec/politicas-de-privacidad-reloj-virtual-ft/" target="_blank">
                   Política de privacidad Reloj Virtual AQHora
                 </a>.
               </p>
             </ion-item>
 
-            <ion-button
-              type="submit"
-              mode="md"
-              shape="round"
-              expand="block"
-              class="btn-login"
+            <ion-button type="submit" mode="md" shape="round" expand="block" class="btn-login"
               [disabled]="!aceptaTerminos || iniciandoSesion">
 
-              <ion-spinner
-                *ngIf="iniciandoSesion"
-                name="crescent"
-                slot="start">
+              <ion-spinner *ngIf="iniciandoSesion" name="crescent" slot="start">
               </ion-spinner>
 
-              <ion-icon
-                *ngIf="!iniciandoSesion"
-                name="log-in-outline"
-                slot="start">
+              <ion-icon *ngIf="!iniciandoSesion" name="log-in-outline" slot="start">
               </ion-icon>
 
               {{ iniciandoSesion ? 'Iniciando...' : 'Iniciar sesión' }}
