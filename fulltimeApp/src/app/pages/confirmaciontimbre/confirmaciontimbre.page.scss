@@ -26,13 +26,14 @@
 
 .confirmacion-content {
   --background:
-    radial-gradient(circle at top, rgba(34, 197, 94, 0.16) 0%, transparent 38%),
-    linear-gradient(180deg, #ffffff 0%, var(--app-bg) 45%, var(--app-bg) 100%);
+    radial-gradient(circle at top, rgba(34, 197, 94, 0.15) 0%, transparent 34%),
+    linear-gradient(180deg, #ffffff 0%, var(--app-bg) 46%, var(--app-bg) 100%);
+  text-align: center;
 }
 
 .confirmacion-wrapper {
   min-height: 100%;
-  padding: 28px 16px 18px 16px;
+  padding: 24px 16px 18px 16px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -44,44 +45,69 @@
 
 .logo-section {
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .logo-app {
-  width: 70%;
-  max-width: 250px;
-  min-width: 175px;
+  width: 58%;
+  max-width: 210px;
+  min-width: 150px;
   display: block;
   margin: auto;
 }
 
 .app-title {
   display: block;
-  margin-top: 8px;
+  margin-top: 6px;
   color: var(--app-text-soft);
-  font-size: 25px;
+  font-size: 22px;
   font-weight: 900;
 }
 
 /* =========================
-   CARD ÉXITO
+   CARD PRINCIPAL
 ========================= */
 
 .success-card {
+  position: relative;
   background: var(--app-card);
   color: var(--app-text);
-  border-radius: 26px;
-  padding: 24px 16px 18px 16px;
+  border-radius: 28px;
+  padding: 20px 16px 18px 16px;
   text-align: center;
   border: 1px solid var(--app-border);
   box-shadow: var(--app-shadow);
+  overflow: hidden;
+}
+
+.success-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 18%;
+  right: 18%;
+  height: 5px;
+  border-radius: 0 0 999px 999px;
+  background: linear-gradient(90deg, var(--app-primary), var(--app-success));
+}
+
+/* =========================
+   ESTADO PRINCIPAL
+========================= */
+
+.estado-principal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 8px 0 18px 0;
 }
 
 .success-icon {
-  width: 68px;
-  height: 68px;
-  margin: 0 auto 14px auto;
-  border-radius: 22px;
+  width: 58px;
+  height: 58px;
+  min-width: 58px;
+  border-radius: 20px;
   background: linear-gradient(135deg, var(--app-success), var(--app-success-dark));
   color: #ffffff;
   display: flex;
@@ -91,84 +117,144 @@
 }
 
 .success-icon ion-icon {
-  font-size: 37px;
+  font-size: 32px;
 }
 
-.success-card h1 {
-  margin: 0;
-  color: var(--app-text);
-  font-size: 22px;
-  font-weight: 900;
-  line-height: 1.2;
+.estado-texto {
+  text-align: left;
 }
 
-.usuario-nombre {
-  margin: 8px 0 0 0;
-  color: var(--app-primary);
-  font-size: 15px;
-  font-weight: 900;
-  line-height: 1.35;
-}
-
-.success-img {
-  width: 165px;
-  height: 165px;
-  object-fit: contain;
+.estado-texto span {
   display: block;
-  margin: 18px auto;
+  color: var(--app-success-dark);
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.estado-texto h1 {
+  margin: 3px 0 0 0;
+  color: var(--app-text);
+  font-size: 25px;
+  font-weight: 900;
+  line-height: 1.1;
 }
 
 /* =========================
-   DETALLE
+   USUARIO
 ========================= */
 
-.detalle-card {
-  margin: 6px 0 16px 0;
-  padding: 12px;
+.usuario-card {
+  margin: 0 0 14px 0;
+  padding: 14px;
   border-radius: 20px;
+  background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  box-shadow: 0 8px 18px rgba(15, 117, 188, 0.22);
+}
+
+.usuario-card ion-icon {
+  font-size: 42px;
+  min-width: 42px;
+  color: #ffffff;
+}
+
+.usuario-card span {
+  display: block;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.usuario-card strong {
+  display: block;
+  margin-top: 3px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+/* =========================
+   DETALLES
+========================= */
+
+.detalle-principal {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.detalle-bloque {
+  padding: 13px;
+  border-radius: 18px;
   background: var(--app-soft);
   border: 1px solid var(--app-border);
-}
-
-.detalle-linea {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  padding: 10px 0;
+  gap: 11px;
   text-align: left;
-  border-bottom: 1px solid var(--app-border);
 }
 
-.detalle-linea:last-child {
-  border-bottom: none;
-}
-
-.detalle-linea ion-icon {
-  width: 34px;
-  height: 34px;
-  min-width: 34px;
-  padding: 8px;
-  border-radius: 13px;
+.detalle-icono {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 15px;
   background: var(--app-primary-light);
   color: var(--app-primary);
-  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.detalle-linea span {
+.detalle-icono ion-icon {
+  font-size: 23px;
+}
+
+.detalle-bloque span {
   display: block;
   color: var(--app-text-soft);
   font-size: 12px;
   font-weight: 800;
 }
 
-.detalle-linea strong {
+.detalle-bloque strong {
   display: block;
-  margin-top: 3px;
+  margin-top: 4px;
   color: var(--app-text);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 900;
-  line-height: 1.3;
+  line-height: 1.35;
   overflow-wrap: anywhere;
+}
+
+.ubicacion-bloque {
+  background: rgba(15, 117, 188, 0.06);
+}
+
+/* =========================
+   IMAGEN SECUNDARIA
+========================= */
+
+.decoracion-img {
+  display: flex;
+  justify-content: center;
+  margin: 4px 0 14px 0;
+}
+
+.decoracion-img img {
+  width: 92px;
+  height: 92px;
+  object-fit: contain;
+  opacity: 0.95;
 }
 
 /* =========================
@@ -182,34 +268,7 @@
   font-size: 14px;
   font-weight: 900;
   text-transform: none;
-}
-
-/* =========================
-   COMPATIBILIDAD
-========================= */
-
-h1 {
-  color: var(--app-text);
-  text-align: center;
-}
-
-.img2 {
-  text-align: center;
-  height: 190px;
-  width: 190px;
-}
-
-ion-content {
-  text-align: center;
-}
-
-p {
-  color: var(--app-text-soft);
-}
-
-.center {
-  display: block;
-  margin: auto;
+  --box-shadow: 0 8px 18px rgba(15, 117, 188, 0.22);
 }
 
 /* =========================
@@ -226,13 +285,20 @@ p {
     --app-border: rgba(255, 255, 255, 0.08);
     --app-shadow: 0 10px 28px rgba(0, 0, 0, 0.42);
     --app-primary-light: rgba(14, 165, 233, 0.16);
-    --app-success-light: rgba(34, 197, 94, 0.14);
   }
 
   .confirmacion-content {
     --background:
-      radial-gradient(circle at top, rgba(34, 197, 94, 0.18) 0%, transparent 38%),
+      radial-gradient(circle at top, rgba(34, 197, 94, 0.18) 0%, transparent 35%),
       linear-gradient(180deg, #0f172a 0%, #0f172a 100%);
+  }
+
+  .estado-texto span {
+    color: #86efac;
+  }
+
+  .ubicacion-bloque {
+    background: rgba(14, 165, 233, 0.09);
   }
 }
 
@@ -242,33 +308,110 @@ p {
 
 @media (max-width: 380px) {
   .confirmacion-wrapper {
-    padding: 22px 14px 14px 14px;
+    padding: 20px 14px 14px 14px;
   }
 
   .logo-app {
-    width: 68%;
-    min-width: 160px;
+    width: 55%;
+    min-width: 145px;
   }
 
   .app-title {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .success-card {
     border-radius: 24px;
-    padding: 22px 14px 16px 14px;
+    padding: 18px 14px 16px 14px;
   }
 
-  .success-card h1 {
-    font-size: 20px;
+  .estado-principal {
+    gap: 11px;
+    margin-bottom: 15px;
   }
 
-  .success-img {
-    width: 145px;
-    height: 145px;
+  .success-icon {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    border-radius: 18px;
   }
 
-  .detalle-linea strong {
-    font-size: 13px;
+  .success-icon ion-icon {
+    font-size: 29px;
+  }
+
+  .estado-texto h1 {
+    font-size: 22px;
+  }
+
+  .estado-texto span {
+    font-size: 12px;
+  }
+
+  .usuario-card {
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .usuario-card strong {
+    font-size: 14px;
+  }
+
+  .detalle-bloque {
+    padding: 12px;
+  }
+
+  .detalle-bloque strong {
+    font-size: 14px;
+  }
+
+  .decoracion-img img {
+    width: 78px;
+    height: 78px;
+  }
+}
+
+/* =========================
+   CELULARES BAJOS
+========================= */
+
+@media (max-height: 700px) {
+  .confirmacion-wrapper {
+    padding-top: 14px;
+  }
+
+  .logo-section {
+    margin-bottom: 10px;
+  }
+
+  .logo-app {
+    max-width: 170px;
+  }
+
+  .app-title {
+    font-size: 19px;
+  }
+
+  .success-card {
+    padding-top: 16px;
+  }
+
+  .estado-principal {
+    margin-bottom: 12px;
+  }
+
+  .decoracion-img img {
+    width: 68px;
+    height: 68px;
+  }
+
+  .detalle-principal {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .btn-inicio {
+    min-height: 44px;
   }
 }
