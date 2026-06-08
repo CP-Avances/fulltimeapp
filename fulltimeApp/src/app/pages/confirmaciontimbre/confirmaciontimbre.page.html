@@ -4,10 +4,7 @@
     <div class="confirmacion-wrapper">
 
       <section class="logo-section">
-        <div class="logo-contenedor">
-          <img class="logo-app" src="../../../assets/images/ISOLOGO.png">
-        </div>
-
+        <img class="logo-app" src="../../../assets/images/ISOLOGO.png" alt="AQHora">
         <ion-label mode="md" class="app-title">
           <b>Reloj Virtual</b>
         </ion-label>
@@ -15,24 +12,35 @@
 
       <section class="success-card">
 
-        <div class="success-icon">
-          <ion-icon name="checkmark-done-outline"></ion-icon>
+        <div class="estado-principal">
+          <div class="success-icon">
+            <ion-icon name="checkmark-done-outline"></ion-icon>
+          </div>
+
+          <div class="estado-texto">
+            <span>Registro exitoso</span>
+            <h1>Timbre enviado</h1>
+          </div>
         </div>
 
-        <h1>Timbre enviado con éxito</h1>
+        <div class="usuario-card">
+          <ion-icon name="person-circle-outline"></ion-icon>
 
-        <p class="usuario-nombre">
-          {{ nombre_usuario }} {{ apellido_usuario }}
-        </p>
+          <div>
+            <span>Empleado</span>
+            <strong>{{ nombre_usuario }} {{ apellido_usuario }}</strong>
+          </div>
+        </div>
 
-        <img class="success-img" src="../../../assets/images/woman.png">
+        <div class="detalle-principal">
 
-        <div class="detalle-card">
-          <div class="detalle-linea">
-            <ion-icon name="calendar-outline"></ion-icon>
+          <div class="detalle-bloque fecha-bloque">
+            <div class="detalle-icono">
+              <ion-icon name="calendar-outline"></ion-icon>
+            </div>
 
             <div>
-              <span>Timbre enviado el</span>
+              <span>Fecha y hora de envío</span>
 
               <strong *ngIf="isConnected && serverConnected">
                 {{ fecha }} a las {{ hora }}
@@ -44,11 +52,13 @@
             </div>
           </div>
 
-          <div class="detalle-linea">
-            <ion-icon name="location-outline"></ion-icon>
+          <div class="detalle-bloque ubicacion-bloque">
+            <div class="detalle-icono">
+              <ion-icon name="location-outline"></ion-icon>
+            </div>
 
             <div>
-              <span>Ubicación</span>
+              <span>Ubicación registrada</span>
 
               <strong *ngIf="ubicacion != null && ubicacion != undefined">
                 {{ ubicacion }}
@@ -59,9 +69,18 @@
               </strong>
             </div>
           </div>
+
         </div>
 
-        <ion-button expand="block" shape="round" class="btn-inicio" (click)="irABienvenido()">
+        <div class="decoracion-img">
+          <img src="../../../assets/images/woman.png" alt="Timbre enviado">
+        </div>
+
+        <ion-button
+          expand="block"
+          shape="round"
+          class="btn-inicio"
+          (click)="irABienvenido()">
 
           <ion-icon name="home-outline" slot="start"></ion-icon>
           Ir a inicio
