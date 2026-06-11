@@ -7,7 +7,7 @@ const config: CapacitorConfig = {
   webDir: 'www',
   server: {
     cleartext: false,
-    androidScheme: 'http',
+    androidScheme: 'https',
   },
   plugins: {
     PushNotifications: {
@@ -17,6 +17,11 @@ const config: CapacitorConfig = {
       resize: KeyboardResize.Body,
       style: KeyboardStyle.Default,
       resizeOnFullScreen: true,
+    },
+    SplashScreen: {
+      launchAutoHide: false,
+      showSpinner: false,
+      backgroundColor: '#ffffff',
     },
     assets: {
       iconPath: 'resources/icon.png',

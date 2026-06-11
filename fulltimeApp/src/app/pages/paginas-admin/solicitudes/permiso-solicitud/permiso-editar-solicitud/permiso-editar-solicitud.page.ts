@@ -23,7 +23,7 @@ export class PermisoEditarSolicitudPage implements OnInit {
   solicitud: any = null;
   idSolicitud!: number;
 
-  tiposPermiso: any[] = [];
+  tiposPermiso: any[] = []; 
   tipoPermisoSeleccionado: number | null = null;
 
   modoSolicitud: 'DIAS' | 'HORAS' = 'DIAS';
@@ -521,7 +521,8 @@ export class PermisoEditarSolicitudPage implements OnInit {
       empleados: [this.idEmpleado],
       incluirFeriados: !!tipo.contar_feriados,
       permiteHoras: this.permiteHoras,
-      tipoDescuento: tipo.tipo_descuento
+      tipoDescuento: tipo.tipo_descuento,
+      idSolicitudActual: this.idSolicitud
     };
 
     if (!this.permiteHoras) {
@@ -667,15 +668,22 @@ export class PermisoEditarSolicitudPage implements OnInit {
 
     this.permisosService.actualizarSolicitudPermiso(this.idSolicitud, payload).subscribe({
       next: async (response) => {
-        const solicitudActualizada = response?.data ?? {
+
+        const respuestaBackend = response?.data ?? response ?? {};
+
+        const solicitudActualizada = {
           ...(this.solicitud ?? {}),
+          ...respuestaBackend,
           ...payload,
+
           id: this.idSolicitud,
           id_permiso: this.idSolicitud,
           id_empleado: this.idEmpleado,
           id_tipo_permiso: this.tipoPermisoSeleccionado,
-          estado: this.solicitud?.estado ?? 1,
-          fecha_creacion: this.solicitud?.fecha_creacion ?? null
+
+          estado: respuestaBackend?.estado ?? this.solicitud?.estado ?? 1,
+          fecha_creacion: respuestaBackend?.fecha_creacion ?? this.solicitud?.fecha_creacion ?? null,
+          fecha_edicion: respuestaBackend?.fecha_edicion ?? new Date().toISOString()
         };
 
         if (this.archivoSeleccionado) {
@@ -874,6 +882,15 @@ export class PermisoEditarSolicitudPage implements OnInit {
         cambioDocumento
       );
 
+      console.log('MENSAJE JSON EDICION PERMISO:', mensaje);
+
+try {
+  console.log('MENSAJE PARSEADO EDICION PERMISO:', JSON.parse(mensaje));
+} catch (error) {
+  console.error('NO SE PUDO PARSEAR MENSAJE EDICION PERMISO:', error);
+}
+
+
       const idPermiso = Number(
         solicitud?.id ??
         solicitud?.id_permiso ??
@@ -973,6 +990,15 @@ export class PermisoEditarSolicitudPage implements OnInit {
 
     const dias = Number(solicitud?.dias_permiso ?? this.diasTotales ?? 0);
     const minutos = Number(solicitud?.minutos_totales ?? this.calcularMinutosTotales() ?? 0);
+
+    const horaInicioMensaje = this.normalizarHoraNotificacion(
+      solicitud?.hora_inicio ?? this.horaInicio
+    );
+
+    const horaFinMensaje = this.normalizarHoraNotificacion(
+      solicitud?.hora_fin ?? this.horaFinal
+    );
+
     const esPorHoras = dias === 0 && minutos > 0;
 
     const fechaDesde = (
@@ -1007,8 +1033,8 @@ export class PermisoEditarSolicitudPage implements OnInit {
         fecha_hasta: esPorHoras ? fechaDesde : fechaHasta,
         dias: esPorHoras ? null : dias,
         hora: esPorHoras ? this.getHorasFormatoHHmmDesdeMinutos(minutos) : null,
-        hora_inicio: esPorHoras ? (solicitud?.hora_inicio ?? this.horaInicio ?? null) : null,
-        hora_fin: esPorHoras ? (solicitud?.hora_fin ?? this.horaFinal ?? null) : null,
+        hora_inicio: esPorHoras ? horaInicioMensaje : null,
+        hora_fin: esPorHoras ? horaFinMensaje : null,
         motivo,
         observacion: solicitud?.descripcion ?? this.observacion ?? '',
         estado_solicitud: this.mapearEstadoTexto(Number(solicitud?.estado ?? 1)),
@@ -1281,6 +1307,24 @@ export class PermisoEditarSolicitudPage implements OnInit {
 
     if (texto.length >= 5) {
       return texto.substring(0, 5);
+    }
+
+    return texto;
+  }
+
+  private normalizarHoraNotificacion(hora: any): string | null {
+    if (!hora) return null;
+
+    const texto = String(hora).trim();
+
+    // Si viene "09:00", lo convertimos a "09:00:00"
+    if (/^\d{2}:\d{2}$/.test(texto)) {
+      return `${texto}:00`;
+    }
+
+    // Si viene "09:00:00", lo dejamos igual
+    if (/^\d{2}:\d{2}:\d{2}$/.test(texto)) {
+      return texto;
     }
 
     return texto;

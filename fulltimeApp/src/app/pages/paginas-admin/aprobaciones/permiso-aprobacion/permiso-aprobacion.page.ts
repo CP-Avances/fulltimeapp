@@ -737,7 +737,8 @@ export class PermisoAprobacionPage implements OnInit {
         this.obtenerTipoNotificacionPermiso(accion),
         this.obtenerAsuntoPermiso(accion),
         idSolicitud,
-        idTipoPermiso
+        idTipoPermiso,
+        accion
       );
 
     } catch (error) {
@@ -811,7 +812,8 @@ export class PermisoAprobacionPage implements OnInit {
     tipoNoti: number,
     asunto: string,
     idPermiso: number,
-    idTipoPermiso: number
+    idTipoPermiso: number,
+    accion: 'PREAUTORIZADO' | 'AUTORIZADO' | 'RECHAZADO'
   ): Promise<void> {
     try {
       const empleados = await firstValueFrom(
@@ -826,9 +828,9 @@ export class PermisoAprobacionPage implements OnInit {
         ? tiposPermiso.find((t: any) => Number(t?.id) === Number(idTipoPermiso))
         : null;
 
-      const tipoPermiteCorreo = this.valorBooleanoPermiso(
-        tipoPermiso?.permiso_mail ?? tipoPermiso?.correo,
-        true
+      const tipoPermiteCorreo = this.tipoPermisoPermiteCorreoAprobacion(
+        tipoPermiso,
+        accion
       );
 
       const idsDestino = Array.from(destinatarios).map(id => Number(id));
@@ -907,6 +909,35 @@ export class PermisoAprobacionPage implements OnInit {
     } catch (error) {
       console.error('ERROR GENERAL EN CORREO/NOTIFICACION PERMISO', error);
     }
+  }
+
+  private tipoPermisoPermiteCorreoAprobacion(
+    tipoPermiso: any,
+    accion: 'PREAUTORIZADO' | 'AUTORIZADO' | 'RECHAZADO'
+  ): boolean {
+
+    if (!tipoPermiso) {
+      return false;
+    }
+
+    if (accion === 'PREAUTORIZADO') {
+      return this.valorBooleanoPermiso(
+        tipoPermiso?.correo_preautorizar,
+        false
+      );
+    }
+
+    if (accion === 'AUTORIZADO') {
+      return this.valorBooleanoPermiso(
+        tipoPermiso?.correo_autorizar,
+        false
+      );
+    }
+
+    return this.valorBooleanoPermiso(
+      tipoPermiso?.correo_negar,
+      false
+    );
   }
 
   private async armarMensajeAprobacionPermiso(

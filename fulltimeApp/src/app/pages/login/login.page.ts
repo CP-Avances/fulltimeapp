@@ -16,7 +16,7 @@ import { PushNotificationService } from 'src/app/services/push-notification.serv
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
-
+ 
 export class LoginPage implements OnInit {
   ips_locales: any = '';
 
@@ -159,10 +159,17 @@ export class LoginPage implements OnInit {
       });
   }
 
+
   // METODO PARA INICIAR SESION
   async validarEmpresa() {
-     this.iniciandoSesion = true;
+    if (this.iniciandoSesion) {
+      return;
+    }
+
+    this.iniciandoSesion = true;
+    this.existeId_Dispositivo = false;
     this.infoDispositivo();
+
     const credenciales = {
       nombre_usuario: this.user.nombre_usuario,
       pass: this.user.pass,
@@ -170,7 +177,7 @@ export class LoginPage implements OnInit {
       codigoEmpresa: this.user.codigo_empresa,
     };
 
-    if (!credenciales.nombre_usuario || !credenciales.pass) {
+    if (!credenciales.nombre_usuario || !credenciales.pass || !credenciales.codigoEmpresa) {
       this.iniciandoSesion = false;
       return this.usuarioIncorrectoToas("Ups! Ingrese sus datos.", 2000);
     }
@@ -184,10 +191,13 @@ export class LoginPage implements OnInit {
       await this.BuscarParametroNumeroDispositivos(datos);
 
     } catch (error: any) {
+      this.iniciandoSesion = false;
+
       const mensaje =
         error?.error?.message ??
         error?.message ??
         'Error al validar credenciales.';
+
       this.usuarioIncorrectoToas(mensaje, 3000);
     }
   }
@@ -240,6 +250,7 @@ export class LoginPage implements OnInit {
         }
         else {
           if (dispositivos.length >= this.rango_dispositivos) {
+            this.iniciandoSesion = false;
             this.usuarioIncorrectoToas("Ups! El usuario llego al limite de dispositivos permitidos", 3000);
             var FormId = 'formulariologin';
             var resetForm = <HTMLFormElement>document.getElementById(FormId);

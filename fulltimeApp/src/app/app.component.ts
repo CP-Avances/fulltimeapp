@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, AfterViewInit } from '@angular/core';
 import { debounceTime } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { AlertController, ToastController } from '@ionic/angular';
@@ -17,7 +17,7 @@ import { SocketService } from './services/socket.service';
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
   showSplash = true;
   splash = true;
@@ -34,7 +34,16 @@ export class AppComponent implements OnInit, OnDestroy {
     private relojService: RelojServiceService,
     private socketService: SocketService,
   ) {
-    this.initializeApp();
+  }
+
+  async ngAfterViewInit() {
+    requestAnimationFrame(async () => {
+      await SplashScreen.hide();
+    });
+
+    setTimeout(() => {
+      this.splash = false;
+    }, 2000);
   }
 
   ngOnInit(): void {
@@ -49,17 +58,6 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.appStateListener) {
       this.appStateListener.remove();
     }
-  }
-
-  async initializeApp() {
-    await SplashScreen.show({
-      showDuration: 2000,
-      autoHide: true,
-    });
-
-    setTimeout(() => {
-      this.splash = false;
-    }, 2000);
   }
 
   // METODO PARA CONECTAR SOCKET SEGUN LA EMPRESA
