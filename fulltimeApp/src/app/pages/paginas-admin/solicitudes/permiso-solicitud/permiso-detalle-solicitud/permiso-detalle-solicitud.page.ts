@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { Capacitor } from '@capacitor/core';
+import { Directory, Filesystem } from '@capacitor/filesystem';
+import { FileOpener } from '@capacitor-community/file-opener';
 
 import { PermisosService } from 'src/app/services/permisos.service';
 import { ReportesMicroService } from 'src/app/services/reportes-micro.service';
@@ -30,6 +33,7 @@ export class PermisoDetalleSolicitudPage implements OnInit {
   s_color: any = null;
   frase: any = null;
   imagen: string = localStorage.getItem('imagen64') ?? '';
+  historialAprobaciones: any[] = [];
 
   private readonly TIPO_NOTI_PERMISO_ELIMINAR = TipoNotificacion.ELIMINAR_PERMISO;
 
@@ -116,6 +120,8 @@ export class PermisoDetalleSolicitudPage implements OnInit {
           };
         }
 
+        this.cargarHistorialAprobaciones();
+
         this.cargando = false;
       },
       error: () => {
@@ -124,6 +130,30 @@ export class PermisoDetalleSolicitudPage implements OnInit {
       }
     });
   }
+
+  private cargarHistorialAprobaciones(): void {
+    const idSolicitud = Number(this.solicitud?.id ?? 0);
+
+    if (!idSolicitud) {
+      this.historialAprobaciones = [];
+      return;
+    }
+
+    this.aprobacionesService
+      .ListarHistorialSolicitud('PERMISO', idSolicitud)
+      .subscribe({
+        next: (data: any[]) => {
+          const rows = Array.isArray(data) ? data : [];
+
+          this.historialAprobaciones = rows.filter((r: any) => r?.activo !== false);
+        },
+        error: (error) => {
+          console.error('[PERMISO PDF HISTORIAL ERROR] No se pudo cargar historial', error);
+          this.historialAprobaciones = [];
+        }
+      });
+  }
+  
 
   estadoTexto(estado: number | string): string {
     const estadoNumber = Number(estado);
@@ -267,44 +297,76 @@ export class PermisoDetalleSolicitudPage implements OnInit {
       return;
     }
 
-    if (this.imprimiendo) return;
+    if (this.imprimiendo) {
+      return;
+    }
 
     this.imprimiendo = true;
 
-    await this.ObtenerLogo();
-    await this.ObtenerColores();
+    try {
 
-    const data = this.construirPayloadReporteSolicitudPermiso();
+      await this.ObtenerLogo();
 
-    this.reportes.generarReporteServicio('solicitud-permiso', 'pdf', data).subscribe({
-      next: ({ blob, filename }) => {
-        this.imprimiendo = false;
-        this.descargarArchivo(blob, filename);
-        this.mostrarToast('Reporte generado correctamente.', 'success');
-      },
-      error: (error) => {
-        console.error('Error generando reporte de permiso:', error);
+      await this.ObtenerColores();
 
-        this.imprimiendo = false;
+      const data = this.construirPayloadReporteSolicitudPermiso();
 
-        this.mostrarToast(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',
-          'danger'
-        );
-      }
-    });
+      this.reportes.generarReporteServicio('solicitud-permiso', 'pdf', data).subscribe({
+        next: async ({ blob, filename }) => {
+          try {
+            await this.descargarArchivo(blob, filename);
+
+            this.mostrarToast('Reporte guardado correctamente.', 'success');
+          } catch (error) {
+            console.error('[PERMISO PDF ERROR A] Error guardando reporte de permiso:', error);
+
+            this.mostrarToast(
+              'El reporte se generó, pero no se pudo guardar en el dispositivo.',
+              'danger'
+            );
+          } finally {
+            this.imprimiendo = false;
+          }
+        },
+        error: (error) => {
+
+          this.imprimiendo = false;
+
+          this.mostrarToast(
+            'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',
+            'danger'
+          );
+        }
+      });
+
+    } catch (error) {
+      this.imprimiendo = false;
+      this.mostrarToast(
+        'No se pudo preparar la información del reporte.',
+        'danger'
+      );
+    }
   }
 
   construirPayloadReporteSolicitudPermiso() {
     const nombreUsuario =
       localStorage.getItem('fullname') ||
       localStorage.getItem('nombre_usuario') ||
+      [
+        localStorage.getItem('nom'),
+        localStorage.getItem('ap')
+      ].filter(Boolean).join(' ').trim() ||
+      localStorage.getItem('username') ||
       'Usuario AQHora';
 
     const nombreEmpresa =
       localStorage.getItem('nombre_empresa') ||
       this.solicitud?.nom_empresa ||
       '';
+
+    const aprobacionesOrdenadas = [...(this.historialAprobaciones || [])]
+      .filter((h: any) => h?.activo !== false)
+      .sort((a: any, b: any) => Number(a?.orden_paso ?? 0) - Number(b?.orden_paso ?? 0));
 
     return {
       usuario: nombreUsuario,
@@ -413,16 +475,54 @@ export class PermisoDetalleSolicitudPage implements OnInit {
           null,
       },
 
-      aprobaciones: []
+      aprobaciones: aprobacionesOrdenadas.map((h: any) => ({
+        orden_paso: h.orden_paso,
+        departamento_nombre: h.departamento_nombre,
+        empleado_nombre: h.empleado_nombre,
+        accion: h.accion,
+        fecha_hora_accion: h.fecha_hora_accion,
+        observacion: h.observacion ?? null,
+        cargo_en_momento: h.cargo_en_momento ?? null,
+      }))
     };
   }
 
-  descargarArchivo(blob: Blob, filename: string) {
+  async descargarArchivo(blob: Blob, filename: string) {
+    const nombreArchivo = this.limpiarNombreArchivo(
+      filename || `solicitud_permiso_${this.solicitud?.id ?? new Date().getTime()}.pdf`
+    );
+
+    const base64 = await this.blobToBase64(blob);
+
+
+    if (Capacitor.isNativePlatform()) {
+
+      const resultado = await Filesystem.writeFile({
+        path: nombreArchivo,
+        data: base64,
+        directory: Directory.Cache,
+        recursive: true
+      });
+
+      try {
+
+        await FileOpener.open({
+          filePath: resultado.uri,
+          contentType: 'application/pdf'
+        });
+
+
+      } catch (error) {
+      }
+
+      return;
+    }
+
     const url = window.URL.createObjectURL(blob);
 
     const link = document.createElement('a');
     link.href = url;
-    link.download = filename;
+    link.download = nombreArchivo;
     link.target = '_blank';
 
     document.body.appendChild(link);
@@ -430,6 +530,39 @@ export class PermisoDetalleSolicitudPage implements OnInit {
 
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
+  }
+
+  private async blobToBase64(blob: Blob): Promise<string> {
+
+    try {
+      const buffer = await blob.arrayBuffer();
+
+      const bytes = new Uint8Array(buffer);
+
+      let binary = '';
+      const chunkSize = 0x8000;
+
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        const chunk = bytes.subarray(i, i + chunkSize);
+        binary += String.fromCharCode.apply(null, Array.from(chunk));
+      }
+
+      const base64 = btoa(binary);
+
+      return base64;
+
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private limpiarNombreArchivo(nombre: string): string {
+    const limpio = nombre
+      .replace(/[\\/:*?"<>|]/g, '_')
+      .replace(/\s+/g, '_')
+      .trim();
+
+    return limpio.toLowerCase().endsWith('.pdf') ? limpio : `${limpio}.pdf`;
   }
 
   async confirmarEliminar() {

@@ -10,6 +10,7 @@ import { ParametrosSistema } from 'src/app/libs/parametros.emun';
 import { SocketService } from 'src/app/services/socket.service';
 import { SessionStorageService } from 'src/app/services/session-storage.service';
 import { PushNotificationService } from 'src/app/services/push-notification.service';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-login',
@@ -186,7 +187,12 @@ export class LoginPage implements OnInit {
       const datos = await this.relojService.ValidarCredencialesMT(credenciales);
 
       await this.registrarDatosLocales(datos);
-      await this.pushNotificationService.inicializarPushNotifications();
+      try {
+        await this.pushNotificationService.inicializarPushNotifications();
+      } catch (error) {
+        console.log('Error inicializando push:', error);
+      }
+
       await this.obtenerImagen64();
       await this.BuscarParametroNumeroDispositivos(datos);
 

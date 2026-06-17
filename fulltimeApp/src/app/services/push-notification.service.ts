@@ -3,6 +3,7 @@ import { Platform, NavController } from '@ionic/angular';
 import { HttpClient } from '@angular/common/http';
 import { Capacitor } from '@capacitor/core';
 import { Device } from '@capacitor/device';
+import { FCM } from '@capacitor-community/fcm';
 
 import {
     PushNotifications,
@@ -18,7 +19,7 @@ import { environment } from 'src/environments/environment';
 })
 export class PushNotificationService {
 
-    private listenersRegistrados: boolean = false;
+    private listenersRegistrados = false;
     private readonly CANAL_NOTIFICACIONES = 'fulltime_notificaciones_v2';
 
     constructor(
@@ -29,7 +30,6 @@ export class PushNotificationService {
 
     async inicializarPushNotifications(): Promise<void> {
         if (!Capacitor.isNativePlatform()) {
-            console.log('Push Notifications solo se inicializa en app nativa.');
             return;
         }
 
@@ -40,7 +40,6 @@ export class PushNotificationService {
         const permiso = await PushNotifications.requestPermissions();
 
         if (permiso.receive !== 'granted') {
-            console.log('Permiso de notificaciones no concedido.');
             return;
         }
 
@@ -53,7 +52,9 @@ export class PushNotificationService {
     }
 
     private async crearCanalAndroid(): Promise<void> {
-        if (Capacitor.getPlatform() !== 'android') return;
+        if (Capacitor.getPlatform() !== 'android') {
+            return;
+        }
 
         try {
             await PushNotifications.createChannel({
@@ -67,52 +68,65 @@ export class PushNotificationService {
                 lights: true,
                 lightColor: '#0f75bc'
             });
-
-            console.log('Canal de notificaciones Android creado correctamente.');
         } catch (error) {
-            console.log('No se pudo crear el canal de notificaciones Android:', error);
+            console.warn('No se pudo crear el canal de notificaciones Android:', error);
         }
     }
 
     private registrarListenersPush(): void {
         PushNotifications.addListener('registration', async (token: Token) => {
-            console.log('TOKEN PUSH FCM/APNS:', token.value);
+            try {
+                if (Capacitor.getPlatform() === 'ios') {
+                    const fcmToken = await FCM.getToken();
 
-            await this.registrarTokenPushEnBackend(token.value);
+                    if (!fcmToken?.token) {
+                        console.warn('No se pudo obtener token FCM en iOS.');
+                        return;
+                    }
+
+                    await this.registrarTokenPushEnBackend(fcmToken.token);
+                    return;
+                }
+
+                await this.registrarTokenPushEnBackend(token.value);
+
+            } catch (error) {
+                console.warn('Error procesando token push:', error);
+            }
         });
 
         PushNotifications.addListener('registrationError', (error: any) => {
-            console.log('Error al registrar push:', error);
+            console.warn('Error al registrar push:', error);
         });
 
         PushNotifications.addListener(
             'pushNotificationReceived',
-            (notification: PushNotificationSchema) => {
-                console.log('Push recibida con app abierta:', notification);
+            (_notification: PushNotificationSchema) => {
+                // La notificación se recibió con la app abierta.
             }
         );
 
         PushNotifications.addListener(
             'pushNotificationActionPerformed',
-            async (notification: ActionPerformed) => {
-                console.log('Usuario abrió la push:', notification);
-                console.log('Data push:', notification.notification.data);
-
+            async (_notification: ActionPerformed) => {
                 await this.navController.navigateRoot('/reloj');
             }
         );
     }
 
     private async registrarTokenPushEnBackend(tokenPush: string): Promise<void> {
-        const info = await Device.getInfo();
-        const id = await Device.getId();
+        if (!tokenPush) {
+            return;
+        }
 
         const idEmpleado = Number(localStorage.getItem('empleadoID') ?? 0);
 
         if (!idEmpleado) {
-            console.log('No se registra token push porque no existe empleadoID.');
             return;
         }
+
+        const info = await Device.getInfo();
+        const id = await Device.getId();
 
         const datos = {
             id_empleado: idEmpleado,
@@ -122,14 +136,10 @@ export class PushNotificationService {
             modelo_dispositivo: info.model
         };
 
-        console.log('DATOS TOKEN PUSH PARA BACKEND:', datos);
-
         this.http.post(`${environment.urlMultitenant}/push/registrar-token`, datos).subscribe({
-            next: (res) => {
-                console.log('Token push registrado correctamente.', res);
-            },
+            next: () => { },
             error: (error) => {
-                console.log('Error al registrar token push:', error);
+                console.warn('Error al registrar token push:', error);
             }
         });
     }

@@ -6,6 +6,9 @@ import { ReportesMicroService } from 'src/app/services/reportes-micro.service';
 import { PermisosAccionesService } from 'src/app/services/permisos-acciones.service';
 import { EmpresaService } from 'src/app/services/empresa.service';
 import { firstValueFrom } from 'rxjs';
+import { Capacitor } from '@capacitor/core';
+import { Directory, Filesystem } from '@capacitor/filesystem';
+import { FileOpener } from '@capacitor-community/file-opener';
 
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { DatosGeneralesService } from 'src/app/services/datos-generales.service';
@@ -27,6 +30,7 @@ export class VacacionDetalleSolicitudPage implements OnInit {
   s_color: any = null;
   frase: any = null;
   imagen: string = localStorage.getItem('imagen64') ?? '';
+  historialAprobaciones: any[] = [];
 
   constructor(
     private router: Router,
@@ -61,6 +65,8 @@ export class VacacionDetalleSolicitudPage implements OnInit {
     await this.ObtenerColores();
 
     await this.cargarPermisosAcciones();
+
+    this.cargarHistorialAprobaciones();
   }
 
   ObtenerLogo(): Promise<void> {
@@ -106,6 +112,35 @@ export class VacacionDetalleSolicitudPage implements OnInit {
 
   obtenerIdSolicitud(): number {
     return Number(this.solicitud?.id_solicitud_vacacion || this.solicitud?.id || 0);
+  }
+
+  private cargarHistorialAprobaciones(): void {
+    const idSolicitud = this.obtenerIdSolicitud();
+
+    if (!idSolicitud) {
+      this.historialAprobaciones = [];
+      return;
+    }
+
+    this.aprobacionesService
+      .ListarHistorialSolicitud('VACACION', idSolicitud)
+      .subscribe({
+        next: (data: any[]) => {
+          const rows = Array.isArray(data) ? data : [];
+
+          this.historialAprobaciones = rows.filter((r: any) => r?.activo !== false);
+
+          console.log('[VACACION PDF HISTORIAL] Historial aprobaciones cargado', {
+            idSolicitud,
+            total: this.historialAprobaciones.length,
+            historial: this.historialAprobaciones
+          });
+        },
+        error: (error) => {
+          console.error('[VACACION PDF HISTORIAL ERROR] No se pudo cargar historial', error);
+          this.historialAprobaciones = [];
+        }
+      });
   }
 
   estadoTexto(estado: number | string): string {
@@ -627,7 +662,7 @@ export class VacacionDetalleSolicitudPage implements OnInit {
     this.generarReporteSolicitudVacacion();
   }
 
-  generarReporteSolicitudVacacion() {
+  async generarReporteSolicitudVacacion() {
     if (!this.solicitud) {
       this.mostrarToast('No se encontró la solicitud para generar el reporte.', 'warning');
       return;
@@ -637,34 +672,79 @@ export class VacacionDetalleSolicitudPage implements OnInit {
 
     this.imprimiendo = true;
 
-    const data = this.construirPayloadReporteSolicitud();
+    try {
+      await this.ObtenerLogo();
+      await this.ObtenerColores();
 
-    this.reportes.generarReporteServicio('solicitud-vacacion', 'pdf', data).subscribe({
-      next: ({ blob, filename }) => {
-        this.imprimiendo = false;
-        this.descargarArchivo(blob, filename);
-        this.mostrarToast('Reporte generado correctamente.', 'success');
-      },
-      error: () => {
-        this.imprimiendo = false;
-        this.mostrarToast(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',
-          'danger'
-        );
-      }
-    });
+      const data = this.construirPayloadReporteSolicitud();
+
+      console.log('[VACACION PDF 01] Payload armado', {
+        idSolicitud: data?.solicitud?.id,
+        empresa: data?.empresa,
+        totalAprobaciones: data?.aprobaciones?.length ?? 0,
+        aprobaciones: data?.aprobaciones ?? []
+      });
+
+      this.reportes.generarReporteServicio('solicitud-vacacion', 'pdf', data).subscribe({
+        next: async ({ blob, filename }) => {
+          try {
+            await this.descargarArchivo(blob, filename);
+
+            this.mostrarToast('Reporte guardado correctamente.', 'success');
+          } catch (error) {
+            console.error('[VACACION PDF ERROR A] Error guardando reporte de vacación:', error);
+
+            this.mostrarToast(
+              'El reporte se generó, pero no se pudo guardar en el dispositivo.',
+              'danger'
+            );
+          } finally {
+            this.imprimiendo = false;
+          }
+        },
+        error: (error) => {
+          console.error('[VACACION PDF ERROR B] Error generando reporte:', error);
+
+          this.imprimiendo = false;
+
+          this.mostrarToast(
+            'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',
+            'danger'
+          );
+        }
+      });
+
+    } catch (error) {
+      console.error('[VACACION PDF ERROR C] Error preparando reporte:', error);
+
+      this.imprimiendo = false;
+
+      this.mostrarToast(
+        'No se pudo preparar la información del reporte.',
+        'danger'
+      );
+    }
   }
 
   construirPayloadReporteSolicitud() {
     const nombreUsuario =
       localStorage.getItem('fullname') ||
       localStorage.getItem('nombre_usuario') ||
+      [
+        localStorage.getItem('nom'),
+        localStorage.getItem('ap')
+      ].filter(Boolean).join(' ').trim() ||
+      localStorage.getItem('username') ||
       'Usuario AQHora';
 
     const nombreEmpresa =
       localStorage.getItem('nombre_empresa') ||
       this.solicitud?.nom_empresa ||
       '';
+
+    const aprobacionesOrdenadas = [...(this.historialAprobaciones || [])]
+      .filter((h: any) => h?.activo !== false)
+      .sort((a: any, b: any) => Number(a?.orden_paso ?? 0) - Number(b?.orden_paso ?? 0));
 
     return {
       usuario: nombreUsuario,
@@ -711,16 +791,50 @@ export class VacacionDetalleSolicitudPage implements OnInit {
         nom_departamento: this.solicitud.nom_departamento || this.solicitud.nombre_departamento || null,
       },
 
-      aprobaciones: []
+      aprobaciones: aprobacionesOrdenadas.map((h: any) => ({
+        orden_paso: h.orden_paso,
+        departamento_nombre: h.departamento_nombre,
+        empleado_nombre: h.empleado_nombre,
+        accion: h.accion,
+        fecha_hora_accion: h.fecha_hora_accion,
+        observacion: h.observacion ?? null,
+        cargo_en_momento: h.cargo_en_momento ?? null,
+      }))
     };
   }
 
-  descargarArchivo(blob: Blob, filename: string) {
+  async descargarArchivo(blob: Blob, filename: string) {
+    const nombreArchivo = this.limpiarNombreArchivo(
+      filename || `solicitud_vacacion_${this.obtenerIdSolicitud() || new Date().getTime()}.pdf`
+    );
+
+    const base64 = await this.blobToBase64(blob);
+
+    if (Capacitor.isNativePlatform()) {
+      const resultado = await Filesystem.writeFile({
+        path: nombreArchivo,
+        data: base64,
+        directory: Directory.Cache,
+        recursive: true
+      });
+
+      try {
+        await FileOpener.open({
+          filePath: resultado.uri,
+          contentType: 'application/pdf'
+        });
+      } catch (error) {
+        console.error('[VACACION PDF OPEN ERROR] Archivo guardado, pero no se pudo abrir:', error);
+      }
+
+      return;
+    }
+
     const url = window.URL.createObjectURL(blob);
 
     const link = document.createElement('a');
     link.href = url;
-    link.download = filename;
+    link.download = nombreArchivo;
     link.target = '_blank';
 
     document.body.appendChild(link);
@@ -728,6 +842,37 @@ export class VacacionDetalleSolicitudPage implements OnInit {
 
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
+  }
+
+  private async blobToBase64(blob: Blob): Promise<string> {
+    try {
+      const buffer = await blob.arrayBuffer();
+
+      const bytes = new Uint8Array(buffer);
+
+      let binary = '';
+      const chunkSize = 0x8000;
+
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        const chunk = bytes.subarray(i, i + chunkSize);
+        binary += String.fromCharCode.apply(null, Array.from(chunk));
+      }
+
+      return btoa(binary);
+
+    } catch (error) {
+      console.error('[VACACION PDF BASE64 ERROR] Error convirtiendo blob a base64:', error);
+      throw error;
+    }
+  }
+
+  private limpiarNombreArchivo(nombre: string): string {
+    const limpio = nombre
+      .replace(/[\\/:*?"<>|]/g, '_')
+      .replace(/\s+/g, '_')
+      .trim();
+
+    return limpio.toLowerCase().endsWith('.pdf') ? limpio : `${limpio}.pdf`;
   }
 
   async mostrarToast(mensaje: string, color: 'success' | 'warning' | 'danger') {
