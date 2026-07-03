@@ -13,7 +13,7 @@
   --app-text: #1f2937;
   --app-text-soft: #64748b;
   --app-border: rgba(15, 23, 42, 0.09);
-  --app-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
+  --app-shadow: 0 6px 18px rgba(15, 23, 42, 0.1);
 
   --estado-laboral: #22c55e;
   --estado-feriado: #0f75bc;
@@ -68,7 +68,11 @@
   margin: 14px;
   padding: 18px 16px;
   border-radius: 22px;
-  background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  background: linear-gradient(
+    135deg,
+    var(--app-primary),
+    var(--app-primary-dark)
+  );
   color: #ffffff;
   box-shadow: 0 7px 18px rgba(15, 117, 188, 0.22);
   text-align: center;
@@ -223,7 +227,11 @@
 }
 
 .columnaCabecera {
-  background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  background: linear-gradient(
+    135deg,
+    var(--app-primary),
+    var(--app-primary-dark)
+  );
   color: #ffffff;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -259,7 +267,8 @@
   border: 1px solid var(--app-border);
   border-radius: 13px;
   padding: 7px 4px;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease,
+    border-color 0.12s ease;
 }
 
 .cuadroDia:active {
@@ -314,7 +323,7 @@
 }
 
 .modalHorario::part(backdrop) {
-  background: rgba(15, 23, 42, 0.45);
+  background: rgba(15, 23, 42, 0.55);
   opacity: 1;
 }
 
@@ -581,57 +590,78 @@
     background: #111827;
   }
 
-  /* El modal se mantiene claro para evitar texto ilegible */
+  .modalHorario::part(backdrop) {
+    background: rgba(0, 0, 0, 0.65);
+    opacity: 1;
+  }
+
   .modalHorario::part(content) {
-    background: #ffffff;
+    background: #1e293b !important;
+    border-radius: 22px;
+    overflow: hidden;
   }
 
   .modal-horario-content {
-    --background: #f4f7fb;
+    --background: #1e293b !important;
   }
 
   .modal-header {
-    background: #ffffff;
-    border-bottom-color: rgba(15, 23, 42, 0.08);
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   .modal-header h2 {
-    color: #0f172a !important;
+    color: #f8fafc !important;
   }
 
   .modal-header p {
-    color: #64748b !important;
-  }
-
-  .horario-card {
-    background: #ffffff;
-  }
-
-  .horario-card ion-card-title {
-    color: #64748b;
-  }
-
-  .detalle-item {
-    --background: #f8fafc;
-    --color: #1f2937;
-  }
-
-  .detalle-item ion-label span {
-    color: #475569;
-  }
-
-  .detalle-item ion-label strong {
-    color: #111827;
+    color: #cbd5e1 !important;
   }
 
   .btn-cerrar-modal::part(native) {
-    background: #e8f4fd !important;
-    color: #0f75bc !important;
+    background: rgba(14, 165, 233, 0.16) !important;
+    color: #38bdf8 !important;
+    border: 1px solid rgba(56, 189, 248, 0.22) !important;
   }
 
   .btn-cerrar-modal ion-icon {
-    color: #0f75bc !important;
-    fill: #0f75bc !important;
+    color: #38bdf8 !important;
+    fill: #38bdf8 !important;
+  }
+
+  .horario-card {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.32);
+  }
+
+  .horario-card ion-card-title {
+    color: #cbd5e1 !important;
+  }
+
+  .detalle-item {
+    --background: #111827 !important;
+    --color: #f8fafc !important;
+    background: #111827 !important;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .detalle-icon {
+    background: rgba(14, 165, 233, 0.16) !important;
+  }
+
+  .detalle-icon ion-icon {
+    color: #38bdf8 !important;
+  }
+
+  .detalle-item ion-label span {
+    color: #cbd5e1 !important;
+  }
+
+  .detalle-item ion-label strong {
+    color: #f8fafc !important;
   }
 }
 
@@ -684,7 +714,7 @@
 
   .modalHorario {
     --width: 90%;
-    --height: 60%;
+    --max-height: 72%;
   }
 
   .modal-header {

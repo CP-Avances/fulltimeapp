@@ -4,7 +4,9 @@
     <div class="confirmacion-wrapper">
 
       <section class="logo-section">
-        <img class="logo-app" src="../../../assets/images/ISOLOGO.png" alt="AQHora">
+        <div class="logo-box">
+          <img class="logo-app" src="../../../assets/images/ISOLOGO.png" alt="AQHora">
+        </div>
 
         <ion-label mode="md" class="app-title">
           <b>Reloj Virtual</b>
@@ -81,11 +83,7 @@
           <img src="../../../assets/images/woman.png" alt="Timbre enviado">
         </div>
 
-        <ion-button
-          expand="block"
-          shape="round"
-          class="btn-inicio"
-          (click)="irABienvenido()">
+        <ion-button expand="block" shape="round" class="btn-inicio" (click)="irABienvenido()">
 
           <ion-icon name="home-outline" slot="start"></ion-icon>
           Ir a inicio

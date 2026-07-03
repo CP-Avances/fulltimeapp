@@ -236,7 +236,13 @@ export class ConfirmaciontimbrePage implements OnInit {
     }
   }
 
-  irABienvenido() {
-    this.navCtroller.navigateForward(['reloj']);
-  }
+irABienvenido() {
+  localStorage.setItem('refrescarUltimoTimbre', 'true');
+
+  this.navCtroller.navigateRoot(['/reloj/bienvenido'], {
+    queryParams: {
+      refreshUltimoTimbre: new Date().getTime()
+    }
+  });
+}
 }
