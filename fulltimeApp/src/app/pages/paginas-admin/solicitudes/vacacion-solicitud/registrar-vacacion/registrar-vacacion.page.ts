@@ -10,7 +10,8 @@ import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { DatosGeneralesService } from 'src/app/services/datos-generales.service';
 import { AprobacionesService } from 'src/app/services/aprobaciones.service';
 import { TipoNotificacion } from 'src/app/interfaces/tipo-notificaciones.enum';
- 
+import { ValidacionesService } from 'src/app/libs/validaciones.service';
+
 @Component({
   selector: 'app-registrar-vacacion',
   templateUrl: './registrar-vacacion.page.html',
@@ -48,6 +49,8 @@ export class RegistrarVacacionPage implements OnInit {
 
   nombreArchivo = '';
   archivoSeleccionado: File | null = null;
+  storageMbUsado: number = 0;
+  storageMbContratado: number = 0;
 
   feriados: IFeriado[] = [];
   idEmpleado!: number;
@@ -69,6 +72,7 @@ export class RegistrarVacacionPage implements OnInit {
     private notificacionesService: NotificacionesService,
     private datosGeneralesService: DatosGeneralesService,
     private aprobacionesService: AprobacionesService,
+    private validar: ValidacionesService,
 
   ) { }
 
@@ -76,10 +80,34 @@ export class RegistrarVacacionPage implements OnInit {
     this.idEmpleado = parseInt(localStorage.getItem('empleadoID') || '0', 10);
     this.idSucursal = parseInt(localStorage.getItem('csucur') || '0', 10);
 
+    this.CargarStorageTenant();
     this.cargarTiposVacacion();
     this.cargarSaldoEmpleado();
     this.cargarFeriados();
   }
+
+  // CONTROLAR USO DE ALMACENAMIENTO
+  private CargarStorageTenant(): void {
+    this.storageMbUsado = Number(localStorage.getItem('storage_mb_usado') ?? 0);
+    this.storageMbContratado = Number(localStorage.getItem('storage_mb_contratado') ?? 0);
+  }
+
+  private ValidarStorageArchivoAdjunto(): boolean {
+    const validacionStorage = this.validar.ValidarLimiteStorageArchivo(
+      this.archivoSeleccionado,
+      this.storageMbUsado,
+      this.storageMbContratado,
+      1
+    );
+
+    if (!validacionStorage.permitido) {
+      this.mostrarToast(validacionStorage.mensaje, 'warning');
+      return false;
+    }
+
+    return true;
+  }
+
 
   cargarTiposVacacion() {
     this.cargandoTipos = true;
@@ -255,6 +283,12 @@ export class RegistrarVacacionPage implements OnInit {
 
     this.archivoSeleccionado = file;
     this.nombreArchivo = file.name;
+
+    if (!this.ValidarStorageArchivoAdjunto()) {
+      this.quitarArchivo();
+      event.target.value = '';
+      return;
+    }
   }
 
   quitarArchivo() {
@@ -386,6 +420,10 @@ export class RegistrarVacacionPage implements OnInit {
 
     if (this.archivoSeleccionado && this.archivoSeleccionado.size > 2e6) {
       this.mostrarToast('El archivo ha excedido el tamaño permitido. Máximo 2MB.', 'warning');
+      return;
+    }
+
+    if (!this.ValidarStorageArchivoAdjunto()) {
       return;
     }
 
@@ -809,7 +847,7 @@ export class RegistrarVacacionPage implements OnInit {
 
     return Array.from(new Set([...jefes, ...especificos]));
   }
-  
+
   private mapearEstadoTexto(estado: number): string {
     switch (Number(estado)) {
       case 1:

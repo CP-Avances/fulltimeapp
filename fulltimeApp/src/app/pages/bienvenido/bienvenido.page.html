@@ -5,7 +5,7 @@
   </ng-container>
 
 
-  <ion-content [fullscreen]="true">
+  <ion-content [fullscreen]="true" class="inicio-content" scrollY="false">
     <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean"></app-refresh-info>
 
     <section class="marca-inicio">
@@ -161,10 +161,39 @@
       </svg>
     </div>
 
+    <ion-card class="ultimo-timbre-card" *ngIf="ultimoTimbre">
+      <ion-card-content>
+
+        <div class="ultimo-timbre-header">
+          <ion-icon name="time-outline"></ion-icon>
+          <span>Último timbre</span>
+        </div>
+
+        <h2>{{ obtenerNombreTimbre(ultimoTimbre.accion, ultimoTimbre.tecla_funcion) }}</h2>
+
+        <p>
+          {{ ultimoTimbre.fecha_hora_timbre_servidor | date:'dd/MM/yyyy HH:mm' }}
+        </p>
+
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="ultimo-timbre-card sin-timbre"
+      *ngIf="!ultimoTimbre && !cargandoUltimoTimbre && !sinConexionUltimoTimbre">
+      <ion-card-content>
+        <div class="ultimo-timbre-header">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <span>Último timbre</span>
+        </div>
+
+        <p>No registra timbres todavía.</p>
+      </ion-card-content>
+    </ion-card>
+
     <div class="Info_hora">
       <ion-fab class="btn-timbre-abierto">
-        <ion-fab-button (click)="VerificarTimbreEspecial('Timbre abierto')" horarioAbierto color="tertiary">
-          <ion-icon name="alarm-outline"></ion-icon>
+        <ion-fab-button class="btn-especial-verde" (click)="VerificarTimbreEspecial('Timbre abierto')" horarioAbierto>
+          <ion-icon name="star"></ion-icon>
         </ion-fab-button>
       </ion-fab>
 
@@ -190,43 +219,20 @@
 
           <ion-row>
             <ion-col size="6">
-              <ion-button class="tamanoBoton" (click)="VerificarTimbresSinInternet('Inicio jornada laboral')">
+              <ion-button class="tamanoBoton btn-inicio"
+                (click)="VerificarTimbresSinInternet('Inicio jornada laboral')">
                 <div class="tamano">
-                  Inicio <br>
-                  Jornada<br>
-                  Laboral
+                  <ion-icon name="log-in-outline"></ion-icon>
+                  <span>Inicio jornada laboral</span>
                 </div>
               </ion-button>
             </ion-col>
 
             <ion-col size="6">
-              <ion-button class="tamanoBoton" color="dark" (click)="VerificarTimbresSinInternet('Fin jornada laboral')">
+              <ion-button class="tamanoBoton btn-fin" (click)="VerificarTimbresSinInternet('Fin jornada laboral')">
                 <div class="tamano">
-                  Fin <br>
-                  Jornada <br>
-                  Laboral
-                </div>
-              </ion-button>
-            </ion-col>
-
-          </ion-row>
-
-          <ion-row>
-
-            <ion-col size="6">
-              <ion-button class="tamanoBoton" (click)="VerificarTimbresSinInternet('Inicio alimentación')">
-                <div class="tamano">
-                  Inicio <br>
-                  Alimentación
-                </div>
-              </ion-button>
-            </ion-col>
-
-            <ion-col size="6">
-              <ion-button color="dark" class="tamanoBoton" (click)="VerificarTimbresSinInternet('Fin alimentación')">
-                <div class="tamano">
-                  Fin <br>
-                  Alimentación
+                  <ion-icon name="log-out-outline"></ion-icon>
+                  <span>Fin jornada laboral</span>
                 </div>
               </ion-button>
             </ion-col>
@@ -236,19 +242,41 @@
           <ion-row>
 
             <ion-col size="6">
-              <ion-button [color]="colorIp" class="tamanoBoton" (click)="btn_InicioPermisosClick()">
+              <ion-button class="tamanoBoton btn-inicio" (click)="VerificarTimbresSinInternet('Inicio alimentación')">
                 <div class="tamano">
-                  Inicio<br>
-                  Permiso
+                  <ion-icon name="restaurant-outline"></ion-icon>
+                  <span>Inicio alimentación</span>
                 </div>
               </ion-button>
             </ion-col>
 
             <ion-col size="6">
-              <ion-button [color]="colorFp" class="tamanoBoton" (click)="btn_FinPermisosClick()">
+              <ion-button class="tamanoBoton btn-fin" (click)="VerificarTimbresSinInternet('Fin alimentación')">
                 <div class="tamano">
-                  Fin <br>
-                  Permiso
+                  <ion-icon name="cafe-outline"></ion-icon>
+                  <span>Fin alimentación</span>
+                </div>
+              </ion-button>
+            </ion-col>
+
+          </ion-row>
+
+          <ion-row>
+
+            <ion-col size="6">
+              <ion-button class="tamanoBoton btn-permiso" (click)="btn_InicioPermisosClick()">
+                <div class="tamano">
+                  <ion-icon name="open-outline"></ion-icon>
+                  <span>Inicio permiso</span>
+                </div>
+              </ion-button>
+            </ion-col>
+
+            <ion-col size="6">
+              <ion-button class="tamanoBoton btn-permiso-fin" (click)="btn_FinPermisosClick()">
+                <div class="tamano">
+                  <ion-icon name="checkmark-circle-outline"></ion-icon>
+                  <span>Fin permiso</span>
                 </div>
               </ion-button>
             </ion-col>

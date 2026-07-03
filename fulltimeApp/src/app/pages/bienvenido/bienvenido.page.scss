@@ -12,66 +12,94 @@
   --app-border: rgba(15, 23, 42, 0.08);
   --app-shadow: 0 6px 18px rgba(15, 23, 42, 0.1);
   --app-shadow-soft: 0 3px 10px rgba(15, 23, 42, 0.08);
+
+  --btn-inicio: #0f83c9;
+  --btn-fin: #2d3438;
+  --btn-permiso: #facb4b;
+  --btn-permiso-fin: #f8ad12;
+  --btn-especial: #22c55e;
+  --btn-especial-dark: #16a34a;
 }
 
 /* ===============================
    CONTENIDO GENERAL
 ================================ */
 
-ion-content {
+ion-content,
+.inicio-content {
   --background: var(--app-bg);
-  --padding-bottom: 78px;
+  --padding-bottom: 66px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.inicio-content::part(scroll) {
+  overflow: hidden !important;
+}
+
+/* ===============================
+   LOGO INICIO
+================================ */
+
+.marca-inicio {
+  width: 100%;
+  margin: 4px auto 3px auto;
   text-align: center;
 }
+
+.marca-logo-box {
+  width: fit-content;
+  max-width: 54%;
+  margin: 0 auto;
+  padding: 5px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.1);
+}
+
+.marca-logo {
+  display: block;
+  width: 112px;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.marca-inicio p {
+  margin: 2px 0 0 0;
+  color: var(--app-text-soft);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+/* ===============================
+   IMAGEN SVG CON MOVIMIENTO
+================================ */
 
 .fondo {
   background: var(--app-card);
   position: relative;
   display: block;
-  padding: 10px 14px 6px 14px;
-  margin: 8px 12px 0 12px;
-  border-radius: 0 0 24px 24px;
+  padding: 5px 10px;
+  margin: 5px 12px 0 12px;
+  border-radius: 18px;
   box-shadow: var(--app-shadow-soft);
+  height: 122px;
+  overflow: hidden;
 }
 
-.center {
-  display: block;
-  margin: 0 auto;
-  width: 34%;
-  max-width: 145px;
-  min-width: 95px;
-}
-
-.fondo ion-label h1 {
-  margin: 2px 0 0 0 !important;
-  font-size: 11px !important;
-  font-weight: 700;
-  color: var(--app-text-soft);
-  letter-spacing: 0.2px;
-}
-
-/* Imagen SVG */
 .imgsvg,
 .imsvg {
-  display: block;
-  margin: 6px auto 10px auto !important;
-  max-width: 92%;
+  display: block !important;
+  width: 92% !important;
+  height: 112px !important;
+  max-width: 92% !important;
+  margin: 0 auto !important;
 }
 
-/* Si la imagen SVG está dentro de img o ion-img */
-.imgsvg img,
-.imsvg img,
-.imgsvg ion-img,
-.imsvg ion-img {
-  width: 100%;
-  max-height: 285px;
-  object-fit: contain;
-}
-
-/* ===============================
-   ANIMACIONES SVG
-================================ */
-
+/* Mantiene el movimiento de tu SVG */
 #Sol {
   animation: animacion 40s infinite;
 }
@@ -104,57 +132,113 @@ ion-content {
 }
 
 /* ===============================
-   FECHA, HORA Y TIMBRE ABIERTO
+   ÚLTIMO TIMBRE
+================================ */
+
+.ultimo-timbre-card {
+  margin: 8px 14px 0 14px;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: var(--app-shadow-soft);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.ultimo-timbre-card ion-card-content {
+  padding: 10px 12px;
+  text-align: center;
+}
+
+.ultimo-timbre-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+
+.ultimo-timbre-header ion-icon {
+  font-size: 15px;
+  color: var(--app-primary);
+}
+
+.ultimo-timbre-card h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.ultimo-timbre-card p {
+  margin: 4px 0 0 0;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.sin-timbre {
+  background: #f8fafc;
+}
+
+/* ===============================
+   FECHA, HORA Y TIMBRE ESPECIAL
 ================================ */
 
 .Info_hora {
   position: relative;
   display: block;
-  margin: 10px 14px 8px 14px;
-  padding: 11px 70px 12px 14px;
+  margin: 8px 14px 0 14px;
+  padding: 9px 60px 9px 12px;
   border-radius: 18px;
   background: var(--app-card);
   box-shadow: var(--app-shadow-soft);
-  min-height: 72px;
+  min-height: 58px;
 }
 
 .Info_hora h3 {
-  margin: 0 0 6px 0;
-  font-size: 12px !important;
-  font-weight: 700;
+  margin: 0 0 3px 0 !important;
+  font-size: 10.5px !important;
+  font-weight: 800;
   color: var(--app-text);
   text-transform: capitalize;
 }
 
 .tamanoHora {
-  font-size: 25px !important;
-  line-height: 1.05;
+  font-size: 21px !important;
+  line-height: 1;
   color: var(--app-text);
   letter-spacing: 0.2px;
 }
 
-/* Botón flotante timbre abierto */
+/* Botón especial verde */
 .Info_hora ion-fab {
   position: absolute;
   top: 50%;
-  right: 14px;
+  right: 12px;
   transform: translateY(-50%);
   width: auto !important;
   height: auto !important;
 }
 
-.Info_hora ion-fab-button {
-  --background: linear-gradient(135deg, #5b6cff, #4f46e5);
-  --background-activated: #4338ca;
-  --background-hover: #4f46e5;
+.Info_hora ion-fab-button,
+.Info_hora ion-fab-button.btn-especial-verde {
+  --background: linear-gradient(
+    135deg,
+    var(--btn-especial),
+    var(--btn-especial-dark)
+  );
+  --background-activated: #15803d;
+  --background-hover: #16a34a;
   --color: #ffffff;
 
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   margin: 0;
-
   border-radius: 50%;
-  box-shadow: 0 8px 16px rgba(79, 70, 229, 0.32);
+  box-shadow: 0 8px 16px rgba(34, 197, 94, 0.3);
 }
 
 .Info_hora ion-fab-button::part(native) {
@@ -162,20 +246,21 @@ ion-content {
 }
 
 .Info_hora ion-fab-button ion-icon {
-  font-size: 22px;
+  font-size: 21px;
+  color: #ffffff;
 }
 
 /* ===============================
-   TARJETA DE BOTONES
+   TARJETA BOTONES
 ================================ */
 
 .botones {
   position: static;
-  margin: 0 12px 12px 12px;
+  margin: 8px 12px 0 12px;
 }
 
 .botones ion-card {
-  margin: 10px 0 0 0 !important;
+  margin: 0 !important;
   border-radius: 18px;
   background: var(--app-card);
   box-shadow: var(--app-shadow);
@@ -185,77 +270,119 @@ ion-content {
 
 .botones ion-card-title {
   display: block;
-  font-size: 13px !important;
-  font-weight: 700;
+  font-size: 11px !important;
+  font-weight: 900;
   color: var(--app-text) !important;
-  margin: 12px 10px 7px 10px !important;
+  margin: 10px 8px 7px 8px !important;
 }
 
 .botones ion-grid {
-  padding: 3px 10px 11px 10px;
+  padding: 3px 10px 13px 10px;
 }
 
 .botones ion-row {
-  margin-bottom: 3px;
+  margin-bottom: 5px;
+}
+
+.botones ion-row:last-child {
+  margin-bottom: 0;
 }
 
 .botones ion-col {
-  padding: 5px;
+  padding: 4px 5px;
 }
 
 /* ===============================
-   BOTONES DE TIMBRE
+   BOTONES COMO WEB
 ================================ */
 
 .tamanoBoton {
-  height: 56px;
+  height: 52px;
   width: 100%;
   margin: 0;
-  --border-radius: 12px;
-  --box-shadow: 0 4px 10px rgba(15, 23, 42, 0.16);
-  font-weight: 800;
+  --border-radius: 13px;
+  --box-shadow: 0 5px 11px rgba(15, 23, 42, 0.15);
   overflow: hidden;
+  font-weight: 900;
 }
 
-/* Botones azules */
-ion-button.tamanoBoton:not([color="dark"]) {
-  --background: linear-gradient(135deg, #3b82f6, #2563eb);
-  --background-activated: #1d4ed8;
-  --background-hover: #2563eb;
+.tamanoBoton::part(native) {
+  border-radius: 13px;
+  padding: 0 8px;
+}
+
+.tamano {
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  font-size: 8.8px;
+  line-height: 1.15;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  white-space: normal;
+  text-align: center;
+}
+
+.tamano ion-icon {
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.tamano span {
+  display: block;
+  max-width: 88px;
+}
+
+/* Colores específicos */
+ion-button.btn-inicio {
+  --background: #0f83c9;
+  --background-activated: #0b6fae;
+  --background-hover: #0b6fae;
   --color: #ffffff;
 }
 
-/* Botones oscuros */
-ion-button.tamanoBoton[color="dark"] {
-  --background: linear-gradient(135deg, #2f343b, #1f2329);
+ion-button.btn-fin {
+  --background: #2d3438;
   --background-activated: #111827;
   --background-hover: #1f2937;
   --color: #ffffff;
 }
 
-ion-button.tamanoBoton::part(native) {
-  border-radius: 12px;
+ion-button.btn-permiso {
+  --background: #facb4b;
+  --background-activated: #f5b82e;
+  --background-hover: #f5b82e;
+  --color: #3f2e00;
 }
 
-.tamano {
-  font-size: 11px;
-  line-height: 1.05;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.2px;
-  white-space: normal;
+ion-button.btn-permiso-fin {
+  --background: #f8ad12;
+  --background-activated: #e89a00;
+  --background-hover: #e89a00;
+  --color: #3f2e00;
 }
 
-/* ===============================
-   OTROS
-================================ */
-
-.textarea {
-  text-align: center;
+/* Compatibilidad si todavía usas color="dark" */
+ion-button.tamanoBoton[color="dark"] {
+  --background: #2d3438;
+  --background-activated: #111827;
+  --background-hover: #1f2937;
+  --color: #ffffff;
 }
 
-h3 {
-  margin-top: 0;
+/* Permisos deshabilitados */
+ion-button[color="deshabilitado"],
+ion-button.tamanoBoton[color="deshabilitado"] {
+  --background: #cfd6dd;
+  --background-activated: #cfd6dd;
+  --background-hover: #cfd6dd;
+  --color: #7b8794;
+  opacity: 0.8;
 }
 
 /* ===============================
@@ -273,13 +400,17 @@ h3 {
     --app-shadow-soft: 0 3px 12px rgba(0, 0, 0, 0.28);
   }
 
-  .fondo ion-label h1 {
-    color: var(--app-text-soft);
+  .marca-logo-box {
+    background: rgba(255, 255, 255, 0.98);
   }
 
+  .marca-inicio p {
+    color: #cbd5e1;
+  }
+
+  .fondo,
   .Info_hora,
-  .botones ion-card,
-  .fondo {
+  .botones ion-card {
     background: var(--app-card);
   }
 
@@ -289,231 +420,85 @@ h3 {
     color: var(--app-text) !important;
   }
 
-  ion-button.tamanoBoton:not([color="dark"]) {
-    --background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  .ultimo-timbre-card {
+    background: #ffffff;
   }
 
-  ion-button.tamanoBoton[color="dark"] {
-    --background: linear-gradient(135deg, #374151, #111827);
+  .ultimo-timbre-card h2 {
+    color: #0f172a;
+  }
+
+  .ultimo-timbre-card p,
+  .ultimo-timbre-header {
+    color: #64748b;
   }
 }
 
 /* ===============================
-   CELULARES ANGOSTOS
+   AJUSTE CELULARES ANGOSTOS
 ================================ */
 
 @media (max-width: 380px) {
-  ion-content {
-    --padding-bottom: 72px;
+  ion-content,
+  .inicio-content {
+    --padding-bottom: 64px;
   }
 
-  .fondo {
-    margin: 6px 10px 0 10px;
-    padding: 9px 10px 4px 10px;
-  }
-
-  .center {
-    width: 36%;
-  }
-
-  .imgsvg,
-  .imsvg {
-    margin: 5px auto 8px auto !important;
-    max-width: 92%;
-  }
-
-  .imgsvg img,
-  .imsvg img,
-  .imgsvg ion-img,
-  .imsvg ion-img {
-    max-height: 250px;
-  }
-
-  .Info_hora {
-    margin: 8px 12px 7px 12px;
-    padding: 10px 62px 11px 10px;
-    min-height: 68px;
-  }
-
-  .Info_hora h3 {
-    font-size: 12px !important;
-    margin-bottom: 5px;
-  }
-
-  .tamanoHora {
-    font-size: 22px !important;
-  }
-
-  .Info_hora ion-fab-button {
-    width: 44px;
-    height: 44px;
-  }
-
-  .botones {
-    margin: 0 10px 10px 10px;
-  }
-
-  .botones ion-card {
-    margin-top: 8px !important;
-  }
-
-  .botones ion-card-title {
-    font-size: 12px !important;
-    margin: 10px 8px 6px 8px !important;
-  }
-
-  .botones ion-grid {
-    padding: 2px 8px 10px 8px;
-  }
-
-  .botones ion-col {
-    padding: 4px;
-  }
-
-  .tamanoBoton {
-    height: 52px;
-  }
-
-  .tamano {
-    font-size: 10px;
-  }
-}
-
-/* ===============================
-   CELULARES PEQUEÑOS EN ALTURA
-   Este bloque es el más importante
-================================ */
-
-@media (max-height: 760px) {
-  ion-content {
-    --padding-bottom: 68px;
-  }
-
-  .fondo {
-    margin: 5px 10px 0 10px;
-    padding: 7px 10px 3px 10px;
-    border-radius: 0 0 20px 20px;
-  }
-
-  .center {
-    width: 30%;
-    max-width: 120px;
-    min-width: 85px;
-  }
-
-  .fondo ion-label h1 {
-    font-size: 10px !important;
-  }
-
-  .imgsvg,
-  .imsvg {
-    margin: 4px auto 7px auto !important;
-    max-width: 91%;
-  }
-
-  .imgsvg img,
-  .imsvg img,
-  .imgsvg ion-img,
-  .imsvg ion-img {
-    max-height: 220px;
-  }
-
-  .Info_hora {
-    margin: 7px 10px 6px 10px;
-    padding: 9px 58px 10px 10px;
-    min-height: 62px;
-    border-radius: 17px;
-  }
-
-  .Info_hora h3 {
-    font-size: 11px !important;
-    margin-bottom: 4px;
-  }
-
-  .tamanoHora {
-    font-size: 21px !important;
-  }
-
-  .Info_hora ion-fab {
-    right: 11px;
-  }
-
-  .Info_hora ion-fab-button {
-    width: 42px;
-    height: 42px;
-  }
-
-  .Info_hora ion-fab-button ion-icon {
-    font-size: 20px;
-  }
-
-  .botones {
-    margin: 0 10px 8px 10px;
-  }
-
-  .botones ion-card {
-    margin-top: 7px !important;
-    border-radius: 17px;
-  }
-
-  .botones ion-card-title {
-    font-size: 12px !important;
-    margin: 9px 8px 5px 8px !important;
-  }
-
-  .botones ion-grid {
-    padding: 2px 8px 9px 8px;
-  }
-
-  .botones ion-row {
+  .marca-inicio {
+    margin-top: 3px;
     margin-bottom: 2px;
   }
 
-  .botones ion-col {
-    padding: 4px;
+  .marca-logo-box {
+    padding: 4px 12px;
+    max-width: 58%;
   }
 
-  .tamanoBoton {
-    height: 48px;
-    --border-radius: 11px;
+  .marca-logo {
+    width: 104px;
   }
 
-  ion-button.tamanoBoton::part(native) {
-    border-radius: 11px;
+  .marca-inicio p {
+    font-size: 8.5px;
   }
 
-  .tamano {
-    font-size: 9.5px;
-    line-height: 1.02;
-  }
-}
-
-/* ===============================
-   CELULARES MUY PEQUEÑOS EN ALTURA
-================================ */
-
-@media (max-height: 700px) {
   .fondo {
-    margin-top: 4px;
-    padding-top: 6px;
+    margin: 4px 10px 0 10px;
+    padding: 4px 8px;
+    height: 110px;
   }
 
-  .imgsvg img,
-  .imsvg img,
-  .imgsvg ion-img,
-  .imsvg ion-img {
-    max-height: 185px;
+  .imgsvg,
+  .imsvg {
+    width: 90% !important;
+    max-width: 90% !important;
+    height: 102px !important;
+  }
+
+  .ultimo-timbre-card {
+    margin: 7px 12px 0 12px;
+  }
+
+  .ultimo-timbre-card ion-card-content {
+    padding: 9px 10px;
+  }
+
+  .ultimo-timbre-card h2 {
+    font-size: 14px;
+  }
+
+  .ultimo-timbre-card p {
+    font-size: 10.5px;
   }
 
   .Info_hora {
-    margin: 6px 9px 5px 9px;
-    padding: 8px 54px 8px 9px;
-    min-height: 58px;
+    margin: 7px 12px 0 12px;
+    padding: 8px 56px 8px 10px;
+    min-height: 54px;
   }
 
   .Info_hora h3 {
     font-size: 10px !important;
-    margin-bottom: 3px;
   }
 
   .tamanoHora {
@@ -521,12 +506,12 @@ h3 {
   }
 
   .Info_hora ion-fab-button {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
   }
 
   .botones {
-    margin: 0 9px 7px 9px;
+    margin: 7px 10px 0 10px;
   }
 
   .botones ion-card-title {
@@ -535,7 +520,7 @@ h3 {
   }
 
   .botones ion-grid {
-    padding: 1px 7px 8px 7px;
+    padding: 1px 8px 8px 8px;
   }
 
   .botones ion-col {
@@ -547,122 +532,22 @@ h3 {
   }
 
   .tamano {
-    font-size: 8.8px;
-    line-height: 1;
+    font-size: 8.4px;
+    gap: 4px;
+  }
+
+  .tamano ion-icon {
+    font-size: 13px;
   }
 }
 
 /* ===============================
-   LOGO INICIO
-   Solo afecta esta pantalla
+   AJUSTE PANTALLAS BAJAS
 ================================ */
-
-.marca-inicio {
-  width: 100%;
-  margin: 6px auto 6px auto;
-  text-align: center;
-}
-
-.marca-logo-box {
-  width: fit-content;
-  max-width: 58%;
-  margin: 0 auto;
-  padding: 7px 18px;
-  border-radius: 16px;
-
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.12);
-}
-
-.marca-logo {
-  display: block;
-  width: 128px;
-  max-width: 100%;
-  height: auto;
-  object-fit: contain;
-}
-
-.marca-inicio p {
-  margin: 3px 0 0 0;
-  color: var(--app-text-soft);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.2px;
-}
-
-/* Evita que el estilo global del logo blanco afecte esta pantalla */
-.marca-inicio.logo-contenedor,
-.marca-inicio .logo-contenedor {
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-/* ===============================
-   LOGO EN MODO OSCURO
-================================ */
-
-@media (prefers-color-scheme: dark) {
-  .marca-logo-box {
-    background: rgba(255, 255, 255, 0.98);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow:
-      0 6px 16px rgba(0, 0, 0, 0.32),
-      0 0 0 1px rgba(56, 189, 248, 0.08);
-  }
-
-  .marca-inicio p {
-    color: #cbd5e1;
-  }
-}
-
-/* ===============================
-   RESPONSIVE LOGO
-================================ */
-
-@media (max-width: 380px) {
-  .marca-inicio {
-    margin: 5px auto 5px auto;
-  }
-
-  .marca-logo-box {
-    padding: 6px 16px;
-    border-radius: 15px;
-    max-width: 62%;
-  }
-
-  .marca-logo {
-    width: 118px;
-  }
-
-  .marca-inicio p {
-    font-size: 9.5px;
-  }
-}
 
 @media (max-height: 760px) {
-  .marca-inicio {
-    margin: 4px auto 4px auto;
-  }
-
-  .marca-logo-box {
-    padding: 5px 14px;
-    border-radius: 14px;
-  }
-
   .marca-logo {
-    width: 110px;
-  }
-
-  .marca-inicio p {
-    font-size: 9px;
-    margin-top: 2px;
-  }
-}
-
-@media (max-height: 700px) {
-  .marca-logo {
-    width: 102px;
+    width: 100px;
   }
 
   .marca-logo-box {
@@ -671,5 +556,170 @@ h3 {
 
   .marca-inicio p {
     font-size: 8.5px;
+    margin-top: 1px;
+  }
+
+  .fondo {
+    height: 102px;
+    padding: 3px 8px;
+    margin-top: 4px;
+  }
+
+  .imgsvg,
+  .imsvg {
+    height: 96px !important;
+    width: 88% !important;
+    max-width: 88% !important;
+  }
+
+  .ultimo-timbre-card {
+    margin-top: 6px;
+  }
+
+  .ultimo-timbre-card ion-card-content {
+    padding: 8px 10px;
+  }
+
+  .ultimo-timbre-header {
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  .ultimo-timbre-card h2 {
+    font-size: 13.5px;
+  }
+
+  .ultimo-timbre-card p {
+    font-size: 10px;
+  }
+
+  .Info_hora {
+    margin-top: 6px;
+    min-height: 50px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+  }
+
+  .Info_hora h3 {
+    font-size: 9.5px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .tamanoHora {
+    font-size: 18px !important;
+  }
+
+  .Info_hora ion-fab-button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .Info_hora ion-fab-button ion-icon {
+    font-size: 18px;
+  }
+
+  .botones {
+    margin-top: 6px;
+  }
+
+  .botones ion-card-title {
+    font-size: 10.5px !important;
+    margin: 7px 8px 3px 8px !important;
+  }
+
+  .botones ion-grid {
+    padding: 1px 7px 7px 7px;
+  }
+
+  .botones ion-col {
+    padding: 3px;
+  }
+
+  .tamanoBoton {
+    height: 40px;
+  }
+
+  .tamano {
+    font-size: 8px;
+    line-height: 1;
+  }
+}
+
+/* ===============================
+   PANTALLAS MUY BAJAS
+================================ */
+
+@media (max-height: 700px) {
+  .marca-inicio {
+    margin-top: 2px;
+  }
+
+  .marca-logo {
+    width: 92px;
+  }
+
+  .marca-logo-box {
+    padding: 3px 10px;
+  }
+
+  .marca-inicio p {
+    display: none;
+  }
+
+  .fondo {
+    height: 88px;
+  }
+
+  .imgsvg,
+  .imsvg {
+    height: 82px !important;
+    width: 84% !important;
+    max-width: 84% !important;
+  }
+
+  .ultimo-timbre-card ion-card-content {
+    padding: 7px 9px;
+  }
+
+  .ultimo-timbre-header {
+    margin-bottom: 3px;
+  }
+
+  .ultimo-timbre-card h2 {
+    font-size: 12.5px;
+  }
+
+  .ultimo-timbre-card p {
+    font-size: 9.5px;
+  }
+
+  .Info_hora {
+    min-height: 46px;
+    padding: 6px 50px 6px 9px;
+  }
+
+  .tamanoHora {
+    font-size: 16.5px !important;
+  }
+
+  .Info_hora ion-fab-button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .botones ion-card-title {
+    font-size: 10px !important;
+  }
+
+  .tamanoBoton {
+    height: 36px;
+  }
+
+  .tamano {
+    font-size: 7.4px;
+  }
+
+  .tamano ion-icon {
+    font-size: 11px;
   }
 }

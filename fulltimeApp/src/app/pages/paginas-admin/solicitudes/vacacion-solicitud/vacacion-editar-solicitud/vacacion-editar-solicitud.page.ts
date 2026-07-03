@@ -11,12 +11,14 @@ import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { DatosGeneralesService } from 'src/app/services/datos-generales.service';
 import { AprobacionesService } from 'src/app/services/aprobaciones.service';
 import { TipoNotificacion } from 'src/app/interfaces/tipo-notificaciones.enum';
+import { ValidacionesService } from 'src/app/libs/validaciones.service';
 
 @Component({
   selector: 'app-vacacion-editar-solicitud',
   templateUrl: './vacacion-editar-solicitud.page.html',
   styleUrls: ['./vacacion-editar-solicitud.page.scss'],
 })
+
 export class VacacionEditarSolicitudPage implements OnInit {
 
   solicitud: any = null;
@@ -27,6 +29,8 @@ export class VacacionEditarSolicitudPage implements OnInit {
   permiteHoras = false;
   incluirFeriadosSeleccionado: boolean | null = null;
   requiereDocumento = false;
+  storageMbUsado: number = 0;
+  storageMbContratado: number = 0;
 
   fechaInicio = '';
   fechaFinal = '';
@@ -75,7 +79,8 @@ export class VacacionEditarSolicitudPage implements OnInit {
     private datosGeneralesService: DatosGeneralesService,
     private aprobacionesService: AprobacionesService,
     private toastController: ToastController,
-    private router: Router
+    private router: Router,
+    private validar: ValidacionesService,
   ) { }
 
   ngOnInit() {
@@ -91,10 +96,34 @@ export class VacacionEditarSolicitudPage implements OnInit {
     this.idEmpleado = Number(this.solicitud.id_empleado || localStorage.getItem('empleadoID') || 0);
     this.idSucursal = parseInt(localStorage.getItem('csucur') || '0', 10);
 
+    this.CargarStorageTenant();
     this.precargarFormulario();
     this.cargarTiposVacacion();
     this.cargarSaldoEmpleado();
     this.cargarFeriados();
+  }
+
+  // CONTROL DE ALMACENAMIENTO
+  private CargarStorageTenant(): void {
+    this.storageMbUsado = Number(localStorage.getItem('storage_mb_usado') ?? 0);
+    this.storageMbContratado = Number(localStorage.getItem('storage_mb_contratado') ?? 0);
+  }
+
+
+  private ValidarStorageArchivoAdjunto(): boolean {
+    const validacionStorage = this.validar.ValidarLimiteStorageArchivo(
+      this.archivoSeleccionado,
+      this.storageMbUsado,
+      this.storageMbContratado,
+      1
+    );
+
+    if (!validacionStorage.permitido) {
+      this.mostrarToast(validacionStorage.mensaje, 'warning');
+      return false;
+    }
+
+    return true;
   }
 
   obtenerIdSolicitud(): number {
@@ -311,6 +340,13 @@ export class VacacionEditarSolicitudPage implements OnInit {
     this.archivoSeleccionado = file;
     this.nombreArchivo = file.name;
     this.documentoPendienteEliminar = false;
+
+    if (!this.ValidarStorageArchivoAdjunto()) {
+      this.quitarArchivo();
+      event.target.value = '';
+      return;
+    }
+
     this.limpiarVerificacion();
   }
 
@@ -443,6 +479,15 @@ export class VacacionEditarSolicitudPage implements OnInit {
 
     if (this.requiereDocumento && !tieneDocumentoActual && !tieneDocumentoNuevo) {
       this.mostrarToast('Este tipo de vacación requiere adjuntar un documento.', 'warning');
+      return;
+    }
+
+    if (this.archivoSeleccionado && this.archivoSeleccionado.size > 2e6) {
+      this.mostrarToast('El archivo ha excedido el tamaño permitido. Máximo 2MB.', 'warning');
+      return;
+    }
+
+    if (this.archivoSeleccionado && !this.ValidarStorageArchivoAdjunto()) {
       return;
     }
 

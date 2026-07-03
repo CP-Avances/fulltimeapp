@@ -68,7 +68,15 @@ export class VacacionCriterioBusquedaPage implements OnInit {
   }
 
   obtenerFechaHoy(): string {
-    return new Date().toISOString().split('T')[0];
+    const hoy = new Date();
+
+    const primerDiaMes = new Date(
+      hoy.getFullYear(),
+      hoy.getMonth(),
+      1
+    );
+
+    return primerDiaMes.toISOString().split('T')[0];
   }
 
   buscarSolicitudes() {

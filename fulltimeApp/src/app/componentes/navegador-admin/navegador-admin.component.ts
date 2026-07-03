@@ -32,6 +32,7 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
 
   username: string = '';
   imagen: string = localStorage.getItem('imagen64') ?? '';
+  codigo: string = localStorage.getItem('codigo') ?? '';
 
   idEmpleadoIngresa: number = 0;
 

@@ -17,7 +17,7 @@ import { Capacitor } from '@capacitor/core';
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
- 
+
 export class LoginPage implements OnInit {
   ips_locales: any = '';
 
@@ -232,6 +232,8 @@ export class LoginPage implements OnInit {
     localStorage.setItem('ruc', datos.ruc);
     localStorage.setItem('version', datos.version);
     localStorage.setItem('modulos', JSON.stringify(datos.modulos));
+    localStorage.setItem('storage_mb_usado', datos.storage_mb_usado);
+    localStorage.setItem('storage_mb_contratado', datos.storage_mb_contratado);
 
     // SOCKET: conectar y registrar empresa (room)
     this.socketService.conectar(datos.codigo_empresa);
@@ -296,7 +298,7 @@ export class LoginPage implements OnInit {
 
   // METODO PARA CAMBIAR A LA PANTALLA DE BIENVENIDA
   cambiodepantallas() {
-     this.iniciandoSesion = false;
+    this.iniciandoSesion = false;
     this.navCtroller.pop();
     this.navCtroller.navigateRoot(['reloj']);
     var FormId = 'formulariologin';

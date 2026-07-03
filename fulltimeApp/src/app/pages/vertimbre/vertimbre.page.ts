@@ -199,193 +199,176 @@ export class VertimbrePage implements OnInit {
   }
 
   // METODO PARA OBTENER LOS TIMBRES Y FORMATEAR FECHAS
-  obtenerTimbres(codigo) {
-    this.limpiarImagenesAnteriores();
-    this.timbres = [];
-    this.relojService.obtenerTimbres(codigo)
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe({
-        next: (res: any[]) => {
+  timbresLista: any[] = [];
+pageActual: number = 1;
+itemsPorPagina: number = 7;
+cargando: boolean = false;
+obtenerTimbres(codigo: any) {
+  this.limpiarImagenesAnteriores();
 
-          let fechasObjeto = {};
-          this.imageUrls = [];
+  this.timbres = [];
+  this.timbresLista = [];
+  this.cargando = true;
 
-          res.forEach(data => {
-            // Formatear fecha y hora
-            data.fecha = this.validar.FormatearFechaZonaHoraria(
-              data.fecha_hora_timbre,
-              this.formato_fecha,
-              this.validar.dia_completo,
-              data.zona_horaria_servidor
-            );
+  this.relojService.obtenerTimbres(codigo)
+    .pipe(takeUntil(this.unsubscribe$))
+    .subscribe({
+      next: (res: any[]) => {
+        this.imageUrls = [];
+        this.timbresLista = this.prepararListaTimbres(res);
 
-            data.hora = this.validar.FormatearHoraZonaHoraria(
-              data.fecha_hora_timbre,
-              this.formato_hora,
-              data.zona_horaria_servidor
-            );
-
-            data.sfecha = '';
-            data.shora = '';
-
-            if (data.fecha_hora_timbre_servidor != null) {
-
-              data.sfecha = this.validar.FormatearFechaZonaHoraria(
-                data.fecha_hora_timbre_servidor,
-                this.formato_fecha,
-                this.validar.dia_completo,
-                data.zona_horaria_servidor
-              );
-              data.shora = this.validar.FormatearHoraZonaHoraria(
-                data.fecha_hora_timbre_servidor,
-                this.formato_hora,
-                data.zona_horaria_servidor
-              );
-            } else if (data.fecha_subida_servidor != null) {
-              data.sfecha = this.validar.FormatearFechaZonaHoraria(
-                data.fecha_subida_servidor,
-                this.formato_fecha,
-                this.validar.dia_completo,
-                data.zona_horaria_servidor
-              );
-              data.shora = this.validar.FormatearHoraZonaHoraria(
-                data.fecha_subida_servidor,
-                this.formato_hora,
-                data.zona_horaria_servidor
-              );
-            }
-
-            // Convertir imagen
-            if (data.imagen && data.imagen.data) {
-              const blob = new Blob([new Uint8Array(data.imagen.data)], { type: "image/webp" });
-              const imageUrl = URL.createObjectURL(blob);
-              this.imageUrls.push(imageUrl);
-              data.imagen = imageUrl;
-            }
-
-            if (data.documento && data.documento.data) {
-              const blob = new Blob([new Uint8Array(data.documento.data)], { type: "image/webp" });
-              const imageUrl = URL.createObjectURL(blob);
-              this.imageUrls.push(imageUrl);
-              data.documento = imageUrl;
-            }
-
-            // Agrupar por fecha
-            if (!fechasObjeto.hasOwnProperty(data.fecha)) {
-              fechasObjeto[data.fecha] = [];
-            }
-            fechasObjeto[data.fecha].push(data);
-          });
-
-          this.timbres = fechasObjeto;
-
-          // Si no hay datos
-          if (Object.keys(fechasObjeto).length === 0) {
-            this.vacio = false;
-            this.todos = true;
-            this.btn_filtro = true;
-            this.btn_todos = true;
-          }
+        if (this.timbresLista.length === 0) {
+          this.vacio = false;
+          this.todos = true;
+          this.btn_filtro = true;
+          this.btn_todos = true;
+        } else {
+          this.vacio = true;
+          this.filtro_mensaje = true;
+          this.todos = false;
+          this.filtro = true;
+          this.btn_filtro = false;
+          this.btn_todos = false;
         }
-      });
 
-  }
+        this.cargando = false;
+      },
+      error: () => {
+        this.cargando = false;
+        this.vacio = false;
+      }
+    });
+}
 
   // METODO PARA OBTENER LOS TIMBRES FILTRADOS Y FORMATEAR LAS FECHAS
-  filtrarFechas() {
-    this.limpiarImagenesAnteriores();
-    this.timbres_filtro = [];
-    if (this.fechaInicio <= this.fechaFinal) {
-      const datos = { fecInicio: this.fechaInicio, fecFinal: this.fechaFinal, codigo: localStorage.getItem('codigo') }
+filtrarFechas() {
+  this.limpiarImagenesAnteriores();
 
-      this.filtimbre.PostFiltrotimbres(datos)
-        .subscribe({
-          next: (res: any[]) => {
+  this.timbres = [];
+  this.timbres_filtro = [];
+  this.timbresLista = [];
+  this.cargando = true;
 
-            let fechasObjeto = {};
-            this.imageUrls = [];
+  if (this.fechaInicio <= this.fechaFinal) {
+    const datos = {
+      fecInicio: this.fechaInicio,
+      fecFinal: this.fechaFinal,
+      codigo: localStorage.getItem('codigo')
+    };
 
-            res.forEach(data => {
-              // Formatear fecha y hora
-              data.fecha = this.validar.FormatearFechaZonaHoraria(
-                data.fecha_hora_timbre,
-                this.formato_fecha,
-                this.validar.dia_completo,
-                data.zona_horaria_servidor
-              );
+    this.filtimbre.PostFiltrotimbres(datos).subscribe({
+      next: (res: any[]) => {
+        this.imageUrls = [];
+        this.timbresLista = this.prepararListaTimbres(res);
 
-              data.hora = this.validar.FormatearHoraZonaHoraria(
-                data.fecha_hora_timbre,
-                this.formato_hora,
-                data.zona_horaria_servidor
-              );
+        if (this.timbresLista.length === 0) {
+          this.filtro_mensaje = false;
+          this.filtro = true;
+          this.vacio = true;
+        } else {
+          this.filtro_mensaje = true;
+          this.vacio = true;
+          this.filtro = false;
+          this.todos = true;
+        }
 
-              data.sfecha = '';
-              data.shora = '';
-
-              if (data.fecha_hora_timbre_servidor != null) {
-                data.sfecha = this.validar.FormatearFechaZonaHoraria(
-                  data.fecha_hora_timbre_servidor,
-                  this.formato_fecha,
-                  this.validar.dia_completo,
-                  data.zona_horaria_servidor
-                );
-                data.shora = this.validar.FormatearHoraZonaHoraria(
-                  data.fecha_hora_timbre_servidor,
-                  this.formato_hora,
-                  data.zona_horaria_servidor
-                );
-              } else if (data.fecha_subida_servidor != null) {
-                data.sfecha = this.validar.FormatearFechaZonaHoraria(
-                  data.fecha_subida_servidor,
-                  this.formato_fecha,
-                  this.validar.dia_completo,
-                  data.zona_horaria_servidor
-                );
-                data.shora = this.validar.FormatearHoraZonaHoraria(
-                  data.fecha_subida_servidor,
-                  this.formato_hora,
-                  data.zona_horaria_servidor
-                );
-              }
-
-              // Convertir imagen
-              if (data.imagen && data.imagen.data) {
-                const blob = new Blob([new Uint8Array(data.imagen.data)], { type: "image/webp" });
-                const imageUrl = URL.createObjectURL(blob);
-                this.imageUrls.push(imageUrl);
-                data.imagen = imageUrl;
-              }
-
-              if (data.documento && data.documento.data) {
-                const blob = new Blob([new Uint8Array(data.documento.data)], { type: "image/webp" });
-                const imageUrl = URL.createObjectURL(blob);
-                this.imageUrls.push(imageUrl);
-                data.documento = imageUrl;
-              }
-
-              // Agrupar por fecha
-              if (!fechasObjeto.hasOwnProperty(data.fecha)) {
-                fechasObjeto[data.fecha] = [];
-              }
-              fechasObjeto[data.fecha].push(data);
-            });
-
-            this.timbres_filtro = fechasObjeto;
-
-            // Si no hay datos
-            if (Object.keys(fechasObjeto).length === 0) {
-              this.filtro_mensaje = false;
-              this.filtro = true;
-              this.vacio = true;
-            }
-          },
-          error: () => {
-            return this.mostrarToas('Lo sentimos no fue posible conectar con el servidor', 3000, "danger");
-          }
-        });
-    }
+        this.cargando = false;
+      },
+      error: () => {
+        this.cargando = false;
+        return this.mostrarToas(
+          'Lo sentimos no fue posible conectar con el servidor',
+          3000,
+          'danger'
+        );
+      }
+    });
   }
+}
+
+prepararListaTimbres(lista: any[]): any[] {
+  if (!Array.isArray(lista)) {
+    return [];
+  }
+
+  return lista.map((data: any) => {
+    const timbre = { ...data };
+    this.prepararTimbre(timbre);
+    return timbre;
+  });
+}
+
+prepararTimbre(data: any) {
+  data.fecha = this.validar.FormatearFechaZonaHoraria(
+    data.fecha_hora_timbre,
+    this.formato_fecha,
+    this.validar.dia_completo,
+    data.zona_horaria_servidor
+  );
+
+  data.hora = this.validar.FormatearHoraZonaHoraria(
+    data.fecha_hora_timbre,
+    this.formato_hora,
+    data.zona_horaria_servidor
+  );
+
+  data.sfecha = '';
+  data.shora = '';
+
+  if (data.fecha_hora_timbre_servidor != null) {
+    data.sfecha = this.validar.FormatearFechaZonaHoraria(
+      data.fecha_hora_timbre_servidor,
+      this.formato_fecha,
+      this.validar.dia_completo,
+      data.zona_horaria_servidor
+    );
+
+    data.shora = this.validar.FormatearHoraZonaHoraria(
+      data.fecha_hora_timbre_servidor,
+      this.formato_hora,
+      data.zona_horaria_servidor
+    );
+  } else if (data.fecha_subida_servidor != null) {
+    data.sfecha = this.validar.FormatearFechaZonaHoraria(
+      data.fecha_subida_servidor,
+      this.formato_fecha,
+      this.validar.dia_completo,
+      data.zona_horaria_servidor
+    );
+
+    data.shora = this.validar.FormatearHoraZonaHoraria(
+      data.fecha_subida_servidor,
+      this.formato_hora,
+      data.zona_horaria_servidor
+    );
+  }
+
+  data.imagen = this.convertirArchivoAUrl(data.imagen);
+  data.documento = this.convertirArchivoAUrl(data.documento);
+}
+
+convertirArchivoAUrl(archivo: any): string {
+  if (!archivo) {
+    return '';
+  }
+
+  if (typeof archivo === 'string') {
+    return archivo;
+  }
+
+  if (archivo.data) {
+    const blob = new Blob([new Uint8Array(archivo.data)], { type: 'image/webp' });
+    const imageUrl = URL.createObjectURL(blob);
+    this.imageUrls.push(imageUrl);
+    return imageUrl;
+  }
+
+  return '';
+}
+
+mostrarPaginacion(): boolean {
+  return this.timbresLista.length > this.itemsPorPagina;
+}
 
   // ABRIR MAPA
   abrirMapa(latitud, longitud) {

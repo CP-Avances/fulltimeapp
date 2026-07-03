@@ -191,8 +191,8 @@ export class ListaEmpleadosComponent implements OnInit {
   public responsive: boolean = true;
 
   public labels: any = {
-    previousLabel: 'ante..',
-    nextLabel: 'sigui..',
+    previousLabel: 'Anterior',
+    nextLabel: 'Siguiente',
     screenReaderPaginationLabel: 'Pagination',
     screenReaderPageLabel: 'page',
     screenReaderCurrentLabel: `You're on page`

@@ -4,6 +4,7 @@ import { HorarioE } from '../interfaces/Horarios';
 import { Cg_Feriados } from '../interfaces/Catalogos';
 import { DateTime } from 'luxon';
 import { EmpleadosService } from '../services/empleados.service';
+import { ResultadoValidacionStorage } from '../interfaces/Parametros';
 
 @Injectable({
     providedIn: 'root'
@@ -184,7 +185,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-  
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -246,7 +247,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                   
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -266,7 +267,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                    
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -286,7 +287,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-                   
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -306,7 +307,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-            
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -326,7 +327,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-               
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -346,7 +347,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-              
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -366,7 +367,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-               
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -386,7 +387,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-      
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -406,7 +407,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-        
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -426,7 +427,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-     
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -446,7 +447,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-     
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -466,7 +467,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-      
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -486,7 +487,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-      
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -506,7 +507,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-       
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -526,7 +527,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-     
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -546,7 +547,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-   
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -566,7 +567,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-        
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -626,7 +627,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-         
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -648,7 +649,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-       
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -668,7 +669,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-  
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -708,7 +709,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-   
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -728,7 +729,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-       
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -748,7 +749,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-      
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -768,7 +769,7 @@ export class ValidacionesService {
                             return laboral
                         }
                     }
-    
+
                     laboral = 0;
                     if (identificador == true) {
                         return laboral
@@ -938,9 +939,9 @@ export class ValidacionesService {
 
         //Condicion para calcular horas de permiso tomando simepre un dia de permiso
         if (tiempo_total <= (horas_trabaja)) { // validacion para permisos de un mismo dia laboral 
-    
+
             let tiempo_transcurrido_horas = this.SegundosToHHMM(tiempo_total);
-  
+
             return {
                 dia: 0,
                 tiempo_transcurrido: tiempo_transcurrido_horas,
@@ -1129,5 +1130,81 @@ export class ValidacionesService {
         });
     };
 
+
+    /** ********************************************************************************* **
+  ** **                     CONTROL DE USO DE ALMACENAMIENTO                        ** **
+  ** ********************************************************************************* **/
+
+    ValidarLimiteStorageArchivo(
+        archivo: File | File[] | FileList | null | undefined,
+        storageMbUsado: number,
+        storageMbContratado: number,
+        cantidadCopias: number = 1
+    ): ResultadoValidacionStorage {
+        const usadoMb = Number(storageMbUsado ?? 0);
+        const contratadoMb = Number(storageMbContratado ?? 0);
+        const copias = Number(cantidadCopias || 1);
+
+        const archivos = this.ObtenerArchivosComoArray(archivo);
+
+        const totalBytes = archivos.reduce((total, item) => {
+            return total + Number(item.size ?? 0);
+        }, 0);
+
+        const archivoMb = Number((totalBytes / 1024 / 1024).toFixed(2));
+        const totalArchivoMb = Number((archivoMb * copias).toFixed(2));
+        const nuevoUsoMb = Number((usadoMb + totalArchivoMb).toFixed(2));
+
+        if (!contratadoMb || contratadoMb <= 0) {
+            return {
+                permitido: true,
+                storageUsadoMb: usadoMb,
+                storageContratadoMb: contratadoMb,
+                archivoMb: totalArchivoMb,
+                nuevoUsoMb,
+                mensaje: ''
+            };
+        }
+
+        if (nuevoUsoMb > contratadoMb) {
+            return {
+                permitido: false,
+                storageUsadoMb: usadoMb,
+                storageContratadoMb: contratadoMb,
+                archivoMb: totalArchivoMb,
+                nuevoUsoMb,
+                mensaje: `Contactese con el Administrador. La empresa ha superado el límite de almacenamiento contratado.`
+            };
+        }
+
+        return {
+            permitido: true,
+            storageUsadoMb: usadoMb,
+            storageContratadoMb: contratadoMb,
+            archivoMb: totalArchivoMb,
+            nuevoUsoMb,
+            mensaje: ''
+        };
+    }
+
+    private ObtenerArchivosComoArray(
+        archivo: File | File[] | FileList | null | undefined
+    ): File[] {
+        if (!archivo) return [];
+
+        if (archivo instanceof File) {
+            return [archivo];
+        }
+
+        if (archivo instanceof FileList) {
+            return Array.from(archivo);
+        }
+
+        if (Array.isArray(archivo)) {
+            return archivo;
+        }
+
+        return [];
+    }
 
 }

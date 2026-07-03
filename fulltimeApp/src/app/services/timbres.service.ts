@@ -29,4 +29,10 @@ export class TimbresService {
     return this.http.post<any>(`${this.apiUrl}/timbres/filtroTimbre`, datos)
   }
 
+  ObtenerUltimoTimbreEmpleado(codigo: string) {
+    return this.http.get<any>(
+      `${this.apiUrl}/timbres/ultimo-timbre/${codigo}`
+    );
+  }
+
 }

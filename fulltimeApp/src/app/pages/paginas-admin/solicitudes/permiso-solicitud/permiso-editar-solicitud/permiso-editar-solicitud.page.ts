@@ -12,6 +12,7 @@ import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { DatosGeneralesService } from 'src/app/services/datos-generales.service';
 import { AprobacionesService } from 'src/app/services/aprobaciones.service';
 import { TipoNotificacion } from 'src/app/interfaces/tipo-notificaciones.enum';
+import { ValidacionesService } from 'src/app/libs/validaciones.service';
 
 @Component({
   selector: 'app-permiso-editar-solicitud',
@@ -23,7 +24,7 @@ export class PermisoEditarSolicitudPage implements OnInit {
   solicitud: any = null;
   idSolicitud!: number;
 
-  tiposPermiso: any[] = []; 
+  tiposPermiso: any[] = [];
   tipoPermisoSeleccionado: number | null = null;
 
   modoSolicitud: 'DIAS' | 'HORAS' = 'DIAS';
@@ -59,6 +60,8 @@ export class PermisoEditarSolicitudPage implements OnInit {
 
   nombreArchivo = '';
   archivoSeleccionado: File | null = null;
+  storageMbUsado: number = 0;
+  storageMbContratado: number = 0;
 
   documentoActual = '';
 
@@ -87,7 +90,8 @@ export class PermisoEditarSolicitudPage implements OnInit {
     private datosGeneralesService: DatosGeneralesService,
     private aprobacionesService: AprobacionesService,
     private toastController: ToastController,
-    private router: Router
+    private router: Router,
+    private validar: ValidacionesService,
   ) { }
 
   ngOnInit() {
@@ -111,9 +115,32 @@ export class PermisoEditarSolicitudPage implements OnInit {
 
     this.idSucursal = Number(localStorage.getItem('csucur') || 0);
 
+    this.CargarStorageTenant();
     this.cargarFeriados();
     this.cargarTiposPermiso();
     this.cargarDetalleSolicitud();
+  }
+
+  // CONTROL DE ALMACENAMIENTO
+  private CargarStorageTenant(): void {
+    this.storageMbUsado = Number(localStorage.getItem('storage_mb_usado') ?? 0);
+    this.storageMbContratado = Number(localStorage.getItem('storage_mb_contratado') ?? 0);
+  }
+
+  private ValidarStorageArchivoAdjunto(): boolean {
+    const validacionStorage = this.validar.ValidarLimiteStorageArchivo(
+      this.archivoSeleccionado,
+      this.storageMbUsado,
+      this.storageMbContratado,
+      1
+    );
+
+    if (!validacionStorage.permitido) {
+      this.mostrarToast(validacionStorage.mensaje, 'warning');
+      return false;
+    }
+
+    return true;
   }
 
   cargarDetalleSolicitud() {
@@ -634,6 +661,10 @@ export class PermisoEditarSolicitudPage implements OnInit {
       return;
     }
 
+    if (!this.ValidarStorageArchivoAdjunto()) {
+      return;
+    }
+
     const esPorHoras = this.permiteHoras;
 
     const fechaInicioSolicitud = esPorHoras ? this.fechaHoras : this.fechaInicio;
@@ -884,11 +915,11 @@ export class PermisoEditarSolicitudPage implements OnInit {
 
       console.log('MENSAJE JSON EDICION PERMISO:', mensaje);
 
-try {
-  console.log('MENSAJE PARSEADO EDICION PERMISO:', JSON.parse(mensaje));
-} catch (error) {
-  console.error('NO SE PUDO PARSEAR MENSAJE EDICION PERMISO:', error);
-}
+      try {
+        console.log('MENSAJE PARSEADO EDICION PERMISO:', JSON.parse(mensaje));
+      } catch (error) {
+        console.error('NO SE PUDO PARSEAR MENSAJE EDICION PERMISO:', error);
+      }
 
 
       const idPermiso = Number(
@@ -1142,6 +1173,12 @@ try {
 
     this.archivoSeleccionado = file;
     this.nombreArchivo = file.name;
+
+    if (!this.ValidarStorageArchivoAdjunto()) {
+      this.quitarArchivo();
+      event.target.value = '';
+      return;
+    }
 
     this.invalidarVerificacion();
   }

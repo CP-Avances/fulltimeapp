@@ -6,13 +6,14 @@ import { ParametrosService } from 'src/app/services/parametros.service';
 import { Router } from '@angular/router';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
-import { interval } from 'rxjs';
+import { interval, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { NetworkService } from '../../libs/network.service';
 import { NavegadorAdminComponent } from 'src/app/componentes/navegador-admin/navegador-admin.component';
 import { Geolocation } from '@capacitor/geolocation';
 import { timeout } from 'rxjs/operators';
-
+import { TimbresPendientesSyncService } from 'src/app/services/timbres-pendientes-sync.service';
+import { TimbresService } from 'src/app/services/timbres.service';
 
 @Component({
   selector: 'app-bienvenido',
@@ -22,18 +23,33 @@ import { timeout } from 'rxjs/operators';
 export class BienvenidoPage implements OnInit, OnDestroy {
 
   @ViewChild(NavegadorAdminComponent) navegadorAdmin: NavegadorAdminComponent;
+
   pipe: DatePipe = new DatePipe('es-EC', null);
+
   time: Date = new Date();
   horaTransformada = this.pipe.transform(Date.now(), 'hh:mm a');
   fechaTransformada = this.pipe.transform(Date.now(), 'fullDate');
-  horarioAbierto: boolean = false;
-  valorsol: string = "none";
-  valorluna: string = "none";
+
+  horarioAbierto = false;
+  valorsol = 'none';
+  valorluna = 'none';
+
   intervalo: any;
+  relojIntervalo: any;
+  sessionSubscription?: Subscription;
+
   funciones: any = [];
   apro_permisos: any;
+
   colorIp: any;
   colorFp: any;
+
+  isConnected = false;
+  sincronizandoPendientes = false;
+
+  ultimoTimbre: any = null;
+  cargandoUltimoTimbre = false;
+  sinConexionUltimoTimbre = false;
 
   constructor(
     public toastController: ToastController,
@@ -44,122 +60,328 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     public relojService: RelojServiceService,
     public empleadoService: EmpleadosService,
     private networkService: NetworkService,
-
-  ) {
-    this.cambioimagen();
-  }
-
+    private timbresPendientesSync: TimbresPendientesSyncService,
+    public timbreService: TimbresService,
+  ) { }
 
   ngOnInit() {
     this.startClock();
-    const subscription = interval(3600000) // Intervalo de 1 hora en milisegundos
+    this.cambioimagen();
+
+    this.sessionSubscription = interval(3600000)
       .pipe(
-        switchMap(() => this.checkSession(localStorage.getItem("empleadoID")))
+        switchMap(() => this.checkSession(localStorage.getItem('empleadoID')))
       )
-      .subscribe(
-        () => {
-        },
-        error => console.error('Error fetching data:', error)
-      );
+      .subscribe({
+        next: () => { },
+        error: error => console.error('Error fetching data:', error)
+      });
 
     this.networkSubscriber();
     this.refreshNavegadorAdmin();
+    this.ObtenerUltimoTimbreEmpleado();
   }
 
   ionViewWillEnter() {
     this.startClock();
     this.networkSubscriber();
     this.refreshNavegadorAdmin();
+    this.ObtenerUltimoTimbreEmpleado();
   }
 
-  // METODO PARA REFRESCAR LA PAGINA
-  refreshNavegadorAdmin() {
-    if (this.navegadorAdmin) {
-      this.navegadorAdmin.ngOnInit(); // O cualquier otro método que necesites ejecutar para refrescar
+ObtenerUltimoTimbreEmpleado() {
+  const codigo = localStorage.getItem('codigo');
+
+  if (!codigo) {
+    this.ultimoTimbre = null;
+    this.cargandoUltimoTimbre = false;
+    this.sinConexionUltimoTimbre = false;
+    return;
+  }
+
+  const conectado = this.networkService.getNetworkStatusDispositivo();
+
+  if (!conectado) {
+    this.cargandoUltimoTimbre = false;
+    this.sinConexionUltimoTimbre = true;
+
+    const ultimoGuardado = localStorage.getItem('ultimoTimbreEmpleado');
+
+    if (ultimoGuardado) {
+      try {
+        this.ultimoTimbre = JSON.parse(ultimoGuardado);
+      } catch {
+        this.ultimoTimbre = null;
+      }
+    }
+
+    return;
+  }
+
+  this.cargandoUltimoTimbre = true;
+  this.sinConexionUltimoTimbre = false;
+
+  this.timbreService.ObtenerUltimoTimbreEmpleado(codigo)
+    .pipe(timeout(5000))
+    .subscribe({
+      next: (resp: any) => {
+        this.ultimoTimbre = resp?.data ?? null;
+
+        if (this.ultimoTimbre) {
+          localStorage.setItem(
+            'ultimoTimbreEmpleado',
+            JSON.stringify(this.ultimoTimbre)
+          );
+        } else {
+          localStorage.removeItem('ultimoTimbreEmpleado');
+        }
+
+        this.cargandoUltimoTimbre = false;
+      },
+      error: (error) => {
+        this.cargandoUltimoTimbre = false;
+
+        if (error?.status === 0) {
+          this.sinConexionUltimoTimbre = true;
+
+          const ultimoGuardado = localStorage.getItem('ultimoTimbreEmpleado');
+
+          if (ultimoGuardado) {
+            try {
+              this.ultimoTimbre = JSON.parse(ultimoGuardado);
+            } catch {
+              this.ultimoTimbre = null;
+            }
+          }
+
+          return;
+        }
+
+        if (error?.status === 404) {
+          this.ultimoTimbre = null;
+          localStorage.removeItem('ultimoTimbreEmpleado');
+          return;
+        }
+
+        this.ultimoTimbre = null;
+      }
+    });
+}
+
+  obtenerNombreTimbre(accion: string, teclaFuncion: any): string {
+    const tecla = String(teclaFuncion ?? '').trim();
+    const acc = String(accion ?? '').trim();
+
+    switch (tecla) {
+      case '0':
+        return 'Entrada jornada';
+      case '1':
+        return 'Salida jornada';
+      case '2':
+        return 'Inicio alimentación';
+      case '3':
+        return 'Fin alimentación';
+      case '4':
+        return 'Inicio permiso';
+      case '5':
+        return 'Fin permiso';
+      case '7':
+        return 'Timbre especial';
+    }
+
+    switch (acc) {
+      case 'E':
+        return 'Entrada jornada';
+      case 'S':
+        return 'Salida jornada';
+      case 'I/A':
+      case 'S/A':
+        return 'Inicio alimentación';
+      case 'F/A':
+      case 'E/A':
+        return 'Fin alimentación';
+      case 'I/P':
+      case 'S/P':
+        return 'Inicio permiso';
+      case 'F/P':
+      case 'E/P':
+        return 'Fin permiso';
+      case 'HA':
+        return 'Timbre especial';
+      default:
+        return 'Timbre registrado';
     }
   }
 
-  // METODO PARA MOSTRAR EL RELOJ
+  // ============================================================
+  // REFRESCAR NAVEGADOR
+  // ============================================================
+
+  refreshNavegadorAdmin() {
+    if (this.navegadorAdmin) {
+      this.navegadorAdmin.ngOnInit();
+    }
+  }
+
+  // ============================================================
+  // RELOJ / IMAGEN
+  // ============================================================
+
   startClock() {
-    setInterval(() => {
+    if (this.relojIntervalo) {
+      clearInterval(this.relojIntervalo);
+    }
+
+    this.relojIntervalo = setInterval(() => {
+      this.time = new Date();
       this.horaTransformada = this.pipe.transform(Date.now(), 'hh:mm:ss a');
       this.fechaTransformada = this.pipe.transform(Date.now(), 'fullDate');
     }, 1000);
   }
 
-  // METODO DE CONGIGURACION DE TOAST
-  async usuarioIncorrectoToas(mensaje: string, duracion: number) {
-    const toast = await this.toastController.create({
-      message: mensaje,
-      duration: duracion,
-      color: "warning"
-    });
-    toast.present();
+  cambioimagen() {
+    if (this.intervalo) {
+      clearInterval(this.intervalo);
+    }
+
+    this.intervalo = setInterval(() => {
+      this.time = new Date();
+
+      const sol = document.getElementById('Sol');
+      const luna = document.getElementById('Luna');
+
+      if (!sol || !luna) {
+        return;
+      }
+
+      if (this.time.getHours() >= 6 && this.time.getHours() <= 18) {
+        sol.style.display = 'block';
+        luna.style.display = 'none';
+      } else {
+        sol.style.display = 'none';
+        luna.style.display = 'block';
+      }
+    }, 1000);
   }
 
-  // METODO PARA ENTRAL AL MODAL
+  // ============================================================
+  // MODAL TIMBRES PENDIENTES
+  // ============================================================
+
   async presentModalTimbresPerdidos() {
     const modal = await this.modalController.create({
       component: TimbresPerdidosComponent,
       cssClass: 'my-custom-class'
     });
+
     return await modal.present();
   }
 
-  //Funcion para el cambio del sol y la luna en la imagen svg//
-  cambioimagen() {
-    this.intervalo = setInterval(() => {
-      if (this.time.getHours() >= 6 && this.time.getHours() <= 18) {
-        document.getElementById('Sol').style.display = "block";
-        document.getElementById('Luna').style.display = "none";
+  // ============================================================
+  // CONEXIÓN / SINCRONIZACIÓN AUTOMÁTICA
+  // ============================================================
 
-      } else if (this.time.getHours() > 18 && this.time.getHours() <= 24) {
-        document.getElementById('Sol').style.display = "none";
-        document.getElementById('Luna').style.display = "block"
-      } else {
-        document.getElementById('Sol').style.display = "none";
-        document.getElementById('Luna').style.display = "block"
-      }
-    }, 1000);
-  }
-
-  // METODO PARA VERIFICAR LA CONEXION A INTERNET
-  isConnected: boolean;
   networkSubscriber() {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
-    console.log("Esta conectado: ", this.isConnected)
+
+    console.log('Esta conectado: ', this.isConnected);
+
     if (!this.isConnected) {
-      this.abrirToas('Por favor verifique su conexión a Internet', "danger", 3000, "middle");
+      this.abrirToas(
+        'Por favor verifique su conexión a Internet',
+        'danger',
+        3000,
+        'middle'
+      );
+
       console.log('Desconectado');
-      this.colorIp = localStorage.getItem("colorIp")
-      this.colorFp = localStorage.getItem("colorFp")
-    } else {
-      console.log('conectado');
-      this.BuscarParametroTimbreInternetRequerido();
-      this.BuscarParametroTimbreConFoto();
-      this.BuscarParametroTimbreUbicacionDesconocida();
-      this.VerificarFunciones();
-      this.BuscarParametroTimbreEspecial();
+
+      this.colorIp = localStorage.getItem('colorIp');
+      this.colorFp = localStorage.getItem('colorFp');
+
+      return;
+    }
+
+    console.log('conectado');
+
+    this.BuscarParametroTimbreInternetRequerido();
+    this.BuscarParametroTimbreConFoto();
+    this.BuscarParametroTimbreUbicacionDesconocida();
+    this.VerificarFunciones();
+    this.BuscarParametroTimbreEspecial();
+
+    this.SincronizarTimbresPendientesAutomatico();
+  }
+
+  private async SincronizarTimbresPendientesAutomatico() {
+    if (this.sincronizandoPendientes) {
+      return;
+    }
+
+    const idEmpleado = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
+
+    if (!idEmpleado || idEmpleado <= 0) {
+      return;
+    }
+
+    if (!this.timbresPendientesSync.tieneTimbresPendientes()) {
+      return;
+    }
+
+    this.sincronizandoPendientes = true;
+
+    try {
+      const resultado = await this.timbresPendientesSync.sincronizarPendientes(idEmpleado);
+
+      if (!resultado.huboPendientes) {
+        return;
+      }
+
+      if (resultado.enviados > 0 && resultado.fallidos === 0) {
+        this.abrirToas(resultado.mensaje, 'success', 3500, 'middle');
+        return;
+      }
+
+      if (resultado.enviados > 0 && resultado.fallidos > 0) {
+        this.abrirToas(resultado.mensaje, 'warning', 4500, 'middle');
+        return;
+      }
+
+      if (resultado.enviados === 0 && resultado.fallidos > 0) {
+        this.abrirToas(resultado.mensaje, 'warning', 4500, 'middle');
+      }
+
+    } catch {
+      this.abrirToas(
+        'No se pudieron sincronizar los timbres pendientes. Intente nuevamente más tarde.',
+        'warning',
+        4500,
+        'middle'
+      );
+
+    } finally {
+      this.sincronizandoPendientes = false;
     }
   }
 
-  // METODO PARA BUSCAR EL PARAMETRO DEL EMPLEADO DE TIMBRE CON FOTO
+  // ============================================================
+  // PARÁMETROS TIMBRE
+  // ============================================================
+
   BuscarParametroTimbreConFoto() {
-    const empleadoID = parseInt(localStorage.getItem("empleadoID") ?? "0", 10);
+    const empleadoID = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
 
     const buscar = {
       ids_empleados: [empleadoID],
     };
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe({
-      next: (res) => {
-
-        const parametro = res.data?.[0];
+      next: (res: any) => {
+        const parametro = res.data?.[0] ?? res.respuesta?.[0];
 
         if (!parametro) {
           localStorage.setItem('timbrarConFoto', 'No');
           localStorage.setItem('opcional_obligatorio', 'No');
-
           return;
         }
 
@@ -168,93 +390,108 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
         const resultadoOpcional = parametro.opcional_obligatorio ? 'Si' : 'No';
         localStorage.setItem('opcional_obligatorio', resultadoOpcional);
-
+      },
+      error: () => {
+        localStorage.setItem('timbrarConFoto', 'No');
+        localStorage.setItem('opcional_obligatorio', 'No');
       }
     });
   }
 
-  // METODO PARA BUSCAR EL PARAMETRO DEL EMPLEADO DE TIMBRE ESPECIAL
   BuscarParametroTimbreEspecial() {
-    const empleadoID = parseInt(localStorage.getItem("empleadoID") ?? "0", 10);
+    const empleadoID = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
 
     const buscar = {
       ids_empleados: [empleadoID],
     };
 
-    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
-      {
-        next: (res) => {
+    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe({
+      next: (res: any) => {
+        const parametro = res.data?.[0] ?? res.respuesta?.[0];
 
-          const parametro = res.data?.[0];
-
-          if (!parametro) {
-            localStorage.setItem('timbrarEspecial', 'No');
-            return;
-          }
-
-          const timbreEspecial = parametro.timbre_especial;
-
-          const resultado = timbreEspecial ? 'Si' : 'No';
-          localStorage.setItem('timbrarEspecial', resultado);
-        },
-        error: () => {
+        if (!parametro) {
           localStorage.setItem('timbrarEspecial', 'No');
+          return;
         }
+
+        const resultado = parametro.timbre_especial ? 'Si' : 'No';
+        localStorage.setItem('timbrarEspecial', resultado);
+      },
+      error: () => {
+        localStorage.setItem('timbrarEspecial', 'No');
       }
-    );
+    });
   }
 
-  // METODO PARA BUSCAR EL PARAMETRO DE UBICACION DESCONOCIDA
   BuscarParametroTimbreUbicacionDesconocida() {
-    const empleadoID = parseInt(localStorage.getItem("empleadoID") ?? "0", 10);
+    const empleadoID = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
 
     const buscar = {
       ids_empleados: [empleadoID],
     };
 
-    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
-      {
-        next: (res) => {
+    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe({
+      next: (res: any) => {
+        const parametro = res.data?.[0] ?? res.respuesta?.[0];
 
-          const parametro = res.data?.[0];
-
-          if (!parametro) {
-            localStorage.setItem('timbrarUbicacionDesconocida', 'No');
-            return;
-          }
-
-          const timbreUbicacionDesconocida = parametro.timbre_ubicacion_desconocida;
-
-
-          const resultado = timbreUbicacionDesconocida ? 'Si' : 'No';
-
-          localStorage.setItem('timbrarUbicacionDesconocida', resultado);
-        },
-        error: () => {
+        if (!parametro) {
           localStorage.setItem('timbrarUbicacionDesconocida', 'No');
+          return;
         }
+
+        const resultado = parametro.timbre_ubicacion_desconocida ? 'Si' : 'No';
+        localStorage.setItem('timbrarUbicacionDesconocida', resultado);
+      },
+      error: () => {
+        localStorage.setItem('timbrarUbicacionDesconocida', 'No');
       }
-    );
+    });
   }
 
-  // METODO QUE REALIZA VALIDACIONES Y DAN PASO A ENVIAR TIMIBRE
+  BuscarParametroTimbreInternetRequerido() {
+    const empleadoID = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
+
+    const buscar = {
+      ids_empleados: [empleadoID],
+    };
+
+    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe({
+      next: (res: any) => {
+        const parametro = res.data?.[0] ?? res.respuesta?.[0];
+
+        if (!parametro) {
+          localStorage.setItem('timbrarSinInternet', 'No');
+          return;
+        }
+
+        const resultado = parametro.timbre_internet ? 'Si' : 'No';
+        localStorage.setItem('timbrarSinInternet', resultado);
+      },
+      error: () => {
+        localStorage.setItem('timbrarSinInternet', 'No');
+      }
+    });
+  }
+
+  // ============================================================
+  // VALIDAR TIMBRE NORMAL / ESPECIAL
+  // ============================================================
+
   async VerificarTimbresSinInternet(accion: string) {
+    await Geolocation.checkPermissions()
+      .then(() => {
+        if (this.networkService.getNetworkStatusDispositivo() === true) {
+          const empleadoID = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
 
-    await Geolocation.checkPermissions().then(() => {
-      if (this.networkService.getNetworkStatusDispositivo() == true) {
-        const empleadoID = parseInt(localStorage.getItem("empleadoID") ?? "0", 10);
+          const buscar = {
+            ids_empleados: [empleadoID],
+          };
 
-        const buscar = {
-          ids_empleados: [empleadoID],
-        };
-
-        this.parametros.ObtenerDetalleParametroUsuario(buscar)
-          .pipe(timeout(2000))
-          .subscribe(
-            {
-              next: (res) => {
-
-                const parametro = res.data?.[0];
+          this.parametros.ObtenerDetalleParametroUsuario(buscar)
+            .pipe(timeout(2000))
+            .subscribe({
+              next: (res: any) => {
+                const parametro = res.data?.[0] ?? res.respuesta?.[0];
 
                 if (!parametro) {
                   localStorage.setItem('timbrarSinInternet', 'No');
@@ -262,33 +499,44 @@ export class BienvenidoPage implements OnInit, OnDestroy {
                   return;
                 }
 
-                const timbreInternet = parametro.timbre_internet;
-                const resultado = timbreInternet ? 'Si' : 'No';
-
+                const resultado = parametro.timbre_internet ? 'Si' : 'No';
                 localStorage.setItem('timbrarSinInternet', resultado);
+
                 this.router.navigate(['/enviartimbre', accion]);
               },
               error: () => {
                 localStorage.setItem('timbrarSinInternet', 'No');
                 this.router.navigate(['/enviartimbre', accion]);
               }
-            }
-          );
-      } else {
-        if (localStorage.getItem("timbrarSinInternet") == "Si") {
-          this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
-        } else {
-          this.router.navigate(['/enviartimbre', accion]);
+            });
+
+          return;
         }
-      };
-    }).catch((error) => {
-      this.abrirToas('Ups!!!, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
-    });
+
+        if (localStorage.getItem('timbrarSinInternet') === 'Si') {
+          this.abrirToas(
+            'No puede realizar timbres sin conexión a Internet',
+            'danger',
+            3000,
+            'middle'
+          );
+          return;
+        }
+
+        this.router.navigate(['/enviartimbre', accion]);
+      })
+      .catch(() => {
+        this.abrirToas(
+          'Ups!!!, al parecer no tiene activada la localización. Por favor, active el GPS.',
+          'warning',
+          3000,
+          'middle'
+        );
+      });
   }
 
-  // METODO QUE REALIZA VALIDACIONES Y DAN PASO A ENVIAR TIMBRE ESPECIAL
   async VerificarTimbreEspecial(accion: string) {
-    const empleadoID = parseInt(localStorage.getItem("empleadoID") ?? "0", 10);
+    const empleadoID = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
 
     const buscar = {
       ids_empleados: [empleadoID],
@@ -296,252 +544,228 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
     this.parametros.ObtenerDetalleParametroUsuario(buscar)
       .pipe(timeout(2000))
-      .subscribe(
-        {
-          next: (res) => {
-
-            const parametro = res.data?.[0];
-
-            if (!parametro) {
-
-              localStorage.setItem('timbrarEspecial', 'No');
-              this.abrirToas(
-                'Ups!!!, al parecer no tiene activado el timbre especial',
-                "warning",
-                3000,
-                "middle"
-              );
-
-              return;
-            }
-
-            const timbreEspecial = parametro.timbre_especial;
-
-            const resultado = timbreEspecial ? 'Si' : 'No';
-            localStorage.setItem('timbrarEspecial', resultado);
-
-            if (resultado === 'Si') {
-              this.VerificarTimbresSinInternet(accion);
-            } else {
-              this.abrirToas(
-                'Ups!!!, al parecer no tiene activado el timbre especial',
-                "warning",
-                3000,
-                "middle"
-              );
-            }
-          },
-          error: () => {
-            if (localStorage.getItem("timbrarEspecial") === 'Si') {
-              this.VerificarTimbresSinInternet(accion);
-            } else {
-              this.abrirToas(
-                'Ups!!!, al parecer no tiene activado el timbre especial',
-                "warning",
-                3000,
-                "middle"
-              );
-            }
-          }
-        }
-      );
-  }
-
-  BuscarParametroTimbreInternetRequerido() {
-    const empleadoID = parseInt(localStorage.getItem("empleadoID") ?? "0", 10);
-
-    const buscar = {
-      ids_empleados: [empleadoID],
-    };
-
-    this.parametros.ObtenerDetalleParametroUsuario(buscar).subscribe(
-      {
-        next: (res) => {
-
-          const parametro = res.data?.[0];
+      .subscribe({
+        next: (res: any) => {
+          const parametro = res.data?.[0] ?? res.respuesta?.[0];
 
           if (!parametro) {
-
-            localStorage.setItem('timbrarSinInternet', 'No');
+            localStorage.setItem('timbrarEspecial', 'No');
+            this.abrirToas(
+              'Ups!!!, al parecer no tiene activado el timbre especial',
+              'warning',
+              3000,
+              'middle'
+            );
             return;
           }
 
-          const timbreInternet = parametro.timbre_internet;
+          const resultado = parametro.timbre_especial ? 'Si' : 'No';
+          localStorage.setItem('timbrarEspecial', resultado);
 
-          const resultado = timbreInternet ? 'Si' : 'No';
-          localStorage.setItem('timbrarSinInternet', resultado);
+          if (resultado === 'Si') {
+            this.VerificarTimbresSinInternet(accion);
+            return;
+          }
+
+          this.abrirToas(
+            'Ups!!!, al parecer no tiene activado el timbre especial',
+            'warning',
+            3000,
+            'middle'
+          );
         },
         error: () => {
-          localStorage.setItem('timbrarSinInternet', 'No');
+          if (localStorage.getItem('timbrarEspecial') === 'Si') {
+            this.VerificarTimbresSinInternet(accion);
+            return;
+          }
+
+          this.abrirToas(
+            'Ups!!!, al parecer no tiene activado el timbre especial',
+            'warning',
+            3000,
+            'middle'
+          );
         }
-      }
-    );
+      });
   }
 
-  // METODO PARA LA CONFIGURACION DEL TOAST
+  // ============================================================
+  // MÓDULO PERMISOS
+  // ============================================================
+
+  VerificarFunciones() {
+    const raw = localStorage.getItem('modulos');
+
+    if (!raw) {
+      this.apro_permisos = false;
+      localStorage.setItem('apro_permisos', 'false');
+      this.colorIp = 'deshabilitado';
+      this.colorFp = 'deshabilitado';
+      localStorage.setItem('colorIp', 'deshabilitado');
+      localStorage.setItem('colorFp', 'deshabilitado');
+      return;
+    }
+
+    try {
+      const modulos = JSON.parse(raw);
+      const { permisos } = modulos;
+
+      this.apro_permisos = !!permisos;
+      localStorage.setItem('apro_permisos', String(this.apro_permisos));
+
+      if (this.apro_permisos === true) {
+        this.colorIp = 'primary';
+        this.colorFp = 'dark';
+        localStorage.setItem('colorIp', 'primary');
+        localStorage.setItem('colorFp', 'dark');
+      } else {
+        this.colorIp = 'deshabilitado';
+        this.colorFp = 'deshabilitado';
+        localStorage.setItem('colorIp', 'deshabilitado');
+        localStorage.setItem('colorFp', 'deshabilitado');
+      }
+
+    } catch {
+      this.apro_permisos = false;
+      localStorage.setItem('apro_permisos', 'false');
+      this.colorIp = 'deshabilitado';
+      this.colorFp = 'deshabilitado';
+      localStorage.setItem('colorIp', 'deshabilitado');
+      localStorage.setItem('colorFp', 'deshabilitado');
+    }
+  }
+
+  async btn_InicioPermisosClick() {
+    await this.ValidarPermisoAntesDeTimbrar('Inicio de permiso');
+  }
+
+  async btn_FinPermisosClick() {
+    await this.ValidarPermisoAntesDeTimbrar('Fin de permiso');
+  }
+
+  private async ValidarPermisoAntesDeTimbrar(accion: string) {
+    await Geolocation.checkPermissions()
+      .then(() => {
+        if (localStorage.getItem('apro_permisos') !== 'true') {
+          this.mostrarToas(' Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.');
+          return;
+        }
+
+        if (this.networkService.getNetworkStatusDispositivo() === false) {
+          if (localStorage.getItem('timbrarSinInternet') === 'Si') {
+            this.abrirToas(
+              'No puede realizar timbres sin conexión a Internet',
+              'danger',
+              3000,
+              'middle'
+            );
+            return;
+          }
+
+          this.router.navigate(['/enviartimbre', accion]);
+          return;
+        }
+
+        const buscar = {
+          ids_empleados: [parseInt(localStorage.getItem('empleadoID') ?? '0', 10)],
+        };
+
+        this.parametros.ObtenerDetalleParametroUsuario(buscar)
+          .pipe(timeout(2000))
+          .subscribe({
+            next: (res: any) => {
+              const parametro = res.data?.[0] ?? res.respuesta?.[0];
+
+              if (!parametro) {
+                localStorage.setItem('timbrarSinInternet', 'No');
+                this.router.navigate(['/enviartimbre', accion]);
+                return;
+              }
+
+              const resultado = parametro.timbre_internet ? 'Si' : 'No';
+              localStorage.setItem('timbrarSinInternet', resultado);
+
+              this.router.navigate(['/enviartimbre', accion]);
+            },
+            error: () => {
+              this.router.navigate(['/enviartimbre', accion]);
+            }
+          });
+      })
+      .catch(() => {
+        this.abrirToas(
+          'Ups!!!, al parecer no tiene activada la localización. Por favor, active el GPS.',
+          'warning',
+          3000,
+          'middle'
+        );
+      });
+  }
+
+  // ============================================================
+  // TOAST / ALERTAS
+  // ============================================================
+
   async abrirToas(mensaje: string, color: string, duracion: number, position: any) {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: duracion,
-      color: color,
-      position: position,
+      color,
+      position,
     });
-    toast.present();
+
+    await toast.present();
   }
 
-  // METODO PARA VERIFICAR LAS FUNCIONES
-  VerificarFunciones() {
+  async usuarioIncorrectoToas(mensaje: string, duracion: number) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: duracion,
+      color: 'warning'
+    });
 
-    const raw = localStorage.getItem('modulos');
-
-    const modulos = JSON.parse(raw);
-
-    const { permisos } = modulos
-
-    this.apro_permisos = permisos;
-    localStorage.setItem("apro_permisos", permisos);
-
-    if (this.apro_permisos == true) {
-      this.colorIp = "primary"
-      this.colorFp = "dark"
-      localStorage.setItem("colorIp", "primary")
-      localStorage.setItem("colorFp", "dark")
-    } else {
-      this.colorIp = "deshabilitado"
-      this.colorFp = "deshabilitado"
-      localStorage.setItem("colorIp", "deshabilitado")
-      localStorage.setItem("colorFp", "deshabilitado")
-    }
-
-  }
-  // METODO PARA VERIFICAR LAS FUNCIONES, VALIDAR PARAMETROS Y DAR PASO A ENVIAR TIMBRE DE INICIO DE PERMISO
-  async btn_InicioPermisosClick() {
-    await Geolocation.checkPermissions().then(() => {
-      if (localStorage.getItem("apro_permisos") == "true") {
-
-        if (this.networkService.getNetworkStatusDispositivo() == false) {
-          this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
-          if (localStorage.getItem('timbrarSinInternet') == "Si") {
-            this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
-          } else {
-            this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
-          }
-        } else {
-          let buscar = {
-            ids_empleados: [parseInt(localStorage.getItem("empleadoID"), 10)],
-          };
-          this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(2000)).subscribe(
-            {
-              next: res => {
-
-                const parametro = res.data?.[0];
-
-                if (!parametro) {
-                  localStorage.setItem('timbrarSinInternet', 'No');
-                  return;
-                }
-
-                const timbreFoto = parametro.timbre_internet;
-                const resultado = timbreFoto ? 'Si' : 'No';
-                localStorage.setItem('timbrarSinInternet', resultado);
-                this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
-              }, error: () => {
-                this.router.navigate(['/enviartimbre', 'Inicio de permiso']);
-              }
-            }
-          );
-        }
-      } else {
-        this.mostrarToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.");
-      }
-    })
-      .catch((error) => {
-        this.abrirToas('Ups!!!, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
-      })
+    await toast.present();
   }
 
-  // METODO PARA VERIFICAR LAS FUNCIONES, VALIDAR PARAMETROS Y DAR PASO A ENVIAR TIMBRE DE FIN DE PERMISO
-  async btn_FinPermisosClick() {
-    await Geolocation.checkPermissions().then(() => {
-      if (localStorage.getItem("apro_permisos") == "true") {
-
-        if (this.networkService.getNetworkStatusDispositivo() == false) {
-          this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
-          if (localStorage.getItem('timbrarSinInternet') == "Si") {
-            this.abrirToas('No puede realizar timbres sin conexión a Internet', "danger", 3000, "middle");
-          } else {
-            this.router.navigate(['/enviartimbre', 'Fin de permiso']);
-          }
-        } else {
-          let buscar = {
-            ids_empleados: [parseInt(localStorage.getItem("empleadoID"), 10)],
-          };
-          this.parametros.ObtenerDetalleParametroUsuario(buscar).pipe(timeout(2000)).subscribe(
-            {
-              next: res => {
-
-                const parametro = res.data?.[0];
-
-                if (!parametro) {
-                  localStorage.setItem('timbrarSinInternet', 'No');
-                  return;
-                }
-
-                const timbreFoto = parametro.timbre_internet;
-                const resultado = timbreFoto ? 'Si' : 'No';
-                localStorage.setItem('timbrarSinInternet', resultado);
-                this.router.navigate(['/enviartimbre', 'Fin de permiso']);
-              }, error: () => {
-                this.router.navigate(['/enviartimbre', 'Fin de permiso']);
-              }
-            }
-          );
-        }
-      } else {
-        this.mostrarToas(" Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos.");
-      }
-    })
-      .catch((error) => {
-        this.abrirToas('Ups!!!, al parecer no tiene activada la localización. Por favor, active el GPS.', "warning", 3000, "middle");
-      })
-  }
-
-  // METODO DE CONFIGURACION DE TOAST DE PERMISOS
   async mostrarToas(mensaje: string) {
     const toast = await this.toastController.create({
       message: `<ion-icon name="information-circle-outline"></ion-icon>`
         + mensaje
         + `Te gustaría activarlo? <br> Comunícate con nosotros: www.casapazmino.com.ec`,
       duration: 4500,
-      position: "top",
-      color: "notificacicon",
-      mode: "ios",
+      position: 'top',
+      color: 'notificacicon',
+      mode: 'ios',
       cssClass: 'toast-custom-class',
     });
+
     await toast.present();
   }
 
-  // METODO DE VALIDACION DE APLICACION MOVIL HABILITADA
-  async checkSession(id_empleado) {
-    this.empleadoService.accesoMovil(id_empleado).subscribe({
-      next: (x: any) => {
-        if (x.data[0].app_habilita == false) {
-          console.log('Session invalid. Closing session...');
-          this.cerrarSesion();
-        }
-      }, error: () => {
-        this.cerrarSesion();
-      }
-    })
+  // ============================================================
+  // SESIÓN
+  // ============================================================
+
+  async checkSession(id_empleado: any) {
+    return this.empleadoService.accesoMovil(id_empleado);
   }
 
-  // METODO PARA CERRAR SESION
   async cerrarSesion() {
     await this.relojService.cerrarSesion();
   }
 
   ngOnDestroy() {
-    clearInterval(this.intervalo);
-  }
+    if (this.intervalo) {
+      clearInterval(this.intervalo);
+    }
 
+    if (this.relojIntervalo) {
+      clearInterval(this.relojIntervalo);
+    }
+
+    if (this.sessionSubscription) {
+      this.sessionSubscription.unsubscribe();
+    }
+  }
 }

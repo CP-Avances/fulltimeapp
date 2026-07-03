@@ -64,7 +64,15 @@ export class PermisoCriterioBusquedaPage implements OnInit {
   }
 
   obtenerFechaHoy(): string {
-    return this.formatearFechaLocal(new Date());
+    const hoy = new Date();
+
+    const primerDiaMes = new Date(
+      hoy.getFullYear(),
+      hoy.getMonth(),
+      1
+    );
+
+    return this.formatearFechaLocal(primerDiaMes);
   }
 
   buscarSolicitudes() {

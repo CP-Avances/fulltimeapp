@@ -1,20 +1,40 @@
-<ion-content>
-  <ion-text mode="ios" style="text-align: center;">
-    <ion-button color="primary" [routerLink]="['/reloj/reportes']" expand="full">
+<ion-content class="reporte-content">
+
+  <!-- HEADER -->
+  <section class="reporte-header">
+    <ion-button class="btn-regresar" [routerLink]="['/reloj/reportes']" expand="full">
       <ion-icon slot="start" name="chevron-back-outline"></ion-icon>
-      <ion-label style="font-size: 20px;">REPORTE DE TIMBRES</ion-label>
+      <ion-label>Reporte de timbres</ion-label>
     </ion-button>
-  </ion-text>
+  </section>
 
-  <br>
+  <!-- FILTROS FECHAS -->
+  <section class="filtros-card">
 
-  <ion-grid style="margin-top: -2%;" mode="md">
-    <ion-row>
-      <!-- FECHA INICIAL -->
-      <ion-col size="6">
-        <ion-item style="border-radius: 5%;" class="item_fondo" id="ReporteTimbre_fechaInicial" fill="solid">
-          <ion-label position="floating">Fecha inicial</ion-label>
-          <ion-input readonly="true" name="finicio" [ngModel]="fechaIn"></ion-input>
+    <div class="seccion-titulo">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <div>
+        <h2>Rango de fechas</h2>
+        <p>Seleccione el periodo para generar el reporte.</p>
+      </div>
+    </div>
+
+    <ion-grid class="fechas-grid" mode="md">
+      <ion-row>
+
+        <!-- FECHA INICIAL -->
+        <ion-col size="6">
+          <button type="button" class="fecha-card" id="ReporteTimbre_fechaInicial">
+
+            <div class="fecha-icon fecha-icon-inicio">
+              <ion-icon name="calendar-outline"></ion-icon>
+            </div>
+
+            <div class="fecha-info">
+              <span>Fecha inicial</span>
+              <strong>{{ fechaIn || 'Seleccionar' }}</strong>
+            </div>
+          </button>
 
           <ion-modal trigger="ReporteTimbre_fechaInicial" class="inputDateFecha">
             <ng-template>
@@ -24,262 +44,351 @@
                   color="success">
                 </ion-datetime>
 
-                <div style="width: 95%">
-                  <ion-label style="float: right; margin: 2%; font-size: medium;" color="success"
-                    (click)="datetimeInicio.cancel(true)">
+                <div class="modal-fecha-acciones">
+                  <ion-button fill="clear" color="medium" (click)="datetimeInicio.cancel(true)">
                     Cancelar
-                  </ion-label>
+                  </ion-button>
                 </div>
               </ion-content>
             </ng-template>
           </ion-modal>
-        </ion-item>
-      </ion-col>
+        </ion-col>
 
-      <!-- FECHA FINAL -->
-      <ion-col size="6">
-        <ion-item style="border-radius: 5%;" class="item_fondo" id="ReporteTimbre_fechaFinal" fill="solid">
-          <ion-label position="floating">Fecha final</ion-label>
-          <ion-input readonly="true" name="ffinal" [ngModel]="fechaFi"></ion-input>
+        <!-- FECHA FINAL -->
+        <ion-col size="6">
+          <button type="button" class="fecha-card" id="ReporteTimbre_fechaFinal">
+
+            <div class="fecha-icon fecha-icon-final">
+              <ion-icon name="calendar-number-outline"></ion-icon>
+            </div>
+
+            <div class="fecha-info">
+              <span>Fecha final</span>
+              <strong>{{ fechaFi || 'Seleccionar' }}</strong>
+            </div>
+          </button>
 
           <ion-modal trigger="ReporteTimbre_fechaFinal" *ngIf="fechaIn != ''" class="inputDateFecha">
             <ng-template>
               <ion-content>
                 <ion-datetime #datetimeFinal presentation="date" [showDefaultButtons]="false" [value]="fechaFinal"
-                  name="ffinal" mode="md" (ionChange)="changeFechaFinal($event)" [min]="fechaIn" [max]="maxDate">
+                  name="ffinal" mode="md" (ionChange)="changeFechaFinal($event)" [min]="fechaIn" [max]="maxDate"
+                  color="success">
                 </ion-datetime>
 
-                <div style="width: 95%">
-                  <ion-label style="float: right; margin: 2%; font-size: medium;" color="primary"
-                    (click)="datetimeFinal.cancel(true)">
+                <div class="modal-fecha-acciones">
+                  <ion-button fill="clear" color="medium" (click)="datetimeFinal.cancel(true)">
                     Cancelar
-                  </ion-label>
+                  </ion-button>
                 </div>
               </ion-content>
             </ng-template>
           </ion-modal>
 
           <ion-popover *ngIf="fechaIn == ''" trigger="ReporteTimbre_fechaFinal">
-            <ion-content>
-              <p style="margin: auto; padding: 4%;">
-                Ingrese la fecha de Inicio
-              </p>
-            </ion-content>
+            <ng-template>
+              <ion-content class="popover-fecha">
+                <p>Primero seleccione la fecha inicial.</p>
+              </ion-content>
+            </ng-template>
           </ion-popover>
-        </ion-item>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+        </ion-col>
+
+      </ion-row>
+    </ion-grid>
+
+  </section>
 
   <!-- CRITERIOS -->
-  <ion-list>
-    <ion-radio-group [(ngModel)]="radioValue" (ionChange)="showValue()">
-      <ion-text mode="ios" color="dark" style="text-align: center;">
-        <h3>Criterios de búsqueda</h3>
-      </ion-text>
+  <section class="criterios-card">
+    <div class="seccion-titulo">
+      <ion-icon name="filter-outline"></ion-icon>
+      <div>
+        <h2>Criterios de búsqueda</h2>
+        <p>Seleccione cómo desea consultar la información.</p>
+      </div>
+    </div>
 
-      <ion-item *ngFor="let c of solicitudes">
+    <ion-radio-group [(ngModel)]="radioValue" (ionChange)="showValue()">
+      <ion-item class="criterio-item" *ngFor="let c of solicitudes" lines="none">
         <ion-label>{{ c.nombre }}</ion-label>
         <ion-radio slot="end" color="success" [value]="c.valor"></ion-radio>
       </ion-item>
     </ion-radio-group>
-  </ion-list>
+  </section>
 
   <!-- INFORMACIÓN DEL DISPOSITIVO -->
-  <ion-item>
-    <ion-toggle (ionChange)="toggleChanged($event)" [(ngModel)]="activarOpcion">
+  <ion-item class="dispositivo-card" lines="none">
+    <div class="dispositivo-icono" slot="start">
+      <ion-icon name="phone-portrait-outline"></ion-icon>
+    </div>
+
+    <ion-label>
+      <h2>Información del dispositivo</h2>
+      <p>Incluir datos del equipo usado para marcar.</p>
+    </ion-label>
+
+    <ion-toggle slot="end" color="success" (ionChange)="toggleChanged($event)" [(ngModel)]="activarOpcion">
     </ion-toggle>
-    <ion-label>Información del dispositivo</ion-label>
   </ion-item>
+
+  <!-- ESTADO INICIAL -->
+  <section class="estado-info" *ngIf="radioValue === 0 && loadingEmpleado">
+    <ion-icon name="search-outline"></ion-icon>
+    <h2>Seleccione un criterio</h2>
+    <p>Puede consultar timbres por sucursal, departamento, empleado o rol.</p>
+  </section>
 
   <!-- LOADING -->
-  <div *ngIf="!loadingEmpleado">
-    <div style="text-align: center;">
-      <br>
-      <ion-text color="primary">
-        <span>Obteniendo datos, por favor espere</span>
-      </ion-text>
-      <ion-progress-bar type="indeterminate"></ion-progress-bar>
-      <br>
+  <section class="estado-carga" *ngIf="!loadingEmpleado">
+    <ion-spinner name="crescent"></ion-spinner>
+    <ion-text color="primary">
+      <span>Obteniendo datos, por favor espere...</span>
+    </ion-text>
+    <ion-progress-bar type="indeterminate"></ion-progress-bar>
+  </section>
+
+  <!-- SUCURSALES -->
+  <ng-container *ngIf="opcion_sucursal && loadingEmpleado">
+
+    <section class="acciones-card">
+      <ion-button class="btn-seleccionar" color="secondary" *ngIf="isChecked_sucu"
+        (click)="checkedAll_sucu(isAllCheck_sucu)">
+        <ion-icon slot="start" name="checkmark-done-outline"></ion-icon>
+        {{ isAllCheck_sucu ? 'Quitar selección' : 'Seleccionar visibles' }}
+      </ion-button>
+
+      <ion-button class="btn-buscar" color="primary" (click)="EnviarSucursal()">
+        <ion-icon slot="start" name="search-outline"></ion-icon>
+        Buscar
+      </ion-button>
+    </section>
+
+    <ion-searchbar class="buscador" placeholder="Buscar sucursal" autocomplete="off" showCancelButton="focus"
+      (ionChange)="changeSearchSucursales($event)">
+    </ion-searchbar>
+
+    <section class="resultado-card">
+      <div class="resultado-header">
+        <div>
+          <h3>Resultado sucursales</h3>
+          <p>{{ sucursales_filtro.length }} registros encontrados</p>
+        </div>
+      </div>
+
+      <ion-list class="resultado-lista" *ngIf="sucursales_filtro.length > 0">
+        <ion-item class="item-color"
+          *ngFor="let s of sucursales_filtro | paginate: { itemsPerPage: itemsPorPagina, currentPage: pageActualSucursal }; trackBy: trackById"
+          mode="md" lines="none">
+          <ion-checkbox *ngIf="isChecked_sucu" slot="start" color="success" [(ngModel)]="s.isChecked_sucu">
+          </ion-checkbox>
+
+          <ion-label>
+            <h2>{{ s.sucursal }}</h2>
+            <p *ngIf="s.ciudad">Ciudad: {{ s.ciudad }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <section class="estado-vacio" *ngIf="sucursales_filtro.length === 0">
+        <ion-icon name="business-outline"></ion-icon>
+        <h2>No existen sucursales</h2>
+        <p>No se encontraron registros para mostrar.</p>
+      </section>
+    </section>
+
+    <div class="paginacion-contenedor" *ngIf="mostrarPaginacionSucursal()">
+      <pagination-controls class="paginacion" (pageChange)="pageActualSucursal = $event" [maxSize]="maxSize"
+        [directionLinks]="directionLinks" [responsive]="responsive" [autoHide]="autoHide"
+        [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
+        [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+        [screenReaderPageLabel]="labels.screenReaderPageLabel"
+        [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+      </pagination-controls>
     </div>
-  </div>
 
-  <!-- LISTAR SUCURSALES -->
-  <ion-row *ngIf="opcion_sucursal">
-    <ion-col *ngIf="isChecked_sucu" size="2">
-      <ion-button color="secondary" (click)="checkedAll_sucu(isAllCheck_sucu)">
-        <ion-icon name="checkmark-done-outline"></ion-icon>
+  </ng-container>
+
+  <!-- DEPARTAMENTOS -->
+  <ng-container *ngIf="opcion_depa && loadingEmpleado">
+
+    <section class="acciones-card">
+      <ion-button class="btn-seleccionar" color="secondary" *ngIf="isChecked_depa"
+        (click)="checkedAll_depa(isAllCheck_depa)">
+        <ion-icon slot="start" name="checkmark-done-outline"></ion-icon>
+        {{ isAllCheck_depa ? 'Quitar selección' : 'Seleccionar visibles' }}
       </ion-button>
-    </ion-col>
 
-    <ion-col [size]="isChecked_sucu ? 10 : 12">
-      <ion-button (click)="EnviarSucursal()" shape="round">
-        BUSCAR
+      <ion-button class="btn-buscar" color="primary" (click)="EnviarDepartamento()">
+        <ion-icon slot="start" name="search-outline"></ion-icon>
+        Buscar
       </ion-button>
-    </ion-col>
-  </ion-row>
+    </section>
 
-  <ion-searchbar *ngIf="opcion_sucursal" autocomplete="off" showCancelButton="focus"
-    (ionChange)="changeSearchSucursales($event)">
-  </ion-searchbar>
+    <ion-searchbar class="buscador" placeholder="Buscar departamento" autocomplete="off" showCancelButton="focus"
+      (ionChange)="changeSearchDepartamento($event)">
+    </ion-searchbar>
 
-  <ion-list *ngIf="opcion_sucursal">
-    <ion-text mode="ios" color="dark" style="text-align: center;">
-      <h3>Resultado Sucursales</h3>
-    </ion-text>
+    <section class="resultado-card">
+      <div class="resultado-header">
+        <div>
+          <h3>Resultado departamentos</h3>
+          <p>{{ departamentos_filtro.length }} registros encontrados</p>
+        </div>
+      </div>
 
-    <ion-item *ngFor="let s of sucursales_filtro | paginate: { itemsPerPage: 10, currentPage: pageActualSucursal }"
-      class="item-color" mode="md" lines="full">
-      <ion-checkbox *ngIf="isChecked_sucu" slot="start" [(ngModel)]="s.isChecked_sucu">
-      </ion-checkbox>
+      <ion-list class="resultado-lista" *ngIf="departamentos_filtro.length > 0">
+        <ion-item class="item-color"
+          *ngFor="let d of departamentos_filtro | paginate: { itemsPerPage: itemsPorPagina, currentPage: pageActualDepartamento }; trackBy: trackById"
+          mode="md" lines="none">
+          <ion-checkbox *ngIf="isChecked_depa" slot="start" color="success" [(ngModel)]="d.isChecked_depa">
+          </ion-checkbox>
 
-      <ion-label>{{ s.sucursal }}</ion-label>
-    </ion-item>
-  </ion-list>
+          <ion-label>
+            <h2>{{ d.departamento }}</h2>
+            <p>Sucursal: {{ d.sucursal }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
 
-  <ion-item style="font-size: 80%; margin: 0% 0% 1% 0%; display: flex; justify-content: center;" [hidden]="verSucursal"
-    *ngIf="opcion_sucursal">
-    <pagination-controls class="paginacion" (pageChange)="pageActualSucursal = $event" [maxSize]="maxSize"
-      [directionLinks]="directionLinks" [responsive]="responsive" [autoHide]="autoHide"
-      [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
-      [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
-      [screenReaderPageLabel]="labels.screenReaderPageLabel"
-      [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
-    </pagination-controls>
-  </ion-item>
+      <section class="estado-vacio" *ngIf="departamentos_filtro.length === 0">
+        <ion-icon name="git-branch-outline"></ion-icon>
+        <h2>No existen departamentos</h2>
+        <p>No se encontraron registros para mostrar.</p>
+      </section>
+    </section>
 
-  <!-- LISTAR DEPARTAMENTOS -->
-  <ion-row *ngIf="opcion_depa">
-    <ion-col *ngIf="isChecked_depa" size="2">
-      <ion-button color="secondary" (click)="checkedAll_depa(isAllCheck_depa)">
-        <ion-icon name="checkmark-done-outline"></ion-icon>
+    <div class="paginacion-contenedor" *ngIf="mostrarPaginacionDepartamento()">
+      <pagination-controls class="paginacion" (pageChange)="pageActualDepartamento = $event" [maxSize]="maxSize"
+        [directionLinks]="directionLinks" [responsive]="responsive" [autoHide]="autoHide"
+        [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
+        [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+        [screenReaderPageLabel]="labels.screenReaderPageLabel"
+        [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+      </pagination-controls>
+    </div>
+
+  </ng-container>
+
+  <!-- EMPLEADOS -->
+  <ng-container *ngIf="opcion_empleado && loadingEmpleado">
+
+    <section class="acciones-card">
+      <ion-button class="btn-seleccionar" color="secondary" *ngIf="isChecked_empl"
+        (click)="checkedAll_empl(isAllCheck_empl)">
+        <ion-icon slot="start" name="checkmark-done-outline"></ion-icon>
+        {{ isAllCheck_empl ? 'Quitar selección' : 'Seleccionar visibles' }}
       </ion-button>
-    </ion-col>
 
-    <ion-col [size]="isChecked_depa ? 10 : 12">
-      <ion-button (click)="EnviarDepartamento()" shape="round">
-        BUSCAR
+      <ion-button class="btn-buscar" color="primary" (click)="EnviarEmpleado()">
+        <ion-icon slot="start" name="search-outline"></ion-icon>
+        Buscar
       </ion-button>
-    </ion-col>
-  </ion-row>
+    </section>
 
-  <ion-searchbar *ngIf="opcion_depa" autocomplete="off" showCancelButton="focus"
-    (ionChange)="changeSearchDepartamento($event)">
-  </ion-searchbar>
+    <ion-searchbar class="buscador" placeholder="Buscar empleado" autocomplete="off" showCancelButton="focus"
+      (ionChange)="changeSearchNombresCompletos($event)">
+    </ion-searchbar>
 
-  <ion-list *ngIf="opcion_depa">
-    <ion-text mode="ios" color="dark" style="text-align: center;">
-      <h3>Resultado Departamentos</h3>
-    </ion-text>
+    <section class="resultado-card">
+      <div class="resultado-header">
+        <div>
+          <h3>Resultado usuarios</h3>
+          <p>{{ empleados_filtro.length }} registros encontrados</p>
+        </div>
+      </div>
 
-    <ion-item style="margin: 2.5%; padding: -2%; border-radius: 3%;"
-      *ngFor="let d of departamentos_filtro | paginate: { itemsPerPage: 10, currentPage: pageActualDepartamento }"
-      class="item-color" mode="md" lines="full">
-      <ion-checkbox *ngIf="isChecked_depa" slot="start" [(ngModel)]="d.isChecked_depa">
-      </ion-checkbox>
+      <ion-list class="resultado-lista" *ngIf="empleados_filtro.length > 0">
+        <ion-item class="item-color"
+          *ngFor="let e of empleados_filtro | paginate: { itemsPerPage: itemsPorPagina, currentPage: pageActual }; trackBy: trackById"
+          mode="md" lines="none">
+          <ion-checkbox *ngIf="isChecked_empl" slot="start" color="success" [(ngModel)]="e.isChecked_empl">
+          </ion-checkbox>
 
-      <ion-label>
-        <h2>{{ d.sucursal }}</h2>
-        <p>Departamento: {{ d.departamento }}</p>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+          <ion-label>
+            <h2>{{ e.nombre }} {{ e.apellido }}</h2>
+            <p *ngIf="e.codigo">Código: {{ e.codigo }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
 
-  <ion-item style="font-size: 80%; margin: 0% 0% 1% 0%; display: flex; justify-content: center;"
-    [hidden]="verDepartamento" *ngIf="opcion_depa">
-    <pagination-controls class="paginacion" (pageChange)="pageActualDepartamento = $event" [maxSize]="maxSize"
-      [directionLinks]="directionLinks" [responsive]="responsive" [autoHide]="autoHide"
-      [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
-      [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
-      [screenReaderPageLabel]="labels.screenReaderPageLabel"
-      [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
-    </pagination-controls>
-  </ion-item>
+      <section class="estado-vacio" *ngIf="empleados_filtro.length === 0">
+        <ion-icon name="people-outline"></ion-icon>
+        <h2>No existen usuarios</h2>
+        <p>No se encontraron registros para mostrar.</p>
+      </section>
+    </section>
 
-  <!-- LISTAR EMPLEADOS -->
-  <ion-row *ngIf="opcion_empleado">
-    <ion-col *ngIf="isChecked_empl" size="2">
-      <ion-button color="secondary" (click)="checkedAll_empl(isAllCheck_empl)">
-        <ion-icon name="checkmark-done-outline"></ion-icon>
+    <div class="paginacion-contenedor" *ngIf="mostrarPaginacionEmpleado()">
+      <pagination-controls class="paginacion" (pageChange)="pageActual = $event" [maxSize]="maxSize"
+        [directionLinks]="directionLinks" [responsive]="responsive" [autoHide]="autoHide"
+        [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
+        [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+        [screenReaderPageLabel]="labels.screenReaderPageLabel"
+        [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+      </pagination-controls>
+    </div>
+
+  </ng-container>
+
+  <!-- ROLES -->
+  <ng-container *ngIf="opcion_rol && loadingEmpleado">
+
+    <section class="acciones-card">
+      <ion-button class="btn-seleccionar" color="secondary" *ngIf="isChecked_rol"
+        (click)="checkedAll_rol(isAllCheck_rol)">
+        <ion-icon slot="start" name="checkmark-done-outline"></ion-icon>
+        {{ isAllCheck_rol ? 'Quitar selección' : 'Seleccionar visibles' }}
       </ion-button>
-    </ion-col>
 
-    <ion-col [size]="isChecked_empl ? 10 : 12">
-      <ion-button (click)="EnviarEmpleado()" shape="round">
-        BUSCAR
+      <ion-button class="btn-buscar" color="primary" (click)="EnviarRoles()">
+        <ion-icon slot="start" name="search-outline"></ion-icon>
+        Buscar
       </ion-button>
-    </ion-col>
-  </ion-row>
+    </section>
 
-  <ion-searchbar *ngIf="opcion_empleado" autocomplete="off" showCancelButton="focus"
-    (ionChange)="changeSearchNombresCompletos($event)">
-  </ion-searchbar>
+    <ion-searchbar class="buscador" placeholder="Buscar rol" autocomplete="off" showCancelButton="focus"
+      (ionChange)="changeSearchRoles($event)">
+    </ion-searchbar>
 
-  <ion-list *ngIf="opcion_empleado">
-    <ion-text mode="ios" color="dark" style="text-align: center;">
-      <h3>Resultado Usuarios</h3>
-    </ion-text>
+    <section class="resultado-card">
+      <div class="resultado-header">
+        <div>
+          <h3>Resultado roles</h3>
+          <p>{{ roles_filtro.length }} registros encontrados</p>
+        </div>
+      </div>
 
-    <ion-item *ngFor="let e of empleados_filtro | paginate: { itemsPerPage: 10, currentPage: pageActual }"
-      class="item-color" mode="md" lines="full">
-      <ion-checkbox *ngIf="isChecked_empl" slot="start" [(ngModel)]="e.isChecked_empl">
-      </ion-checkbox>
+      <ion-list class="resultado-lista" *ngIf="roles_filtro.length > 0">
+        <ion-item class="item-color"
+          *ngFor="let r of roles_filtro | paginate: { itemsPerPage: itemsPorPagina, currentPage: pageActualRol }; trackBy: trackById"
+          mode="md" lines="none">
+          <ion-checkbox *ngIf="isChecked_rol" slot="start" color="success" [(ngModel)]="r.isChecked_rol">
+          </ion-checkbox>
 
-      <ion-label>{{ e.nombre }} {{ e.apellido }}</ion-label>
-    </ion-item>
-  </ion-list>
+          <ion-label>
+            <h2>{{ r.rol }}</h2>
+          </ion-label>
+        </ion-item>
+      </ion-list>
 
-  <ion-item style="font-size: 80%; margin: 0% 0% 1% 0%; display: flex; justify-content: center;" [hidden]="ver"
-    *ngIf="opcion_empleado">
-    <pagination-controls class="paginacion" (pageChange)="pageActual = $event" [maxSize]="maxSize"
-      [directionLinks]="directionLinks" [responsive]="responsive" [autoHide]="autoHide"
-      [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
-      [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
-      [screenReaderPageLabel]="labels.screenReaderPageLabel"
-      [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
-    </pagination-controls>
-  </ion-item>
+      <section class="estado-vacio" *ngIf="roles_filtro.length === 0">
+        <ion-icon name="person-circle-outline"></ion-icon>
+        <h2>No existen roles</h2>
+        <p>No se encontraron registros para mostrar.</p>
+      </section>
+    </section>
 
-  <!-- LISTAR ROLES -->
-  <ion-row *ngIf="opcion_rol">
-    <ion-col *ngIf="isChecked_rol" size="2">
-      <ion-button color="secondary" (click)="checkedAll_rol(isAllCheck_rol)">
-        <ion-icon name="checkmark-done-outline"></ion-icon>
-      </ion-button>
-    </ion-col>
+    <div class="paginacion-contenedor" *ngIf="mostrarPaginacionRol()">
+      <pagination-controls class="paginacion" (pageChange)="pageActualRol = $event" [maxSize]="maxSize"
+        [directionLinks]="directionLinks" [responsive]="responsive" [autoHide]="autoHide"
+        [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
+        [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+        [screenReaderPageLabel]="labels.screenReaderPageLabel"
+        [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+      </pagination-controls>
+    </div>
 
-    <ion-col [size]="isChecked_rol ? 10 : 12">
-      <ion-button (click)="EnviarRoles()" shape="round">
-        BUSCAR
-      </ion-button>
-    </ion-col>
-  </ion-row>
+  </ng-container>
 
-  <ion-searchbar *ngIf="opcion_rol" autocomplete="off" showCancelButton="focus" (ionChange)="changeSearchRoles($event)">
-  </ion-searchbar>
-
-  <ion-list *ngIf="opcion_rol">
-    <ion-text mode="ios" color="dark" style="text-align: center;">
-      <h3>Resultado Roles</h3>
-    </ion-text>
-
-    <ion-item *ngFor="let r of roles_filtro | paginate: { itemsPerPage: 10, currentPage: pageActualRol }"
-      class="item-color" mode="md" lines="full">
-      <ion-checkbox *ngIf="isChecked_rol" slot="start" [(ngModel)]="r.isChecked_rol">
-      </ion-checkbox>
-
-      <ion-label>{{ r.rol }}</ion-label>
-    </ion-item>
-  </ion-list>
-
-  <ion-item style="font-size: 80%; margin: 0% 0% 1% 0%; display: flex; justify-content: center;" [hidden]="verRol"
-    *ngIf="opcion_rol">
-    <pagination-controls class="paginacion" (pageChange)="pageActualRol = $event" [maxSize]="maxSize"
-      [directionLinks]="directionLinks" [responsive]="responsive" [autoHide]="autoHide"
-      [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
-      [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
-      [screenReaderPageLabel]="labels.screenReaderPageLabel"
-      [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
-    </pagination-controls>
-  </ion-item>
 </ion-content>

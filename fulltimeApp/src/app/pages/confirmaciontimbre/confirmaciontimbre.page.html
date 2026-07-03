@@ -5,6 +5,7 @@
 
       <section class="logo-section">
         <img class="logo-app" src="../../../assets/images/ISOLOGO.png" alt="AQHora">
+
         <ion-label mode="md" class="app-title">
           <b>Reloj Virtual</b>
         </ion-label>
@@ -41,14 +42,18 @@
 
             <div>
               <span>Fecha y hora de envío</span>
+              <strong>{{ fecha }} a las {{ hora }}</strong>
+            </div>
+          </div>
 
-              <strong *ngIf="isConnected && serverConnected">
-                {{ fecha }} a las {{ hora }}
-              </strong>
+          <div class="detalle-bloque tipo-bloque">
+            <div class="detalle-icono">
+              <ion-icon name="swap-horizontal-outline"></ion-icon>
+            </div>
 
-              <strong *ngIf="!isConnected || !serverConnected">
-                {{ fechaTransformada }} a las {{ horaTransformada }}
-              </strong>
+            <div>
+              <span>Tipo de timbre</span>
+              <strong>{{ tipoTimbre }}</strong>
             </div>
           </div>
 
@@ -60,11 +65,11 @@
             <div>
               <span>Ubicación registrada</span>
 
-              <strong *ngIf="ubicacion != null && ubicacion != undefined">
+              <strong *ngIf="ubicacion != null && ubicacion != undefined && ubicacion !== ''">
                 {{ ubicacion }}
               </strong>
 
-              <strong *ngIf="ubicacion == null || ubicacion == undefined">
+              <strong *ngIf="ubicacion == null || ubicacion == undefined || ubicacion === ''">
                 Sin ubicación
               </strong>
             </div>

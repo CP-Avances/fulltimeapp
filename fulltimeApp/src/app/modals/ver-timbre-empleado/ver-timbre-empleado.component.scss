@@ -1,190 +1,209 @@
 /* =========================
-   HEADER
+   GENERAL
 ========================= */
 
 .timbres-header {
-  background: linear-gradient(135deg, #0f75bc, #0b5a92);
+  background: #0f75bc;
   color: #ffffff;
-  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.18);
 }
 
-.header-filtros {
-  padding: 0 3% 3% 3%;
-}
-
-.header-filtros ion-row {
-  margin: 0;
-}
-
-.header-filtros ion-col {
-  padding: 4px;
-}
-
-/* =========================
-   SEGMENTO HORA SERVIDOR / DISPOSITIVO
-========================= */
-
-.segmento-hora {
-  margin: 3% 0;
-  padding: 4px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.18);
-}
-
-.segmento-hora ion-segment-button {
-  --color: #ffffff;
-  --color-checked: #ffffff;
-  --background: transparent;
-  --background-checked: rgba(255, 255, 255, 0.16);
-  --indicator-color: #ffffff;
-  --border-radius: 12px;
-  min-height: 38px;
-  text-transform: none;
-}
-
-.segmento-hora ion-segment-button ion-label {
-  color: #ffffff !important;
-  font-size: 68%;
-  font-weight: 800;
-  opacity: 1 !important;
-}
-
-.segmento-hora ion-segment-button.segment-button-checked ion-label,
-.segmento-hora ion-segment-button[aria-selected="true"] ion-label {
-  color: #ffffff !important;
-  opacity: 1 !important;
+.timbres-content {
+  --background: #eef3f8;
 }
 
 /* =========================
    FILTROS
 ========================= */
 
-.item_fondo {
-  --background: #ffffff;
-  --color: #1f2937;
+.filtros-card {
+  margin: 12px;
+  padding: 12px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.segmento-hora {
+  margin: 0 0 12px 0;
+  padding: 4px;
+  border-radius: 14px;
+  background: #edf2f7;
+}
+
+.segmento-hora ion-segment-button {
+  --background: transparent;
+  --background-checked: #0f75bc;
+  --color: #64748b;
+  --color-checked: #ffffff;
+  --indicator-color: transparent;
   --border-radius: 12px;
-  --padding-start: 10px;
-  --inner-padding-end: 8px;
-  border-radius: 12px !important;
-}
-
-.item_fondo ion-label {
-  color: #475569 !important;
-  font-size: 72%;
-  font-weight: 700;
-}
-
-.item_fondo ion-input {
-  color: #1f2937;
-  font-size: 82%;
-  font-weight: 700;
-}
-
-.header-filtros ion-button {
-  --border-radius: 16px;
-  min-height: 36px;
-  margin-top: 2%;
+  min-height: 38px;
   text-transform: none;
+}
+
+.segmento-hora ion-segment-button ion-label {
+  font-size: 72%;
   font-weight: 800;
 }
 
-.header-filtros ion-button ion-label {
-  font-size: 70%;
-  font-weight: 800;
+.segmento-hora ion-segment-button.segment-button-checked ion-label,
+.segmento-hora ion-segment-button[aria-selected="true"] ion-label {
+  color: #ffffff !important;
 }
+
+.fechas-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.fecha-box {
+  width: 100%;
+  min-height: 62px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
+  background: #f8fafc;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+.fecha-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.fecha-valor {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.botones-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.btn-buscar,
+.btn-todos {
+  min-height: 40px;
+  margin: 0;
+  text-transform: none;
+  font-weight: 900;
+  --border-radius: 14px;
+  --box-shadow: none;
+}
+
+.btn-buscar {
+  --background: #27c2c9;
+  --background-activated: #17aab0;
+  --color: #ffffff;
+}
+
+.btn-todos {
+  --background: #6d87f5;
+  --background-activated: #5874e6;
+  --color: #ffffff;
+}
+
+.btn-buscar ion-label,
+.btn-todos ion-label {
+  font-size: 72%;
+  font-weight: 900;
+}
+
+/* =========================
+   TÍTULO
+========================= */
 
 .titulo-lista {
-  margin: 3%;
+  margin: 2px 12px 8px 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid rgba(15, 23, 42, 0.08);
   text-align: center;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
 }
 
 .titulo-lista ion-text {
-  color: #ffffff;
+  color: #0f172a;
   font-size: 90%;
-  font-weight: 800;
+  font-weight: 900;
 }
 
 /* =========================
-   CONTENIDO / LISTA
+   CARGANDO
 ========================= */
 
-ion-content {
-  --background: #f4f7fb;
+.estado-cargando {
+  margin: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  background: #ffffff;
+  text-align: center;
 }
 
-ion-list {
+/* =========================
+   LISTA
+========================= */
+
+.lista-timbres {
   background: transparent;
-  padding: 0 0 8px 0;
+  padding: 0 10px 8px 10px;
 }
 
-ion-item-divider {
-  --background: #eef3f8;
-  --color: #64748b;
-  min-height: 28px;
-  border: none;
+.timbre-item {
+  --background: transparent;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --min-height: auto;
+  margin: 0 0 8px 0;
 }
 
-ion-item-divider ion-label {
-  color: #64748b !important;
-  font-size: 78%;
-  font-weight: 700;
-}
-
-ion-item {
-  --background: #ffffff;
-  --color: #1f2937;
-  --padding-start: 10px;
-  --inner-padding-end: 8px;
-  --min-height: 54px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
-  position: relative;
-}
-
-/* =========================
-   ACCIÓN DEL TIMBRE
-========================= */
-
-.contenedor-accion {
-  width: 42%;
-  min-width: 0;
-}
-
-.textoTimbreEmpleado {
-  text-align: left;
-  color: #0f75bc;
+.timbre-card {
   width: 100%;
-}
-
-.accion-timbre {
+  padding: 10px 10px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
   display: flex;
   align-items: center;
-  gap: 5px;
-  width: 100%;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.btn-info-timbre {
-  --padding-start: 0;
-  --padding-end: 0;
-  --background: rgba(15, 117, 188, 0.10);
-  --color: #0f75bc;
-  --border-radius: 50%;
-  width: 22px;
-  height: 22px;
-  min-width: 22px;
-  margin: 0;
+.timbre-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.btn-info-timbre ion-icon {
-  font-size: 16px;
+.timbre-textos {
+  flex: 1;
+  min-width: 0;
 }
 
 .accion-texto {
-  flex: 1;
-  min-width: 0;
   color: #0f75bc;
-  font-size: 70%;
-  font-weight: 800;
-  line-height: 1.2;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.15;
   text-align: left;
 }
 
@@ -194,125 +213,147 @@ ion-item {
   overflow-wrap: break-word;
 }
 
-/* Se oculta el texto anterior de más información */
-.textoObs {
-  display: none;
+.fecha-timbre {
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.timbre-derecha {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* =========================
+   BOTÓN INFO
+========================= */
+
+.btn-info-timbre {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(14, 165, 233, 0.22);
+  outline: none;
+  background: #e0f2fe;
+  color: #0284c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+}
+
+.btn-info-timbre ion-icon {
+  color: #0284c7 !important;
+  font-size: 15px;
 }
 
 /* =========================
    HORA
 ========================= */
 
-.tamanoBotonDER {
-  width: 4rem;
-  height: 2rem;
-  position: absolute;
-  right: 40%;
-  font-size: 70%;
-  --background: #f8fafc;
-  --color: #1f2937;
-  --box-shadow: none;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+.hora-card {
+  width: 76px;
+  min-width: 76px;
+  padding: 5px 4px;
+  border-radius: 9px;
+  background: #f8fafc;
+  border: 1px solid rgba(100, 116, 139, 0.16);
+  text-align: center;
 }
 
-.tamanoBotonDER div {
-  font-size: 70%;
+.hora-card span {
+  display: block;
+  color: #475569;
+  font-size: 10px;
   font-weight: 800;
-  line-height: 1.1;
+  line-height: 1;
+  margin-bottom: 2px;
 }
 
-.tamanoBotonDER ion-text {
-  color: #0f75bc;
+.hora-card strong {
+  display: block;
+  color: #0b5a92;
+  font-size: 10.5px;
   font-weight: 900;
+  line-height: 1.1;
+  white-space: nowrap;
 }
 
 /* =========================
-   BOTONES DE ACCIÓN
+   ACCIONES
 ========================= */
 
-.tamanoIconoEmpleado {
-  font-size: 150%;
+.acciones-timbre {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.accion-icono {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 0;
   margin: 0;
-  border: 0;
 }
 
-.ubicacionIZQ,
-.ubicacionMED,
-.ubicacionDER {
-  width: 3rem;
-  height: 3rem;
-  position: absolute;
-  --background: #f8fafc;
-  --color: #0f75bc;
-  --box-shadow: none;
+.accion-icono ion-icon {
+  font-size: 17px;
+  opacity: 1 !important;
 }
 
-.ubicacionIZQ {
-  right: 26%;
+/* Foto / carita - amarillo */
+.accion-foto {
+  background: #fef3c7;
+  border-color: rgba(245, 158, 11, 0.25);
 }
 
-.ubicacionMED {
-  right: 13%;
+.accion-foto ion-icon {
+  color: #d97706 !important;
 }
 
-.ubicacionDER {
-  right: 0%;
+/* Documento / imagen - morado/rosado */
+.accion-documento {
+  background: #fce7f3;
+  border-color: rgba(219, 39, 119, 0.22);
 }
 
-.ubicacionIZQ[disabled],
-.ubicacionMED[disabled],
-.ubicacionDER[disabled] {
-  opacity: 0.35;
+.accion-documento ion-icon {
+  color: #db2777 !important;
 }
 
-/* =========================
-   TEXTOS GENERALES
-========================= */
-
-p {
-  font-size: 70%;
-  overflow-wrap: break-word;
+/* Mapa - verde */
+.accion-mapa {
+  background: #dcfce7;
+  border-color: rgba(22, 163, 74, 0.22);
 }
 
-h4 {
-  margin-top: 1%;
-  font-size: 85%;
+.accion-mapa ion-icon {
+  color: #16a34a !important;
 }
 
-ion-label {
-  font-size: 70%;
+.accion-icono.accion-deshabilitada,
+.accion-icono:disabled {
+  opacity: 0.38;
+  background: #f1f5f9;
+  border-color: rgba(148, 163, 184, 0.18);
 }
 
-.tamanoImagen {
-  height: 55%;
-  width: 55%;
-  display: block;
-  margin: auto;
-}
-
-.tamanoBotonIZQ {
-  width: 3rem;
-  height: 2rem;
-  position: absolute;
-  left: 5%;
-}
-
-.centrarTimbre {
-  margin: auto;
-  width: 90%;
-  margin-right: 10%;
-}
-
-.botones-container {
-  position: absolute;
-}
-
-.siguiente-botones {
-  position: absolute;
-  top: 0;
-  right: 0;
-  margin-right: 10px;
+.accion-icono.accion-deshabilitada ion-icon,
+.accion-icono:disabled ion-icon {
+  color: #94a3b8 !important;
 }
 
 /* =========================
@@ -320,27 +361,23 @@ ion-label {
 ========================= */
 
 .paginacion-contenedor {
-  width: 100%;
-  margin: 0 0 4% 0;
-  padding: 1% 0;
+  margin: 8px 10px 12px 10px;
+  padding: 8px 0;
+  border-radius: 14px;
   background: #ffffff;
-  border-top: 1px solid #d0d0d0;
-  border-bottom: 1px solid #d0d0d0;
+  border: 1px solid rgba(15, 23, 42, 0.08);
   text-align: center;
 }
 
 .paginacion {
-  margin: auto;
-  padding-top: 2%;
-  padding-bottom: 2%;
   width: 100%;
   display: flex;
   justify-content: center;
 }
 
 .paginacion ::ng-deep .ngx-pagination {
-  padding: 0%;
-  margin: auto;
+  padding: 0;
+  margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -351,24 +388,137 @@ ion-label {
 }
 
 .paginacion ::ng-deep .ngx-pagination .current {
-  background: rgb(28, 133, 219);
-  color: rgb(255, 255, 255);
+  background: #0f75bc;
+  color: #ffffff;
   font-weight: bold;
-  border-radius: 5px;
-}
-
-.paginacion ::ng-deep .ngx-pagination span {
-  color: rgb(120, 120, 120);
-  font-family: monospace;
+  border-radius: 6px;
 }
 
 .paginacion ::ng-deep .ngx-pagination a {
   background-color: transparent;
-  color: rgb(46, 143, 235);
+  color: #0f75bc;
 }
 
-.paginacion ::ng-deep .ngx-pagination .disabled {
-  color: #b0b0b0;
+.paginacion ::ng-deep .ngx-pagination span {
+  color: #64748b;
+  font-family: monospace;
+}
+
+/* =========================
+   VACÍO
+========================= */
+
+.estado-vacio {
+  margin: 12px;
+  padding: 18px;
+  border-radius: 18px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.tamanoImagen {
+  width: 58%;
+  max-width: 220px;
+  display: block;
+  margin: auto;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 390px) {
+  .filtros-card {
+    margin: 10px;
+    padding: 10px;
+  }
+
+  .fecha-box {
+    min-height: 58px;
+    padding: 8px 10px;
+  }
+
+  .fecha-label {
+    font-size: 10px;
+  }
+
+  .fecha-valor {
+    font-size: 13px;
+  }
+
+  .timbre-card {
+    padding: 9px 8px;
+    gap: 6px;
+  }
+
+  .timbre-info {
+    gap: 6px;
+  }
+
+  .timbre-derecha {
+    gap: 4px;
+  }
+
+  .hora-card {
+    width: 74px;
+    min-width: 74px;
+  }
+
+  .hora-card strong {
+    font-size: 10px;
+  }
+
+  .accion-icono {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+  }
+
+  .accion-icono ion-icon {
+    font-size: 16px;
+  }
+
+  .accion-texto {
+    font-size: 12px;
+  }
+
+  .fecha-timbre {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 350px) {
+  .fechas-grid,
+  .botones-grid {
+    gap: 6px;
+  }
+
+  .hora-card {
+    width: 70px;
+    min-width: 70px;
+  }
+
+  .acciones-timbre {
+    gap: 3px;
+  }
+
+  .accion-icono {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+  }
+
+  .accion-icono ion-icon {
+    font-size: 15px;
+  }
+
+  .accion-texto {
+    font-size: 11px;
+  }
+
+  .fecha-timbre {
+    font-size: 9px;
+  }
 }
 
 /* =========================
@@ -376,57 +526,107 @@ ion-label {
 ========================= */
 
 @media (prefers-color-scheme: dark) {
-  ion-content {
+  .timbres-content {
     --background: #0f172a;
   }
 
-  ion-item {
-    --background: #1e293b;
-    --color: #f8fafc;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  .filtros-card,
+  .titulo-lista,
+  .timbre-card,
+  .paginacion-contenedor,
+  .estado-vacio,
+  .estado-cargando {
+    background: #1e293b;
+    border-color: rgba(255, 255, 255, 0.08);
   }
 
-  ion-item-divider {
-    --background: #111827;
+  .segmento-hora {
+    background: #0f172a;
   }
 
-  ion-item-divider ion-label {
-    color: #cbd5e1 !important;
+  .fecha-box {
+    background: #111827;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .fecha-label {
+    color: #cbd5e1;
+  }
+
+  .fecha-valor {
+    color: #f8fafc;
+  }
+
+  .titulo-lista ion-text {
+    color: #f8fafc;
   }
 
   .accion-texto {
     color: #38bdf8;
   }
 
-  .btn-info-timbre {
-    --background: rgba(56, 189, 248, 0.14);
-    --color: #38bdf8;
+  .fecha-timbre {
+    color: #cbd5e1;
   }
 
-  .tamanoBotonDER,
-  .ubicacionIZQ,
-  .ubicacionMED,
-  .ubicacionDER {
-    --background: #111827;
-    --color: #38bdf8;
+  .btn-info-timbre {
+    background: rgba(14, 165, 233, 0.16);
+    border-color: rgba(14, 165, 233, 0.25);
+  }
+
+  .btn-info-timbre ion-icon {
+    color: #38bdf8 !important;
+  }
+
+  .hora-card {
+    background: #111827;
     border-color: rgba(255, 255, 255, 0.08);
   }
 
-  .tamanoBotonDER ion-text {
+  .hora-card span {
+    color: #cbd5e1;
+  }
+
+  .hora-card strong {
     color: #38bdf8;
   }
 
-  .paginacion-contenedor {
-    background: #1e293b;
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  .accion-foto {
+    background: rgba(245, 158, 11, 0.18);
+    border-color: rgba(245, 158, 11, 0.28);
   }
 
-  .paginacion ::ng-deep .ngx-pagination span {
-    color: rgb(211, 211, 211);
+  .accion-foto ion-icon {
+    color: #fbbf24 !important;
   }
 
-  .paginacion ::ng-deep .ngx-pagination a {
-    color: rgb(46, 143, 235);
+  .accion-documento {
+    background: rgba(219, 39, 119, 0.18);
+    border-color: rgba(219, 39, 119, 0.28);
+  }
+
+  .accion-documento ion-icon {
+    color: #f472b6 !important;
+  }
+
+  .accion-mapa {
+    background: rgba(34, 197, 94, 0.16);
+    border-color: rgba(34, 197, 94, 0.24);
+  }
+
+  .accion-mapa ion-icon {
+    color: #4ade80 !important;
+  }
+
+  .accion-icono.accion-deshabilitada,
+  .accion-icono:disabled {
+    opacity: 0.35;
+    background: #111827;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .accion-icono.accion-deshabilitada ion-icon,
+  .accion-icono:disabled ion-icon {
+    color: #64748b !important;
   }
 }
