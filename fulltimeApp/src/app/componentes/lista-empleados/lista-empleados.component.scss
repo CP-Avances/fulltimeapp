@@ -151,65 +151,135 @@
 }
 
 /* =========================
-   PAGINACIÓN
+   PAGINACIÓN COMPACTA COMPLETA
 ========================= */
 
 .contenedor-paginacion {
-  margin: 10px 2px 0 2px;
-  padding: 8px 4px;
+  margin: 10px 8px 0 8px;
+  padding: 5px 8px;
+  min-height: 38px;
   background: var(--app-card);
   border-radius: 16px;
-  box-shadow: var(--app-shadow);
+  border: 1px solid var(--app-border);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
   text-align: center;
 }
 
 .paginacion {
-  margin: auto;
-  padding: 0;
-}
-
-.paginacion ::ng-deep .ngx-pagination {
-  padding: 0;
-  margin: 0 auto;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 3px;
-  flex-wrap: wrap;
+}
+
+.paginacion ::ng-deep .ngx-pagination {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  min-height: 28px !important;
+
+  display: grid !important;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+/* Oculta números intermedios */
+.paginacion ::ng-deep .ngx-pagination li:not(.pagination-previous):not(.pagination-next):not(.current) {
+  display: none !important;
 }
 
 .paginacion ::ng-deep .ngx-pagination li {
-  margin: 0;
-  border-radius: 10px;
-  overflow: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  line-height: 1 !important;
 }
 
-.paginacion ::ng-deep .ngx-pagination a,
-.paginacion ::ng-deep .ngx-pagination button {
-  padding: 6px 9px;
-  color: var(--app-primary);
-  background: transparent;
-  border-radius: 10px;
-  font-size: 12px;
-  font-weight: 700;
+/* Ubicación de anterior, actual y siguiente */
+.paginacion ::ng-deep .ngx-pagination .pagination-previous {
+  grid-column: 1;
+  justify-self: start;
 }
 
 .paginacion ::ng-deep .ngx-pagination .current {
-  background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
-  color: #ffffff;
-  font-weight: 800;
-  border-radius: 10px;
-  padding: 6px 10px;
-  box-shadow: 0 4px 10px rgba(15, 117, 188, 0.25);
+  grid-column: 2;
+  justify-self: center;
 }
 
+.paginacion ::ng-deep .ngx-pagination .pagination-next {
+  grid-column: 3;
+  justify-self: end;
+}
+
+/* Estilo general */
+.paginacion ::ng-deep .ngx-pagination a,
+.paginacion ::ng-deep .ngx-pagination button,
+.paginacion ::ng-deep .ngx-pagination .current {
+  height: 26px !important;
+  min-width: auto !important;
+  padding: 0 5px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: var(--app-primary) !important;
+
+  font-size: 10.5px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+/* Página actual */
+.paginacion ::ng-deep .ngx-pagination .current {
+  color: var(--app-text) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 8px !important;
+}
+
+/* Anterior y siguiente completos */
+.paginacion ::ng-deep .ngx-pagination .pagination-previous a,
+.paginacion ::ng-deep .ngx-pagination .pagination-previous span,
+.paginacion ::ng-deep .ngx-pagination .pagination-next a,
+.paginacion ::ng-deep .ngx-pagination .pagination-next span {
+  width: 100% !important;
+  max-width: none !important;
+  padding: 0 4px !important;
+  font-size: 10.5px !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+}
+
+.paginacion ::ng-deep .ngx-pagination .pagination-previous a,
+.paginacion ::ng-deep .ngx-pagination .pagination-previous span {
+  justify-content: flex-start !important;
+}
+
+.paginacion ::ng-deep .ngx-pagination .pagination-next a,
+.paginacion ::ng-deep .ngx-pagination .pagination-next span {
+  justify-content: flex-end !important;
+}
+
+/* Deshabilitado */
 .paginacion ::ng-deep .ngx-pagination .disabled {
-  color: #a0aec0;
-  opacity: 0.55;
+  color: #cbd5e1 !important;
+  opacity: 1 !important;
 }
 
 .paginacion ::ng-deep .ngx-pagination span {
-  font-family: inherit;
+  color: inherit !important;
+  font-family: inherit !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
 }
 
 /* =========================
@@ -285,10 +355,30 @@
     font-size: 28px;
   }
 
-  .paginacion ::ng-deep .ngx-pagination a,
-  .paginacion ::ng-deep .ngx-pagination button,
-  .paginacion ::ng-deep .ngx-pagination .current {
-    padding: 5px 8px;
-    font-size: 11px;
-  }
+.contenedor-paginacion {
+  margin: 8px 6px 0 6px;
+  padding: 4px 6px;
+  min-height: 34px;
+  border-radius: 14px;
+}
+
+.paginacion ::ng-deep .ngx-pagination {
+  gap: 2px !important;
+}
+
+.paginacion ::ng-deep .ngx-pagination a,
+.paginacion ::ng-deep .ngx-pagination button,
+.paginacion ::ng-deep .ngx-pagination .current {
+  height: 24px !important;
+  font-size: 9.5px !important;
+  padding: 0 3px !important;
+}
+
+.paginacion ::ng-deep .ngx-pagination .pagination-previous a,
+.paginacion ::ng-deep .ngx-pagination .pagination-previous span,
+.paginacion ::ng-deep .ngx-pagination .pagination-next a,
+.paginacion ::ng-deep .ngx-pagination .pagination-next span {
+  font-size: 9.5px !important;
+  padding: 0 2px !important;
+}
 }

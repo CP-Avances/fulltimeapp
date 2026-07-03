@@ -303,59 +303,97 @@
 }
 
 /* =========================
-   PAGINACIÓN
+   PAGINACIÓN COMPACTA
 ========================= */
 
 .paginacion-contenedor {
-  margin: 0 0 16px 0;
-  padding: 8px 4px;
+  margin: 10px 18px 16px 18px;
+  padding: 5px 8px;
+  min-height: 38px;
   background: var(--app-card);
   border-radius: 16px;
   border: 1px solid var(--app-border);
-  box-shadow: var(--app-shadow);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
   text-align: center;
 }
 
 .paginacion {
-  margin: auto;
   width: 100%;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .paginacion ::ng-deep .ngx-pagination {
-  padding: 0;
-  margin: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 2px;
-  flex-wrap: wrap;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: auto !important;
+  min-height: 28px !important;
+
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 5px !important;
 }
 
 .paginacion ::ng-deep .ngx-pagination li {
-  margin: 0 2px;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 9px !important;
+  overflow: hidden !important;
+  line-height: 1 !important;
+}
+
+.paginacion ::ng-deep .ngx-pagination a,
+.paginacion ::ng-deep .ngx-pagination button,
+.paginacion ::ng-deep .ngx-pagination .current {
+  min-width: 28px !important;
+  height: 28px !important;
+  padding: 0 7px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border-radius: 9px !important;
+  background: transparent !important;
+  color: var(--app-primary) !important;
+
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
 }
 
 .paginacion ::ng-deep .ngx-pagination .current {
-  background: var(--app-primary);
-  color: #ffffff;
-  font-weight: 900;
-  border-radius: 8px;
-  padding: 5px 9px;
+  background: transparent !important;
+  color: var(--app-text) !important;
+  box-shadow: none !important;
+}
+
+.paginacion ::ng-deep .ngx-pagination .disabled {
+  color: #cbd5e1 !important;
+  opacity: 1 !important;
 }
 
 .paginacion ::ng-deep .ngx-pagination span {
-  color: var(--app-text-soft);
-  font-family: inherit;
-  font-weight: 800;
+  color: inherit !important;
+  font-family: inherit !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
 }
 
-.paginacion ::ng-deep .ngx-pagination a {
-  background-color: transparent;
-  color: var(--app-primary);
-  font-weight: 800;
-  border-radius: 8px;
+/* Oculta los números intermedios y deja: Anterior  1 / 2  Siguiente */
+.paginacion ::ng-deep .ngx-pagination li:not(.pagination-previous):not(.pagination-next):not(.current) {
+  display: none !important;
+}
+
+.paginacion ::ng-deep .ngx-pagination .pagination-previous a,
+.paginacion ::ng-deep .ngx-pagination .pagination-previous span,
+.paginacion ::ng-deep .ngx-pagination .pagination-next a,
+.paginacion ::ng-deep .ngx-pagination .pagination-next span {
+  font-size: 11px !important;
+  padding: 0 6px !important;
 }
 
 /* =========================
@@ -545,4 +583,32 @@
   .offline-img {
     width: 78%;
   }
+
+  .paginacion-contenedor {
+  margin: 8px 22px 14px 22px;
+  padding: 4px 6px;
+  min-height: 34px;
+  border-radius: 14px;
+}
+
+.paginacion ::ng-deep .ngx-pagination {
+  gap: 3px !important;
+}
+
+.paginacion ::ng-deep .ngx-pagination a,
+.paginacion ::ng-deep .ngx-pagination button,
+.paginacion ::ng-deep .ngx-pagination .current {
+  height: 25px !important;
+  min-width: 24px !important;
+  padding: 0 4px !important;
+  font-size: 10px !important;
+}
+
+.paginacion ::ng-deep .ngx-pagination .pagination-previous a,
+.paginacion ::ng-deep .ngx-pagination .pagination-previous span,
+.paginacion ::ng-deep .ngx-pagination .pagination-next a,
+.paginacion ::ng-deep .ngx-pagination .pagination-next span {
+  font-size: 10px !important;
+  padding: 0 4px !important;
+}
 }

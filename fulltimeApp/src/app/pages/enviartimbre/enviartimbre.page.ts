@@ -24,6 +24,8 @@ import { FechaHoraService } from 'src/app/services/fecha-hora.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ParametrosSistema } from 'src/app/libs/parametros.emun';
 
+type MotivoConexion = 'SIN_INTERNET' | 'ERROR_SERVIDOR' | 'TIMEOUT' | 'OK';
+
 @Component({
   selector: 'app-enviartimbre',
   templateUrl: './enviartimbre.page.html',
@@ -61,9 +63,23 @@ export class EnviartimbrePage implements OnInit {
   zonaHoraria: string = '';
   gmtDispositivo: string = '';
 
-  private readonly IDENTIFICACION_BIOMETRICA = 'B';
-  private readonly NINGUNA_IDENTIFICACION = 'N';
-  private readonly IDENTIFICACION_DESACTIVADA = 'D';
+  private readonly IDENTIFICACION_BIOMETRICA = 'BIOMETRICA';
+  private readonly NINGUNA_IDENTIFICACION = 'NINGUNA';
+  private readonly IDENTIFICACION_DESACTIVADA = 'DESCONOCIDA';
+
+  private readonly APP_MOVIL = 'APP_MOVIL';
+
+  /*
+    Estos timbres validan ubicación, pero NO se bloquean
+    si están fuera de zona o si salen como desconocidos.
+
+    2 = Inicio alimentación
+    3 = Fin alimentación
+    4 = Inicio permiso
+    5 = Fin permiso
+    7 = Timbre especial / abierto
+  */
+  private readonly TIMBRES_UBICACION_FLEXIBLE = new Set<string>(['2', '3', '4', '5', '7']);
 
   cargandoPosicion = false;
 
@@ -74,7 +90,12 @@ export class EnviartimbrePage implements OnInit {
     longitud: null,
     id_reloj: 97,
     ubicacion: '',
-    imagen: null
+    imagen: null,
+    dispositivo_timbre: 'APP_MOVIL',
+    conexion: true,
+    novedades_conexion: null,
+    fecha_subida_servidor: null,
+    tipo_autenticacion: null,
   };
 
   pipe = new DatePipe('en-US');
@@ -94,9 +115,10 @@ export class EnviartimbrePage implements OnInit {
   numeroCaracteres = 0;
   intentos: number = 0;
   modelo_dispositivo: string = '';
+  id_dispositivo_movil: string = '';
 
   conexion = true;
-  novedades_conexion: string = '';
+  novedades_conexion: string | null = null;
 
   activarOpcion: boolean = false;
 
@@ -162,10 +184,11 @@ export class EnviartimbrePage implements OnInit {
     await this.BuscarOpcionMarcacion();
     await this.solicitarPermisosIniciales();
 
-    /**
-     * IMPORTANTE:
-     * Aquí ya se valida y se muestra la ubicación ANTES de presionar Continuar.
-     */
+    /*
+      Precarga visual de ubicación.
+      Si falla, no bloquea la pantalla.
+      La validación fuerte se realiza al presionar Enviar Timbre.
+    */
     await this.actualizarUbicacionAntesDeContinuar();
   }
 
@@ -198,7 +221,6 @@ export class EnviartimbrePage implements OnInit {
         permisos.coarseLocation === 'granted';
 
       if (locationGranted) {
-        await this.obtenerPosicion();
         return true;
       }
 
@@ -206,32 +228,10 @@ export class EnviartimbrePage implements OnInit {
         permissions: ['location']
       } as any);
 
-      const requestGranted =
-        request.location === 'granted' ||
+      return request.location === 'granted' ||
         request.coarseLocation === 'granted';
 
-      if (requestGranted) {
-        await this.obtenerPosicion();
-        return true;
-      }
-
-      await this.abrirToas(
-        'No se otorgó permiso de ubicación. Para timbrar debe permitir el acceso a la ubicación.',
-        'warning',
-        5000,
-        'middle'
-      );
-
-      return false;
-
-    } catch (error: any) {
-      await this.abrirToas(
-        'No fue posible solicitar el permiso de ubicación. Revise que la ubicación esté activa y que la app tenga permiso desde la configuración del teléfono.',
-        'danger',
-        6000,
-        'middle'
-      );
-
+    } catch {
       return false;
     }
   }
@@ -265,7 +265,7 @@ export class EnviartimbrePage implements OnInit {
 
       return false;
 
-    } catch (error) {
+    } catch {
       await this.abrirToas(
         'No fue posible solicitar el permiso de cámara. Revise los permisos de la app.',
         'danger',
@@ -315,9 +315,9 @@ export class EnviartimbrePage implements OnInit {
 
     if (!this.isConnected) {
       this.abrirToas(
-        'Por favor verifique su conexión a Internet',
-        'danger',
-        3000,
+        'Sin conexión a Internet. Si el parámetro lo permite, el timbre quedará pendiente de sincronización.',
+        'warning',
+        4000,
         'middle'
       );
     }
@@ -327,48 +327,103 @@ export class EnviartimbrePage implements OnInit {
 
   async comprobarGPS() {
     if (this.platform.is('hybrid')) {
-      await this.solicitarPermisoUbicacionInicial();
+      const permiso = await this.solicitarPermisoUbicacionInicial();
+
+      if (permiso) {
+        await this.obtenerPosicion(false);
+      }
+
       return;
     }
 
-    await this.obtenerPosicionWeb();
+    await this.obtenerPosicionWeb(false);
   }
 
   async requestLocationPermission() {
-    await this.solicitarPermisoUbicacionInicial();
+    const permiso = await this.solicitarPermisoUbicacionInicial();
+
+    if (!permiso) {
+      await this.abrirToas(
+        'No se otorgó permiso de ubicación.',
+        'warning',
+        4000,
+        'middle'
+      );
+      return;
+    }
+
+    await this.obtenerPosicion(true);
     await this.actualizarUbicacionAntesDeContinuar();
   }
 
-  async obtenerPosicion() {
+  async obtenerPosicion(mostrarMensaje = true): Promise<boolean> {
     this.cargandoPosicion = true;
 
     try {
+      const permisos: any = await Geolocation.checkPermissions();
+
+      const permisoOk =
+        permisos.location === 'granted' ||
+        permisos.coarseLocation === 'granted';
+
+      if (!permisoOk) {
+        const request: any = await Geolocation.requestPermissions({
+          permissions: ['location']
+        } as any);
+
+        const requestOk =
+          request.location === 'granted' ||
+          request.coarseLocation === 'granted';
+
+        if (!requestOk) {
+          this.geoLatitude = 0;
+          this.geoLongitude = 0;
+
+          if (mostrarMensaje) {
+            await this.abrirToas(
+              'No se otorgó permiso de ubicación.',
+              'warning',
+              4000,
+              'middle'
+            );
+          }
+
+          return false;
+        }
+      }
+
       const resp = await Geolocation.getCurrentPosition({
         enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
+        timeout: 8000,
+        maximumAge: 30000
       });
 
-      this.geoLongitude = resp.coords.longitude;
       this.geoLatitude = resp.coords.latitude;
+      this.geoLongitude = resp.coords.longitude;
+
+      return true;
 
     } catch {
       this.geoLatitude = 0;
       this.geoLongitude = 0;
 
-      await this.abrirToas(
-        'Ups!!! No se ha obtenido coordenadas de ubicación.',
-        'danger',
-        6000,
-        'middle'
-      );
+      if (mostrarMensaje) {
+        await this.abrirToas(
+          'No se pudo obtener la ubicación actual.',
+          'warning',
+          4000,
+          'middle'
+        );
+      }
+
+      return false;
 
     } finally {
       this.cargandoPosicion = false;
     }
   }
 
-  obtenerPosicionWeb(): Promise<void> {
+  obtenerPosicionWeb(mostrarMensaje = true): Promise<boolean> {
     this.cargandoPosicion = true;
 
     return new Promise((resolve) => {
@@ -376,7 +431,17 @@ export class EnviartimbrePage implements OnInit {
         this.geoLatitude = 0;
         this.geoLongitude = 0;
         this.cargandoPosicion = false;
-        resolve();
+
+        if (mostrarMensaje) {
+          this.abrirToas(
+            'El navegador no soporta geolocalización.',
+            'warning',
+            4000,
+            'middle'
+          );
+        }
+
+        resolve(false);
         return;
       }
 
@@ -385,20 +450,28 @@ export class EnviartimbrePage implements OnInit {
           this.geoLatitude = position.coords.latitude;
           this.geoLongitude = position.coords.longitude;
           this.cargandoPosicion = false;
-          resolve();
+          resolve(true);
         },
-        (error) => {
-          console.warn('No se pudo obtener ubicación en navegador:', error);
-
+        () => {
           this.geoLatitude = 0;
           this.geoLongitude = 0;
           this.cargandoPosicion = false;
-          resolve();
+
+          if (mostrarMensaje) {
+            this.abrirToas(
+              'No se pudo obtener la ubicación actual desde el navegador.',
+              'warning',
+              4000,
+              'middle'
+            );
+          }
+
+          resolve(false);
         },
         {
           enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
+          timeout: 8000,
+          maximumAge: 30000
         }
       );
     });
@@ -422,15 +495,22 @@ export class EnviartimbrePage implements OnInit {
 
   obtenerIdCelular() {
     Device.getInfo().then((info) => {
-      this.modelo_dispositivo = info.model;
+      this.modelo_dispositivo = info.model || 'Desconocido';
     }).catch(() => {
       this.modelo_dispositivo = 'Desconocido';
     });
 
     Device.getId().then((id) => {
-      this.nuevoTimbre.dispositivo_timbre = id.identifier + '';
+      this.id_dispositivo_movil = id.identifier || 'Desconocido';
+
+      this.nuevoTimbre.dispositivo_timbre = this.APP_MOVIL;
+      this.nuevoTimbre.id_dispositivo_movil = this.id_dispositivo_movil;
+
     }).catch(() => {
-      this.nuevoTimbre.dispositivo_timbre = 'Desconocido';
+      this.id_dispositivo_movil = 'Desconocido';
+
+      this.nuevoTimbre.dispositivo_timbre = this.APP_MOVIL;
+      this.nuevoTimbre.id_dispositivo_movil = 'Desconocido';
     });
   }
 
@@ -525,7 +605,6 @@ export class EnviartimbrePage implements OnInit {
     if (!this.platform.is('hybrid')) {
       this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
       this.guardarEnBDD();
-
       return;
     }
 
@@ -552,9 +631,9 @@ export class EnviartimbrePage implements OnInit {
       }
     }).catch(() => {
       this.abrirToas(
-        'Ocurrió un error al autenticar del usuario. El timbre no se envió',
+        'Ocurrió un error al autenticar al usuario. El timbre no se envió.',
         'danger',
-        1000,
+        2000,
         'middle'
       );
 
@@ -613,23 +692,41 @@ export class EnviartimbrePage implements OnInit {
   }
 
   async enviarTimbre(ev?: any) {
+    const teclaFuncion = this.obtenerIdTipo();
+    const esTimbreFlexible = this.EsTimbreFlexibleUbicacion(teclaFuncion);
+
+    let ubicacionObtenida = false;
+
     if (this.platform.is('hybrid')) {
       const tienePermisoUbicacion = await this.solicitarPermisoUbicacionInicial();
 
       if (!tienePermisoUbicacion) {
-        return this.abrirToas(
-          'Ups, al parecer no ha otorgado el permiso de acceder a la ubicación al Reloj Virtual. Por favor vaya a las configuraciones de nuestra app y permita al Reloj Virtual acceder a su ubicación.',
-          'danger',
-          6000,
-          'middle'
-        );
+        this.geoLatitude = 0;
+        this.geoLongitude = 0;
+
+        if (esTimbreFlexible) {
+          this.actualizarUbicacionPantalla('SIN UBICACION');
+
+          await this.abrirToas(
+            'No se obtuvo permiso de ubicación. Este tipo de timbre se registrará como SIN UBICACION.',
+            'warning',
+            4000,
+            'middle'
+          );
+        } else {
+          return this.abrirToas(
+            'Debe permitir el acceso a la ubicación para registrar este tipo de timbre.',
+            'danger',
+            6000,
+            'middle'
+          );
+        }
+      } else {
+        ubicacionObtenida = await this.obtenerPosicion(!esTimbreFlexible);
       }
 
-      if (!this.geoLatitude || !this.geoLongitude) {
-        await this.obtenerPosicion();
-      }
     } else {
-      this.abrirToas(
+      await this.abrirToas(
         'Prueba desde navegador: no se usará autenticación biométrica.',
         'warning',
         2000,
@@ -638,32 +735,22 @@ export class EnviartimbrePage implements OnInit {
 
       this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
 
-      if (!this.geoLatitude || !this.geoLongitude) {
-        await this.obtenerPosicionWeb();
-      }
+      ubicacionObtenida = await this.obtenerPosicionWeb(!esTimbreFlexible);
     }
 
-    /**
-     * Antes de continuar, volvemos a validar la ubicación.
-     * Así no se envía el timbre con ubicación vacía.
-     */
+    if (!ubicacionObtenida && esTimbreFlexible) {
+      this.geoLatitude = 0;
+      this.geoLongitude = 0;
+      this.actualizarUbicacionPantalla('SIN UBICACION');
+    }
+
     await this.actualizarUbicacionAntesDeContinuar();
 
-    if (!this.ubicacion) {
-      return this.abrirToas(
-        'No se pudo validar la ubicación. Intente refrescar la pantalla.',
-        'warning',
-        4000,
-        'middle'
-      );
-    }
+    const ubicacionValida = this.NormalizarUbicacionParaTimbre(teclaFuncion);
 
-    if (
-      this.ubicacion === 'DESCONOCIDO' &&
-      this.desconocida !== true
-    ) {
+    if (!ubicacionValida) {
       return this.abrirToas(
-        'Timbre con ubicación desconocida. No permitido.',
+        'No se pudo validar la ubicación. Este tipo de timbre solo puede registrarse en zonas permitidas.',
         'danger',
         5000,
         'middle'
@@ -727,6 +814,19 @@ export class EnviartimbrePage implements OnInit {
 
     const teclaFuncion = this.obtenerIdTipo();
 
+    const ubicacionValida = this.NormalizarUbicacionParaTimbre(teclaFuncion);
+
+    if (!ubicacionValida) {
+      return this.abrirToas(
+        'No se pudo validar la ubicación. Este tipo de timbre solo puede registrarse en zonas permitidas.',
+        'danger',
+        5000,
+        'middle'
+      );
+    }
+
+    const esTimbreFlexible = this.EsTimbreFlexibleUbicacion(teclaFuncion);
+
     this.nuevoTimbre.codigo = this.codigo;
     this.nuevoTimbre.fec_hora_timbre = fechaHoraTimbre;
 
@@ -743,11 +843,21 @@ export class EnviartimbrePage implements OnInit {
     this.nuevoTimbre.latitud = this.geoLatitude ? String(this.geoLatitude) : '0';
     this.nuevoTimbre.longitud = this.geoLongitude ? String(this.geoLongitude) : '0';
 
-    this.nuevoTimbre.ubicacion = this.ubicacion || 'Sin Ubicación';
+    this.nuevoTimbre.ubicacion = this.ubicacion || (esTimbreFlexible ? 'SIN UBICACION' : 'Sin Ubicación');
+
+    this.nuevoTimbre.dispositivo_timbre = this.APP_MOVIL;
+    this.nuevoTimbre.id_dispositivo_movil = this.id_dispositivo_movil || 'Desconocido';
+    this.nuevoTimbre.modelo_dispositivo = this.modelo_dispositivo || 'Desconocido';
+
+    /*
+      Desde la app móvil enviamos null.
+      Si el timbre queda offline, esta fecha se llena cuando se sincronice.
+    */
+    this.nuevoTimbre.fecha_subida_servidor = null;
 
     if (this.nuevoTimbre.accion === 'HA' && !this.nuevoTimbre.observacion) {
       return this.abrirToas(
-        'Lo siento! Debes ingresar una observación antes de enviar un timbre abierto 😅',
+        'Debes ingresar una observación antes de enviar un timbre abierto.',
         'danger',
         5000,
         'middle'
@@ -757,31 +867,26 @@ export class EnviartimbrePage implements OnInit {
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
 
     if (this.isConnected === true) {
-      this.nuevoTimbre.conexion = true;
-      this.nuevoTimbre.novedades_conexion = 'Sin problemas de conexión';
-
+      this.PrepararDatosConexion(true, null);
       this.EnviarDatos(this.nuevoTimbre);
       return;
     }
 
     if (this.requiereInternet === true) {
-      this.abrirToas(
-        'Timbre sin conexión a Internet. No permitido',
+      return this.abrirToas(
+        'Este timbre requiere conexión a Internet. No se guardó el registro.',
         'danger',
         5000,
         'middle'
       );
-
-      return this.router.navigate(['/login']);
     }
 
-    this.nuevoTimbre.ubicacion = this.ubicacion || 'Sin Ubicación';
-    this.actualizarUbicacionPantalla(this.nuevoTimbre.ubicacion);
+    this.PrepararDatosConexion(
+      false,
+      this.ObtenerNovedadConexion('SIN_INTERNET')
+    );
 
-    this.nuevoTimbre.conexion = false;
-    this.nuevoTimbre.novedades_conexion = 'Falló conexión al Internet';
-
-    this.guardarTimbreStorage(this.nuevoTimbre);
+    this.guardarTimbrePendiente(this.nuevoTimbre, 'SIN_INTERNET');
   }
 
   formatearFechaTimbreParaBackend(fecha: any): string {
@@ -805,7 +910,14 @@ export class EnviartimbrePage implements OnInit {
 
     let horas = fechaDate.getHours();
     const minutos = String(fechaDate.getMinutes()).padStart(2, '0');
-    const segundos = String(fechaDate.getSeconds()).padStart(2, '0');
+
+    /*
+      Siempre se envía h:m:s.
+      Si capturar_segundos = false, segundos va en 00.
+    */
+    const segundos = this.capturar_segundos
+      ? String(fechaDate.getSeconds()).padStart(2, '0')
+      : '00';
 
     const ampm = horas >= 12 ? 'PM' : 'AM';
 
@@ -816,13 +928,7 @@ export class EnviartimbrePage implements OnInit {
   }
 
   guardarTimbreStorage(timbre: Timbre) {
-    this.dataLocalService.guardarTimbre(timbre);
-
-    this.navCtroller.navigateForward(['confirmaciontimbre'], {
-      queryParams: {
-        data: JSON.stringify(timbre)
-      }
-    });
+    this.guardarTimbrePendiente(timbre, 'SIN_INTERNET');
   }
 
   // ============================================================
@@ -933,14 +1039,21 @@ export class EnviartimbrePage implements OnInit {
 
       if (!this.geoLatitude || !this.geoLongitude) {
         if (this.platform.is('hybrid')) {
-          await this.obtenerPosicion();
+          await this.obtenerPosicion(false);
         } else {
-          await this.obtenerPosicionWeb();
+          await this.obtenerPosicionWeb(false);
         }
       }
 
       if (!this.geoLatitude || !this.geoLongitude) {
-        this.actualizarUbicacionPantalla('Sin Ubicación');
+        const teclaFuncion = this.obtenerIdTipo();
+
+        if (this.EsTimbreFlexibleUbicacion(teclaFuncion)) {
+          this.actualizarUbicacionPantalla('SIN UBICACION');
+        } else {
+          this.actualizarUbicacionPantalla('Sin Ubicación');
+        }
+
         return;
       }
 
@@ -953,20 +1066,33 @@ export class EnviartimbrePage implements OnInit {
       this.actualizarUbicacionPantalla(ubicacionCalculada);
 
     } catch {
-      this.actualizarUbicacionPantalla('Sin Ubicación');
+      const teclaFuncion = this.obtenerIdTipo();
+
+      if (this.EsTimbreFlexibleUbicacion(teclaFuncion)) {
+        this.actualizarUbicacionPantalla('SIN UBICACION');
+      } else {
+        this.actualizarUbicacionPantalla('Sin Ubicación');
+      }
     } finally {
       this.cargandoPosicion = false;
     }
   }
 
   async calcularUbicacionActual(latitud: any, longitud: any, rango: any): Promise<string> {
+    const teclaFuncion = this.obtenerIdTipo();
+    const esTimbreFlexible = this.EsTimbreFlexibleUbicacion(teclaFuncion);
+
     if (this.modulo_geolocalizacion !== true) {
-      return 'DESCONOCIDO';
+      return esTimbreFlexible ? 'DESCONOCIDO' : 'Sin Ubicación';
+    }
+
+    if (!latitud || !longitud || Number(latitud) === 0 || Number(longitud) === 0) {
+      return esTimbreFlexible ? 'SIN UBICACION' : 'Sin Ubicación';
     }
 
     const informacion: any = {
-      lat1: String(latitud ?? '0'),
-      lng1: String(longitud ?? '0'),
+      lat1: String(latitud),
+      lng1: String(longitud),
       lat2: '',
       lng2: '',
       valor: rango
@@ -984,7 +1110,7 @@ export class EnviartimbrePage implements OnInit {
       return domicilio;
     }
 
-    if (this.desconocida === true) {
+    if (this.desconocida === true || esTimbreFlexible) {
       return 'DESCONOCIDO';
     }
 
@@ -1052,7 +1178,10 @@ export class EnviartimbrePage implements OnInit {
   }
 
   PermitirUbicacionDesconocida(timbre: any, guardarSinServidor: boolean = false) {
-    if (this.desconocida === true) {
+    const teclaFuncion = String(timbre.tecl_funcion ?? timbre.tecla_funcion ?? this.obtenerIdTipo());
+    const esFlexible = this.EsTimbreFlexibleUbicacion(teclaFuncion);
+
+    if (this.desconocida === true || esFlexible) {
       timbre.ubicacion = 'DESCONOCIDO';
       this.actualizarUbicacionPantalla(timbre.ubicacion);
 
@@ -1060,7 +1189,9 @@ export class EnviartimbrePage implements OnInit {
         this.GuardartimbresinServidor(timbre);
       } else {
         this.abrirToas(
-          'Marcación realizada dentro de un perímetro DESCONOCIDO.',
+          esFlexible
+            ? 'Marcación registrada como DESCONOCIDO. Este tipo de timbre no restringe perímetro.'
+            : 'Marcación realizada dentro de un perímetro DESCONOCIDO.',
           'primary',
           3000,
           'top'
@@ -1079,7 +1210,90 @@ export class EnviartimbrePage implements OnInit {
       'middle'
     );
 
-    return this.router.navigate(['/login']);
+    return;
+  }
+
+  private EsTimbreFlexibleUbicacion(teclaFuncion: string | number): boolean {
+    return this.TIMBRES_UBICACION_FLEXIBLE.has(String(teclaFuncion));
+  }
+
+  private EsUbicacionNoValida(ubicacion: string): boolean {
+    const valor = (ubicacion || '').trim().toUpperCase();
+
+    return (
+      valor === '' ||
+      valor === 'SIN UBICACION' ||
+      valor === 'SIN UBICACIÓN' ||
+      valor === 'SIN UBICACION ACTUAL' ||
+      valor === 'SIN UBICACIÓN ACTUAL' ||
+      valor === 'VALIDANDO UBICACION...' ||
+      valor === 'VALIDANDO UBICACIÓN...'
+    );
+  }
+
+  private NormalizarUbicacionParaTimbre(teclaFuncion: string): boolean {
+    const esFlexible = this.EsTimbreFlexibleUbicacion(teclaFuncion);
+    const ubicacionActual = (this.ubicacion || '').trim();
+
+    if (!ubicacionActual || this.EsUbicacionNoValida(ubicacionActual)) {
+      if (esFlexible) {
+        this.actualizarUbicacionPantalla('SIN UBICACION');
+        return true;
+      }
+
+      return false;
+    }
+
+    if (ubicacionActual.toUpperCase() === 'DESCONOCIDO') {
+      if (this.desconocida === true || esFlexible) {
+        return true;
+      }
+
+      return false;
+    }
+
+    return true;
+  }
+
+  // ============================================================
+  // CONEXIÓN / NOVEDADES
+  // ============================================================
+
+  private ObtenerNovedadConexion(tipo: MotivoConexion): string | null {
+    switch (tipo) {
+      case 'OK':
+        return null;
+
+      case 'SIN_INTERNET':
+        return 'Timbre generado sin conexión a Internet. Pendiente de sincronización.';
+
+      case 'TIMEOUT':
+        return 'No hubo respuesta del servidor dentro del tiempo esperado. Timbre guardado localmente.';
+
+      case 'ERROR_SERVIDOR':
+        return 'No se pudo conectar con el servidor. Timbre guardado localmente.';
+
+      default:
+        return 'Novedad de conexión no identificada.';
+    }
+  }
+
+  private PrepararDatosConexion(conectado: boolean, novedad: string | null = null): void {
+    this.nuevoTimbre.dispositivo_timbre = this.APP_MOVIL;
+    this.nuevoTimbre.conexion = conectado;
+
+    /*
+      IMPORTANTE:
+      Desde esta pantalla, aunque el timbre se envíe correctamente,
+      fecha_subida_servidor siempre debe ir NULL.
+
+      Este campo solo se llena cuando el timbre ya estaba guardado
+      en memoria del teléfono y luego se sincroniza desde la pantalla
+      de timbres pendientes.
+    */
+    this.nuevoTimbre.fecha_subida_servidor = null;
+
+    this.nuevoTimbre.novedades_conexion = conectado ? null : novedad;
   }
 
   // ============================================================
@@ -1089,6 +1303,14 @@ export class EnviartimbrePage implements OnInit {
   EnviarDatos(data: any) {
     this.actualizarUbicacionPantalla(data.ubicacion || 'DESCONOCIDO');
 
+    /*
+      Envío directo desde la pantalla de timbrar.
+      No es una sincronización de timbre pendiente,
+      por eso fecha_subida_servidor debe ir NULL.
+    */
+    data.dispositivo_timbre = this.APP_MOVIL;
+    data.fecha_subida_servidor = null;
+
     this.relojService.enviarTimbre(data).pipe(timeout(5000)).subscribe({
       next: () => {
         this.navCtroller.navigateForward(['confirmaciontimbre'], {
@@ -1097,14 +1319,24 @@ export class EnviartimbrePage implements OnInit {
           }
         });
       },
-      error: () => {
-        this.GuardartimbresinServidor(data);
+      error: (error: any) => {
+        const novedad = error?.name === 'TimeoutError'
+          ? this.ObtenerNovedadConexion('TIMEOUT')
+          : this.ObtenerNovedadConexion('ERROR_SERVIDOR');
 
-        this.abrirToas(
-          'Error con la conexión al servidor. El timbre se guardó en memoria del teléfono',
-          'danger',
-          3000,
-          'middle'
+        data.conexion = false;
+        data.dispositivo_timbre = this.APP_MOVIL;
+
+        /*
+          Sigue siendo NULL porque todavía NO se ha subido al servidor.
+          Solo quedó guardado localmente.
+        */
+        data.fecha_subida_servidor = null;
+        data.novedades_conexion = novedad;
+
+        this.guardarTimbrePendiente(
+          data,
+          error?.name === 'TimeoutError' ? 'TIMEOUT' : 'ERROR_SERVIDOR'
         );
       }
     });
@@ -1112,7 +1344,9 @@ export class EnviartimbrePage implements OnInit {
 
   GuardartimbresinServidor(data: any) {
     data.conexion = false;
-    data.novedades_conexion = 'Falló conexión al servidor';
+    data.dispositivo_timbre = this.APP_MOVIL;
+    data.fecha_subida_servidor = null;
+    data.novedades_conexion = data.novedades_conexion || this.ObtenerNovedadConexion('ERROR_SERVIDOR');
 
     if (!data.ubicacion) {
       data.ubicacion = this.ubicacion || 'Sin Ubicación';
@@ -1120,16 +1354,47 @@ export class EnviartimbrePage implements OnInit {
 
     this.actualizarUbicacionPantalla(data.ubicacion);
 
-    this.nuevoTimbre.conexion = data.conexion;
+    this.guardarTimbrePendiente(data, 'ERROR_SERVIDOR');
+  }
+
+  async guardarTimbrePendiente(data: any, motivo: 'SIN_INTERNET' | 'ERROR_SERVIDOR' | 'TIMEOUT') {
+    data.conexion = false;
+    data.dispositivo_timbre = this.APP_MOVIL;
+
+    /*
+      El timbre queda en memoria.
+      Aún no se ha subido al servidor.
+    */
+    data.fecha_subida_servidor = null;
+
+    if (!data.novedades_conexion) {
+      data.novedades_conexion = motivo === 'SIN_INTERNET'
+        ? this.ObtenerNovedadConexion('SIN_INTERNET')
+        : motivo === 'TIMEOUT'
+          ? this.ObtenerNovedadConexion('TIMEOUT')
+          : this.ObtenerNovedadConexion('ERROR_SERVIDOR');
+    }
+
+    if (!data.ubicacion) {
+      data.ubicacion = this.ubicacion || 'Sin Ubicación';
+    }
+
+    this.actualizarUbicacionPantalla(data.ubicacion);
+
+    this.nuevoTimbre.conexion = false;
+    this.nuevoTimbre.fecha_subida_servidor = null;
     this.nuevoTimbre.novedades_conexion = data.novedades_conexion;
 
     this.dataLocalService.guardarTimbresPerdidos(data);
 
-    this.navCtroller.navigateForward(['confirmaciontimbre'], {
-      queryParams: {
-        data: JSON.stringify(data)
-      }
-    });
+    await this.abrirToas(
+      'Timbre guardado en el teléfono. Aún no ha sido enviado al servidor.',
+      'warning',
+      6000,
+      'middle'
+    );
+
+    return;
   }
 
   // ============================================================

@@ -19,6 +19,8 @@ interface CheckOptions {
   nombre: string;
 }
 
+type TipoBusqueda = 'sucursal' | 'departamento' | 'empleado' | 'rol';
+
 @Component({
   selector: 'app-reporte-timbres',
   templateUrl: './reporte-timbres.page.html',
@@ -26,10 +28,8 @@ interface CheckOptions {
 })
 export class ReporteTimbresPage {
 
-  // INTERRUPTOR PARA VER LA INFORMACION DEL DISPOSITIVO
   activarOpcion: boolean = false;
 
-  // VARIABLES DE FECHA
   maxDate: string = new Date().toISOString().split('T')[0];
 
   get fechaInicio(): string {
@@ -46,7 +46,6 @@ export class ReporteTimbresPage {
   fechaIn: string | null = '';
   fechaFi: string | null = '';
 
-  // VARIABLES DE ESTADO
   loadingEmpleado: boolean = true;
   listLoaded: boolean = false;
 
@@ -57,7 +56,6 @@ export class ReporteTimbresPage {
 
   radioValue: number = 0;
 
-  // LISTAS
   datosGenerales: any[] = [];
 
   departamentos: any[] = [];
@@ -79,22 +77,18 @@ export class ReporteTimbresPage {
     { valor: 4, nombre: 'Rol' },
   ];
 
-  // VARIABLES DE VISUALIZACIÓN
   ver: boolean = true;
   verDepartamento: boolean = true;
   verSucursal: boolean = true;
   verRol: boolean = true;
 
-  // DATOS DEL USUARIO LOGUEADO
   rolEmpleado: number = 0;
   idEmpleado: number = 0;
 
-  // ASIGNACIONES DE ACCESO
   idDepartamentosAcceso: Set<any> = new Set();
   idSucursalesAcceso: Set<any> = new Set();
   idUsuariosAcceso: Set<any> = new Set();
 
-  // CHECKBOX TODOS
   isAllCheck_sucu: boolean = false;
   isAllCheck_depa: boolean = false;
   isAllCheck_empl: boolean = false;
@@ -105,23 +99,23 @@ export class ReporteTimbresPage {
   isChecked_empl: boolean = true;
   isChecked_rol: boolean = true;
 
-  // VARIABLES PARA EL MANEJO DE LA PAGINACION
   pageActual: number = 1;
   pageActualDepartamento: number = 1;
   pageActualSucursal: number = 1;
   pageActualRol: number = 1;
 
-  public maxSize: number = 5;
+  public itemsPorPagina: number = 8;
+  public maxSize: number = 3;
   public directionLinks: boolean = true;
-  public autoHide: boolean = false;
+  public autoHide: boolean = true;
   public responsive: boolean = true;
 
   public labels: any = {
-    previousLabel: 'ante..',
-    nextLabel: 'sigui..',
-    screenReaderPaginationLabel: 'Pagination',
-    screenReaderPageLabel: 'page',
-    screenReaderCurrentLabel: `You're on page`
+    previousLabel: '‹ Anterior',
+    nextLabel: 'Siguiente ›',
+    screenReaderPaginationLabel: 'Paginación',
+    screenReaderPageLabel: 'Página',
+    screenReaderCurrentLabel: 'Página actual'
   };
 
   constructor(
@@ -135,20 +129,14 @@ export class ReporteTimbresPage {
   ) { }
 
   async ngOnInit(): Promise<void> {
-    this.idEmpleado = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
-    this.rolEmpleado = parseInt(localStorage.getItem('rol') ?? '0', 10);
-
+    this.inicializarUsuario();
     this.reiniciarPantalla();
-
     await this.cargarAsignacionesUsuario();
   }
 
   async ionViewWillEnter(): Promise<void> {
-    this.idEmpleado = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
-    this.rolEmpleado = parseInt(localStorage.getItem('rol') ?? '0', 10);
-
+    this.inicializarUsuario();
     this.reiniciarPantalla();
-
     await this.cargarAsignacionesUsuario();
   }
 
@@ -156,8 +144,15 @@ export class ReporteTimbresPage {
     this.limpiarRango_fechas();
   }
 
+  private inicializarUsuario(): void {
+    this.idEmpleado = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') ?? '0', 10);
+  }
+
   private async cargarAsignacionesUsuario(): Promise<void> {
-    if (!this.idEmpleado) return;
+    if (!this.idEmpleado) {
+      return;
+    }
 
     try {
       await this.asignacionesMovil.ObtenerAsignacionesUsuario(this.idEmpleado);
@@ -174,14 +169,14 @@ export class ReporteTimbresPage {
   }
 
   private aplicarFiltroPorAsignacion(informacion: any[]): any[] {
-    if (!informacion || informacion.length === 0) return [];
+    if (!informacion || informacion.length === 0) {
+      return [];
+    }
 
-    // SI ES SUPERADMINISTRADOR, VE TODO
     if (this.rolEmpleado === 1) {
       return informacion;
     }
 
-    // SI NO HAY USUARIOS ASIGNADOS, NO MOSTRAR INFORMACIÓN
     if (!this.idUsuariosAcceso || this.idUsuariosAcceso.size === 0) {
       return [];
     }
@@ -198,47 +193,65 @@ export class ReporteTimbresPage {
     this.activarOpcion = false;
     this.radioValue = 0;
     this.loadingEmpleado = true;
+    this.listLoaded = false;
 
+    this.reiniciarChecks();
+    this.reiniciarPaginas();
     this.limpiarOpcionesVista();
     this.limpiarListas();
   }
 
-  // INTERRUPTOR
-  toggleChanged(event: any) {
-    this.activarOpcion = event.detail.checked;
+  private reiniciarChecks(): void {
+    this.isAllCheck_sucu = false;
+    this.isAllCheck_depa = false;
+    this.isAllCheck_empl = false;
+    this.isAllCheck_rol = false;
   }
 
-  // METODO PARA ALMACENAR EN UNA VARIABLE LA FECHA DE INICIO SELECCIONADA
+  private reiniciarPaginas(): void {
+    this.pageActual = 1;
+    this.pageActualDepartamento = 1;
+    this.pageActualSucursal = 1;
+    this.pageActualRol = 1;
+  }
+
+  toggleChanged(event: any) {
+    this.activarOpcion = !!event?.detail?.checked;
+  }
+
   changeFechaInicio(e: any) {
-    const valor = e?.target?.value ?? '';
+    const valor = e?.detail?.value ?? e?.target?.value ?? '';
 
     this.dataUserService.setFechaRangoInicio(valor);
     this.datetimeInicio?.confirm(true);
 
     if (!this.fechaInicio) {
-      this.fechaIn = null;
+      this.fechaIn = '';
       return;
     }
 
     this.fechaIn = DateTime.fromISO(this.fechaInicio).toFormat('yyyy-MM-dd');
+
+    if (this.fechaFi && this.fechaFi < this.fechaIn) {
+      this.dataUserService.setFechaRangoFinal('');
+      this.fechaFi = '';
+    }
   }
 
-  // METODO PARA ALMACENAR EN UNA VARIABLE LA FECHA FIN SELECCIONADA
   changeFechaFinal(e: any) {
-    const valor = e?.target?.value ?? '';
+    const valor = e?.detail?.value ?? e?.target?.value ?? '';
 
     this.dataUserService.setFechaRangoFinal(valor);
     this.datetimeFinal?.confirm(true);
 
     if (!this.fechaFinal) {
-      this.fechaFi = null;
+      this.fechaFi = '';
       return;
     }
 
     this.fechaFi = DateTime.fromISO(this.fechaFinal).toFormat('yyyy-MM-dd');
   }
 
-  // METODO PARA LIMPIAR LAS VARIABLES DE FECHA FINAL E INICIAL
   limpiarRango_fechas() {
     this.dataUserService.setFechaRangoInicio('');
     this.dataUserService.setFechaRangoFinal('');
@@ -247,7 +260,6 @@ export class ReporteTimbresPage {
     this.fechaFi = '';
   }
 
-  // METODO DE CONFIGURACION DEL TOAST
   async mostrarToas(mensaje: string, duracion: number, color: string) {
     const toast = await this.toastController.create({
       message: mensaje,
@@ -260,7 +272,6 @@ export class ReporteTimbresPage {
     this.dismissLoading();
   }
 
-  // METODO DE CONFIGURACION DE LAS ALERTAS
   async mostrarAlertas(mensaje: string, duracion: number, color: string) {
     const toast = await this.toastController.create({
       message: mensaje,
@@ -279,7 +290,6 @@ export class ReporteTimbresPage {
     }
   }
 
-  // METODO PARA ABRIR EL MODAL DEL REPORTE DE TIMBRE
   async presentModal(objeto: any) {
     const modal = await this.modalController.create({
       component: ReporteTimbreComponent,
@@ -293,9 +303,10 @@ export class ReporteTimbresPage {
     return await modal.present();
   }
 
-  // METODO PARA CARGAR LOS REGISTROS DE SUCURSALES, DEPARTAMENTOS, EMPLEADOS O ROLES
   showValue() {
-    this.loadingEmpleado = this.radioValue === 0;
+    this.reiniciarChecks();
+    this.reiniciarPaginas();
+    this.limpiarListas();
 
     this.opcion_sucursal = this.radioValue === 1;
     this.opcion_depa = this.radioValue === 2;
@@ -304,20 +315,28 @@ export class ReporteTimbresPage {
 
     if (this.radioValue === 0) {
       sessionStorage.removeItem('datos_comunicado');
-      this.limpiarListas();
+      this.loadingEmpleado = true;
       return;
     }
 
     this.loadingEmpleado = false;
 
-    if (this.radioValue === 1) {
-      this.cargarListaSucursales();
-    } else if (this.radioValue === 2) {
-      this.cargarDepartamentos();
-    } else if (this.radioValue === 3) {
-      this.cargarEmpleados();
-    } else if (this.radioValue === 4) {
-      this.cargarRoles();
+    switch (this.radioValue) {
+      case 1:
+        this.cargarListaSucursales();
+        break;
+      case 2:
+        this.cargarDepartamentos();
+        break;
+      case 3:
+        this.cargarEmpleados();
+        break;
+      case 4:
+        this.cargarRoles();
+        break;
+      default:
+        this.loadingEmpleado = true;
+        break;
     }
   }
 
@@ -361,10 +380,12 @@ export class ReporteTimbresPage {
         callback();
 
         this.loadingEmpleado = true;
+        this.listLoaded = true;
       },
       error: () => {
         this.loadingEmpleado = true;
-        this.mostrarAlertas('No se ha encontrado información.', 1000, 'danger');
+        this.listLoaded = false;
+        this.mostrarAlertas('No se ha encontrado información.', 1800, 'danger');
       }
     });
   }
@@ -375,7 +396,7 @@ export class ReporteTimbresPage {
     return lista.filter((item: T) => {
       const clave = obtenerClave(item);
 
-      if (claves.has(clave)) {
+      if (!clave || claves.has(clave)) {
         return false;
       }
 
@@ -384,7 +405,6 @@ export class ReporteTimbresPage {
     });
   }
 
-  // METODO PARA CARGAR LOS REGISTROS DE SUCURSALES
   cargarListaSucursales() {
     this.cargarDatosGenerales(() => {
       this.sucursales = this.datosGenerales.map((obj: any) => ({
@@ -395,15 +415,16 @@ export class ReporteTimbresPage {
         departemento: obj.name_dep,
         regimen: obj.name_regimen,
         nombre1: `${obj.apellido ?? ''} ${obj.nombre ?? ''}`.trim(),
+        isChecked_sucu: false
       }));
 
       this.sucursales = this.filtrarUnicos(
         this.sucursales,
-        (item: any) => String(item.id)
+        (item: any) => String(item.id ?? '')
       );
 
       this.sucursales_filtro = [...this.sucursales];
-      this.verSucursal = this.sucursales_filtro.length < 11;
+      this.verSucursal = !this.mostrarPaginacionSucursal();
 
       this.departamentos = [];
       this.empleados = [];
@@ -411,7 +432,6 @@ export class ReporteTimbresPage {
     });
   }
 
-  // METODO PARA CARGAR LOS REGISTROS DE DEPARTAMENTOS
   cargarDepartamentos() {
     this.cargarDatosGenerales(() => {
       this.departamentos = this.datosGenerales.map((obj: any) => ({
@@ -425,15 +445,16 @@ export class ReporteTimbresPage {
         departemento: obj.name_dep,
         regimen: obj.name_regimen,
         nombre1: `${obj.apellido ?? ''} ${obj.nombre ?? ''}`.trim(),
+        isChecked_depa: false
       }));
 
       this.departamentos = this.filtrarUnicos(
         this.departamentos,
-        (item: any) => `${item.id}-${item.id_suc}`
+        (item: any) => `${item.id ?? ''}-${item.id_suc ?? ''}`
       );
 
       this.departamentos_filtro = [...this.departamentos];
-      this.verDepartamento = this.departamentos_filtro.length < 11;
+      this.verDepartamento = !this.mostrarPaginacionDepartamento();
 
       this.sucursales = [];
       this.empleados = [];
@@ -441,7 +462,6 @@ export class ReporteTimbresPage {
     });
   }
 
-  // METODO PARA CARGAR LOS REGISTROS DE EMPLEADOS
   cargarEmpleados() {
     this.cargarDatosGenerales(() => {
       this.empleados = this.datosGenerales.map((obj: any) => ({
@@ -465,10 +485,11 @@ export class ReporteTimbresPage {
         name_cargo: obj.name_cargo,
         name_dep: obj.name_dep,
         name_regimen: obj.name_regimen,
+        isChecked_empl: false
       }));
 
       this.empleados_filtro = [...this.empleados];
-      this.ver = this.empleados_filtro.length < 11;
+      this.ver = !this.mostrarPaginacionEmpleado();
 
       this.sucursales = [];
       this.departamentos = [];
@@ -476,7 +497,6 @@ export class ReporteTimbresPage {
     });
   }
 
-  // METODO PARA CARGAR LOS REGISTROS DE ROLES
   cargarRoles() {
     this.cargarDatosGenerales(() => {
       this.roles = this.datosGenerales.map((obj: any) => ({
@@ -500,16 +520,17 @@ export class ReporteTimbresPage {
         app_habilita: obj.app_habilita,
         web_habilita: obj.web_habilita,
         comunicado_mail: obj.comunicado_mail,
-        comunicado_noti: obj.comunicado_notificacion
+        comunicado_noti: obj.comunicado_notificacion,
+        isChecked_rol: false
       }));
 
       this.roles = this.filtrarUnicos(
         this.roles,
-        (item: any) => String(item.id)
+        (item: any) => String(item.id ?? '')
       );
 
       this.roles_filtro = [...this.roles];
-      this.verRol = this.roles_filtro.length < 11;
+      this.verRol = !this.mostrarPaginacionRol();
 
       this.departamentos = [];
       this.sucursales = [];
@@ -517,117 +538,159 @@ export class ReporteTimbresPage {
     });
   }
 
-  // METODO DE VERIFICACION DE MARCACION DE TODOS LOS REGISTROS DE SUCURSALES
   checkedAll_sucu(isAllChecked_sucu: boolean) {
     this.isAllCheck_sucu = !isAllChecked_sucu;
 
-    if (this.radioValue === 1) {
-      this.sucursales.forEach((o: any) => {
-        o.isChecked_sucu = this.isAllCheck_sucu;
-      });
-    }
+    this.sucursales_filtro.forEach((o: any) => {
+      o.isChecked_sucu = this.isAllCheck_sucu;
+    });
   }
 
-  // METODO DE VERIFICACION DE MARCACION DE TODOS LOS REGISTROS DE DEPARTAMENTOS
   checkedAll_depa(isAllChecked_depa: boolean) {
     this.isAllCheck_depa = !isAllChecked_depa;
 
-    if (this.radioValue === 2) {
-      this.departamentos.forEach((o: any) => {
-        o.isChecked_depa = this.isAllCheck_depa;
-      });
-    }
+    this.departamentos_filtro.forEach((o: any) => {
+      o.isChecked_depa = this.isAllCheck_depa;
+    });
   }
 
-  // METODO DE VERIFICACION DE MARCACION DE TODOS LOS REGISTROS DE EMPLEADOS
   checkedAll_empl(isAllChecked_empl: boolean) {
     this.isAllCheck_empl = !isAllChecked_empl;
 
-    if (this.radioValue === 3) {
-      this.empleados.forEach((o: any) => {
-        o.isChecked_empl = this.isAllCheck_empl;
-      });
-    }
+    this.empleados_filtro.forEach((o: any) => {
+      o.isChecked_empl = this.isAllCheck_empl;
+    });
   }
 
-  // METODO DE VERIFICACION DE MARCACION DE TODOS LOS REGISTROS DE ROLES
   checkedAll_rol(isAllChecked_rol: boolean) {
     this.isAllCheck_rol = !isAllChecked_rol;
 
-    if (this.radioValue === 4) {
-      this.roles.forEach((o: any) => {
-        o.isChecked_rol = this.isAllCheck_rol;
-      });
-    }
+    this.roles_filtro.forEach((o: any) => {
+      o.isChecked_rol = this.isAllCheck_rol;
+    });
   }
 
   private validarFechasSeleccionadas(): boolean {
-    if (!this.fechaFi || !this.fechaIn) {
-      this.mostrarToas('Seleccione Fechas', 3000, 'warning');
+    if (!this.fechaIn) {
+      this.mostrarToas('Seleccione la fecha inicial.', 2500, 'warning');
+      return false;
+    }
+
+    if (!this.fechaFi) {
+      this.mostrarToas('Seleccione la fecha final.', 2500, 'warning');
+      return false;
+    }
+
+    if (this.fechaFi < this.fechaIn) {
+      this.mostrarToas('La fecha final no puede ser menor a la fecha inicial.', 3000, 'warning');
       return false;
     }
 
     return true;
   }
 
-  private obtenerDatosComunicado(): any[] {
-    return JSON.parse(sessionStorage.getItem('datos_comunicado') ?? '[]');
+  private validarSeleccion(
+    tipo: TipoBusqueda,
+    listaCompleta: any[],
+    seleccionados: any[]
+  ): boolean {
+    if (!this.validarFechasSeleccionadas()) {
+      return false;
+    }
+
+    if (!listaCompleta || listaCompleta.length === 0) {
+      this.mostrarToas(`No existen registros de ${this.obtenerNombreTipo(tipo)} para consultar.`, 3000, 'warning');
+      return false;
+    }
+
+    if (!seleccionados || seleccionados.length === 0) {
+      this.mostrarToas(`Seleccione al menos un ${this.obtenerNombreTipo(tipo)}.`, 3000, 'warning');
+      return false;
+    }
+
+    return true;
   }
 
-  // METODO QUE ALMACENA LOS REGISTROS DE SUCURSALES EN UN ARREGLO
-  EnviarSucursal() {
-    if (!this.validarFechasSeleccionadas()) return;
+  private obtenerNombreTipo(tipo: TipoBusqueda): string {
+    switch (tipo) {
+      case 'sucursal':
+        return 'sucursal';
+      case 'departamento':
+        return 'departamento';
+      case 'empleado':
+        return 'empleado';
+      case 'rol':
+        return 'rol';
+      default:
+        return 'registro';
+    }
+  }
 
+  private obtenerDatosComunicado(): any[] {
+    try {
+      return JSON.parse(sessionStorage.getItem('datos_comunicado') ?? '[]');
+    } catch {
+      return [];
+    }
+  }
+
+  EnviarSucursal() {
     const sucu = this.sucursales.filter((o: any) => o.isChecked_sucu === true);
+
+    if (!this.validarSeleccion('sucursal', this.sucursales, sucu)) {
+      return;
+    }
 
     this.ModelarSucursal(sucu);
   }
 
-  // METODO QUE OBTIENE LOS EMPLEADOS DE LAS SUCURSALES Y LOS ENVIA EN EL MODAL
   ModelarSucursal(dataSucursal: any[]) {
     const respuesta = this.obtenerDatosComunicado();
 
     const seleccionados = dataSucursal.map((sucursal: any) => ({
       ...sucursal,
       opcion: 1,
-      empleados: respuesta.filter((selec: any) => selec.id_suc === sucursal.id)
+      empleados: respuesta.filter((selec: any) => Number(selec.id_suc) === Number(sucursal.id))
     }));
 
     this.presentModal(seleccionados);
   }
 
-  // METODO QUE ALMACENA LOS REGISTROS DE DEPARTAMENTO EN UN ARREGLO
   EnviarDepartamento() {
-    if (!this.validarFechasSeleccionadas()) return;
-
     const depa = this.departamentos.filter((o: any) => o.isChecked_depa === true);
+
+    if (!this.validarSeleccion('departamento', this.departamentos, depa)) {
+      return;
+    }
 
     this.ModelarDepartamentos(depa);
   }
 
-  // METODO QUE OBTIENE LOS EMPLEADOS DE LOS DEPARTAMENTOS Y LOS ENVIA EN EL MODAL
   ModelarDepartamentos(dataDepartamentos: any[]) {
     const respuesta = this.obtenerDatosComunicado();
 
     const seleccionados = dataDepartamentos.map((departamento: any) => ({
       ...departamento,
       opcion: 2,
-      empleados: respuesta.filter((selec: any) => selec.id_depa === departamento.id)
+      empleados: respuesta.filter((selec: any) => {
+        return Number(selec.id_depa) === Number(departamento.id)
+          && Number(selec.id_suc) === Number(departamento.id_suc);
+      })
     }));
 
     this.presentModal(seleccionados);
   }
 
-  // METODO QUE ALMACENA LOS REGISTROS DE EMPLEADOS EN UN ARREGLO
   EnviarEmpleado() {
-    if (!this.validarFechasSeleccionadas()) return;
-
     const empl = this.empleados.filter((o: any) => o.isChecked_empl === true);
+
+    if (!this.validarSeleccion('empleado', this.empleados, empl)) {
+      return;
+    }
 
     this.ModelarEmpleados(empl);
   }
 
-  // METODO QUE OBTIENE LOS EMPLEADOS Y LOS ENVIA EN EL MODAL
   ModelarEmpleados(dataEmpleados: any[]) {
     const seleccionados: any[] = [
       {
@@ -640,36 +703,43 @@ export class ReporteTimbresPage {
     this.presentModal(seleccionados);
   }
 
-  // METODO QUE ALMACENA LOS REGISTROS DE ROLES EN UN ARREGLO
   EnviarRoles() {
-    if (!this.validarFechasSeleccionadas()) return;
-
     const role = this.roles.filter((o: any) => o.isChecked_rol === true);
+
+    if (!this.validarSeleccion('rol', this.roles, role)) {
+      return;
+    }
 
     this.ModelarRol(role);
   }
 
-  // METODO QUE OBTIENE LOS EMPLEADOS DE LOS ROLES Y LOS ENVIA EN EL MODAL
   ModelarRol(dataRol: any[]) {
     const respuesta = this.obtenerDatosComunicado();
 
     const seleccionados = dataRol.map((rol: any) => ({
       ...rol,
       opcion: 4,
-      empleados: respuesta.filter((selec: any) => selec.id_rol === rol.id)
+      empleados: respuesta.filter((selec: any) => Number(selec.id_rol) === Number(rol.id))
     }));
 
     this.presentModal(seleccionados);
   }
 
-  private filtrarPorTexto(lista: any[], campo: string, texto: string): any[] {
+  private filtrarPorTexto(lista: any[], campos: string[], texto: string): any[] {
     const palabrasBusqueda = String(texto ?? '')
       .toLowerCase()
       .split(' ')
       .filter(Boolean);
 
+    if (palabrasBusqueda.length === 0) {
+      return [...lista];
+    }
+
     return lista.filter((o: any) => {
-      const valorCampo = String(o[campo] ?? '').toLowerCase();
+      const valorCampo = campos
+        .map((campo: string) => String(o[campo] ?? ''))
+        .join(' ')
+        .toLowerCase();
 
       return palabrasBusqueda.every((palabra: string) => {
         return valorCampo.includes(palabra);
@@ -677,48 +747,79 @@ export class ReporteTimbresPage {
     });
   }
 
-  // METODOS PARA BUSCAR LOS REGISTROS DE SUCURSALES, DEPARTAMENTOS, EMPLEADOS
   changeSearchSucursales(e: any) {
     const texto = e?.detail?.value ?? '';
 
+    this.pageActualSucursal = 1;
+
     this.sucursales_filtro = this.filtrarPorTexto(
       this.sucursales,
-      'sucursal',
+      ['sucursal', 'ciudad'],
       texto
     );
+
+    this.verSucursal = !this.mostrarPaginacionSucursal();
   }
 
   changeSearchDepartamento(e: any) {
     const texto = e?.detail?.value ?? '';
 
+    this.pageActualDepartamento = 1;
+
     this.departamentos_filtro = this.filtrarPorTexto(
       this.departamentos,
-      'departamento',
+      ['departamento', 'sucursal'],
       texto
     );
+
+    this.verDepartamento = !this.mostrarPaginacionDepartamento();
   }
 
   changeSearchNombresCompletos(e: any) {
-    const texto = String(e?.detail?.value ?? '').toLowerCase();
-    const palabrasBusqueda = texto.split(' ').filter(Boolean);
+    const texto = e?.detail?.value ?? '';
 
-    this.empleados_filtro = this.empleados.filter((o: any) => {
-      const nombreCompleto = `${o.nombre ?? ''} ${o.apellido ?? ''}`.toLowerCase();
+    this.pageActual = 1;
 
-      return palabrasBusqueda.every((palabra: string) => {
-        return nombreCompleto.includes(palabra);
-      });
-    });
+    this.empleados_filtro = this.filtrarPorTexto(
+      this.empleados,
+      ['nombre', 'apellido', 'codigo', 'identificacion'],
+      texto
+    );
+
+    this.ver = !this.mostrarPaginacionEmpleado();
   }
 
-  // METODO PARA DEFINIR EL BUSCADOR DE ROLES
   changeSearchRoles(e: any) {
     const texto = e?.detail?.value ?? '';
 
+    this.pageActualRol = 1;
+
     this.roles_filtro = this.filtrarPorTexto(
       this.roles,
-      'rol',
+      ['rol'],
       texto
     );
+
+    this.verRol = !this.mostrarPaginacionRol();
+  }
+
+  mostrarPaginacionSucursal(): boolean {
+    return this.sucursales_filtro.length > this.itemsPorPagina;
+  }
+
+  mostrarPaginacionDepartamento(): boolean {
+    return this.departamentos_filtro.length > this.itemsPorPagina;
+  }
+
+  mostrarPaginacionEmpleado(): boolean {
+    return this.empleados_filtro.length > this.itemsPorPagina;
+  }
+
+  mostrarPaginacionRol(): boolean {
+    return this.roles_filtro.length > this.itemsPorPagina;
+  }
+
+  trackById(index: number, item: any): any {
+    return item?.id ?? item?.codigo ?? index;
   }
 }

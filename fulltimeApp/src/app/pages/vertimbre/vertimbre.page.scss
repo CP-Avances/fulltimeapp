@@ -1,18 +1,18 @@
 :host {
   --app-primary: #0f75bc;
   --app-primary-dark: #0b5a92;
-  --app-primary-light: #e8f4fd;
-
-  --app-bg: #f4f7fb;
+  --app-bg: #eef3f8;
   --app-card: #ffffff;
   --app-soft: #f8fafc;
   --app-text: #1f2937;
   --app-text-soft: #64748b;
   --app-border: rgba(15, 23, 42, 0.09);
-  --app-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
+  --app-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
 }
 
-/* HEADER */
+/* =========================
+   HEADER
+========================= */
 
 .timbres-header {
   background: var(--app-card);
@@ -23,7 +23,7 @@
 }
 
 .header-logo {
-  padding: 24px 12px 14px 12px;
+  padding: 22px 12px 12px 12px;
   background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
   text-align: center;
   border-bottom: 1px solid var(--app-border);
@@ -48,18 +48,6 @@
   object-fit: contain;
 }
 
-.logo-card-offline {
-  margin: 0 auto;
-}
-
-.logo-timbres-offline {
-  display: block;
-  width: 145px;
-  max-width: 100%;
-  height: auto;
-  object-fit: contain;
-}
-
 .header-title h1 {
   margin: 8px 0 0 0;
   font-size: 18px;
@@ -67,111 +55,130 @@
   font-weight: 900;
 }
 
-.header-filtros {
-  padding: 8px 10px 12px 10px;
-  background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+/* =========================
+   FILTROS
+========================= */
+
+.filtros-card {
+  margin: 0;
+  padding: 10px 12px 12px 12px;
+  background: linear-gradient(180deg, #0f75bc 0%, #0b5a92 100%);
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.16);
 }
 
-.header-filtros ion-row {
-  margin: 0;
+.botones-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
 }
 
-.header-filtros ion-col {
-  padding: 4px;
-}
-
-.header-filtros ion-button {
-  --border-radius: 16px;
-  min-height: 40px;
+.btn-buscar,
+.btn-todos {
+  min-height: 36px;
   margin: 0;
   text-transform: none;
   font-weight: 900;
+  --border-radius: 13px;
+  --box-shadow: 0 5px 12px rgba(15, 23, 42, 0.14);
 }
 
-.header-filtros ion-button ion-label {
-  font-size: 70%;
+.btn-buscar {
+  --background: #27c2c9;
+  --background-activated: #17aab0;
+  --color: #ffffff;
+}
+
+.btn-todos {
+  --background: #6d87f5;
+  --background-activated: #5874e6;
+  --color: #ffffff;
+}
+
+.btn-buscar ion-label,
+.btn-todos ion-label {
+  font-size: 66%;
   font-weight: 900;
 }
 
-/* CONTENT */
+.btn-buscar ion-icon,
+.btn-todos ion-icon {
+  font-size: 15px;
+}
+
+/* =========================
+   CONTENT
+========================= */
 
 .timbres-content {
   --background: var(--app-bg);
 }
 
+.titulo-lista {
+  margin: 10px 10px 8px 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--app-card);
+  color: var(--app-text);
+  border: 1px solid var(--app-border);
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+}
+
+.titulo-lista ion-text {
+  color: var(--app-text);
+  font-size: 90%;
+  font-weight: 900;
+}
+
 .lista-timbres {
   background: transparent;
-  padding: 0 0 8px 0;
+  padding: 0 10px 6px 10px;
 }
 
-ion-item-divider {
-  --background: #eef3f8;
-  --color: var(--app-text-soft);
-  min-height: 30px;
-  border: none;
-}
-
-ion-item-divider ion-label {
-  color: var(--app-text-soft) !important;
-  font-size: 78%;
-  font-weight: 800;
-}
-
-/* ITEMS */
+/* =========================
+   CARD TIMBRE
+========================= */
 
 .item-timbre {
-  --background: var(--app-card);
-  --color: var(--app-text);
-  --padding-start: 10px;
-  --inner-padding-end: 8px;
-  --min-height: 58px;
-  margin: 0;
-  border-bottom: 1px solid var(--app-border);
-  position: relative;
+  --background: transparent;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --min-height: auto;
+  margin: 0 0 8px 0;
 }
 
-.contenedor-accion {
-  width: 42%;
-  min-width: 0;
-}
-
-.textoTimbreEmpleado {
-  text-align: left;
-  color: var(--app-primary);
+.timbre-card {
   width: 100%;
-}
-
-.accion-timbre {
+  padding: 9px 8px;
+  border-radius: 16px;
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
   display: flex;
   align-items: center;
-  gap: 5px;
-  width: 100%;
+  justify-content: space-between;
+  gap: 6px;
 }
 
-.btn-info-timbre {
-  --padding-start: 0;
-  --padding-end: 0;
-  --background: rgba(15, 117, 188, 0.10);
-  --color: var(--app-primary);
-  --border-radius: 50%;
-  width: 23px;
-  height: 23px;
-  min-width: 23px;
-  margin: 0;
+.timbre-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.btn-info-timbre ion-icon {
-  font-size: 16px;
+.timbre-textos {
+  flex: 1;
+  min-width: 0;
 }
 
 .accion-texto {
-  flex: 1;
-  min-width: 0;
   color: var(--app-primary);
-  font-size: 70%;
+  font-size: 12px;
   font-weight: 900;
-  line-height: 1.2;
+  line-height: 1.15;
   text-align: left;
 }
 
@@ -181,75 +188,152 @@ ion-item-divider ion-label {
   overflow-wrap: break-word;
 }
 
-/* Ocultar texto antiguo */
-.textoObs {
-  display: none;
-}
-
-/* HORA */
-
-.tamanoBotonDER {
-  width: 4rem;
-  height: 2rem;
-  position: absolute;
-  right: 40%;
-  font-size: 70%;
-  --background: var(--app-soft);
-  --color: var(--app-text);
-  --box-shadow: none;
-  border: 1px solid var(--app-border);
-}
-
-.tamanoBotonDER div {
-  font-size: 70%;
-  font-weight: 800;
+.fecha-timbre {
+  margin-top: 3px;
+  color: var(--app-text-soft);
+  font-size: 10px;
+  font-weight: 700;
   line-height: 1.1;
 }
 
-.tamanoBotonDER ion-text {
-  color: var(--app-primary);
-  font-weight: 900;
+.timbre-derecha {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-/* BOTONES DERECHA */
+/* =========================
+   INFO
+========================= */
 
-.tamanoIconoEmpleado {
-  font-size: 150%;
+.btn-info-timbre {
+  width: 23px;
+  height: 23px;
+  min-width: 23px;
+  border-radius: 50%;
+  border: 1px solid rgba(14, 165, 233, 0.22);
+  outline: none;
+  background: #e0f2fe;
+  color: #0284c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 0;
   margin: 0;
-  border: 0;
 }
 
-.ubicacionIZQ,
-.ubicacionMED,
-.ubicacionDER {
-  width: 3rem;
-  height: 3rem;
-  position: absolute;
-  --background: var(--app-soft);
-  --color: var(--app-primary);
-  --box-shadow: none;
+.btn-info-timbre ion-icon {
+  color: #0284c7 !important;
+  font-size: 15px;
 }
 
-.ubicacionIZQ {
-  right: 26%;
+/* =========================
+   HORA
+========================= */
+
+.hora-card {
+  width: 74px;
+  min-width: 74px;
+  padding: 5px 4px;
+  border-radius: 9px;
+  background: var(--app-soft);
+  border: 1px solid rgba(100, 116, 139, 0.16);
+  text-align: center;
 }
 
-.ubicacionMED {
-  right: 13%;
+.hora-card span {
+  display: block;
+  color: #475569;
+  font-size: 9.5px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 2px;
 }
 
-.ubicacionDER {
-  right: 0%;
+.hora-card strong {
+  display: block;
+  color: #0b5a92;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.1;
+  white-space: nowrap;
 }
 
-.ubicacionIZQ[disabled],
-.ubicacionMED[disabled],
-.ubicacionDER[disabled] {
-  opacity: 0.35;
+/* =========================
+   ACCIONES
+========================= */
+
+.acciones-timbre {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-/* ESTADOS */
+.accion-icono {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+}
+
+.accion-icono ion-icon {
+  font-size: 16px;
+  opacity: 1 !important;
+}
+
+/* Foto / carita - amarillo */
+.accion-foto {
+  background: #fef3c7;
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+.accion-foto ion-icon {
+  color: #d97706 !important;
+}
+
+/* Documento / imagen - rosado */
+.accion-documento {
+  background: #fce7f3;
+  border-color: rgba(219, 39, 119, 0.22);
+}
+
+.accion-documento ion-icon {
+  color: #db2777 !important;
+}
+
+/* Mapa - verde */
+.accion-mapa {
+  background: #dcfce7;
+  border-color: rgba(22, 163, 74, 0.22);
+}
+
+.accion-mapa ion-icon {
+  color: #16a34a !important;
+}
+
+.accion-icono.accion-deshabilitada,
+.accion-icono:disabled {
+  opacity: 0.38;
+  background: #f1f5f9;
+  border-color: rgba(148, 163, 184, 0.18);
+}
+
+.accion-icono.accion-deshabilitada ion-icon,
+.accion-icono:disabled ion-icon {
+  color: #94a3b8 !important;
+}
+
+/* =========================
+   ESTADOS
+========================= */
 
 .estado-carga {
   margin: 14px;
@@ -291,105 +375,102 @@ ion-item-divider ion-label {
   margin: 0 auto 18px auto;
 }
 
-/* PAGINACIÓN */
+/* =========================
+   PAGINACIÓN COMPACTA
+========================= */
 
-.footer-paginacion {
-  background: transparent;
-  border-top: none;
-  padding: 6px 10px 10px 10px;
-}
-
-.footer-paginacion ion-item {
-  --background: transparent;
-  --border-width: 0;
-  --padding-start: 0;
-  --inner-padding-end: 0;
-  --min-height: auto;
-  margin: 0;
+.paginacion-contenedor {
+  margin: 8px 36px 12px 36px;
+  padding: 4px 6px;
+  min-height: 34px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  text-align: center;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.05);
 }
 
 .paginacion {
   width: 100%;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .paginacion ::ng-deep .ngx-pagination {
-  padding: 8px 10px;
-  margin: 0 auto;
-  width: fit-content;
-  max-width: 100%;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
-
-  background: var(--app-card);
-  border: 1px solid var(--app-border);
-  border-radius: 16px;
-  box-shadow: var(--app-shadow);
+  padding: 0 !important;
+  margin: 0 !important;
+  width: auto !important;
+  min-height: 26px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 4px !important;
 }
 
 .paginacion ::ng-deep .ngx-pagination li {
-  margin: 0;
-  border-radius: 10px;
-  overflow: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  line-height: 1 !important;
+}
+
+.paginacion ::ng-deep .ngx-pagination a,
+.paginacion ::ng-deep .ngx-pagination button,
+.paginacion ::ng-deep .ngx-pagination .current {
+  min-width: 22px !important;
+  height: 24px !important;
+  padding: 0 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 8px !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
 }
 
 .paginacion ::ng-deep .ngx-pagination a,
 .paginacion ::ng-deep .ngx-pagination button {
-  min-width: 30px;
-  height: 30px;
-  padding: 0 8px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: transparent;
-  color: var(--app-primary);
-  border-radius: 10px;
-
-  font-size: 12px;
-  font-weight: 900;
-  text-decoration: none;
-}
-
-.paginacion ::ng-deep .ngx-pagination a:hover {
-  background: rgba(15, 117, 188, 0.10);
+  background: transparent !important;
+  color: #0f75bc !important;
 }
 
 .paginacion ::ng-deep .ngx-pagination .current {
-  min-width: 30px;
-  height: 30px;
-  padding: 0 9px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
-  color: #ffffff;
-  font-size: 12px;
-  font-weight: 900;
-  border-radius: 10px;
-  box-shadow: 0 5px 12px rgba(15, 117, 188, 0.25);
+  background: transparent !important;
+  color: #0f172a !important;
+  box-shadow: none !important;
 }
 
 .paginacion ::ng-deep .ngx-pagination .disabled {
-  color: var(--app-text-soft);
-  opacity: 0.45;
+  color: #cbd5e1 !important;
+  opacity: 1 !important;
 }
 
 .paginacion ::ng-deep .ngx-pagination span {
-  color: inherit;
-  font-family: inherit;
-  font-weight: 900;
+  color: inherit !important;
+  font-family: inherit !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
 }
 
-/* OFFLINE */
+.paginacion ::ng-deep .ngx-pagination li:not(.pagination-previous):not(.pagination-next):not(.current) {
+  display: none !important;
+}
+
+.paginacion ::ng-deep .ngx-pagination .pagination-previous a,
+.paginacion ::ng-deep .ngx-pagination .pagination-previous span,
+.paginacion ::ng-deep .ngx-pagination .pagination-next a,
+.paginacion ::ng-deep .ngx-pagination .pagination-next span {
+  font-size: 10px !important;
+  padding: 0 4px !important;
+}
+
+/* =========================
+   OFFLINE
+========================= */
 
 .offline-card {
   margin: 16px 14px 14px 14px;
@@ -407,7 +488,7 @@ ion-item-divider ion-label {
   height: 58px;
   margin: 0 auto 12px auto;
   border-radius: 18px;
-  background: var(--app-primary-light);
+  background: #e8f4fd;
   color: var(--app-primary);
   display: flex;
   align-items: center;
@@ -443,20 +524,21 @@ ion-item-divider ion-label {
   text-align: center;
 }
 
-.center1 {
+.logo-card-offline {
+  margin: 0 auto;
+}
+
+.logo-timbres-offline {
   display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 30%;
+  width: 145px;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
-.center1 img {
-  width: 100%;
-}
-
-.center1 h1 {
-  margin: 6px 0 0 0;
-  font-size: 13px;
+.offline-image-card h1 {
+  margin: 8px 0 0 0;
+  font-size: 15px;
   color: var(--app-text-soft);
 }
 
@@ -464,7 +546,7 @@ ion-item-divider ion-label {
   width: 72%;
   max-width: 260px;
   display: block;
-  margin: auto;
+  margin: 12px auto 0 auto;
 }
 
 .offline-message {
@@ -478,7 +560,9 @@ ion-item-divider ion-label {
   font-weight: 800;
 }
 
-/* GENERAL */
+/* =========================
+   GENERAL ELEMENTS
+========================= */
 
 .center {
   display: block;
@@ -505,7 +589,125 @@ ion-label {
   font-weight: bold;
 }
 
-/* DARK MODE */
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 390px) {
+  .filtros-card {
+    padding: 9px 10px 10px 10px;
+  }
+
+  .botones-grid {
+    gap: 8px;
+  }
+
+  .btn-buscar,
+  .btn-todos {
+    min-height: 34px;
+    --border-radius: 13px;
+  }
+
+  .btn-buscar ion-label,
+  .btn-todos ion-label {
+    font-size: 64%;
+  }
+
+  .timbre-card {
+    padding: 8px 8px;
+    gap: 6px;
+  }
+
+  .timbre-info {
+    gap: 6px;
+  }
+
+  .timbre-derecha {
+    gap: 4px;
+  }
+
+  .hora-card {
+    width: 70px;
+    min-width: 70px;
+  }
+
+  .hora-card strong {
+    font-size: 10px;
+  }
+
+  .accion-icono {
+    width: 27px;
+    height: 27px;
+    min-width: 27px;
+  }
+
+  .accion-icono ion-icon {
+    font-size: 16px;
+  }
+
+  .accion-texto {
+    font-size: 12px;
+  }
+
+  .fecha-timbre {
+    font-size: 10px;
+  }
+
+  .paginacion-contenedor {
+    margin: 8px 42px 10px 42px;
+    padding: 3px 5px;
+    min-height: 32px;
+    border-radius: 14px;
+  }
+
+  .paginacion ::ng-deep .ngx-pagination a,
+  .paginacion ::ng-deep .ngx-pagination button,
+  .paginacion ::ng-deep .ngx-pagination .current {
+    height: 23px !important;
+    font-size: 9.5px !important;
+  }
+}
+
+@media (max-width: 350px) {
+  .botones-grid {
+    gap: 6px;
+  }
+
+  .hora-card {
+    width: 68px;
+    min-width: 68px;
+  }
+
+  .acciones-timbre {
+    gap: 3px;
+  }
+
+  .accion-icono {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+  }
+
+  .accion-icono ion-icon {
+    font-size: 15px;
+  }
+
+  .accion-texto {
+    font-size: 11px;
+  }
+
+  .fecha-timbre {
+    font-size: 9px;
+  }
+
+  .paginacion-contenedor {
+    margin: 8px 32px 10px 32px;
+  }
+}
+
+/* =========================
+   DARK MODE
+========================= */
 
 @media (prefers-color-scheme: dark) {
   :host {
@@ -516,23 +718,18 @@ ion-label {
     --app-text-soft: #cbd5e1;
     --app-border: rgba(255, 255, 255, 0.08);
     --app-shadow: 0 6px 18px rgba(0, 0, 0, 0.38);
-    --app-primary-light: rgba(14, 165, 233, 0.16);
   }
 
-.header-logo {
-  background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
-}
+  .header-logo {
+    background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+  }
 
-.logo-card {
-  background: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow:
-    0 8px 18px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(56, 189, 248, 0.08);
-}
-
-  ion-item-divider {
-    --background: #111827;
+  .logo-card {
+    background: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow:
+      0 8px 18px rgba(0, 0, 0, 0.35),
+      0 0 0 1px rgba(56, 189, 248, 0.08);
   }
 
   .accion-texto {
@@ -540,45 +737,82 @@ ion-label {
   }
 
   .btn-info-timbre {
-    --background: rgba(56, 189, 248, 0.14);
-    --color: #38bdf8;
+    background: rgba(14, 165, 233, 0.16);
+    border-color: rgba(14, 165, 233, 0.25);
   }
 
-  .tamanoBotonDER,
-  .ubicacionIZQ,
-  .ubicacionMED,
-  .ubicacionDER {
-    --background: #111827;
-    --color: #38bdf8;
+  .btn-info-timbre ion-icon {
+    color: #38bdf8 !important;
+  }
+
+  .hora-card span {
+    color: #cbd5e1;
+  }
+
+  .hora-card strong {
+    color: #38bdf8;
+  }
+
+  .accion-foto {
+    background: rgba(245, 158, 11, 0.18);
+    border-color: rgba(245, 158, 11, 0.28);
+  }
+
+  .accion-foto ion-icon {
+    color: #fbbf24 !important;
+  }
+
+  .accion-documento {
+    background: rgba(219, 39, 119, 0.18);
+    border-color: rgba(219, 39, 119, 0.28);
+  }
+
+  .accion-documento ion-icon {
+    color: #f472b6 !important;
+  }
+
+  .accion-mapa {
+    background: rgba(34, 197, 94, 0.16);
+    border-color: rgba(34, 197, 94, 0.24);
+  }
+
+  .accion-mapa ion-icon {
+    color: #4ade80 !important;
+  }
+
+  .accion-icono.accion-deshabilitada,
+  .accion-icono:disabled {
+    opacity: 0.35;
+    background: #111827;
     border-color: rgba(255, 255, 255, 0.08);
   }
 
-  .tamanoBotonDER ion-text {
-    color: #38bdf8;
+  .accion-icono.accion-deshabilitada ion-icon,
+  .accion-icono:disabled ion-icon {
+    color: #64748b !important;
+  }
+
+  .paginacion-contenedor {
+    background: #1e293b;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .paginacion ::ng-deep .ngx-pagination a,
+  .paginacion ::ng-deep .ngx-pagination button {
+    color: #38bdf8 !important;
+  }
+
+  .paginacion ::ng-deep .ngx-pagination .current {
+    background: transparent !important;
+    color: #f8fafc !important;
+  }
+
+  .paginacion ::ng-deep .ngx-pagination .disabled {
+    color: #64748b !important;
   }
 
   .offline-message {
     background: rgba(239, 68, 68, 0.16);
     color: #fca5a5;
-  }
-
-    .paginacion ::ng-deep .ngx-pagination {
-    background: #1e293b;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.38);
-  }
-
-  .paginacion ::ng-deep .ngx-pagination a,
-  .paginacion ::ng-deep .ngx-pagination button {
-    color: #38bdf8;
-  }
-
-  .paginacion ::ng-deep .ngx-pagination a:hover {
-    background: rgba(56, 189, 248, 0.12);
-  }
-
-  .paginacion ::ng-deep .ngx-pagination .current {
-    background: linear-gradient(135deg, #0f75bc, #2563eb);
-    color: #ffffff;
   }
 }

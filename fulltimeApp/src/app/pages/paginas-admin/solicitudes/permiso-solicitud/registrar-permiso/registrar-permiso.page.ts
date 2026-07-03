@@ -11,6 +11,7 @@ import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { DatosGeneralesService } from 'src/app/services/datos-generales.service';
 import { AprobacionesService } from 'src/app/services/aprobaciones.service';
 import { TipoNotificacion } from 'src/app/interfaces/tipo-notificaciones.enum';
+import { ValidacionesService } from 'src/app/libs/validaciones.service';
 
 @Component({
   selector: 'app-registrar-permiso',
@@ -55,6 +56,8 @@ export class RegistrarPermisoPage implements OnInit {
 
   nombreArchivo = '';
   archivoSeleccionado: File | null = null;
+  storageMbUsado: number = 0;
+  storageMbContratado: number = 0;
 
   feriados: IFeriado[] = [];
 
@@ -80,14 +83,38 @@ export class RegistrarPermisoPage implements OnInit {
     private notificacionesService: NotificacionesService,
     private datosGeneralesService: DatosGeneralesService,
     private aprobacionesService: AprobacionesService,
+    private validar: ValidacionesService,
   ) { }
 
   ngOnInit() {
     this.idEmpleado = parseInt(localStorage.getItem('empleadoID') || '0', 10);
     this.idSucursal = parseInt(localStorage.getItem('csucur') || '0', 10);
 
+    this.CargarStorageTenant();
     this.cargarTiposPermiso();
     this.cargarFeriados();
+  }
+
+  // CONTROL DE DOCUMENTOS
+  private CargarStorageTenant(): void {
+    this.storageMbUsado = Number(localStorage.getItem('storage_mb_usado') ?? 0);
+    this.storageMbContratado = Number(localStorage.getItem('storage_mb_contratado') ?? 0);
+  }
+
+  private ValidarStorageArchivoAdjunto(): boolean {
+    const validacionStorage = this.validar.ValidarLimiteStorageArchivo(
+      this.archivoSeleccionado,
+      this.storageMbUsado,
+      this.storageMbContratado,
+      1
+    );
+
+    if (!validacionStorage.permitido) {
+      this.mostrarToast(validacionStorage.mensaje, 'warning');
+      return false;
+    }
+
+    return true;
   }
 
   cargarTiposPermiso() {
@@ -513,6 +540,10 @@ export class RegistrarPermisoPage implements OnInit {
       return;
     }
 
+    if (!this.ValidarStorageArchivoAdjunto()) {
+      return;
+    }
+
     this.registrandoSolicitud = true;
 
     const esPorHoras = this.permiteHoras;
@@ -742,17 +773,17 @@ export class RegistrarPermisoPage implements OnInit {
 
       if (idsCorreo.length > 0) {
         try {
-        const correosEnviar = empleadosReceptores
-          .filter((e: any) => {
-            const recibeCorreo =
-              e?.permiso_mail === true ||
-              e?.permiso_mail === 1 ||
-              e?.permiso_mail === 'true';
+          const correosEnviar = empleadosReceptores
+            .filter((e: any) => {
+              const recibeCorreo =
+                e?.permiso_mail === true ||
+                e?.permiso_mail === 1 ||
+                e?.permiso_mail === 'true';
 
-            return tipoPermiteCorreoCreacion && recibeCorreo && !!e?.correo;
-          })
-          .map((e: any) => String(e.correo).trim())
-          .filter((correo: string) => !!correo);
+              return tipoPermiteCorreoCreacion && recibeCorreo && !!e?.correo;
+            })
+            .map((e: any) => String(e.correo).trim())
+            .filter((correo: string) => !!correo);
 
           const correoUnico = Array.from(new Set(correosEnviar)).join(', ');
 
@@ -918,6 +949,12 @@ export class RegistrarPermisoPage implements OnInit {
 
     this.archivoSeleccionado = file;
     this.nombreArchivo = file.name;
+
+    if (!this.ValidarStorageArchivoAdjunto()) {
+      this.quitarArchivo();
+      event.target.value = '';
+      return;
+    }
 
     this.invalidarVerificacion();
   }

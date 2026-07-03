@@ -440,12 +440,11 @@ export class PermisoAprobacionPage implements OnInit {
   }
 
   obtenerFechaHoy(): string {
-    const fecha = new Date();
-    const yyyy = fecha.getFullYear();
-    const mm = String(fecha.getMonth() + 1).padStart(2, '0');
-    const dd = String(fecha.getDate()).padStart(2, '0');
+    const hoy = new Date();
+    const anio = hoy.getFullYear();
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
 
-    return `${yyyy}-${mm}-${dd}`;
+    return `${anio}-${mes}-01`;
   }
 
   formatearFecha(fecha: string | undefined): string {
@@ -1068,22 +1067,22 @@ export class PermisoAprobacionPage implements OnInit {
   private obtenerAccionPermiso(
     decision: 'APRUEBA' | 'RECHAZA',
     pasoActual: any
-    ): 'PREAUTORIZADO' | 'AUTORIZADO' | 'RECHAZADO' {
+  ): 'PREAUTORIZADO' | 'AUTORIZADO' | 'RECHAZADO' {
 
-      const tipoPaso = String(pasoActual?.tipo_paso ?? '').toUpperCase();
+    const tipoPaso = String(pasoActual?.tipo_paso ?? '').toUpperCase();
 
-      if (decision === 'RECHAZA') {
-        return 'RECHAZADO';
-      }
-
-      if (!tipoPaso || tipoPaso === 'AUTORIZA') {
-        return 'AUTORIZADO';
-      }
-
-      return 'PREAUTORIZADO';
+    if (decision === 'RECHAZA') {
+      return 'RECHAZADO';
     }
 
-    private obtenerTipoNotificacionPermiso(accion: string): number {
+    if (!tipoPaso || tipoPaso === 'AUTORIZA') {
+      return 'AUTORIZADO';
+    }
+
+    return 'PREAUTORIZADO';
+  }
+
+  private obtenerTipoNotificacionPermiso(accion: string): number {
     if (accion === 'RECHAZADO') {
       return TipoNotificacion.RECHAZAR_PERMISO;
     }

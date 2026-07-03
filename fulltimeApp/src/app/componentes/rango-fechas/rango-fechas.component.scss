@@ -1,0 +1,154 @@
+.rango-fechas-grid {
+  margin: 0;
+  padding: 0;
+}
+
+.rango-fechas-row {
+  margin: 0;
+}
+
+.rango-fechas-col {
+  padding: 4px;
+}
+
+.fecha-card {
+  width: 100%;
+  min-height: 54px;
+  border: none;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 8px 9px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  box-shadow: 0 5px 12px rgba(15, 23, 42, 0.12);
+}
+
+.fecha-card:active {
+  transform: scale(0.98);
+}
+
+.fecha-icono {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fecha-icono ion-icon {
+  font-size: 17px;
+}
+
+.fecha-icono-inicio {
+  background: #e0f2fe;
+}
+
+.fecha-icono-inicio ion-icon {
+  color: #0284c7;
+}
+
+.fecha-icono-fin {
+  background: #dcfce7;
+}
+
+.fecha-icono-fin ion-icon {
+  color: #16a34a;
+}
+
+.fecha-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.fecha-info span {
+  display: block;
+  color: #64748b;
+  font-size: 9.5px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+.fecha-info strong {
+  display: block;
+  color: #0f172a;
+  font-size: 12.5px;
+  font-weight: 900;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal-fecha-acciones {
+  width: 95%;
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 0;
+}
+
+.modal-fecha-acciones ion-label {
+  margin: 2%;
+  font-size: medium;
+  font-weight: 800;
+}
+
+.popover-fecha-texto {
+  margin: auto;
+  padding: 12px;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 390px) {
+  .rango-fechas-col {
+    padding: 3px;
+  }
+
+  .fecha-card {
+    min-height: 50px;
+    padding: 7px 8px;
+    border-radius: 14px;
+    gap: 7px;
+  }
+
+  .fecha-icono {
+    width: 27px;
+    height: 27px;
+    min-width: 27px;
+    border-radius: 10px;
+  }
+
+  .fecha-icono ion-icon {
+    font-size: 15px;
+  }
+
+  .fecha-info span {
+    font-size: 9px;
+  }
+
+  .fecha-info strong {
+    font-size: 11.5px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .fecha-card {
+    background: #ffffff;
+    color: #0f172a;
+  }
+
+  .fecha-info span {
+    color: #64748b;
+  }
+
+  .fecha-info strong {
+    color: #0f172a;
+  }
+}
