@@ -25,8 +25,11 @@
 ========================= */
 
 .confirmacion-content {
-  --background:
-    radial-gradient(circle at top, rgba(34, 197, 94, 0.15) 0%, transparent 34%),
+  --background: radial-gradient(
+      circle at top,
+      rgba(34, 197, 94, 0.15) 0%,
+      transparent 34%
+    ),
     linear-gradient(180deg, #ffffff 0%, var(--app-bg) 46%, var(--app-bg) 100%);
   text-align: center;
 }
@@ -48,20 +51,32 @@
   margin-bottom: 14px;
 }
 
+.logo-box {
+  width: fit-content;
+  max-width: 70%;
+  margin: 0 auto;
+  padding: 8px 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.18);
+}
+
 .logo-app {
-  width: 58%;
-  max-width: 210px;
-  min-width: 150px;
+  width: 175px;
+  max-width: 100%;
+  height: auto;
   display: block;
-  margin: auto;
+  object-fit: contain;
 }
 
 .app-title {
   display: block;
-  margin-top: 6px;
-  color: var(--app-text-soft);
+  margin-top: 8px;
+  color: #ffffff;
   font-size: 22px;
   font-weight: 900;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 /* =========================
@@ -81,7 +96,7 @@
 }
 
 .success-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 18%;
@@ -108,7 +123,11 @@
   height: 58px;
   min-width: 58px;
   border-radius: 20px;
-  background: linear-gradient(135deg, var(--app-success), var(--app-success-dark));
+  background: linear-gradient(
+    135deg,
+    var(--app-success),
+    var(--app-success-dark)
+  );
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -149,7 +168,11 @@
   margin: 0 0 14px 0;
   padding: 14px;
   border-radius: 20px;
-  background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  background: linear-gradient(
+    135deg,
+    var(--app-primary),
+    var(--app-primary-dark)
+  );
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -288,8 +311,11 @@
   }
 
   .confirmacion-content {
-    --background:
-      radial-gradient(circle at top, rgba(34, 197, 94, 0.18) 0%, transparent 35%),
+    --background: radial-gradient(
+        circle at top,
+        rgba(34, 197, 94, 0.18) 0%,
+        transparent 35%
+      ),
       linear-gradient(180deg, #0f172a 0%, #0f172a 100%);
   }
 
@@ -311,9 +337,13 @@
     padding: 20px 14px 14px 14px;
   }
 
+  .logo-box {
+    padding: 7px 16px;
+    max-width: 72%;
+  }
+
   .logo-app {
-    width: 55%;
-    min-width: 145px;
+    width: 160px;
   }
 
   .app-title {
@@ -385,8 +415,12 @@
     margin-bottom: 10px;
   }
 
+  .logo-box {
+    padding: 6px 14px;
+  }
+
   .logo-app {
-    max-width: 170px;
+    width: 150px;
   }
 
   .app-title {

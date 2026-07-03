@@ -82,6 +82,7 @@ export class EnviartimbrePage implements OnInit {
   private readonly TIMBRES_UBICACION_FLEXIBLE = new Set<string>(['2', '3', '4', '5', '7']);
 
   cargandoPosicion = false;
+  enviandoTimbre = false;
 
   public nuevoTimbre: any = {
     codigo: '',
@@ -692,72 +693,94 @@ export class EnviartimbrePage implements OnInit {
   }
 
   async enviarTimbre(ev?: any) {
-    const teclaFuncion = this.obtenerIdTipo();
-    const esTimbreFlexible = this.EsTimbreFlexibleUbicacion(teclaFuncion);
+    if (this.enviandoTimbre) {
+      return;
+    }
 
-    let ubicacionObtenida = false;
+    this.enviandoTimbre = true;
 
-    if (this.platform.is('hybrid')) {
-      const tienePermisoUbicacion = await this.solicitarPermisoUbicacionInicial();
+    try {
+      const teclaFuncion = this.obtenerIdTipo();
+      const esTimbreFlexible = this.EsTimbreFlexibleUbicacion(teclaFuncion);
 
-      if (!tienePermisoUbicacion) {
-        this.geoLatitude = 0;
-        this.geoLongitude = 0;
+      let ubicacionObtenida = false;
 
-        if (esTimbreFlexible) {
-          this.actualizarUbicacionPantalla('SIN UBICACION');
+      if (this.platform.is('hybrid')) {
+        const tienePermisoUbicacion = await this.solicitarPermisoUbicacionInicial();
 
-          await this.abrirToas(
-            'No se obtuvo permiso de ubicación. Este tipo de timbre se registrará como SIN UBICACION.',
-            'warning',
-            4000,
-            'middle'
-          );
+        if (!tienePermisoUbicacion) {
+          this.geoLatitude = 0;
+          this.geoLongitude = 0;
+
+          if (esTimbreFlexible) {
+            this.actualizarUbicacionPantalla('SIN UBICACION');
+
+            await this.abrirToas(
+              'No se obtuvo permiso de ubicación. Este tipo de timbre se registrará como SIN UBICACION.',
+              'warning',
+              4000,
+              'middle'
+            );
+          } else {
+            this.enviandoTimbre = false;
+
+            return this.abrirToas(
+              'Debe permitir el acceso a la ubicación para registrar este tipo de timbre.',
+              'danger',
+              6000,
+              'middle'
+            );
+          }
         } else {
-          return this.abrirToas(
-            'Debe permitir el acceso a la ubicación para registrar este tipo de timbre.',
-            'danger',
-            6000,
-            'middle'
-          );
+          ubicacionObtenida = await this.obtenerPosicion(!esTimbreFlexible);
         }
+
       } else {
-        ubicacionObtenida = await this.obtenerPosicion(!esTimbreFlexible);
+        await this.abrirToas(
+          'Prueba desde navegador: no se usará autenticación biométrica.',
+          'warning',
+          2000,
+          'middle'
+        );
+
+        this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
+
+        ubicacionObtenida = await this.obtenerPosicionWeb(!esTimbreFlexible);
       }
 
-    } else {
+      if (!ubicacionObtenida && esTimbreFlexible) {
+        this.geoLatitude = 0;
+        this.geoLongitude = 0;
+        this.actualizarUbicacionPantalla('SIN UBICACION');
+      }
+
+      await this.actualizarUbicacionAntesDeContinuar();
+
+      const ubicacionValida = this.NormalizarUbicacionParaTimbre(teclaFuncion);
+
+      if (!ubicacionValida) {
+        this.enviandoTimbre = false;
+
+        return this.abrirToas(
+          'No se pudo validar la ubicación. Este tipo de timbre solo puede registrarse en zonas permitidas.',
+          'danger',
+          5000,
+          'middle'
+        );
+      }
+
+      await this.iniciarProcesoFoto();
+
+    } catch {
+      this.enviandoTimbre = false;
+
       await this.abrirToas(
-        'Prueba desde navegador: no se usará autenticación biométrica.',
-        'warning',
-        2000,
-        'middle'
-      );
-
-      this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
-
-      ubicacionObtenida = await this.obtenerPosicionWeb(!esTimbreFlexible);
-    }
-
-    if (!ubicacionObtenida && esTimbreFlexible) {
-      this.geoLatitude = 0;
-      this.geoLongitude = 0;
-      this.actualizarUbicacionPantalla('SIN UBICACION');
-    }
-
-    await this.actualizarUbicacionAntesDeContinuar();
-
-    const ubicacionValida = this.NormalizarUbicacionParaTimbre(teclaFuncion);
-
-    if (!ubicacionValida) {
-      return this.abrirToas(
-        'No se pudo validar la ubicación. Este tipo de timbre solo puede registrarse en zonas permitidas.',
+        'Ocurrió un error al procesar el timbre. Intente nuevamente.',
         'danger',
-        5000,
+        4000,
         'middle'
       );
     }
-
-    await this.iniciarProcesoFoto();
   }
 
   obtenerIdTipo(): string {
@@ -1313,6 +1336,20 @@ export class EnviartimbrePage implements OnInit {
 
     this.relojService.enviarTimbre(data).pipe(timeout(5000)).subscribe({
       next: () => {
+        this.enviandoTimbre = false;
+
+
+        localStorage.setItem('ultimoTimbreEmpleado', JSON.stringify({
+          fecha_hora_timbre: data.fec_hora_timbre,
+          fecha_hora_timbre_servidor: data.fec_hora_timbre,
+          fecha_hora_timbre_validado: data.fec_hora_timbre,
+          accion: data.accion,
+          tecla_funcion: data.tecla_funcion ?? data.tecl_funcion,
+          tecl_funcion: data.tecl_funcion ?? data.tecla_funcion
+        }));
+
+        localStorage.setItem('refrescarUltimoTimbre', 'true');
+
         this.navCtroller.navigateForward(['confirmaciontimbre'], {
           queryParams: {
             data: JSON.stringify(data)
@@ -1390,9 +1427,17 @@ export class EnviartimbrePage implements OnInit {
     await this.abrirToas(
       'Timbre guardado en el teléfono. Aún no ha sido enviado al servidor.',
       'warning',
-      6000,
+      3500,
       'middle'
     );
+
+    this.enviandoTimbre = false;
+
+    /*
+      Cerramos la pantalla para evitar que el usuario vuelva a enviar
+      el mismo timbre desde el formulario.
+    */
+    this.navCtroller.navigateRoot(['/reloj/bienvenido']);
 
     return;
   }

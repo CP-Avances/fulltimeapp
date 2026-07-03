@@ -3,7 +3,7 @@ import { DatePipe } from '@angular/common';
 import { ToastController, ModalController, AlertController } from '@ionic/angular';
 import { TimbresPerdidosComponent } from './showTimbresGuardados.component';
 import { ParametrosService } from 'src/app/services/parametros.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { RelojServiceService } from 'src/app/services/reloj-service.service';
 import { EmpleadosService } from 'src/app/services/empleados.service';
 import { interval, Subscription } from 'rxjs';
@@ -57,6 +57,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     public alertCrtl: AlertController,
     public parametros: ParametrosService,
     public router: Router,
+    private route: ActivatedRoute,
     public relojService: RelojServiceService,
     public empleadoService: EmpleadosService,
     private networkService: NetworkService,
@@ -80,93 +81,126 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     this.networkSubscriber();
     this.refreshNavegadorAdmin();
     this.ObtenerUltimoTimbreEmpleado();
+
+    this.route.queryParams.subscribe(params => {
+      if (params['refreshUltimoTimbre']) {
+        setTimeout(() => {
+          this.ObtenerUltimoTimbreEmpleado();
+        }, 300);
+      }
+    });
   }
 
   ionViewWillEnter() {
     this.startClock();
     this.networkSubscriber();
     this.refreshNavegadorAdmin();
+  }
+
+  ionViewDidEnter() {
+    const refrescar = localStorage.getItem('refrescarUltimoTimbre');
+
+    if (refrescar === 'true') {
+      localStorage.removeItem('refrescarUltimoTimbre');
+
+      setTimeout(() => {
+        this.ObtenerUltimoTimbreEmpleado();
+      }, 300);
+
+      return;
+    }
+
     this.ObtenerUltimoTimbreEmpleado();
   }
 
-ObtenerUltimoTimbreEmpleado() {
-  const codigo = localStorage.getItem('codigo');
-
-  if (!codigo) {
-    this.ultimoTimbre = null;
-    this.cargandoUltimoTimbre = false;
-    this.sinConexionUltimoTimbre = false;
-    return;
-  }
-
-  const conectado = this.networkService.getNetworkStatusDispositivo();
-
-  if (!conectado) {
-    this.cargandoUltimoTimbre = false;
-    this.sinConexionUltimoTimbre = true;
-
+  cargarUltimoTimbreLocal() {
     const ultimoGuardado = localStorage.getItem('ultimoTimbreEmpleado');
 
-    if (ultimoGuardado) {
-      try {
-        this.ultimoTimbre = JSON.parse(ultimoGuardado);
-      } catch {
-        this.ultimoTimbre = null;
-      }
+    if (!ultimoGuardado) {
+      return;
     }
 
-    return;
+    try {
+      this.ultimoTimbre = JSON.parse(ultimoGuardado);
+    } catch {
+      this.ultimoTimbre = null;
+      localStorage.removeItem('ultimoTimbreEmpleado');
+    }
   }
 
-  this.cargandoUltimoTimbre = true;
-  this.sinConexionUltimoTimbre = false;
+  ObtenerUltimoTimbreEmpleado() {
 
-  this.timbreService.ObtenerUltimoTimbreEmpleado(codigo)
-    .pipe(timeout(5000))
-    .subscribe({
-      next: (resp: any) => {
-        this.ultimoTimbre = resp?.data ?? null;
+    console.log('Consultando último timbre...', new Date().toLocaleTimeString());
+    const codigo = localStorage.getItem('codigo');
 
-        if (this.ultimoTimbre) {
-          localStorage.setItem(
-            'ultimoTimbreEmpleado',
-            JSON.stringify(this.ultimoTimbre)
-          );
-        } else {
-          localStorage.removeItem('ultimoTimbreEmpleado');
-        }
+    if (!codigo) {
+      this.ultimoTimbre = null;
+      this.cargandoUltimoTimbre = false;
+      this.sinConexionUltimoTimbre = false;
+      return;
+    }
 
-        this.cargandoUltimoTimbre = false;
-      },
-      error: (error) => {
-        this.cargandoUltimoTimbre = false;
+    const conectado = this.networkService.getNetworkStatusDispositivo();
 
-        if (error?.status === 0) {
-          this.sinConexionUltimoTimbre = true;
+    if (!conectado) {
+      this.cargandoUltimoTimbre = false;
+      this.sinConexionUltimoTimbre = true;
+      this.cargarUltimoTimbreLocal();
+      return;
+    }
 
-          const ultimoGuardado = localStorage.getItem('ultimoTimbreEmpleado');
+    this.cargandoUltimoTimbre = true;
+    this.sinConexionUltimoTimbre = false;
 
-          if (ultimoGuardado) {
-            try {
-              this.ultimoTimbre = JSON.parse(ultimoGuardado);
-            } catch {
-              this.ultimoTimbre = null;
-            }
+    this.timbreService.ObtenerUltimoTimbreEmpleado(codigo)
+      .pipe(timeout(5000))
+      .subscribe({
+        next: (resp: any) => {
+          const ultimoBackend = resp?.data ?? null;
+
+          if (ultimoBackend) {
+            this.ultimoTimbre = ultimoBackend;
+
+            localStorage.setItem(
+              'ultimoTimbreEmpleado',
+              JSON.stringify(ultimoBackend)
+            );
+          } else {
+            /*
+              Si el backend no devuelve dato, no borro directamente.
+              Mantengo el último local para evitar que la card quede vacía.
+            */
+            this.cargarUltimoTimbreLocal();
           }
 
-          return;
-        }
+          this.cargandoUltimoTimbre = false;
+        },
+        error: (error) => {
+          this.cargandoUltimoTimbre = false;
 
-        if (error?.status === 404) {
-          this.ultimoTimbre = null;
-          localStorage.removeItem('ultimoTimbreEmpleado');
-          return;
-        }
+          if (error?.status === 0) {
+            this.sinConexionUltimoTimbre = true;
+            this.cargarUltimoTimbreLocal();
+            return;
+          }
 
-        this.ultimoTimbre = null;
-      }
-    });
-}
+          if (error?.status === 404) {
+            /*
+              Solo aquí sí se puede limpiar, porque el backend dice
+              que no existe ningún timbre.
+            */
+            this.ultimoTimbre = null;
+            localStorage.removeItem('ultimoTimbreEmpleado');
+            return;
+          }
+
+          /*
+            Para cualquier otro error, mantengo lo local.
+          */
+          this.cargarUltimoTimbreLocal();
+        }
+      });
+  }
 
   obtenerNombreTimbre(accion: string, teclaFuncion: any): string {
     const tecla = String(teclaFuncion ?? '').trim();
@@ -314,7 +348,9 @@ ObtenerUltimoTimbreEmpleado() {
   }
 
   private async SincronizarTimbresPendientesAutomatico() {
+    console.log('Intentando sincronizar pendientes...');
     if (this.sincronizandoPendientes) {
+      console.log('Ya se está sincronizando.');
       return;
     }
 

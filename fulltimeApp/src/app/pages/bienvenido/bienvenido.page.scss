@@ -82,20 +82,20 @@ ion-content,
   background: var(--app-card);
   position: relative;
   display: block;
-  padding: 5px 10px;
+  padding: 6px 10px;
   margin: 5px 12px 0 12px;
   border-radius: 18px;
   box-shadow: var(--app-shadow-soft);
-  height: 122px;
+  height: 132px;
   overflow: hidden;
 }
 
 .imgsvg,
 .imsvg {
   display: block !important;
-  width: 92% !important;
-  height: 112px !important;
-  max-width: 92% !important;
+  width: 94% !important;
+  height: 122px !important;
+  max-width: 94% !important;
   margin: 0 auto !important;
 }
 
@@ -144,7 +144,7 @@ ion-content,
 }
 
 .ultimo-timbre-card ion-card-content {
-  padding: 10px 12px;
+  padding: 12px 12px;
   text-align: center;
 }
 
@@ -167,9 +167,9 @@ ion-content,
 .ultimo-timbre-card h2 {
   margin: 0;
   color: #0f172a;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 900;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .ultimo-timbre-card p {
@@ -191,11 +191,11 @@ ion-content,
   position: relative;
   display: block;
   margin: 8px 14px 0 14px;
-  padding: 9px 60px 9px 12px;
+  padding: 10px 62px 10px 12px;
   border-radius: 18px;
   background: var(--app-card);
   box-shadow: var(--app-shadow-soft);
-  min-height: 58px;
+  min-height: 62px;
 }
 
 .Info_hora h3 {
@@ -207,7 +207,7 @@ ion-content,
 }
 
 .tamanoHora {
-  font-size: 21px !important;
+  font-size: 23px !important;
   line-height: 1;
   color: var(--app-text);
   letter-spacing: 0.2px;
@@ -234,8 +234,8 @@ ion-content,
   --background-hover: #16a34a;
   --color: #ffffff;
 
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   margin: 0;
   border-radius: 50%;
   box-shadow: 0 8px 16px rgba(34, 197, 94, 0.3);
@@ -246,7 +246,7 @@ ion-content,
 }
 
 .Info_hora ion-fab-button ion-icon {
-  font-size: 21px;
+  font-size: 22px;
   color: #ffffff;
 }
 
@@ -270,18 +270,18 @@ ion-content,
 
 .botones ion-card-title {
   display: block;
-  font-size: 11px !important;
+  font-size: 11.5px !important;
   font-weight: 900;
   color: var(--app-text) !important;
-  margin: 10px 8px 7px 8px !important;
+  margin: 11px 8px 8px 8px !important;
 }
 
 .botones ion-grid {
-  padding: 3px 10px 13px 10px;
+  padding: 5px 10px 15px 10px;
 }
 
 .botones ion-row {
-  margin-bottom: 5px;
+  margin-bottom: 7px;
 }
 
 .botones ion-row:last-child {
@@ -297,29 +297,29 @@ ion-content,
 ================================ */
 
 .tamanoBoton {
-  height: 52px;
+  height: 58px;
   width: 100%;
   margin: 0;
-  --border-radius: 13px;
+  --border-radius: 14px;
   --box-shadow: 0 5px 11px rgba(15, 23, 42, 0.15);
   overflow: hidden;
   font-weight: 900;
 }
 
 .tamanoBoton::part(native) {
-  border-radius: 13px;
+  border-radius: 14px;
   padding: 0 8px;
 }
 
 .tamano {
   width: 100%;
-  min-height: 52px;
+  min-height: 58px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 8px;
 
-  font-size: 8.8px;
+  font-size: 9.5px;
   line-height: 1.15;
   font-weight: 900;
   text-transform: uppercase;
@@ -329,13 +329,13 @@ ion-content,
 }
 
 .tamano ion-icon {
-  font-size: 15px;
+  font-size: 17px;
   flex-shrink: 0;
 }
 
 .tamano span {
   display: block;
-  max-width: 88px;
+  max-width: 92px;
 }
 
 /* Colores específicos */
@@ -510,6 +510,10 @@ ion-button.tamanoBoton[color="deshabilitado"] {
     height: 40px;
   }
 
+  .Info_hora ion-fab-button ion-icon {
+    font-size: 19px;
+  }
+
   .botones {
     margin: 7px 10px 0 10px;
   }
@@ -532,12 +536,17 @@ ion-button.tamanoBoton[color="deshabilitado"] {
   }
 
   .tamano {
+    min-height: 43px;
     font-size: 8.4px;
     gap: 4px;
   }
 
   .tamano ion-icon {
     font-size: 13px;
+  }
+
+  .tamano span {
+    max-width: 82px;
   }
 }
 
@@ -640,8 +649,13 @@ ion-button.tamanoBoton[color="deshabilitado"] {
   }
 
   .tamano {
+    min-height: 40px;
     font-size: 8px;
     line-height: 1;
+  }
+
+  .tamano ion-icon {
+    font-size: 12px;
   }
 }
 
@@ -707,6 +721,10 @@ ion-button.tamanoBoton[color="deshabilitado"] {
     height: 34px;
   }
 
+  .Info_hora ion-fab-button ion-icon {
+    font-size: 16px;
+  }
+
   .botones ion-card-title {
     font-size: 10px !important;
   }
@@ -716,6 +734,7 @@ ion-button.tamanoBoton[color="deshabilitado"] {
   }
 
   .tamano {
+    min-height: 36px;
     font-size: 7.4px;
   }
 

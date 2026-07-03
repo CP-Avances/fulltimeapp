@@ -159,10 +159,15 @@
 
   <!-- BOTÓN CONTINUAR -->
   <section class="acciones" *ngIf="!cargandoPosicion; else elseBlock">
-    <ion-button shape="round" expand="block" class="btn-continuar" (click)="enviarTimbre()">
+    <ion-button shape="round" expand="block" class="btn-continuar" [disabled]="enviandoTimbre" (click)="enviarTimbre()">
 
-      <ion-icon name="paper-plane-outline" slot="start"></ion-icon>
-      Continuar
+      <ion-spinner *ngIf="enviandoTimbre" name="crescent" slot="start">
+      </ion-spinner>
+
+      <ion-icon *ngIf="!enviandoTimbre" name="paper-plane-outline" slot="start">
+      </ion-icon>
+
+      {{ enviandoTimbre ? 'Procesando...' : 'Continuar' }}
     </ion-button>
   </section>
 
