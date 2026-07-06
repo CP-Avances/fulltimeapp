@@ -80,4 +80,10 @@ export class EmpleadosService {
       )
       .pipe(map(res => res.data ?? []));
   }
+
+  // BUSCAR LISTA DE EMPLEADOS QUE SE MUESTRAN EN LA BUSQUEDA   **USADO** **MIGRADO
+  BuscarListaEmpleados() {
+    return this.http.get<any>(`${this.apiUrlM}/empleado/buscador/empleado`)
+      .pipe(map(res => res.data));
+  }
 }

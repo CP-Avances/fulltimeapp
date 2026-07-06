@@ -130,7 +130,6 @@ export class BienvenidoPage implements OnInit, OnDestroy {
 
   ObtenerUltimoTimbreEmpleado() {
 
-    console.log('Consultando último timbre...', new Date().toLocaleTimeString());
     const codigo = localStorage.getItem('codigo');
 
     if (!codigo) {
@@ -348,9 +347,7 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   }
 
   private async SincronizarTimbresPendientesAutomatico() {
-    console.log('Intentando sincronizar pendientes...');
     if (this.sincronizandoPendientes) {
-      console.log('Ya se está sincronizando.');
       return;
     }
 
@@ -374,21 +371,40 @@ export class BienvenidoPage implements OnInit, OnDestroy {
       }
 
       if (resultado.enviados > 0 && resultado.fallidos === 0) {
-        this.abrirToas(resultado.mensaje, 'success', 3500, 'middle');
+        await this.abrirToas(resultado.mensaje, 'success', 3500, 'middle');
+
+        /*
+          IMPORTANTE:
+          Cuando los timbres pendientes se sincronizan correctamente,
+          volvemos a consultar el último timbre desde el backend.
+        */
+        setTimeout(() => {
+          this.ObtenerUltimoTimbreEmpleado();
+        }, 800);
+
         return;
       }
 
       if (resultado.enviados > 0 && resultado.fallidos > 0) {
-        this.abrirToas(resultado.mensaje, 'warning', 4500, 'middle');
+        await this.abrirToas(resultado.mensaje, 'warning', 4500, 'middle');
+
+        /*
+          Aunque algunos fallen, si al menos uno se envió,
+          refrescamos la card del último timbre.
+        */
+        setTimeout(() => {
+          this.ObtenerUltimoTimbreEmpleado();
+        }, 800);
+
         return;
       }
 
       if (resultado.enviados === 0 && resultado.fallidos > 0) {
-        this.abrirToas(resultado.mensaje, 'warning', 4500, 'middle');
+        await this.abrirToas(resultado.mensaje, 'warning', 4500, 'middle');
       }
 
     } catch {
-      this.abrirToas(
+      await this.abrirToas(
         'No se pudieron sincronizar los timbres pendientes. Intente nuevamente más tarde.',
         'warning',
         4500,

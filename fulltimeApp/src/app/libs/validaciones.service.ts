@@ -1207,4 +1207,47 @@ export class ValidacionesService {
         return [];
     }
 
+
+    /** ******************************************************************** **
+     ** **                 METODO PARA CONTROLAR INGRESO DE NUMEROS          **
+     ** ** ***************************************************************** **/
+
+    IngresarSoloNumeros(event: any): boolean {
+        const key = event?.key ?? '';
+
+        const teclasPermitidas = [
+            'Backspace',
+            'Enter',
+            'Tab',
+            'ArrowLeft',
+            'ArrowRight',
+            'Delete'
+        ];
+
+        const esNumero = /^\d$/.test(key);
+
+        if (esNumero || teclasPermitidas.includes(key)) {
+            return true;
+        }
+
+        event.preventDefault();
+
+        this.abrirToast(
+            'No se admite el ingreso de letras. Use solo números.',
+            'warning'
+        );
+
+        return false;
+    }
+
+    async abrirToast(mensaje: string, color: string = 'primary') {
+        const toast = await this.toastController.create({
+            message: mensaje,
+            duration: 2500,
+            color,
+            position: 'middle'
+        });
+
+        await toast.present();
+    }
 }

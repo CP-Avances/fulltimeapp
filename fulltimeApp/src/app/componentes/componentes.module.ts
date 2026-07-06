@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 import { NavegadorAdminComponent } from './navegador-admin/navegador-admin.component';
@@ -16,6 +16,7 @@ import { RangoFechasComponent } from './rango-fechas/rango-fechas.component';
 import { CloseModalComponent } from './close-modal/close-modal.component';
 import { RefreshInfoComponent } from './refresh-info/refresh-info.component';
 import { ListaNotificacionComponent } from './lista-notificaciones/lista-notificacion.component';
+import { EditarTimbreModalComponent } from './editar-timbre-modal/editar-timbre-modal.component';
 
 
 @NgModule({
@@ -27,6 +28,7 @@ import { ListaNotificacionComponent } from './lista-notificaciones/lista-notific
         ListaEmpleadosComponent,
         ListaNotificacionComponent,
         RangoFechasComponent,
+        EditarTimbreModalComponent,
     ],
     exports: [
         NavegadorAdminComponent,
@@ -36,13 +38,15 @@ import { ListaNotificacionComponent } from './lista-notificaciones/lista-notific
         ListaEmpleadosComponent,
         ListaNotificacionComponent,
         RangoFechasComponent,
+        EditarTimbreModalComponent,
     ],
     imports: [
         CommonModule,
         IonicModule,
         FormsModule,
         RouterModule,
-        NgxPaginationModule
+        NgxPaginationModule,
+        ReactiveFormsModule
     ],
     providers: [
         DataUserLoggedService,

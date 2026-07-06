@@ -74,7 +74,8 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
     justificarTimbres: false,
     timbresEmpleados: false,
     reporteTimbres: false,
-    aprobaciones: false
+    aprobaciones: false,
+    actualizarTimbres: false,
   };
 
   private unsubscribeNotificacion?: () => void;
@@ -376,7 +377,9 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
         'Registrar Timbres',
         'Ver Timbres',
         'Reporte Timbres',
-        'Aprobaciones'
+        'Aprobaciones',
+        'Actualizar Timbres'
+
       ]
     };
 
@@ -388,6 +391,7 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
         this.permisosRol.timbresEmpleados = this.tienePermiso(res, 'Ver Timbres');
         this.permisosRol.reporteTimbres = this.tienePermiso(res, 'Reporte Timbres');
         this.permisosRol.aprobaciones = this.tienePermiso(res, 'Aprobaciones');
+        this.permisosRol.actualizarTimbres = this.tienePermiso(res, 'Actualizar Timbres');
       },
       error: () => {
         this.permisosRol = {
@@ -396,7 +400,8 @@ export class NavegadorAdminComponent implements OnInit, OnDestroy {
           justificarTimbres: false,
           timbresEmpleados: false,
           reporteTimbres: false,
-          aprobaciones: false
+          aprobaciones: false,
+          actualizarTimbres: false,
         };
       }
     });

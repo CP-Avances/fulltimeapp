@@ -3,10 +3,10 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { AutenticacionGuard } from "./guards/autenticacion.guard";
 
 const routes: Routes = [
-  { 
-    path: '', 
-    redirectTo: 'login', 
-    pathMatch: 'full' 
+  {
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full'
   },
   {
     path: 'login',
@@ -26,12 +26,18 @@ const routes: Routes = [
   },
   {
     path: 'modals',
-    loadChildren: () => import('./modals/modals.module').then( m => m.ModalsPageModule)
+    loadChildren: () => import('./modals/modals.module').then(m => m.ModalsPageModule)
   },
   {
     path: 'aprobaciones',
-    loadChildren: () => import('./pages/paginas-admin/aprobaciones/aprobaciones.module').then( m => m.AprobacionesPageModule)
-  }
+    loadChildren: () => import('./pages/paginas-admin/aprobaciones/aprobaciones.module').then(m => m.AprobacionesPageModule)
+  },
+  {
+    path: 'actualizar-timbres',
+    loadChildren: () => import('./pages/actualizar-timbres/actualizar-timbres.module').then(m => m.ActualizarTimbresPageModule),
+    canActivate: [AutenticacionGuard]
+  },
+
 ];
 @NgModule({
   imports: [
@@ -39,4 +45,4 @@ const routes: Routes = [
   ],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }
