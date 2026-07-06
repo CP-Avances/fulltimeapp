@@ -30,6 +30,22 @@ export interface Timbre {
     
 }
 
-
+export interface ITimbreFechaEmpleadoRow {
+    empleado: string;
+    id_empleado: number;
+    fecha_hora_timbre: string;
+    accion: string | null;
+    tecla_funcion: string | null;
+    observacion: string | null;
+    latitud: string | null;
+    longitud: string | null;
+    codigo: string;
+    id_reloj: number | null;
+    ubicacion: string | null;
+    fecha_hora_timbre_servidor: string | null;
+    dispositivo_timbre: string | null;
+    id: number;
+    fecha_hora_timbre_validado: string | null;
+}
 
 

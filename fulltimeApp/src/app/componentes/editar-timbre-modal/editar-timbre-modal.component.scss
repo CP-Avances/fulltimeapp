@@ -1,0 +1,267 @@
+.editar-header {
+  ion-toolbar {
+    --background: #0f4c81;
+    --color: #ffffff;
+    --border-width: 0;
+  }
+
+  ion-title {
+    font-size: 17px;
+    font-weight: 900;
+  }
+
+  ion-button {
+    --color: #ffffff;
+  }
+
+  ion-icon {
+    font-size: 24px;
+  }
+}
+
+.editar-content {
+  --background: #eef4fb;
+  --padding-bottom: 16px;
+}
+
+.info-timbre-card {
+  margin: 14px;
+  padding: 16px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #0f4c81, #1476b8);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 12px 26px rgba(15, 76, 129, 0.28);
+
+  .info-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    ion-icon {
+      font-size: 30px;
+      color: #ffffff;
+    }
+  }
+
+  .info-text {
+    min-width: 0;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 900;
+    line-height: 1.25;
+  }
+
+  p {
+    margin: 4px 0 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.88);
+  }
+}
+
+.detalle-card,
+.form-card {
+  margin: 12px 14px;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.detalle-card {
+  ion-card-content {
+    padding: 14px;
+  }
+}
+
+.detalle-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e2e8f0;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  span {
+    font-size: 12px;
+    font-weight: 800;
+    color: #64748b;
+  }
+
+  strong {
+    font-size: 12px;
+    font-weight: 900;
+    color: #0f172a;
+    text-align: right;
+  }
+}
+
+.form-card {
+  ion-card-header {
+    padding: 16px 16px 4px;
+  }
+
+  ion-card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #0f172a;
+    font-size: 17px;
+    font-weight: 900;
+
+    ion-icon {
+      color: #0f4c81;
+    }
+  }
+
+  ion-card-content {
+    padding: 12px 14px 16px;
+  }
+}
+
+.input-item {
+  --background: #f8fafc;
+  --border-radius: 16px;
+  --padding-start: 12px;
+  --inner-padding-end: 12px;
+  --min-height: 64px;
+
+  margin-bottom: 11px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+
+  ion-icon[slot='start'] {
+    margin-right: 8px;
+    color: #0f4c81;
+    font-size: 21px;
+  }
+
+  ion-label {
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  ion-select,
+  ion-textarea {
+    --color: #0f172a;
+    --placeholder-color: #94a3b8;
+    --placeholder-opacity: 1;
+    font-size: 14px;
+    font-weight: 600;
+  }
+}
+
+.observacion-item {
+  align-items: flex-start;
+
+  ion-icon[slot='start'] {
+    margin-top: 20px;
+  }
+}
+
+.estado-cargando-modal {
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  ion-spinner {
+    color: #0f4c81;
+    margin-bottom: 12px;
+  }
+
+  p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 700;
+  }
+}
+
+.editar-footer {
+  ion-toolbar {
+    --background: #ffffff;
+    --border-width: 1px 0 0 0;
+    --border-color: #e2e8f0;
+    padding: 8px 14px;
+  }
+}
+
+.btn-guardar {
+  --background: #0f4c81;
+  --background-activated: #0b3a63;
+  --color: #ffffff;
+  --box-shadow: 0 8px 16px rgba(15, 76, 129, 0.25);
+
+  height: 46px;
+  font-weight: 900;
+  text-transform: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .editar-content {
+    --background: #0f172a;
+  }
+
+  .detalle-card,
+  .form-card {
+    background: #1e293b;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+  }
+
+  .detalle-row {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+
+    span {
+      color: #cbd5e1;
+    }
+
+    strong {
+      color: #f8fafc;
+    }
+  }
+
+  .form-card ion-card-title {
+    color: #f8fafc;
+  }
+
+  .input-item {
+    --background: #111827;
+    border-color: rgba(255, 255, 255, 0.08);
+
+    ion-label {
+      color: #cbd5e1;
+    }
+
+    ion-select,
+    ion-textarea {
+      --color: #f8fafc;
+      --placeholder-color: #94a3b8;
+    }
+  }
+
+  .estado-cargando-modal p {
+    color: #cbd5e1;
+  }
+
+  .editar-footer ion-toolbar {
+    --background: #1e293b;
+    --border-color: rgba(255, 255, 255, 0.08);
+  }
+}

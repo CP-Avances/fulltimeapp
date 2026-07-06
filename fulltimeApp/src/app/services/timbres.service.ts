@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { ApiResponse } from './feriados.service';
+import { map } from 'rxjs';
+import { ITimbreFechaEmpleadoRow } from '../interfaces/Timbre';
 
 @Injectable({
   providedIn: 'root'
@@ -35,4 +38,18 @@ export class TimbresService {
     );
   }
 
+  // METODO PARA BUSCAR TIMBRES SEGUN CRITERIOS DE BUSQUEDA   **USADO**
+  ObtenerTimbresFechaEmple(datos: any) {
+    const params = new HttpParams()
+      .set('codigo', datos.codigo)
+      .set('identificacion', datos.identificacion)
+      .set('fecha', datos.fecha)
+    return this.http.get<ApiResponse<ITimbreFechaEmpleadoRow[]>>(`${this.apiUrl}/timbres/timbresfechaempleado`, { params })
+      .pipe(map(res => res.data));
+  }
+
+  // METODO PARA EDITAR TIMBRES    **USADO**
+  EditarTimbreEmpleado(data: any) {
+    return this.http.put(`${this.apiUrl}/timbres/timbre/editar`, data);
+  }
 }

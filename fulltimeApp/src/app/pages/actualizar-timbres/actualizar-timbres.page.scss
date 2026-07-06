@@ -1,0 +1,693 @@
+/* ============================================================
+   HEADER
+============================================================ */
+
+.timbres-header {
+  ion-toolbar {
+    --background: #0f4c81;
+    --color: #ffffff;
+    --border-width: 0;
+  }
+
+  ion-title {
+    font-size: 17px;
+    font-weight: 800;
+  }
+
+  ion-back-button {
+    --color: #ffffff;
+  }
+}
+
+/* ============================================================
+   CONTENT
+============================================================ */
+
+.actualizar-timbres-content {
+  --background: #eef4fb;
+  --padding-bottom: 24px;
+}
+
+/* ============================================================
+   INTRO
+============================================================ */
+
+.intro-card {
+  margin: 14px 14px 10px;
+  padding: 18px 16px;
+  border-radius: 22px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #0f4c81, #1476b8);
+  box-shadow: 0 12px 26px rgba(15, 76, 129, 0.28);
+  text-align: center;
+
+  .intro-icon {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 10px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon {
+      font-size: 34px;
+      color: #ffffff;
+    }
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 900;
+    line-height: 1.2;
+  }
+
+  p {
+    margin: 8px 0 0;
+    font-size: 13px;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+/* ============================================================
+   BUSQUEDA CARD
+============================================================ */
+
+.busqueda-card {
+  margin: 14px;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.09);
+  overflow: hidden;
+
+  ion-card-header {
+    padding: 16px 16px 6px;
+  }
+
+  ion-card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #0f172a;
+    font-size: 17px;
+    font-weight: 900;
+
+    ion-icon {
+      color: #0f4c81;
+      font-size: 21px;
+    }
+  }
+
+  ion-card-subtitle {
+    margin-top: 6px;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  ion-card-content {
+    padding: 12px 14px 16px;
+  }
+}
+
+/* ============================================================
+   INPUTS
+============================================================ */
+
+.input-item {
+  --background: #f8fafc;
+  --border-radius: 16px;
+  --padding-start: 12px;
+  --inner-padding-end: 12px;
+  --min-height: 64px;
+
+  margin-bottom: 11px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+
+  ion-icon[slot="start"] {
+    margin-right: 8px;
+    color: #0f4c81;
+    font-size: 21px;
+  }
+
+  ion-label {
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  ion-input {
+    --color: #0f172a;
+    --placeholder-color: #94a3b8;
+    --placeholder-opacity: 1;
+    font-size: 14px;
+    font-weight: 600;
+  }
+}
+
+/* ============================================================
+   AUTOCOMPLETE
+============================================================ */
+
+.autocomplete-list {
+  margin: -5px 0 12px;
+  padding: 6px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.autocomplete-item {
+  --background: #ffffff;
+  --border-radius: 14px;
+  --padding-start: 10px;
+  --inner-padding-end: 8px;
+  --min-height: 58px;
+
+  margin-bottom: 6px;
+  border-radius: 14px;
+  border: 1px solid #edf2f7;
+
+  ion-icon {
+    color: #0f4c81;
+    font-size: 24px;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 800;
+    color: #0f172a;
+  }
+
+  p {
+    margin: 4px 0 0;
+    font-size: 11px;
+    color: #64748b;
+  }
+}
+
+/* ============================================================
+   BOTONES FORM
+============================================================ */
+
+.acciones-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.btn-buscar {
+  --background: #0f4c81;
+  --background-activated: #0b3a63;
+  --color: #ffffff;
+  --box-shadow: 0 8px 16px rgba(15, 76, 129, 0.25);
+
+  height: 46px;
+  font-weight: 800;
+  text-transform: none;
+}
+
+.btn-limpiar {
+  --border-color: #0f4c81;
+  --color: #0f4c81;
+  --background: #ffffff;
+
+  height: 44px;
+  font-weight: 800;
+  text-transform: none;
+}
+
+/* ============================================================
+   ESTADOS
+============================================================ */
+
+.estado-card,
+.sin-resultados-card {
+  margin: 14px;
+  padding: 20px 16px;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  text-align: center;
+
+  ion-spinner {
+    margin-bottom: 10px;
+    color: #0f4c81;
+  }
+
+  p {
+    margin: 8px 0 0;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  ion-progress-bar {
+    margin-top: 14px;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+}
+
+.sin-resultados-card {
+  .sin-resultados-icon {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 10px;
+    border-radius: 18px;
+    background: #fff7ed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon {
+      font-size: 34px;
+      color: #f97316;
+    }
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 900;
+    color: #0f172a;
+  }
+}
+
+/* ============================================================
+   RESULTADOS
+============================================================ */
+
+.resultados-section {
+  margin: 4px 0 20px;
+}
+
+.resultados-header {
+  margin: 16px 16px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  span {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #0f4c81;
+  }
+
+  h2 {
+    margin: 2px 0 0;
+    font-size: 19px;
+    font-weight: 900;
+    color: #0f172a;
+  }
+
+  ion-badge {
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 900;
+  }
+}
+
+.timbre-card {
+  margin: 12px 14px;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+
+  ion-card-content {
+    padding: 14px;
+  }
+}
+
+.timbre-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.timbre-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: rgba(15, 76, 129, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon {
+    font-size: 27px;
+    color: #0f4c81;
+  }
+}
+
+.timbre-info-principal {
+  min-width: 0;
+
+  h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 15px;
+    font-weight: 900;
+    line-height: 1.25;
+  }
+
+  p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+  }
+}
+
+.timbre-fecha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: 16px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 800;
+
+  ion-icon {
+    color: #0f4c81;
+    font-size: 17px;
+  }
+}
+
+/* ============================================================
+   DETALLE CARD
+============================================================ */
+
+.detalle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.detalle-item {
+  min-height: 62px;
+  padding: 10px;
+  border-radius: 15px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+
+  span {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 10.5px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+  }
+
+  strong {
+    display: block;
+    color: #0f172a;
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1.25;
+    word-break: break-word;
+  }
+}
+
+/* ============================================================
+   OBSERVACION / NOVEDAD
+============================================================ */
+
+.observacion-box,
+.novedad-box {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 15px;
+
+  ion-icon {
+    margin-top: 2px;
+    flex-shrink: 0;
+    font-size: 18px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+}
+
+.observacion-box {
+  background: #eff6ff;
+  color: #1e40af;
+
+  ion-icon {
+    color: #2563eb;
+  }
+}
+
+.novedad-box {
+  background: #fff7ed;
+  color: #9a3412;
+
+  ion-icon {
+    color: #f97316;
+  }
+}
+
+/* ============================================================
+   ACCIONES CARD
+============================================================ */
+
+.acciones-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+
+  ion-button {
+    height: 38px;
+    text-transform: none;
+    font-size: 12px;
+    font-weight: 900;
+  }
+}
+
+.btn-ver {
+  --border-color: #0f4c81;
+  --color: #0f4c81;
+}
+
+.btn-editar {
+  --background: #0f4c81;
+  --background-activated: #0b3a63;
+  --color: #ffffff;
+}
+
+/* ============================================================
+   MODAL GLOBAL TIMBRE
+============================================================ */
+
+:host ::ng-deep .modal-timbre {
+  --width: 94%;
+  --height: 88%;
+  --border-radius: 22px;
+  --box-shadow: 0 18px 40px rgba(15, 23, 42, 0.35);
+}
+
+:host ::ng-deep .modal-timbre::part(content) {
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+/* ============================================================
+   DARK MODE
+============================================================ */
+
+@media (prefers-color-scheme: dark) {
+  .actualizar-timbres-content {
+    --background: #0f172a;
+  }
+
+  .intro-card {
+    background: linear-gradient(135deg, #0f4c81, #075985);
+  }
+
+  .busqueda-card,
+  .estado-card,
+  .sin-resultados-card,
+  .timbre-card {
+    background: #1e293b;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+  }
+
+  .busqueda-card {
+    ion-card-title,
+    ion-card-subtitle {
+      color: #f8fafc;
+    }
+
+    ion-card-subtitle {
+      color: #cbd5e1;
+    }
+  }
+
+  .input-item {
+    --background: #111827;
+    border-color: rgba(255, 255, 255, 0.08);
+
+    ion-label {
+      color: #cbd5e1;
+    }
+
+    ion-input {
+      --color: #f8fafc;
+      --placeholder-color: #94a3b8;
+    }
+  }
+
+  .autocomplete-list {
+    background: #111827;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .autocomplete-item {
+    --background: #1e293b;
+    border-color: rgba(255, 255, 255, 0.08);
+
+    h3 {
+      color: #f8fafc;
+    }
+
+    p {
+      color: #cbd5e1;
+    }
+  }
+
+  .btn-limpiar {
+    --background: #1e293b;
+  }
+
+  .sin-resultados-card h2,
+  .resultados-header h2,
+  .timbre-info-principal h3 {
+    color: #f8fafc;
+  }
+
+  .estado-card p,
+  .sin-resultados-card p,
+  .timbre-info-principal p {
+    color: #cbd5e1;
+  }
+
+  .timbre-fecha {
+    background: #111827;
+    color: #f8fafc;
+  }
+
+  .detalle-item {
+    background: #111827;
+    border-color: rgba(255, 255, 255, 0.08);
+
+    span {
+      color: #cbd5e1;
+    }
+
+    strong {
+      color: #f8fafc;
+    }
+  }
+
+  .observacion-box {
+    background: rgba(37, 99, 235, 0.16);
+    color: #bfdbfe;
+  }
+
+  .novedad-box {
+    background: rgba(249, 115, 22, 0.16);
+    color: #fed7aa;
+  }
+
+  :host ::ng-deep .modal-timbre::part(content) {
+    background: #1e293b;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE PEQUEÑO
+============================================================ */
+
+@media (max-width: 380px) {
+  .intro-card {
+    padding: 15px 13px;
+
+    h1 {
+      font-size: 18px;
+    }
+
+    p {
+      font-size: 12px;
+    }
+  }
+
+  .detalle-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .acciones-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-height: 720px) {
+  .intro-card {
+    padding: 14px;
+
+    .intro-icon {
+      width: 50px;
+      height: 50px;
+
+      ion-icon {
+        font-size: 30px;
+      }
+    }
+
+    h1 {
+      font-size: 18px;
+    }
+  }
+
+  .busqueda-card ion-card-content {
+    padding-bottom: 12px;
+  }
+
+  .input-item {
+    --min-height: 58px;
+    margin-bottom: 9px;
+  }
+}
+
+.acciones-card.editar-unico {
+  grid-template-columns: 1fr;
+
+  .btn-editar {
+    width: 100%;
+  }
+}

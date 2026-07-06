@@ -65,7 +65,7 @@ export class InformacionAdminPage implements OnInit {
   }
 
   public get app_info(): any {
-    return localStorage.getItem("version")
+    return localStorage.getItem("version_movil")
   }
 
   ver: boolean = true;

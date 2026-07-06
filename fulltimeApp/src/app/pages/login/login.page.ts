@@ -222,6 +222,7 @@ export class LoginPage implements OnInit {
     localStorage.setItem('UCedula', datos.cedula);
     localStorage.setItem('codigo', datos.codigo);
     localStorage.setItem('caducidad_licencia', datos.caducidad_licencia);
+    localStorage.setItem('version_movil', datos.version_movil);
     //APP INFORMACION
     localStorage.setItem('ruc', datos.ruc);
     localStorage.setItem('version', datos.version);

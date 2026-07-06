@@ -1,0 +1,183 @@
+<ion-header class="editar-header">
+  <ion-toolbar>
+    <ion-title>Editar acción</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="cerrar()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="editar-content">
+
+  <ng-container *ngIf="EditartimbreForm; else cargandoFormulario">
+
+    <!-- INFORMACIÓN DEL TIMBRE -->
+    <section class="info-timbre-card">
+
+      <div class="info-icon">
+        <ion-icon name="finger-print-outline"></ion-icon>
+      </div>
+
+      <div class="info-text">
+        <h2>{{ datosTimbre?.empleado || datosTimbre?.nombre || 'Empleado' }}</h2>
+        <p>Código: {{ datosTimbre?.codigo || 'N/A' }}</p>
+      </div>
+
+    </section>
+
+    <!-- DETALLE ACTUAL -->
+    <ion-card class="detalle-card">
+      <ion-card-content>
+
+        <div class="detalle-row">
+          <span>Fecha</span>
+          <strong>{{ datosTimbre?.fecha_ || datosTimbre?.fecha || 'N/A' }}</strong>
+        </div>
+
+        <div class="detalle-row">
+          <span>Hora</span>
+          <strong>{{ datosTimbre?.hora_ || datosTimbre?.hora || 'N/A' }}</strong>
+        </div>
+
+        <div class="detalle-row">
+          <span>Acción actual</span>
+          <strong>
+            {{ datosTimbre?.accion_ || datosTimbre?.accion || 'N/A' }}
+          </strong>
+        </div>
+
+        <div class="detalle-row">
+          <span>Tecla actual</span>
+          <strong>
+            {{ datosTimbre?.tecla_funcion || 'N/A' }}
+            <ng-container *ngIf="datosTimbre?.tecla_funcion_">
+              - {{ datosTimbre?.tecla_funcion_ }}
+            </ng-container>
+          </strong>
+        </div>
+
+      </ion-card-content>
+    </ion-card>
+
+    <!-- FORMULARIO -->
+    <form [formGroup]="EditartimbreForm">
+
+      <ion-card class="form-card">
+        <ion-card-header>
+          <ion-card-title>
+            <ion-icon name="create-outline"></ion-icon>
+            Nueva acción del timbre
+          </ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content>
+
+          <!-- ACCIÓN -->
+          <ion-item class="input-item" lines="none">
+            <ion-icon name="swap-horizontal-outline" slot="start"></ion-icon>
+
+            <ion-label position="stacked">
+              Acción
+            </ion-label>
+
+            <ion-select
+              formControlName="accionTimbre"
+              interface="popover"
+              placeholder="Seleccione acción"
+              (ionChange)="SelectedAccion($event)">
+
+              <ion-select-option
+                *ngFor="let accion of acciones"
+                [value]="accion.item">
+                {{ accion.text }}
+              </ion-select-option>
+
+            </ion-select>
+          </ion-item>
+
+          <!-- TECLA FUNCIÓN -->
+          <ion-item class="input-item" lines="none">
+            <ion-icon name="keypad-outline" slot="start"></ion-icon>
+
+            <ion-label position="stacked">
+              Tecla función
+            </ion-label>
+
+            <ion-select
+              formControlName="teclaFunTimbre"
+              interface="popover"
+              placeholder="Seleccione tecla"
+              (ionChange)="SelectedTecla($event)">
+
+              <ion-select-option
+                *ngFor="let tecla of tecl_funcio"
+                [value]="tecla.value">
+                {{ tecla.value }}
+              </ion-select-option>
+
+            </ion-select>
+          </ion-item>
+
+          <!-- OBSERVACIÓN -->
+          <ion-item class="input-item observacion-item" lines="none">
+            <ion-icon name="chatbox-ellipses-outline" slot="start"></ion-icon>
+
+            <ion-label position="stacked">
+              Observación
+            </ion-label>
+
+            <ion-textarea
+              formControlName="ObservacionForm"
+              placeholder="Ingrese el motivo del cambio"
+              autoGrow="true"
+              rows="4">
+            </ion-textarea>
+          </ion-item>
+
+        </ion-card-content>
+      </ion-card>
+
+    </form>
+
+  </ng-container>
+
+  <ng-template #cargandoFormulario>
+    <div class="estado-cargando-modal">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando información del timbre...</p>
+    </div>
+  </ng-template>
+
+</ion-content>
+
+<ion-footer class="editar-footer">
+  <ion-toolbar>
+
+    <ion-button
+      expand="block"
+      shape="round"
+      class="btn-guardar"
+      [disabled]="!EditartimbreForm || EditartimbreForm.invalid || enviando"
+      (click)="EnviarDatosTimbre(EditartimbreForm.value)">
+
+      <ion-spinner
+        *ngIf="enviando"
+        name="crescent"
+        slot="start">
+      </ion-spinner>
+
+      <ion-icon
+        *ngIf="!enviando"
+        name="save-outline"
+        slot="start">
+      </ion-icon>
+
+      {{ enviando ? 'Guardando...' : 'Guardar cambios' }}
+
+    </ion-button>
+
+  </ion-toolbar>
+</ion-footer>

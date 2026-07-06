@@ -1,0 +1,269 @@
+<ion-header class="timbres-header">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/reloj/bienvenido"></ion-back-button>
+    </ion-buttons>
+
+    <ion-title>Actualizar timbres</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen class="actualizar-timbres-content">
+
+  <!-- ENCABEZADO -->
+  <section class="intro-card">
+    <div class="intro-icon">
+      <ion-icon name="finger-print-outline"></ion-icon>
+    </div>
+
+    <h1>Actualización de datos de timbres</h1>
+    <p>
+      Consulte los timbres registrados por empleado, código o identificación.
+    </p>
+  </section>
+
+  <!-- FORMULARIO DE BÚSQUEDA -->
+  <form [formGroup]="formulario">
+
+    <ion-card class="busqueda-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="search-outline"></ion-icon>
+          Criterios de búsqueda
+        </ion-card-title>
+
+        <ion-card-subtitle>
+          Complete al menos un dato del empleado y seleccione la fecha de consulta.
+        </ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <!-- EMPLEADO -->
+        <ion-item class="input-item" lines="none">
+          <ion-icon name="person-outline" slot="start"></ion-icon>
+
+          <ion-label position="stacked">
+            Empleado
+          </ion-label>
+
+          <ion-input type="text" formControlName="funcionarioForm" placeholder="Buscar por nombre" autocomplete="off">
+          </ion-input>
+        </ion-item>
+
+        <!-- LISTA AUTOCOMPLETE -->
+        <ion-list class="autocomplete-list" *ngIf="funcionarioF.value && (filtroNombre | async) as empleadosFiltrados">
+
+          <ion-item button detail="false" class="autocomplete-item"
+            *ngFor="let empleado of empleadosFiltrados | slice:0:6" (click)="seleccionarEmpleado(empleado)">
+
+            <ion-icon name="person-circle-outline" slot="start"></ion-icon>
+
+            <ion-label>
+              <h3>{{ empleado.empleado }}</h3>
+              <p>
+                Código: {{ empleado.codigo || 'N/A' }}
+                <span *ngIf="empleado.identificacion">
+                  · CI: {{ empleado.identificacion }}
+                </span>
+              </p>
+            </ion-label>
+
+          </ion-item>
+
+        </ion-list>
+
+        <!-- IDENTIFICACIÓN -->
+        <ion-item class="input-item" lines="none">
+          <ion-icon name="card-outline" slot="start"></ion-icon>
+
+          <ion-label position="stacked">
+            Identificación
+          </ion-label>
+
+          <ion-input type="tel" inputmode="numeric" pattern="[0-9]*" formControlName="cedulaForm"
+            placeholder="Ingrese identificación" (keypress)="validar.IngresarSoloNumeros($event)">
+          </ion-input>
+        </ion-item>
+
+        <!-- CÓDIGO -->
+        <ion-item class="input-item" lines="none">
+          <ion-icon name="barcode-outline" slot="start"></ion-icon>
+
+          <ion-label position="stacked">
+            Código
+          </ion-label>
+
+          <ion-input type="tel" inputmode="numeric" pattern="[0-9]*" formControlName="codigoForm"
+            placeholder="Ingrese código" (keypress)="validar.IngresarSoloNumeros($event)">
+          </ion-input>
+        </ion-item>
+
+        <!-- FECHA -->
+        <ion-item class="input-item" lines="none">
+          <ion-icon name="calendar-outline" slot="start"></ion-icon>
+
+          <ion-label position="stacked">
+            Fecha de consulta
+          </ion-label>
+
+          <ion-input type="date" formControlName="fechaForm">
+          </ion-input>
+        </ion-item>
+
+
+        <!-- BOTONES -->
+        <div class="acciones-form">
+
+          <ion-button expand="block" shape="round" class="btn-buscar" [disabled]="cargando || !formulario.valid"
+            (click)="BuscarTimbresFecha(formulario.value)">
+
+            <ion-spinner *ngIf="cargando" name="crescent" slot="start">
+            </ion-spinner>
+
+            <ion-icon *ngIf="!cargando" name="search-outline" slot="start">
+            </ion-icon>
+
+            {{ cargando ? 'Buscando...' : 'Buscar' }}
+
+          </ion-button>
+
+          <ion-button expand="block" shape="round" fill="outline" class="btn-limpiar" [disabled]="cargando"
+            (click)="LimpiarCampos()">
+
+            <ion-icon name="refresh-outline" slot="start"></ion-icon>
+            Limpiar
+
+          </ion-button>
+
+        </div>
+
+      </ion-card-content>
+    </ion-card>
+
+  </form>
+
+  <!-- CARGANDO -->
+  <section class="estado-card" *ngIf="cargando">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Consultando timbres, por favor espere...</p>
+    <ion-progress-bar type="indeterminate"></ion-progress-bar>
+  </section>
+
+  <!-- SIN RESULTADOS -->
+  <section class="sin-resultados-card" *ngIf="mostrarResultados && !cargando && timbres.length === 0">
+
+    <div class="sin-resultados-icon">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+    </div>
+
+    <h2>Sin timbres encontrados</h2>
+    <p>No existen registros para los criterios ingresados.</p>
+
+  </section>
+
+  <!-- RESULTADOS -->
+  <section class="resultados-section" *ngIf="mostrarResultados && !cargando && timbres.length > 0">
+
+    <div class="resultados-header">
+      <div>
+        <span>Resultados</span>
+        <h2>Timbres encontrados</h2>
+      </div>
+
+      <ion-badge color="primary">
+        {{ timbres.length }}
+      </ion-badge>
+    </div>
+
+    <ion-card class="timbre-card" *ngFor="let t of timbres">
+
+      <ion-card-content>
+
+        <!-- CABECERA TIMBRE -->
+        <div class="timbre-card-header">
+
+          <div class="timbre-icon">
+            <ion-icon name="time-outline"></ion-icon>
+          </div>
+
+          <div class="timbre-info-principal">
+            <h3>{{ t.empleado }}</h3>
+            <p>Código: {{ t.codigo }}</p>
+          </div>
+
+        </div>
+
+        <!-- FECHA Y HORA -->
+        <div class="timbre-fecha">
+          <ion-icon name="calendar-outline"></ion-icon>
+          <span>{{ t.fecha }}</span>
+
+          <ion-icon name="alarm-outline"></ion-icon>
+          <span>{{ t.hora }}</span>
+        </div>
+
+        <!-- DETALLES -->
+        <div class="detalle-grid">
+
+          <div class="detalle-item">
+            <span>Acción</span>
+            <strong>{{ t.accion_ }} ({{ t.accion }})</strong>
+          </div>
+
+          <div class="detalle-item">
+            <span>Tecla función</span>
+            <strong>{{ t.tecla_funcion }} - {{ t.tecla_funcion_ }}</strong>
+          </div>
+
+          <div class="detalle-item">
+            <span>Código reloj</span>
+            <strong>{{ t.id_reloj || 'N/A' }}</strong>
+          </div>
+
+          <div class="detalle-item">
+            <span>Ubicación</span>
+            <strong>
+              <ng-container *ngIf="t.latitud && t.longitud; else sinUbicacion">
+                {{ t.latitud }}, {{ t.longitud }}
+              </ng-container>
+
+              <ng-template #sinUbicacion>
+                Sin ubicación
+              </ng-template>
+            </strong>
+          </div>
+
+        </div>
+
+        <!-- OBSERVACIÓN -->
+        <div class="observacion-box" *ngIf="t.observacion">
+          <ion-icon name="chatbox-ellipses-outline"></ion-icon>
+          <p>{{ t.observacion }}</p>
+        </div>
+
+        <!-- NOVEDADES CONEXIÓN -->
+        <div class="novedad-box" *ngIf="t.novedades_conexion">
+          <ion-icon name="cloud-offline-outline"></ion-icon>
+          <p>{{ t.novedades_conexion }}</p>
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="acciones-card editar-unico">
+
+          <ion-button size="small" shape="round" class="btn-editar" (click)="AbrirVentanaEditar(t)">
+
+            <ion-icon name="create-outline" slot="start"></ion-icon>
+            Editar acción
+
+          </ion-button>
+
+        </div>
+
+      </ion-card-content>
+
+    </ion-card>
+
+  </section>
+
+</ion-content>

@@ -100,6 +100,14 @@
                 <ion-label>Timbres</ion-label>
             </ion-item>
 
+            <ion-item [routerLink]="['/actualizar-timbres']" (click)="closeAdmin()" class="menu-item"
+                *ngIf="permisosRol.actualizarTimbres">
+                <div class="menu-icon" slot="start">
+                    <ion-icon name="people-outline"></ion-icon>
+                </div>
+                <ion-label>Actualizar Timbres</ion-label>
+            </ion-item>
+
             <ion-item [routerLink]="['/reloj/comunicado']" (click)="closeAdmin()" *ngIf="permisosRol.comunicados"
                 class="menu-item">
                 <div class="menu-icon" slot="start">
