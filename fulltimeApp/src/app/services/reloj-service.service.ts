@@ -53,16 +53,16 @@ export class RelojServiceService {
 
 
   // VERIFICAR EXISTENCIA DE INICIO DE SESION
-async estaLogueado(): Promise<boolean> {
-  const token = await this.sessionStorageService.getToken();
+  async estaLogueado(): Promise<boolean> {
+    const token = await this.sessionStorageService.getToken();
 
-  if (!token || token === 'null' || token === 'undefined') {
-    return false;
+    if (!token || token === 'null' || token === 'undefined') {
+      return false;
+    }
+
+    return true;
   }
 
-  return true;
-}
-  
   // VERIFICAR EXISTENCIA DE ROL
   existeRol() {
     return !!localStorage.getItem('rol');
@@ -76,15 +76,15 @@ async estaLogueado(): Promise<boolean> {
   }
 
   // OBTENER TOKEN
-async getToken() {
-  const token = await this.sessionStorageService.getToken();
+  async getToken() {
+    const token = await this.sessionStorageService.getToken();
 
-  if (!token || token === 'null' || token === 'undefined') {
-    return null;
+    if (!token || token === 'null' || token === 'undefined') {
+      return null;
+    }
+
+    return token;
   }
-
-  return token;
-}
 
   // METODO PARA CERRAR SESION
   async cerrarSesion() {
@@ -125,4 +125,21 @@ async getToken() {
     return this.http.get<any>(this.apiUrl + '/timbres/timbreEmpleado/' + codigo);
   }
 
+  // METODO PARA BUSCAR POR WEL CODIGO DEL EMPLEADO LOS TIMBRES
+  obtenerTimbresOptimizado(codigo: any) {
+    return this.http.get<any>(this.apiUrl + '/timbres/timbreEmpleado/optimizado/' + codigo);
+  }
+
+  verArchivoTimbre(
+    id: number,
+    campo: 'imagen' | 'documento',
+    modo: 'ver' | 'descargar' = 'ver'
+  ) {
+    return this.http.get(
+      `${this.apiUrl}/timbres/ver-documento/${id}/archivos/${encodeURIComponent(campo)}?modo=${modo}`,
+      {
+        responseType: 'blob'
+      }
+    );
+  }
 }

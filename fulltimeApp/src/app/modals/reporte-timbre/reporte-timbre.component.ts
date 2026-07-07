@@ -800,6 +800,7 @@ export class ReporteTimbreComponent implements OnInit {
   // METODO PARA ALMACENAR LA INFORMACION DE LOS TIMBRES PARA QUE SEAN MOSTRADOS EN PANTALLA 
   ExtraerDatos() {
     this.timbres = [];
+    this.pageActual = 1;
     let n = 0;
     let accionT = '';
     this.data_pdf.forEach((data: any) => {
@@ -866,4 +867,24 @@ export class ReporteTimbreComponent implements OnInit {
     this.verReporte = true;
   }
 
+
+  pageActual: number = 1;
+  itemsPorPagina: number = 10;
+
+  mostrarPaginacion(): boolean {
+    return this.timbres && this.timbres.length > this.itemsPorPagina;
+  }
+
+  public maxSize: number = 5;
+  public directionLinks: boolean = true;
+  public autoHide: boolean = true;
+  public responsive: boolean = true;
+
+  public labels: any = {
+    previousLabel: 'Anterior',
+    nextLabel: 'Siguiente',
+    screenReaderPaginationLabel: 'Paginación',
+    screenReaderPageLabel: 'Página',
+    screenReaderCurrentLabel: `Página actual`
+  };
 }

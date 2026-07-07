@@ -1,104 +1,517 @@
+/* =========================
+   GENERAL
+========================= */
+
+ion-content.reporte-content,
+ion-content {
+  --background: #eef3f8;
+  overflow-x: hidden;
+}
+
 .margenIzqTitulo {
   margin-left: 15%;
 }
 
-ion-content {
-  overflow-x: scroll;
+/* =========================
+   ENCABEZADO DEL REPORTE
+========================= */
 
-  .btn-reporte {
-    margin: 10px 0px
-  }
-
-  ;
-
-  ion-icon {
-    margin-right: 10px;
-  }
-
-  table {
-    margin-left: 4%;
-    width: 92%;
-    background-color: #ffffff;
-  }
-
-  .header-table {
-    background-color: #5270b4;
-    border: 1px solid #5270b4;
-    margin: 2%;
-    color: #ffffff;
-
-    th,
-    td {
-      text-align: center;
-      padding: 5px;
-      font-size: 8px;
-    }
-  }
-
-  .detail-table {
-    margin: 1%;
-
-    th,
-    td {
-      font-size: 5px;
-      text-align: center;
-      border-collapse: collapse;
-      padding: 0% 1% 0% 1%;
-    }
-
-    tr:nth-child(even) {
-      background-color: rgb(216, 215, 215);
-      border: 1px solid rgb(216, 215, 215);
-    }
-
-    tr:nth-child(odd) {
-      background-color: rgb(255, 255, 255);
-      border: 1px solid rgb(255, 255, 255);
-    }
-  }
+.reporte-header-card {
+  margin: 12px;
+  padding: 14px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.info {
-  margin: -2% 2% 2% 2%;
+.reporte-header-card ion-icon {
+  font-size: 34px;
+  color: #0f75bc;
+  margin-right: 0;
+}
+
+.reporte-header-card h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.reporte-header-card p {
+  margin: 4px 0 0 0;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* =========================
+   ESTADOS
+========================= */
+
+.estado-fechas,
+.estado-carga,
+.estado-vacio {
+  margin: 12px;
+  padding: 18px;
+  border-radius: 18px;
+  background: #ffffff;
+  text-align: center;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+}
+
+.estado-fechas ion-icon,
+.estado-vacio ion-icon {
+  font-size: 42px;
+  color: #0f75bc;
+  margin-right: 0;
+}
+
+.estado-fechas h3,
+.estado-vacio h3 {
+  margin: 8px 0 4px 0;
+  font-size: 17px;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.estado-fechas p,
+.estado-vacio p {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.estado-carga span {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.estado-carga ion-progress-bar {
+  margin-top: 12px;
+}
+
+/* =========================
+   ACCIONES REPORTE
+========================= */
+
+.acciones-reporte-card {
+  margin: 12px;
+  padding: 14px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.empleado-info,
+.periodo-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 800;
   text-align: center;
 }
 
+.periodo-info {
+  margin-top: 6px;
+  color: #64748b;
+}
+
+.empleado-info ion-icon,
+.periodo-info ion-icon {
+  color: #0f75bc;
+  font-size: 18px;
+  margin-right: 0;
+}
+
+.botones-reporte-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.botones-reporte-grid ion-button,
+.btn-reporte {
+  margin: 0;
+  text-transform: none;
+  font-weight: 900;
+  --border-radius: 14px;
+}
+
+/* =========================
+   RESUMEN
+========================= */
+
+.info {
+  margin: 8px 12px;
+  text-align: center;
+}
+
+.info h5,
 h5 {
-  font-size: 60%;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 900;
+  color: #0f75bc;
+}
+
+.resumen-reporte {
+  margin: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.resumen-reporte div {
+  padding: 12px;
+  border-radius: 16px;
+  background: #ffffff;
+  text-align: center;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.resumen-reporte span {
+  display: block;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 800;
+}
+
+.resumen-reporte strong {
+  display: block;
+  margin-top: 4px;
+  color: #0f75bc;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+/* =========================
+   TABLA
+========================= */
+
+.tabla-card {
+  margin: 12px;
+  padding: 12px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.tabla-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.tabla-toolbar h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.items-pagina-item {
+  width: 125px;
+  --background: #f8fafc;
+  --border-radius: 12px;
+  font-size: 12px;
 }
 
 .table-responsive {
   display: block;
   width: 100%;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch; // Para una mejor experiencia en dispositivos móviles
+  -webkit-overflow-scrolling: touch;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
 
+.responsive-table,
+.table-responsive table,
+table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  color: #0f172a;
+  margin: 0;
+}
+
+.responsive-table th,
+.responsive-table td,
+.table-responsive table th,
+.table-responsive table td {
+  text-align: center;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.header-table {
+  background-color: #5270b4;
+  border: 1px solid #5270b4;
+  color: #ffffff;
+}
+
+.header-table th,
+.header-table td {
+  text-align: center;
+  padding: 8px 10px;
+  font-size: 11px;
+  font-weight: 900;
+  background-color: #5270b4;
+  color: #ffffff;
+}
+
+.detail-table {
+  margin: 0;
+}
+
+.detail-table th,
+.detail-table td {
+  font-size: 11px;
+  text-align: center;
+  border-collapse: collapse;
+  padding: 7px 8px;
+}
+
+.detail-table tr:nth-child(even) {
+  background-color: #f1f5f9;
+}
+
+.detail-table tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.total-reporte {
+  margin-top: 10px;
+  text-align: center;
+  color: #0f172a;
+  font-size: 13px;
+}
+
+.total-reporte p {
+  margin: 0;
+}
+
+/* =========================
+   PAGINACIÓN
+========================= */
+
+.paginacion-contenedor {
+  margin: 12px 0 4px 0;
+  padding: 8px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  text-align: center;
+}
+
+.paginacion {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.paginacion ::ng-deep .ngx-pagination {
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.paginacion ::ng-deep .ngx-pagination li {
+  margin: 0 2px !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+.paginacion ::ng-deep .ngx-pagination a,
+.paginacion ::ng-deep .ngx-pagination button,
+.paginacion ::ng-deep .ngx-pagination .current {
+  min-width: 28px !important;
+  height: 28px !important;
+  padding: 0 7px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 8px !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  text-decoration: none !important;
+}
+
+.paginacion ::ng-deep .ngx-pagination a,
+.paginacion ::ng-deep .ngx-pagination button {
+  background: #ffffff !important;
+  color: #0f75bc !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+
+.paginacion ::ng-deep .ngx-pagination .current {
+  background: #0f75bc !important;
+  color: #ffffff !important;
+}
+
+.paginacion ::ng-deep .ngx-pagination .disabled {
+  color: #cbd5e1 !important;
+  opacity: 1 !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media screen and (max-width: 768px) {
+  .responsive-table,
+  .table-responsive table,
   table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 600px; // Define un ancho mínimo para evitar que las celdas se compriman demasiado
-    color: rgb(0, 0, 0);
-    thead {
-      background-color: #5270b4;
-    }
-
-    th,
-    td {
-      text-align: center;
-      padding: 8px;
-      border: 1px solid #ddd;
-    }
-
-    @media screen and (max-width: 768px) {
-
-      th,
-      td {
-        font-size: 11px;
-        padding: 4px;
-      }
-    }
+    min-width: 900px;
   }
-  .hidden {
-    display: none;
+
+  .responsive-table th,
+  .responsive-table td,
+  .table-responsive table th,
+  .table-responsive table td {
+    font-size: 10px;
+    padding: 5px;
+  }
+
+  .header-table th,
+  .header-table td {
+    font-size: 9px;
+    padding: 6px;
+  }
+
+  .detail-table th,
+  .detail-table td {
+    font-size: 9px;
+    padding: 5px;
+  }
+}
+
+@media (max-width: 390px) {
+  .botones-reporte-grid,
+  .resumen-reporte {
+    grid-template-columns: 1fr;
+  }
+
+  .tabla-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .items-pagina-item {
+    width: 100%;
+  }
+
+  .reporte-header-card {
+    align-items: flex-start;
+  }
+}
+
+/* =========================
+   DARK MODE
+========================= */
+
+@media (prefers-color-scheme: dark) {
+  ion-content.reporte-content,
+  ion-content {
+    --background: #0f172a;
+  }
+
+  .reporte-header-card,
+  .acciones-reporte-card,
+  .estado-fechas,
+  .estado-carga,
+  .estado-vacio,
+  .tabla-card,
+  .resumen-reporte div {
+    background: #1e293b;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .reporte-header-card h2,
+  .estado-fechas h3,
+  .estado-vacio h3,
+  .tabla-toolbar h3,
+  .total-reporte {
+    color: #f8fafc;
+  }
+
+  .reporte-header-card p,
+  .estado-fechas p,
+  .estado-vacio p,
+  .periodo-info,
+  .resumen-reporte span {
+    color: #cbd5e1;
+  }
+
+  .empleado-info {
+    color: #f8fafc;
+  }
+
+  .table-responsive {
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .responsive-table,
+  .table-responsive table,
+  table {
+    background: #1e293b;
+    color: #f8fafc;
+  }
+
+  .detail-table tr:nth-child(even) {
+    background-color: #111827;
+  }
+
+  .detail-table tr:nth-child(odd) {
+    background-color: #1e293b;
+  }
+
+  .responsive-table th,
+  .responsive-table td,
+  .table-responsive table th,
+  .table-responsive table td {
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .paginacion-contenedor,
+  .items-pagina-item {
+    background: #111827;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .paginacion ::ng-deep .ngx-pagination a,
+  .paginacion ::ng-deep .ngx-pagination button {
+    background: #1e293b !important;
+    color: #38bdf8 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .paginacion ::ng-deep .ngx-pagination .current {
+    background: #0f75bc !important;
+    color: #ffffff !important;
   }
 }

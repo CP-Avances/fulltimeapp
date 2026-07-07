@@ -1,100 +1,163 @@
 <app-close-modal titleModal="Generar Reporte"></app-close-modal>
 
+<ion-content class="reporte-content">
 
-<ion-content>
+  <section class="reporte-header-card">
+    <ion-icon name="document-text-outline"></ion-icon>
+    <div>
+      <h2>Reporte de timbres</h2>
+      <p *ngIf="data?.fullname">{{ data.fullname }}</p>
+    </div>
+  </section>
 
-  <br>
-  <ion-text color="primary" *ngIf="fechaInicio === '' || fechaFinal === ''; else showBoton">
-    <h1 style="margin: 5px 15px; text-align: center;">Falta agregar las fechas de consultas</h1>
-  </ion-text>
+  <section class="estado-fechas" *ngIf="fechaInicio === '' || fechaFinal === ''; else showBoton">
+    <ion-icon name="calendar-outline"></ion-icon>
+    <h3>Falta agregar las fechas de consulta</h3>
+    <p>Seleccione un rango de fechas para generar el reporte.</p>
+  </section>
 
   <ng-template #showBoton>
 
-    <ion-grid>
-      <ion-row>
-        <ion-col size="12">
-          <ion-text color="dark">
-            <h4 style="margin: 5px 15px; text-align: center;"><ion-icon name="person"></ion-icon>{{data.fullname}}</h4>
-          </ion-text>
-        </ion-col>
-      </ion-row>
+    <section class="acciones-reporte-card">
 
-      <ion-row>
+      <div class="empleado-info">
+        <ion-icon name="person-circle-outline"></ion-icon>
+        <span>{{ data.fullname }}</span>
+      </div>
 
-        <ion-col size="6">
-          <ion-button color="success" shape="round" expand="full" (click)="generarExcel()" [disabled]="!showBtnPdf">
-            <ion-icon name="grid"></ion-icon>EXCEL
-          </ion-button>
-        </ion-col>
-        <ion-col size="6">
-          <ion-button color="danger" shape="round" expand="full" (click)="GenerarPDF()" [disabled]="!showBtnPdf">
-            <ion-icon name="document-text-outline"></ion-icon>PDF
-          </ion-button>
-        </ion-col>
+      <div class="periodo-info">
+        <ion-icon name="calendar-clear-outline"></ion-icon>
+        <span>
+          Periodo:
+          {{ fechaInicio?.split('T')[0] }}
+          al
+          {{ fechaFinal?.split('T')[0] }}
+        </span>
+      </div>
 
-      </ion-row>
+      <div class="botones-reporte-grid">
+        <ion-button color="success" shape="round" expand="block" (click)="generarExcel()" [disabled]="!showBtnPdf">
 
-    </ion-grid>
+          <ion-icon name="grid-outline" slot="start"></ion-icon>
+          EXCEL
+        </ion-button>
 
-    <div *ngIf="!existenEmpleados">
+        <ion-button color="danger" shape="round" expand="block" (click)="GenerarPDF()" [disabled]="!showBtnPdf">
+
+          <ion-icon name="document-text-outline" slot="start"></ion-icon>
+          PDF
+        </ion-button>
+      </div>
+
+    </section>
+
+    <section class="estado-carga" *ngIf="!existenEmpleados">
       <ion-text color="primary">
-        <span>Obteniendo timbres</span>
+        <span>Obteniendo timbres, por favor espere</span>
       </ion-text>
-      <ion-progress-bar value="0.5" buffer="0.75"></ion-progress-bar>
-    </div>
+      <ion-progress-bar type="indeterminate"></ion-progress-bar>
+    </section>
 
-    <div class="info" *ngIf="count != 0">
-      <h5>
-        Timbres encontrados {{count}}
-      </h5>
-    </div>
+    <section class="resumen-reporte" *ngIf="count != 0">
+      <div>
+        <span>Total timbres encontrados</span>
+        <strong>{{ count }}</strong>
+      </div>
 
-    <div class="table-responsive" *ngIf="verReporte">
-      <table id="tablaReporte" class="responsive-table">
-        <thead class="header-table">
-          <tr>
-            <td style="text-align: center;" rowspan="2">N°</td>
-            <td style="text-align: center;" rowspan="2">CÓDIGO</td>
-            <td style="text-align: center;" rowspan="2">EMPLEADO</td>
-            <td style="text-align: center;" colspan="2">TIMBRE</td>
-            <td style="text-align: center;" colspan="2" [ngClass]="{'hidden': !activarOpcion}">DISPOSITIVO</td>
-            <td style="text-align: center;" rowspan="2">RELOJ</td>
-            <td style="text-align: center;" rowspan="2">ACCIÓN</td>
-            <td style="text-align: center;" rowspan="2">OBSERVACION</td>
-            <td style="text-align: center;" rowspan="2">LONGITUD</td>
-            <td style="text-align: center;" rowspan="2">LATITUD</td>
-          </tr>
-          <tr>
-            <td style="text-align: center;">FECHA</td>
-            <td style="text-align: center;">HORA</td>
-            <td style="text-align: center;" [ngClass]="{'hidden': !activarOpcion}">FECHA</td>
-            <td style="text-align: center;" [ngClass]="{'hidden': !activarOpcion}">HORA</td>
-          </tr>
-        </thead>
-        <tbody class="detail-table">
-          <tr *ngFor="let timbre of timbres">
-            <td>{{timbre.n}}</td>
-            <td>{{timbre.codigo}}</td>
-            <td>{{timbre.empleado}}</td>
-            <td>{{timbre.fechaTimbreServidor}}</td>
-            <td>{{timbre.horaTimbreServidor}}</td>
-            <td *ngIf="activarOpcion">{{timbre.fechaTimbre}}</td>
-            <td *ngIf="activarOpcion">{{timbre.horaTimbre}}</td>
-            <td>{{timbre.reloj}}</td>
-            <td>{{timbre.accion}}</td>
-            <td>{{timbre.observacion}}</td>
-            <td>{{timbre.longitud}}</td>
-            <td>{{timbre.latitud}}</td>
-          </tr>
-          <tr>
-            <td colspan="8" *ngIf="count != 0">
-              <p>Total timbres filtrados {{count}}</p>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <br><br>
+      <div>
+        <span>Mostrando por página</span>
+        <strong>{{ itemsPorPagina }}</strong>
+      </div>
+    </section>
+
+    <section class="tabla-card" *ngIf="verReporte">
+
+      <div class="tabla-toolbar">
+        <h3>Detalle de timbres</h3>
+
+        <ion-item class="items-pagina-item" lines="none">
+          <ion-label>Filas</ion-label>
+          <ion-select interface="popover" [(ngModel)]="itemsPorPagina" (ionChange)="pageActual = 1">
+
+            <ion-select-option [value]="5">5</ion-select-option>
+            <ion-select-option [value]="10">10</ion-select-option>
+            <ion-select-option [value]="20">20</ion-select-option>
+            <ion-select-option [value]="50">50</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </div>
+
+      <div class="table-responsive">
+        <table id="tablaReporte" class="responsive-table">
+
+          <thead class="header-table">
+            <tr>
+              <th rowspan="2">N°</th>
+              <th rowspan="2">CÓDIGO</th>
+              <th rowspan="2">EMPLEADO</th>
+              <th colspan="2">TIMBRE</th>
+              <th colspan="2" *ngIf="activarOpcion">DISPOSITIVO</th>
+              <th rowspan="2">RELOJ</th>
+              <th rowspan="2">ACCIÓN</th>
+              <th rowspan="2">OBSERVACIÓN</th>
+              <th rowspan="2">LONGITUD</th>
+              <th rowspan="2">LATITUD</th>
+            </tr>
+
+            <tr>
+              <th>FECHA</th>
+              <th>HORA</th>
+              <th *ngIf="activarOpcion">FECHA</th>
+              <th *ngIf="activarOpcion">HORA</th>
+            </tr>
+          </thead>
+
+          <tbody class="detail-table">
+            <tr
+              *ngFor="let timbre of timbres | paginate: { id: 'reporteTimbres', itemsPerPage: itemsPorPagina, currentPage: pageActual }">
+
+              <td>{{ timbre.n }}</td>
+              <td>{{ timbre.codigo }}</td>
+              <td>{{ timbre.empleado }}</td>
+              <td>{{ timbre.fechaTimbreServidor }}</td>
+              <td>{{ timbre.horaTimbreServidor }}</td>
+
+              <td *ngIf="activarOpcion">{{ timbre.fechaTimbre }}</td>
+              <td *ngIf="activarOpcion">{{ timbre.horaTimbre }}</td>
+
+              <td>{{ timbre.reloj }}</td>
+              <td>{{ timbre.accion }}</td>
+              <td>{{ timbre.observacion }}</td>
+              <td>{{ timbre.longitud }}</td>
+              <td>{{ timbre.latitud }}</td>
+            </tr>
+          </tbody>
+
+        </table>
+      </div>
+
+      <div class="paginacion-contenedor" *ngIf="mostrarPaginacion()">
+        <pagination-controls id="reporteTimbres" class="paginacion" (pageChange)="pageActual = $event"
+          [maxSize]="maxSize" [directionLinks]="directionLinks" [responsive]="responsive" [autoHide]="autoHide"
+          [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
+          [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
+          [screenReaderPageLabel]="labels.screenReaderPageLabel"
+          [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+        </pagination-controls>
+      </div>
+
+      <div class="total-reporte" *ngIf="count != 0">
+        <p>Total timbres filtrados: <strong>{{ count }}</strong></p>
+      </div>
+
+    </section>
+
+    <section class="estado-vacio" *ngIf="verReporte && count === 0">
+      <ion-icon name="file-tray-outline"></ion-icon>
+      <h3>Sin registros</h3>
+      <p>No existen timbres registrados en el rango seleccionado.</p>
+    </section>
+
   </ng-template>
 
 </ion-content>
