@@ -1,6 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Ver Imagen</ion-title>
+
     <ion-buttons slot="end">
       <ion-button (click)="cerrarModal()">
         <ion-icon slot="icon-only" name="close"></ion-icon>
@@ -9,8 +10,12 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content >
+<ion-content class="modal-imagen-content">
   <div class="image-container">
-    <ion-img [src]="imagen" *ngIf="imagen" class="full-width"></ion-img>
+    <img
+      *ngIf="imagen"
+      [src]="imagen"
+      class="imagen-timbre"
+      alt="Imagen del timbre">
   </div>
 </ion-content>

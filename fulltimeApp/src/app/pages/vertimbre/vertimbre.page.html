@@ -13,13 +13,23 @@
     <app-rango-fechas></app-rango-fechas>
 
     <div class="botones-grid">
-      <ion-button class="btn-buscar" shape="round" expand="block" (click)="mostrarfiltro()" [disabled]="btn_filtro">
+      <ion-button
+        class="btn-buscar"
+        shape="round"
+        expand="block"
+        (click)="mostrarfiltro()"
+        [disabled]="btn_filtro || cargando">
 
         <ion-icon name="search-outline" slot="start"></ion-icon>
         <ion-label>Buscar timbres</ion-label>
       </ion-button>
 
-      <ion-button class="btn-todos" shape="round" expand="block" (click)="mostrarTimbres()" [disabled]="btn_todos">
+      <ion-button
+        class="btn-todos"
+        shape="round"
+        expand="block"
+        (click)="mostrarTimbres()"
+        [disabled]="btn_todos || cargando">
 
         <ion-icon name="list-outline" slot="start"></ion-icon>
         <ion-label>Mostrar todos</ion-label>
@@ -44,7 +54,10 @@
 
   <ion-content class="timbres-content">
 
-    <app-refresh-info *ngIf="timbresLista.length > 0" (onRefresh)="ngOnInit()" removeItem="noClean">
+    <app-refresh-info
+      *ngIf="timbresLista.length > 0"
+      (onRefresh)="mostrarTimbres()"
+      removeItem="noClean">
     </app-refresh-info>
 
     <section class="titulo-lista" *ngIf="timbresLista.length > 0">
@@ -53,7 +66,7 @@
 
     <div *ngIf="cargando" class="estado-carga">
       <ion-text color="primary">
-        <span>Obteniendo timbres, por favor espere</span>
+        <span>Obteniendo información, por favor espere</span>
       </ion-text>
       <ion-progress-bar type="indeterminate"></ion-progress-bar>
     </div>
@@ -62,14 +75,19 @@
 
       <ion-list class="lista-timbres" *ngIf="timbresLista.length > 0">
 
-        <ion-item class="item-timbre" lines="none"
+        <ion-item
+          class="item-timbre"
+          lines="none"
           *ngFor="let t of timbresLista | paginate: { id: 'timbresUsuario', itemsPerPage: itemsPorPagina, currentPage: pageActual }">
 
           <div class="timbre-card">
 
             <div class="timbre-info">
 
-              <button *ngIf="t.dispositivo_timbre != ''" type="button" class="btn-info-timbre"
+              <button
+                *ngIf="t.dispositivo_timbre != ''"
+                type="button"
+                class="btn-info-timbre"
                 (click)="presentAlert(t.observacion, t.hora_timbre_diferente, t.ubicacion, t.novedades_conexion, t.conexion)">
 
                 <ion-icon
@@ -114,19 +132,35 @@
 
               <div class="acciones-timbre">
 
-                <button type="button" class="accion-icono accion-foto" [class.accion-deshabilitada]="!t.imagen"
-                  [disabled]="!t.imagen" (click)="mostrarImagenModal(t.imagen)">
+                <!-- Imagen del timbre -->
+                <button
+                  type="button"
+                  class="accion-icono accion-foto"
+                  title="Ver imagen"
+                  [class.accion-deshabilitada]="!t.tiene_imagen"
+                  [disabled]="!t.tiene_imagen || cargando"
+                  (click)="abrirImagenTimbre(t)">
 
                   <ion-icon name="happy-outline"></ion-icon>
                 </button>
 
-                <button type="button" class="accion-icono accion-documento" [class.accion-deshabilitada]="!t.documento"
-                  [disabled]="!t.documento" (click)="mostrarImagenModal(t.documento)">
+                <!-- Documento del timbre -->
+                <button
+                  type="button"
+                  class="accion-icono accion-documento"
+                  title="Ver documento"
+                  [class.accion-deshabilitada]="!t.tiene_documento"
+                  [disabled]="!t.tiene_documento || cargando"
+                  (click)="abrirDocumentoTimbre(t)">
 
                   <ion-icon name="image-outline"></ion-icon>
                 </button>
 
-                <button type="button" class="accion-icono accion-mapa"
+                <!-- Ubicación -->
+                <button
+                  type="button"
+                  class="accion-icono accion-mapa"
+                  title="Ver ubicación"
                   [class.accion-deshabilitada]="!t.latitud || !t.longitud || t.latitud === '0' || t.longitud === '0'"
                   [disabled]="!t.latitud || !t.longitud || t.latitud === '0' || t.longitud === '0'"
                   (click)="abrirMapa(t.latitud, t.longitud)">
@@ -145,9 +179,16 @@
       </ion-list>
 
       <div class="paginacion-contenedor" *ngIf="mostrarPaginacion()">
-        <pagination-controls id="timbresUsuario" class="paginacion" (pageChange)="pageActual = $event"
-          [maxSize]="maxSize" [directionLinks]="directionLinks" [responsive]="responsive" [autoHide]="autoHide"
-          [previousLabel]="labels.previousLabel" [nextLabel]="labels.nextLabel"
+        <pagination-controls
+          id="timbresUsuario"
+          class="paginacion"
+          (pageChange)="pageActual = $event"
+          [maxSize]="maxSize"
+          [directionLinks]="directionLinks"
+          [responsive]="responsive"
+          [autoHide]="autoHide"
+          [previousLabel]="labels.previousLabel"
+          [nextLabel]="labels.nextLabel"
           [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
           [screenReaderPageLabel]="labels.screenReaderPageLabel"
           [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
@@ -173,7 +214,9 @@
 <ng-container *ngIf="!isConnected || !serverConnected">
   <ion-content class="timbres-content">
 
-    <app-refresh-info (onRefresh)="ngOnInit()" removeItem="noClean">
+    <app-refresh-info
+      (onRefresh)="inicializarPantalla()"
+      removeItem="noClean">
     </app-refresh-info>
 
     <section class="offline-card">
