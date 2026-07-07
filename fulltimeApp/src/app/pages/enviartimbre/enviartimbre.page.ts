@@ -528,6 +528,8 @@ export class EnviartimbrePage implements OnInit {
         const permisoCamara = await this.solicitarPermisoCamara();
 
         if (!permisoCamara) {
+          this.enviandoTimbre = false;
+
           return this.abrirToas(
             'No se pudo obtener permiso de cámara. Timbre cancelado.',
             'warning',
@@ -537,10 +539,25 @@ export class EnviartimbrePage implements OnInit {
         }
 
         try {
-          await this.tomarFoto();
-          this.identificarUsuario();
+          const fotoTomada = await this.tomarFoto();
+
+          if (!fotoTomada) {
+            this.enviandoTimbre = false;
+
+            return this.abrirToas(
+              'No se tomó la foto. Timbre cancelado.',
+              'warning',
+              3000,
+              'middle'
+            );
+          }
+
+          await this.identificarUsuario();
+
         } catch {
-          this.abrirToas(
+          this.enviandoTimbre = false;
+
+          return this.abrirToas(
             'No se pudo obtener la foto, timbre cancelado.',
             'warning',
             3000,
@@ -551,29 +568,41 @@ export class EnviartimbrePage implements OnInit {
         return;
       }
 
-      this.identificarUsuario();
+      await this.identificarUsuario();
       return;
     }
 
-    this.identificarUsuario();
+    await this.identificarUsuario();
   }
 
-  async tomarFoto() {
-    const cameraPhoto = await Camera.getPhoto({
-      quality: 100,
-      allowEditing: false,
-      resultType: CameraResultType.DataUrl,
-      correctOrientation: true,
-      source: CameraSource.Camera,
-      direction: CameraDirection.Front,
-      width: 600,
-      height: 600,
-    });
+  async tomarFoto(): Promise<boolean> {
+    try {
+      const cameraPhoto = await Camera.getPhoto({
+        quality: 100,
+        allowEditing: false,
+        resultType: CameraResultType.DataUrl,
+        correctOrientation: true,
+        source: CameraSource.Camera,
+        direction: CameraDirection.Front,
+        width: 600,
+        height: 600,
+      });
 
-    if (cameraPhoto.dataUrl) {
-      this.imagen = await this.convertirBase64AWebP(cameraPhoto.dataUrl);
-    } else {
+      if (cameraPhoto.dataUrl) {
+        this.imagen = await this.convertirBase64AWebP(cameraPhoto.dataUrl);
+        return true;
+      }
+
       this.imagen = '';
+      return false;
+
+    } catch {
+      /*
+        Aquí entra cuando el usuario cancela la cámara
+        o cuando ocurre un error al abrir/tomar la foto.
+      */
+      this.imagen = '';
+      return false;
     }
   }
 
@@ -605,16 +634,16 @@ export class EnviartimbrePage implements OnInit {
   async identificarUsuario() {
     if (!this.platform.is('hybrid')) {
       this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
-      this.guardarEnBDD();
+      await this.guardarEnBDD();
       return;
     }
 
     await this.fingerprintAIO.isAvailable({
       requireStrongBiometrics: false
-    }).then(() => {
-      this.openAutenticacion();
-    }).catch(() => {
-      this.enviarTimbreSinAuth();
+    }).then(async () => {
+      await this.openAutenticacion();
+    }).catch(async () => {
+      await this.enviarTimbreSinAuth();
     });
   }
 
@@ -625,25 +654,32 @@ export class EnviartimbrePage implements OnInit {
       fallbackButtonTitle: 'PIN',
       subtitle: 'Es necesario autenticarse para enviar el timbre',
       description: 'Casa Pazmiño S.A'
-    }).then((resul: any) => {
+    }).then(async (resul: any) => {
       if (resul) {
         this.nuevoTimbre.tipo_autenticacion = this.IDENTIFICACION_BIOMETRICA;
-        this.guardarEnBDD();
+        await this.guardarEnBDD();
+        return;
       }
-    }).catch(() => {
-      this.abrirToas(
+
+      this.enviandoTimbre = false;
+
+    }).catch(async () => {
+      this.intentos = this.intentos + 1;
+
+      if (this.intentos === 2) {
+        this.intentos = 0;
+        await this.enviarTimbreAuthProble();
+        return;
+      }
+
+      this.enviandoTimbre = false;
+
+      await this.abrirToas(
         'Ocurrió un error al autenticar al usuario. El timbre no se envió.',
         'danger',
         2000,
         'middle'
       );
-
-      this.intentos = this.intentos + 1;
-
-      if (this.intentos === 2) {
-        this.enviarTimbreAuthProble();
-        this.intentos = 0;
-      }
     });
   }
 
@@ -660,12 +696,15 @@ export class EnviartimbrePage implements OnInit {
         {
           text: 'Cancelar',
           role: 'cancel',
+          handler: () => {
+            this.enviandoTimbre = false;
+          }
         },
         {
           text: 'Listo',
-          handler: () => {
+          handler: async () => {
             this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
-            this.guardarEnBDD();
+            await this.guardarEnBDD();
           }
         }
       ]
@@ -692,8 +731,40 @@ export class EnviartimbrePage implements OnInit {
     }
   }
 
+  private validarObservacionAntesDeEnviar(): boolean {
+    const esTimbreAbierto = this.nombreInfo_timbre === 'Timbre abierto';
+    const observacion = String(this.nuevoTimbre.observacion ?? '').trim();
+
+    if (esTimbreAbierto) {
+      if (observacion.length === 0) {
+        this.abrirToas(
+          'Debes ingresar una observación antes de enviar un timbre abierto.',
+          'danger',
+          5000,
+          'middle'
+        );
+
+        return false;
+      }
+
+      this.nuevoTimbre.observacion = observacion;
+    }
+
+    return true;
+  }
+
   async enviarTimbre(ev?: any) {
     if (this.enviandoTimbre) {
+      return;
+    }
+
+    /*
+      Validación temprana.
+      Aquí todavía NO se bloquea el botón ni se inicia ubicación/foto/biometría.
+    */
+    const observacionValida = this.validarObservacionAntesDeEnviar();
+
+    if (!observacionValida) {
       return;
     }
 
@@ -827,6 +898,8 @@ export class EnviartimbrePage implements OnInit {
     const fechaHoraTimbre = this.formatearFechaTimbreParaBackend(this.fechaHora);
 
     if (!fechaHoraTimbre) {
+      this.enviandoTimbre = false;
+
       return this.abrirToas(
         'No se pudo obtener la fecha y hora del timbre. Intente nuevamente.',
         'warning',
@@ -840,6 +913,8 @@ export class EnviartimbrePage implements OnInit {
     const ubicacionValida = this.NormalizarUbicacionParaTimbre(teclaFuncion);
 
     if (!ubicacionValida) {
+      this.enviandoTimbre = false;
+
       return this.abrirToas(
         'No se pudo validar la ubicación. Este tipo de timbre solo puede registrarse en zonas permitidas.',
         'danger',
@@ -878,13 +953,21 @@ export class EnviartimbrePage implements OnInit {
     */
     this.nuevoTimbre.fecha_subida_servidor = null;
 
-    if (this.nuevoTimbre.accion === 'HA' && !this.nuevoTimbre.observacion) {
-      return this.abrirToas(
-        'Debes ingresar una observación antes de enviar un timbre abierto.',
-        'danger',
-        5000,
-        'middle'
-      );
+    if (this.nuevoTimbre.accion === 'HA') {
+      const observacion = String(this.nuevoTimbre.observacion ?? '').trim();
+
+      if (observacion.length === 0) {
+        this.enviandoTimbre = false;
+
+        return this.abrirToas(
+          'Debes ingresar una observación antes de enviar un timbre abierto.',
+          'danger',
+          5000,
+          'middle'
+        );
+      }
+
+      this.nuevoTimbre.observacion = observacion;
     }
 
     this.isConnected = this.networkService.getNetworkStatusDispositivo();
@@ -896,6 +979,8 @@ export class EnviartimbrePage implements OnInit {
     }
 
     if (this.requiereInternet === true) {
+      this.enviandoTimbre = false;
+
       return this.abrirToas(
         'Este timbre requiere conexión a Internet. No se guardó el registro.',
         'danger',
@@ -910,6 +995,21 @@ export class EnviartimbrePage implements OnInit {
     );
 
     this.guardarTimbrePendiente(this.nuevoTimbre, 'SIN_INTERNET');
+  }
+
+  botonEnviarDeshabilitado(): boolean {
+    return this.esTimbreEspecialSinObservacion();
+  }
+
+  mostrarMensajeObservacionObligatoria(): boolean {
+    return this.esTimbreEspecialSinObservacion();
+  }
+
+  private esTimbreEspecialSinObservacion(): boolean {
+    const esTimbreAbierto = this.nombreInfo_timbre === 'Timbre abierto';
+    const observacion = String(this.nuevoTimbre.observacion ?? '').trim();
+
+    return esTimbreAbierto && observacion.length === 0;
   }
 
   formatearFechaTimbreParaBackend(fecha: any): string {
@@ -1337,7 +1437,6 @@ export class EnviartimbrePage implements OnInit {
     this.relojService.enviarTimbre(data).pipe(timeout(5000)).subscribe({
       next: () => {
         this.enviandoTimbre = false;
-
 
         localStorage.setItem('ultimoTimbreEmpleado', JSON.stringify({
           fecha_hora_timbre: data.fec_hora_timbre,

@@ -158,8 +158,11 @@
   </ion-card>
 
   <!-- BOTÓN CONTINUAR -->
+  <!-- BOTÓN CONTINUAR -->
   <section class="acciones" *ngIf="!cargandoPosicion; else elseBlock">
-    <ion-button shape="round" expand="block" class="btn-continuar" [disabled]="enviandoTimbre" (click)="enviarTimbre()">
+
+    <ion-button shape="round" expand="block" class="btn-continuar"
+      [disabled]="enviandoTimbre || botonEnviarDeshabilitado()" (click)="enviarTimbre()">
 
       <ion-spinner *ngIf="enviandoTimbre" name="crescent" slot="start">
       </ion-spinner>
@@ -169,6 +172,12 @@
 
       {{ enviandoTimbre ? 'Procesando...' : 'Continuar' }}
     </ion-button>
+
+    <ion-text color="danger" class="mensaje-observacion" *ngIf="mostrarMensajeObservacionObligatoria()">
+
+      <small>Debe ingresar una observación para continuar.</small>
+    </ion-text>
+
   </section>
 
   <!-- CARGANDO POSICIÓN -->

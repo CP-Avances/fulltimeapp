@@ -113,7 +113,6 @@ export class RelojServiceService {
     return this.http.get<any>(`${this.apiUrl}/api/empresa/buscar/datos`);
   }
 
-  // TIMBRE
   // METODO PARA CREAR UN TIMBRE
   enviarTimbre(datos: any) {
     return this.http.post<any>(`${this.apiUrl}/timbres`, datos)
