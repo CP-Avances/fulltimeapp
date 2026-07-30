@@ -49,6 +49,7 @@
           </strong>
         </div>
 
+
         <div class="detalle-row">
           <span>Tecla actual</span>
           <strong>
@@ -83,39 +84,9 @@
               Acción
             </ion-label>
 
-            <ion-select
-              formControlName="accionTimbre"
-              interface="popover"
-              placeholder="Seleccione acción"
-              (ionChange)="SelectedAccion($event)">
-
-              <ion-select-option
-                *ngFor="let accion of acciones"
-                [value]="accion.item">
+            <ion-select formControlName="accionTimbre" interface="popover" placeholder="Seleccione acción">
+              <ion-select-option *ngFor="let accion of acciones" [value]="accion.value">
                 {{ accion.text }}
-              </ion-select-option>
-
-            </ion-select>
-          </ion-item>
-
-          <!-- TECLA FUNCIÓN -->
-          <ion-item class="input-item" lines="none">
-            <ion-icon name="keypad-outline" slot="start"></ion-icon>
-
-            <ion-label position="stacked">
-              Tecla función
-            </ion-label>
-
-            <ion-select
-              formControlName="teclaFunTimbre"
-              interface="popover"
-              placeholder="Seleccione tecla"
-              (ionChange)="SelectedTecla($event)">
-
-              <ion-select-option
-                *ngFor="let tecla of tecl_funcio"
-                [value]="tecla.value">
-                {{ tecla.value }}
               </ion-select-option>
 
             </ion-select>
@@ -129,10 +100,7 @@
               Observación
             </ion-label>
 
-            <ion-textarea
-              formControlName="ObservacionForm"
-              placeholder="Ingrese el motivo del cambio"
-              autoGrow="true"
+            <ion-textarea formControlName="ObservacionForm" placeholder="Ingrese el motivo del cambio" autoGrow="true"
               rows="4">
             </ion-textarea>
           </ion-item>
@@ -156,23 +124,14 @@
 <ion-footer class="editar-footer">
   <ion-toolbar>
 
-    <ion-button
-      expand="block"
-      shape="round"
-      class="btn-guardar"
+    <ion-button expand="block" shape="round" class="btn-guardar"
       [disabled]="!EditartimbreForm || EditartimbreForm.invalid || enviando"
       (click)="EnviarDatosTimbre(EditartimbreForm.value)">
 
-      <ion-spinner
-        *ngIf="enviando"
-        name="crescent"
-        slot="start">
+      <ion-spinner *ngIf="enviando" name="crescent" slot="start">
       </ion-spinner>
 
-      <ion-icon
-        *ngIf="!enviando"
-        name="save-outline"
-        slot="start">
+      <ion-icon *ngIf="!enviando" name="save-outline" slot="start">
       </ion-icon>
 
       {{ enviando ? 'Guardando...' : 'Guardar cambios' }}

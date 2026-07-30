@@ -53,8 +53,11 @@ export class TimbresPendientesSyncService {
     // MÉTODO PRINCIPAL
     // ============================================================
 
-    async sincronizarPendientes(idEmpleado: number): Promise<ResultadoSincronizacionTimbres> {
-        const timbres = this.obtenerTimbresPendientes();
+    async sincronizarPendientes(
+        idEmpleado: number
+    ): Promise<ResultadoSincronizacionTimbres> {
+        const timbres =
+            this.obtenerTimbresPendientes();
 
         if (timbres.length === 0) {
             return {
@@ -62,13 +65,16 @@ export class TimbresPendientesSyncService {
                 enviados: 0,
                 fallidos: 0,
                 huboPendientes: false,
-                mensaje: 'No existen timbres pendientes por enviar.'
+                mensaje:
+                    'No existen timbres pendientes por enviar.'
             };
         }
 
         try {
             await firstValueFrom(
-                this.relojService.obtenerUsuario(idEmpleado).pipe(timeout(3000))
+                this.relojService
+                    .obtenerUsuario(idEmpleado)
+                    .pipe(timeout(3000))
             );
         } catch {
             return {
@@ -76,53 +82,97 @@ export class TimbresPendientesSyncService {
                 enviados: 0,
                 fallidos: timbres.length,
                 huboPendientes: true,
-                mensaje: 'Falló la conexión con el servidor, no se pudieron enviar los timbres.'
+                mensaje:
+                    'Falló la conexión con el servidor, no se pudieron enviar los timbres.'
             };
         }
 
-        const rango = await this.obtenerRangoUbicacion();
-        await this.actualizarParametroUbicacionDesconocida(idEmpleado);
+        const rango =
+            await this.obtenerRangoUbicacion();
+
+        await this.actualizarParametroUbicacionDesconocida(
+            idEmpleado
+        );
 
         const resultados: ResultadoEnvioTimbre[] = [];
 
         /*
-          Se envían secuencialmente para evitar cruces entre validaciones
-          de ubicación, servicios y actualizaciones de storage.
-        */
+         * Se envían secuencialmente.
+         */
         for (const timbre of timbres) {
-            const resultado = await this.procesarYEnviarTimbre(timbre, idEmpleado, rango);
+            const resultado =
+                await this.procesarYEnviarTimbre(
+                    timbre,
+                    idEmpleado,
+                    rango
+                );
+
             resultados.push(resultado);
         }
 
-        const enviados = resultados.filter(r => r.enviado).length;
-        const fallidos = resultados.length - enviados;
+        const enviados =
+            resultados.filter(
+                resultado => resultado.enviado
+            ).length;
 
-        if (enviados === resultados.length) {
-            this.limpiarTimbresPendientes();
+        const fallidos =
+            resultados.length - enviados;
 
+        /*
+         * Extraer únicamente los timbres que no lograron
+         * enviarse.
+         */
+        const timbresFallidos =
+            resultados
+                .filter(
+                    resultado =>
+                        resultado.enviado === false
+                )
+                .map(
+                    resultado =>
+                        resultado.timbre
+                );
+
+        /*
+         * Limpiar el almacenamiento anterior.
+         *
+         * Esto evita que vuelvan a enviarse los timbres
+         * que sí llegaron correctamente al servidor.
+         */
+        this.limpiarTimbresPendientes();
+
+        /*
+         * Guardar nuevamente solo los fallidos.
+         */
+        for (const timbreFallido of timbresFallidos) {
+            this.dataLocalService
+                .guardarTimbresPerdidos(
+                    timbreFallido
+                );
+        }
+
+        if (fallidos === 0) {
             return {
                 total: resultados.length,
                 enviados,
                 fallidos,
                 huboPendientes: true,
-                mensaje: enviados > 1
-                    ? `Los ${enviados} timbres se han enviado correctamente.`
-                    : 'El timbre ha sido enviado exitosamente.'
+                mensaje:
+                    enviados > 1
+                        ? `Los ${enviados} timbres se han enviado correctamente.`
+                        : 'El timbre ha sido enviado exitosamente.'
             };
         }
 
-        /*
-          Como DataLocalService no tiene un método claro para eliminar solo
-          los enviados, no se borra todo si hubo fallos. Así evitamos pérdida
-          de registros. Luego podemos mejorar DataLocalService para dejar solo
-          los fallidos.
-        */
         return {
             total: resultados.length,
             enviados,
             fallidos,
             huboPendientes: true,
-            mensaje: `Se enviaron ${enviados} de ${resultados.length} timbres. ${fallidos} timbre(s) permanecen pendientes.`
+            mensaje:
+                `Se enviaron ${enviados} de ` +
+                `${resultados.length} timbres. ` +
+                `${fallidos} timbre(s) permanecen pendientes.`
         };
     }
 
@@ -232,8 +282,6 @@ export class TimbresPendientesSyncService {
                 fecha_subida_servidor: null,
                 novedades_conexion: 'Falló nuevamente la conexión al servidor. Timbre pendiente de sincronización.'
             };
-
-            this.dataLocalService.guardarTimbresPerdidos(timbrePendiente);
 
             return {
                 enviado: false,
@@ -504,8 +552,6 @@ export class TimbresPendientesSyncService {
                 fecha_subida_servidor: null,
                 novedades_conexion: 'Falló nuevamente la conexión al servidor. Timbre pendiente de sincronización.'
             };
-
-            this.dataLocalService.guardarTimbresPerdidos(timbrePendiente);
 
             return {
                 enviado: false,
