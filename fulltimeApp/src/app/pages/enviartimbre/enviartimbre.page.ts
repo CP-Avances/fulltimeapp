@@ -1174,8 +1174,6 @@ export class EnviartimbrePage implements OnInit {
     );
 
     return;
-
-    this.guardarTimbrePendiente(this.nuevoTimbre, 'SIN_INTERNET');
   }
 
   botonEnviarDeshabilitado(): boolean {
@@ -2186,52 +2184,80 @@ export class EnviartimbrePage implements OnInit {
     this.guardarTimbrePendiente(data, 'ERROR_SERVIDOR');
   }
 
-  async guardarTimbrePendiente(data: any, motivo: 'SIN_INTERNET' | 'ERROR_SERVIDOR' | 'TIMEOUT') {
+  async guardarTimbrePendiente(
+    data: any,
+    motivo:
+      | 'SIN_INTERNET'
+      | 'ERROR_SERVIDOR'
+      | 'TIMEOUT'
+  ): Promise<void> {
+
     data.conexion = false;
-    data.dispositivo_timbre = this.APP_MOVIL;
+    data.dispositivo_timbre =
+      this.APP_MOVIL;
 
     /*
-      El timbre queda en memoria.
-      Aún no se ha subido al servidor.
-    */
+     * Todavía no se ha enviado al servidor.
+     */
     data.fecha_subida_servidor = null;
 
     if (!data.novedades_conexion) {
-      data.novedades_conexion = motivo === 'SIN_INTERNET'
-        ? this.ObtenerNovedadConexion('SIN_INTERNET')
-        : motivo === 'TIMEOUT'
-          ? this.ObtenerNovedadConexion('TIMEOUT')
-          : this.ObtenerNovedadConexion('ERROR_SERVIDOR');
+      data.novedades_conexion =
+        motivo === 'SIN_INTERNET'
+          ? this.ObtenerNovedadConexion(
+            'SIN_INTERNET'
+          )
+          : motivo === 'TIMEOUT'
+            ? this.ObtenerNovedadConexion(
+              'TIMEOUT'
+            )
+            : this.ObtenerNovedadConexion(
+              'ERROR_SERVIDOR'
+            );
     }
 
     if (!data.ubicacion) {
-      data.ubicacion = this.ubicacion || 'Sin Ubicación';
+      data.ubicacion =
+        this.ubicacion ||
+        'Sin Ubicación';
     }
 
-    this.actualizarUbicacionPantalla(data.ubicacion);
+    this.actualizarUbicacionPantalla(
+      data.ubicacion
+    );
 
     this.nuevoTimbre.conexion = false;
-    this.nuevoTimbre.fecha_subida_servidor = null;
-    this.nuevoTimbre.novedades_conexion = data.novedades_conexion;
+    this.nuevoTimbre.fecha_subida_servidor =
+      null;
 
-    this.dataLocalService.guardarTimbresPerdidos(data);
+    this.nuevoTimbre.novedades_conexion =
+      data.novedades_conexion;
 
-    await this.abrirToas(
-      'Timbre guardado en el teléfono. Aún no ha sido enviado al servidor.',
-      'warning',
-      3500,
-      'middle'
-    );
+    /*
+     * Guardar el objeto completo:
+     *
+     * - fecha y hora;
+     * - acción;
+     * - ubicación;
+     * - coordenadas;
+     * - foto;
+     * - autenticación;
+     * - datos del dispositivo.
+     */
+    this.dataLocalService
+      .guardarTimbresPerdidos(data);
 
     this.enviandoTimbre = false;
 
     /*
-      Cerramos la pantalla para evitar que el usuario vuelva a enviar
-      el mismo timbre desde el formulario.
-    */
-    this.navCtroller.navigateRoot(['/reloj/bienvenido']);
-
-    return;
+     * Mostrar una confirmación informativa.
+     * La pantalla se cierra únicamente cuando
+     * el usuario presiona OK.
+     */
+    await this.mostrarConfirmacionTimbrePendiente(
+      data,
+      motivo
+    );
   }
 
   // ============================================================
@@ -2251,5 +2277,96 @@ export class EnviartimbrePage implements OnInit {
 
   toggleChanged(event: any) {
     this.activarOpcion = event.detail.checked;
+  }
+
+  private async mostrarConfirmacionTimbrePendiente(
+    data: any,
+    motivo: 'SIN_INTERNET' | 'ERROR_SERVIDOR' | 'TIMEOUT'
+  ): Promise<void> {
+    const nombreTimbre =
+      this.nombre_timbre ||
+      this.nombreInfo_timbre ||
+      'TIMBRE';
+
+    const fechaTimbre =
+      data.fec_hora_timbre ||
+      this.fechaHora ||
+      'No disponible';
+
+    const ubicacionTimbre =
+      data.ubicacion ||
+      'Sin ubicación';
+
+    const tieneFoto =
+      !!data.imagen;
+
+    let mensajeMotivo =
+      'El timbre fue almacenado en la memoria del teléfono.';
+
+    if (motivo === 'SIN_INTERNET') {
+      mensajeMotivo =
+        'No existe conexión a Internet. El timbre fue almacenado en la memoria del teléfono.';
+    }
+
+    if (motivo === 'TIMEOUT') {
+      mensajeMotivo =
+        'El servidor no respondió a tiempo. El timbre fue almacenado en la memoria del teléfono.';
+    }
+
+    if (motivo === 'ERROR_SERVIDOR') {
+      mensajeMotivo =
+        'No fue posible comunicarse con el servidor. El timbre fue almacenado en la memoria del teléfono.';
+    }
+
+    const alert = await this.alertController.create({
+      header: 'Timbre guardado',
+      subHeader: 'Pendiente de sincronización',
+
+      message: `
+      <div style="text-align: left;">
+        <p>${mensajeMotivo}</p>
+
+        <p>
+          <strong>Tipo:</strong><br>
+          ${nombreTimbre}
+        </p>
+
+        <p>
+          <strong>Fecha y hora:</strong><br>
+          ${fechaTimbre}
+        </p>
+
+        <p>
+          <strong>Ubicación:</strong><br>
+          ${ubicacionTimbre}
+        </p>
+
+        <p>
+          <strong>Foto:</strong><br>
+          ${tieneFoto ? 'Sí, guardada con el timbre' : 'No registrada'}
+        </p>
+
+        <p style="margin-top: 16px;">
+          El timbre se enviará automáticamente cuando vuelva a existir conexión con el servidor.
+        </p>
+      </div>
+    `,
+
+      backdropDismiss: false,
+
+      buttons: [
+        {
+          text: 'OK',
+          role: 'confirm',
+          handler: () => {
+            this.navCtroller.navigateRoot([
+              '/reloj/bienvenido'
+            ]);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 }
