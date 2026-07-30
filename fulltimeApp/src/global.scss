@@ -16,7 +16,7 @@
 @import "~@ionic/angular/css/normalize.css";
 @import "~@ionic/angular/css/structure.css";
 @import "~@ionic/angular/css/typography.css";
-@import '~@ionic/angular/css/display.css';
+@import "~@ionic/angular/css/display.css";
 
 /* Optional CSS utils that can be commented out */
 @import "~@ionic/angular/css/padding.css";
@@ -26,75 +26,75 @@
 @import "~@ionic/angular/css/flex-utils.css";
 @import "~flatpickr/dist/flatpickr.css";
 
-.pendiente{
-  color: rgb(18, 166, 193); 
+.pendiente {
+  color: rgb(18, 166, 193);
   margin-top: -1%;
   font-size: 3vw;
 }
-  
-.pre_autorizado{
-  color: rgb(99, 112, 255); 
+
+.pre_autorizado {
+  color: rgb(99, 112, 255);
   margin-top: 1%;
   font-size: 3vw;
 }
-  
-.autorizada{
-  color: rgb(43, 207, 43); 
+
+.autorizada {
+  color: rgb(43, 207, 43);
   margin-top: -2%;
   font-size: 3vw;
 }
-  
-.negado{
-  color: rgb(243, 65, 127); 
+
+.negado {
+  color: rgb(243, 65, 127);
   margin-top: -2%;
   font-size: 3.5vw;
 }
-  
-.item-pendientes-color{
-  --ion-item-background:#333333c3;
-  --ion-item-color:#ffffffd5;
+
+.item-pendientes-color {
+  --ion-item-background: #333333c3;
+  --ion-item-color: #ffffffd5;
   margin-bottom: 1%;
   margin-left: 4%;
   margin-right: 4%;
 }
-  
-.item-pre_autorizados-color{
-  --ion-item-background:#052344c7;
-  --ion-item-color:#ffffffd5;
+
+.item-pre_autorizados-color {
+  --ion-item-background: #052344c7;
+  --ion-item-color: #ffffffd5;
   margin-bottom: 1%;
   margin-left: 4%;
   margin-right: 4%;
 }
-  
-.item-autorizados-color{
-  --ion-item-background:#064432c9;
-  --ion-item-color:#ffffffd5;
-  margin-top: 1%;
-  margin-left: 4%;
-  margin-right: 4%;
-}
-  
-.item-negados-color{
-  --ion-item-background:#43042dc6;
-  --ion-item-color:#ffffffd5;
+
+.item-autorizados-color {
+  --ion-item-background: #064432c9;
+  --ion-item-color: #ffffffd5;
   margin-top: 1%;
   margin-left: 4%;
   margin-right: 4%;
 }
 
-#notification-button {            
+.item-negados-color {
+  --ion-item-background: #43042dc6;
+  --ion-item-color: #ffffffd5;
+  margin-top: 1%;
+  margin-left: 4%;
+  margin-right: 4%;
+}
+
+#notification-button {
   position: relative;
   width: 60%;
-  overflow: visible!important;
+  overflow: visible !important;
 }
 
 #notifications-badge {
-    background-color: rgb(255, 0, 0);
-    position: absolute;
-    top: -2px;
-    right: 20px;
-    border-radius: 100%;
-    font-size: 65%;
+  background-color: rgb(255, 0, 0);
+  position: absolute;
+  top: -2px;
+  right: 20px;
+  border-radius: 100%;
+  font-size: 65%;
 }
 
 ion-alert.custom-alert {
@@ -106,7 +106,7 @@ button.alert-button.alert-button-confirm {
   color: var(--ion-color-acua-contrast);
 }
 
-button.alert-button.alert-button-cancel{
+button.alert-button.alert-button-cancel {
   background-color: var(--ion-color-danger);
   color: var(--ion-color-danger-contrast);
 }
@@ -117,31 +117,31 @@ button.alert-button.alert-button-cancel{
 }
 
 .ios .custom-alert button.alert-button {
-  border: 0.55px solid rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.2)
+  border: 0.55px solid rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.2);
 }
 
 .ios button.alert-button.alert-button-confirm {
   border-bottom-right-radius: 13px;
 }
 
-.img-alert{
+.img-alert {
   width: 55%;
   height: 50%;
   margin-top: 2%;
 }
 
-.card-alert{
+.card-alert {
   width: 100%;
   height: 100%;
   padding: 5%;
   align-items: center;
   border-radius: 5%;
   background-color: rgb(47, 46, 46);
-  color:rgb(255, 255, 255)
+  color: rgb(255, 255, 255);
 }
 
 //notificaciones de tipo toast
-.card-activacion{
+.card-activacion {
   width: 30%;
   height: 30%;
   padding: 2%;
@@ -153,96 +153,100 @@ div#alert-90msg.alert-message.sc-io-alert-ios {
   color: var(--ion-color-acua-contrast);
 }
 
-button.alert-button.alert-button-salir-confirm{
-    background-color: var(--ion-color-danger);
-    color: var(--ion-color-danger-contrast);
+button.alert-button.alert-button-salir-confirm {
+  background-color: var(--ion-color-danger);
+  color: var(--ion-color-danger-contrast);
 }
 
-button.alert-button.alert-button-salir-cancel{
+button.alert-button.alert-button-salir-cancel {
   background-color: var(--ion-color-success);
   color: var(--ion-color-success-contrast);
 }
-  
-.MsIngreso{
-  position:relative;
+
+.MsIngreso {
+  position: relative;
   margin-bottom: 10%;
   animation-name: MsIngreso;
   animation-duration: 1.5s;
-  overflow:hidden;
+  overflow: hidden;
 }
 
 @keyframes MsIngreso {
-  0%{transform: translateX(100%)}
-  100%{transform: translateX(0%)}
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
 }
 
 .toast-custom-class {
   text-align: center;
-  width:90%;
+  width: 90%;
   margin: 10% 5% 0% 5%;
   font-size: 15px;
-  height:30%;
+  height: 30%;
 }
 
-.toast-custom-noti{
+.toast-custom-noti {
   text-align: center;
-  width:60%;
+  width: 60%;
   margin: 8% 5% 0% 5%;
   font-size: 12.2px;
-  height:40%;
+  height: 40%;
   margin-left: 30%;
-  position:relative;
+  position: relative;
   transition: opacity 0.1s;
 }
 
 @keyframes blured {
-  0%{transition: none;}
-  50%{transition: ease-in-out;}
+  0% {
+    transition: none;
+  }
+  50% {
+    transition: ease-in-out;
+  }
 }
 
-.showtoast-custom-class{
+.showtoast-custom-class {
   text-align: center;
   font-size: 14px;
 }
 
-ion-modal{
+ion-modal {
   --background: rgba(39, 36, 40, 0.566);
 }
 
-.inputDateFecha{
-  
-  &::part(content){
+.inputDateFecha {
+  &::part(content) {
     backdrop-filter: blur(6px);
   }
 
-  ion-content{
+  ion-content {
     --background: transparent;
     --padding-top: 23vh;
     --padding-start: 30px;
     --padding-end: 20px;
 
-    ion-datetime{
+    ion-datetime {
       border-radius: 10px;
-      
     }
   }
 }
 
-.modalHorario{
-  
-  &::part(content){
+.modalHorario {
+  &::part(content) {
     backdrop-filter: blur(6px);
   }
 
-  ion-content{
+  ion-content {
     --background: transparent;
     --padding-top: 10vh;
     --padding-start: 30px;
     --padding-end: 20px;
 
-    ion-datetime{
+    ion-datetime {
       border-radius: 10px;
-      
     }
   }
 }
@@ -252,7 +256,6 @@ ion-popover.noti-popover {
   --min-width: unset;
   --max-width: unset;
 }
-
 
 /* =====================================================
    MODAL SELECTOR COMPLETO - EMPLEADOS / DEPARTAMENTOS
@@ -392,7 +395,7 @@ ion-modal.modal-selector-completo .mensaje-vacio-selector {
   background: #ffffff;
   border: 1px dashed rgba(15, 23, 42, 0.14);
   border-radius: 20px;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.1);
 }
 
 ion-modal.modal-selector-completo .mensaje-vacio-selector ion-icon {
@@ -479,22 +482,184 @@ ion-modal.modal-selector-completo ion-footer ion-button {
   }
 
   .logo-contenedor {
-  width: fit-content;
-  max-width: 75%;
-  margin: 0 auto;
-  padding: 10px 16px;
-  border-radius: 18px;
-  background: #ffffff;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+    width: fit-content;
+    max-width: 75%;
+    margin: 0 auto;
+    padding: 10px 16px;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+  }
+
+  .logo-app {
+    display: block;
+    width: 100%;
+    max-width: 230px;
+    height: auto;
+    object-fit: contain;
+  }
 }
 
-.logo-app {
-  display: block;
-  width: 100%;
-  max-width: 230px;
-  height: auto;
-  object-fit: contain;
-}
+/* ============================================================
+   ALERTA DE TIMBRE PENDIENTE
+   ============================================================ */
+
+.alert-timbre-pendiente {
+  --width: 90%;
+  --max-width: 420px;
+
+  .alert-wrapper {
+    border-radius: 20px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.2),
+      0 4px 12px rgba(15, 23, 42, 0.08);
+  }
+
+  .alert-head {
+    padding: 24px 24px 6px;
+    text-align: center;
+  }
+
+  .alert-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  .alert-sub-title {
+    margin-top: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #d97706;
+  }
+
+  .alert-message {
+    max-height: none;
+    padding: 10px 22px 6px;
+    color: #334155;
+  }
+
+  .timbre-pendiente-contenido {
+    text-align: center;
+  }
+
+  .timbre-pendiente-icono {
+    width: 72px;
+    height: 72px;
+    margin: 4px auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #fff7ed;
+    color: #ea580c;
+  }
+
+  .timbre-pendiente-icono ion-icon {
+    font-size: 38px;
+  }
+
+  .timbre-pendiente-mensaje {
+    margin: 0 0 18px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #475569;
+  }
+
+  .timbre-pendiente-detalles {
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #f8fafc;
+  }
+
+  .timbre-pendiente-fila {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px 14px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+  }
+
+  .timbre-pendiente-fila:last-child {
+    border-bottom: none;
+  }
+
+  .timbre-pendiente-etiqueta {
+    flex-shrink: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+  }
+
+  .timbre-pendiente-valor {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  .timbre-pendiente-aviso {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    text-align: left;
+  }
+
+  .timbre-pendiente-aviso ion-icon {
+    flex-shrink: 0;
+    font-size: 22px;
+  }
+
+  .timbre-pendiente-aviso span {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .alert-button-group {
+    padding: 12px 22px 22px;
+  }
+
+  .alert-button {
+    width: 100%;
+    min-height: 46px;
+    margin: 0;
+    border-radius: 12px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .alert-button .alert-button-inner {
+    justify-content: center;
+  }
 }
 
+@media (max-width: 360px) {
+  .alert-timbre-pendiente {
+    --width: 94%;
 
+    .alert-message {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+
+    .timbre-pendiente-fila {
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .timbre-pendiente-valor {
+      text-align: left;
+    }
+  }
+}
