@@ -2301,54 +2301,91 @@ export class EnviartimbrePage implements OnInit {
       !!data.imagen;
 
     let mensajeMotivo =
-      'El timbre fue almacenado en la memoria del teléfono.';
+      'El timbre fue almacenado temporalmente en el teléfono.';
 
     if (motivo === 'SIN_INTERNET') {
       mensajeMotivo =
-        'No existe conexión a Internet. El timbre fue almacenado en la memoria del teléfono.';
+        'No existe conexión a Internet. El timbre quedó guardado en el teléfono.';
     }
 
     if (motivo === 'TIMEOUT') {
       mensajeMotivo =
-        'El servidor no respondió a tiempo. El timbre fue almacenado en la memoria del teléfono.';
+        'El servidor no respondió a tiempo. El timbre quedó guardado en el teléfono.';
     }
 
     if (motivo === 'ERROR_SERVIDOR') {
       mensajeMotivo =
-        'No fue posible comunicarse con el servidor. El timbre fue almacenado en la memoria del teléfono.';
+        'No fue posible comunicarse con el servidor. El timbre quedó guardado en el teléfono.';
     }
 
     const alert = await this.alertController.create({
+      cssClass: 'alert-timbre-pendiente',
       header: 'Timbre guardado',
       subHeader: 'Pendiente de sincronización',
 
       message: `
-      <div style="text-align: left;">
-        <p>${mensajeMotivo}</p>
+      <div class="timbre-pendiente-contenido">
 
-        <p>
-          <strong>Tipo:</strong><br>
-          ${nombreTimbre}
+        <div class="timbre-pendiente-icono">
+          <ion-icon name="cloud-offline-outline"></ion-icon>
+        </div>
+
+        <p class="timbre-pendiente-mensaje">
+          ${mensajeMotivo}
         </p>
 
-        <p>
-          <strong>Fecha y hora:</strong><br>
-          ${fechaTimbre}
-        </p>
+        <div class="timbre-pendiente-detalles">
 
-        <p>
-          <strong>Ubicación:</strong><br>
-          ${ubicacionTimbre}
-        </p>
+          <div class="timbre-pendiente-fila">
+            <span class="timbre-pendiente-etiqueta">
+              Tipo
+            </span>
 
-        <p>
-          <strong>Foto:</strong><br>
-          ${tieneFoto ? 'Sí, guardada con el timbre' : 'No registrada'}
-        </p>
+            <span class="timbre-pendiente-valor">
+              ${nombreTimbre}
+            </span>
+          </div>
 
-        <p style="margin-top: 16px;">
-          El timbre se enviará automáticamente cuando vuelva a existir conexión con el servidor.
-        </p>
+          <div class="timbre-pendiente-fila">
+            <span class="timbre-pendiente-etiqueta">
+              Fecha y hora
+            </span>
+
+            <span class="timbre-pendiente-valor">
+              ${fechaTimbre}
+            </span>
+          </div>
+
+          <div class="timbre-pendiente-fila">
+            <span class="timbre-pendiente-etiqueta">
+              Ubicación
+            </span>
+
+            <span class="timbre-pendiente-valor">
+              ${ubicacionTimbre}
+            </span>
+          </div>
+
+          <div class="timbre-pendiente-fila">
+            <span class="timbre-pendiente-etiqueta">
+              Foto
+            </span>
+
+            <span class="timbre-pendiente-valor">
+              ${tieneFoto ? 'Sí' : 'No'}
+            </span>
+          </div>
+
+        </div>
+
+        <div class="timbre-pendiente-aviso">
+          <ion-icon name="sync-outline"></ion-icon>
+
+          <span>
+            El timbre se enviará automáticamente cuando vuelva la conexión.
+          </span>
+        </div>
+
       </div>
     `,
 
@@ -2358,6 +2395,7 @@ export class EnviartimbrePage implements OnInit {
         {
           text: 'OK',
           role: 'confirm',
+          cssClass: 'boton-confirmar-timbre',
           handler: () => {
             this.navCtroller.navigateRoot([
               '/reloj/bienvenido'
