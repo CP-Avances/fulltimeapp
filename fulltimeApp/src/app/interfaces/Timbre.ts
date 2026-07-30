@@ -48,4 +48,14 @@ export interface ITimbreFechaEmpleadoRow {
     fecha_hora_timbre_validado: string | null;
 }
 
+export interface ConfiguracionMarcacionLocal {
+  empleadoId: number;
+  foto: boolean;
+  fotoObligatoria: boolean;
+  ubicacionDesconocida: boolean;
+  timbreEspecial: boolean;
+  requiereInternet: boolean;
+  fechaActualizacion: string;
+}
+
 

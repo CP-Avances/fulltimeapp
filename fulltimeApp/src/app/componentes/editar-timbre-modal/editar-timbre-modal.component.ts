@@ -30,8 +30,6 @@ export class EditarTimbreModalComponent implements OnInit {
   simbolo_ = '';
 
   seleccion: any;
-  SeleccionTecla: any;
-  teclaFun: any;
   envio_accion = '';
 
   // LISTA DE ACCIONES DE TIMBRES
@@ -44,17 +42,6 @@ export class EditarTimbreModalComponent implements OnInit {
     { value: '5', item: 'F/P', text: 'Fin permiso' },
     { value: '7', item: 'HA', text: 'Timbre libre' },
     { value: '99', item: 'D', text: 'Desconocido' },
-  ];
-
-  tecl_funcio: any[] = [
-    { value: '0' },
-    { value: '1' },
-    { value: '2' },
-    { value: '3' },
-    { value: '4' },
-    { value: '5' },
-    { value: '7' },
-    { value: '99' },
   ];
 
   constructor(
@@ -147,20 +134,22 @@ export class EditarTimbreModalComponent implements OnInit {
 
     this.ValidarObservacion();
 
+    this.acciones.forEach((elementAccion: any) => {
+      if (elementAccion.item == this.datosTimbre.accion) {
+        this.seleccion = elementAccion.value;
+      }
+    });
+
     this.EditartimbreForm = this.formBuilder.group({
-      accionTimbre: [this.datosTimbre.accion, Validators.required],
-      teclaFunTimbre: [String(this.datosTimbre.tecla_funcion ?? ''), Validators.required],
+      accionTimbre: [this.seleccion, Validators.required],
       ObservacionForm: [this.observacion]
     });
 
-    this.seleccion = this.datosTimbre.accion;
-    this.SeleccionTecla = String(this.datosTimbre.tecla_funcion ?? '');
   }
 
   crearFormularioVacio() {
     this.EditartimbreForm = this.formBuilder.group({
       accionTimbre: ['', Validators.required],
-      teclaFunTimbre: ['', Validators.required],
       ObservacionForm: ['']
     });
   }
@@ -194,56 +183,27 @@ export class EditarTimbreModalComponent implements OnInit {
   }
 
   // ============================================================
-  // SELECCIONAR ACCIÓN / TECLA
-  // ============================================================
-
-  SelectedAccion(event: any) {
-    const accionSeleccionada = event?.detail?.value;
-
-    this.seleccion = accionSeleccionada;
-
-    this.acciones.forEach((elementAccion: any) => {
-      if (elementAccion.item === this.seleccion) {
-        this.SeleccionTecla = elementAccion.value;
-      }
-    });
-
-    this.EditartimbreForm.patchValue({
-      accionTimbre: this.seleccion,
-      teclaFunTimbre: this.SeleccionTecla
-    });
-  }
-
-  SelectedTecla(event: any) {
-    const teclaSeleccionada = event?.detail?.value;
-
-    this.SeleccionTecla = teclaSeleccionada;
-
-    this.acciones.forEach((elementAccion: any) => {
-      if (elementAccion.value === this.SeleccionTecla) {
-        this.seleccion = elementAccion.item;
-      }
-    });
-
-    this.EditartimbreForm.patchValue({
-      accionTimbre: this.seleccion,
-      teclaFunTimbre: this.SeleccionTecla
-    });
-  }
-
-  // ============================================================
   // ACTUALIZAR TIMBRE
   // ============================================================
 
   EnviarDatosTimbre(formTimbre: any) {
     if (this.EditartimbreForm.invalid) {
       this.EditartimbreForm.markAllAsTouched();
-      this.mostrarToast('Complete la acción y tecla función.', 'warning');
+
+      this.mostrarToast(
+        'Complete la acción y tecla función.',
+        'warning'
+      );
+
       return;
     }
 
     if (!this.datosTimbre?.id) {
-      this.mostrarToast('No se encontró el identificador del timbre.', 'danger');
+      this.mostrarToast(
+        'No se encontró el identificador del timbre.',
+        'danger'
+      );
+
       return;
     }
 
@@ -252,40 +212,101 @@ export class EditarTimbreModalComponent implements OnInit {
       this.datosTimbre.fecha_hora_timbre ??
       this.datosTimbre.fecha_hora_timbre_servidor;
 
-    const observacionForm = String(formTimbre.ObservacionForm ?? '').trim();
+    const observacionForm = String(
+      formTimbre.ObservacionForm ?? ''
+    ).trim();
 
     const data = {
       id: this.datosTimbre.id,
       codigo: this.datosTimbre.codigo,
-      tecla: formTimbre.teclaFunTimbre,
+      tecla: formTimbre.accionTimbre,
+
       observacion: observacionForm
         ? this.simbolo_ + observacionForm
         : this.simbolo_.trim(),
+
       fecha: fechaTimbre,
     };
 
     this.enviando = true;
 
-    this.timbreServicio.EditarTimbreEmpleado(data).subscribe({
-      next: async () => {
-        this.enviando = false;
+    this.timbreServicio
+      .EditarTimbreEmpleado(data)
+      .subscribe({
+        next: async () => {
+          this.enviando = false;
 
-        await this.mostrarToast('Registros actualizados.', 'success');
+          await this.mostrarToast(
+            'Registros actualizados.',
+            'success'
+          );
 
-        this.modalController.dismiss({
-          actualizado: true
-        });
-      },
-      error: async () => {
-        this.enviando = false;
+          await this.modalController.dismiss({
+            actualizado: true
+          });
+        },
 
-        await this.mostrarToast('No se pudo actualizar el timbre.', 'danger');
+        error: async (error) => {
+          this.enviando = false;
 
-        this.modalController.dismiss({
-          actualizado: true
-        });
-      }
-    });
+          console.log('Error al editar timbre:', error);
+
+          if (error.status === 409) {
+            const mensajeBackend = String(
+              error?.error?.message ?? ''
+            ).trim();
+
+            const detalleBackend = String(
+              error?.error?.detalle ?? ''
+            ).trim();
+
+            const mensaje =
+              detalleBackend ||
+              (
+                mensajeBackend &&
+                  mensajeBackend !== 'Ha ocurrido un error'
+                  ? mensajeBackend
+                  : 'Ya existe un timbre con la acción seleccionada. Primero asigne al timbre existente su acción correcta y vuelva a intentarlo.'
+              );
+
+            await this.mostrarToast(
+              mensaje,
+              'warning'
+            );
+
+            /*
+             * Se cierra porque el usuario debe corregir
+             * primero otro timbre.
+             */
+            await this.modalController.dismiss({
+              actualizado: false
+            });
+
+            return;
+          }
+
+          const mensajeBackend = String(
+            error?.error?.detalle ??
+            error?.error?.message ??
+            ''
+          ).trim();
+
+          const mensaje =
+            mensajeBackend &&
+              mensajeBackend !== 'Ha ocurrido un error'
+              ? mensajeBackend
+              : 'No se pudo actualizar el timbre.';
+
+          await this.mostrarToast(
+            mensaje,
+            'danger'
+          );
+
+          await this.modalController.dismiss({
+            actualizado: false
+          });
+        }
+      });
   }
 
   cerrar() {

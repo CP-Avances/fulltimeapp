@@ -52,6 +52,7 @@ export class LoginPage implements OnInit {
   ) { }
 
   ionViewWillEnter() {
+    this.aceptaTerminos = false;
     this.infoDispositivo();
 
   }
@@ -60,8 +61,6 @@ export class LoginPage implements OnInit {
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
-
-    this.obtenerInfoTerminosCondiciones();
 
     const logueado = await this.relojService.estaLogueado();
 
@@ -108,35 +107,18 @@ export class LoginPage implements OnInit {
   }
 
   // METODO PARA OBTENER LA INFORMACION DEL DISPOSITIVO
-  infoDispositivo() {
-    Device.getId().then((id) => {
-      this.id_celular = id.identifier;
-    });
-    Device.getInfo().then((info) => {
-      this.dispositi = info.model;
-    });
-  }
+  async infoDispositivo(): Promise<void> {
+    const id =
+      await Device.getId();
 
-  // METODO PARA CONTROLAR LA ACPETACION DE TERMINOS Y CONDICIONES
-  obtenerInfoTerminosCondiciones() {
-    this.infoDispositivo();
-    Device.getId().then((id) => {
-      this.relojService.obtenerDispositivoPorID(id.identifier).subscribe(
-        {
-          next: dispositivos => {
-            if (dispositivos.terminos_condiciones != null) {
-              this.aceptaTerminos = dispositivos.terminos_condiciones;
-              this.mostrarCheckboxInicialmente = this.aceptaTerminos;
-            } else {
-              this.aceptaTerminos = false;
-            }
-          }, error: () => {
-            this.aceptaTerminos = false;
-          }
-        }
-      )
-    });
+    const info =
+      await Device.getInfo();
 
+    this.id_celular =
+      id.identifier;
+
+    this.dispositi =
+      info.model;
   }
 
   mostrarPassword(): void {
@@ -168,25 +150,51 @@ export class LoginPage implements OnInit {
 
     this.iniciandoSesion = true;
     this.existeId_Dispositivo = false;
-    this.infoDispositivo();
+
+    await this.infoDispositivo();
+
+    if (!this.aceptaTerminos) {
+      this.iniciandoSesion = false;
+
+      return this.usuarioIncorrectoToas(
+        'Debe aceptar los Términos y Condiciones AQHora y la Política de Privacidad AQHora.',
+        3000
+      );
+    }
 
     const credenciales = {
       nombre_usuario: this.user.nombre_usuario,
       pass: this.user.pass,
       movil: true,
       codigoEmpresa: this.user.codigo_empresa,
+      id_dispositivo: this.id_celular,
+      acepta_terminos: this.aceptaTerminos
     };
 
-    if (!credenciales.nombre_usuario || !credenciales.pass || !credenciales.codigoEmpresa) {
+    if (
+      !credenciales.nombre_usuario ||
+      !credenciales.pass ||
+      !credenciales.codigoEmpresa
+    ) {
       this.iniciandoSesion = false;
-      return this.usuarioIncorrectoToas("Ups! Ingrese sus datos.", 2000);
+
+      return this.usuarioIncorrectoToas(
+        'Ups! Ingrese sus datos.',
+        2000
+      );
     }
 
     try {
-      const datos = await this.relojService.ValidarCredencialesMT(credenciales);
+      const datos =
+        await this.relojService
+          .ValidarCredencialesMT(
+            credenciales
+          );
 
       await this.registrarDatosLocales(datos);
-      await this.pushNotificationService.inicializarPushNotifications();
+      await this.pushNotificationService
+        .inicializarPushNotifications();
+
       await this.obtenerImagen64();
       await this.BuscarParametroNumeroDispositivos(datos);
 
@@ -198,7 +206,10 @@ export class LoginPage implements OnInit {
         error?.message ??
         'Error al validar credenciales.';
 
-      this.usuarioIncorrectoToas(mensaje, 3000);
+      this.usuarioIncorrectoToas(
+        mensaje,
+        3000
+      );
     }
   }
 
@@ -355,7 +366,6 @@ export class LoginPage implements OnInit {
 
   // METODO PARA REGISTRAR EL DISPOSITIVO
   registrarIdDispositivoenBDD(id_celular: any, model_dispositivo: any) {
-    this.obtenerInfoTerminosCondiciones();
 
     const id_usuario = localStorage.getItem('empleadoID');
 
