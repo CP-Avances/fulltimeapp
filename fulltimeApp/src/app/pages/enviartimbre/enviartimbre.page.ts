@@ -1830,8 +1830,7 @@ export class EnviartimbrePage implements OnInit {
     longitud: any,
     rango: any
   ): Promise<string> {
-    const teclaFuncion =
-      this.obtenerIdTipo();
+    const teclaFuncion = this.obtenerIdTipo();
 
     const esTimbreFlexible =
       this.EsTimbreFlexibleUbicacion(
@@ -1839,7 +1838,7 @@ export class EnviartimbrePage implements OnInit {
       );
 
     /*
-     * Cuando el módulo de geolocalización no está activo,
+     * Si el módulo de geolocalización no está activo,
      * no existe una restricción de zona que validar.
      */
     if (this.modulo_geolocalizacion !== true) {
@@ -1847,10 +1846,7 @@ export class EnviartimbrePage implements OnInit {
     }
 
     /*
-     * Primero verificamos que el teléfono haya conseguido
-     * coordenadas mediante GPS.
-     *
-     * Tener GPS no requiere necesariamente Internet.
+     * El teléfono no logró obtener coordenadas GPS.
      */
     if (
       !latitud ||
@@ -1868,11 +1864,11 @@ export class EnviartimbrePage implements OnInit {
         .getNetworkStatusDispositivo();
 
     /*
-     * El empleado tiene coordenadas, pero no hay Internet
-     * para consultar las zonas asignadas.
+     * Hay coordenadas GPS, pero no existe conexión
+     * para consultar las zonas y el domicilio.
      *
-     * La autorización para timbrar sin Internet se valida
-     * después mediante requiereInternet.
+     * Más adelante se validará si el empleado tiene
+     * permitido timbrar sin Internet.
      */
     if (this.isConnected !== true) {
       return 'SIN CONEXIÓN A INTERNET';
@@ -1887,13 +1883,17 @@ export class EnviartimbrePage implements OnInit {
     };
 
     /*
-     * Buscar zonas asignadas directamente al empleado.
+     * Primero consultar las zonas asignadas.
      */
     const resultadoZonas =
       await this.buscarUbicacionPermitida(
         informacion
       );
 
+    /*
+     * Si se encuentra dentro de una zona,
+     * se devuelve el nombre de esa zona.
+     */
     if (
       resultadoZonas.estado ===
       'ENCONTRADA'
@@ -1902,13 +1902,17 @@ export class EnviartimbrePage implements OnInit {
     }
 
     /*
-     * Buscar domicilio.
+     * Si no está dentro de una zona, buscar domicilio.
      */
     const resultadoDomicilio =
       await this.buscarUbicacionDomicilio(
         informacion
       );
 
+    /*
+     * Si se encuentra dentro del domicilio,
+     * se devuelve DOMICILIO.
+     */
     if (
       resultadoDomicilio.estado ===
       'ENCONTRADA'
@@ -1917,10 +1921,10 @@ export class EnviartimbrePage implements OnInit {
     }
 
     /*
-     * No existen zonas ni domicilio asignados.
+     * No tiene zonas asignadas ni domicilio.
      *
-     * Esto no es responsabilidad del empleado,
-     * por tanto se permite realizar la marcación.
+     * Se permite timbrar porque la falta de asignación
+     * no es responsabilidad del usuario.
      */
     if (
       resultadoZonas.estado ===
@@ -1932,9 +1936,10 @@ export class EnviartimbrePage implements OnInit {
     }
 
     /*
-     * Hubo un problema técnico al consultar la configuración.
+     * Una de las consultas falló por un problema técnico.
      *
-     * No se confunde con "no tiene zonas asignadas".
+     * Esto no debe confundirse con no tener una
+     * zona o domicilio asignado.
      */
     if (
       resultadoZonas.estado === 'ERROR' ||
@@ -1944,8 +1949,11 @@ export class EnviartimbrePage implements OnInit {
     }
 
     /*
-     * Existen zonas asignadas, pero las coordenadas
-     * no pertenecen a ninguna.
+     * En este punto sí existe una zona o domicilio asignado,
+     * pero el usuario está fuera del perímetro.
+     *
+     * Si puede timbrar desde ubicación desconocida,
+     * o se trata de un timbre flexible, se permite.
      */
     if (
       this.desconocida === true ||
@@ -1954,6 +1962,10 @@ export class EnviartimbrePage implements OnInit {
       return 'DESCONOCIDO';
     }
 
+    /*
+     * Tiene zona o domicilio asignado, pero está fuera
+     * y no tiene habilitada la ubicación desconocida.
+     */
     return 'FUERA DE ZONA';
   }
 
@@ -1961,28 +1973,24 @@ export class EnviartimbrePage implements OnInit {
     informacion: any
   ): Promise<ResultadoConsultaUbicacion> {
     try {
-      const res: any =
-        await firstValueFrom(
-          this.restP
-            .ObtenerUbicacionUsuario(
-              this.id_usuario
-            )
-            .pipe(timeout(5000))
-        );
+      const res: any = await firstValueFrom(
+        this.restP
+          .ObtenerUbicacionUsuario(this.id_usuario)
+          .pipe(timeout(5000))
+      );
 
       const datosUbicacion: any[] =
-        res?.data ??
-        res ??
-        [];
+        Array.isArray(res?.data)
+          ? res.data
+          : Array.isArray(res)
+            ? res
+            : [];
 
       /*
-       * El servidor respondió correctamente,
+       * La consulta respondió correctamente,
        * pero el empleado no tiene zonas asignadas.
        */
-      if (
-        !Array.isArray(datosUbicacion) ||
-        datosUbicacion.length === 0
-      ) {
+      if (datosUbicacion.length === 0) {
         return {
           estado: 'NO_ASIGNADA',
           ubicacion: ''
@@ -1990,6 +1998,16 @@ export class EnviartimbrePage implements OnInit {
       }
 
       for (const zona of datosUbicacion) {
+        /*
+         * Ignorar registros incompletos.
+         */
+        if (
+          !zona?.latitud ||
+          !zona?.longitud
+        ) {
+          continue;
+        }
+
         const datosValidacion = {
           ...informacion,
           lat2: zona.latitud,
@@ -2004,24 +2022,34 @@ export class EnviartimbrePage implements OnInit {
         if (estaDentro) {
           return {
             estado: 'ENCONTRADA',
-
             ubicacion:
-              zona.descripcion ??
+              zona.descripcion ||
               'Ubicación permitida'
           };
         }
       }
 
       /*
-       * Sí tiene zonas asignadas, pero no se encuentra
-       * dentro de ninguna.
+       * Sí existen zonas válidas, pero el empleado
+       * se encuentra fuera de todas ellas.
        */
       return {
         estado: 'FUERA_DE_ZONA',
         ubicacion: ''
       };
 
-    } catch (error) {
+    } catch (error: any) {
+      /*
+       * En este servicio, 404 significa que el empleado
+       * no tiene zonas asignadas.
+       */
+      if (error?.status === 404) {
+        return {
+          estado: 'NO_ASIGNADA',
+          ubicacion: ''
+        };
+      }
+
       console.warn(
         'No se pudieron consultar las zonas asignadas:',
         error
@@ -2038,26 +2066,26 @@ export class EnviartimbrePage implements OnInit {
     informacion: any
   ): Promise<ResultadoConsultaUbicacion> {
     try {
-      const res: any =
-        await firstValueFrom(
-          this.restE
-            .ObtenerUbicacion(
-              this.id_usuario
-            )
-            .pipe(timeout(5000))
-        );
+      const res: any = await firstValueFrom(
+        this.restE
+          .ObtenerUbicacion(this.id_usuario)
+          .pipe(timeout(5000))
+      );
 
       const domicilio =
         res?.data?.[0] ??
+        res?.respuesta?.[0] ??
         res?.[0] ??
         null;
 
       /*
-       * El empleado no tiene domicilio registrado.
+       * El servicio respondió, pero el empleado
+       * no tiene domicilio registrado.
        */
       if (
-        !domicilio?.latitud ||
-        !domicilio?.longitud
+        !domicilio ||
+        !domicilio.latitud ||
+        !domicilio.longitud
       ) {
         return {
           estado: 'NO_ASIGNADA',
@@ -2083,12 +2111,27 @@ export class EnviartimbrePage implements OnInit {
         };
       }
 
+      /*
+       * Tiene domicilio asignado, pero está fuera
+       * del perímetro permitido.
+       */
       return {
         estado: 'FUERA_DE_ZONA',
         ubicacion: ''
       };
 
-    } catch (error) {
+    } catch (error: any) {
+      /*
+       * Un 404 significa que no tiene domicilio,
+       * no que exista un error de validación.
+       */
+      if (error?.status === 404) {
+        return {
+          estado: 'NO_ASIGNADA',
+          ubicacion: ''
+        };
+      }
+
       console.warn(
         'No se pudo consultar el domicilio:',
         error
