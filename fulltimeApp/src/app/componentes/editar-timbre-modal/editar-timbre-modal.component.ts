@@ -216,16 +216,40 @@ export class EditarTimbreModalComponent implements OnInit {
       formTimbre.ObservacionForm ?? ''
     ).trim();
 
+    /*
+     * La tecla original puede venir directamente en
+     * tecla_funcion. Si no existe, usamos la selección
+     * identificada al cargar el formulario.
+     */
+    const teclaAnterior =
+      this.datosTimbre.tecla_funcion ??
+      this.seleccion;
+
+    const teclaNueva =
+      formTimbre.accionTimbre;
+
+    const novedadesGenerales =
+      this.construirNovedadesGenerales(
+        teclaAnterior,
+        teclaNueva
+      );
+
     const data = {
       id: this.datosTimbre.id,
       codigo: this.datosTimbre.codigo,
-      tecla: formTimbre.accionTimbre,
+      tecla: teclaNueva,
 
       observacion: observacionForm
         ? this.simbolo_ + observacionForm
         : this.simbolo_.trim(),
 
       fecha: fechaTimbre,
+
+      /*
+       * Campo nuevo enviado al backend.
+       */
+      novedades_generales:
+        novedadesGenerales
     };
 
     this.enviando = true;
@@ -249,7 +273,10 @@ export class EditarTimbreModalComponent implements OnInit {
         error: async (error) => {
           this.enviando = false;
 
-          console.log('Error al editar timbre:', error);
+          console.log(
+            'Error al editar timbre:',
+            error
+          );
 
           if (error.status === 409) {
             const mensajeBackend = String(
@@ -264,7 +291,8 @@ export class EditarTimbreModalComponent implements OnInit {
               detalleBackend ||
               (
                 mensajeBackend &&
-                  mensajeBackend !== 'Ha ocurrido un error'
+                  mensajeBackend !==
+                  'Ha ocurrido un error'
                   ? mensajeBackend
                   : 'Ya existe un timbre con la acción seleccionada. Primero asigne al timbre existente su acción correcta y vuelva a intentarlo.'
               );
@@ -274,10 +302,6 @@ export class EditarTimbreModalComponent implements OnInit {
               'warning'
             );
 
-            /*
-             * Se cierra porque el usuario debe corregir
-             * primero otro timbre.
-             */
             await this.modalController.dismiss({
               actualizado: false
             });
@@ -293,7 +317,8 @@ export class EditarTimbreModalComponent implements OnInit {
 
           const mensaje =
             mensajeBackend &&
-              mensajeBackend !== 'Ha ocurrido un error'
+              mensajeBackend !==
+              'Ha ocurrido un error'
               ? mensajeBackend
               : 'No se pudo actualizar el timbre.';
 
@@ -328,5 +353,78 @@ export class EditarTimbreModalComponent implements OnInit {
     });
 
     await toast.present();
+  }
+
+  private esAccionFlexible(tecla: any): boolean {
+    return ['2', '3', '4', '5', '7']
+      .includes(String(tecla ?? '').trim());
+  }
+
+  private esAccionConValidacionZona(tecla: any): boolean {
+    return ['0', '1']
+      .includes(String(tecla ?? '').trim());
+  }
+
+  private obtenerNombreAccion(tecla: any): string {
+    const accion = this.acciones.find(
+      (item: any) =>
+        String(item.value) ===
+        String(tecla ?? '')
+    );
+
+    return accion?.text ?? 'Acción desconocida';
+  }
+
+  private construirNovedadesGenerales(
+    teclaAnterior: any,
+    teclaNueva: any
+  ): string | null {
+    const novedadAnterior = String(
+      this.datosTimbre?.novedades_generales ?? ''
+    ).trim();
+
+    const accionFueModificada =
+      String(teclaAnterior ?? '') !==
+      String(teclaNueva ?? '');
+
+    const cambioFlexibleAZona =
+      this.esAccionFlexible(teclaAnterior) &&
+      this.esAccionConValidacionZona(teclaNueva);
+
+    /*
+     * Solo se genera esta novedad cuando una acción libre
+     * cambia a Entrada o Salida.
+     */
+    if (
+      !accionFueModificada ||
+      !cambioFlexibleAZona
+    ) {
+      return novedadAnterior || null;
+    }
+
+    const accionAnterior =
+      this.obtenerNombreAccion(teclaAnterior);
+
+    const accionNueva =
+      this.obtenerNombreAccion(teclaNueva);
+
+    const ubicacionOriginal = String(
+      this.datosTimbre?.ubicacion ??
+      'SIN INFORMACIÓN DE UBICACIÓN'
+    ).trim();
+
+    const nuevaNovedad =
+      `ACCIÓN EDITADA: de ${accionAnterior.toUpperCase()} ` +
+      `a ${accionNueva.toUpperCase()}. ` +
+      `La ubicación original fue registrada como ` +
+      `${ubicacionOriginal.toUpperCase()} y no fue validada ` +
+      `para la nueva acción.`;
+
+    /*
+     * Conservar novedades anteriores, en caso de existir.
+     */
+    return novedadAnterior
+      ? `${novedadAnterior} | ${nuevaNovedad}`
+      : nuevaNovedad;
   }
 }

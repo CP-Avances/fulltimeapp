@@ -902,10 +902,10 @@ export class EnviartimbrePage implements OnInit {
     }
 
     /*
-      Validación temprana.
-      Aquí todavía NO se bloquea el botón ni se inicia ubicación/foto/biometría.
-    */
-    const observacionValida = this.validarObservacionAntesDeEnviar();
+     * Validar primero la observación para timbre abierto.
+     */
+    const observacionValida =
+      this.validarObservacionAntesDeEnviar();
 
     if (!observacionValida) {
       return;
@@ -914,42 +914,82 @@ export class EnviartimbrePage implements OnInit {
     this.enviandoTimbre = true;
 
     try {
-      const teclaFuncion = this.obtenerIdTipo();
-      const esTimbreFlexible = this.EsTimbreFlexibleUbicacion(teclaFuncion);
+      const teclaFuncion =
+        this.obtenerIdTipo();
+
+      const esTimbreFlexible =
+        this.EsTimbreFlexibleUbicacion(
+          teclaFuncion
+        );
 
       let ubicacionObtenida = false;
 
+      /*
+       * ==========================================================
+       * DISPOSITIVO MÓVIL
+       * ==========================================================
+       */
       if (this.platform.is('hybrid')) {
-        const tienePermisoUbicacion = await this.solicitarPermisoUbicacionInicial();
+        const tienePermisoUbicacion =
+          await this.solicitarPermisoUbicacionInicial();
 
+        /*
+         * El usuario no concedió permiso de ubicación.
+         */
         if (!tienePermisoUbicacion) {
           this.geoLatitude = 0;
           this.geoLongitude = 0;
+          this.precisionUbicacion = null;
 
+          /*
+           * Alimentación, permisos y timbre especial:
+           * siempre se permiten.
+           */
           if (esTimbreFlexible) {
-            this.actualizarUbicacionPantalla('SIN UBICACION');
-
-            await this.abrirToas(
-              'No se obtuvo permiso de ubicación. Este tipo de timbre se registrará como SIN UBICACION.',
-              'warning',
-              4000,
-              'middle'
+            this.actualizarUbicacionPantalla(
+              'UBICACIÓN LIBRE'
             );
+
+            ubicacionObtenida = false;
+
           } else {
+            /*
+             * Entrada y salida de jornada sí necesitan
+             * permiso de ubicación.
+             */
             this.enviandoTimbre = false;
 
-            return this.abrirToas(
+            await this.abrirToas(
               'Debe permitir el acceso a la ubicación para registrar este tipo de timbre.',
               'danger',
               6000,
               'middle'
             );
+
+            return;
           }
+
         } else {
-          ubicacionObtenida = await this.obtenerPosicion(!esTimbreFlexible);
+          /*
+           * El permiso existe. Intentar obtener GPS.
+           *
+           * Para timbres flexibles no mostramos mensaje
+           * de error si el GPS falla, porque igual pueden
+           * continuar como UBICACIÓN LIBRE.
+           */
+          ubicacionObtenida =
+            await this.obtenerPosicion(
+              !esTimbreFlexible
+            );
         }
 
       } else {
+        /*
+         * ========================================================
+         * NAVEGADOR
+         * ========================================================
+         */
+
         await this.abrirToas(
           'Prueba desde navegador: no se usará autenticación biométrica.',
           'warning',
@@ -957,29 +997,71 @@ export class EnviartimbrePage implements OnInit {
           'middle'
         );
 
-        this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
+        this.nuevoTimbre.tipo_autenticacion =
+          this.NINGUNA_IDENTIFICACION;
 
-        ubicacionObtenida = await this.obtenerPosicionWeb(!esTimbreFlexible);
+        ubicacionObtenida =
+          await this.obtenerPosicionWeb(
+            !esTimbreFlexible
+          );
       }
 
-      if (!ubicacionObtenida && esTimbreFlexible) {
+      /*
+       * Si no se obtuvo GPS y es alimentación,
+       * permiso o timbre especial, se permite
+       * continuar como UBICACIÓN LIBRE.
+       */
+      if (
+        !ubicacionObtenida &&
+        esTimbreFlexible
+      ) {
         this.geoLatitude = 0;
         this.geoLongitude = 0;
-        this.actualizarUbicacionPantalla('SIN UBICACION');
+        this.precisionUbicacion = null;
+
+        this.actualizarUbicacionPantalla(
+          'UBICACIÓN LIBRE'
+        );
       }
 
-      await this.actualizarUbicacionAntesDeContinuar();
+      /*
+       * Si sí existen coordenadas, este método consulta:
+       *
+       * 1. zonas asignadas;
+       * 2. domicilio;
+       * 3. si no coincide y es flexible, devuelve
+       *    UBICACIÓN LIBRE.
+       */
+      if (ubicacionObtenida) {
+        await this.actualizarUbicacionAntesDeContinuar();
+      }
 
+      /*
+       * Validación final:
+       *
+       * - alimentación, permisos y especial siempre pasan;
+       * - entrada y salida aplican las reglas de zona.
+       */
       const ubicacionValida =
-        await this.validarUbicacionParaContinuar(teclaFuncion);
+        await this.validarUbicacionParaContinuar(
+          teclaFuncion
+        );
 
       if (!ubicacionValida) {
         return;
       }
 
+      /*
+       * Continuar con foto, autenticación y guardado.
+       */
       await this.iniciarProcesoFoto();
 
-    } catch {
+    } catch (error) {
+      console.error(
+        'Error al procesar el timbre:',
+        error
+      );
+
       this.enviandoTimbre = false;
 
       await this.abrirToas(
@@ -1830,7 +1912,8 @@ export class EnviartimbrePage implements OnInit {
     longitud: any,
     rango: any
   ): Promise<string> {
-    const teclaFuncion = this.obtenerIdTipo();
+    const teclaFuncion =
+      this.obtenerIdTipo();
 
     const esTimbreFlexible =
       this.EsTimbreFlexibleUbicacion(
@@ -1838,15 +1921,22 @@ export class EnviartimbrePage implements OnInit {
       );
 
     /*
-     * Si el módulo de geolocalización no está activo,
-     * no existe una restricción de zona que validar.
+     * Si el módulo de geolocalización no está activo:
+     *
+     * - alimentación, permisos y especial se registran
+     *   como UBICACIÓN LIBRE;
+     * - entrada y salida se registran sin ubicación asignada.
      */
     if (this.modulo_geolocalizacion !== true) {
-      return 'SIN UBICACIÓN ASIGNADA';
+      return esTimbreFlexible
+        ? 'UBICACIÓN LIBRE'
+        : 'SIN UBICACIÓN ASIGNADA';
     }
 
     /*
-     * El teléfono no logró obtener coordenadas GPS.
+     * No se obtuvieron coordenadas GPS.
+     *
+     * Los timbres flexibles siempre se permiten.
      */
     if (
       !latitud ||
@@ -1855,8 +1945,8 @@ export class EnviartimbrePage implements OnInit {
       Number(longitud) === 0
     ) {
       return esTimbreFlexible
-        ? 'SIN UBICACIÓN'
-        : 'Sin Ubicación';
+        ? 'UBICACIÓN LIBRE'
+        : 'SIN UBICACIÓN';
     }
 
     this.isConnected =
@@ -1864,14 +1954,15 @@ export class EnviartimbrePage implements OnInit {
         .getNetworkStatusDispositivo();
 
     /*
-     * Hay coordenadas GPS, pero no existe conexión
-     * para consultar las zonas y el domicilio.
+     * Sin Internet no podemos consultar zonas ni domicilio.
      *
-     * Más adelante se validará si el empleado tiene
-     * permitido timbrar sin Internet.
+     * Para timbres flexibles se registra UBICACIÓN LIBRE.
+     * Para entrada y salida se aplica la validación offline.
      */
     if (this.isConnected !== true) {
-      return 'SIN CONEXIÓN A INTERNET';
+      return esTimbreFlexible
+        ? 'UBICACIÓN LIBRE'
+        : 'SIN CONEXIÓN A INTERNET';
     }
 
     const informacion: any = {
@@ -1891,8 +1982,10 @@ export class EnviartimbrePage implements OnInit {
       );
 
     /*
-     * Si se encuentra dentro de una zona,
-     * se devuelve el nombre de esa zona.
+     * Está dentro de una zona asignada.
+     *
+     * Esto se aplica tanto para timbres normales
+     * como para alimentación, permisos y especial.
      */
     if (
       resultadoZonas.estado ===
@@ -1902,7 +1995,7 @@ export class EnviartimbrePage implements OnInit {
     }
 
     /*
-     * Si no está dentro de una zona, buscar domicilio.
+     * Si no coincide con una zona, consultar domicilio.
      */
     const resultadoDomicilio =
       await this.buscarUbicacionDomicilio(
@@ -1910,8 +2003,7 @@ export class EnviartimbrePage implements OnInit {
       );
 
     /*
-     * Si se encuentra dentro del domicilio,
-     * se devuelve DOMICILIO.
+     * Está dentro del domicilio.
      */
     if (
       resultadoDomicilio.estado ===
@@ -1921,10 +2013,24 @@ export class EnviartimbrePage implements OnInit {
     }
 
     /*
-     * No tiene zonas asignadas ni domicilio.
+     * Alimentación, permisos y timbre especial:
      *
-     * Se permite timbrar porque la falta de asignación
-     * no es responsabilidad del usuario.
+     * - ya se consultaron zonas;
+     * - ya se consultó domicilio;
+     * - no coincide con ninguno;
+     * - siempre se permite la marcación.
+     */
+    if (esTimbreFlexible) {
+      return 'UBICACIÓN LIBRE';
+    }
+
+    /*
+     * Desde aquí continúan únicamente las validaciones
+     * de entrada y salida de jornada.
+     */
+
+    /*
+     * No tiene zonas ni domicilio asignados.
      */
     if (
       resultadoZonas.estado ===
@@ -1936,10 +2042,20 @@ export class EnviartimbrePage implements OnInit {
     }
 
     /*
-     * Una de las consultas falló por un problema técnico.
-     *
-     * Esto no debe confundirse con no tener una
-     * zona o domicilio asignado.
+     * No tiene zonas asignadas, pero sí tiene domicilio
+     * y se encuentra fuera de él.
+     */
+    if (
+      resultadoZonas.estado ===
+      'NO_ASIGNADA' &&
+      resultadoDomicilio.estado ===
+      'FUERA_DE_ZONA'
+    ) {
+      return 'SIN ZONA ASIGNADA - FUERA DEL DOMICILIO';
+    }
+
+    /*
+     * Error técnico real al consultar la ubicación.
      */
     if (
       resultadoZonas.estado === 'ERROR' ||
@@ -1949,23 +2065,14 @@ export class EnviartimbrePage implements OnInit {
     }
 
     /*
-     * En este punto sí existe una zona o domicilio asignado,
-     * pero el usuario está fuera del perímetro.
-     *
-     * Si puede timbrar desde ubicación desconocida,
-     * o se trata de un timbre flexible, se permite.
+     * Tiene una zona o domicilio asignado, pero está fuera.
+     * Se permite únicamente cuando puede timbrar desde
+     * ubicación desconocida.
      */
-    if (
-      this.desconocida === true ||
-      esTimbreFlexible
-    ) {
+    if (this.desconocida === true) {
       return 'DESCONOCIDO';
     }
 
-    /*
-     * Tiene zona o domicilio asignado, pero está fuera
-     * y no tiene habilitada la ubicación desconocida.
-     */
     return 'FUERA DE ZONA';
   }
 
@@ -2224,32 +2331,44 @@ export class EnviartimbrePage implements OnInit {
         .toUpperCase();
 
     /*
-     * El GPS no proporcionó coordenadas.
+     * Alimentación, permisos y timbre especial
+     * siempre están permitidos.
+     *
+     * Se conserva la ubicación calculada:
+     * - nombre de la zona;
+     * - DOMICILIO;
+     * - UBICACIÓN LIBRE.
      */
+    if (esFlexible) {
+      if (
+        !ubicacionActual ||
+        ubicacionActual ===
+        'VALIDANDO UBICACIÓN...' ||
+        ubicacionActual ===
+        'VALIDANDO UBICACION...'
+      ) {
+        this.actualizarUbicacionPantalla(
+          'UBICACIÓN LIBRE'
+        );
+      }
+
+      return true;
+    }
+
+    /*
+     * Desde aquí continúan solo las validaciones
+     * de entrada y salida.
+     */
+
     if (
       !ubicacionActual ||
       this.EsUbicacionNoValida(
         ubicacionActual
       )
     ) {
-      if (esFlexible) {
-        this.actualizarUbicacionPantalla(
-          'SIN UBICACIÓN'
-        );
-
-        return true;
-      }
-
       return false;
     }
 
-    /*
-     * No hay Internet para consultar las zonas.
-     *
-     * Se permite continuar únicamente cuando existe
-     * una configuración válida y esa configuración
-     * permite timbrar sin conexión.
-     */
     if (
       ubicacionActual ===
       'SIN CONEXIÓN A INTERNET' ||
@@ -2263,10 +2382,6 @@ export class EnviartimbrePage implements OnInit {
       );
     }
 
-    /*
-     * El empleado no tiene ninguna zona ni domicilio
-     * asignados. Se permite la marcación.
-     */
     if (
       ubicacionActual ===
       'SIN UBICACIÓN ASIGNADA' ||
@@ -2276,10 +2391,13 @@ export class EnviartimbrePage implements OnInit {
       return true;
     }
 
-    /*
-     * Ocurrió un error técnico al consultar las zonas.
-     * No debe confundirse con no tener asignaciones.
-     */
+    if (
+      ubicacionActual ===
+      'SIN ZONA ASIGNADA - FUERA DEL DOMICILIO'
+    ) {
+      return true;
+    }
+
     if (
       ubicacionActual ===
       'ERROR AL VALIDAR UBICACIÓN' ||
@@ -2289,23 +2407,18 @@ export class EnviartimbrePage implements OnInit {
       return false;
     }
 
-    /*
-     * Tiene zonas asignadas, pero está fuera de ellas.
-     */
-    if (ubicacionActual === 'FUERA DE ZONA') {
+    if (
+      ubicacionActual ===
+      'FUERA DE ZONA'
+    ) {
       return false;
     }
 
-    /*
-     * No coincide con una zona, pero el empleado tiene
-     * habilitada la ubicación desconocida o se trata
-     * de un timbre flexible.
-     */
-    if (ubicacionActual === 'DESCONOCIDO') {
-      return (
-        this.desconocida === true ||
-        esFlexible
-      );
+    if (
+      ubicacionActual ===
+      'DESCONOCIDO'
+    ) {
+      return this.desconocida === true;
     }
 
     return true;
