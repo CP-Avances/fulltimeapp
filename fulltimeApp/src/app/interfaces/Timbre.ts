@@ -58,4 +58,14 @@ export interface ConfiguracionMarcacionLocal {
   fechaActualizacion: string;
 }
 
+export type EstadoConsultaUbicacion =
+  | 'ENCONTRADA'
+  | 'NO_ASIGNADA'
+  | 'FUERA_DE_ZONA'
+  | 'ERROR';
+
+export interface ResultadoConsultaUbicacion {
+  estado: EstadoConsultaUbicacion;
+  ubicacion: string;
+}
 
