@@ -14,7 +14,7 @@ import {
 import { firstValueFrom } from 'rxjs';
 import { timeout } from 'rxjs/operators';
 
-import { ConfiguracionMarcacionLocal, Timbre } from '../../interfaces/Timbre';
+import { ConfiguracionMarcacionLocal, ResultadoConsultaUbicacion, Timbre } from '../../interfaces/Timbre';
 import { DataLocalService } from '../../libs/data-local.service';
 import { NetworkService } from '../../libs/network.service';
 import { RelojServiceService } from '../../services/reloj-service.service';
@@ -25,6 +25,8 @@ import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ParametrosSistema } from 'src/app/libs/parametros.emun';
 
 type MotivoConexion = 'SIN_INTERNET' | 'ERROR_SERVIDOR' | 'TIMEOUT' | 'OK';
+
+
 
 @Component({
   selector: 'app-enviartimbre',
@@ -1823,16 +1825,57 @@ export class EnviartimbrePage implements OnInit {
     }
   }
 
-  async calcularUbicacionActual(latitud: any, longitud: any, rango: any): Promise<string> {
-    const teclaFuncion = this.obtenerIdTipo();
-    const esTimbreFlexible = this.EsTimbreFlexibleUbicacion(teclaFuncion);
+  async calcularUbicacionActual(
+    latitud: any,
+    longitud: any,
+    rango: any
+  ): Promise<string> {
+    const teclaFuncion =
+      this.obtenerIdTipo();
 
+    const esTimbreFlexible =
+      this.EsTimbreFlexibleUbicacion(
+        teclaFuncion
+      );
+
+    /*
+     * Cuando el módulo de geolocalización no está activo,
+     * no existe una restricción de zona que validar.
+     */
     if (this.modulo_geolocalizacion !== true) {
-      return esTimbreFlexible ? 'DESCONOCIDO' : 'Sin Ubicación';
+      return 'SIN UBICACIÓN ASIGNADA';
     }
 
-    if (!latitud || !longitud || Number(latitud) === 0 || Number(longitud) === 0) {
-      return esTimbreFlexible ? 'SIN UBICACION' : 'Sin Ubicación';
+    /*
+     * Primero verificamos que el teléfono haya conseguido
+     * coordenadas mediante GPS.
+     *
+     * Tener GPS no requiere necesariamente Internet.
+     */
+    if (
+      !latitud ||
+      !longitud ||
+      Number(latitud) === 0 ||
+      Number(longitud) === 0
+    ) {
+      return esTimbreFlexible
+        ? 'SIN UBICACIÓN'
+        : 'Sin Ubicación';
+    }
+
+    this.isConnected =
+      this.networkService
+        .getNetworkStatusDispositivo();
+
+    /*
+     * El empleado tiene coordenadas, pero no hay Internet
+     * para consultar las zonas asignadas.
+     *
+     * La autorización para timbrar sin Internet se valida
+     * después mediante requiereInternet.
+     */
+    if (this.isConnected !== true) {
+      return 'SIN CONEXIÓN A INTERNET';
     }
 
     const informacion: any = {
@@ -1843,74 +1886,218 @@ export class EnviartimbrePage implements OnInit {
       valor: rango
     };
 
-    const ubicacionPermitida = await this.buscarUbicacionPermitida(informacion);
+    /*
+     * Buscar zonas asignadas directamente al empleado.
+     */
+    const resultadoZonas =
+      await this.buscarUbicacionPermitida(
+        informacion
+      );
 
-    if (ubicacionPermitida) {
-      return ubicacionPermitida;
-    }
-
-    const domicilio = await this.buscarUbicacionDomicilio(informacion);
-
-    if (domicilio) {
-      return domicilio;
-    }
-
-    if (this.desconocida === true || esTimbreFlexible) {
-      return 'DESCONOCIDO';
+    if (
+      resultadoZonas.estado ===
+      'ENCONTRADA'
+    ) {
+      return resultadoZonas.ubicacion;
     }
 
     /*
-      Sí existen coordenadas, pero no pertenecen
-      a ninguna zona permitida.
-    */
+     * Buscar domicilio.
+     */
+    const resultadoDomicilio =
+      await this.buscarUbicacionDomicilio(
+        informacion
+      );
+
+    if (
+      resultadoDomicilio.estado ===
+      'ENCONTRADA'
+    ) {
+      return resultadoDomicilio.ubicacion;
+    }
+
+    /*
+     * No existen zonas ni domicilio asignados.
+     *
+     * Esto no es responsabilidad del empleado,
+     * por tanto se permite realizar la marcación.
+     */
+    if (
+      resultadoZonas.estado ===
+      'NO_ASIGNADA' &&
+      resultadoDomicilio.estado ===
+      'NO_ASIGNADA'
+    ) {
+      return 'SIN UBICACIÓN ASIGNADA';
+    }
+
+    /*
+     * Hubo un problema técnico al consultar la configuración.
+     *
+     * No se confunde con "no tiene zonas asignadas".
+     */
+    if (
+      resultadoZonas.estado === 'ERROR' ||
+      resultadoDomicilio.estado === 'ERROR'
+    ) {
+      return 'ERROR AL VALIDAR UBICACIÓN';
+    }
+
+    /*
+     * Existen zonas asignadas, pero las coordenadas
+     * no pertenecen a ninguna.
+     */
+    if (
+      this.desconocida === true ||
+      esTimbreFlexible
+    ) {
+      return 'DESCONOCIDO';
+    }
+
     return 'FUERA DE ZONA';
   }
 
-  async buscarUbicacionPermitida(informacion: any): Promise<string> {
+  async buscarUbicacionPermitida(
+    informacion: any
+  ): Promise<ResultadoConsultaUbicacion> {
     try {
-      const res: any = await firstValueFrom(this.restP.ObtenerUbicacionUsuario(this.id_usuario));
-      const datosUbicacion: any[] = res.data ?? res ?? [];
+      const res: any =
+        await firstValueFrom(
+          this.restP
+            .ObtenerUbicacionUsuario(
+              this.id_usuario
+            )
+            .pipe(timeout(5000))
+        );
 
-      if (!datosUbicacion || datosUbicacion.length === 0) {
-        return '';
+      const datosUbicacion: any[] =
+        res?.data ??
+        res ??
+        [];
+
+      /*
+       * El servidor respondió correctamente,
+       * pero el empleado no tiene zonas asignadas.
+       */
+      if (
+        !Array.isArray(datosUbicacion) ||
+        datosUbicacion.length === 0
+      ) {
+        return {
+          estado: 'NO_ASIGNADA',
+          ubicacion: ''
+        };
       }
 
-      for (const obj of datosUbicacion) {
-        informacion.lat2 = obj.latitud;
-        informacion.lng2 = obj.longitud;
+      for (const zona of datosUbicacion) {
+        const datosValidacion = {
+          ...informacion,
+          lat2: zona.latitud,
+          lng2: zona.longitud
+        };
 
-        const estaDentro = await this.validarCoordenadas(informacion);
+        const estaDentro =
+          await this.validarCoordenadas(
+            datosValidacion
+          );
 
         if (estaDentro) {
-          return obj.descripcion ?? 'Ubicación Permitida';
+          return {
+            estado: 'ENCONTRADA',
+
+            ubicacion:
+              zona.descripcion ??
+              'Ubicación permitida'
+          };
         }
       }
 
-      return '';
+      /*
+       * Sí tiene zonas asignadas, pero no se encuentra
+       * dentro de ninguna.
+       */
+      return {
+        estado: 'FUERA_DE_ZONA',
+        ubicacion: ''
+      };
 
-    } catch {
-      return '';
+    } catch (error) {
+      console.warn(
+        'No se pudieron consultar las zonas asignadas:',
+        error
+      );
+
+      return {
+        estado: 'ERROR',
+        ubicacion: ''
+      };
     }
   }
 
-  async buscarUbicacionDomicilio(informacion: any): Promise<string> {
+  async buscarUbicacionDomicilio(
+    informacion: any
+  ): Promise<ResultadoConsultaUbicacion> {
     try {
-      const res: any = await firstValueFrom(this.restE.ObtenerUbicacion(this.id_usuario));
-      const domicilio = res.data?.[0] ?? res?.[0];
+      const res: any =
+        await firstValueFrom(
+          this.restE
+            .ObtenerUbicacion(
+              this.id_usuario
+            )
+            .pipe(timeout(5000))
+        );
 
-      if (!domicilio?.latitud || !domicilio?.longitud) {
-        return '';
+      const domicilio =
+        res?.data?.[0] ??
+        res?.[0] ??
+        null;
+
+      /*
+       * El empleado no tiene domicilio registrado.
+       */
+      if (
+        !domicilio?.latitud ||
+        !domicilio?.longitud
+      ) {
+        return {
+          estado: 'NO_ASIGNADA',
+          ubicacion: ''
+        };
       }
 
-      informacion.lat2 = domicilio.latitud;
-      informacion.lng2 = domicilio.longitud;
+      const datosValidacion = {
+        ...informacion,
+        lat2: domicilio.latitud,
+        lng2: domicilio.longitud
+      };
 
-      const estaDentro = await this.validarCoordenadas(informacion);
+      const estaDentro =
+        await this.validarCoordenadas(
+          datosValidacion
+        );
 
-      return estaDentro ? 'DOMICILIO' : '';
+      if (estaDentro) {
+        return {
+          estado: 'ENCONTRADA',
+          ubicacion: 'DOMICILIO'
+        };
+      }
 
-    } catch {
-      return '';
+      return {
+        estado: 'FUERA_DE_ZONA',
+        ubicacion: ''
+      };
+
+    } catch (error) {
+      console.warn(
+        'No se pudo consultar el domicilio:',
+        error
+      );
+
+      return {
+        estado: 'ERROR',
+        ubicacion: ''
+      };
     }
   }
 
@@ -1983,7 +2170,6 @@ export class EnviartimbrePage implements OnInit {
   private NormalizarUbicacionParaTimbre(
     teclaFuncion: string
   ): boolean {
-
     const esFlexible =
       this.EsTimbreFlexibleUbicacion(
         teclaFuncion
@@ -1995,8 +2181,8 @@ export class EnviartimbrePage implements OnInit {
         .toUpperCase();
 
     /*
-      No se consiguieron coordenadas.
-    */
+     * El GPS no proporcionó coordenadas.
+     */
     if (
       !ubicacionActual ||
       this.EsUbicacionNoValida(
@@ -2005,7 +2191,7 @@ export class EnviartimbrePage implements OnInit {
     ) {
       if (esFlexible) {
         this.actualizarUbicacionPantalla(
-          'SIN UBICACION'
+          'SIN UBICACIÓN'
         );
 
         return true;
@@ -2015,17 +2201,63 @@ export class EnviartimbrePage implements OnInit {
     }
 
     /*
-      Sí existen coordenadas, pero están
-      fuera de las zonas permitidas.
-    */
+     * No hay Internet para consultar las zonas.
+     *
+     * Se permite continuar únicamente cuando existe
+     * una configuración válida y esa configuración
+     * permite timbrar sin conexión.
+     */
+    if (
+      ubicacionActual ===
+      'SIN CONEXIÓN A INTERNET' ||
+      ubicacionActual ===
+      'SIN CONEXION A INTERNET'
+    ) {
+      return (
+        this.configuracionMarcacionDisponible ===
+        true &&
+        this.requiereInternet === false
+      );
+    }
+
+    /*
+     * El empleado no tiene ninguna zona ni domicilio
+     * asignados. Se permite la marcación.
+     */
+    if (
+      ubicacionActual ===
+      'SIN UBICACIÓN ASIGNADA' ||
+      ubicacionActual ===
+      'SIN UBICACION ASIGNADA'
+    ) {
+      return true;
+    }
+
+    /*
+     * Ocurrió un error técnico al consultar las zonas.
+     * No debe confundirse con no tener asignaciones.
+     */
+    if (
+      ubicacionActual ===
+      'ERROR AL VALIDAR UBICACIÓN' ||
+      ubicacionActual ===
+      'ERROR AL VALIDAR UBICACION'
+    ) {
+      return false;
+    }
+
+    /*
+     * Tiene zonas asignadas, pero está fuera de ellas.
+     */
     if (ubicacionActual === 'FUERA DE ZONA') {
       return false;
     }
 
     /*
-      Existen coordenadas, pero no coinciden
-      con una zona registrada.
-    */
+     * No coincide con una zona, pero el empleado tiene
+     * habilitada la ubicación desconocida o se trata
+     * de un timbre flexible.
+     */
     if (ubicacionActual === 'DESCONOCIDO') {
       return (
         this.desconocida === true ||
@@ -2042,9 +2274,32 @@ export class EnviartimbrePage implements OnInit {
         .trim()
         .toUpperCase();
 
-    return ubicacionNormalizada === 'FUERA DE ZONA'
-      ? 'La ubicación obtenida está fuera de las zonas permitidas para realizar este timbre.'
-      : 'No fue posible obtener una ubicación válida. Verifique que el GPS y la ubicación precisa estén activos y vuelva a intentarlo.';
+    if (
+      ubicacionNormalizada ===
+      'FUERA DE ZONA'
+    ) {
+      return 'La ubicación obtenida está fuera de las zonas asignadas. Para timbrar desde este lugar debe tener habilitada la marcación en ubicación desconocida.';
+    }
+
+    if (
+      ubicacionNormalizada ===
+      'ERROR AL VALIDAR UBICACIÓN' ||
+      ubicacionNormalizada ===
+      'ERROR AL VALIDAR UBICACION'
+    ) {
+      return 'No fue posible consultar las zonas asignadas. Verifique la conexión e intente nuevamente.';
+    }
+
+    if (
+      ubicacionNormalizada ===
+      'SIN CONEXIÓN A INTERNET' ||
+      ubicacionNormalizada ===
+      'SIN CONEXION A INTERNET'
+    ) {
+      return 'No tiene permitido registrar timbres sin conexión a Internet.';
+    }
+
+    return 'No fue posible obtener una ubicación válida. Verifique que el GPS y la ubicación precisa estén activos y vuelva a intentarlo.';
   }
 
   private async validarUbicacionParaContinuar(
@@ -2320,7 +2575,7 @@ export class EnviartimbrePage implements OnInit {
 
     const alert = await this.alertController.create({
       cssClass: 'alert-timbre-pendiente',
-      header: 'Timbre guardado',
+      header: 'Timbre guardado localmente',
       subHeader: 'Pendiente de sincronización',
 
       message: `
