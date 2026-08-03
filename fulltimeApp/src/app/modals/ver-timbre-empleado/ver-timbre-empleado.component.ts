@@ -211,8 +211,6 @@ export class VerTimbreEmpleadoComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (res: any[]) => {
-          console.log('TIMBRES EMPLEADO:', res);
-          console.log('PRIMER TIMBRE EMPLEADO:', res?.[0]);
           this.timbresLista = this.prepararListaTimbres(res);
 
           if (this.timbresLista.length === 0) {

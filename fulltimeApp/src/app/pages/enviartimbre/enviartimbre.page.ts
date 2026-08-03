@@ -1395,11 +1395,6 @@ export class EnviartimbrePage implements OnInit {
 
       this.configuracionMarcacionDisponible = true;
       this.configuracionMarcacionDesdeStorage = true;
-
-      console.log(
-        'Configuración de marcación cargada desde el teléfono:',
-        configuracionLocal
-      );
     }
 
     /*
@@ -1511,11 +1506,6 @@ export class EnviartimbrePage implements OnInit {
 
       this.configuracionMarcacionDisponible = true;
       this.configuracionMarcacionDesdeStorage = false;
-
-      console.log(
-        'Configuración de marcación actualizada desde el servidor:',
-        nuevaConfiguracion
-      );
 
       if (
         this.platform.is('hybrid') &&

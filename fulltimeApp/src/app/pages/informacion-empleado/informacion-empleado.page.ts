@@ -89,6 +89,7 @@ export class InformacionEmpleadoPage implements OnInit {
     this.usuario.name_rol = this.data.name_rol;
     this.usuario.name_regimen = this.data.name_regimen;
     this.usuario.nombre_nacionalidad = this.data.nombre_nacionalidad;
+    this.usuario.codigo = this.data.codigo;
 
     this.BuscarFormatos();
   }
