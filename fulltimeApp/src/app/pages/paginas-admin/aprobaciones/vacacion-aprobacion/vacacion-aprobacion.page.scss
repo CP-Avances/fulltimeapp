@@ -337,6 +337,158 @@ ion-select::part(icon) {
 }
 
 /* =========================
+   RESULTADO DE VERIFICACIÓN
+========================= */
+
+.resultado-validacion {
+  width: 100%;
+  padding-bottom: 10px;
+}
+
+/* Resumen superior */
+.resultado-validacion-resumen {
+  border-top: 4px solid var(--ion-color-warning);
+}
+
+.resultado-validacion-resumen ion-card-header {
+  padding-bottom: 4px;
+}
+
+.resultado-validacion-resumen ion-card-title {
+  text-align: center;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.resultado-validacion-resumen ion-card-content {
+  text-align: center;
+}
+
+.resultado-resumen-icono {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2px 0 12px 0;
+}
+
+.resultado-resumen-icono ion-icon {
+  font-size: 46px;
+}
+
+.resultado-validacion-resumen p {
+  margin: 6px 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--app-text-soft);
+}
+
+.resultado-validacion-resumen p b {
+  color: var(--app-text);
+  font-weight: 900;
+}
+
+
+/* =========================
+   TARJETA DE CADA NOVEDAD
+========================= */
+
+.tarjeta-resultado-validacion {
+  margin-top: 12px;
+  border-left: 4px solid var(--ion-color-warning);
+}
+
+.cabecera-resultado-validacion {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.cabecera-resultado-validacion ion-badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.tarjeta-resultado-validacion ion-card-title {
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.tarjeta-resultado-validacion ion-card-subtitle {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+/* =========================
+   BLOQUE DE NOVEDAD
+========================= */
+
+.bloque-novedad {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(var(--ion-color-warning-rgb), 0.45);
+  background: rgba(var(--ion-color-warning-rgb), 0.10);
+}
+
+.titulo-novedad {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 8px;
+}
+
+.titulo-novedad ion-icon {
+  flex-shrink: 0;
+  font-size: 22px;
+}
+
+.titulo-novedad b {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--app-text);
+}
+
+.bloque-novedad p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--app-text);
+  overflow-wrap: anywhere;
+}
+
+
+/* =========================
+   BOTÓN ACEPTAR
+========================= */
+
+.acciones-resultado-validacion {
+  margin-top: 18px;
+  padding: 0 2px 10px 2px;
+}
+
+.acciones-resultado-validacion ion-button {
+  --border-radius: 14px;
+
+  min-height: 46px;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: none;
+}
+
+.acciones-resultado-validacion ion-spinner {
+  width: 18px;
+  height: 18px;
+}
+
+
+
+/* =========================
    PAGINACIÓN
 ========================= */
 

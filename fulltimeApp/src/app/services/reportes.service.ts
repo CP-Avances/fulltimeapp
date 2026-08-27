@@ -24,6 +24,13 @@ export class ReportesService {
       .pipe(map(res => res.data));
   }
 
+  // METODO PARA CONSULTAR EL RESUMEN GENERAL DE ASISTENCIA
+  ReporteResumenAsistencia(data: any, desde: string, hasta: string) {
+    return this.http
+      .post<any>(
+        `${this.apiUrl}/reporte-tiempo-laborado/tiempo-laborado-empleados/${desde}/${hasta}`, data)
+      .pipe(map(res => res.data));
+  }
 
   // METODO PARA OBTENER EL TOTAL DE REGISTROS
   SumarRegistros(array: any[]) {

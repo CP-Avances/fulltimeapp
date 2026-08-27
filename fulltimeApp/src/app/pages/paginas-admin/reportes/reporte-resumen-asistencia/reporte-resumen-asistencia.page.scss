@@ -1,0 +1,1207 @@
+:host {
+  --app-primary: #0f75bc;
+  --app-primary-dark: #0b4f86;
+
+  --app-bg: #f4f7fb;
+  --app-card: #ffffff;
+
+  --app-text: #1f2937;
+  --app-text-soft: #64748b;
+
+  --app-border: rgba(15, 23, 42, 0.09);
+
+  --app-shadow:
+    0 6px 18px rgba(15, 23, 42, 0.10);
+}
+
+/* =========================================
+   CONTENIDO
+========================================= */
+
+.reporte-content {
+  --background: var(--app-bg);
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.reporte-header {
+  padding: 14px 14px 0 14px;
+}
+
+.btn-regresar {
+  --background:
+    linear-gradient(
+      135deg,
+      var(--app-primary),
+      var(--app-primary-dark)
+    );
+
+  --border-radius: 18px;
+
+  min-height: 58px;
+
+  font-weight: 800;
+  text-transform: none;
+
+  overflow: hidden;
+}
+
+/* =========================================
+   TARJETAS
+========================================= */
+
+.filtros-card,
+.empleados-card,
+.acciones-card {
+  margin: 14px;
+
+  padding: 16px;
+
+  border-radius: 20px;
+
+  background: var(--app-card);
+
+  border:
+    1px solid var(--app-border);
+
+  box-shadow:
+    var(--app-shadow);
+}
+
+/* =========================================
+   TÍTULO DE SECCIÓN
+========================================= */
+
+.seccion-titulo {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 16px;
+}
+
+.seccion-icono {
+  width: 46px;
+  height: 46px;
+
+  min-width: 46px;
+
+  border-radius: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--app-primary),
+      var(--app-primary-dark)
+    );
+}
+
+.seccion-icono ion-icon {
+  font-size: 24px;
+}
+
+.seccion-titulo h2 {
+  margin: 0 0 4px 0;
+
+  color: var(--app-text);
+
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.seccion-titulo p {
+  margin: 0;
+
+  color: var(--app-text-soft);
+
+  font-size: 12px;
+  font-weight: 600;
+
+  line-height: 1.35;
+}
+
+/* =========================================
+   FECHAS
+========================================= */
+
+.fechas-grid {
+  padding: 0;
+}
+
+.fecha-card {
+  width: 100%;
+  min-height: 92px;
+
+  padding: 11px;
+
+  border: 1px solid var(--app-border);
+  border-radius: 16px;
+
+  background: var(--app-bg);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  cursor: pointer;
+}
+
+.fecha-icon {
+  width: 36px;
+  height: 36px;
+
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--app-primary);
+
+  background:
+    rgba(15, 117, 188, 0.12);
+}
+
+.fecha-icon ion-icon {
+  font-size: 21px;
+}
+
+.fecha-info {
+  min-width: 0;
+
+  text-align: center;
+}
+
+.fecha-info span {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: var(--app-text-soft);
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.fecha-info strong {
+  display: block;
+
+  color: var(--app-text);
+
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.modal-fecha-acciones {
+  padding: 10px 16px;
+
+  text-align: right;
+}
+
+.popover-fecha {
+  --padding-start: 14px;
+  --padding-end: 14px;
+}
+
+.popover-fecha p {
+  margin: 14px;
+
+  color: var(--app-text);
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* =========================================
+   BUSCADOR
+========================================= */
+
+.buscador {
+  --background: var(--app-bg);
+
+  --border-radius: 15px;
+
+  padding-left: 0;
+  padding-right: 0;
+
+  margin-bottom: 8px;
+}
+
+/* =========================================
+   RESULTADOS
+========================================= */
+
+.resultado-header {
+  margin: 8px 0 10px 0;
+
+  padding: 0 4px;
+}
+
+.resultado-header h3 {
+  margin: 0 0 3px 0;
+
+  color: var(--app-text);
+
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.resultado-header p {
+  margin: 0;
+
+  color: var(--app-text-soft);
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* =========================================
+   EMPLEADOS
+========================================= */
+
+.resultado-lista {
+  padding: 0;
+
+  background: transparent;
+}
+
+.empleado-item {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 12px;
+  margin-bottom: 9px;
+
+  background: var(--app-bg);
+
+  border: 1px solid var(--app-border);
+  border-radius: 16px;
+
+  color: inherit;
+
+  text-align: left;
+
+  font-family: inherit;
+
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.empleado-item:active {
+  transform: scale(0.985);
+}
+
+.empleado-seleccionado {
+  border-color: var(--app-primary);
+
+  box-shadow:
+    0 0 0 2px rgba(15, 117, 188, 0.12);
+}
+
+.empleado-informacion {
+  flex: 1;
+  min-width: 0;
+}
+
+.empleado-informacion h2 {
+  margin: 0 0 4px 0;
+
+  color: var(--app-text);
+
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.empleado-informacion p {
+  margin: 2px 0;
+
+  color: var(--app-text-soft);
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.empleado-radio {
+  min-width: 24px;
+
+  font-size: 24px;
+
+  color: var(--app-primary);
+}
+
+.empleado-avatar {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--app-primary);
+
+  background:
+    rgba(15, 117, 188, 0.12);
+}
+
+.empleado-avatar ion-icon {
+  font-size: 23px;
+}
+
+.empleado-item h2 {
+  margin-bottom: 4px;
+
+  color: var(--app-text);
+
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.empleado-item p {
+  margin: 2px 0;
+
+  color: var(--app-text-soft);
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* =========================================
+   ESTADOS
+========================================= */
+
+.estado-carga,
+.estado-vacio {
+  padding: 28px 12px;
+
+  text-align: center;
+}
+
+.estado-carga ion-spinner,
+.estado-vacio ion-icon {
+  margin-bottom: 10px;
+}
+
+.estado-carga span {
+  display: block;
+
+  margin-bottom: 12px;
+
+  color: var(--app-text-soft);
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.estado-vacio ion-icon {
+  font-size: 42px;
+
+  color: var(--app-text-soft);
+}
+
+.estado-vacio h2 {
+  margin: 0 0 6px 0;
+
+  color: var(--app-text);
+
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.estado-vacio p {
+  margin: 0;
+
+  color: var(--app-text-soft);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* =========================================
+   PAGINACIÓN
+========================================= */
+
+.paginacion-contenedor {
+  margin-top: 14px;
+
+  text-align: center;
+}
+
+/* =========================================
+   BOTÓN GENERAR
+========================================= */
+
+.btn-generar {
+  --background:
+    linear-gradient(
+      135deg,
+      var(--app-primary),
+      var(--app-primary-dark)
+    );
+
+  --border-radius: 16px;
+
+  min-height: 50px;
+
+  margin: 0;
+
+  font-weight: 900;
+  text-transform: none;
+}
+
+/* =========================================
+   DARK MODE
+========================================= */
+
+@media (prefers-color-scheme: dark) {
+
+  :host {
+    --app-bg: #0f172a;
+    --app-card: #1e293b;
+
+    --app-text: #f8fafc;
+    --app-text-soft: #cbd5e1;
+
+    --app-border:
+      rgba(255, 255, 255, 0.08);
+
+    --app-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.38);
+  }
+
+  .fecha-icon,
+  .empleado-avatar {
+    background:
+      rgba(56, 189, 248, 0.14);
+  }
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 380px) {
+
+  .reporte-header,
+  .filtros-card,
+  .empleados-card,
+  .acciones-card {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .filtros-card,
+  .empleados-card,
+  .acciones-card {
+    padding: 14px;
+  }
+
+  .fecha-card {
+    min-height: 88px;
+
+    padding: 9px 6px;
+  }
+
+  .fecha-info strong {
+    font-size: 11px;
+  }
+}:host {
+  --app-primary: #0f75bc;
+  --app-primary-dark: #0b4f86;
+
+  --app-bg: #f4f7fb;
+  --app-card: #ffffff;
+
+  --app-text: #1f2937;
+  --app-text-soft: #64748b;
+
+  --app-border: rgba(15, 23, 42, 0.09);
+
+  --app-shadow:
+    0 6px 18px rgba(15, 23, 42, 0.10);
+}
+
+/* =========================================
+   CONTENIDO
+========================================= */
+
+.reporte-content {
+  --background: var(--app-bg);
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.reporte-header {
+  padding: 14px 14px 0 14px;
+}
+
+.btn-regresar {
+  --background:
+    linear-gradient(
+      135deg,
+      var(--app-primary),
+      var(--app-primary-dark)
+    );
+
+  --border-radius: 18px;
+
+  min-height: 58px;
+
+  font-weight: 800;
+  text-transform: none;
+
+  overflow: hidden;
+}
+
+/* =========================================
+   TARJETAS
+========================================= */
+
+.filtros-card,
+.empleados-card,
+.acciones-card {
+  margin: 14px;
+  padding: 16px;
+
+  border-radius: 20px;
+
+  background: var(--app-card);
+
+  border: 1px solid var(--app-border);
+
+  box-shadow: var(--app-shadow);
+}
+
+/* =========================================
+   TÍTULO DE SECCIÓN
+========================================= */
+
+.seccion-titulo {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 16px;
+}
+
+.seccion-icono {
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+
+  border-radius: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--app-primary),
+      var(--app-primary-dark)
+    );
+}
+
+.seccion-icono ion-icon {
+  font-size: 24px;
+}
+
+.seccion-titulo h2 {
+  margin: 0 0 4px 0;
+
+  color: var(--app-text);
+
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.seccion-titulo p {
+  margin: 0;
+
+  color: var(--app-text-soft);
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* =========================================
+   FECHAS
+========================================= */
+
+.fechas-grid {
+  padding: 0;
+}
+
+.fecha-card {
+  width: 100%;
+  min-height: 92px;
+
+  padding: 11px;
+
+  border: 1px solid var(--app-border);
+  border-radius: 16px;
+
+  background: var(--app-bg);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.fecha-card:active {
+  transform: scale(0.985);
+}
+
+.fecha-icon {
+  width: 36px;
+  height: 36px;
+
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--app-primary);
+
+  background: rgba(15, 117, 188, 0.12);
+}
+
+.fecha-icon ion-icon {
+  font-size: 21px;
+}
+
+.fecha-info {
+  min-width: 0;
+
+  text-align: center;
+}
+
+.fecha-info span {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: var(--app-text-soft);
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.fecha-info strong {
+  display: block;
+
+  color: var(--app-text);
+
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.modal-fecha-acciones {
+  padding: 10px 16px;
+
+  text-align: right;
+}
+
+.popover-fecha {
+  --padding-start: 14px;
+  --padding-end: 14px;
+}
+
+.popover-fecha p {
+  margin: 14px;
+
+  color: var(--app-text);
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* =========================================
+   BUSCADOR
+========================================= */
+
+.buscador {
+  --background: var(--app-bg);
+  --border-radius: 15px;
+
+  padding-left: 0;
+  padding-right: 0;
+
+  margin-bottom: 8px;
+}
+
+/* =========================================
+   RESULTADOS
+========================================= */
+
+.resultado-header {
+  margin: 8px 0 10px 0;
+  padding: 0 4px;
+}
+
+.resultado-header h3 {
+  margin: 0 0 3px 0;
+
+  color: var(--app-text);
+
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.resultado-header p {
+  margin: 0;
+
+  color: var(--app-text-soft);
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* =========================================
+   LISTA DE EMPLEADOS
+========================================= */
+
+.resultado-lista {
+  padding: 0;
+
+  background: transparent;
+}
+
+.empleado-item {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 12px;
+  margin-bottom: 9px;
+
+  background: var(--app-bg);
+
+  border: 1px solid var(--app-border);
+  border-radius: 16px;
+
+  color: inherit;
+
+  text-align: left;
+  font-family: inherit;
+
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.empleado-item:active {
+  transform: scale(0.985);
+}
+
+/* EMPLEADO SELECCIONADO */
+
+.empleado-seleccionado {
+  border-color: var(--app-primary);
+
+  box-shadow:
+    0 0 0 2px rgba(15, 117, 188, 0.12);
+
+  background:
+    rgba(15, 117, 188, 0.06);
+}
+
+/* AVATAR */
+
+.empleado-avatar {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+
+  border-radius: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--app-primary);
+
+  background:
+    rgba(15, 117, 188, 0.12);
+}
+
+.empleado-avatar ion-icon {
+  font-size: 23px;
+}
+
+/* INFORMACIÓN */
+
+.empleado-informacion {
+  flex: 1;
+
+  min-width: 0;
+}
+
+.empleado-informacion h2 {
+  margin: 0 0 4px 0;
+
+  color: var(--app-text);
+
+  font-size: 14px;
+  font-weight: 900;
+
+  line-height: 1.25;
+}
+
+.empleado-informacion p {
+  margin: 2px 0;
+
+  color: var(--app-text-soft);
+
+  font-size: 11px;
+  font-weight: 600;
+
+  line-height: 1.3;
+}
+
+/* SELECTOR CIRCULAR */
+
+.selector-empleado {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+
+  border-radius: 50%;
+
+  border: 2px solid var(--app-text-soft);
+
+  position: relative;
+
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.selector-empleado-activo {
+  border-color: var(--app-primary);
+}
+
+.selector-empleado-activo::after {
+  content: '';
+
+  position: absolute;
+
+  width: 12px;
+  height: 12px;
+
+  left: 3px;
+  top: 3px;
+
+  border-radius: 50%;
+
+  background: var(--app-primary);
+}
+
+/* =========================================
+   ESTADOS
+========================================= */
+
+.estado-carga,
+.estado-vacio {
+  padding: 28px 12px;
+
+  text-align: center;
+}
+
+.estado-carga ion-spinner,
+.estado-vacio ion-icon {
+  margin-bottom: 10px;
+}
+
+.estado-carga span {
+  display: block;
+
+  margin-bottom: 12px;
+
+  color: var(--app-text-soft);
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.estado-vacio ion-icon {
+  font-size: 42px;
+
+  color: var(--app-text-soft);
+}
+
+.estado-vacio h2 {
+  margin: 0 0 6px 0;
+
+  color: var(--app-text);
+
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.estado-vacio p {
+  margin: 0;
+
+  color: var(--app-text-soft);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* =========================================
+   PAGINACIÓN
+========================================= */
+
+.paginacion-contenedor {
+  margin-top: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+}
+
+.btn-pagina {
+  min-height: 38px;
+
+  padding: 8px 12px;
+
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+
+  background: var(--app-bg);
+
+  color: var(--app-primary);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 4px;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.btn-pagina ion-icon {
+  font-size: 16px;
+}
+
+.btn-pagina:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn-pagina:disabled {
+  opacity: 0.4;
+
+  cursor: default;
+}
+
+.pagina-info {
+  min-width: 44px;
+
+  color: var(--app-text-soft);
+
+  text-align: center;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* =========================================
+   BOTÓN GENERAR
+========================================= */
+
+.btn-generar {
+  --background:
+    linear-gradient(
+      135deg,
+      var(--app-primary),
+      var(--app-primary-dark)
+    );
+
+  --border-radius: 16px;
+
+  min-height: 50px;
+
+  margin: 0;
+
+  font-weight: 900;
+  text-transform: none;
+}
+
+/* =========================================
+   DARK MODE
+========================================= */
+
+@media (prefers-color-scheme: dark) {
+
+  :host {
+    --app-bg: #0f172a;
+    --app-card: #1e293b;
+
+    --app-text: #f8fafc;
+    --app-text-soft: #cbd5e1;
+
+    --app-border:
+      rgba(255, 255, 255, 0.08);
+
+    --app-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.38);
+  }
+
+  .fecha-icon,
+  .empleado-avatar {
+    background:
+      rgba(56, 189, 248, 0.14);
+  }
+
+  .empleado-seleccionado {
+    background:
+      rgba(56, 189, 248, 0.08);
+
+    box-shadow:
+      0 0 0 2px rgba(56, 189, 248, 0.10);
+  }
+
+  .selector-empleado {
+    border-color: #94a3b8;
+  }
+
+  .selector-empleado-activo {
+    border-color: #38bdf8;
+  }
+
+  .selector-empleado-activo::after {
+    background: #38bdf8;
+  }
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 380px) {
+
+  .reporte-header {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .filtros-card,
+  .empleados-card,
+  .acciones-card {
+    margin-left: 10px;
+    margin-right: 10px;
+
+    padding: 14px;
+  }
+
+  .fecha-card {
+    min-height: 88px;
+
+    padding: 9px 6px;
+  }
+
+  .fecha-info strong {
+    font-size: 11px;
+  }
+
+  .empleado-item {
+    gap: 10px;
+
+    padding: 10px;
+  }
+
+  .empleado-avatar {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+
+    border-radius: 12px;
+  }
+
+  .empleado-avatar ion-icon {
+    font-size: 21px;
+  }
+
+  .empleado-informacion h2 {
+    font-size: 13px;
+  }
+
+  .empleado-informacion p {
+    font-size: 10.5px;
+  }
+
+  .paginacion-contenedor {
+    gap: 8px;
+  }
+
+  .btn-pagina {
+    padding: 7px 9px;
+
+    font-size: 11px;
+  }
+
+  .pagina-info {
+    min-width: 36px;
+
+    font-size: 11px;
+  }
+}

@@ -1,0 +1,403 @@
+<ion-content class="reporte-content">
+
+  <section class="reporte-header">
+
+    <ion-button
+      class="btn-regresar"
+      [routerLink]="['/reloj/reportes']"
+      expand="full">
+
+      <ion-icon
+        slot="start"
+        name="chevron-back-outline">
+      </ion-icon>
+
+      <ion-label>
+        Resumen general de asistencia
+      </ion-label>
+
+    </ion-button>
+
+  </section>
+
+
+  <section class="filtros-card">
+
+    <div class="seccion-titulo">
+
+      <div class="seccion-icono">
+        <ion-icon name="calendar-outline"></ion-icon>
+      </div>
+
+      <div>
+        <h2>Rango de fechas</h2>
+
+        <p>
+          Consulte información de hasta un mes atrás.
+        </p>
+      </div>
+
+    </div>
+
+
+    <ion-grid class="fechas-grid" mode="md">
+
+      <ion-row>
+
+        <ion-col size="6">
+
+          <button
+            type="button"
+            class="fecha-card"
+            id="ResumenAsistencia_fechaInicial">
+
+            <div class="fecha-icon">
+
+              <ion-icon
+                name="calendar-outline">
+              </ion-icon>
+
+            </div>
+
+            <div class="fecha-info">
+
+              <span>
+                Fecha inicial
+              </span>
+
+              <strong>
+                {{ fechaInicio || 'Seleccionar' }}
+              </strong>
+
+            </div>
+
+          </button>
+
+
+          <ion-modal
+            trigger="ResumenAsistencia_fechaInicial"
+            class="inputDateFecha">
+
+            <ng-template>
+
+              <ion-content>
+
+                <ion-datetime
+                  #datetimeInicio
+                  presentation="date"
+                  [showDefaultButtons]="false"
+                  [value]="fechaInicio"
+                  [min]="minDate"
+                  [max]="maxDate"
+                  mode="md"
+                  color="success"
+                  (ionChange)="changeFechaInicio($event)">
+                </ion-datetime>
+
+                <div class="modal-fecha-acciones">
+
+                  <ion-button
+                    fill="clear"
+                    color="medium"
+                    (click)="datetimeInicio.cancel(true)">
+
+                    Cancelar
+
+                  </ion-button>
+
+                </div>
+
+              </ion-content>
+
+            </ng-template>
+
+          </ion-modal>
+
+        </ion-col>
+
+
+        <ion-col size="6">
+
+          <button
+            type="button"
+            class="fecha-card"
+            id="ResumenAsistencia_fechaFinal">
+
+            <div class="fecha-icon">
+
+              <ion-icon
+                name="calendar-number-outline">
+              </ion-icon>
+
+            </div>
+
+            <div class="fecha-info">
+
+              <span>
+                Fecha final
+              </span>
+
+              <strong>
+                {{ fechaFin || 'Seleccionar' }}
+              </strong>
+
+            </div>
+
+          </button>
+
+
+          <ion-modal
+            *ngIf="fechaInicio"
+            trigger="ResumenAsistencia_fechaFinal"
+            class="inputDateFecha">
+
+            <ng-template>
+
+              <ion-content>
+
+                <ion-datetime
+                  #datetimeFinal
+                  presentation="date"
+                  [showDefaultButtons]="false"
+                  [value]="fechaFin"
+                  [min]="fechaInicio"
+                  [max]="maxDate"
+                  mode="md"
+                  color="success"
+                  (ionChange)="changeFechaFinal($event)">
+                </ion-datetime>
+
+                <div class="modal-fecha-acciones">
+
+                  <ion-button
+                    fill="clear"
+                    color="medium"
+                    (click)="datetimeFinal.cancel(true)">
+
+                    Cancelar
+
+                  </ion-button>
+
+                </div>
+
+              </ion-content>
+
+            </ng-template>
+
+          </ion-modal>
+
+
+          <ion-popover
+            *ngIf="!fechaInicio"
+            trigger="ResumenAsistencia_fechaFinal">
+
+            <ng-template>
+
+              <ion-content class="popover-fecha">
+
+                <p>
+                  Primero seleccione la fecha inicial.
+                </p>
+
+              </ion-content>
+
+            </ng-template>
+
+          </ion-popover>
+
+        </ion-col>
+
+      </ion-row>
+
+    </ion-grid>
+
+  </section>
+
+
+  <section class="empleados-card">
+
+    <div class="seccion-titulo">
+
+      <div class="seccion-icono">
+        <ion-icon name="person-outline"></ion-icon>
+      </div>
+
+      <div>
+        <h2>Empleado</h2>
+
+        <p>
+          Seleccione un empleado para generar el reporte.
+        </p>
+      </div>
+
+    </div>
+
+
+    <section
+      class="estado-carga"
+      *ngIf="cargando">
+
+      <ion-spinner name="crescent"></ion-spinner>
+
+      <span>
+        Obteniendo empleados...
+      </span>
+
+      <ion-progress-bar
+        type="indeterminate">
+      </ion-progress-bar>
+
+    </section>
+
+
+    <ng-container *ngIf="!cargando">
+
+      <ion-searchbar
+        class="buscador"
+        placeholder="Buscar empleado"
+        autocomplete="off"
+        showCancelButton="focus"
+        (ionChange)="changeSearchEmpleado($event)">
+      </ion-searchbar>
+
+
+      <div
+        class="resultado-header"
+        *ngIf="empleadosFiltro.length > 0">
+
+        <div>
+          <h3>Usuarios disponibles</h3>
+
+          <p>
+            {{ empleadosFiltro.length }}
+            registros encontrados
+          </p>
+        </div>
+
+      </div>
+
+
+      <div
+        class="resultado-lista"
+        *ngIf="empleadosFiltro.length > 0">
+
+        <button
+          type="button"
+          class="empleado-item"
+          *ngFor="let empleado of empleadosPaginados; trackBy: trackById"
+          [class.empleado-seleccionado]="estaEmpleadoSeleccionado(empleado.id)"
+          (click)="seleccionarEmpleado(empleado)">
+
+          <div class="empleado-avatar">
+            <ion-icon name="person-outline"></ion-icon>
+          </div>
+
+          <div class="empleado-informacion">
+
+            <h2>
+              {{ empleado.apellido }} {{ empleado.nombre }}
+            </h2>
+
+            <p *ngIf="empleado.codigo">
+              Código: {{ empleado.codigo }}
+            </p>
+
+            <p *ngIf="empleado.identificacion">
+              Identificación: {{ empleado.identificacion }}
+            </p>
+
+            <p *ngIf="empleado.departamento">
+              Departamento: {{ empleado.departamento }}
+            </p>
+
+          </div>
+
+          <div
+            class="selector-empleado"
+            [class.selector-empleado-activo]="estaEmpleadoSeleccionado(empleado.id)">
+          </div>
+
+        </button>
+
+      </div>
+
+
+      <section
+        class="estado-vacio"
+        *ngIf="empleadosFiltro.length === 0">
+
+        <ion-icon name="people-outline"></ion-icon>
+
+        <h2>No existen usuarios disponibles</h2>
+
+        <p>
+          No se encontraron empleados a los que tenga acceso.
+        </p>
+
+      </section>
+
+      <div
+        class="paginacion-contenedor"
+        *ngIf="totalPaginas > 1">
+
+        <button
+          type="button"
+          class="btn-pagina"
+          [disabled]="pageActual === 1"
+          (click)="paginaAnterior()">
+
+          <ion-icon name="chevron-back-outline"></ion-icon>
+          Anterior
+
+        </button>
+
+        <span class="pagina-info">
+          {{ pageActual }} / {{ totalPaginas }}
+        </span>
+
+        <button
+          type="button"
+          class="btn-pagina"
+          [disabled]="pageActual === totalPaginas"
+          (click)="paginaSiguiente()">
+
+          Siguiente
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+
+        </button>
+
+      </div>
+
+
+    </ng-container>
+
+  </section>
+
+
+  <section class="acciones-card">
+
+    <ion-button
+      class="btn-generar"
+      expand="block"
+      [disabled]="cargando || generando"
+      (click)="generarReporte()">
+
+      <ion-spinner
+        *ngIf="generando"
+        slot="start"
+        name="crescent">
+      </ion-spinner>
+
+      <ion-icon
+        *ngIf="!generando"
+        slot="start"
+        name="document-text-outline">
+      </ion-icon>
+
+      {{ generando ? 'Generando...' : 'Generar reporte' }}
+
+    </ion-button>
+
+  </section>
+
+</ion-content>

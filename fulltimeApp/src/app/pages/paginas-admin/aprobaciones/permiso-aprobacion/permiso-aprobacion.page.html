@@ -6,7 +6,7 @@
     <ion-title>Aprobación permisos</ion-title>
   </ion-toolbar>
 </ion-header>
- 
+  
 <ion-content>
 
   <ion-refresher slot="fixed" (ionRefresh)="inicializarPantalla(); $event.target.complete()">
@@ -124,6 +124,201 @@
 
       </ion-card-content>
     </ion-card>
+
+    <div
+      *ngIf="!cargandoInicial &&
+            tieneConfiguracionAprobacion &&
+            modoVista === 'resultado-validacion'"
+      class="resultado-validacion">
+
+      <ion-card class="resultado-validacion-resumen">
+
+        <ion-card-header>
+          <ion-card-title>
+            Resultado de verificación
+          </ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content>
+
+          <div class="resultado-resumen-icono">
+            <ion-icon
+              name="warning-outline"
+              color="warning">
+            </ion-icon>
+          </div>
+
+          <p>
+            Se encontraron novedades que impidieron procesar
+            {{ resultadosValidacion.length }}
+            solicitud(es).
+          </p>
+
+          <p *ngIf="solicitudesProcesadasExitosamente > 0">
+            <b>
+              {{ solicitudesProcesadasExitosamente }}
+              solicitud(es) fueron procesadas correctamente.
+            </b>
+          </p>
+
+          <p>
+            Revise el detalle de cada solicitud.
+          </p>
+
+        </ion-card-content>
+
+      </ion-card>
+
+      <ion-card
+        *ngFor="let resultado of resultadosValidacion; let i = index"
+        class="tarjeta-resultado-validacion">
+
+        <ion-card-header>
+
+          <div class="cabecera-resultado-validacion">
+            <ion-badge color="warning">
+              Novedad {{ i + 1 }}
+            </ion-badge>
+          </div>
+
+          <ion-card-title>
+            {{ resultado.empleado }}
+          </ion-card-title>
+
+          <ion-card-subtitle>
+            {{ resultado.tipoPermiso }}
+          </ion-card-subtitle>
+
+        </ion-card-header>
+
+        <ion-card-content>
+
+          <div
+            class="fila-info"
+            *ngIf="resultado.departamento">
+
+            <span>Departamento:</span>
+            <b>{{ resultado.departamento }}</b>
+
+          </div>
+
+          <div class="fila-info">
+
+            <span>Fecha solicitud:</span>
+            <b>{{ formatearFecha(resultado.fechaSolicitud) }}</b>
+
+          </div>
+
+
+          <ng-container *ngIf="resultado.esPorHoras">
+
+            <div class="fila-info">
+
+              <span>Fecha:</span>
+              <b>{{ formatearFecha(resultado.fechaInicio) }}</b>
+
+            </div>
+
+            <div class="fila-info">
+
+              <span>Horas:</span>
+              <b>{{ resultado.horas }}</b>
+
+            </div>
+
+            <div
+              class="fila-info"
+              *ngIf="resultado.horaInicio">
+
+              <span>Hora inicio:</span>
+              <b>{{ resultado.horaInicio }}</b>
+
+            </div>
+
+            <div
+              class="fila-info"
+              *ngIf="resultado.horaFin">
+
+              <span>Hora fin:</span>
+              <b>{{ resultado.horaFin }}</b>
+
+            </div>
+
+          </ng-container>
+
+
+          <ng-container *ngIf="!resultado.esPorHoras">
+
+            <div class="fila-info">
+
+              <span>Fecha inicio:</span>
+              <b>{{ formatearFecha(resultado.fechaInicio) }}</b>
+
+            </div>
+
+            <div class="fila-info">
+
+              <span>Fecha fin:</span>
+              <b>{{ formatearFecha(resultado.fechaFin) }}</b>
+
+            </div>
+
+            <div class="fila-info">
+
+              <span>Días:</span>
+              <b>{{ resultado.dias }}</b>
+
+            </div>
+
+          </ng-container>
+
+
+          <div class="bloque-novedad">
+
+            <div class="titulo-novedad">
+
+              <ion-icon
+                name="alert-circle-outline"
+                color="warning">
+              </ion-icon>
+
+              <b>Novedad</b>
+
+            </div>
+
+            <p>
+              {{ resultado.mensaje }}
+            </p>
+
+          </div>
+
+        </ion-card-content>
+
+      </ion-card>
+
+      <div class="acciones-resultado-validacion">
+
+        <ion-button
+          expand="block"
+          color="primary"
+          [disabled]="cargando"
+          (click)="aceptarResultadoValidacion()">
+
+          <ion-spinner
+            *ngIf="cargando"
+            name="crescent">
+          </ion-spinner>
+
+          <span *ngIf="!cargando">
+            Aceptar
+          </span>
+
+        </ion-button>
+
+      </div>
+
+    </div>
+
 
     <div *ngIf="modoVista === 'lista'">
 

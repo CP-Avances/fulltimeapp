@@ -3,12 +3,26 @@ import { AlertController, ToastController } from '@ionic/angular';
 import { AprobacionesService } from 'src/app/services/aprobaciones.service';
 import { PermisosService } from 'src/app/services/permisos.service';
 import { DatosGeneralesService } from 'src/app/services/datos-generales.service';
-
 import { firstValueFrom } from 'rxjs';
 
 import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { TipoNotificacion } from 'src/app/interfaces/tipo-notificaciones.enum';
-
+interface ResultadoValidacionPermiso {
+  id: number;
+  empleado: string;
+  tipoPermiso: string;
+  departamento: string;
+  fechaSolicitud: any;
+  fechaInicio: any;
+  fechaFin: any;
+  dias: number;
+  minutos: number;
+  esPorHoras: boolean;
+  horas: string;
+  horaInicio: string | null;
+  horaFin: string | null;
+  mensaje: string;
+}
 @Component({
   selector: 'app-permiso-aprobacion',
   templateUrl: './permiso-aprobacion.page.html',
@@ -16,7 +30,7 @@ import { TipoNotificacion } from 'src/app/interfaces/tipo-notificaciones.enum';
 })
 export class PermisoAprobacionPage implements OnInit {
 
-  modoVista: 'criterios' | 'lista' = 'criterios';
+  modoVista: 'criterios' | 'lista' | 'resultado-validacion' = 'criterios';
 
   idEmpleadoLogueado: number = 0;
   rolEmpleado: number = 0;
@@ -30,7 +44,11 @@ export class PermisoAprobacionPage implements OnInit {
   criterioBusqueda: 'tipo' | 'dep' | 'emp' | null = null;
   fechaDesde: string = '';
   estadoSolicitud: string = 'PENDIENTE';
+  
   solicitudesSeleccionadas: any[] = [];
+  resultadosValidacion: ResultadoValidacionPermiso[] = [];
+  solicitudesProcesadasExitosamente = 0;
+
   procesandoMultiple = false;
 
   selectorAbierto = false;
@@ -88,11 +106,17 @@ export class PermisoAprobacionPage implements OnInit {
   inicializarPantalla() {
     this.idEmpleadoLogueado = Number(localStorage.getItem('empleadoID') ?? 0);
     this.rolEmpleado = Number(localStorage.getItem('rol') ?? 0);
-
     this.fechaDesde = this.obtenerFechaHoy();
-
+    this.modoVista = 'criterios';
+    this.solicitudes = [];
+    this.solicitudesPaginadas = [];
+    this.solicitudesSeleccionadas = [];
+    this.resultadosValidacion = [];
+    this.solicitudesProcesadasExitosamente = 0;
+    this.procesandoMultiple = false;
     this.cargarDatosIniciales();
   }
+
 
   cargarDatosIniciales() {
     this.cargandoInicial = true;
@@ -264,7 +288,7 @@ export class PermisoAprobacionPage implements OnInit {
     this.solicitudes = [];
   }
 
-  buscarSolicitudes() {
+  buscarSolicitudes(mostrarMensajeResultado: boolean = true) {
     if (!this.validarFormularioBusqueda()) return;
 
     const payload: any = {
@@ -289,31 +313,50 @@ export class PermisoAprobacionPage implements OnInit {
     }
 
     this.cargando = true;
+
     this.solicitudes = [];
     this.solicitudesPaginadas = [];
     this.solicitudesSeleccionadas = [];
     this.procesandoMultiple = false;
 
     this.permisosService.buscarSolicitudesPermisos(payload).subscribe({
+
       next: async (resp: any) => {
-        const solicitudes = Array.isArray(resp?.data) ? resp.data : [];
+
+        const solicitudes = Array.isArray(resp?.data)
+          ? resp.data
+          : [];
 
         await this.filtrarSolicitudesAprobables(solicitudes);
 
         this.page = 0;
         this.actualizarPaginacion();
 
+        this.resultadosValidacion = [];
+        this.solicitudesProcesadasExitosamente = 0;
+
         this.cargando = false;
         this.modoVista = 'lista';
 
-        if (this.solicitudes.length === 0) {
-          this.mostrarToast('No existen solicitudes pendientes de aprobación para usted.', 'warning');
+        if (
+          mostrarMensajeResultado &&
+          this.solicitudes.length === 0
+        ) {
+          this.mostrarToast(
+            'No existen solicitudes pendientes de aprobación para usted.',
+            'warning'
+          );
         }
       },
+
       error: () => {
         this.cargando = false;
-        this.mostrarToast('No se pudieron consultar las solicitudes de permisos.', 'danger');
+        this.mostrarToast(
+          'No se pudieron consultar las solicitudes de permisos.',
+          'danger'
+        );
       }
+
     });
   }
 
@@ -436,6 +479,9 @@ export class PermisoAprobacionPage implements OnInit {
     this.solicitudes = [];
     this.solicitudesPaginadas = [];
     this.solicitudesSeleccionadas = [];
+    this.resultadosValidacion = [];
+    this.solicitudesProcesadasExitosamente = 0;
+
     this.procesandoMultiple = false;
   }
 
@@ -605,17 +651,30 @@ export class PermisoAprobacionPage implements OnInit {
     await alert.present();
   }
 
-  async ejecutarAccionMultiple(decision: 'APRUEBA' | 'RECHAZA', observacion: string) {
+  async ejecutarAccionMultiple(
+    decision: 'APRUEBA' | 'RECHAZA',
+    observacion: string
+  ) {
+
     this.procesandoMultiple = true;
 
     let exitosas = 0;
     let sinPermiso = 0;
-    let conflictos = 0;
     let errores = 0;
 
-    for (const solicitud of this.solicitudesSeleccionadas) {
+    this.resultadosValidacion = [];
+    this.solicitudesProcesadasExitosamente = 0;
+
+    const solicitudesAProcesar = [
+      ...this.solicitudesSeleccionadas
+    ];
+
+    for (const solicitud of solicitudesAProcesar) {
+      const snapshot = JSON.parse(
+        JSON.stringify(solicitud)
+      );
+
       try {
-        const snapshot = JSON.parse(JSON.stringify(solicitud));
 
         await firstValueFrom(
           this.aprobacionesService.EjecutarAccionSolicitud({
@@ -635,35 +694,164 @@ export class PermisoAprobacionPage implements OnInit {
         exitosas++;
 
       } catch (error: any) {
+
+        console.log(
+          'Error al procesar solicitud de permiso:',
+          solicitud?.id,
+          error
+        );
+
         if (error?.status === 403) {
           sinPermiso++;
-        } else if (error?.status === 409) {
-          conflictos++;
-        } else {
-          errores++;
+          continue;
         }
+
+        if (error?.status === 409) {
+
+          const mensajeBackend =
+            error?.error?.detalle ||
+            error?.error?.message ||
+            'La solicitud no cumple las validaciones actuales.';
+
+          const nombreEmpleado = [
+            snapshot?.apellido_empleado,
+            snapshot?.nombre_empleado
+          ]
+            .filter(Boolean)
+            .join(' ')
+            .trim();
+
+          const tipoPermiso =
+            snapshot?.tipo_permiso_descripcion ??
+            snapshot?.descripcion_tipo_permiso ??
+            snapshot?.tipoPermiso ??
+            snapshot?.motivo ??
+            'Permiso';
+
+          const departamento =
+            snapshot?.nombre_departamento ??
+            snapshot?.nom_departamento ??
+            snapshot?.departamento_nombre ??
+            snapshot?.departamento ??
+            '';
+
+          const dias = Number(
+            snapshot?.dias_permiso ??
+            snapshot?.dia ??
+            snapshot?.dias ??
+            0
+          );
+
+          const minutos = Number(
+            snapshot?.minutos_totales ??
+            0
+          );
+
+          const esPorHoras =
+            dias === 0 &&
+            minutos > 0;
+
+          this.resultadosValidacion.push({
+
+            id: Number(
+              snapshot?.id ??
+              snapshot?.id_permiso ??
+              snapshot?.id_solicitud_permiso ??
+              0
+            ),
+
+            empleado:
+              nombreEmpleado ||
+              `Solicitud ${snapshot?.id ?? ''}`,
+
+            tipoPermiso:
+              String(tipoPermiso),
+
+            departamento:
+              String(departamento),
+
+            fechaSolicitud:
+              snapshot?.fecha_creacion ??
+              snapshot?.fecha_solicitud ??
+              null,
+
+            fechaInicio:
+              snapshot?.fecha_inicio ??
+              snapshot?.fecha ??
+              null,
+
+            fechaFin:
+              snapshot?.fecha_final ??
+              snapshot?.fecha ??
+              null,
+
+            dias,
+
+            minutos,
+
+            esPorHoras,
+
+            horas:
+              this.getHorasFormatoHHmmDesdeMinutos(minutos),
+
+            horaInicio:
+              snapshot?.hora_inicio ??
+              null,
+
+            horaFin:
+              snapshot?.hora_fin ??
+              null,
+
+            mensaje:
+              String(mensajeBackend)
+
+          });
+
+          continue;
+        }
+
+        errores++;
       }
     }
 
     this.procesandoMultiple = false;
 
+    this.solicitudesProcesadasExitosamente = exitosas;
+
+    if (this.resultadosValidacion.length > 0) {
+
+      this.modoVista = 'resultado-validacion';
+
+      return;
+    }
+
     if (exitosas > 0) {
-      await this.mostrarToast(`Acción aplicada a ${exitosas} solicitud(es).`, 'success');
+      await this.mostrarToast(
+        `Acción aplicada a ${exitosas} solicitud(es).`,
+        'success'
+      );
     }
 
     if (sinPermiso > 0) {
-      await this.mostrarToast(`${sinPermiso} solicitud(es) sin permisos para esa acción.`, 'danger');
-    }
-
-    if (conflictos > 0) {
-      await this.mostrarToast(`${conflictos} solicitud(es) no cumplen las validaciones actuales.`, 'warning');
+      await this.mostrarToast(
+        `${sinPermiso} solicitud(es) sin permisos para esa acción.`,
+        'danger'
+      );
     }
 
     if (errores > 0) {
-      await this.mostrarToast(`${errores} solicitud(es) no pudieron procesarse.`, 'danger');
+      await this.mostrarToast(
+        `${errores} solicitud(es) no pudieron procesarse.`,
+        'danger'
+      );
     }
 
-    await this.buscarSolicitudes();
+    this.buscarSolicitudes(false);
+  }
+
+  
+  aceptarResultadoValidacion() {
+    this.buscarSolicitudes(false);
   }
 
   private async enviarComunicacionesAprobacionPermiso(

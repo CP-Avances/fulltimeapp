@@ -11,7 +11,16 @@ import { NotificacionesService } from 'src/app/services/notificaciones.service';
 import { TipoNotificacion } from 'src/app/interfaces/tipo-notificaciones.enum';
 
 type TipoSelector = 'dep' | 'emp';
-
+interface ResultadoValidacionVacacion {
+  id: number;
+  empleado: string;
+  departamento: string;
+  codigo: string;
+  fechaInicio: any;
+  fechaFin: any;
+  dias: number;
+  mensaje: string;
+}
 @Component({
   selector: 'app-vacacion-aprobacion',
   templateUrl: './vacacion-aprobacion.page.html',
@@ -29,7 +38,7 @@ export class VacacionAprobacionPage implements OnInit {
   tieneConfiguracionAprobacion = false;
   mensajeSinConfiguracion = 'No tiene configuración activa para aprobar solicitudes de vacaciones.';
 
-  modoVista: 'criterios' | 'lista' = 'criterios';
+  modoVista: 'criterios' | 'lista' | 'resultado-validacion' = 'criterios';
 
   criterioBusqueda: TipoSelector = 'dep';
   fechaDesde = '';
@@ -62,6 +71,8 @@ export class VacacionAprobacionPage implements OnInit {
 
   solicitudes: any[] = [];
   solicitudesSeleccionadas: any[] = [];
+  resultadosValidacion: ResultadoValidacionVacacion[] = [];
+  solicitudesProcesadasExitosamente = 0;
 
   page = 0;
   pageSize = 5;
@@ -104,6 +115,8 @@ export class VacacionAprobacionPage implements OnInit {
     this.modoVista = 'criterios';
     this.solicitudes = [];
     this.solicitudesSeleccionadas = [];
+    this.resultadosValidacion = [];
+    this.solicitudesProcesadasExitosamente = 0;
 
     await this.cargarParametroVerificacion();
     await this.validarScopeAprobacion();
@@ -467,7 +480,7 @@ export class VacacionAprobacionPage implements OnInit {
     return `${item.apellido || ''} ${item.nombre || ''}`.trim();
   }
 
-  async buscarSolicitudes() {
+  async buscarSolicitudes(mostrarMensajeResultado: boolean = true) {
     if (!this.criterioBusqueda) {
       await this.mostrarToast('Seleccione un criterio de búsqueda.', 'warning');
       return;
@@ -523,10 +536,20 @@ export class VacacionAprobacionPage implements OnInit {
       this.page = 0;
       this.modoVista = 'lista';
 
-      if (this.solicitudes.length === 0) {
-        await this.mostrarToast('No existen solicitudes pendientes de aprobación para usted.', 'warning');
-      } else {
-        await this.mostrarToast(`Se encontraron ${this.solicitudes.length} solicitud(es) para aprobar.`, 'success');
+      if (mostrarMensajeResultado) {
+
+        if (this.solicitudes.length === 0) {
+          await this.mostrarToast(
+            'No existen solicitudes pendientes de aprobación para usted.',
+            'warning'
+          );
+        } else {
+          await this.mostrarToast(
+            `Se encontraron ${this.solicitudes.length} solicitud(es) para aprobar.`,
+            'success'
+          );
+        }
+
       }
 
     } catch (error: any) {
@@ -629,6 +652,8 @@ export class VacacionAprobacionPage implements OnInit {
     this.modoVista = 'criterios';
     this.solicitudes = [];
     this.solicitudesSeleccionadas = [];
+    this.resultadosValidacion = [];
+    this.solicitudesProcesadasExitosamente = 0;
     this.page = 0;
   }
 
@@ -747,17 +772,31 @@ export class VacacionAprobacionPage implements OnInit {
     await alert.present();
   }
 
-  async ejecutarAccionMultiple(decision: 'APRUEBA' | 'RECHAZA', observacion: string) {
+  async ejecutarAccionMultiple(
+    decision: 'APRUEBA' | 'RECHAZA',
+    observacion: string
+  ) {
+
     this.procesandoMultiple = true;
 
     let exitosas = 0;
     let sinPermiso = 0;
-    let conflictos = 0;
     let errores = 0;
 
-    for (const solicitud of this.solicitudesSeleccionadas) {
+    // Limpiamos cualquier resultado anterior
+    this.resultadosValidacion = [];
+    this.solicitudesProcesadasExitosamente = 0;
+
+    const solicitudesAProcesar = [
+      ...this.solicitudesSeleccionadas
+    ];
+
+    for (const solicitud of solicitudesAProcesar) {
+      const snapshot = JSON.parse(
+        JSON.stringify(solicitud)
+      );
+
       try {
-        const snapshot = JSON.parse(JSON.stringify(solicitud));
 
         await firstValueFrom(
           this.aprobacionesService.EjecutarAccionSolicitud({
@@ -778,35 +817,121 @@ export class VacacionAprobacionPage implements OnInit {
         exitosas++;
 
       } catch (error: any) {
+
+        console.log(
+          'Error al procesar solicitud de vacación:',
+          solicitud?.id,
+          error
+        );
+
         if (error?.status === 403) {
+
           sinPermiso++;
-        } else if (error?.status === 409) {
-          conflictos++;
-        } else {
-          errores++;
+          continue;
         }
+
+        if (error?.status === 409) {
+
+          const mensajeBackend =
+            error?.error?.detalle ||
+            error?.error?.message ||
+            'La solicitud no cumple las validaciones actuales.';
+
+          const nombreEmpleado = [
+            snapshot?.nombre_empleado,
+            snapshot?.apellido_empleado
+          ]
+            .filter(Boolean)
+            .join(' ')
+            .trim();
+
+          this.resultadosValidacion.push({
+            id: Number(
+              snapshot?.id ??
+              snapshot?.id_solicitud_vacacion ??
+              0
+            ),
+
+            empleado:
+              nombreEmpleado ||
+              `Solicitud ${snapshot?.id ?? ''}`,
+
+            departamento:
+              snapshot?.nombre_departamento ??
+              snapshot?.departamento ??
+              snapshot?.nom_departamento ??
+              '',
+
+            codigo: String(
+              snapshot?.codigo_empleado ??
+              snapshot?.codigo ??
+              ''
+            ),
+
+            fechaInicio:
+              snapshot?.fecha_inicio ??
+              null,
+
+            fechaFin:
+              snapshot?.fecha_final ??
+              null,
+
+            dias: Number(
+              snapshot?.numero_dias_totales ??
+              snapshot?.num_dias_totales ??
+              snapshot?.dias ??
+              0
+            ),
+
+            mensaje: String(mensajeBackend)
+          });
+
+          continue;
+        }
+        errores++;
       }
     }
 
     this.procesandoMultiple = false;
 
+    this.solicitudesProcesadasExitosamente = exitosas;
+
+    if (this.resultadosValidacion.length > 0) {
+
+      this.modoVista = 'resultado-validacion';
+
+      return;
+    }
+
     if (exitosas > 0) {
-      await this.mostrarToast(`Acción aplicada a ${exitosas} solicitud(es).`, 'success');
+      await this.mostrarToast(
+        `Acción aplicada a ${exitosas} solicitud(es).`,
+        'success'
+      );
     }
 
     if (sinPermiso > 0) {
-      await this.mostrarToast(`${sinPermiso} solicitud(es) sin permisos para esa acción.`, 'danger');
-    }
-
-    if (conflictos > 0) {
-      await this.mostrarToast(`${conflictos} solicitud(es) no cumplen las validaciones actuales.`, 'warning');
+      await this.mostrarToast(
+        `${sinPermiso} solicitud(es) sin permisos para esa acción.`,
+        'danger'
+      );
     }
 
     if (errores > 0) {
-      await this.mostrarToast(`${errores} solicitud(es) no pudieron procesarse.`, 'danger');
+      await this.mostrarToast(
+        `${errores} solicitud(es) no pudieron procesarse.`,
+        'danger'
+      );
     }
 
-    await this.buscarSolicitudes();
+    await this.buscarSolicitudes(false);
+  }
+
+  async aceptarResultadoValidacion() {
+    this.modoVista = 'lista';
+    this.resultadosValidacion = [];
+    this.solicitudesProcesadasExitosamente = 0;
+    await this.buscarSolicitudes(false);
   }
 
   private async enviarComunicacionesAprobacionVacacion(

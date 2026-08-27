@@ -37,6 +37,31 @@ import { ConnectivityService } from 'src/app/services/conexion-servidor.service'
             </ion-card-content>
           </ion-card>
 
+          <ion-card
+            class="opcion-card"
+            button="true"
+            [routerLink]="['/reloj/reportes/reporte-resumen-asistencia']">
+
+            <ion-card-content>
+
+              <div class="opcion-icono">
+                <ion-icon name="clipboard-outline"></ion-icon>
+              </div>
+
+              <div class="opcion-texto">
+                <h2>Resumen general de asistencia</h2>
+                <p>Consulta y descarga el resumen de asistencia.</p>
+              </div>
+
+              <ion-icon
+                class="opcion-flecha"
+                name="chevron-forward-outline">
+              </ion-icon>
+
+            </ion-card-content>
+
+          </ion-card>
+
         </section>
 
       </ng-container>
