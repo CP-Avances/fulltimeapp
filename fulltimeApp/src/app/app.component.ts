@@ -6,10 +6,8 @@ import { AlertController, ToastController } from '@ionic/angular';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { App } from '@capacitor/app';
 import type { PluginListenerHandle } from '@capacitor/core';
-
+import { TimbresPendientesSyncService } from './services/timbres-pendientes-sync.service';
 import { NetworkService } from './libs/network.service';
-import { DataLocalService } from './libs/data-local.service';
-import { RelojServiceService } from './services/reloj-service.service';
 import { SocketService } from './services/socket.service';
 
 @Component({
@@ -22,6 +20,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   showSplash = true;
   splash = true;
   id_celular: any;
+  private sincronizandoPendientes = false;
 
   private networkSubscription?: Subscription;
   private appStateListener?: PluginListenerHandle;
@@ -30,9 +29,8 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     public alertController: AlertController,
     private toastController: ToastController,
     private networkService: NetworkService,
-    private dataLocalService: DataLocalService,
-    private relojService: RelojServiceService,
     private socketService: SocketService,
+    private timbresPendientesSync: TimbresPendientesSyncService,
   ) {
   }
 
@@ -106,55 +104,71 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // METODO PARA ENVIAR TIMBRES GUARDADOS CUANDO VUELVE LA CONEXION
-  private enviarTimbresByConnected(): void {
-    const timbres = [...this.dataLocalService.timbresStorage];
+  private async enviarTimbresByConnected(): Promise<void> {
+    if (this.sincronizandoPendientes) {
+      return;
+    }
 
-    if (timbres.length === 0) return;
+    const idEmpleado = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
 
-    let procesados = 0;
+    if (!idEmpleado || idEmpleado <= 0) {
+      return;
+    }
 
-    timbres.forEach((t) => {
-      t.fecha_hora_timbre_servidor = t.fecha_hora_timbre;
+    this.sincronizandoPendientes = true;
 
-      this.relojService.enviarTimbre(t).subscribe({
-        next: () => {
-          procesados++;
+    try {
+      const resultado = await this.timbresPendientesSync.sincronizarPendientes(idEmpleado);
 
-          if (procesados === timbres.length) {
-            this.dataLocalService.eliminarInfo('timbres');
+      if (resultado.sesionRevocada) {
+        return;
+      }
 
-            setTimeout(() => {
-              this.presentAlert();
-            }, 1000);
-          }
-        },
-        error: () => {
-          procesados++;
+      if (!resultado.huboPendientes) {
+        return;
+      }
 
-          this.dataLocalService.guardarTimbresPerdidos(t);
+      if (resultado.enviados > 0 && resultado.fallidos === 0) {
+        await this.mostrarToastSincronizacion(
+          resultado.mensaje,
+          'success'
+        );
 
-          if (procesados === timbres.length) {
-            this.dataLocalService.eliminarInfo('timbres');
+        return;
+      }
 
-            setTimeout(() => {
-              this.presentAlert();
-            }, 1000);
-          }
-        }
-      });
-    });
-  }
+      if (resultado.enviados > 0 && resultado.fallidos > 0) {
+        await this.mostrarToastSincronizacion(
+          resultado.mensaje,
+          'warning'
+        );
 
-  private async presentAlert() {
-    const alert = await this.alertController.create({
-      cssClass: 'my-custom-class',
-      header: 'Mensaje',
-      message: 'Los timbres guardados se han enviado automáticamente.',
-      mode: 'ios',
-      buttons: ['OK']
-    });
+        return;
+      }
 
-    await alert.present();
+      if (resultado.enviados === 0 && resultado.fallidos > 0) {
+        await this.mostrarToastSincronizacion(
+          resultado.mensaje,
+          'warning'
+        );
+      }
+
+    } catch (error: any) {
+      if (
+        error?.status === 401 &&
+        error?.error?.code === 'dispositivo_revocado'
+      ) {
+        return;
+      }
+
+      console.error(
+        '[app] Error sincronizando timbres pendientes:',
+        error
+      );
+
+    } finally {
+      this.sincronizandoPendientes = false;
+    }
   }
 
   // PESTAÑAS DE MENSAJES
@@ -166,6 +180,21 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
       color: 'notificacicon',
       mode: 'ios',
       cssClass: 'toast-custom-class',
+    });
+
+    await toast.present();
+  }
+
+  private async mostrarToastSincronizacion(
+    mensaje: string,
+    color: string
+  ): Promise<void> {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: 3500,
+      color,
+      position: 'middle',
+      mode: 'ios'
     });
 
     await toast.present();

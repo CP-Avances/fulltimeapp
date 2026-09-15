@@ -12,6 +12,8 @@ export class DataLocalService {
 
   private _storage: Storage | null = null;
 
+  private inicializacionPromise: Promise<void>;
+
   private timbres: Timbre[] = [];
 
   public get timbresStorage(): Timbre[] {
@@ -28,7 +30,7 @@ export class DataLocalService {
     private storage: Storage,
     public alertCrtl: AlertController,
   ) {
-    this.init();
+    this.inicializacionPromise = this.init();
   }
 
   private async init() {
@@ -36,6 +38,10 @@ export class DataLocalService {
     this._storage = storage;
     await this.cargarTimbres()
     await this.cargarTimbresPerdidos()
+  }
+
+  public async ready(): Promise<void> {
+    await this.inicializacionPromise;
   }
 
   // Diseno de Mensaje de notificacion con logo 
@@ -52,18 +58,21 @@ export class DataLocalService {
   }
 
   // METODO PARA ALMACENAR LOS TIMBRES SIN INTERNET EN EL STORAGE 
-  guardarTimbre(timbre: Timbre) {
-    const existe = this.timbres.find(tim => tim.fecha_hora_timbre === timbre.fecha_hora_timbre)
-    if (!existe) {
-      this.mensaje = `<div class="card-alert">
-                            <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
-                            <br>
-                            <p> Timbre guardado en la memoria del teléfono. Se enviarán cuando tenga conexión a internet 😅 </p>
-                          </div>`;
-      this.showAlert(this.mensaje);
-      this.timbres.push(timbre);
-      this._storage.set('timbres', this.timbres);
+  async guardarTimbre(timbre: Timbre): Promise<void> {
+    await this.ready();
+
+    const existe = this.existeTimbre(this.timbres, timbre);
+
+    if (existe) {
+      return;
     }
+
+    this.timbres.push(timbre);
+
+    await this._storage!.set(
+      'timbres',
+      [...this.timbres]
+    );
   }
 
   //METODO PARA LEER LOS TIMBRES GUARDADOS SIN INTERNET
@@ -75,18 +84,24 @@ export class DataLocalService {
   }
 
   // METODO PARA ALMACENAR LOS TIMBRES SIN SERVIDOR EN EL STORAGE 
-  guardarTimbresPerdidos(timbre: Timbre) {
-    const existe = this.timbresPerdidos.find(tim => tim.fecha_hora_timbre === timbre.fecha_hora_timbre)
-    if (!existe) {
-      this.mensaje = `<div class="card-alert">
-                            <img src="../../../assets/images/LOGOBLFT.png" class="img-alert">
-                            <br>
-                            <p> Timbre guardado en la memoria del teléfono. Revisar en el listado de "Timbres no enviados" </p>
-                          </div>`;
-      this.showAlert(this.mensaje);
-      this.timbresPerdidos.push(timbre);
-      this._storage.set('timbresPerdidos', this.timbresPerdidos);
+  async guardarTimbresPerdidos(timbre: Timbre): Promise<void> {
+    await this.ready();
+
+    const existe = this.existeTimbre(
+      this.timbresPerdidos,
+      timbre
+    );
+
+    if (existe) {
+      return;
     }
+
+    this.timbresPerdidos.push(timbre);
+
+    await this._storage!.set(
+      'timbresPerdidos',
+      [...this.timbresPerdidos]
+    );
   }
 
   //METODO PARA LEER LOS TIMBRES GUARDADOS POR FALLO EN LA CONEXION CON EL SERVIDOR
@@ -98,21 +113,76 @@ export class DataLocalService {
   }
 
   // METODO PARA ELIMINAR DEL STORAGE LOS TIMBRES
-  public async eliminarInfo(key: string) {
-    await this._storage.remove(key);
-    switch (key) {
+  public async eliminarInfo(key: string): Promise<void> {
+    await this.ready();
 
+    await this._storage!.remove(key);
+
+    switch (key) {
       case 'timbresPerdidos':
         this.timbresPerdidos = [];
         break;
-
       case 'timbres':
         this.timbres = [];
         break;
-
-      default:
-        break;
     }
   }
+
+
+  private obtenerClaveTimbre(timbre: any): string | null {
+      const fecha = String(
+          timbre?.fec_hora_timbre ??
+          timbre?.fecha_hora_timbre ??
+          timbre?.fecha_hora_timbre_servidor ??
+          ''
+      ).trim();
+
+      if (!fecha) {
+          return null;
+      }
+
+      const teclaFuncion = String(
+          timbre?.tecl_funcion ??
+          timbre?.tecla_funcion ??
+          timbre?.teclaFuncion ??
+          ''
+      ).trim();
+
+      const accion = String(timbre?.accion ?? '').trim();
+
+      return `${fecha}|${teclaFuncion}|${accion}`;
+  }
+
+  private existeTimbre(lista: Timbre[], timbre: Timbre): boolean {
+      const claveNueva = this.obtenerClaveTimbre(timbre);
+
+      if (!claveNueva) {
+          return false;
+      }
+
+      return lista.some(item =>
+          this.obtenerClaveTimbre(item) === claveNueva
+      );
+  }
+
+  public async reemplazarTimbresPendientes(timbresFallidos: Timbre[]): Promise<void> {
+    await this.ready();
+
+    if (timbresFallidos.length > 0) {
+      this.timbresPerdidos = [...timbresFallidos];
+
+      await this._storage!.set(
+        'timbresPerdidos',
+        [...this.timbresPerdidos]
+      );
+    } else {
+      this.timbresPerdidos = [];
+      await this._storage!.remove('timbresPerdidos');
+    }
+
+    this.timbres = [];
+    await this._storage!.remove('timbres');
+  }
+
 
 }

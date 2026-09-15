@@ -1,16 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { RelojServiceService } from "src/app/services/reloj-service.service";
 import { NavController, ToastController, Platform, AlertController } from "@ionic/angular";
-import { IdDispositivos } from 'src/app/interfaces/Usuario';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { Device } from '@capacitor/device';
 import { EmpleadosService } from 'src/app/services/empleados.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
-import { ParametrosSistema } from 'src/app/libs/parametros.emun';
 import { SocketService } from 'src/app/services/socket.service';
 import { SessionStorageService } from 'src/app/services/session-storage.service';
 import { PushNotificationService } from 'src/app/services/push-notification.service';
-import { Capacitor } from '@capacitor/core';
+import { TimbresPendientesSyncService } from 'src/app/services/timbres-pendientes-sync.service';
 
 @Component({
   selector: 'app-login',
@@ -23,6 +21,8 @@ export class LoginPage implements OnInit {
 
   iniciandoSesion = false;
   aceptaTerminos: boolean = false; // Inicialización predeterminada
+  private readonly VERSION_SESION_DISPOSITIVO = '2';
+  private readonly CLAVE_VERSION_SESION_DISPOSITIVO = 'sesion_dispositivo_version';
 
   user = {
     nombre_usuario: "",
@@ -30,12 +30,9 @@ export class LoginPage implements OnInit {
     codigo_empresa: "",
   }
 
-  iddispositivos: IdDispositivos[] = [];
   verPassword = false;
   id_celular: any;
   dispositi: any;
-
-  existeId_Dispositivo: boolean;
   mostrarCheckboxInicialmente: boolean;
 
   constructor(
@@ -50,6 +47,7 @@ export class LoginPage implements OnInit {
     public sessionStorageService: SessionStorageService,
     private readonly socketService: SocketService,
     private pushNotificationService: PushNotificationService,
+    private timbresPendientesSync: TimbresPendientesSyncService,
   ) { }
 
   ionViewWillEnter() {
@@ -73,8 +71,6 @@ export class LoginPage implements OnInit {
 
     this.BuscarParametroTimbreUbicacionDesconocida();
   }
-
-  rango_dispositivos: any;
 
 
   // METODO PARA OBTENER PARAMETRO DE UBICACION DESCONOCIDA
@@ -126,22 +122,6 @@ export class LoginPage implements OnInit {
     this.verPassword = !this.verPassword;
   }
 
-  //METODO PARA VER EL NUMERO DE DISPOSITIVOS QUE PUEDE TENER UN USUARIO
-  async BuscarParametroNumeroDispositivos(datos: any) {
-    this.rango_dispositivos = 1;
-    this.parametros.ObtenerDetallesParametros(ParametrosSistema.DISPOSITIVOS_MOVILES).subscribe(
-      {
-        next: res => {
-          res.forEach(p => {
-            this.rango_dispositivos = parseInt(p.descripcion);
-          });
-          this.obtenerIdDispositivosUsuario(datos);
-        }, error: () => {
-          this.obtenerIdDispositivosUsuario(datos);
-        }
-      });
-  }
-
 
   // METODO PARA INICIAR SESION
   async validarEmpresa() {
@@ -150,7 +130,6 @@ export class LoginPage implements OnInit {
     }
 
     this.iniciandoSesion = true;
-    this.existeId_Dispositivo = false;
 
     await this.infoDispositivo();
 
@@ -163,20 +142,7 @@ export class LoginPage implements OnInit {
       );
     }
 
-    const credenciales = {
-      nombre_usuario: this.user.nombre_usuario,
-      pass: this.user.pass,
-      movil: true,
-      codigoEmpresa: this.user.codigo_empresa,
-      id_dispositivo: this.id_celular,
-      acepta_terminos: this.aceptaTerminos
-    };
-
-    if (
-      !credenciales.nombre_usuario ||
-      !credenciales.pass ||
-      !credenciales.codigoEmpresa
-    ) {
+    if (!this.user.nombre_usuario || !this.user.pass || !this.user.codigo_empresa) {
       this.iniciandoSesion = false;
 
       return this.usuarioIncorrectoToas(
@@ -185,37 +151,90 @@ export class LoginPage implements OnInit {
       );
     }
 
+    await this.ejecutarLogin(false);
+  }
+
+  private async ejecutarLogin(confirmarDispositivo: boolean) {
+    this.iniciandoSesion = true;
+
+    const credenciales = {
+      nombre_usuario: this.user.nombre_usuario,
+      pass: this.user.pass,
+      movil: true,
+      codigoEmpresa: this.user.codigo_empresa,
+      id_dispositivo: this.id_celular,
+      modelo_dispositivo: this.dispositi,
+      confirmar_dispositivo: confirmarDispositivo,
+      acepta_terminos: this.aceptaTerminos
+    };
+
     try {
-      const datos =
-        await this.relojService
-          .ValidarCredencialesMT(
-            credenciales
-          );
+      const datos = await this.relojService.ValidarCredencialesMT(credenciales);
 
       await this.registrarDatosLocales(datos);
-      await this.pushNotificationService
-        .inicializarPushNotifications();
-
+      this.sincronizarTimbresDespuesLogin(Number(datos.empleado));
+      await this.pushNotificationService.inicializarPushNotifications();
       await this.obtenerImagen64();
-      await this.BuscarParametroNumeroDispositivos(datos);
+
+      this.usuarioSuccessToas("Ingreso exitoso", 2000);
+      this.cambiodepantallas();
 
     } catch (error: any) {
       this.iniciandoSesion = false;
 
+      const etapaError = error?.error?.etapa ?? null;
+
+      if (
+        !confirmarDispositivo &&
+        error?.status === 409 &&
+        etapaError === "validar_dispositivo_movil"
+      ) {
+        await this.registrarCelular();
+        return;
+      }
+
       const mensaje =
         error?.error?.message ??
+        error?.error?.detalle ??
         error?.message ??
         'Error al validar credenciales.';
 
-      this.usuarioIncorrectoToas(
-        mensaje,
-        3000
+      this.usuarioIncorrectoToas(mensaje, 3000);
+    }
+  }
+
+  private async sincronizarTimbresDespuesLogin(idEmpleado: number): Promise<void> {
+    if (!idEmpleado || idEmpleado <= 0) {
+      return;
+    }
+
+    try {
+      const resultado = await this.timbresPendientesSync.sincronizarPendientes(idEmpleado);
+
+      if (resultado.sesionRevocada || !resultado.huboPendientes) {
+        return;
+      }
+
+      await this.abrirToas(
+        resultado.mensaje,
+        resultado.fallidos === 0 ? 'success' : 'warning',
+        3500
+      );
+
+    } catch (error) {
+      console.error(
+        '[login] Error sincronizando timbres pendientes:',
+        error
       );
     }
   }
 
   async registrarDatosLocales(datos: any) {
     await this.sessionStorageService.setToken(datos.token);
+    localStorage.setItem(
+      this.CLAVE_VERSION_SESION_DISPOSITIVO,
+      this.VERSION_SESION_DISPOSITIVO
+    );
 
     localStorage.setItem('rol', datos.rol);
     localStorage.setItem('ip', datos.ip_adress);
@@ -242,50 +261,11 @@ export class LoginPage implements OnInit {
     localStorage.setItem('storage_mb_usado', datos.storage_mb_usado);
     localStorage.setItem('storage_mb_contratado', datos.storage_mb_contratado);
 
+    localStorage.setItem('UidDispositivo', String(this.id_celular ?? ''));
+
     // SOCKET: conectar y registrar empresa (room)
     this.socketService.conectar(datos.codigo_empresa);
     this.socketService.setEmpresa(datos.codigo_empresa);
-  }
-
-  async obtenerIdDispositivosUsuario(datos: any) {
-    this.relojService.obtenerIdDispositivosUsuario(datos.empleado).subscribe({
-      next: async (dispositivos) => {
-
-        //Buscar el id_dispositivo y el id_celular si son el mismo
-        dispositivos.forEach((item: any) => {
-          if (item.id_dispositivo == this.id_celular) {
-            this.iddispositivos = dispositivos
-            this.existeId_Dispositivo = true;
-          }
-        });
-
-        if (this.existeId_Dispositivo) {
-          this.usuarioSuccessToas("Ingreso exitoso", 2000);
-          this.cambiodepantallas();
-        }
-        else {
-          if (dispositivos.length >= this.rango_dispositivos) {
-            this.iniciandoSesion = false;
-            this.usuarioIncorrectoToas("Ups! El usuario llego al limite de dispositivos permitidos", 3000);
-            var FormId = 'formulariologin';
-            var resetForm = <HTMLFormElement>document.getElementById(FormId);
-            resetForm.reset();
-          } else {
-            this.registrarCelular();
-            this.usuarioSuccessToas("Ingreso exitoso", 2000);
-            this.cambiodepantallas();
-          }
-        }
-      },
-      error: (err) => {
-        this.iniciandoSesion = false;
-        if (err.status == 0) {
-          this.usuarioIncorrectoToas("Halgo ha salido mal. COMPRUEBA TU CONEXION A INTERNET o PONGASE EN CONTACTO CON EL ADMINISTRADOR", 3000);
-        } else {
-          this.usuarioIncorrectoToas(err.error.message, 3000)
-        }
-      }
-    });
   }
 
 
@@ -343,51 +323,32 @@ export class LoginPage implements OnInit {
     const alert = await this.alertController.create({
       subHeader: 'Registro de dispositivo',
       message: 'Se va a registrar este celular para realizar sus timbres',
-      mode: "ios",
+      mode: 'ios',
       buttons: [
         {
           text: 'Cancelar',
           role: 'cancel',
-          handler: async () => {
-            await this.relojService.cerrarSesion();
-            this.abrirToas("Debe registrar un dispositivo para usar el sistema", "danger", 3500);
+          handler: () => {
+            this.iniciandoSesion = false;
+
+            this.abrirToas(
+              'Debe registrar un dispositivo para usar el sistema',
+              'danger',
+              3500
+            );
           }
         },
         {
           text: 'Listo',
-          handler: () => {
-            this.registrarIdDispositivoenBDD(this.id_celular, this.dispositi);
+          handler: async () => {
+            await this.ejecutarLogin(true);
           }
         }
       ],
       backdropDismiss: false
     });
+
     await alert.present();
-  }
-
-  // METODO PARA REGISTRAR EL DISPOSITIVO
-  registrarIdDispositivoenBDD(id_celular: any, model_dispositivo: any) {
-
-    const id_usuario = localStorage.getItem('empleadoID');
-
-    this.relojService.registrarCelularUsuario(id_usuario, id_celular, model_dispositivo, true).subscribe(
-      {
-        next: res => {
-          localStorage.setItem('UidDispositivo', id_celular);
-          res.id_empleado = id_usuario
-          res.id_dispositivo = id_celular;
-          res.modelo_dispositivo = model_dispositivo;
-
-        }, error: (err) => {
-          this.iniciandoSesion = false;
-          if (err.status == 0) {
-            this.usuarioIncorrectoToas("Ups! halgo ha salido mal. COMPRUEBA TU CONEXION A INTERNET o PONGASE EN CONTACTO CON EL ADMINISTRADOR", 3000);
-          } else {
-            this.usuarioIncorrectoToas(err.error.message, 3000)
-          }
-        }
-      }
-    )
   }
 
   //METODO PARA CREAR LAS ALERTAS

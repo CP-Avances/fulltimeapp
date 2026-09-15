@@ -12,7 +12,6 @@ import { NetworkService } from '../../libs/network.service';
 import { NavegadorAdminComponent } from 'src/app/componentes/navegador-admin/navegador-admin.component';
 import { Geolocation } from '@capacitor/geolocation';
 import { timeout } from 'rxjs/operators';
-import { TimbresPendientesSyncService } from 'src/app/services/timbres-pendientes-sync.service';
 import { TimbresService } from 'src/app/services/timbres.service';
 
 @Component({
@@ -45,11 +44,14 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   colorFp: any;
 
   isConnected = false;
-  sincronizandoPendientes = false;
 
   ultimoTimbre: any = null;
   cargandoUltimoTimbre = false;
   sinConexionUltimoTimbre = false;
+
+  private readonly VERSION_SESION_DISPOSITIVO = '2';
+  private readonly CLAVE_VERSION_SESION_DISPOSITIVO = 'sesion_dispositivo_version';
+  private sesionDispositivoValidada = false;
 
   constructor(
     public toastController: ToastController,
@@ -61,11 +63,18 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     public relojService: RelojServiceService,
     public empleadoService: EmpleadosService,
     private networkService: NetworkService,
-    private timbresPendientesSync: TimbresPendientesSyncService,
     public timbreService: TimbresService,
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    const sesionCompatible = await this.validarMigracionSesionDispositivo();
+
+    if (!sesionCompatible) {
+      return;
+    }
+
+    this.sesionDispositivoValidada = true;
+
     this.startClock();
     this.cambioimagen();
 
@@ -85,26 +94,38 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     this.route.queryParams.subscribe(params => {
       if (params['refreshUltimoTimbre']) {
         setTimeout(() => {
-          this.ObtenerUltimoTimbreEmpleado();
+          if (this.sesionDispositivoValidada) {
+            this.ObtenerUltimoTimbreEmpleado();
+          }
         }, 300);
       }
     });
   }
 
   ionViewWillEnter() {
+    if (!this.sesionDispositivoValidada) {
+      return;
+    }
+
     this.startClock();
     this.networkSubscriber();
     this.refreshNavegadorAdmin();
   }
 
   ionViewDidEnter() {
+    if (!this.sesionDispositivoValidada) {
+      return;
+    }
+
     const refrescar = localStorage.getItem('refrescarUltimoTimbre');
 
     if (refrescar === 'true') {
       localStorage.removeItem('refrescarUltimoTimbre');
 
       setTimeout(() => {
-        this.ObtenerUltimoTimbreEmpleado();
+        if (this.sesionDispositivoValidada) {
+          this.ObtenerUltimoTimbreEmpleado();
+        }
       }, 300);
 
       return;
@@ -343,77 +364,6 @@ export class BienvenidoPage implements OnInit, OnDestroy {
     this.VerificarFunciones();
     this.BuscarParametroTimbreEspecial();
 
-    this.SincronizarTimbresPendientesAutomatico();
-  }
-
-  private async SincronizarTimbresPendientesAutomatico() {
-    if (this.sincronizandoPendientes) {
-      return;
-    }
-
-    const idEmpleado = parseInt(localStorage.getItem('empleadoID') ?? '0', 10);
-
-    if (!idEmpleado || idEmpleado <= 0) {
-      return;
-    }
-
-    if (!this.timbresPendientesSync.tieneTimbresPendientes()) {
-      return;
-    }
-
-    this.sincronizandoPendientes = true;
-
-    try {
-      const resultado = await this.timbresPendientesSync.sincronizarPendientes(idEmpleado);
-
-      if (!resultado.huboPendientes) {
-        return;
-      }
-
-      if (resultado.enviados > 0 && resultado.fallidos === 0) {
-        await this.abrirToas(resultado.mensaje, 'success', 3500, 'middle');
-
-        /*
-          IMPORTANTE:
-          Cuando los timbres pendientes se sincronizan correctamente,
-          volvemos a consultar el último timbre desde el backend.
-        */
-        setTimeout(() => {
-          this.ObtenerUltimoTimbreEmpleado();
-        }, 800);
-
-        return;
-      }
-
-      if (resultado.enviados > 0 && resultado.fallidos > 0) {
-        await this.abrirToas(resultado.mensaje, 'warning', 4500, 'middle');
-
-        /*
-          Aunque algunos fallen, si al menos uno se envió,
-          refrescamos la card del último timbre.
-        */
-        setTimeout(() => {
-          this.ObtenerUltimoTimbreEmpleado();
-        }, 800);
-
-        return;
-      }
-
-      if (resultado.enviados === 0 && resultado.fallidos > 0) {
-        await this.abrirToas(resultado.mensaje, 'warning', 4500, 'middle');
-      }
-
-    } catch {
-      await this.abrirToas(
-        'No se pudieron sincronizar los timbres pendientes. Intente nuevamente más tarde.',
-        'warning',
-        4500,
-        'middle'
-      );
-
-    } finally {
-      this.sincronizandoPendientes = false;
-    }
   }
 
   // ============================================================
@@ -798,6 +748,31 @@ export class BienvenidoPage implements OnInit, OnDestroy {
   // ============================================================
   // SESIÓN
   // ============================================================
+
+  private async validarMigracionSesionDispositivo(): Promise<boolean> {
+    const token = await this.relojService.getToken();
+
+    if (!token) {
+      return true;
+    }
+
+    const versionSesion = localStorage.getItem(
+      this.CLAVE_VERSION_SESION_DISPOSITIVO
+    );
+
+    if (versionSesion === this.VERSION_SESION_DISPOSITIVO) {
+      return true;
+    }
+
+    await this.relojService.cerrarSesion();
+
+    await this.usuarioIncorrectoToas(
+      'Por seguridad, debe iniciar sesión nuevamente para vincular este dispositivo.',
+      4000
+    );
+
+    return false;
+  }
 
   async checkSession(id_empleado: any) {
     return this.empleadoService.accesoMovil(id_empleado);

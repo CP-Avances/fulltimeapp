@@ -15,6 +15,7 @@ export type ResultadoSincronizacionTimbres = {
     fallidos: number;
     mensaje: string;
     huboPendientes: boolean;
+    sesionRevocada?: boolean;
 };
 
 type ResultadoEnvioTimbre = {
@@ -41,6 +42,7 @@ export class TimbresPendientesSyncService {
       aunque el parámetro general de ubicación desconocida esté desactivado.
     */
     private readonly TIMBRES_UBICACION_FLEXIBLE = new Set<string>(['2', '3', '4', '5', '7']);
+    private sincronizacionEnCurso: Promise<ResultadoSincronizacionTimbres> | null = null;
 
     constructor(
         private dataLocalService: DataLocalService,
@@ -56,8 +58,27 @@ export class TimbresPendientesSyncService {
     async sincronizarPendientes(
         idEmpleado: number
     ): Promise<ResultadoSincronizacionTimbres> {
-        const timbres =
-            this.obtenerTimbresPendientes();
+
+        if (this.sincronizacionEnCurso) {
+            return await this.sincronizacionEnCurso;
+        }
+
+        this.sincronizacionEnCurso = this.ejecutarSincronizacion(idEmpleado);
+
+        try {
+            return await this.sincronizacionEnCurso;
+        } finally {
+            this.sincronizacionEnCurso = null;
+        }
+    }
+
+    private async ejecutarSincronizacion(
+        idEmpleado: number
+    ): Promise<ResultadoSincronizacionTimbres> {
+
+        await this.dataLocalService.ready();
+
+        const timbres = this.obtenerTimbresPendientes();
 
         if (timbres.length === 0) {
             return {
@@ -65,8 +86,7 @@ export class TimbresPendientesSyncService {
                 enviados: 0,
                 fallidos: 0,
                 huboPendientes: false,
-                mensaje:
-                    'No existen timbres pendientes por enviar.'
+                mensaje: 'No existen timbres pendientes por enviar.'
             };
         }
 
@@ -76,80 +96,60 @@ export class TimbresPendientesSyncService {
                     .obtenerUsuario(idEmpleado)
                     .pipe(timeout(3000))
             );
-        } catch {
+        } catch (error: any) {
+            if (
+                error?.status === 401 &&
+                error?.error?.code === 'dispositivo_revocado'
+            ) {
+                return {
+                    total: timbres.length,
+                    enviados: 0,
+                    fallidos: timbres.length,
+                    huboPendientes: true,
+                    sesionRevocada: true,
+                    mensaje: ''
+                };
+            }
+
             return {
                 total: timbres.length,
                 enviados: 0,
                 fallidos: timbres.length,
                 huboPendientes: true,
-                mensaje:
-                    'Falló la conexión con el servidor, no se pudieron enviar los timbres.'
+                sesionRevocada: false,
+                mensaje: 'Falló la conexión con el servidor, no se pudieron enviar los timbres.'
             };
         }
 
-        const rango =
-            await this.obtenerRangoUbicacion();
+        const rango = await this.obtenerRangoUbicacion();
 
-        await this.actualizarParametroUbicacionDesconocida(
-            idEmpleado
-        );
+        await this.actualizarParametroUbicacionDesconocida(idEmpleado);
 
         const resultados: ResultadoEnvioTimbre[] = [];
 
-        /*
-         * Se envían secuencialmente.
-         */
         for (const timbre of timbres) {
-            const resultado =
-                await this.procesarYEnviarTimbre(
-                    timbre,
-                    idEmpleado,
-                    rango
-                );
+            const resultado = await this.procesarYEnviarTimbre(
+                timbre,
+                idEmpleado,
+                rango
+            );
 
             resultados.push(resultado);
         }
 
-        const enviados =
-            resultados.filter(
-                resultado => resultado.enviado
-            ).length;
+        const enviados = resultados.filter(
+            resultado => resultado.enviado
+        ).length;
 
-        const fallidos =
-            resultados.length - enviados;
+        const fallidos = resultados.length - enviados;
 
-        /*
-         * Extraer únicamente los timbres que no lograron
-         * enviarse.
-         */
-        const timbresFallidos =
-            resultados
-                .filter(
-                    resultado =>
-                        resultado.enviado === false
-                )
-                .map(
-                    resultado =>
-                        resultado.timbre
-                );
+        const timbresFallidos = resultados
+            .filter(resultado => resultado.enviado === false)
+            .map(resultado => resultado.timbre);
 
-        /*
-         * Limpiar el almacenamiento anterior.
-         *
-         * Esto evita que vuelvan a enviarse los timbres
-         * que sí llegaron correctamente al servidor.
-         */
-        this.limpiarTimbresPendientes();
-
-        /*
-         * Guardar nuevamente solo los fallidos.
-         */
-        for (const timbreFallido of timbresFallidos) {
-            this.dataLocalService
-                .guardarTimbresPerdidos(
-                    timbreFallido
-                );
-        }
+        await this.dataLocalService.reemplazarTimbresPendientes(
+            timbresFallidos
+        );
 
         if (fallidos === 0) {
             return {
@@ -157,10 +157,10 @@ export class TimbresPendientesSyncService {
                 enviados,
                 fallidos,
                 huboPendientes: true,
-                mensaje:
-                    enviados > 1
-                        ? `Los ${enviados} timbres se han enviado correctamente.`
-                        : 'El timbre ha sido enviado exitosamente.'
+                sesionRevocada: false,
+                mensaje: enviados > 1
+                    ? `Los ${enviados} timbres se han enviado correctamente.`
+                    : 'El timbre ha sido enviado exitosamente.'
             };
         }
 
@@ -169,9 +169,9 @@ export class TimbresPendientesSyncService {
             enviados,
             fallidos,
             huboPendientes: true,
+            sesionRevocada: false,
             mensaje:
-                `Se enviaron ${enviados} de ` +
-                `${resultados.length} timbres. ` +
+                `Se enviaron ${enviados} de ${resultados.length} timbres. ` +
                 `${fallidos} timbre(s) permanecen pendientes.`
         };
     }
@@ -191,10 +191,6 @@ export class TimbresPendientesSyncService {
         return this.obtenerTimbresPendientes().length > 0;
     }
 
-    private limpiarTimbresPendientes(): void {
-        this.dataLocalService.eliminarInfo('timbresPerdidos');
-        this.dataLocalService.eliminarInfo('timbres');
-    }
 
     // ============================================================
     // PARÁMETROS
