@@ -47,17 +47,17 @@ export class TokenInterceptorService implements HttpInterceptor {
               error.status === 401 &&
               error.error?.code === 'dispositivo_revocado';
 
-            const tokenInvalido =
+            const usuarioAppInactivo =
               error.status === 401 &&
-              error.error?.code === 'token_invalido';
+              error.error?.code === 'usuario_app_inactivo';
 
-            if (dispositivoRevocado || tokenInvalido) {
+            if (dispositivoRevocado || usuarioAppInactivo) {
               if (!this.cerrandoSesion) {
                 this.cerrandoSesion = true;
 
                 const mensaje = dispositivoRevocado
-                  ? error.error?.message
-                  : 'Tu sesión ya no es válida. Inicia sesión nuevamente.';
+                  ? 'El dispositivo ya no está autorizado.'
+                  : 'El usuario no tiene acceso a la aplicación móvil.';
 
                 this.cerrarSesionForzada(mensaje);
               }
@@ -74,7 +74,6 @@ export class TokenInterceptorService implements HttpInterceptor {
 
   private async cerrarSesionForzada(mensaje?: string): Promise<void> {
     try {
-      // Datos que deben sobrevivir al cierre forzado de sesión
       const uidDispositivo = localStorage.getItem('UidDispositivo');
       const codigoEmpresa = localStorage.getItem('codigo_empresa');
 
@@ -83,12 +82,10 @@ export class TokenInterceptorService implements HttpInterceptor {
       localStorage.clear();
       sessionStorage.clear();
 
-      // Restaurar identidad permanente del dispositivo
       if (uidDispositivo) {
         localStorage.setItem('UidDispositivo', uidDispositivo);
       }
 
-      // Mantener empresa para facilitar el nuevo ingreso
       if (codigoEmpresa) {
         localStorage.setItem('codigo_empresa', codigoEmpresa);
       }
@@ -98,8 +95,8 @@ export class TokenInterceptorService implements HttpInterceptor {
       await this.navController.navigateRoot('login');
 
       const toast = await this.toastController.create({
-        message: mensaje || 'Tu sesión ya no se encuentra autorizada.',
-        duration: 3500,
+        message: mensaje,
+        duration: 3000,
         color: 'danger',
         mode: 'ios'
       });
