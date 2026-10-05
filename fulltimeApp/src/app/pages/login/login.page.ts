@@ -105,17 +105,17 @@ export class LoginPage implements OnInit {
 
   // METODO PARA OBTENER LA INFORMACION DEL DISPOSITIVO
   async infoDispositivo(): Promise<void> {
-    const id =
-      await Device.getId();
+    const idGuardado = localStorage.getItem('UidDispositivo');
 
-    const info =
-      await Device.getInfo();
+    const id = await Device.getId();
+    const info = await Device.getInfo();
 
     this.id_celular =
-      id.identifier;
+      idGuardado && idGuardado.trim() !== ''
+        ? idGuardado
+        : id.identifier;
 
-    this.dispositi =
-      info.model;
+    this.dispositi = info.model;
   }
 
   mostrarPassword(): void {
