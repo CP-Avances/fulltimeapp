@@ -7,7 +7,7 @@ const config: CapacitorConfig = {
   webDir: 'www',
   server: {
     cleartext: false,
-    androidScheme: 'http',
+    androidScheme: 'https',
   },
   plugins: {
     PushNotifications: {
