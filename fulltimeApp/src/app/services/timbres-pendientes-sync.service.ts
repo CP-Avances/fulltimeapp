@@ -101,7 +101,7 @@ export class TimbresPendientesSyncService {
         error?.status === 401 &&
         (
           error?.error?.code === 'dispositivo_revocado' ||
-          error?.error?.code === 'token_invalido'
+          error?.error?.code === 'usuario_app_inactivo'
         )
       ) {
         return {
