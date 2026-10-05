@@ -156,7 +156,10 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     } catch (error: any) {
       if (
         error?.status === 401 &&
-        error?.error?.code === 'dispositivo_revocado'
+        (
+          error?.error?.code === 'dispositivo_revocado' ||
+          error?.error?.code === 'token_invalido'
+        )
       ) {
         return;
       }
