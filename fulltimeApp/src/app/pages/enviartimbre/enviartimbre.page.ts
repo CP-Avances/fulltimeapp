@@ -23,6 +23,7 @@ import { EmpleadosService } from 'src/app/services/empleados.service';
 import { FechaHoraService } from 'src/app/services/fecha-hora.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ParametrosSistema } from 'src/app/libs/parametros.emun';
+import { DeviceCredential } from '../../plugins/device-credential.plugin';
 
 type MotivoConexion = 'SIN_INTERNET' | 'ERROR_SERVIDOR' | 'TIMEOUT' | 'OK';
 
@@ -83,6 +84,7 @@ export class EnviartimbrePage implements OnInit {
   private readonly IDENTIFICACION_BIOMETRICA = 'BIOMETRICA';
   private readonly NINGUNA_IDENTIFICACION = 'NINGUNA';
   private readonly IDENTIFICACION_DESACTIVADA = 'DESCONOCIDA';
+  private readonly CREDENCIAL_DISPOSITIVO = 'CREDENCIAL_DISPOSITIVO';
 
   private readonly APP_MOVIL = 'APP_MOVIL';
 
@@ -448,7 +450,7 @@ export class EnviartimbrePage implements OnInit {
           /*
             Una precisión de 30 metros o menos ya es suficientemente
             buena para dejar de realizar más intentos.
-  
+
             Esto NO modifica el rango parametrizado.
           */
           if (
@@ -774,41 +776,53 @@ export class EnviartimbrePage implements OnInit {
 
   async identificarUsuario() {
     if (!this.platform.is('hybrid')) {
-      this.nuevoTimbre.tipo_autenticacion = this.NINGUNA_IDENTIFICACION;
+      this.nuevoTimbre.tipo_autenticacion =
+        this.NINGUNA_IDENTIFICACION;
+
       await this.guardarEnBDD();
       return;
     }
 
-    await this.fingerprintAIO.isAvailable({
-      requireStrongBiometrics: false
-    }).then(async () => {
-      await this.openAutenticacion();
-    }).catch(async () => {
-      await this.enviarTimbreSinAuth();
-    });
+    try {
+
+      await this.fingerprintAIO.isAvailable({
+        requireStrongBiometrics: false
+      });
+
+      await this.autenticarDispositivoConBiometria();
+
+    } catch {
+
+      await this.autenticarConCredencialDispositivo();
+    }
   }
 
-  async openAutenticacion() {
-    await this.fingerprintAIO.show({
-      disableBackup: false,
-      title: 'Comprobando',
-      fallbackButtonTitle: 'PIN',
-      subtitle: 'Es necesario autenticarse para enviar el timbre',
-      description: 'Casa Pazmiño S.A'
-    }).then(async (resul: any) => {
-      if (resul) {
-        this.nuevoTimbre.tipo_autenticacion = this.IDENTIFICACION_BIOMETRICA;
+  async autenticarDispositivoConBiometria() {
+    try {
+      const resultado: any =
+        await this.fingerprintAIO.show({
+          disableBackup: true,
+          title: 'Comprobando identidad',
+          subtitle: 'Autentíquese para registrar el timbre',
+          description: 'Casa Pazmiño S.A'
+        });
+
+      if (resultado) {
+        this.nuevoTimbre.tipo_autenticacion =
+          this.IDENTIFICACION_BIOMETRICA;
+
         await this.guardarEnBDD();
         return;
       }
 
       this.enviandoTimbre = false;
 
-    }).catch(async () => {
-      this.intentos = this.intentos + 1;
+    } catch {
+      this.intentos++;
 
       if (this.intentos === 2) {
         this.intentos = 0;
+
         await this.enviarTimbreAuthProble();
         return;
       }
@@ -821,12 +835,53 @@ export class EnviartimbrePage implements OnInit {
         2000,
         'middle'
       );
-    });
+    }
   }
 
-  async enviarTimbreSinAuth() {
-    this.nuevoTimbre.tipo_autenticacion = this.IDENTIFICACION_DESACTIVADA;
-    await this.guardarEnBDD();
+  async autenticarConCredencialDispositivo() {
+    try {
+      const resultado =
+        await DeviceCredential.authenticate();
+
+      // Credencial validada correctamente
+      if (resultado?.authenticated === true) {
+        this.nuevoTimbre.tipo_autenticacion =
+          this.CREDENCIAL_DISPOSITIVO;
+
+        await this.guardarEnBDD();
+        return;
+      }
+
+      // No existe ningún método de seguridad configurado
+      if (resultado?.available === false) {
+        this.nuevoTimbre.tipo_autenticacion =
+          this.NINGUNA_IDENTIFICACION;
+
+        await this.guardarEnBDD();
+        return;
+      }
+
+      // Existe seguridad, pero el usuario canceló o no completó
+      this.nuevoTimbre.tipo_autenticacion =
+        this.IDENTIFICACION_DESACTIVADA;
+
+      this.enviandoTimbre = false;
+
+      await this.enviarTimbreAuthProble();
+
+    } catch (error: any) {
+      console.error(
+        'ERROR DEVICE CREDENTIAL:',
+        error
+      );
+
+      this.nuevoTimbre.tipo_autenticacion =
+        this.IDENTIFICACION_DESACTIVADA;
+
+      this.enviandoTimbre = false;
+
+      await this.enviarTimbreAuthProble();
+    }
   }
 
   async enviarTimbreAuthProble() {

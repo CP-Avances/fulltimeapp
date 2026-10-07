@@ -1,7 +1,10 @@
 <ion-header class="timbres-header" *ngIf="isConnected && serverConnected">
   <div class="header-logo">
     <div class="logo-card">
-      <ion-img class="logo-timbres" src="../../../assets/images/ISOLOGO.png"></ion-img>
+      <ion-img
+        class="logo-timbres"
+        src="../../../assets/images/ISOLOGO.png"
+      ></ion-img>
     </div>
 
     <ion-label mode="md" class="header-title">
@@ -18,8 +21,8 @@
         shape="round"
         expand="block"
         (click)="mostrarfiltro()"
-        [disabled]="btn_filtro || cargando">
-
+        [disabled]="btn_filtro || cargando"
+      >
         <ion-icon name="search-outline" slot="start"></ion-icon>
         <ion-label>Buscar timbres</ion-label>
       </ion-button>
@@ -29,8 +32,8 @@
         shape="round"
         expand="block"
         (click)="mostrarTimbres()"
-        [disabled]="btn_todos || cargando">
-
+        [disabled]="btn_todos || cargando"
+      >
         <ion-icon name="list-outline" slot="start"></ion-icon>
         <ion-label>Mostrar todos</ion-label>
       </ion-button>
@@ -41,7 +44,10 @@
 <ion-header class="timbres-header" *ngIf="!isConnected || !serverConnected">
   <div class="header-logo">
     <div class="logo-card">
-      <ion-img class="logo-timbres" src="../../../assets/images/ISOLOGO.png"></ion-img>
+      <ion-img
+        class="logo-timbres"
+        src="../../../assets/images/ISOLOGO.png"
+      ></ion-img>
     </div>
 
     <ion-label mode="md" class="header-title">
@@ -51,13 +57,12 @@
 </ion-header>
 
 <ng-container *ngIf="isConnected && serverConnected">
-
   <ion-content class="timbres-content">
-
     <app-refresh-info
       *ngIf="timbresLista.length > 0"
       (onRefresh)="mostrarTimbres()"
-      removeItem="noClean">
+      removeItem="noClean"
+    >
     </app-refresh-info>
 
     <section class="titulo-lista" *ngIf="timbresLista.length > 0">
@@ -72,31 +77,35 @@
     </div>
 
     <ng-container *ngIf="!cargando">
-
       <ion-list class="lista-timbres" *ngIf="timbresLista.length > 0">
-
         <ion-item
           class="item-timbre"
           lines="none"
-          *ngFor="let t of timbresLista | paginate: { id: 'timbresUsuario', itemsPerPage: itemsPorPagina, currentPage: pageActual }">
-
+          *ngFor="let t of timbresLista | paginate: { id: 'timbresUsuario', itemsPerPage: itemsPorPagina, currentPage: pageActual }"
+        >
           <div class="timbre-card">
-
             <div class="timbre-info">
-
               <button
                 *ngIf="t.dispositivo_timbre != ''"
                 type="button"
                 class="btn-info-timbre"
-                (click)="presentAlert(t.observacion, t.hora_timbre_diferente, t.ubicacion, t.novedades_conexion, t.conexion)">
-
+                (click)="presentAlert(
+                  t.observacion,
+                  t.hora_timbre_diferente,
+                  t.ubicacion,
+                  t.novedades_conexion,
+                  t.conexion,
+                  t.dispositivo_timbre,
+                  t.id_reloj
+                )"
+              >
                 <ion-icon
-                  [name]="t.hora_timbre_diferente || t.conexion != true ? 'alert-circle-outline' : 'information-circle-outline'">
+                  [name]="t.hora_timbre_diferente || t.conexion != true ? 'alert-circle-outline' : 'information-circle-outline'"
+                >
                 </ion-icon>
               </button>
 
               <div class="timbre-textos">
-
                 <div class="accion-texto" [ngSwitch]="t.accion">
                   <span *ngSwitchCase="'PES'">Entrada o salida permiso</span>
                   <span *ngSwitchCase="'AES'">Entrada o salida almuerzo</span>
@@ -115,23 +124,17 @@
                   <span *ngSwitchDefault>Timbre desconocido</span>
                 </div>
 
-                <div class="fecha-timbre">
-                  {{ t.sfecha || t.fecha }}
-                </div>
-
+                <div class="fecha-timbre">{{ t.sfecha || t.fecha }}</div>
               </div>
-
             </div>
 
             <div class="timbre-derecha">
-
               <div class="hora-card">
                 <span>Hora</span>
                 <strong>{{ t.shora || t.hora }}</strong>
               </div>
 
               <div class="acciones-timbre">
-
                 <!-- Imagen del timbre -->
                 <button
                   type="button"
@@ -139,8 +142,8 @@
                   title="Ver imagen"
                   [class.accion-deshabilitada]="!t.tiene_imagen"
                   [disabled]="!t.tiene_imagen || cargando"
-                  (click)="abrirImagenTimbre(t)">
-
+                  (click)="abrirImagenTimbre(t)"
+                >
                   <ion-icon name="happy-outline"></ion-icon>
                 </button>
 
@@ -151,8 +154,8 @@
                   title="Ver documento"
                   [class.accion-deshabilitada]="!t.tiene_documento"
                   [disabled]="!t.tiene_documento || cargando"
-                  (click)="abrirDocumentoTimbre(t)">
-
+                  (click)="abrirDocumentoTimbre(t)"
+                >
                   <ion-icon name="image-outline"></ion-icon>
                 </button>
 
@@ -163,19 +166,14 @@
                   title="Ver ubicación"
                   [class.accion-deshabilitada]="!t.latitud || !t.longitud || t.latitud === '0' || t.longitud === '0'"
                   [disabled]="!t.latitud || !t.longitud || t.latitud === '0' || t.longitud === '0'"
-                  (click)="abrirMapa(t.latitud, t.longitud)">
-
+                  (click)="abrirMapa(t.latitud, t.longitud)"
+                >
                   <ion-icon name="location-outline"></ion-icon>
                 </button>
-
               </div>
-
             </div>
-
           </div>
-
         </ion-item>
-
       </ion-list>
 
       <div class="paginacion-contenedor" *ngIf="mostrarPaginacion()">
@@ -191,32 +189,33 @@
           [nextLabel]="labels.nextLabel"
           [screenReaderPaginationLabel]="labels.screenReaderPaginationLabel"
           [screenReaderPageLabel]="labels.screenReaderPageLabel"
-          [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel">
+          [screenReaderCurrentLabel]="labels.screenReaderCurrentLabel"
+        >
         </pagination-controls>
       </div>
 
       <div class="estado-vacio" *ngIf="!vacio">
-        <ion-img class="tamanoImagen" src="../../../assets/images/Sin_registro.svg"></ion-img>
+        <ion-img
+          class="tamanoImagen"
+          src="../../../assets/images/Sin_registro.svg"
+        ></ion-img>
         <ion-label>El empleado no tiene registrados timbres</ion-label>
       </div>
 
       <div class="estado-vacio" *ngIf="!filtro_mensaje">
-        <ion-img class="tamanoImagen" src="../../../assets/images/Sin_registro.svg"></ion-img>
+        <ion-img
+          class="tamanoImagen"
+          src="../../../assets/images/Sin_registro.svg"
+        ></ion-img>
         <ion-label>No existen timbres registrados en esas fechas</ion-label>
       </div>
-
     </ng-container>
-
   </ion-content>
-
 </ng-container>
 
 <ng-container *ngIf="!isConnected || !serverConnected">
   <ion-content class="timbres-content">
-
-    <app-refresh-info
-      (onRefresh)="inicializarPantalla()"
-      removeItem="noClean">
+    <app-refresh-info (onRefresh)="inicializarPantalla()" removeItem="noClean">
     </app-refresh-info>
 
     <section class="offline-card">
@@ -239,7 +238,11 @@
 
     <section class="offline-image-card">
       <div class="logo-card logo-card-offline">
-        <img class="logo-timbres-offline" src="../../../assets/images/ISOLOGO.png" alt="AQHora">
+        <img
+          class="logo-timbres-offline"
+          src="../../../assets/images/ISOLOGO.png"
+          alt="AQHora"
+        />
       </div>
 
       <ion-label mode="md" color="medium">
@@ -250,14 +253,11 @@
     </section>
 
     <section class="offline-message">
-      <ion-text *ngIf="!isConnected">
-        No tiene conexión a internet
-      </ion-text>
+      <ion-text *ngIf="!isConnected"> No tiene conexión a internet </ion-text>
 
       <ion-text *ngIf="!serverConnected">
         No tiene conexión al servidor
       </ion-text>
     </section>
-
   </ion-content>
 </ng-container>
