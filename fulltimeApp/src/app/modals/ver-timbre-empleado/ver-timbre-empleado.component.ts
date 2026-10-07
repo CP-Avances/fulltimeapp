@@ -633,8 +633,11 @@ export class VerTimbreEmpleadoComponent implements OnInit, OnDestroy {
     hora_timbre_diferente: any,
     ubicacion: any,
     novedades_conexion: any,
-    conexion: any
+    conexion: any,
+    dispositivo_timbre: any,
+    id_reloj: any
   ) {
+
     let novedad = novedades_conexion;
 
     if (conexion === true) {
@@ -645,9 +648,25 @@ export class VerTimbreEmpleadoComponent implements OnInit, OnDestroy {
       }
     }
 
+    let encabezado = obs;
+
+    if (
+      !encabezado ||
+      encabezado === 'null' ||
+      encabezado === 'undefined'
+    ) {
+      if (dispositivo_timbre === 'BIOMETRICO') {
+        encabezado = `BIOMÉTRICO - ${id_reloj || 'RELOJ'}`;
+      } else if (dispositivo_timbre === 'APP_MOVIL') {
+        encabezado = ubicacion || 'APP MÓVIL';
+      } else {
+        encabezado = 'Detalle del timbre';
+      }
+    }
+
     let mensaje = '';
 
-    if (ubicacion) {
+    if (ubicacion && dispositivo_timbre !== 'BIOMETRICO') {
       mensaje += `<br><br><ion-icon name="location-outline"></ion-icon> ${ubicacion}`;
     }
 
@@ -656,7 +675,7 @@ export class VerTimbreEmpleadoComponent implements OnInit, OnDestroy {
     }
 
     const alert = await this.alertController.create({
-      header: obs || 'Detalle del timbre',
+      header: encabezado,
       message: mensaje,
       cssClass: 'my-custom-class',
       mode: 'ios',
