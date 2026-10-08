@@ -24,6 +24,7 @@ import { FechaHoraService } from 'src/app/services/fecha-hora.service';
 import { ValidacionesService } from 'src/app/libs/validaciones.service';
 import { ParametrosSistema } from 'src/app/libs/parametros.emun';
 import { DeviceCredential } from '../../plugins/device-credential.plugin';
+import { Subscription } from 'rxjs';
 
 type MotivoConexion = 'SIN_INTERNET' | 'ERROR_SERVIDOR' | 'TIMEOUT' | 'OK';
 
@@ -140,6 +141,9 @@ export class EnviartimbrePage implements OnInit {
 
   numeroCaracteres = 0;
   intentos: number = 0;
+
+  private backButtonSub?: Subscription;
+
   modelo_dispositivo: string = '';
   id_dispositivo_movil: string = '';
 
@@ -169,6 +173,7 @@ export class EnviartimbrePage implements OnInit {
     private restE: EmpleadosService,
     public parametros: ParametrosService,
     private fechaHoraService: FechaHoraService,
+
     public validar: ValidacionesService,
     private fingerprintAIO: FingerprintAIO
   ) { }
@@ -222,6 +227,45 @@ export class EnviartimbrePage implements OnInit {
       La validación fuerte se realiza al presionar Enviar Timbre.
     */
     await this.actualizarUbicacionAntesDeContinuar();
+  }
+
+  ionViewDidEnter() {
+    this.reiniciarIntentosAutenticacion();
+
+    this.backButtonSub = this.platform.backButton.subscribeWithPriority(
+      9999,
+      () => {
+        this.reiniciarIntentosAutenticacion();
+
+        this.navCtroller.navigateRoot([
+          '/reloj/bienvenido'
+        ]);
+      }
+    );
+  }
+
+  ionViewDidLeave() {
+    this.reiniciarIntentosAutenticacion();
+
+    if (this.backButtonSub) {
+      this.backButtonSub.unsubscribe();
+      this.backButtonSub = undefined;
+    }
+  }
+
+  private reiniciarIntentosAutenticacion(): void {
+    this.intentos = 0;
+    this.enviandoTimbre = false;
+  }
+
+  volverPrincipal() {
+    this.intentos = 0;
+    this.enviandoTimbre = false;
+    this.nuevoTimbre.tipo_autenticacion = null;
+
+    this.navCtroller.navigateRoot([
+      '/reloj/bienvenido'
+    ]);
   }
 
   // ============================================================
@@ -801,7 +845,7 @@ export class EnviartimbrePage implements OnInit {
     try {
       const resultado: any =
         await this.fingerprintAIO.show({
-          disableBackup: true,
+          disableBackup: false,
           title: 'Comprobando identidad',
           subtitle: 'Autentíquese para registrar el timbre',
           description: 'Casa Pazmiño S.A'
